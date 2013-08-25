@@ -22,15 +22,17 @@ public class ExecuteCommand extends AbstractRequest implements Request
     private String cwd = DEFAULT_CWD;
     private StreamHandling stderr = StreamHandling.CAPTURE_AND_RETURN;
     private StreamHandling stdout = StreamHandling.CAPTURE_AND_RETURN;
-    private String program;
+    private final String program;
     private String runAs = DEFAULT_RUN_AS;
     private List<String> args = DEFAULT_ARGS;
     private Map<String,String> env = DEFAULT_ENV;
 
 
-    public ExecuteCommand( int requestSeqNum, UUID issuerId, UUID agentId, UUID messageId )
+    public ExecuteCommand( String program, int requestSeqNum, UUID issuerId, UUID agentId, UUID messageId )
     {
         super( requestSeqNum, issuerId, agentId, messageId );
+
+        this.program = program;
     }
 
 
