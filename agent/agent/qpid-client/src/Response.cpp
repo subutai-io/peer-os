@@ -18,6 +18,7 @@ Response::Response() {
 	setResponseSeqnum(0);
 	setStderr("");
 	setStdout("");
+	setExitcode("");
 }
 
 Response::~Response() {
@@ -36,6 +37,22 @@ void Response::Serialize( Json::Value& root , std::string& output ){
 	root["response"]["uuid"]=uuid;
 
 	output = writer.write(root);
+	response_seqnum++;		//increasing response_seqnum for new response serialization
+
+	root.clear();
+}
+void Response::SerializeDone( Json::Value& root , std::string& output ){
+	Json::Value environment;
+	Json::StyledWriter writer;
+
+	root["response"]["type"] = type;
+	root["response"]["request_seqnum"]=request_seqnum;
+	root["response"]["response_seqnum"] =response_seqnum;
+	root["response"]["exit_code"] = exit_code;
+	root["response"]["uuid"]=uuid;
+
+	output = writer.write(root);
+	response_seqnum++;				//increasing response_seqnum for new response serialization
 	root.clear();
 }
 bool Response::Deserialize( Json::Value& root, std::string& input ){
@@ -50,15 +67,30 @@ bool Response::Deserialize( Json::Value& root, std::string& input ){
 		return false; //error in parsing Json
 	}
 
-	this->setType(root["response"]["type"].asString());
-	this->setRequestSeqnum(root["response"]["request_seqnum"].asInt());
-	this->setResponseSeqnum(root["response"]["response_seqnum"].asInt());
-	this->setStdout(root["response"]["stdout"].asString());
-	this->setStderr(root["response"]["stderr"].asString());
-	this->setUuid(root["response"]["uuid"].asString());
-
+	if(root["response"]["exit_code"].asString() == "")
+	{
+		this->setType(root["response"]["type"].asString());
+		this->setRequestSeqnum(root["response"]["request_seqnum"].asInt());
+		this->setResponseSeqnum(root["response"]["response_seqnum"].asInt());
+		this->setStdout(root["response"]["stdout"].asString());
+		this->setStderr(root["response"]["stderr"].asString());
+		this->setUuid(root["response"]["uuid"].asString());
+	}
+	else{
+		this->setType(root["response"]["type"].asString());
+		this->setRequestSeqnum(root["response"]["request_seqnum"].asInt());
+		this->setResponseSeqnum(root["response"]["response_seqnum"].asInt());
+		this->setExitcode(root["response"]["exit_code"].asString());
+		this->setUuid(root["response"]["uuid"].asString());
+	}
 	string output = writer.write(root);
 	return true;
+}
+string& Response::getExitcode(){
+	return exit_code;
+}
+void Response::setExitcode(const string& exitcode){
+	exit_code = exitcode;
 }
 
 string& Response::getType() {

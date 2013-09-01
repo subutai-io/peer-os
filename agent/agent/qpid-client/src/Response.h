@@ -33,8 +33,11 @@ public:
 	void setStderr(const string& std_err);
 	string& getStdout() ;
 	void setStdout(const string& std_out);
+	string& getExitcode() ;
+	void setExitcode(const string& exitcode);
 
 	void Serialize(Json::Value& root , std::string& output  );
+	void SerializeDone(Json::Value& root , std::string& output  );
 	bool Deserialize( Json::Value& root, std::string& input );
 
 private:
@@ -44,5 +47,6 @@ private:
 	int				response_seqnum;
 	string       	stdout;
 	string        	stderr;
+	string			exit_code;
 };
 #endif /* RESPONSE_H_ */

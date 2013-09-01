@@ -49,18 +49,25 @@ int main(int argc, char** argv) {
 		Receiver receiver = session.createReceiver(mac + "; {create: always, delete:always}"); //client always listen his address
 		Sender 	sender = session.createSender("service_queue; {create: always, delete:always}");	//client send message to server address
 
-
-		response.setType("reg");				//sending registration information to server
+		response.setType("registration");				//sending registration information to server
 		response.setUuid(mac);
 		response.setStderr("no");
 		response.setStdout("no");
-		response.setRequestSeqnum(12);
-		response.setResponseSeqnum(13);
+		response.setRequestSeqnum(0);
+		response.setResponseSeqnum(1);
 
 		response.Serialize(send,output);
 		message.setContent(output);
 		sender.send(message);
-		cout << message.getContent() << endl;
+
+		response.setType("registration-done");				//sending done information
+		response.setUuid(mac);
+		response.setRequestSeqnum(0);
+		response.setExitcode("100");
+
+		response.SerializeDone(send,output);
+		message.setContent(output);
+		sender.send(message);
 
 		while (true){
 			try{
@@ -68,25 +75,36 @@ int main(int argc, char** argv) {
 				message = receiver.fetch(Duration::IMMEDIATE); //fetch a message from service_queue
 				input = message.getContent();
 				session.acknowledge();
+				cout << input << endl;
 
 				if(command.Deserialize(recieve,input))
 				{
-					if(command.getType() == "done")				//host is registered to server
+					if(command.getType() == "command-registration-done")				//host is registered to server
 					{
-						cout << command.getType() << endl;
-						cout << command.getCwd() << endl;
-						cout << command.getFooPath()<< endl;
-						cout << command.getBarValue()<< endl;
-						cout << command.getProgram()<< endl;
-						cout << command.getRequestSeqnum()<< endl;
-						cout << command.getRunAs() << endl;
-						cout << command.getArguments()[0].c_str() << endl;
-						cout << command.getStderr() << endl;
-						cout << command.getStdout() << endl;
 
 					}
-					else
-						cout<< input << endl;
+					else if(command.getType() == "command-execute"){
+
+						response.setType("response-execute");				//sending a chunk
+						response.setUuid(Uuid(true).str());
+						response.setStderr("no");
+						response.setStdout("no");
+						response.setRequestSeqnum(command.getRequestSeqnum());
+						response.setResponseSeqnum(0);
+
+						response.Serialize(send,output);
+						message.setContent(output);
+						sender.send(message);
+
+						response.setType("response-execute-done");				//sending done information
+						response.setUuid(Uuid(true).str());
+						response.setRequestSeqnum(command.getRequestSeqnum());
+						response.setExitcode("100");
+
+						response.SerializeDone(send,output);
+						message.setContent(output);
+						sender.send(message);
+					}
 				}
 
 			}catch(const std::exception& error)
