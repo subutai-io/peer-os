@@ -1,6 +1,7 @@
-.idea
+*.idea
 *.log
 *.iml
 *.classes
 *.o
 *.mk
+agent/daemon-class/Debug/src/*.o
