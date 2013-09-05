@@ -1,0 +1,5 @@
+.idea
+*.log
+*.iml
+*.project
+*.classes
