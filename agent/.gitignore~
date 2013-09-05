@@ -1,5 +1,6 @@
 .idea
 *.log
 *.iml
-*.project
+*.o
+*.mk
 *.classes
