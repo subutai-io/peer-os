@@ -1,0 +1,13 @@
+Reading package lists...
+Building dependency tree...
+Reading state information...
+synaptic is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+
+#success DaemonThreadTest OK
+
+#starting DaemonUidTest
+
+#success DaemonUidTest OK
+
+#ending DaemonTestSuite
