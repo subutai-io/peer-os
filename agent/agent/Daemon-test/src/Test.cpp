@@ -17,7 +17,7 @@
 #include "ide_listener.h"
 #include "cute_runner.h"
 #include "DaemonConnection.h"
-#include "responsePack.h"
+#include "ResponsePack.h"
 #include "Command.h"
 #include "ThreadOperation.h"
 #include "UserID.h"
@@ -41,7 +41,7 @@ void DaemonCommunicationTest() {
 	connection.close();
 }
 void getMacIDTest(){
-	responsePack response;
+	ResponsePack response;
 	string mac = response.getMacID();
 	ASSERTM("MAC ID Could not be read !!", ! mac.empty());
 }
@@ -49,7 +49,7 @@ int DaemonSendMessageTest() {
 	string url =  "172.16.33.7:5672";
 	string connectionOptions = "{reconnect:false}";
 	DaemonConnection connection(url, connectionOptions);
-	responsePack response;
+	ResponsePack response;
 
 	if(! connection.openMySession(response.getMacID())){ //connection is closed
 		ASSERTM("Connection is closed", connection.openMySession(response.getMacID()));
@@ -57,7 +57,7 @@ int DaemonSendMessageTest() {
 	}
 	try{
 		connection.sendMessage("SENDTESTING");
-		Receiver test = connection.getMySession().createReceiver("service_queue; {create: always}");
+		Receiver test = connection.getMySession().createReceiver("service_queue; {create: always, delete:always}");
 
 		Message received = test.fetch();
 		ASSERT_EQUAL("SENDTESTING", received.getContent());
@@ -73,7 +73,7 @@ int DaemonGetMessageTest() {
 	string url =  "172.16.33.7:5672";
 	string connectionOptions = "{reconnect:false}";
 	DaemonConnection connection(url, connectionOptions);
-	responsePack response;
+	ResponsePack response;
 
 	if(! connection.openMySession(response.getMacID())){ //connection is closed
 		ASSERTM("Connection is closed", connection.openMySession(response.getMacID()));
@@ -96,7 +96,7 @@ int DaemonGetMessageTest() {
 	return 0;
 }
 void DaemonSerializeResponseTest(){
-	responsePack sendresponse, receiveresponse;
+	ResponsePack sendresponse, receiveresponse;
 
 	sendresponse.setType("TestResponse");
 	sendresponse.setMacID("11:22:33:44:55:66");
@@ -119,7 +119,7 @@ void DaemonSerializeResponseTest(){
 	ASSERT_EQUAL(sendresponse.getUuid(),receiveresponse.getUuid());
 }
 void DaemonSerializeResponseDoneTest(){
-	responsePack sendresponse, receiveresponse;
+	ResponsePack sendresponse, receiveresponse;
 
 	sendresponse.setType("TestResponse");
 	sendresponse.setMacID("11:22:33:44:55:66");
@@ -185,40 +185,79 @@ void DaemonSerializeCommandTest(){
 	}
 }
 void DaemonThreadTest(){
-	pool tp(2);
+	pool tp(10);
 	ThreadOperation thread;
 	Command sendcommand;
 	string url =  "172.16.33.7:5672";
 	string connectionOptions = "{reconnect:false}";
 	DaemonConnection connection(url, connectionOptions);
-	responsePack response;
+	ResponsePack response;
+	string output;
 
 	connection.openMySession(response.getMacID());
 
+	for(unsigned int i=0; i < 150; i++) //create 150 messages for thread pool and send it to broker
+	{
 
-	sendcommand.setType("TestCommand");
-	sendcommand.setCwd("/");
-	sendcommand.setUuid("TESTUUID");
-	sendcommand.setRequestSeqnum(0);
-	sendcommand.setStdout("default value");
-	sendcommand.setStderr("default value");
-	sendcommand.setRunAs("root");
-	sendcommand.setProgram("/usr/bin/apt-get");
-	sendcommand.getArguments().push_back("install");
-	sendcommand.getArguments().push_back("synaptic");
-	pair <string,string> dummy;
-	dummy.first = "LD_PATH";
-	dummy.second = "/usr/bin/";
-	sendcommand.getEnv().push_back(dummy);
+		sendcommand.getArguments().clear();
+		sendcommand.setType("execute-request");
+		sendcommand.setCwd("/home/emin/TEST/");
+		sendcommand.setProgram("/sbin/ifconfig");
+//		sendcommand.getArguments().push_back("-l");
+		sendcommand.setRequestSeqnum(i);
+		sendcommand.setRunAs("root");
+		sendcommand.setStderr("capt");
+		sendcommand.setStdout("capt");
+		sendcommand.setUuid(Uuid(true).str());
 
-	tp.schedule(boost::bind(&ThreadOperation::threadFunction,&thread,sendcommand ,connection));
+		sendcommand.Serialize(output);
+		connection.sendMessage(output);
+		connection.getMySession().acknowledge();
+	}
+	bool state = false ;
+	bool mys = false;
+	Command mycommand;
 
+	Receiver test = connection.getMySession().createReceiver("service_queue; {create: always,delete:always}");
+	Message received;
+	int count = 0;
+	while(true){
+		try{
+			received = test.fetch();	//fetch 150 messages and open each for a thread
+			string input = received.getContent();
+			mycommand.Deserialize(input);
+
+			if(mycommand.getType()=="execute-request")
+			{
+				tp.wait(10);
+				state = tp.schedule(boost::bind(&ThreadOperation::threadFunction,&thread,mycommand ,connection));
+
+				if(count == 149)
+				{
+					mys = true;
+					break;
+				}
+				count ++;
+			}
+		}
+		catch(const std::exception& error)
+		{
+			connection.close();
+			break;
+		}
+	}
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
+	connection.close();
+	ASSERT_EQUALM("Threads are open successfully !!",true,mys);
 }
 void DaemonUidTest(){
-	UserID uid;
-	uid_t ruid, euid;
+	UserID myuid;
+	uid_t ruid;
+	uid_t euid;
 
-	ASSERT_EQUAL(true,uid.getIDs(ruid ,euid,"emin"));
+	ASSERT_EQUAL(true,myuid.getIDs(ruid ,euid,"emin"));
 }
 
 void runSuite(){
@@ -231,8 +270,8 @@ void runSuite(){
 	daemon.push_back(CUTE(DaemonSerializeResponseTest));
 	daemon.push_back(CUTE(DaemonSerializeResponseDoneTest));
 	daemon.push_back(CUTE(DaemonSerializeCommandTest));
-	//daemon.push_back(CUTE(DaemonThreadTest));
 	daemon.push_back(CUTE(DaemonUidTest));
+	daemon.push_back(CUTE(DaemonThreadTest));
 
 	cute::ide_listener lis;
 	cute::makeRunner(lis)(daemon, "DaemonTestSuite");

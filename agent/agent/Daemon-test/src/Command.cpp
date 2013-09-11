@@ -4,13 +4,7 @@
  *  Created on: Aug 28, 2013
  *      Author: Emin inal
  */
-#include <iostream>
-#include <jsoncpp/json.h>
-#include <string>
-#include <vector>
-#include <cstdlib>
-#include <sstream>
-#include <list>
+
 #include "Command.h"
 
 using namespace std;
@@ -35,7 +29,13 @@ Command::~Command() {
 }
 
 void Command::Serialize(string& output){
-
+#include <iostream>
+#include <jsoncpp/json.h>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <sstream>
+#include <list>
 	Json::Value environment;
 	Json::StyledWriter writer;
 	Json::Value root;

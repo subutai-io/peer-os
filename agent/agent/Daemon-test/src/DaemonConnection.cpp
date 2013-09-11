@@ -44,7 +44,6 @@ void DaemonConnection::SetMyReciever(Receiver myreceiver){
 	receiver = myreceiver;
 }
 bool DaemonConnection::openMySession(string mac_id){
-
 	try {
 		this->open();
 		session = this->createSession();
@@ -56,8 +55,8 @@ bool DaemonConnection::openMySession(string mac_id){
 	{
 		cout << error.what()<< endl;
 		this->close();
-		return false;
 	}
+	return false;
 }
 
 

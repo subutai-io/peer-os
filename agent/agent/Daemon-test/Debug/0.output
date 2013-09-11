@@ -1,13 +1,67 @@
-Reading package lists...
-Building dependency tree...
-Reading state information...
-synaptic is already the newest version.
-0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+br0       Link encap:Ethernet  HWaddr 68:05:ca:19:5a:2c  
+          inet addr:172.16.33.2  Bcast:172.16.39.255  Mask:255.255.248.0
+          inet6 addr: fe80::6a05:caff:fe19:5a2c/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1895 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1286 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:381910 (381.9 KB)  TX bytes:242423 (242.4 KB)
 
-#success DaemonThreadTest OK
+eth0      Link encap:Ethernet  HWaddr 6c:3b:e5:2a:a5:aa  
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+          Interrupt:20 Memory:f7d00000-f7d20000 
 
-#starting DaemonUidTest
+eth1      Link encap:Ethernet  HWaddr 68:05:ca:19:5a:2c  
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1118 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:678 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:329061 (329.0 KB)  TX bytes:81129 (81.1 KB)
+          Interrupt:16 Memory:f7cc0000-f7ce0000 
 
-#success DaemonUidTest OK
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:10 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:10 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:1024 (1.0 KB)  TX bytes:1024 (1.0 KB)
 
-#ending DaemonTestSuite
+lxcbr0    Link encap:Ethernet  HWaddr 36:df:dd:b8:11:f9  
+          inet addr:10.0.3.1  Bcast:10.0.3.255  Mask:255.255.255.0
+          inet6 addr: fe80::34df:ddff:feb8:11f9/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:54 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 B)  TX bytes:9329 (9.3 KB)
+
+virbr0    Link encap:Ethernet  HWaddr 76:e6:75:48:62:bf  
+          inet addr:192.168.122.1  Bcast:192.168.122.255  Mask:255.255.255.0
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+vnet0     Link encap:Ethernet  HWaddr fe:54:00:46:d8:bc  
+          inet6 addr: fe80::fc54:ff:fe46:d8bc/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:963 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1510 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:500 
+          RX bytes:123910 (123.9 KB)  TX bytes:270920 (270.9 KB)
+
+vnet1     Link encap:Ethernet  HWaddr fe:54:00:94:2e:73  
+          inet6 addr: fe80::fc54:ff:fe94:2e73/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:115 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:604 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:500 
+          RX bytes:15473 (15.4 KB)  TX bytes:64122 (64.1 KB)
+

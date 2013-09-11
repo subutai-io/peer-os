@@ -2,12 +2,10 @@
  * UserID.cpp
  *
  *  Created on: Sep 4, 2013
- *      Author: qt-test
+ *      Author: Bilal Bal
  */
 
 #include "UserID.h"
-
-
 
 UserID::UserID() {
 	// TODO Auto-generated constructor stub
@@ -49,19 +47,18 @@ void UserID::undo_setuid(uid_t &ruid)
 
 bool UserID::getIDs(uid_t& ruid,uid_t&  euid,string runAs)
 {
+
 	struct passwd *pw;
 	ruid = getuid();
 
-	  if (NULL == (pw = getpwnam(runAs.c_str())))
-	  {
-	     perror("getpwnam() error.");
-	     cout << perror <<endl;
-	     return false;
-	  }
-	  else
-	  {
-			euid = pw->pw_uid;
-			return true;
-	  }
-
+	if (NULL == (pw = getpwnam(runAs.c_str())))
+	{
+		perror("getpwnam() error.");
+		return false;
+	}
+	else
+	{
+		euid = pw->pw_uid;
+		return true;
+	}
 }

@@ -5,9 +5,7 @@
  *      Author: Emin inal
  */
 #include "Response.h"
-
 using namespace std;
-
 
 Response::Response() {
 	// TODO Auto-generated constructor stub
@@ -150,6 +148,3 @@ string& Response::getStdout(){
 void Response::setStdout(const string& std_out){
 	this->stdout = std_out;
 }
-
-
-
