@@ -23,9 +23,11 @@ public class Dictionary {
     {
         Configuration conf = new Configuration();
 
-        conf.set("fs.default.name", "hdfs://" + "localhost" + ":8020");
-        conf.set("mapred.job.tracker", "localhost" + ":9000");
+        String host= "172.16.57.48";
+        conf.set("fs.default.name", "hdfs://" + host  + ":8020");
+        conf.set("mapred.job.tracker", host + ":9000");
         conf.set("mapred.jar","/home/skardan/Desktop/my-app/target/my-app-1.0-SNAPSHOT.jar");
+        System.setProperty("HADOOP_USER_NAME", "skardan");
 
         Job job = new Job(conf, "dictionary");
         job.setJarByClass(Dictionary.class);
@@ -41,6 +43,7 @@ public class Dictionary {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileInputFormat.addInputPath(job, new Path(args[1]));
         FileOutputFormat.setOutputPath(job, new Path(args[2]));
+        System.out.println("JAR : " + job.getJar());
         boolean result = job.waitForCompletion(true);
         System.exit(result ? 0 : 1);
     }
