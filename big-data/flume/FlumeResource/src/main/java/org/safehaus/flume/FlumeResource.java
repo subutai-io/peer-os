@@ -1,4 +1,4 @@
-package org.safahaus.flume;
+package org.safehaus.flume;
 
 import org.apache.flume.node.Application;
 import org.junit.rules.ExternalResource;

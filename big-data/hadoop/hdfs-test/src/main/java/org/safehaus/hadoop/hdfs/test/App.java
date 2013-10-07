@@ -44,5 +44,9 @@ public class App
     	{	
     		logger.warn("Home directory {} does not exists.", homeDir);
     	}
+    	else
+    	{
+    		logger.debug("Home directory {} exists.", homeDir);
+    	}
     }
 }

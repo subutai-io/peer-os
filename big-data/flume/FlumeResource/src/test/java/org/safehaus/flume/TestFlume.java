@@ -13,7 +13,7 @@ import org.apache.flume.api.RpcClientFactory;
 import org.apache.flume.event.EventBuilder;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.safahaus.flume.FlumeResource;
+import org.safehaus.flume.FlumeResource;
 
 public class TestFlume {
 
