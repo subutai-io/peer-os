@@ -1,5 +1,7 @@
 package org.safehaus.flume;
 
+import java.io.File;
+
 import org.apache.flume.node.Application;
 import org.junit.rules.ExternalResource;
 
@@ -12,6 +14,15 @@ public class FlumeResource extends ExternalResource {
 	@Override
 	protected void before() throws Throwable {
 //		app = new Application();
+		
+		//Is exec file exists, first delete previous content.
+		File file = new File("/tmp/flume-exec");
+		if (file.exists())
+		{
+			file.delete();
+		}
+		file.createNewFile();
+		
 		final String[] args = {"--conf-file", "target/classes/flume-avro-mem-logger.properties", "--name", "agent"};
 //		app.main(args);
 		Application.main(args);

@@ -1,5 +1,9 @@
 package org.safehaus.flume;
 
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -25,6 +29,43 @@ public class TestFlume {
 
 	@ClassRule
 	public static FlumeResource flumeResource = new FlumeResource();
+
+	@Test
+	public void testExecSource() throws InterruptedException {
+		File file  = new File("/tmp/flume-exec");
+		FileWriter writer = null;
+		
+		if (!file.exists())
+		{
+			fail("File not present");
+		}
+		try {
+			writer = new FileWriter(file, true);
+		} catch (IOException e) {
+			fail("Cant write to file");
+			e.printStackTrace();
+		}
+
+		// Send 10 events to the remote Flume agent. That agent should be
+		// configured to listen with an AvroSource.
+		String sampleData = "Hello from Exec to Flume! - ";
+		for (int i = 0; i < 10; i++) {
+			try {
+				writer.write(sampleData + i + System.getProperty("line.separator"));
+				writer.flush();
+			} catch (IOException e) {
+				fail("Cant write to file");
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			writer.close();
+		} catch (IOException e) {
+			fail("Cant close file");
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void testAvroSource() throws InterruptedException {
