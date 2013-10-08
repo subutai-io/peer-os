@@ -1,0 +1,17 @@
+*.class
+
+# IDE and Maven files and directories #
+*.iml
+*.ipr
+.idea
+.project
+.classpath
+.settings
+.metadata
+target
+META-INF
+
+# Package Files #
+*.jar
+*.war
+*.ear

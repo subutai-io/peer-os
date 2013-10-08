@@ -1,0 +1,4 @@
+Contains the code for the server system which is to be installed on Management host.
+
+After the build, a custom tar.gz karaf distribution for the Server can be found in:
+./server-karaf/target/ directory.
