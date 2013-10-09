@@ -38,7 +38,6 @@
                     <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.shared.communication</Bundle-SymbolicName>
-                        <Bundle-Activator>org.safehaus.kiskis.mgmt.shared.communication.Activator</Bundle-Activator>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

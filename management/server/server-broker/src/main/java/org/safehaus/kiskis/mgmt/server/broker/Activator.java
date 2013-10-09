@@ -26,7 +26,7 @@ public class Activator implements BundleActivator {
         try {
             ServiceReference ref =
                     context.getServiceReference(IGenerator.class.getName());
-            //generator = ((IGenerator) context.getService(ref));
+            generator = ((IGenerator) context.getService(ref));
 
             broker.setPersistent(false);
             broker.setUseJmx(false);
@@ -34,6 +34,7 @@ public class Activator implements BundleActivator {
             broker.start();
             setupListener();
         } catch (Exception ex) {
+            System.out.println(ex.toString());
             LOG.log(Level.SEVERE, null, ex);
         }
     }
