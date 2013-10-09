@@ -1,9 +1,10 @@
 package org.safehaus.kiskis.mgmt.server.broker;
 
+import org.safehaus.kiskis.mgmt.shared.communication.interfaces.server.IServerManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IGenerator;
-import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.IServerManager;
+
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
