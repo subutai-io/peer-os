@@ -4,8 +4,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Common;
-import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IResponseGenerator;
+import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IGenerator;
 
 import javax.jms.*;
 import java.util.logging.Level;
@@ -18,13 +19,14 @@ public class Activator implements BundleActivator {
 
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
     BrokerService broker = new BrokerService();
-    IResponseGenerator generator;
+    IGenerator generator;
 
     @Override
     public void start(BundleContext context) throws Exception {
         try {
-            generator =
-                    (IResponseGenerator) context.getServiceReference(IResponseGenerator.class.getName());
+            ServiceReference ref =
+                    context.getServiceReference(IGenerator.class.getName());
+            //generator = ((IGenerator) context.getService(ref));
 
             broker.setPersistent(false);
             broker.setUseJmx(false);

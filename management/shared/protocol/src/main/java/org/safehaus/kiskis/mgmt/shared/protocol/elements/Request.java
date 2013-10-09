@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * It describes an action to execute against certain {@link Request} received
  */
-public class Request implements Serializable {
+public class Request extends Command implements Serializable {
     private RequestType type;
     private String uuid;
     private String macAddress;

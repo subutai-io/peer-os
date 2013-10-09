@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.server.broker;
 import com.google.gson.Gson;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IResponseGenerator;
+import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IGenerator;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.IServerManager;
 
 import javax.jms.Message;
@@ -16,11 +16,11 @@ import java.util.logging.Logger;
 public class ServerMessageBroker implements IServerManager, MessageListener {
 
     private static final Logger LOG = Logger.getLogger(ServerMessageBroker.class.getName());
-    private IResponseGenerator generator;
+    private IGenerator generator;
     Session session;
     Gson gson = new Gson();
 
-    public ServerMessageBroker(Session session, IResponseGenerator generator) {
+    public ServerMessageBroker(Session session, IGenerator generator) {
         this.session = session;
         this.generator = generator;
     }
@@ -40,6 +40,9 @@ public class ServerMessageBroker implements IServerManager, MessageListener {
         try {
             String jsonCmd = txtMsg.getText();
 
+            if(generator != null){
+                System.out.println(generator.fromJson(jsonCmd));
+            }
             Response res = gson.fromJson(jsonCmd, Response.class);
             System.out.println(res);
         } catch (Exception ex) {
