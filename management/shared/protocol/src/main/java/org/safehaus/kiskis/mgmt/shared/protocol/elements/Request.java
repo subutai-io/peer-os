@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * It describes an action to execute against certain {@link Request} received
  */
-public class Request implements Serializable, Command {
+public class Request implements Serializable, Transportable {
     private RequestType type;
     private String uuid;
     private String macAddress;
@@ -100,6 +100,6 @@ public class Request implements Serializable, Command {
 
     @Override
     public String toString() {
-        return "Command{" + "type=" + type + ", uuid=" + uuid + ", macAddress=" + macAddress + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", runAs=" + runAs + ", environment=" + environment + '}';
+        return "Transportable{" + "type=" + type + ", uuid=" + uuid + ", macAddress=" + macAddress + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", runAs=" + runAs + ", environment=" + environment + '}';
     }
 }

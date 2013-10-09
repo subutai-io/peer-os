@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.shared.communication.impl;
 
 import com.google.gson.Gson;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.elements.Transportable;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IGenerator;
 
 /**
@@ -16,12 +16,12 @@ public class CommandGenerator implements IGenerator {
     private Gson gson = new Gson();
 
     @Override
-    public Command fromJson(String json) {
-        return gson.fromJson(json, Command.class);
+    public Transportable fromJson(String json) {
+        return gson.fromJson(json, Transportable.class);
     }
 
     @Override
-    public String toJson(Command request) {
-        return gson.toJson(request, Command.class);
+    public String toJson(Transportable request) {
+        return gson.toJson(request, Transportable.class);
     }
 }

@@ -1,10 +1,10 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.interfaces;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.elements.Transportable;
 
 public interface IGenerator {
 
-    public Command fromJson(String json);
+    public Transportable fromJson(String json);
 
-    public String toJson(Command request);
+    public String toJson(Transportable request);
 }

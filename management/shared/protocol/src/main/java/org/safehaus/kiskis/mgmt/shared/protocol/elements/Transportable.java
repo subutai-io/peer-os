@@ -7,5 +7,5 @@ package org.safehaus.kiskis.mgmt.shared.protocol.elements;
  * Time: 4:20 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface Command {
+public interface Transportable {
 }

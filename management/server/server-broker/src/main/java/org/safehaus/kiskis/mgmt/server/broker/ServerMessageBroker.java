@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.server.broker;
 
 import org.safehaus.kiskis.mgmt.shared.communication.interfaces.server.IServerManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.elements.Transportable;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IGenerator;
 
 
@@ -37,7 +37,7 @@ public class ServerMessageBroker implements IServerManager, MessageListener {
             String jsonCmd = txtMsg.getText();
 
             if(generator != null){
-                Command comm = generator.fromJson(jsonCmd);
+                Transportable comm = generator.fromJson(jsonCmd);
                 System.out.println(comm.toString());
             }
         } catch (Exception ex) {
