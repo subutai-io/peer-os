@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.protocol.impl;
+package org.safehaus.kiskis.mgmt.shared.communication.interfaces.impl;
 
 import com.google.gson.Gson;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;

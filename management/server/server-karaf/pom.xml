@@ -14,6 +14,19 @@
 
     <description>Kiskis Management Server Custom Karaf Distribution</description>
 
+    <properties>
+        <vaadin.version>6.8.12</vaadin.version>
+        <activemq.version>5.8.0</activemq.version>
+        <gwt.version>2.3.0</gwt.version>
+        <gwt.plugin.version>2.2.0</gwt.plugin.version>
+        <commons-net.version>2.0</commons-net.version>
+        <geronimo.version>1.1.1</geronimo.version>
+        <geronimo-spec.version>2.1-rc4</geronimo-spec.version>
+        <jmdns.version>3.4.1</jmdns.version>
+        <xalan.version>2.7.1</xalan.version>
+        <gson.version>2.2.4</gson.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.karaf</groupId>
@@ -27,6 +40,51 @@
             <version>${karaf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin</artifactId>
+            <version>${vaadin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-jaas</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons-net.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <version>${geronimo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-ejb</artifactId>
+            <version>${geronimo-spec.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.jmdns</groupId>
+            <artifactId>jmdns</artifactId>
+            <version>${jmdns.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalan.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
         </dependency>
     </dependencies>
 
@@ -122,6 +180,51 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-server-manager-packages</artifactId>
                                     <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.vaadin</groupId>
+                                    <artifactId>vaadin</artifactId>
+                                    <version>${vaadin.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.activemq</groupId>
+                                    <artifactId>activemq-all</artifactId>
+                                    <version>${activemq.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.activemq</groupId>
+                                    <artifactId>activemq-jaas</artifactId>
+                                    <version>${activemq.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-net</groupId>
+                                    <artifactId>commons-net</artifactId>
+                                    <version>${commons-net.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.geronimo.specs</groupId>
+                                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                                    <version>${geronimo.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>geronimo-spec</groupId>
+                                    <artifactId>geronimo-spec-ejb</artifactId>
+                                    <version>${geronimo-spec.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.jmdns</groupId>
+                                    <artifactId>jmdns</artifactId>
+                                    <version>${jmdns.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>xalan</groupId>
+                                    <artifactId>xalan</artifactId>
+                                    <version>${xalan.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.google.code.gson</groupId>
+                                    <artifactId>gson</artifactId>
+                                    <version>${gson.version}</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
