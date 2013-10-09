@@ -32,11 +32,10 @@ public class TestFlume {
 
 	@Test
 	public void testExecSource() throws InterruptedException {
-		File file  = new File("/tmp/flume-exec");
+		File file = new File("/tmp/flume-exec");
 		FileWriter writer = null;
-		
-		if (!file.exists())
-		{
+
+		if (!file.exists()) {
 			fail("File not present");
 		}
 		try {
@@ -49,6 +48,47 @@ public class TestFlume {
 		// Send 10 events to the remote Flume agent. That agent should be
 		// configured to listen with an AvroSource.
 		String sampleData = "Hello from Exec to Flume! - ";
+		for (int i = 0; i < 10; i++) {
+			try {
+				writer.write(sampleData + i + System.getProperty("line.separator"));
+				writer.flush();
+			} catch (IOException e) {
+				fail("Cant write to file");
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			writer.close();
+		} catch (IOException e) {
+			fail("Cant close file");
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testSpoolDirectorySource() throws InterruptedException {
+		File spoolDir = new File("/tmp/flumeSpool");
+		FileWriter writer = null;
+
+		if (!spoolDir.exists()) {
+			fail("Spool directory " + spoolDir.getAbsolutePath() + " not present");
+		}
+		if (!spoolDir.isDirectory()) {
+			fail("Spool path " + spoolDir.getAbsolutePath() + " is not a directory");
+		}
+		File file = new File(spoolDir.getAbsoluteFile()+File.separator+"tmp1");
+		try {
+			file.createNewFile();
+			writer = new FileWriter(file, true);
+		} catch (IOException e) {
+			fail("Cant write to file");
+			e.printStackTrace();
+		}
+
+		// Send 10 events to the remote Flume agent. That agent should be
+		// configured to listen with an AvroSource.
+		String sampleData = "Hello from SpoolDir to Flume! - ";
 		for (int i = 0; i < 10; i++) {
 			try {
 				writer.write(sampleData + i + System.getProperty("line.separator"));
@@ -178,9 +218,7 @@ public class TestFlume {
 		// Create a Flume Event object that encapsulates the sample data
 		if (out != null) {
 			out.println(data);
-		}
-		else
-		{
+		} else {
 			System.out.println("Can't output to netcat socket");
 		}
 	}

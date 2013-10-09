@@ -23,6 +23,16 @@ public class FlumeResource extends ExternalResource {
 		}
 		file.createNewFile();
 		
+		File spoolDir = new File("/tmp/flumeSpool");
+		if (spoolDir.exists() && !spoolDir.isDirectory())
+		{
+			spoolDir.delete();
+		}
+		if (!spoolDir.exists())
+		{
+			spoolDir.mkdir();
+		}
+		
 		final String[] args = {"--conf-file", "target/classes/flume-avro-mem-logger.properties", "--name", "agent"};
 //		app.main(args);
 		Application.main(args);
@@ -47,6 +57,12 @@ public class FlumeResource extends ExternalResource {
 	
 	@Override
 	protected void after() {
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.err.println( "after test class: " + ++aCount );
 		super.after();
 	}
