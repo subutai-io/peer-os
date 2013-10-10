@@ -1,12 +1,13 @@
-package org.safehaus.kiskis.mgmt.server.broker;
+package org.safehaus.kiskis.mgmt.shared.communication;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.shared.communication.impl.ServerMessageBroker;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Common;
-import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.IGenerator;
+import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import javax.jms.*;
 import java.util.logging.Level;
@@ -18,15 +19,16 @@ import java.util.logging.Logger;
 public class Activator implements BundleActivator {
 
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
-    BrokerService broker = new BrokerService();
-    IGenerator generator;
+    private BrokerService broker = new BrokerService();
+    private static ServiceReference refServerBroker;
+    private static BundleContext context;
 
     @Override
     public void start(BundleContext context) throws Exception {
         try {
-            ServiceReference ref =
-                    context.getServiceReference(IGenerator.class.getName());
-            generator = ((IGenerator) context.getService(ref));
+            Activator.context = context;
+            Activator.refServerBroker =
+                    context.getServiceReference(RegisteredHostInterface.class.getName());
 
             broker.setPersistent(false);
             broker.setUseJmx(false);
@@ -58,10 +60,15 @@ public class Activator implements BundleActivator {
             Destination adminQueue = session.createQueue(Common.MQ_SERVICE_QUEUE);
 
             MessageConsumer consumer = session.createConsumer(adminQueue);
-            consumer.setMessageListener(new ServerMessageBroker(session, generator));
+            consumer.setMessageListener(new ServerMessageBroker(session));
             System.out.println("ActiveMQ started...");
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
+    }
+
+    public static RegisteredHostInterface getServerBroker() {
+        return ((RegisteredHostInterface)
+                Activator.context.getService(Activator.refServerBroker));
     }
 }

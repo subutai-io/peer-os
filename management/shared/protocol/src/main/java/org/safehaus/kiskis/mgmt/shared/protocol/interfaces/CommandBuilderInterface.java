@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
  *
  * @author bahadyr
  */
-public interface CommandBuilderImp {
+public interface CommandBuilderInterface {
  
         public Request buildRequest(CommandEnum commandEnum);
 }

@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.communication.interfaces.agent;
+package org.safehaus.kiskis.mgmt.shared.protocol.interfaces.agent;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;

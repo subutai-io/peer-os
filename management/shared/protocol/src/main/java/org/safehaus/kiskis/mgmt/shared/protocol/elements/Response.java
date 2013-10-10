@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Defines a reply which is produced from executing a {@link Response}
  */
-public class Response implements Serializable, Transportable {
+public class Response implements Serializable {
     private ResponseType type;
     private Integer exitCode; //might be null if not final response chunk
     private String uuid;

@@ -6,13 +6,13 @@ package org.safehaus.kiskis.mgmt.server.broker;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.CommandBuilderImp;
+import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.CommandBuilderInterface;
 
 /**
  *
  * @author bahadyr
  */
-public class CommandBuilder implements CommandBuilderImp {
+public class CommandBuilder implements CommandBuilderInterface {
 
     public Request buildRequest(CommandEnum commandEnum) {
         Request r = new Request();

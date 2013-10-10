@@ -24,6 +24,16 @@
             <artifactId>mgmt-shared-protocol</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>5.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <version>1.1.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -38,6 +48,7 @@
                     <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.shared.communication</Bundle-SymbolicName>
+                        <Bundle-Activator>org.safehaus.kiskis.mgmt.shared.communication.Activator</Bundle-Activator>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

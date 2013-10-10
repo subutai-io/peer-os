@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.communication.interfaces.server;
+package org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
@@ -10,6 +10,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
  * Time: 8:22 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface IServerSend {
-    public Response send(Request request);
+public interface CommandSendInterface {
+    public Response sendToAgent(Request request);
 }
