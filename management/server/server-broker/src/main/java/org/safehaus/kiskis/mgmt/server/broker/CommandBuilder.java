@@ -17,23 +17,17 @@ public class CommandBuilder implements CommandBuilderImp {
     public Request buildRequest(CommandEnum commandEnum) {
         Request r = new Request();
         switch (commandEnum) {
-            case CLONING_DEFAULT_LXC: {
+            case INSTALLING: {
                 String[] argument = {"-n"};
                 r.setEnvironment(null);
             }
-            case INSTALLING_DEFAULT_LXC_CONTAINER_IN_A_HOST: {
+            case CLONE: {
                 return null;
             }
-            case INSTALLING_HADOOP_NODE: {
+            case START: {
                 return null;
             }
-            case INSTALLING_LXC_IN_A_HOST: {
-                return null;
-            }
-            case STARTING_LXC_CONTAINERS: {
-                return null;
-            }
-            case STOPPING_LXC_CONTAINERS: {
+            case STOP: {
                 return null;
             }
 
