@@ -18,7 +18,8 @@ public class CommandBuilder implements CommandBuilderImp {
         Request r = new Request();
         switch (commandEnum) {
             case INSTALL: {
-                String[] argument = {"-n"};
+                // building command
+                String[] argument = {"-n, hsadood ,adhfas df"};
                 r.setEnvironment(null);
             }
             case CLONE: {
