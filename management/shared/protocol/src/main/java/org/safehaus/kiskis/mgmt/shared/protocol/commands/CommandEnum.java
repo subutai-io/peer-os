@@ -10,7 +10,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol.commands;
  */
 public enum CommandEnum {
 
-    INSTALLING,
+    INSTALL,
     CLONE,
     START,
     STOP;

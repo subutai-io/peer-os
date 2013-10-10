@@ -17,7 +17,7 @@ public class CommandBuilder implements CommandBuilderImp {
     public Request buildRequest(CommandEnum commandEnum) {
         Request r = new Request();
         switch (commandEnum) {
-            case INSTALLING: {
+            case INSTALL: {
                 String[] argument = {"-n"};
                 r.setEnvironment(null);
             }
