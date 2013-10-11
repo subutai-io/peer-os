@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
 
 
@@ -18,6 +19,6 @@ public interface RegisteredHostInterface {
      */
     public Set<Agent> getRegisteredHosts();
 
-    public Response sendAgentResponse(Response response);
+    public Request sendAgentResponse(Response response);
 
 }

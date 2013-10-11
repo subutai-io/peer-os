@@ -8,6 +8,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
 
 public class ServerMessageBroker implements MessageListener {
 
@@ -24,13 +25,14 @@ public class ServerMessageBroker implements MessageListener {
             String jsonCmd = txtMsg.getText();
 
             System.out.println("Message :" + jsonCmd);
-            System.out.println()
-            ;
+            System.out.println();
+            
             Response comm = JsonGenerator.fromJson(jsonCmd);
             System.out.println("Communication service got:" + comm.toString());
             System.out.println();
 
-            Activator.getServerBroker().sendAgentResponse(comm);
+            Request req = Activator.getServerBroker().sendAgentResponse(comm);
+            System.out.println("Request:" + req);
         } catch (Exception ex) {
             System.out.println(ex);
         }

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.broker;
+package org.safehaus.kiskis.mgmt.server.broker.impl;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
@@ -21,6 +21,7 @@ public class CommandBuilder implements CommandBuilderInterface {
                 // building command
                 String[] argument = {"-n, hsadood ,adhfas df"};
                 r.setEnvironment(null);
+                
             }
             case CLONE: {
                 return null;

@@ -20,15 +20,15 @@ public class Activator implements BundleActivator {
 
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
     private BrokerService broker = new BrokerService();
-    private static ServiceReference refServerBroker;
+//    private static ServiceReference refServerBroker;
     private static BundleContext context;
 
     @Override
     public void start(BundleContext context) throws Exception {
         try {
             Activator.context = context;
-            Activator.refServerBroker =
-                    context.getServiceReference(RegisteredHostInterface.class.getName());
+//            Activator.refServerBroker =
+//                    context.getServiceReference(RegisteredHostInterface.class.getName());
 
             broker.setPersistent(false);
             broker.setUseJmx(false);
@@ -68,6 +68,8 @@ public class Activator implements BundleActivator {
     }
 
     public static RegisteredHostInterface getServerBroker() {
-        return ((RegisteredHostInterface) Activator.context.getService(Activator.refServerBroker));
+        ServiceReference refServerBroker =
+                    Activator.context.getServiceReference(RegisteredHostInterface.class.getName());
+        return ((RegisteredHostInterface) Activator.context.getService(refServerBroker));
     }
 }

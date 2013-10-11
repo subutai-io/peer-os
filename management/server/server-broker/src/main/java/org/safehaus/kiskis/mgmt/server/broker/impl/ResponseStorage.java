@@ -6,7 +6,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import java.util.Set;
+import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.broker.Activator;
 import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
+import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 10/10/13 Time: 4:48 PM To
@@ -21,7 +24,7 @@ public class ResponseStorage implements RegisteredHostInterface {
         return commands;
     }
 
-    public ResponseStorage() {
+    public ResponseStorage() {        
         agents = new HashSet<Agent>();
     }
 
@@ -32,17 +35,22 @@ public class ResponseStorage implements RegisteredHostInterface {
     }
 
     @Override
-    public Response sendAgentResponse(Response response) {
+    public Request sendAgentResponse(Response response) {
+        Request req = null;
         //TO-DO Create result from Response for ui
         System.out.println("Received response from communication: " + response.toString());
         System.out.println();
 
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
-                Agent agent = new Agent();
-                agent.setUuid(response.getUuid());
-                agents.add(agent);
-                System.out.println("Agents count " + agents.size());
+//                Agent agent = new Agent();
+//                agent.setUuid(response.getUuid());
+//                agents.add(agent);
+//                System.out.println("Agents count " + agents.size());
+                req = new Request();
+                req.setUuid(response.getUuid());                
+                
+                Activator.getCommandSender().sendCommandToAgent(req);
                 break;
             }
             case HEARTBEAT_RESPONSE: {
@@ -60,7 +68,7 @@ public class ResponseStorage implements RegisteredHostInterface {
         }
 
 
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return req;  //To change body of implemented methods use File | Settings | File Templates.
     }
     //private void registerAgent(Response response) {
 //        response.getUuid();
