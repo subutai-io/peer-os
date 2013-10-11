@@ -7,7 +7,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
 public class ServerSideAction implements CommandSendInterface {
 
     @Override
-    public Response sendToAgent(Request request) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Response sendCommandToAgent(Request request) {
+        System.out.println("Command for Agent is send to ActiveMQ");
+        return null;  
     }
 }

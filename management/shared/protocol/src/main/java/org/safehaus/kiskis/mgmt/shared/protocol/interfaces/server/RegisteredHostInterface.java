@@ -1,9 +1,10 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server;
 
+
+import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
 
-import java.util.List;
 
 /**
  * Used by Management Server components query and manage the managed Agents
@@ -15,7 +16,8 @@ public interface RegisteredHostInterface {
      *
      * @return the registered hosts
      */
-    List<Agent> getRegisteredHosts();
+    public Set<Agent> getRegisteredHosts();
 
-    Response sendAgentResponse(Response response);
+    public Response sendAgentResponse(Response response);
+
 }

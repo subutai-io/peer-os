@@ -11,5 +11,5 @@ import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
  * To change this template use File | Settings | File Templates.
  */
 public interface CommandSendInterface {
-    public Response sendToAgent(Request request);
+    public Response sendCommandToAgent(Request request);
 }

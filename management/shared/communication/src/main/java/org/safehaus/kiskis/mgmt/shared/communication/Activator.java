@@ -68,7 +68,6 @@ public class Activator implements BundleActivator {
     }
 
     public static RegisteredHostInterface getServerBroker() {
-        return ((RegisteredHostInterface)
-                Activator.context.getService(Activator.refServerBroker));
+        return ((RegisteredHostInterface) Activator.context.getService(Activator.refServerBroker));
     }
 }
