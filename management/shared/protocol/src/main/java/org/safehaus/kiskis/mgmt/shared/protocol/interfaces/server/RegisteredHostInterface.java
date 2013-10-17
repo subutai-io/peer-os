@@ -2,9 +2,9 @@ package org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server;
 
 
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
+import org.safehaus.kiskismgmt.protocol.Agent;
+import org.safehaus.kiskismgmt.protocol.Request;
+import org.safehaus.kiskismgmt.protocol.Response;
 
 
 /**

@@ -1,21 +1,29 @@
-package org.safehaus.kiskis.mgmt.shared.protocol.elements;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.safehaus.kiskismgmt.protocol;
 
-import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
- * It describes an action to execute against certain {@link Request} received
+ *
+ * @author Dilshat
  */
-public class Request implements Serializable {
+public class Request {
+
     private RequestType type;
     private String uuid;
-    private String macAddress;
     private Long requestSequenceNumber;
     private String workingDirectory;
     private String program;
     private OutputRedirection stdOut;
     private OutputRedirection stdErr;
+    private String stdOutPath;
+    private String stdErrPath;
     private String runAs;
+    private List<String> args;
     private Map<String, String> environment;
 
     public RequestType getType() {
@@ -32,14 +40,6 @@ public class Request implements Serializable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public String getMacAddress() {
-        return macAddress;
-    }
-
-    public void setMacAddress(String macAddress) {
-        this.macAddress = macAddress;
     }
 
     public Long getRequestSequenceNumber() {
@@ -82,12 +82,36 @@ public class Request implements Serializable {
         this.stdErr = stdErr;
     }
 
+    public String getStdOutPath() {
+        return stdOutPath;
+    }
+
+    public void setStdOutPath(String stdOutPath) {
+        this.stdOutPath = stdOutPath;
+    }
+
+    public String getStdErrPath() {
+        return stdErrPath;
+    }
+
+    public void setStdErrPath(String stdErrPath) {
+        this.stdErrPath = stdErrPath;
+    }
+
     public String getRunAs() {
         return runAs;
     }
 
     public void setRunAs(String runAs) {
         this.runAs = runAs;
+    }
+
+    public List<String> getArgs() {
+        return args;
+    }
+
+    public void setArgs(List<String> args) {
+        this.args = args;
     }
 
     public Map<String, String> getEnvironment() {
@@ -100,6 +124,6 @@ public class Request implements Serializable {
 
     @Override
     public String toString() {
-        return "Transportable{" + "type=" + type + ", uuid=" + uuid + ", macAddress=" + macAddress + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", runAs=" + runAs + ", environment=" + environment + '}';
+        return "Request{" + "type=" + type + ", uuid=" + uuid + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment + '}';
     }
 }

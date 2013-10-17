@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.protocol.elements;
+package org.safehaus.kiskismgmt.protocol;
 
 /**
  * Used to define a physical host on the whole network. It could be management server or the agent.

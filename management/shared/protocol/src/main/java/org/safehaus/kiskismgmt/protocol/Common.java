@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.protocol.elements;
+package org.safehaus.kiskismgmt.protocol;
 
 /**
  * Created with IntelliJ IDEA.

@@ -6,7 +6,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.communication.impl.ServerMessageBroker;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Common;
+import org.safehaus.kiskismgmt.protocol.Common;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import javax.jms.*;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class Activator implements BundleActivator {
 
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
-    private BrokerService broker = new BrokerService();
+    private final BrokerService broker = new BrokerService();
 //    private static ServiceReference refServerBroker;
     private static BundleContext context;
 

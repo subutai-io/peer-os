@@ -1,15 +1,15 @@
 package org.safehaus.kiskis.mgmt.server.broker.impl;
 
 import java.util.HashSet;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Response;
+import org.safehaus.kiskismgmt.protocol.Agent;
+import org.safehaus.kiskismgmt.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import java.util.Set;
-import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.broker.Activator;
 import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
+import org.safehaus.kiskismgmt.protocol.Request;
+import org.safehaus.kiskismgmt.protocol.RequestType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 10/10/13 Time: 4:48 PM To
@@ -24,7 +24,7 @@ public class ResponseStorage implements RegisteredHostInterface {
         return commands;
     }
 
-    public ResponseStorage() {        
+    public ResponseStorage() {
         agents = new HashSet<Agent>();
     }
 
@@ -39,7 +39,6 @@ public class ResponseStorage implements RegisteredHostInterface {
         Request req = null;
         //TO-DO Create result from Response for ui
         System.out.println("Received response from communication: " + response.toString());
-        System.out.println();
 
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
@@ -48,8 +47,18 @@ public class ResponseStorage implements RegisteredHostInterface {
 //                agents.add(agent);
 //                System.out.println("Agents count " + agents.size());
                 req = new Request();
-                req.setUuid(response.getUuid());                
+                req.setUuid(response.getUuid());
+                req.setType(RequestType.REGISTRATION_REQUEST_DONE);
+                System.out.println(response.getType() + " executing!!!");
                 
+
+//{
+//  command:
+//    {
+//      "type":"REGISTRATION_REQUEST_DONE",
+//      "uuid":"3394ef08-7b0a-4971-a428-2b241f36fe73"
+//    }
+//}                
                 Activator.getCommandSender().sendCommandToAgent(req);
                 break;
             }
@@ -66,7 +75,6 @@ public class ResponseStorage implements RegisteredHostInterface {
                 break;
             }
         }
-
 
         return req;  //To change body of implemented methods use File | Settings | File Templates.
     }

@@ -5,7 +5,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.interfaces;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
-import org.safehaus.kiskis.mgmt.shared.protocol.elements.Request;
+import org.safehaus.kiskismgmt.protocol.Request;
 
 /**
  *
