@@ -20,4 +20,21 @@ public class Command implements ICommand {
             this.response = (Response) message;
         }
     }
+
+    public Request getCommand() {
+        return command;
+    }
+
+    public void setCommand(Request command) {
+        this.command = command;
+    }
+
+    public Response getResponse() {
+        return response;
+    }
+
+    public void setResponse(Response response) {
+        this.response = response;
+    }
+
 }
