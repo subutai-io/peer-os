@@ -1,9 +1,8 @@
-package org.safehaus.kiskis.vaadin;
+package org.safehaus.kiskis.mgmt.server.ui.vaadin;
 
 import com.vaadin.Application;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.vaadin.util.AppData;
+import org.safehaus.kiskis.mgmt.server.ui.vaadin.util.AppData;
 import org.safehaus.kiskismgmt.protocol.Agent;
 
 import java.util.Iterator;
@@ -14,6 +13,7 @@ public class ExampleApplication extends Application {
 
     private HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
     private Tree tree = new Tree("Settings");
+    private Button button;
     //
     private final String title;
     private Set<Agent> hosts;
@@ -53,18 +53,27 @@ public class ExampleApplication extends Application {
     }
 
     private Tree initTree() {
-//        hosts = AppData.getBroker().getRegisteredHosts();
-//        Iterator itr = hosts.iterator();
-//        while(itr.hasNext()) {
-//            Agent agent = (Agent) itr.next();
-//            tree.addItem(agent.getUuid());
-//        }
+        hosts = Activator.getServerBroker().getRegisteredHosts();
+        Iterator itr = hosts.iterator();
+        tree.removeAllItems();
+        while (itr.hasNext()) {
+            Agent agent = (Agent) itr.next();
+            tree.addItem(agent.getUuid());
+        }
         return tree;
     }
 
     private VerticalLayout getMainPanel() {
         VerticalLayout l = new VerticalLayout();
         l.setSizeFull();
+
+        button = new Button("Update agents");
+        button.addListener(new Button.ClickListener() {
+            public void buttonClick(Button.ClickEvent event) {
+                initTree();
+            }
+        });
+        l.addComponent(button);
         //l.addComponent(new TabView());
 
         return l;

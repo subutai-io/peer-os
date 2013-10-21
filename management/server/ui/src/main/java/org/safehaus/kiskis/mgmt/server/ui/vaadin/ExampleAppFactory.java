@@ -1,8 +1,7 @@
-package org.safehaus.kiskis.vaadin;
+package org.safehaus.kiskis.mgmt.server.ui.vaadin;
 
 import com.vaadin.Application;
 import com.vaadin.Application.SystemMessages;
-import org.safehaus.kiskis.mgmt.server.broker.impl.ResponseStorage;
 import org.safehaus.kiskis.mgmt.vaadin.bridge.ApplicationFactory;
 
 public class ExampleAppFactory implements ApplicationFactory {
@@ -10,15 +9,15 @@ public class ExampleAppFactory implements ApplicationFactory {
     private final String title;
 //    private ResponseStorage broker;
 
-//    , ResponseStorage broker
-    public ExampleAppFactory(String title) {
+//
+    public ExampleAppFactory(String title) { //ResponseStorage broker
         this.title = title;
 //        this.broker = broker;
     }
 
     @Override
     public String getApplicationCSSClassName() {
-        return "ExampleApplication";
+        return "Kiskis Management Server UI";
     }
 
     @Override
@@ -28,7 +27,7 @@ public class ExampleAppFactory implements ApplicationFactory {
 
     @Override
     public Application newInstance() {
-        return new ExampleApplication(title);
+        return new ExampleApplication(title);      // , broker
     }
 
 //    public void setBroker(ResponseStorage broker) {

@@ -22,10 +22,14 @@ public class ResponseStorage implements RegisteredHostInterface {
         agents = new HashSet<Agent>();
         agentOutputs = new CopyOnWriteArrayList();
         // TODO init set of pruducts
+        Agent a1 = new Agent();
+        a1.setUuid("1");
+        agents.add(a1);
     }
 
     @Override
     public Set<Agent> getRegisteredHosts() {
+        System.out.println("Reading list of agents");
         //To change body of implemented methods use File | Settings | File Templates.
         return agents;
     }

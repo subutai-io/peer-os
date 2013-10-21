@@ -7,7 +7,7 @@
 	 	http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0
 	 	http://svn.apache.org/repos/asf/aries/trunk/blueprint/blueprint-cm/src/main/resources/org/apache/aries/blueprint/compendium/cm/blueprint-cm-1.1.0.xsd
 	 ">
-    <cm:property-placeholder persistent-id="org.safehaus.ksks.vaadin" update-strategy="reload">
+    <cm:property-placeholder persistent-id="org.safehaus.kiskis.vaadin" update-strategy="reload">
         <cm:default-properties>
             <cm:property name="title" value="Kiskis Management Server UI"/>
         </cm:default-properties>
@@ -15,7 +15,7 @@
 
     <!--<reference id="broker" availability="mandatory" interface="org.safehaus.kiskis.mgmt.server.broker.impl.ResponseStorage"/>-->
 
-    <bean id="appFactory" class="org.safehaus.kiskis.vaadin.ExampleAppFactory">
+    <bean id="appFactory" class="org.safehaus.kiskis.mgmt.server.ui.vaadin.ExampleAppFactory">
         <!--<property name="broker" ref="broker"></property>-->
         <argument value="${title}"/>
     </bean>

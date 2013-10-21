@@ -65,8 +65,9 @@
                     <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.server.ui</Bundle-SymbolicName>
+                        <Bundle-Activator>org.safehaus.kiskis.mgmt.server.ui.vaadin.Activator</Bundle-Activator>
                         <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true
+                            {local-packages};{local-packages}.vaadin;version=${project.version};-noimport:=true
                         </Export-Package>
                     </instructions>
                 </configuration>
