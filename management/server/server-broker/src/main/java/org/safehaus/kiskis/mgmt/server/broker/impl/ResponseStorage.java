@@ -19,11 +19,6 @@ import org.safehaus.kiskismgmt.protocol.RequestType;
 public class ResponseStorage implements RegisteredHostInterface {
 
     Set<Agent> agents;
-    CommandEnum commands;
-
-    public CommandEnum getCommands() {
-        return commands;
-    }
 
     public ResponseStorage() {
         agents = new HashSet<Agent>();
