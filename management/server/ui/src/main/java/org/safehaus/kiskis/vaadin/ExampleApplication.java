@@ -53,12 +53,12 @@ public class ExampleApplication extends Application {
     }
 
     private Tree initTree() {
-        hosts = AppData.getBroker().getRegisteredHosts();
-        Iterator itr = hosts.iterator();
-        while(itr.hasNext()) {
-            Agent agent = (Agent) itr.next();
-            tree.addItem(agent.getUuid());
-        }
+//        hosts = AppData.getBroker().getRegisteredHosts();
+//        Iterator itr = hosts.iterator();
+//        while(itr.hasNext()) {
+//            Agent agent = (Agent) itr.next();
+//            tree.addItem(agent.getUuid());
+//        }
         return tree;
     }
 

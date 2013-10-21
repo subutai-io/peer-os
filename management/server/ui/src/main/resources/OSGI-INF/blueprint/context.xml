@@ -22,7 +22,7 @@
 
     <service ref="appFactory" interface="org.safehaus.kiskis.mgmt.vaadin.bridge.ApplicationFactory">
         <service-properties>
-            <entry key="alias" value="/ui"/>
+            <entry key="alias" value="/mgmt-ui"/>
         </service-properties>
     </service>
 
