@@ -1,16 +1,13 @@
 package org.safehaus.kiskis.mgmt.server.broker.impl;
 
-import java.util.HashSet;
-import org.safehaus.kiskismgmt.protocol.Agent;
-import org.safehaus.kiskismgmt.protocol.Response;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.safehaus.kiskismgmt.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.broker.Activator;
 import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
-import org.safehaus.kiskismgmt.protocol.Command;
-import org.safehaus.kiskismgmt.protocol.Request;
-import org.safehaus.kiskismgmt.protocol.RequestType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 10/10/13 Time: 4:48 PM To
@@ -18,10 +15,14 @@ import org.safehaus.kiskismgmt.protocol.RequestType;
  */
 public class ResponseStorage implements RegisteredHostInterface {
 
-    Set<Agent> agents;
+    private Set<Agent> agents;
+    private List<AgentOutput> agentOutputs;
+    private Set<Product> products;
 
     public ResponseStorage() {
         agents = new HashSet<Agent>();
+        agentOutputs = new CopyOnWriteArrayList();
+        // TODO init set of pruducts
     }
 
     @Override
@@ -30,6 +31,31 @@ public class ResponseStorage implements RegisteredHostInterface {
         return agents;
     }
 
+    @Override
+    public Set<Product> getRegisteredProducts() {
+        return products;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<AgentOutput> getAgentOutput(Agent agent) {
+        // Must be thread safe to delete old data
+        List<AgentOutput> output = (List<AgentOutput>) ((ArrayList) agentOutputs).clone();
+        agentOutputs.clear();
+        return output;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Boolean execCommand(Agent agent, Product product, Enum command) {
+        //Activator.getCommandSender().sendCommandToAgent(command);
+        return Boolean.TRUE;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * For Communication Bundle
+     *
+     * @param response
+     * @return
+     */
     @Override
     public Request sendAgentResponse(Response response) {
         Request req = null;
