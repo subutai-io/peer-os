@@ -9,10 +9,9 @@ public class ExampleAppFactory implements ApplicationFactory {
     private final String title;
 //    private ResponseStorage broker;
 
-//
-    public ExampleAppFactory(String title) { //ResponseStorage broker
+    //
+    public ExampleAppFactory(String title) {
         this.title = title;
-//        this.broker = broker;
     }
 
     @Override
@@ -27,10 +26,6 @@ public class ExampleAppFactory implements ApplicationFactory {
 
     @Override
     public Application newInstance() {
-        return new ExampleApplication(title);      // , broker
+        return new ExampleApplication(title);
     }
-
-//    public void setBroker(ResponseStorage broker) {
-//        this.broker = broker;
-//    }
 }
