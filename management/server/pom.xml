@@ -21,6 +21,7 @@
         <module>manager-packages</module>
         <module>server-karaf</module>
         <module>motd</module>
+        <module>vaadinbridge</module>
     </modules>
 
     <description>Parent project for the Kiskis Management Server Artifacts</description>
