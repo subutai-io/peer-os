@@ -13,10 +13,10 @@
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <reference id="broker" availability="mandatory" interface="org.safehaus.kiskis.mgmt.server.broker.impl.ResponseStorage"/>
+    <!--<reference id="broker" availability="mandatory" interface="org.safehaus.kiskis.mgmt.server.broker.impl.ResponseStorage"/>-->
 
     <bean id="appFactory" class="org.safehaus.kiskis.vaadin.ExampleAppFactory">
-        <property name="broker" ref="broker"></property>
+        <!--<property name="broker" ref="broker"></property>-->
         <argument value="${title}"/>
     </bean>
 

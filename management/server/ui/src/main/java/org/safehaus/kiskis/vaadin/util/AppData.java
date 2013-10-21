@@ -25,7 +25,7 @@ public class AppData
             new ThreadLocal<AppData>();
 
     //
-    private ResponseStorage broker;
+//    private ResponseStorage broker;
 
     public AppData(Application app) {
         this.app = app;
@@ -68,11 +68,11 @@ public class AppData
         return instance.get().bundle.getString(msgId);
     }
 
-    public static ResponseStorage getBroker() {
-        return instance.get().broker;
-    }
-
-    public static void setRemoteExecService(ResponseStorage broker) {
-        instance.get().broker = broker;
-    }
+//    public static ResponseStorage getBroker() {
+//        return instance.get().broker;
+//    }
+//
+//    public static void setRemoteExecService(ResponseStorage broker) {
+//        instance.get().broker = broker;
+//    }
 }

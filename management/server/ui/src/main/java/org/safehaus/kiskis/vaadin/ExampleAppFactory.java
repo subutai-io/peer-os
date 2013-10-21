@@ -8,11 +8,12 @@ import org.safehaus.kiskis.mgmt.vaadin.bridge.ApplicationFactory;
 public class ExampleAppFactory implements ApplicationFactory {
 
     private final String title;
-    private ResponseStorage broker;
+//    private ResponseStorage broker;
 
-    public ExampleAppFactory(String title, ResponseStorage broker) {
+//    , ResponseStorage broker
+    public ExampleAppFactory(String title) {
         this.title = title;
-        this.broker = broker;
+//        this.broker = broker;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class ExampleAppFactory implements ApplicationFactory {
         return new ExampleApplication(title);
     }
 
-    public void setBroker(ResponseStorage broker) {
-        this.broker = broker;
-    }
+//    public void setBroker(ResponseStorage broker) {
+//        this.broker = broker;
+//    }
 }
