@@ -7,7 +7,6 @@ import org.safehaus.kiskismgmt.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import org.safehaus.kiskis.mgmt.server.broker.Activator;
-import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 10/10/13 Time: 4:48 PM To
@@ -64,23 +63,16 @@ public class ResponseStorage implements RegisteredHostInterface {
 
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
-//                Agent agent = new Agent();
-//                agent.setUuid(response.getUuid());
-//                agents.add(agent);
-//                System.out.println("Agents count " + agents.size());
+                Agent agent = new Agent();
+                agent.setUuid(response.getUuid());
+                agents.add(agent);
+                System.out.println("Agents count " + agents.size());
+                
                 req = new Request();
-
                 req.setUuid(response.getUuid());
                 req.setType(RequestType.REGISTRATION_REQUEST_DONE);
-                System.out.println(response.getType() + " executing!!!");
                 Command command = new Command(req);
-//{
-//  command:
-//    {
-//      "type":"REGISTRATION_REQUEST_DONE",
-//      "uuid":"3394ef08-7b0a-4971-a428-2b241f36fe73"
-//    }
-//}                
+
                 Activator.getCommandSender().sendCommandToAgent(command);
                 break;
             }
@@ -100,7 +92,4 @@ public class ResponseStorage implements RegisteredHostInterface {
 
         return req;  //To change body of implemented methods use File | Settings | File Templates.
     }
-    //private void registerAgent(Response response) {
-//        response.getUuid();
-    //}
 }
