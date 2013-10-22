@@ -7,6 +7,8 @@ import org.safehaus.kiskismgmt.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import org.safehaus.kiskis.mgmt.server.broker.Activator;
+import org.safehaus.kiskis.mgmt.shared.protocol.products.HadoopCommandEnum;
+import org.safehaus.kiskis.mgmt.shared.protocol.products.HadoopProduct;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 10/10/13 Time: 4:48 PM To
@@ -36,6 +38,8 @@ public class ResponseStorage implements RegisteredHostInterface {
 
     @Override
     public Set<Product> getRegisteredProducts() {
+        // TODO fetch product bundles from karaf
+        products.add(new HadoopProduct());
         return products;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -71,7 +75,7 @@ public class ResponseStorage implements RegisteredHostInterface {
                 agent.setUuid(response.getUuid());
                 agents.add(agent);
                 System.out.println("Agents count " + agents.size());
-                
+
                 req = new Request();
                 req.setUuid(response.getUuid());
                 req.setType(RequestType.REGISTRATION_REQUEST_DONE);
