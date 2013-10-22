@@ -4,4 +4,6 @@
 *.classes
 *.o
 *.mk
-agent/daemon-class/Debug/src/*.o
+*.a
+agent/daemon/Debug/*
+
