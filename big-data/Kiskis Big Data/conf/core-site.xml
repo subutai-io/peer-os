@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+    <property>
+         <name>fs.default.name</name>
+         <value>hdfs://localhost:8020</value>
+    </property>
+	<property>
+         <name>hadoop.tmp.dir</name>
+         <value>/home/emin/Desktop/hadoop_play/tmp</value>
+    </property>
+    <!-- OOZIE -->
+    <property>
+        <name>hadoop.proxyuser.emin.hosts</name>
+        <value>127.0.0.1</value>
+    </property>
+     <property>
+        <name>hadoop.proxyuser.emin.groups</name>
+        <value>*</value>
+     </property>
+
+</configuration>

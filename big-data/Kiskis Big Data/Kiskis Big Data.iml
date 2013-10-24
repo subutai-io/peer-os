@@ -218,7 +218,7 @@
     <orderEntry type="library" name="Maven: storm:tools.cli:0.2.2" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.disruptor:disruptor:2.10.1" level="project" />
     <orderEntry type="library" name="Maven: storm:jgrapht:0.8.3" level="project" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="file://$MODULE_DIR$/conf" />
@@ -227,7 +227,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/externalJars/jdo2-api-2.3-ec.jar!/" />
@@ -236,7 +236,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="file://$MODULE_DIR$/externalJars/oozie_jars" />
