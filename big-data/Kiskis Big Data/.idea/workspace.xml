@@ -2,24 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/oozie_client_3_3_2.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/jdo2-api-2.3-ec.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/oozie-client-3.3.2.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/oozie-core-3.3.2.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-jdbc-2.1.0.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-kernel-2.1.0.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-lib-2.1.0.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-persistence-2.1.0.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-persistence-jdbc-2.1.0.jar" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Kiskis Big Data.iml" afterPath="$PROJECT_DIR$/Kiskis Big Data.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/README" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="TestLib.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/fragment.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382615572198" ignored="false" />
     <file path="/HadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381324485243" ignored="false" />
-    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382619662974" ignored="false" />
+    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382619701805" ignored="false" />
     <file path="/TestHadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612669819" ignored="false" />
     <file path="/AllTests.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612783578" ignored="false" />
     <file path="/TestHiveExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381300653984" ignored="false" />
@@ -90,6 +80,7 @@
     <file path="/ExclamationTopology.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382447406020" ignored="false" />
     <file path="/TestRemoteStorm.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382597202663" ignored="false" />
     <file path="/StartHadoopCluster.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382604260149" ignored="false" />
+    <file path="/README" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382619789773" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,16 +211,27 @@
       <file leaf-file-name="AllTests.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/AllTests.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="28" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.0">
+            <state line="66" column="0" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OozieExternalResource.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="OozieExternalResource.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="26" selection-start="1072" selection-end="1072" vertical-scroll-proportion="0.295858">
+            <state line="41" column="32" selection-start="1402" selection-end="1402" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="31" selection-start="31" selection-end="31" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -253,7 +255,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/SolrExternalResource.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/test/java/stormTest/TestRemoteStorm.java" />
         <option value="$PROJECT_DIR$/src/main/java/oozie/LocalOozieExample.java" />
@@ -269,6 +270,7 @@
         <option value="$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java" />
         <option value="$PROJECT_DIR$/src/test/java/AllTests.java" />
         <option value="$PROJECT_DIR$/src/test/java/hiveTest/TestHiveExternalResource.java" />
+        <option value="$PROJECT_DIR$/README" />
       </list>
     </option>
   </component>
@@ -496,24 +498,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value=".idea" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="KisKis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Kiskis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value=".idea" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libraries" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -878,6 +862,11 @@
       <created>1380183365982</created>
       <updated>1380183365982</updated>
     </task>
+    <task id="LOCAL-00001" summary="Added configuration files.">
+      <created>1382619705628</created>
+      <updated>1382619705628</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -974,7 +963,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added configuration files." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -988,6 +977,7 @@
     <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="Added configuration files." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1001,11 +991,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/stormTest/TestStormExternalResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="31" selection-start="2232" selection-end="2232" vertical-scroll-proportion="0.9386503" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/stormTest/TestRemoteStorm.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="37" column="13" selection-start="1350" selection-end="1350" vertical-scroll-proportion="-0.28834355" />
@@ -1074,7 +1059,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/AllTests.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="28" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.0">
+        <state line="66" column="0" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -1088,7 +1073,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="26" selection-start="1072" selection-end="1072" vertical-scroll-proportion="0.295858">
+        <state line="41" column="32" selection-start="1402" selection-end="1402" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="31" selection-start="31" selection-end="31" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
