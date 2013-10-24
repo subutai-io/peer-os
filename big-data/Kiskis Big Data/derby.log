@@ -1,6 +1,0 @@
-----------------------------------------------------------------
-2013-10-24 12:18:52.506 GMT:
- Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.1.0 - (938214): instance a816c00e-0141-ea67-2cc3-00000c331328 
-on database directory /home/emin/Desktop/hadoop_play/my_hdfs/metastore_db   with class loader sun.misc.Launcher$AppClassLoader@6cd9c6e2
-
-Database Class Loader started - derby.database.classpath=''
