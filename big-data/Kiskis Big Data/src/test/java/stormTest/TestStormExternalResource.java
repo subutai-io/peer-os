@@ -55,7 +55,7 @@ public class TestStormExternalResource {
 
             backtype.storm.LocalCluster cluster = new backtype.storm.LocalCluster();
             cluster.submitTopology("test", conf, builder.createTopology());
-            Utils.sleep(10000);
+            Utils.sleep(5000);
             System.out.println("Killing the topology and shutting the cluster down.");
             cluster.killTopology("test");
             cluster.shutdown();
