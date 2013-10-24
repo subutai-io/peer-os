@@ -8,7 +8,7 @@
     <ignored path=".idea/workspace.xml" />
     <file path="/fragment.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382615572198" ignored="false" />
     <file path="/HadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381324485243" ignored="false" />
-    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382621207936" ignored="false" />
+    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382621238943" ignored="false" />
     <file path="/TestHadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612669819" ignored="false" />
     <file path="/AllTests.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612783578" ignored="false" />
     <file path="/TestHiveExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381300653984" ignored="false" />
@@ -808,7 +808,11 @@
       <created>1382621220774</created>
       <updated>1382621220774</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added configuration files.">
+      <created>1382621240572</created>
+      <updated>1382621240572</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
