@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" name="Default" comment="" />
+    <list default="true" id="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/oozie_client_3_3_2.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/jdo2-api-2.3-ec.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/oozie-client-3.3.2.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/oozie-core-3.3.2.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-jdbc-2.1.0.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-kernel-2.1.0.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-lib-2.1.0.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-persistence-2.1.0.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/oozie_jars/openjpa-persistence-jdbc-2.1.0.jar" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Kiskis Big Data.iml" afterPath="$PROJECT_DIR$/Kiskis Big Data.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="TestLib.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/fragment.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382615572198" ignored="false" />
     <file path="/HadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381324485243" ignored="false" />
-    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382615572198" ignored="false" />
+    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382619662974" ignored="false" />
     <file path="/TestHadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612669819" ignored="false" />
     <file path="/AllTests.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612783578" ignored="false" />
     <file path="/TestHiveExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381300653984" ignored="false" />
@@ -204,10 +217,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="AllTests.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="AllTests.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/AllTests.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="28" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.44785276">
+            <state line="66" column="28" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OozieExternalResource.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="28" column="26" selection-start="1072" selection-end="1072" vertical-scroll-proportion="0.295858">
               <folding />
             </state>
           </provider>
@@ -219,6 +241,14 @@
     <FindUsagesManager>
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitLogSettings">
+    <option name="myDateState">
+      <MyDateState />
+    </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
@@ -297,10 +327,10 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="64" />
     <option name="y" value="-4" />
-    <option name="width" value="1865" />
-    <option name="height" value="1114" />
+    <option name="width" value="1857" />
+    <option name="height" value="1085" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -441,19 +471,65 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="KisKis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Kiskis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="conf" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="KisKis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Kiskis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value=".idea" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="KisKis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Kiskis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value=".idea" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="options.lastSelected" value="MavenSettings" />
+    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/externalJars/jdo2-api-2.3-ec.jar!/" />
     <property name="project.structure.side.proportion" value="0.28486648" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
@@ -461,9 +537,9 @@
     <property name="restartRequiresConfirmation" value="true" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.searchVisible" value="true" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -478,7 +554,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.AllTests">
+  <component name="RunManager" selected="Application.StartHadoopCluster">
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
@@ -515,19 +591,6 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -556,6 +619,19 @@
       <listeners />
       <method />
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" />
@@ -569,6 +645,17 @@
       <option name="PASS_PARENT_ENVS" value="true" />
       <module name="" />
       <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="CFConfiguration" factoryName="Remote">
+      <option name="PORT" value="80" />
+      <option name="LOCAL" value="false" />
+      <deployment />
+      <server-settings>
+        <option name="USERNAME" value="" />
+        <option name="PASSWORD" value="" />
+        <data />
+      </server-settings>
       <method />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -590,17 +677,6 @@
       </option>
       <envs />
       <patterns />
-      <method />
-    </configuration>
-    <configuration default="true" type="CFConfiguration" factoryName="Remote">
-      <option name="PORT" value="80" />
-      <option name="LOCAL" value="false" />
-      <deployment />
-      <server-settings>
-        <option name="USERNAME" value="" />
-        <option name="PASSWORD" value="" />
-        <data />
-      </server-settings>
       <method />
     </configuration>
     <configuration default="false" name="JavaCheck" type="Application" factoryName="Application">
@@ -825,7 +901,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-4" width="1865" height="1114" extended-state="6" />
+    <frame x="64" y="-4" width="1857" height="1085" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -833,7 +909,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2498615" sideWeight="0.670247" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32963988" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44253492" sideWeight="0.499723" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4424686" sideWeight="0.499723" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44253492" sideWeight="0.500277" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -846,8 +922,8 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23213297" sideWeight="0.5746509" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20110804" sideWeight="0.5574651" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42320085" sideWeight="0.49916896" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20110804" sideWeight="0.57679915" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42320085" sideWeight="0.49916896" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="164" y="96" width="1657" height="885" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -925,13 +1001,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/luceneTest/TestLuceneExternalResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="30" selection-start="1361" selection-end="1361" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/stormTest/TestStormExternalResource.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="60" column="31" selection-start="2232" selection-end="2232" vertical-scroll-proportion="0.9386503" />
@@ -962,11 +1031,6 @@
         <state line="84" column="29" selection-start="3417" selection-end="3417" vertical-scroll-proportion="0.7321063" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Kiskis Big Data.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-demo/4.4.0/lucene-demo-4.4.0.jar!/org/apache/lucene/demo/IndexFiles.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="29" selection-start="227" selection-end="227" vertical-scroll-proportion="0.2262931" />
@@ -981,16 +1045,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/hiveTest/TestHiveExternalResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="88" column="33" selection-start="3336" selection-end="3336" vertical-scroll-proportion="0.57974136">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="13" selection-start="2682" selection-end="2682" vertical-scroll-proportion="0.030674847">
-          <folding />
-        </state>
+        <state line="88" column="33" selection-start="3336" selection-end="3336" vertical-scroll-proportion="0.57974136" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/oozieTest/TestOozieExternalResource.java">
@@ -1002,21 +1057,38 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/OrderExternalResources.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="0" selection-start="2257" selection-end="2257" vertical-scroll-proportion="0.5705522">
-          <folding />
-        </state>
+        <state line="60" column="0" selection-start="2257" selection-end="2257" vertical-scroll-proportion="0.5705522" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/luceneTest/TestLuceneExternalResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="12" selection-start="844" selection-end="844" vertical-scroll-proportion="0.030674847">
+        <state line="19" column="12" selection-start="844" selection-end="844" vertical-scroll-proportion="0.030674847" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Kiskis Big Data.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/AllTests.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="28" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.44785276">
+        <state line="66" column="28" selection-start="2481" selection-end="2481" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/libraries/oozie_client_3_3_2.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="26" selection-start="1072" selection-end="1072" vertical-scroll-proportion="0.295858">
           <folding />
         </state>
       </provider>
@@ -1097,7 +1169,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>Maven: xpp3:xpp3_min:1.1.4c</last-edited>
+          <last-edited>oozie-client-3.3.2</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

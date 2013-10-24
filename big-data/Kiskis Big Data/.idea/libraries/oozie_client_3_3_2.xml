@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="oozie-client-3.3.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/externalJars/oozie_jars/oozie-client-3.3.2.jar!/" />
+      <root url="jar://$USER_HOME$/externalJars/oozie_jars/oozie-core-3.3.2.jar!/" />
+      <root url="jar://$USER_HOME$/externalJars/jdo2-api-2.3-ec.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
