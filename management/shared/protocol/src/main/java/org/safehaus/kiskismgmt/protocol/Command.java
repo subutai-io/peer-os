@@ -7,7 +7,6 @@ package org.safehaus.kiskismgmt.protocol;
 /**
  *
  * @author dilshat
- * Wrapper object for proper JSON generation
  */
 public class Command implements ICommand {
 
