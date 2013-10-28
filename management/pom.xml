@@ -11,6 +11,7 @@
 
     <packaging>pom</packaging>
 
+    <!-- this is just a comment for testing -->
     <properties>
         <karaf.version>2.3.1</karaf.version>
     </properties>
