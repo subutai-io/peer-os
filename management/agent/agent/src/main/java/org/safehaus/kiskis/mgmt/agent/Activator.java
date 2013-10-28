@@ -5,6 +5,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * BundleActivator for the mgmt-agent bundle
+ * Some test comment with referencing issue id 
  */
 public class Activator implements BundleActivator {
 
