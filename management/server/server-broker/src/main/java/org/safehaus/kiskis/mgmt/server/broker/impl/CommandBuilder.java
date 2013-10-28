@@ -14,6 +14,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.CommandBuilderInterfa
  */
 public class CommandBuilder implements CommandBuilderInterface {
 
+    /**
+     * builds request
+     * @param commandEnum
+     * @return 
+     */
     public Request buildRequest(CommandEnum commandEnum) {
         Request r = new Request();
         switch (commandEnum) {
