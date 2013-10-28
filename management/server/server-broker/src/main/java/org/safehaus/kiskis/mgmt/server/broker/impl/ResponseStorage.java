@@ -7,7 +7,7 @@ import org.safehaus.kiskismgmt.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import org.safehaus.kiskis.mgmt.server.broker.Activator;
-import org.safehaus.kiskis.mgmt.shared.protocol.products.HadoopCommandEnum;
+import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
 import org.safehaus.kiskis.mgmt.shared.protocol.products.HadoopProduct;
 
 /**
@@ -52,9 +52,19 @@ public class ResponseStorage implements RegisteredHostInterface {
     }
 
     @Override
-    public Boolean execCommand(Agent agent, Product product, Enum command) {
-        //Activator.getCommandSender().sendCommandToAgent(command);
-        return Boolean.TRUE;  //To change body of implemented methods use File | Settings | File Templates.
+    public Boolean execCommand(Agent agent, Product product, CommandEnum commandEnum) {
+        Request req = new Request();
+        switch (commandEnum) {
+            case INSTALL: {
+                req.setUuid(agent.getUuid());
+                req.setProgram(product.getProductName());
+                req.setProgram("ls -l");
+            }
+        }
+
+        Command command = new Command(req);
+        Response res = Activator.getCommandSender().sendCommandToAgent(command);
+        return res != null;
     }
 
     /**
@@ -93,6 +103,7 @@ public class ResponseStorage implements RegisteredHostInterface {
                 break;
             }
             case EXECUTE_RESPONSE: {
+
                 System.out.println("ER");
                 break;
             }
