@@ -24,7 +24,7 @@ import org.safehaus.kiskismgmt.protocol.Response;
 /**
  *
  * @author bahadyr
- * Test class junit comment
+ * Test class junit comment test comment
  */
 public class ResponseStorageTest {
     
