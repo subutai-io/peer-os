@@ -9,7 +9,7 @@ import org.safehaus.kiskismgmt.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.CommandBuilderInterface;
 
 /**
- *
+ * test
  * @author bahadyr
  */
 public class CommandBuilder implements CommandBuilderInterface {
