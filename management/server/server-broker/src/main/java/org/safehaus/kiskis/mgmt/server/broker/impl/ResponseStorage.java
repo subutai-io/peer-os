@@ -28,7 +28,11 @@ public class ResponseStorage implements RegisteredHostInterface {
         a1.setUuid("1");
         agents.add(a1);
     }
-
+    
+    /**
+     * Returns list of hosts
+     * @return 
+     */
     @Override
     public Set<Agent> getRegisteredHosts() {
         System.out.println("Reading list of agents");
