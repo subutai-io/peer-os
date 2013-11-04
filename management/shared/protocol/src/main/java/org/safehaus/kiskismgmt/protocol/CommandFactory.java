@@ -33,7 +33,7 @@ public class CommandFactory {
         return new Command(req);
     }
 
-    public static ICommand createResponse(ResponseType type, String uuid, String source, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid) {
+    public static ICommand createResponse(ResponseType type, String uuid, String source, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid, String macAddress, String ip, String hostname) {
         Response res = new Response();
         res.setSource(source);
         res.setType(type);
@@ -44,6 +44,9 @@ public class CommandFactory {
         res.setRequestSequenceNumber(reqSeqNum);
         res.setResponseSequenceNumber(resSeqnum);
         res.setPid(pid);
+        res.setMacAddress(macAddress);
+        res.setIp(ip);
+        res.setHostname(hostname);
 
         return new Command(res);
     }
