@@ -27,15 +27,20 @@ public class ResponseStorage implements RegisteredHostInterface {
         Agent a1 = new Agent();
         a1.setUuid("1");
         agents.add(a1);
+
+        Agent a2 = new Agent();
+        a2.setUuid("2");
+        agents.add(a2);
     }
-    
+
     /**
      * Returns list of hosts
-     * @return 
+     *
+     * @return
      */
     @Override
     public Set<Agent> getRegisteredHosts() {
-        System.out.println("Reading list of agents");
+        //System.out.println("Reading list of agents");
         //To change body of implemented methods use File | Settings | File Templates.
         return agents;
     }
@@ -56,19 +61,25 @@ public class ResponseStorage implements RegisteredHostInterface {
     }
 
     @Override
-    public Boolean execCommand(Agent agent, Product product, CommandEnum commandEnum) {
-        Request req = new Request();
-        switch (commandEnum) {
-            case INSTALL: {
-                req.setUuid(agent.getUuid());
-                req.setProgram(product.getProductName());
-                req.setProgram("ls -l");
-            }
-        }
+    public Boolean execCommand(Agent agent, String command) {
+//        Request req = new Request();
+//        switch (commandEnum) {
+//            case INSTALL: {
+//                req.setUuid(agent.getUuid());
+//                req.setProgram(product.getProductName());
+//                req.setProgram("ls -l");
+//            }
+//        }
 
-        Command command = new Command(req);
-        Response res = Activator.getCommandSender().sendCommandToAgent(command);
-        return res != null;
+        Request req = CommandJson.getRequest(command);
+        Command comm = new Command(req);
+        Response res = Activator.getCommandSender().sendCommandToAgent(comm);
+//        Command command = new Command(req);
+//        Response res = Activator.getCommandSender().sendCommandToAgent(command);
+        System.out.println(agent.toString());
+        System.out.println(command);
+//        return res != null;
+        return true;
     }
 
     /**
@@ -81,7 +92,6 @@ public class ResponseStorage implements RegisteredHostInterface {
     public Request sendAgentResponse(Response response) {
         Request req = null;
         //TO-DO Create result from Response for ui
-        System.out.println("Received response from communication: " + response.toString());
 
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
@@ -107,8 +117,8 @@ public class ResponseStorage implements RegisteredHostInterface {
                 break;
             }
             case EXECUTE_RESPONSE: {
-
-                System.out.println("ER");
+                String stdOut = response.getStdOut();
+                System.out.println(stdOut);
                 break;
             }
         }

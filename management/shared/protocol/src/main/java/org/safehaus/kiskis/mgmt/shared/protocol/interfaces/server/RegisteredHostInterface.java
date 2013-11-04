@@ -39,7 +39,7 @@ public interface RegisteredHostInterface {
      * @param agent
      * @return
      */
-    public Boolean execCommand(Agent agent, Product product, CommandEnum command);
+    public Boolean execCommand(Agent agent, String command);
 
     /**
      * For Communication Bundle

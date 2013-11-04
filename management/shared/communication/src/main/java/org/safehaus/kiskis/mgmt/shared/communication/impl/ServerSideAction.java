@@ -1,8 +1,10 @@
 package org.safehaus.kiskis.mgmt.shared.communication.impl;
 
+import java.util.logging.Logger;
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -14,16 +16,19 @@ import org.safehaus.kiskismgmt.protocol.Response;
 
 public class ServerSideAction implements CommandSendInterface {
 
+    private static final Logger LOG = Logger.getLogger(ServerSideAction.class.getName());
+    private static final String brokerURL = "tcp://127.0.0.1:61616";
+    private static final String brokerUsername = "karaf";
+    private static final String brokerPassword = "karaf";
+
     @Override
     public Response sendRequestToAgent(Request request) {
-        System.out.println("Command for Agent is send to ActiveMQ");
         thread(new RequestProducer(request), false);
         return null;
     }
-    
+
     @Override
     public Response sendCommandToAgent(Command command) {
-        System.out.println("Command for Agent is send to ActiveMQ");
         thread(new CommandProducer(command), false);
         return null;
     }
@@ -41,12 +46,11 @@ public class ServerSideAction implements CommandSendInterface {
         public RequestProducer(Request request) {
             this.request = request;
         }
-        
+
         public void run() {
             try {
-                System.out.println("SENDING RESPONSE TO AGENT VIA ACTIVEMQ " + request.getUuid());
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://127.0.0.1:61616");
-                Connection connection = connectionFactory.createConnection("karaf", "karaf");
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
+                Connection connection = connectionFactory.createConnection(brokerUsername, brokerPassword);
                 connection.start();
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 Destination destination = session.createQueue(request.getUuid());
@@ -54,19 +58,15 @@ public class ServerSideAction implements CommandSendInterface {
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 String json = CommandJson.getJson(request);
                 TextMessage message = session.createTextMessage(json);
-//                System.out.println(message);
-//                System.out.println("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
                 producer.send(message);
-                System.out.println("MESSAGE SENT TO AGENT" + message.getText());
                 session.close();
                 connection.close();
-            } catch (Exception e) {
+            } catch (JMSException e) {
                 System.out.println("Caught: " + e);
-//                e.printStackTrace();
             }
         }
     }
-    
+
     public static class CommandProducer implements Runnable {
 
         Command command;
@@ -74,12 +74,11 @@ public class ServerSideAction implements CommandSendInterface {
         public CommandProducer(Command command) {
             this.command = command;
         }
-        
+
         public void run() {
             try {
-                System.out.println("SENDING RESPONSE TO AGENT VIA ACTIVEMQ " + command.getCommand().getUuid());
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://127.0.0.1:61616");
-                Connection connection = connectionFactory.createConnection("karaf", "karaf");
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
+                Connection connection = connectionFactory.createConnection(brokerUsername, brokerPassword);
                 connection.start();
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 Destination destination = session.createQueue(command.getCommand().getUuid());
@@ -87,15 +86,11 @@ public class ServerSideAction implements CommandSendInterface {
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 String json = CommandJson.getJson(command);
                 TextMessage message = session.createTextMessage(json);
-//                System.out.println(message);
-//                System.out.println("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
                 producer.send(message);
-                System.out.println("MESSAGE SENT TO AGENT" + message.getText());
                 session.close();
                 connection.close();
-            } catch (Exception e) {
+            } catch (JMSException e) {
                 System.out.println("Caught: " + e);
-//                e.printStackTrace();
             }
         }
     }

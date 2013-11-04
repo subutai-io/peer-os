@@ -1,0 +1,149 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>JSP Page</title>
+    <link href="resources/jquery/css/no-theme/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
+    <link href="resources/primeui/themes/blitzer/theme.css" rel="stylesheet"/>
+    <link href="resources/primeui/primeui-1.0.RC1-min.css" rel="stylesheet"/>
+    <link href="resources/primeui/all.css" rel="stylesheet"/>
+    <link href="resources/primeui/demo.css" rel="stylesheet"/>
+    <script src="resources/jquery/jquery-1.10.2.min.js"></script>
+    <script src="resources/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="resources/primeui/primeui-1.0.RC1.js"></script>
+    <script type="text/javascript">
+        var host;
+        $(function () {
+            var themes = new Array();
+
+            setInterval(function () {
+                $.ajax({
+                    url: 'http://localhost:8181/mgmt-server-backend',
+                    type: 'POST',
+                    data: { action: "getAgents"}
+                }).done(function (data) {
+                            var array = jQuery.parseJSON(data);
+                            for (var item in array) {
+                                themes.push(array[item].agent);
+                            }
+                            $('#custom').puilistbox({
+                                data: themes,
+                                scrollHeight: $(document).height() - 300,
+                                width: 150,
+                                content: function (option) {
+                                    return '<img src="resources/images/online.png" alt="" /><span>' + option + '</span>';
+                                },
+                                itemSelect: function (event, item) {
+                                    host = item.text();
+                                }
+                            });
+                        });
+            }, 5000);
+
+            $('#sidebar').puipanel();
+
+            $('#in').puiinputtext();
+
+            $('#default').puitabview();
+
+            $('.content-section').width($(document).width() - 100);
+            $('.content-block').width($('.content-section').width() - 50);
+            $('#footer').css('top', ($(document).height() - $('#footer').height()));
+
+            $('#commands').puipanel();
+            $('#output').puipanel();
+
+            $('#button_install').puibutton({
+                click: function (event) {
+                    $.ajax({
+                        url: 'http://localhost:8181/mgmt-server-backend',
+                        type: 'POST',
+                        data: { action: "sendCommand", agent: host, comm: $('#text_output').val()}
+                    }).
+                            done(function () {
+                                alert("Done");
+                            })
+                }
+            });
+            $('#button_start').puibutton();
+            $('#button_stop').puibutton();
+            $('#button_info').puibutton();
+
+            $('#text_output').puiinputtextarea();
+        });
+
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <div id="header">
+        <div class="header-block">
+            <h1 class="logo"><a href="index.html">primeui</a></h1>
+            <ul id="nav">
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+        <div class="content-section">
+            <div class="content-block">
+                <div id="sidebar" title="Agents">
+                    <input id="in" type="text" style="width:150px; padding: 4px 2px;"/>
+                    <select id="custom"></select>
+                </div>
+                <div id="content-demo">
+                    <h1 class="widget-title">Node1</h1>
+
+                    <p>Some information about node: IP, MAC, etc.</p>
+
+                    <div id="default">
+                        <ul>
+                            <li><a href="#tab1">Information</a></li>
+                            <li><a href="#tab2">Hadoop</a></li>
+                            <li><a href="#tab3">Cassandra</a></li>
+                        </ul>
+                        <div>
+                            <div id="tab1">
+                                <div id="commands" title="Commands">
+                                    <button id="button_install" type="button">Install</button>
+                                    <button id="button_start" type="button">Start</button>
+                                    <button id="button_stop" type="button">Stop</button>
+                                    <button id="button_info" type="button">Info</button>
+                                </div>
+                                <div id="output" title="Output">
+                                    <textarea id="text_output" cols="100"
+                                              style="resize: none; height: 245px;"></textarea>
+                                </div>
+                            </div>
+                            <div id="tab2">
+                                Francis Ford Coppola's legendary continuation and sequel to his landmark 1972 film,
+                                The_Godfather, parallels the young Vito Corleone's rise with his son Michael's spiritual
+                                fall, deepening The_Godfather's depiction of the dark side of the American dream. In the
+                                early 1900s, the child Vito flees his Sicilian village for America after the local Mafia
+                                kills his family. Vito struggles to make a living, legally or illegally, for his wife
+                                and growing brood in Little Italy, killing the local Black Hand Fanucci after he demands
+                                his customary cut of the tyro's business. With Fanucci gone, Vito's communal stature
+                                grows.
+                            </div>
+                            <div id="tab3">
+                                After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo
+                                returned to the well for this third and final story of the fictional Corleone crime
+                                family. Two decades have passed, and crime kingpin Michael Corleone, now divorced from
+                                his wife Kay has nearly succeeded in keeping his promise that his family would one day
+                                be completely legitimate.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="clear: both">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer">
+        <div class="footer-block">
+            <div class="copy-block">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

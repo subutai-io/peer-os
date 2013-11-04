@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1383114559319
+Build-Jdk: 1.7.0_25
+Built-By: daralbaev
+Bundle-Activator: org.safehaus.kiskis.mgmt.ui.Activator
+Bundle-ClassPath: WEB-INF/classes
+Bundle-Description: Server UI Bundle
+Bundle-ManifestVersion: 2
+Bundle-Name: Kiskis Management Server UI
+Bundle-SymbolicName: org.safehaus.kiskis.mgmt.server.ui
+Bundle-Version: 0.0.1.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: org.safehaus.kiskis.mgmt.ui.servlet;uses:="javax.servlet
+ ,javax.servlet.http";version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.
+ ui;version="0.0.1.SNAPSHOT";uses:="org.osgi.framework,org.safehaus.kisk
+ is.mgmt.shared.protocol.interfaces.server"
+Import-Package: javax.servlet,javax.servlet.http,org.osgi.framework;vers
+ ion="[1.6,2)",org.safehaus.kiskis.mgmt.shared.protocol.interfaces.serve
+ r;version="[0.0,1)",org.safehaus.kiskismgmt.protocol;version="[0.0,1)"
+Tool: Bnd-2.1.0.20130426-122213
+Web-ContextPath: mgmt-server-ui
+Webapp-Context: mgmt-server-ui

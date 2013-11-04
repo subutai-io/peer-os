@@ -43,6 +43,7 @@
             <directory>target/dependencies/kiskis-server</directory>
             <includes>
                 <include>*.jar</include>
+                <include>*.war</include>
             </includes>
             <outputDirectory>system/kiskis-server</outputDirectory>
         </fileSet>

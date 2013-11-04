@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+	<bean id="uiServlet" class="org.safehaus.kiskis.mgmt.server.backend.servlet.UIServlet">
+	</bean>
+	<service ref="uiServlet" interface="javax.servlet.http.HttpServlet">
+		<service-properties>
+			<entry key="alias" value="/mgmt-server-backend" />
+		</service-properties>
+	</service>
+</blueprint>

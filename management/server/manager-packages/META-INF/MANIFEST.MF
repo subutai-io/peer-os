@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1383553749101
+Build-Jdk: 1.7.0_25
+Built-By: bahadyr
+Bundle-Description: Packages Manager Bundle
+Bundle-ManifestVersion: 2
+Bundle-Name: Kiskis Management Server Packages Manager
+Bundle-SymbolicName: org.safehaus.kiskis.mgmt.server.manager.packages
+Bundle-Version: 0.0.1.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Tool: Bnd-2.1.0.20130426-122213

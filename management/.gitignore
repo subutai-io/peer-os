@@ -9,7 +9,6 @@
 .settings
 .metadata
 target
-META-INF
 
 # Package Files #
 *.jar

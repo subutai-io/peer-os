@@ -17,11 +17,12 @@
         <module>server</module>
         <module>server-broker</module>
         <module>ui</module>
+        <module>backend</module>
         <module>manager-hostname</module>
         <module>manager-packages</module>
         <module>server-karaf</module>
         <module>motd</module>
-        <module>vaadinbridge</module>
+
     </modules>
 
     <description>Parent project for the Kiskis Management Server Artifacts</description>
