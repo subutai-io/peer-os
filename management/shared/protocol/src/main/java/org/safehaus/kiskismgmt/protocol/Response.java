@@ -4,6 +4,8 @@
  */
 package org.safehaus.kiskismgmt.protocol;
 
+import java.util.List;
+
 /**
  *
  * @author Dilshat
@@ -21,6 +23,15 @@ public class Response {
     private Integer pid;
     public String macAddress;
     public String hostname;
+    public List<String> ips;
+
+    public List<String> getIps() {
+        return ips;
+    }
+
+    public void setIps(List<String> ips) {
+        this.ips = ips;
+    }
 
     public String getMacAddress() {
         return macAddress;
