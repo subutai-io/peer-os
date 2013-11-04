@@ -23,18 +23,14 @@ import hadoopTest.TestRemoteHadoop;
 import hiveTest.TestHiveExternalResource;
 import hiveTest.TestRemoteHive;
 import junit.framework.JUnit4TestAdapter;
-import luceneTest.TestLuceneExternalResource;
-import mahoutTest.TestMahoutExternalResource;
+import luceneTest.TestLucene;
+import mahoutTest.TestMahout;
 import mongoDBTest.TestMongoDBExternalResource;
-import mongoDBTest.TestRemoteMongoDB;
 import oozieTest.TestOozieExternalResource;
-import oozieTest.TestRemoteOozie;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import pigTest.TestPigExternalResource;
-import solrTest.TestRemoteSolr;
 import solrTest.TestSolrExternalResource;
-import stormTest.TestRemoteStorm;
 import stormTest.TestStormExternalResource;
 
 // This section declares all of the test classes in your program.
@@ -46,34 +42,34 @@ import stormTest.TestStormExternalResource;
 //        RunHadoopandWait.class,
 //        TestHadoopExternalResource.class,
 //        TestRemoteHadoop.class,
-//        TestMahoutExternalResource.class,
+//        TestMahout.class,
 //        TestPigExternalResource.class,
 //        TestRemoteOozie.class,
 //        TestOozieExternalResource.class,
-//        TestLuceneExternalResource.class,
+//        TestLucene.class,
 //        TestRemoteSolr.class,
-//        TestSolrExternalResource.class,
+        TestSolrExternalResource.class,
 //        TestStormExternalResource.class,
 //        TestRemoteStorm.class,
-        TestRemoteMongoDB.class,
+//        TestRemoteMongoDB.class,
 //        TestMongoDBExternalResource.class,
 
 })
 /**
-* ...
-*
-* @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
-* @version $Rev$
-*/
+ * ...
+ *
+ * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @version $Rev$
+ */
 public class AllTests {
-    // This can be empty if you are using an IDE that includes support for JUnit
-    // such as Eclipse. However, if you are using Java on the command line or
-    // with a simpler IDE like JGrasp or jCreator, the following main() and
-    // suite()
-    // might be helpful.
+//    This can be empty if you are using an IDE that includes support for JUnit
+//    such as Eclipse. However, if you are using Java on the command line or
+//    with a simpler IDE like JGrasp or jCreator, the following main() and
+//    suite()
+//    might be helpful.
 
-    // Execution begins at main(). In this test class, we will execute
-    // a text test runner that will tell you if any of your tests fail.
+//    Execution begins at main(). In this test class, we will execute
+//    a text test runner that will tell you if any of your tests fail.
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }

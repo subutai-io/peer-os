@@ -26,15 +26,21 @@ import hadoop.WordCountExample.WordReducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
+import org.apache.hadoop.hdfs.protocol.ClientProtocol;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Scanner;
 
 
@@ -52,7 +58,7 @@ public class TestHadoopExternalResource {
     String inputPathHDFS="/home/emin/dft-input/dft";
     String inputPathLocal = "/home/emin/Desktop/hadoop_play/dft";
     String outputPath="/home/emin/dft-output";
-    String mapredJarPath = "/home/emin/workspace/TestLib/target/TestLib-1.0-SNAPSHOT.jar";
+    String mapredJarPath = "/home/emin/main/Kiskis Big Data/target/KiskisBigData-1.0-SNAPSHOT.jar";
 
     @Test
     public void testHadoopCluster() throws IOException, ClassNotFoundException, InterruptedException {
@@ -79,33 +85,32 @@ public class TestHadoopExternalResource {
         job.waitForCompletion(true);
 //        HadoopExternalResource.waitForAllTime();
     }
+    @Test
+    public void printHdfsStatistics() throws IOException {
+        Configuration conf = resource.getConf();
+        FileSystem fs = FileSystem.get(conf);
+        DistributedFileSystem dfs = (DistributedFileSystem) fs;
+        System.out.println("Content Summary: "+dfs.getClient().namenode.getContentSummary("/"));
+        ClientProtocol clientProtocol = dfs.getClient().namenode;
+        try {
+            System.out.println("Printing Distributed File System Home Directory:");
+            FileSystem fileSystem = DistributedFileSystem.get(conf);
+            System.out.println(fileSystem.getHomeDirectory());
+            System.out.println("Statistics:");
+            for (FileSystem.Statistics statistics : DistributedFileSystem.getAllStatistics()) {
+                System.out.println(statistics.toString());
+            }
 
-//    private static void removeDirectoryFromHDFS(FileSystem fs, String path)
-//    {
-//        try {
-//            if(fs.exists(new Path(path)))
-//            {
-//                System.out.println(path + " exists and it is being deleted for the new execution!");
-//                fs.delete(new Path(path), true);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
-//    }
-//    private static void copyDirectoryToHDFS(FileSystem fs, String inputPathLocal, String inputPathHDFS)
-//    {
-//        try {
-//            if(!fs.exists(new Path(inputPathHDFS)))
-//            {
-//                System.out.println("Input directory does not exist on HDFS, copying from local filesystem to HDFS");
-//                fs.copyFromLocalFile(false,true, new Path(inputPathLocal),new Path(inputPathHDFS));
-//            }
-//            else
-//            {
-//                System.out.println("Input directory already exists on HDFS!");
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
-//    }
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+    }
+    @Test
+    public void checkJobTrackerStatus() throws IOException {
+        JobClient jobClient = new JobClient(new InetSocketAddress("localhost", 9000), new Configuration());
+        System.out.println("JobTracker State: " + jobClient.getClusterStatus().getJobTrackerState().toString());
+        Assert.assertTrue(jobClient.getClusterStatus().getJobTrackerState().toString().equalsIgnoreCase("RUNNING"));
+    }
+
 }

@@ -43,6 +43,7 @@
                 </configuration>
             </plugin>
 
+
         </plugins>
     </build>
 
@@ -113,18 +114,6 @@
                     <artifactId>hadoop-core</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mahout</groupId>
-            <artifactId>mahout-math</artifactId>
-            <version>0.8</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mahout</groupId>
-            <artifactId>mahout-utils</artifactId>
-            <version>0.5</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.mahout</groupId>
@@ -413,13 +402,35 @@
         </dependency>
         <!-- Storm -->
 
+
         <!-- MongoDB -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.11.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>2.11.1</version>
+        </dependency>
+
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
             <version>1.40</version>
         </dependency>
         <!-- MongoDB -->
+
+        <!-- Sqoop -->
+        <dependency>
+            <groupId>org.apache.sqoop</groupId>
+            <artifactId>sqoop</artifactId>
+            <version>1.5.0-incubating-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Sqoop -->
 
 
     </dependencies>

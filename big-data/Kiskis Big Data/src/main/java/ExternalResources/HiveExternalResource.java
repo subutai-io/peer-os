@@ -19,6 +19,9 @@
  */
 package ExternalResources;
 
+import org.junit.rules.ExternalResource;
+
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -31,7 +34,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class HiveExternalResource extends MyExternalResource{
+public class HiveExternalResource extends ExternalResource {
 
     private static String driverName = "org.apache.hadoop.hive.jdbc.HiveDriver";
     private String host;
@@ -44,9 +47,14 @@ public class HiveExternalResource extends MyExternalResource{
     {
         host = "";
     }
-
+    public static final OutputStream DEV_NULL = new OutputStream() {
+        public void write(int b) { }
+    };
     @Override
     public void before() {
+        // Disable derby.log file creation
+        System.setProperty("derby.stream.error.field",this.getClass().getName()+"DEV_NULL");
+
         Logger logger = Logger.getLogger("MyLog");
         System.out.println("In before method of " + this.getClass().getName());
         try {
@@ -70,7 +78,6 @@ public class HiveExternalResource extends MyExternalResource{
 //            }
         }
     }
-
     public Connection getCon() {
         return con;
     }

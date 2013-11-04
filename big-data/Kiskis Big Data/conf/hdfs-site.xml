@@ -27,5 +27,4 @@
 	    	<value>${user.name}</value>
 	</property>
 
-
 </configuration>

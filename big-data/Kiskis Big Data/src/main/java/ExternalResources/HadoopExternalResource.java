@@ -21,7 +21,7 @@ package ExternalResources;
 
 import ExternalResources.Threads.*;
 import hadoop.HdfsAdmin;
-import ubuntu.JavaCheck;
+import org.junit.rules.ExternalResource;
 import org.apache.hadoop.conf.Configuration;
 
 /**
@@ -30,7 +30,7 @@ import org.apache.hadoop.conf.Configuration;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class HadoopExternalResource extends MyExternalResource {
+public class HadoopExternalResource extends ExternalResource {
 
     private String nameNode;
     private String jobTracker;
@@ -38,6 +38,12 @@ public class HadoopExternalResource extends MyExternalResource {
     boolean isLocal;
     private Configuration conf;
 
+    /**
+     *
+     * @param nameNode set this argument to the IP address of the machine that is running nameNode
+     * @param jobTracker set this argument to the IP address of the machine that is running jobTracker
+     * @param userName set this argument to the username that has the access to the file system
+     */
     public HadoopExternalResource(String nameNode, String jobTracker, String userName)
     {
         this.nameNode = nameNode;
@@ -62,23 +68,24 @@ public class HadoopExternalResource extends MyExternalResource {
         System.out.println("Accessing to the remote cluster");
         setConf(new Configuration());
         // Check if namenode and jobtracker processes are running on the computers of the given IPs
-        if (JavaCheck.checkJavaProcess("NameNode", userName + "@" + nameNode) && JavaCheck.checkJavaProcess("JobTracker",userName+"@"+jobTracker))
-        {
+//        if (JavaCheck.checkJavaProcess("NameNode", userName + "@" + nameNode) && JavaCheck.checkJavaProcess("JobTracker",userName+"@"+jobTracker))
+//        {
 //            System.out.println("NameNode and JobTracker are running on the given machines of IPs");
             getConf().set("fs.default.name", "hdfs://" + nameNode + ":8020");
             getConf().set("mapred.job.tracker", jobTracker + ":9000");
             System.setProperty("HADOOP_USER_NAME", userName);
-        }
-        else
-        {
-            System.out.println("NameNode and JobTracker are NOT running on the given machines of IPs");
-            isLocal = true;
-            startLocalCluster();
-        }
+//        }
+//        else
+//        {
+//            System.out.println("NameNode and JobTracker are NOT running on the given machines of IPs");
+//            isLocal = true;
+//            startLocalCluster();
+//        }
     }
 
     public void startLocalCluster()
     {
+        conf = new Configuration();
         System.out.println("Starting Local Cluster!");
         Thread [] threads = new Thread[5];
         threads[0] = new NameNodeThread();
@@ -121,7 +128,7 @@ public class HadoopExternalResource extends MyExternalResource {
                 //Wait for the last threads execution
                 if(startCount==threads.length)
                     while(!threads[startCount-1].getState().toString().equalsIgnoreCase("WAITING"))
-                        doNothing();
+                    {}
             }
         }
         if(isSuccesful)
@@ -131,17 +138,6 @@ public class HadoopExternalResource extends MyExternalResource {
         }
         else
             System.out.println("The cluster is not started succesfully!!!");
-    }
-
-
-    private void doNothing() {
-    }
-    public static void waitForAllTime()
-    {
-        System.out.println("Waiting to stop...");
-        while(true)
-        {
-        }
     }
 
     @Override

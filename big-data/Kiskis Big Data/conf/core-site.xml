@@ -12,6 +12,7 @@
          <name>hadoop.tmp.dir</name>
          <value>/home/${user.name}/Desktop/hadoop_play/tmp</value>
     </property>
+
     <!-- OOZIE -->
     <property>
         <name>hadoop.proxyuser.emin.hosts</name>

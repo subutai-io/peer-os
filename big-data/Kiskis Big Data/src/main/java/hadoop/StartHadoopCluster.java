@@ -20,20 +20,9 @@
 package hadoop;
 
 import ExternalResources.Threads.*;
-import hadoop.WordCountExample.WordMapper;
-import hadoop.WordCountExample.WordReducer;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import ubuntu.JavaCheck;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 /**
  * ...
@@ -55,11 +44,14 @@ public class StartHadoopCluster {
         StartHadoopCluster a = new StartHadoopCluster();
         a.startLocalCluster();
         while(true)
+        {
             Thread.sleep(2147483647);
+        }
     }
 
     public void startLocalCluster()
     {
+        conf = new Configuration();
         System.out.println("Starting Local Cluster!");
         Thread [] threads = new Thread[5];
         threads[0] = new NameNodeThread();

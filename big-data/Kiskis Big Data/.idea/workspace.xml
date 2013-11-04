@@ -1,63 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_googlecode_javaewah_JavaEWAH_0_3_2.xml" afterPath="" />
+    <list default="true" id="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" name="Default" comment="Added some more test cases and made some minor changes on external resources.">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__asm_asm_3_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_ecyrd_speed4j_speed4j_0_9.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_github_stephenc_eaio_uuid_uuid_3_2_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_github_stephenc_findbugs_findbugs_annotations_1_3_9_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_github_stephenc_high_scale_lib_high_scale_lib_1_1_2.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_github_stephenc_jamm_0_2_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_guava_guava_14_0_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_ibm_icu_icu4j_49_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_ning_compress_lzf_0_8_4.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_jersey_core_1_8.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_jersey_json_1_8.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_jersey_server_1_8.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_api_1_0_4.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javolution_javolution_5_5_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__jdk_tools_jdk_tools_1_6.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_ST4_4_0_4.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_avro_avro_ipc_1_7_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_avro_avro_mapred_1_7_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_xml_bind_jaxb_impl_2_2_3_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_yammer_metrics_metrics_core_2_0_3.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_7_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_core_1_8_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_4.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_digester_commons_digester_1_8.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_httpclient_commons_httpclient_3_0_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_io_commons_io_2_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_3.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__edu_stanford_ppl_snaptree_0_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__io_netty_netty_3_5_9_Final.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_xml_bind_jaxb_api_2_2_2.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_xml_stream_stax_api_1_0_2.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__me_prettyprint_hector_core_1_0_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_java_dev_jets3t_jets3t_0_6_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_jpountz_lz4_lz4_1_1_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_sourceforge_nekohtml_nekohtml_1_9_17.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_antlr_3_2.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_cassandra_cassandra_all_1_2_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_cassandra_cassandra_thrift_1_2_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_cassandra_deps_avro_1_4_0_cassandra_1.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_compress_1_4_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_annotations_2_0_5_alpha.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_common_2_0_5_alpha.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_cli_0_11_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_common_0_11_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_exec_0_11_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_jdbc_0_11_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_metastore_0_11_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_serde_0_11_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_service_0_11_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_shims_0_11_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_math_2_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_core_1_2_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hbase_hbase_client_0_95_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hbase_hbase_common_0_95_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hbase_hbase_protocol_0_95_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_lucene_lucene_benchmark_4_3_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_mahout_mahout_examples_0_8.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_mahout_mahout_integration_0_8.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_mahout_mahout_utils_0_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_solr_solr_commons_csv_3_1_0.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_thrift_libfb303_0_9_0.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_thrift_libthrift_0_9_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_velocity_velocity_1_7.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_datanucleus_datanucleus_connectionpool_2_0_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_datanucleus_datanucleus_core_2_0_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_datanucleus_datanucleus_enhancer_2_0_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_datanucleus_datanucleus_rdbms_2_0_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_iq80_snappy_snappy_0_2.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_json_json_20090211.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mortbay_jetty_jetty_6_1_14.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/externalJars/jdo2-api-2.3-ec.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test/java/previousTest/HadoopExternalResource.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test/java/previousTest/TestHadoopExternalResource.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_cloudera_htrace_htrace_1_50.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_jackson_jackson_core_asl_1_9_12.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_jackson_jackson_jaxrs_1_7_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_jackson_jackson_mapper_asl_1_8_8.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_jackson_jackson_xc_1_7_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_jettison_jettison_1_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mindrot_jbcrypt_0_3m.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mongodb_bson_2_11_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mongodb_mongo_java_driver_2_11_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_jcl_1_6_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__stax_stax_api_1_0_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__xerces_xercesImpl_2_9_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/MyExternalResource.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/OrderExternalResources.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/ubuntu/JavaCheck.java" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/java/luceneTest/TestLuceneExternalResource.java" afterPath="$PROJECT_DIR$/src/test/java/luceneTest/TestLucene.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/java/mahoutTest/TestMahoutExternalResource.java" afterPath="$PROJECT_DIR$/src/test/java/mahoutTest/TestMahout.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/AllTests.java" afterPath="$PROJECT_DIR$/src/test/java/AllTests.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/DataNodeThread.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/DataNodeThread.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/HadoopExternalResource.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/HadoopExternalResource.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/hadoop/HdfsAdmin.java" afterPath="$PROJECT_DIR$/src/main/java/hadoop/HdfsAdmin.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/HiveExternalResource.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/HiveExternalResource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/JobTrackerThread.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/JobTrackerThread.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Kiskis Big Data.iml" afterPath="$PROJECT_DIR$/Kiskis Big Data.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/NameNodeThread.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/NameNodeThread.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/PigExternalResource.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/PigExternalResource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/SecondaryNameNodeThread.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/SecondaryNameNodeThread.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/SolrExternalResource.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/SolrExternalResource.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/hadoop/StartHadoopCluster.java" afterPath="$PROJECT_DIR$/src/main/java/hadoop/StartHadoopCluster.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/TaskTrackerThread.java" afterPath="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/TaskTrackerThread.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/hadoopTest/TestHadoopExternalResource.java" afterPath="$PROJECT_DIR$/src/test/java/hadoopTest/TestHadoopExternalResource.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/hiveTest/TestHiveExternalResource.java" afterPath="$PROJECT_DIR$/src/test/java/hiveTest/TestHiveExternalResource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/oozieTest/TestOozieExternalResource.java" afterPath="$PROJECT_DIR$/src/test/java/oozieTest/TestOozieExternalResource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/pigTest/TestPigExternalResource.java" afterPath="$PROJECT_DIR$/src/test/java/pigTest/TestPigExternalResource.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/conf/core-site.xml" afterPath="$PROJECT_DIR$/conf/core-site.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/conf/hadoop-env.sh" afterPath="$PROJECT_DIR$/conf/hadoop-env.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/conf/hdfs-site.xml" afterPath="$PROJECT_DIR$/conf/hdfs-site.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/conf/hive-site.xml" afterPath="$PROJECT_DIR$/conf/hive-site.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="TestLib.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/fragment.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383119893889" ignored="false" />
-    <file path="/HadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383127076932" ignored="false" />
-    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383134326754" ignored="false" />
-    <file path="/TestHadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612669819" ignored="false" />
-    <file path="/AllTests.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383130191328" ignored="false" />
-    <file path="/TestHiveExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383134223415" ignored="false" />
-    <file path="/pom.xml" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383125093666" ignored="false" />
-    <file path="/HiveExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383127495007" ignored="false" />
+    <file path="/fragment.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383207073265" ignored="false" />
+    <file path="/HadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383213339585" ignored="false" />
+    <file path="/Dummy.txt" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383546279180" ignored="false" />
+    <file path="/TestHadoopExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383213143962" ignored="false" />
+    <file path="/AllTests.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383292546004" ignored="false" />
+    <file path="/TestHiveExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383223388877" ignored="false" />
+    <file path="/pom.xml" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383307724631" ignored="false" />
+    <file path="/HiveExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383289053788" ignored="false" />
     <file path="$USER_HOME$/Desktop/my_hadoop-common-release-1.2.1/src/hdfs/hdfs-default.xml" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380280641465" ignored="false" />
     <file path="$USER_HOME$/Desktop/my_hadoop-common-release-1.2.1/src/c++/libhdfs/tests/conf/core-site.xml" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380284118658" ignored="false" />
     <file path="/NameNode.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380284144520" ignored="false" />
@@ -76,16 +120,16 @@
     <file path="$USER_HOME$/Desktop/my_hadoop-common-release-1.2.1/core-site.xml" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380518151234" ignored="false" />
     <file path="/DenemeExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380709044474" ignored="false" />
     <file path="/TestDenemeExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380700134249" ignored="false" />
-    <file path="/TaskTrackerThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380613546806" ignored="false" />
-    <file path="/SecondaryNameNodeThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380613465385" ignored="false" />
-    <file path="/NameNodeThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380776823823" ignored="false" />
-    <file path="/JobTrackerThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380621955582" ignored="false" />
+    <file path="/TaskTrackerThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383314084841" ignored="false" />
+    <file path="/SecondaryNameNodeThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383314079082" ignored="false" />
+    <file path="/NameNodeThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383314074366" ignored="false" />
+    <file path="/JobTrackerThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383314070690" ignored="false" />
     <file path="/DataNodeThread.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380613282526" ignored="false" />
     <file path="$USER_HOME$/Desktop/my_hadoop-common-release-1.2.1/src/mapred/org/apache/hadoop/mapred/JobTracker.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380622107429" ignored="false" />
     <file path="/JobTracker.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380622097725" ignored="false" />
     <file path="$USER_HOME$/Desktop/my_hadoop-common-release-1.2.1/src/mapred/org/apache/hadoop/mapred/JobHistory.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380622125441" ignored="false" />
-    <file path="/OozieExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382614146274" ignored="false" />
-    <file path="/TestOozieExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382613266043" ignored="false" />
+    <file path="/OozieExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383294409838" ignored="false" />
+    <file path="/TestOozieExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383138303321" ignored="false" />
     <file path="/MahoutExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380711635784" ignored="false" />
     <file path="/TestMahoutExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381303446947" ignored="false" />
     <file path="/RunHadoopandWait.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380808727762" ignored="false" />
@@ -97,9 +141,9 @@
     <file path="/mapred-site.xml" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1380889638310" ignored="false" />
     <file path="/core-site.xml" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383125375354" ignored="false" />
     <file path="/AbstractExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381141649119" ignored="false" />
-    <file path="/MyExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381141723512" ignored="false" />
+    <file path="/MyExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383141443824" ignored="false" />
     <file path="/TestPigExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381470923027" ignored="false" />
-    <file path="/PigExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381141087540" ignored="false" />
+    <file path="/PigExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383201325146" ignored="false" />
     <file path="/HDFS.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381324453005" ignored="false" />
     <file path="/hadoop-core-1.2.1.pom" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382703396310" ignored="false" />
     <file path="/denemeMahoutJob.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381302662770" ignored="false" />
@@ -111,26 +155,32 @@
     <file path="/LuceneExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381390509311" ignored="false" />
     <file path="/TestLuceneExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382613110251" ignored="false" />
     <file path="/RunLuceneExample.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381390976986" ignored="false" />
-    <file path="/JavaCheck.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381392807766" ignored="false" />
+    <file path="/JavaCheck.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383285420595" ignored="false" />
     <file path="/LocalOozieExample.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381392838252" ignored="false" />
     <file path="/sadsa.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1381472742451" ignored="false" />
-    <file path="/SolrExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382515891591" ignored="false" />
-    <file path="/TestSolrExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382612157334" ignored="false" />
+    <file path="/SolrExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383314450872" ignored="false" />
+    <file path="/TestSolrExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383295775228" ignored="false" />
     <file path="/TestRemoteSolr.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382344195060" ignored="false" />
     <file path="/StormExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382431718533" ignored="false" />
     <file path="/TestStormExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382448059984" ignored="false" />
     <file path="/WordCountTopology.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382446874835" ignored="false" />
     <file path="/ExclamationTopology.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382447406020" ignored="false" />
     <file path="/TestRemoteStorm.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382597202663" ignored="false" />
-    <file path="/StartHadoopCluster.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383134653495" ignored="false" />
-    <file path="/README" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382619789773" ignored="false" />
+    <file path="/StartHadoopCluster.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383213367766" ignored="false" />
+    <file path="/README" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383306496128" ignored="false" />
     <file path="/TestRemoteMongoDB.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382625522568" ignored="false" />
     <file path="/TestMongoDBExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383133231457" ignored="false" />
     <file path="/MongoExternalResource.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1382698757831" ignored="false" />
-    <file path="/hadoop-env.sh" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383118458326" ignored="false" />
-    <file path="/TestRemoteHive.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383127202062" ignored="false" />
-    <file path="/TestRemoteHadoop.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383132549085" ignored="false" />
-    <file path="/HdfsAdmin.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383132299415" ignored="false" />
+    <file path="/hadoop-env.sh" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383291370301" ignored="false" />
+    <file path="/TestRemoteHive.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383201107367" ignored="false" />
+    <file path="/TestRemoteHadoop.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383212998872" ignored="false" />
+    <file path="/HdfsAdmin.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383138449526" ignored="false" />
+    <file path="/OrderExternalResources.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383141451671" ignored="false" />
+    <file path="/TestMahout.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383227988001" ignored="false" />
+    <file path="/kMeansJob.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383227564772" ignored="false" />
+    <file path="/dummyTest.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383292791053" ignored="false" />
+    <file path="/Admin.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383294145352" ignored="false" />
+    <file path="/TestSqoop.java" changelist="fdc6f722-3903-4fc9-bcf8-5bfd3197c069" time="1383307577613" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +189,7 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/KisKis Big Data$AllTests.coverage" NAME="AllTests Coverage Results" MODIFIED="1383121982390" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/KisKis Big Data$AllTests.coverage" NAME="AllTests Coverage Results" MODIFIED="1383142341481" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -153,68 +203,7 @@
     <sortChildren value="false" />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/JobTrackerThread.java" line="39" class="ExternalResources.Threads.JobTrackerThread" package="ExternalResources.Threads">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/SecondaryNameNodeThread.java" line="37" class="ExternalResources.Threads.SecondaryNameNodeThread" package="ExternalResources.Threads">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/TaskTrackerThread.java" line="38" class="ExternalResources.Threads.TaskTrackerThread" package="ExternalResources.Threads">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/hiveTest/TestRemoteHive.java" line="50" class="hiveTest.TestRemoteHive" package="hiveTest">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </line_breakpoints>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -251,7 +240,38 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/TaskTrackerThread.java" line="38" class="ExternalResources.Threads.TaskTrackerThread" package="ExternalResources.Threads">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/hiveTest/TestRemoteHive.java" line="52" class="hiveTest.TestRemoteHive" package="hiveTest">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -261,69 +281,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="AllTests.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/AllTests.java">
+      <file leaf-file-name="MongoExternalResource.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/MongoExternalResource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="0" selection-start="1087" selection-end="1087" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#3187#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TestMongoDBExternalResource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/mongoDBTest/TestMongoDBExternalResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="52" column="5" selection-start="1905" selection-end="1905" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HiveExternalResource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/HiveExternalResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="79" column="6" selection-start="2631" selection-end="2697" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#2700#0" expanded="true" />
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TestHadoopExternalResource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/hadoopTest/TestHadoopExternalResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="19" selection-start="2351" selection-end="2351" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="StartHadoopCluster.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/hadoop/StartHadoopCluster.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="57" column="35" selection-start="2151" selection-end="2161" vertical-scroll-proportion="0.4524237">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RunHadoopandWait.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/hadoopTest/RunHadoopandWait.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="16" selection-start="1221" selection-end="1221" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TestHiveExternalResource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/hiveTest/TestHiveExternalResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="61" column="26" selection-start="1967" selection-end="1967" vertical-scroll-proportion="0.0">
+            <state line="75" column="32" selection-start="2613" selection-end="2613" vertical-scroll-proportion="0.76581573">
               <folding />
             </state>
           </provider>
@@ -348,22 +309,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/test/java/hiveTest/TestRemoteHive.java" />
-        <option value="$PROJECT_DIR$/src/test/java/oozieTest/TestOozieExternalResource.java" />
-        <option value="$PROJECT_DIR$/src/main/java/oozie/LocalOozieExample.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java" />
-        <option value="$PROJECT_DIR$/src/main/java/oozie/denemeOozieCluster.java" />
-        <option value="$PROJECT_DIR$/src/test/java/oozieTest/TestRemoteOozie.java" />
-        <option value="$PROJECT_DIR$/src/main/java/hadoop/HdfsAdmin.java" />
-        <option value="$PROJECT_DIR$/src/test/java/hadoopTest/TestRemoteHadoop.java" />
-        <option value="$PROJECT_DIR$/src/test/java/hiveTest/TestHiveExternalResource.java" />
-        <option value="$PROJECT_DIR$/src/test/java/mongoDBTest/TestMongoDBExternalResource.java" />
-        <option value="$PROJECT_DIR$/src/test/java/AllTests.java" />
-        <option value="$PROJECT_DIR$/src/test/java/mongoDBTest/TestRemoteMongoDB.java" />
+        <option value="$PROJECT_DIR$/src/main/java/system/Admin.java" />
         <option value="$PROJECT_DIR$/src/main/java/ExternalResources/HadoopExternalResource.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/HiveExternalResource.java" />
-        <option value="$PROJECT_DIR$/src/test/java/hadoopTest/TestHadoopExternalResource.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java" />
+        <option value="$PROJECT_DIR$/src/test/java/solrTest/TestSolrExternalResource.java" />
+        <option value="$PROJECT_DIR$/README" />
+        <option value="$PROJECT_DIR$/src/test/java/sqoopTest/TestSqoop.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/test/java/AllTests.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/DataNodeThread.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/JobTrackerThread.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/NameNodeThread.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/SecondaryNameNodeThread.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/Threads/TaskTrackerThread.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/SolrExternalResource.java" />
         <option value="$PROJECT_DIR$/src/main/java/hadoop/StartHadoopCluster.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ExternalResources/MongoExternalResource.java" />
       </list>
     </option>
   </component>
@@ -387,24 +348,6 @@
           <option name="myItemId" value="KiskisBigData" />
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
         </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Dependencies" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$DependenciesNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="KiskisBigData" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Plugins" />
-          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$PluginsNode" />
-        </PATH_ELEMENT>
       </PATH>
       <PATH>
         <PATH_ELEMENT>
@@ -426,9 +369,9 @@
     <option name="skipTests" value="true" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="65" />
-    <option name="y" value="24" />
-    <option name="width" value="1863" />
+    <option name="x" value="64" />
+    <option name="y" value="-4" />
+    <option name="width" value="1857" />
     <option name="height" value="1085" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -464,7 +407,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -553,7 +496,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="solrTest" />
+              <option name="myItemId" value="oozieTest" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -579,7 +522,33 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="mongoDBTest" />
+              <option name="myItemId" value="hiveTest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="KisKis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Kiskis Big Data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="hadoopTest" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -671,113 +640,33 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="hadoop" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="KisKis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Kiskis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="ExternalResources" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="KisKis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Kiskis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="conf" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="KisKis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Kiskis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="conf" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="conf" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="KisKis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Kiskis Big Data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="conf" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="conf" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hadoop-conf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="project.structure.last.edited" value="Modules" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="102" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="201" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="112" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="221" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="201" />
-    <property name="recentsLimit" value="5" />
-    <property name="MemberChooser.sorted" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="recentsLimit" value="5" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="102" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
-    <property name="last_opened_file_path" value="$USER_HOME$/temp_add" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="227" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1126" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="1126" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="227" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="221" />
+    <property name="last_opened_file_path" value="/opt/hadoop-1.2.1/hadoop-tools-1.2.1.jar!/" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="115" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="537" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="537" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="115" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="112" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -785,26 +674,26 @@
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
     <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
-    <property name="options.lastSelected" value="reference.settings.project.maven.repository.indices" />
     <property name="ChangesBrowser.SHOW_FLATTEN" value="false" />
+    <property name="options.lastSelected" value="reference.settings.project.maven.repository.indices" />
     <property name="project.structure.side.proportion" value="0.28486648" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
     <property name="restartRequiresConfirmation" value="true" />
-    <property name="dynamic.classpath" value="false" />
     <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateTestDialog.Recents.Supers">
-      <recent name="" />
-    </key>
     <key name="CreateTestDialog.RecentsKey">
       <recent name="hadoop" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="hadoop" />
@@ -813,6 +702,9 @@
       <recent name="$PROJECT_DIR$/src/main/java" />
       <recent name="$PROJECT_DIR$/src/test/java/hadoopTest" />
       <recent name="$PROJECT_DIR$/src/main/java/hadoop" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
@@ -855,19 +747,6 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -896,6 +775,19 @@
       <listeners />
       <method />
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" />
@@ -909,6 +801,17 @@
       <option name="PASS_PARENT_ENVS" value="true" />
       <module name="" />
       <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="CFConfiguration" factoryName="Remote">
+      <option name="PORT" value="80" />
+      <option name="LOCAL" value="false" />
+      <deployment />
+      <server-settings>
+        <option name="USERNAME" value="" />
+        <option name="PASSWORD" value="" />
+        <data />
+      </server-settings>
       <method />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -930,34 +833,6 @@
       </option>
       <envs />
       <patterns />
-      <method />
-    </configuration>
-    <configuration default="true" type="CFConfiguration" factoryName="Remote">
-      <option name="PORT" value="80" />
-      <option name="LOCAL" value="false" />
-      <deployment />
-      <server-settings>
-        <option name="USERNAME" value="" />
-        <option name="PASSWORD" value="" />
-        <data />
-      </server-settings>
-      <method />
-    </configuration>
-    <configuration default="false" name="JavaCheck" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="ubuntu.JavaCheck" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="Kiskis Big Data" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
     <configuration default="false" name="NameNode" type="Application" factoryName="Application">
@@ -983,83 +858,9 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="DataNode" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="org.apache.hadoop.hdfs.server.datanode.DataNode" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="Kiskis Big Data" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="SecondaryNameNode" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="org.apache.hadoop.hdfs.server.namenode.SecondaryNameNode" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="Kiskis Big Data" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="JobTracker" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="org.apache.hadoop.mapred.JobTracker" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="Kiskis Big Data" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
     <configuration default="false" name="StartHadoopCluster" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="hadoop.StartHadoopCluster" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="Kiskis Big Data" />
-      <envs />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="denemeOozieCluster" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="oozie.denemeOozieCluster" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
@@ -1089,7 +890,7 @@
       <option name="MAIN_CLASS_NAME" value="AllTests" />
       <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="VM_PARAMETERS" value="" />
       <option name="PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ENV_VARIABLES" />
@@ -1111,15 +912,10 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <list size="8">
-      <item index="0" class="java.lang.String" itemvalue="Application.JavaCheck" />
-      <item index="1" class="java.lang.String" itemvalue="Application.NameNode" />
-      <item index="2" class="java.lang.String" itemvalue="Application.DataNode" />
-      <item index="3" class="java.lang.String" itemvalue="Application.SecondaryNameNode" />
-      <item index="4" class="java.lang.String" itemvalue="Application.JobTracker" />
-      <item index="5" class="java.lang.String" itemvalue="Application.StartHadoopCluster" />
-      <item index="6" class="java.lang.String" itemvalue="Application.denemeOozieCluster" />
-      <item index="7" class="java.lang.String" itemvalue="JUnit.AllTests" />
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="Application.NameNode" />
+      <item index="1" class="java.lang.String" itemvalue="Application.StartHadoopCluster" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.AllTests" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -1174,7 +970,11 @@
       <created>1382621248858</created>
       <updated>1382621248858</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Added some more test cases and made some minor changes on external resources.">
+      <created>1383135004022</created>
+      <updated>1383135004022</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -1198,13 +998,12 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="24" width="1863" height="1085" extended-state="6" />
+    <frame x="64" y="-4" width="1857" height="1085" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.500277" order="7" side_tool="true" content_ui="tabs" x="95" y="528" width="1805" height="307" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2498615" sideWeight="0.670247" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32963988" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4414608" sideWeight="0.499723" order="3" side_tool="false" content_ui="tabs" />
@@ -1212,21 +1011,22 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43071964" sideWeight="0.500831" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32867885" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42964554" sideWeight="0.500831" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32867885" sideWeight="0.499723" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32867885" sideWeight="0.499723" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2498615" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24044321" sideWeight="0.67132115" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24709141" sideWeight="0.57035446" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20498616" sideWeight="0.67132115" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43071964" sideWeight="0.49916896" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23379502" sideWeight="0.57035446" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42964554" sideWeight="0.49916896" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="164" y="96" width="1657" height="885" />
-      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23767313" sideWeight="0.26100966" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23767313" sideWeight="0.5692803" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32867885" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39957035" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -1302,123 +1102,96 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/stormTest/TestRemoteStorm.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/SecondaryNameNodeThread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="13" selection-start="1350" selection-end="1350" vertical-scroll-proportion="-0.056277055">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/solrTest/TestSolrExternalResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="13" selection-start="1449" selection-end="1449" vertical-scroll-proportion="0.046">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/hadoopTest/TestRemoteHadoop.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="13" selection-start="1615" selection-end="1615" vertical-scroll-proportion="0.332">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ubuntu/JavaCheck.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="13" selection-start="1039" selection-end="1039" vertical-scroll-proportion="-0.5">
-          <folding />
-        </state>
+        <state line="31" column="13" selection-start="1187" selection-end="1187" vertical-scroll-proportion="0.37815127" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/NameNodeThread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="5" selection-start="1164" selection-end="1164" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="30" column="13" selection-start="1114" selection-end="1114" vertical-scroll-proportion="0.37815127" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/mongoDBTest/TestMongoDBExternalResource.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/JobTrackerThread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="52" column="5" selection-start="1905" selection-end="1905" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="38" column="13" selection-start="1318" selection-end="1318" vertical-scroll-proportion="0.3650108" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/Threads/DataNodeThread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="18" selection-start="1132" selection-end="1132" vertical-scroll-proportion="0.38922155" />
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/solr/solr-solrj/4.4.0/solr-solrj-4.4.0-sources.jar!/org/apache/solr/client/solrj/SolrServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="349" column="23" selection-start="14064" selection-end="14064" vertical-scroll-proportion="0.75409836" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/AllTests.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="0" selection-start="1087" selection-end="1087" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#3187#0" expanded="true" />
-          </folding>
-        </state>
+        <state line="50" column="23" selection-start="1966" selection-end="1966" vertical-scroll-proportion="-0.027310925" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/HiveExternalResource.java">
+    <entry file="file://$PROJECT_DIR$/kiskis.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="79" column="6" selection-start="2631" selection-end="2697" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#2700#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/hadoop/HdfsAdmin.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/system/Admin.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="31" selection-start="34" selection-end="34" vertical-scroll-proportion="0.027522936">
+        <state line="34" column="13" selection-start="1173" selection-end="1173" vertical-scroll-proportion="0.33193278" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/solrTest/TestSolrExternalResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="70" column="9" selection-start="2474" selection-end="2474" vertical-scroll-proportion="0.3067227" />
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/externalJars/oozie_jars/oozie-core-3.3.2.jar!/org/apache/oozie/local/LocalOozie.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="54" selection-start="568" selection-end="568" vertical-scroll-proportion="0.26439482">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/hadoopTest/TestHadoopExternalResource.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/SolrExternalResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="19" selection-start="2351" selection-end="2351" vertical-scroll-proportion="0.0">
+        <state line="79" column="35" selection-start="2869" selection-end="2869" vertical-scroll-proportion="0.76598173">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/hadoopTest/RunHadoopandWait.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/OozieExternalResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="16" selection-start="1221" selection-end="1221" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/HadoopExternalResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="138" column="23" selection-start="5073" selection-end="5073" vertical-scroll-proportion="0.33270678">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/mongoDBTest/TestRemoteMongoDB.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="51" selection-start="1603" selection-end="1603" vertical-scroll-proportion="0.6440367">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/MongoExternalResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="13" selection-start="1454" selection-end="1454" vertical-scroll-proportion="0.13157895">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/hiveTest/TestHiveExternalResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="61" column="26" selection-start="1967" selection-end="1967" vertical-scroll-proportion="0.0">
+        <state line="83" column="33" selection-start="2784" selection-end="2784" vertical-scroll-proportion="-0.015538291">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/hadoop/StartHadoopCluster.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="57" column="35" selection-start="2151" selection-end="2161" vertical-scroll-proportion="0.4524237">
+        <state line="24" column="26" selection-start="950" selection-end="950" vertical-scroll-proportion="0.016891891">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="0" selection-start="69" selection-end="69" vertical-scroll-proportion="0.049944505">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="423" column="24" selection-start="13254" selection-end="13254" vertical-scroll-proportion="0.68368477">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ExternalResources/MongoExternalResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="75" column="32" selection-start="2613" selection-end="2613" vertical-scroll-proportion="0.76581573">
           <folding />
         </state>
       </provider>

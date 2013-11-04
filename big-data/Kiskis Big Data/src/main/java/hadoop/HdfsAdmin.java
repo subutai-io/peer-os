@@ -173,4 +173,17 @@ public class HdfsAdmin {
         }
 
     }
+    public static void saveNameSpace()
+    {
+        try {
+            conf =  new Configuration();
+            fs = FileSystem.get(conf);
+            DistributedFileSystem dfs = (DistributedFileSystem) fs;
+            dfs.setSafeMode(FSConstants.SafeModeAction.SAFEMODE_ENTER);
+            dfs.saveNamespace();
+            dfs.setSafeMode(FSConstants.SafeModeAction.SAFEMODE_LEAVE);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
 }

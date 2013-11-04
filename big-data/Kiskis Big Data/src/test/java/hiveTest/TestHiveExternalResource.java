@@ -21,12 +21,13 @@ package hiveTest;
 
 import ExternalResources.HadoopExternalResource;
 import ExternalResources.HiveExternalResource;
-import ExternalResources.MyExternalResource;
-import ExternalResources.OrderExternalResources;
 import org.junit.*;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * ...
@@ -37,27 +38,23 @@ import java.util.ArrayList;
 
 public class TestHiveExternalResource {
 
-    static ArrayList<MyExternalResource> resources;
-
-
-
-
-// @ClassRule
-//    public static HadoopExternalResource hadoopResource = new HadoopExternalResource();
-    @ClassRule
+    public static HadoopExternalResource hadoopResource = new HadoopExternalResource();
     public static HiveExternalResource hiveResource = new HiveExternalResource();
 
-
-//    @ClassRule
-//    public static OrderExternalResources abstractExternalResource = new OrderExternalResources(resources);
+    @ClassRule
+    public static TestRule chain = RuleChain.outerRule(hiveResource);
+//    public static TestRule chain = RuleChain.outerRule(hadoopResource).around(hiveResource);
 
     @Test
     public void runHqlQueries() {
+        Logger logger = Logger.getLogger("MyLog");
         Statement stmt = null;
+        String tableName = "deneme";
+        ResultSet res;
         try {
+
             stmt = hiveResource.getCon().createStatement();
-            ResultSet res;
-//            stmt.executeQuery("CREATE TABLE " + "deneme" + " (key INT, value STRING)");
+            stmt.executeQuery("CREATE TABLE " + tableName + " (key INT, value STRING)");
 //            show tables
             String sql = "show tables";
             System.out.println("Running: " + sql);
@@ -66,9 +63,20 @@ public class TestHiveExternalResource {
                 System.out.println(res.getString(1));
             }
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.log(Level.WARNING, "--Table " + tableName +" already exists!");
+            String sql = "show tables";
+            System.out.println("Running: " + sql);
+            if (stmt != null) {
+                try {
+                    res = stmt.executeQuery(sql);
+                    while (res.next()) {
+                        System.out.println(res.getString(1));
+                    }
+                } catch (SQLException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
         }
-//        HadoopExternalResource.waitForAllTime();
     }
 
 }
