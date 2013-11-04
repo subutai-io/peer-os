@@ -10,6 +10,7 @@ package org.safehaus.kiskismgmt.protocol;
  */
 public class Response {
 
+    private String source;
     private ResponseType type;
     private Integer exitCode; //might be null if not final response chunk
     private String uuid;
@@ -18,6 +19,14 @@ public class Response {
     private String stdOut;
     private String stdErr;
     private Integer pid;
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
 
     public ResponseType getType() {
         return type;
@@ -85,6 +94,6 @@ public class Response {
 
     @Override
     public String toString() {
-        return "Response{" + "type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + '}';
+        return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + '}';
     }
 }

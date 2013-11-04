@@ -13,9 +13,10 @@ import java.util.Map;
 
 public class CommandFactory {
 
-    public static ICommand createRequest(RequestType type, String uuid, Long reqSeqNum,
+    public static ICommand createRequest(RequestType type, String uuid, String source, Long reqSeqNum,
             String workDir, String program, OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath, String stdErrPath, String runAs, List<String> args, Map<String, String> envVars) {
         Request req = new Request();
+        req.setSource(source);
         req.setType(type);
         req.setUuid(uuid);
         req.setRequestSequenceNumber(reqSeqNum);
@@ -32,8 +33,9 @@ public class CommandFactory {
         return new Command(req);
     }
 
-    public static ICommand createResponse(ResponseType type, String uuid, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid) {
+    public static ICommand createResponse(ResponseType type, String uuid, String source, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid) {
         Response res = new Response();
+        res.setSource(source);
         res.setType(type);
         res.setUuid(uuid);
         res.setExitCode(exitCode);

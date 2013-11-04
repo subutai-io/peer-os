@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public class Request {
 
+    private String source;
     private RequestType type;
     private String uuid;
     private Long requestSequenceNumber;
@@ -25,6 +26,14 @@ public class Request {
     private String runAs;
     private List<String> args;
     private Map<String, String> environment;
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
 
     public RequestType getType() {
         return type;
@@ -124,6 +133,6 @@ public class Request {
 
     @Override
     public String toString() {
-        return "Request{" + "type=" + type + ", uuid=" + uuid + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment + '}';
+        return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment + '}';
     }
 }
