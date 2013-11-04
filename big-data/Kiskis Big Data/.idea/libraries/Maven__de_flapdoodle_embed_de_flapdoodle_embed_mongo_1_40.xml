@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.mongo:1.40">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/flapdoodle/embed/de.flapdoodle.embed.mongo/1.40/de.flapdoodle.embed.mongo-1.40.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/de/flapdoodle/embed/de.flapdoodle.embed.mongo/1.40/de.flapdoodle.embed.mongo-1.40-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/flapdoodle/embed/de.flapdoodle.embed.mongo/1.40/de.flapdoodle.embed.mongo-1.40-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

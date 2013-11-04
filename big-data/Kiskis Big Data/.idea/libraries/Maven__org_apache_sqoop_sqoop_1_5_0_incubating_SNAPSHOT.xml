@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.sqoop:sqoop:1.5.0-incubating-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/sqoop/sqoop/1.5.0-incubating-SNAPSHOT/sqoop-1.5.0-incubating-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/sqoop/sqoop/1.5.0-incubating-SNAPSHOT/sqoop-1.5.0-incubating-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/sqoop/sqoop/1.5.0-incubating-SNAPSHOT/sqoop-1.5.0-incubating-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
