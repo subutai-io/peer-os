@@ -12,13 +12,17 @@ import java.util.List;
  */
 public interface AgentFacade {
 
+    public Agent getAgent(Long id);
+
     public Agent getAgent(String uuid);
 
     public List<Agent> getAgents();
 
     public void removeAgent(String uuid);
 
+    public void removeAgent(Long id);
+
     public void createAgent(String uuid);
-    
+
     public int getAgentCount();
 }

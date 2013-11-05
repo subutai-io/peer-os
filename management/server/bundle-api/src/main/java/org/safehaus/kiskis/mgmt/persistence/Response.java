@@ -11,6 +11,8 @@ package org.safehaus.kiskis.mgmt.persistence;
 public interface Response {
 
     public Long getId();
+    
+    public String getSource();
 
     public String getUuid();
 

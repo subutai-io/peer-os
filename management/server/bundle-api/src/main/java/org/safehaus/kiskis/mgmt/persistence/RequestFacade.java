@@ -14,13 +14,13 @@ public interface RequestFacade {
 
     public Request getRequest(long id);
 
-    public Request getRequest(String uuid, long requestSequenceNumber);
+    public Request getRequest(String source, String uuid, long requestSequenceNumber);
 
-    public List<Request> getRequests(String uuid, int limit);
+    public List<Request> getRequests(String source, String uuid, boolean desc, int limit);
 
     public void removeRequest(long id);
 
-    public void createRequest(String uuid, long requestSequenceNumber, String body);
+    public void createRequest(String source, String uuid, long requestSequenceNumber, String body);
 
     public int getRequestCount();
 }

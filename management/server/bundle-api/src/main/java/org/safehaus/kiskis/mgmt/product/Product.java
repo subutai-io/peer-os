@@ -4,7 +4,7 @@
  */
 package org.safehaus.kiskis.mgmt.product;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -18,5 +18,5 @@ public interface Product {
 
     public String getContextPath();
 
-    public List<String> getCommands();
+    public Map<String, String> getCommands();
 }

@@ -4,11 +4,21 @@
  */
 package org.safehaus.kiskis.mgmt.persistence;
 
+import java.util.List;
+
 /**
  *
  * @author dilshat
  */
 public interface Agent {
 
+    public Long getId();
+
     public String getUUID();
+
+    public String getMacAddress();
+
+    public String getHostName();
+
+    public List<String> getIps();
 }

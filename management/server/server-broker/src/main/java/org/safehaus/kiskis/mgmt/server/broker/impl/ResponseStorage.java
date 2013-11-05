@@ -2,12 +2,12 @@ package org.safehaus.kiskis.mgmt.server.broker.impl;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.safehaus.kiskis.mgmt.registry.ProductRegistry;
 
 import org.safehaus.kiskismgmt.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
 
 import org.safehaus.kiskis.mgmt.server.broker.Activator;
-import org.safehaus.kiskis.mgmt.shared.protocol.commands.CommandEnum;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 10/10/13 Time: 4:48 PM To
@@ -18,6 +18,7 @@ public class ResponseStorage implements RegisteredHostInterface {
     private Set<Agent> agents;
     private List<AgentOutput> agentOutputs;
     private Set<Product> products;
+    private ProductRegistry registry;
 
     public ResponseStorage() {
         agents = new HashSet<Agent>();
@@ -44,12 +45,13 @@ public class ResponseStorage implements RegisteredHostInterface {
         return agents;
     }
 
+    public void setRegistry(ProductRegistry registry) {
+        this.registry = registry;
+    }
+
     @Override
     public Set<Product> getRegisteredProducts() {
         // TODO fetch product bundles from karaf
-        
-        
-        
         return products;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -94,6 +96,8 @@ public class ResponseStorage implements RegisteredHostInterface {
         Request req = null;
         //TO-DO Create result from Response for ui
 
+        System.out.println(registry.getProducts().size());
+        
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
                 Agent agent = new Agent();
