@@ -20,9 +20,11 @@
         <module>backend</module>
         <module>manager-hostname</module>
         <module>manager-packages</module>
-        <module>server-karaf</module>
         <module>motd</module>
-
+        <module>bundle-api</module>
+        <module>bundle-api-impl</module>
+        <module>mgmt-bundle-impl</module>
+        <module>server-karaf</module>
     </modules>
 
     <description>Parent project for the Kiskis Management Server Artifacts</description>

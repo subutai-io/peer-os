@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383553744793
+Bnd-LastModified: 1383654724624
 Build-Jdk: 1.7.0_25
 Built-By: bahadyr
 Bundle-Activator: org.safehaus.kiskis.mgmt.server.Activator

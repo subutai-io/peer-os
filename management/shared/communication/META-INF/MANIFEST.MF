@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383553728944
+Bnd-LastModified: 1383654718383
 Build-Jdk: 1.7.0_25
 Built-By: bahadyr
 Bundle-Activator: org.safehaus.kiskis.mgmt.shared.communication.Activato
@@ -11,9 +11,9 @@ Bundle-Name: Kiskis Management Shared Communication
 Bundle-SymbolicName: org.safehaus.kiskis.mgmt.shared.communication
 Bundle-Version: 0.0.1.SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
-Export-Package: org.safehaus.kiskis.mgmt.shared.communication;version="0
- .0.1.SNAPSHOT";uses:="org.osgi.framework,org.safehaus.kiskis.mgmt.share
- d.protocol.interfaces.server",org.safehaus.kiskis.mgmt.shared.communica
+Export-Package: org.safehaus.kiskis.mgmt.shared.communication;uses:="org
+ .osgi.framework,org.safehaus.kiskis.mgmt.shared.protocol.interfaces.ser
+ ver";version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.communica
  tion.util;version="0.0.1.SNAPSHOT";uses:="org.safehaus.kiskismgmt.proto
  col"
 Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.interfaces.serv

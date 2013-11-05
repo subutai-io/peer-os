@@ -146,6 +146,23 @@
                         <configuration>
                             <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
                             <artifactItems>
+
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>product-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>product-registry</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hadoop-mgmt-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383553744454
+Bnd-LastModified: 1383654724376
 Build-Jdk: 1.7.0_25
 Built-By: bahadyr
 Bundle-Activator: org.safehaus.kiskis.mgmt.server.broker.Activator
@@ -23,7 +23,6 @@ Import-Package: org.osgi.framework;version="[1.6,2)",org.osgi.service.bl
  ueprint;version="[1.0.0,2.0.0)",org.safehaus.kiskis.mgmt.shared.protoco
  l.commands;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.i
  nterfaces;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.in
- terfaces.server;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.proto
- col.products;version="[0.0,1)",org.safehaus.kiskismgmt.protocol;version
- ="[0.0,1)"
+ terfaces.server;version="[0.0,1)",org.safehaus.kiskismgmt.protocol;vers
+ ion="[0.0,1)"
 Tool: Bnd-2.1.0.20130426-122213
