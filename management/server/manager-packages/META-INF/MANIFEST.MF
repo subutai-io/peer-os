@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383831728938
+Bnd-LastModified: 1383839928721
 Build-Jdk: 1.7.0_25
-Built-By: daralbaev
+Built-By: dilshat
 Bundle-Description: Packages Manager Bundle
 Bundle-ManifestVersion: 2
 Bundle-Name: Kiskis Management Server Packages Manager

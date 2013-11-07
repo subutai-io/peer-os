@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383831728831
+Bnd-LastModified: 1383839928618
 Build-Jdk: 1.7.0_25
-Built-By: daralbaev
+Built-By: dilshat
 Bundle-Description: Hostname Manager Bundle
 Bundle-ManifestVersion: 2
 Bundle-Name: Kiskis Management Server Hostname Manager
