@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383817329373
+Bnd-LastModified: 1383817627773
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Activator: org.safehaus.kiskis.mgmt.shared.communication.Activato
