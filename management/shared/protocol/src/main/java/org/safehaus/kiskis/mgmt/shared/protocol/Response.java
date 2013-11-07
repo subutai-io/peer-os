@@ -125,6 +125,19 @@ public class Response {
 
     @Override
     public String toString() {
-        return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + ", macAddress=" + macAddress + ", hostname=" + hostname + '}';
+        return "Response{" +
+                "source='" + source + '\'' +
+                ", type=" + type +
+                ", exitCode=" + exitCode +
+                ", uuid='" + uuid + '\'' +
+                ", requestSequenceNumber=" + requestSequenceNumber +
+                ", responseSequenceNumber=" + responseSequenceNumber +
+                ", stdOut='" + stdOut + '\'' +
+                ", stdErr='" + stdErr + '\'' +
+                ", pid=" + pid +
+                ", macAddress='" + macAddress + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", ips=" + ips +
+                '}';
     }
 }
