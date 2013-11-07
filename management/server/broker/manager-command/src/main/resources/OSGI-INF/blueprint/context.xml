@@ -13,7 +13,8 @@
         <property name="communicationService" ref="communicationService"/>
     </bean>
     <service ref="commandManagerService"
-             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface">
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface"
+            ranking="1">
         <service-properties>
             <!-- This property is only important for the DOSGi tutorial -->
             <entry key="service.exported.interfaces" value="*"/>

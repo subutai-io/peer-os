@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <reference id="brokerService" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface"/>
+        <reference id="brokerService" availability="optional"
+                   interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface"/>
+        <bean id="communicationService"
+              class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"
+              init-method="init" destroy-method="destroy">
+            <property name="brokerService" ref="brokerService"/>
+        </bean>
 
-    <bean id="communicationService"
-          class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"
-          init-method="init" destroy-method="destroy">
-        <property name="brokerService" ref="brokerService"/>
-    </bean>
+<!--    <reference-list id="brokerService" availability="mandatory"
+                    interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface">
+        <reference-listener
+                bind-method="setBrokerService" unbind-method="unsetBrokerService">
+            <bean class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"/>
+        </reference-listener>
+    </reference-list>-->
+
     <service ref="communicationService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface">
         <service-properties>

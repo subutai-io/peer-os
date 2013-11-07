@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383844106806
+Bnd-LastModified: 1383851712406
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Blueprint: OSGI-INF/blueprint/context.xml
@@ -14,4 +14,7 @@ Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInter
 Import-Package: org.osgi.service.blueprint;version="[1.0.0,2.0.0)",org.s
  afehaus.kiskis.mgmt.shared.protocol;version="[0.0,1)",org.safehaus.kisk
  is.mgmt.shared.protocol.api;version="[0.0,1)"
+Import-Service: org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManage
+ rInterface;multiple:=false,org.safehaus.kiskis.mgmt.shared.protocol.api
+ .CommandManagerInterface;multiple:=false
 Tool: Bnd-2.1.0.20130426-122213

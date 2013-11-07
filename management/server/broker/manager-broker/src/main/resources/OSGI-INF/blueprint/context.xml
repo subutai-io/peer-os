@@ -12,7 +12,8 @@
     </bean>
 
     <service ref="brokerService"
-             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface">
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface"
+            ranking="3">
         <service-properties>
             <!-- This property is only important for the DOSGi tutorial -->
             <entry key="service.exported.interfaces" value="*"/>

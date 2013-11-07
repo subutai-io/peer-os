@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383844104442
+Bnd-LastModified: 1383851710007
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Description: Shared Protocol Bundle
