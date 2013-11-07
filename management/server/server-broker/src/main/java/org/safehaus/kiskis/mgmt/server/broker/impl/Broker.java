@@ -20,6 +20,7 @@ public class Broker implements BrokerInterface {
     public Request distribute(Response response) {
         Request req = null;
         //TO-DO Distribute response to Agent or Command Bundle
+        System.out.println(response.toString());
         return req;
     }
 }

@@ -49,7 +49,6 @@
                     <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.server.broker</Bundle-SymbolicName>
-                        <Bundle-Activator>org.safehaus.kiskis.mgmt.server.broker.Activator</Bundle-Activator>
                         <Export-Package>
                             {local-packages};{local-packages}.impl;version=${project.version};-noimport:=true
                         </Export-Package>

@@ -68,8 +68,8 @@ public class Activator implements BundleActivator {
     }
 
     public static BrokerInterface getServerBroker() {
-        ServiceReference refServerBroker =
+        ServiceReference brokerService =
                     Activator.context.getServiceReference(BrokerInterface.class.getName());
-        return ((BrokerInterface) Activator.context.getService(refServerBroker));
+        return ((BrokerInterface) Activator.context.getService(brokerService));
     }
 }
