@@ -5,7 +5,7 @@ import org.apache.activemq.broker.BrokerService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.shared.communication.impl.ServerMessageBroker;
+import org.safehaus.kiskis.mgmt.shared.communication.impl.CommunicationMessageListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
@@ -60,7 +60,7 @@ public class Activator implements BundleActivator {
             Destination adminQueue = session.createQueue(Common.MQ_SERVICE_QUEUE);
 
             MessageConsumer consumer = session.createConsumer(adminQueue);
-            consumer.setMessageListener(new ServerMessageBroker(session));
+            consumer.setMessageListener(new CommunicationMessageListener(session));
             System.out.println("ActiveMQ started...");
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, null, ex);

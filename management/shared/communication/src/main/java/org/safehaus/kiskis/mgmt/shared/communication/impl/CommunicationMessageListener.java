@@ -11,11 +11,11 @@ import javax.jms.TextMessage;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
-public class ServerMessageBroker implements MessageListener {
+public class CommunicationMessageListener implements MessageListener {
 
     Session session;
 
-    public ServerMessageBroker(Session session) {
+    public CommunicationMessageListener(Session session) {
         this.session = session;
     }
 
