@@ -20,7 +20,6 @@
 
     <modules>
         <module>shared</module>
-        <module>agent</module>
         <module>server</module>
     </modules>
 

@@ -155,6 +155,21 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--UI Dependencies-->
+
+                                <!--Broker Dependencies-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-broker</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-agent</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!--Broker Dependencies-->
+
+                                <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
@@ -165,26 +180,8 @@
                                     <artifactId>mgmt-shared-communication</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-broker</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-manager-hostname</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-manager-packages</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
+                                <!--Shared Dependencies-->
+
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin</artifactId>

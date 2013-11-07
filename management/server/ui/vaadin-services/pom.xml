@@ -31,7 +31,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}.server.ui.services</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

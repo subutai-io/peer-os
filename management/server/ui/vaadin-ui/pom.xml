@@ -30,7 +30,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}.server.ui</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

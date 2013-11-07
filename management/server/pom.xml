@@ -29,13 +29,10 @@
     </properties>
 
     <modules>
-        <module>server</module>
-        <module>server-broker</module>
-        <module>manager-hostname</module>
-        <module>manager-packages</module>
         <module>motd</module>
+        <module>broker</module>
         <module>ui</module>
-        <module>modules</module>
+        <module>ui-modules</module>
         <module>server-karaf</module>
     </modules>
 

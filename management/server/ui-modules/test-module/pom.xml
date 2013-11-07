@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-ui</artifactId>
+        <artifactId>modules</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ui-vaadin-bridge</artifactId>
+    <artifactId>test-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Vaadin Bridge</name>
-    <description>Kiskis Management Vaadin Bridge</description>
+    <name>Kiskis Management Test Module</name>
+    <description>Kiskis Management Test Module</description>
 
     <build>
         <plugins>
@@ -30,9 +31,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.server.ui.bridge</Bundle-SymbolicName>
-                        <Bundle-Activator>org.safehaus.kiskis.mgmt.server.ui.bridge.internal.VaadinBridgeActivator
-                        </Bundle-Activator>
+                        <Bundle-SymbolicName>${project.artifactId}.server.ui.modules</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
@@ -46,27 +45,32 @@
         </repository>
     </repositories>
 
-
     <dependencies>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${servlet.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>${osgi.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <artifactId>ui-vaadin-services</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${servlet.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <version>${osgi.version}</version>
-        </dependency>
     </dependencies>
+
 </project>

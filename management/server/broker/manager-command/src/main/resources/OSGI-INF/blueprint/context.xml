@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <reference id="persistenceCommandService" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface"/>
+
+    <reference id="communicationService" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface"/>
+
+    <bean id="commandManagerService"
+          class="org.safehaus.kiskis.mgmt.server.command.CommandManager">
+        <property name="persistenceCommandService" ref="persistenceCommandService"/>
+        <property name="communicationService" ref="communicationService"/>
+    </bean>
+    <service ref="commandManagerService"
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface">
+        <service-properties>
+            <!-- This property is only important for the DOSGi tutorial -->
+            <entry key="service.exported.interfaces" value="*"/>
+        </service-properties>
+    </service>
+</blueprint>

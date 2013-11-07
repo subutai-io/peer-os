@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-shared-parent</artifactId>
+        <artifactId>mgmt-server-broker-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mgmt-shared-communication</artifactId>
-    <name>Kiskis Management Shared Communication</name>
-    <description>Shared Communication Bundle</description>
+
+    <artifactId>mgmt-server-agent</artifactId>
+    <name>Kiskis Management Server Agent</name>
+    <description>Kiskis Management Server Agent</description>
 
     <packaging>bundle</packaging>
 
@@ -25,14 +27,9 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <version>${activemq.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms_1.1_spec</artifactId>
-            <version>1.1.1</version>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <artifactId>mgmt-shared-communication</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -53,10 +50,11 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.shared.communication</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.server.agent</Bundle-SymbolicName>
                         <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true
+                            {local-packages};{local-packages}.impl;version=${project.version};-noimport:=true
                         </Export-Package>
+                        <Import-Package>*</Import-Package>
                     </instructions>
                 </configuration>
             </plugin>
