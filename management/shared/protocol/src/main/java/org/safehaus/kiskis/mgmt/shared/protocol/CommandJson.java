@@ -36,7 +36,7 @@ public class CommandJson {
         return gson.toJson(cmd);
     }
     
-    public static String getJson(Request request) {
-        return gson.toJson(request);
-    }
+//    public static String getJson(Request request) {
+//        return gson.toJson(request);
+//    }
 }

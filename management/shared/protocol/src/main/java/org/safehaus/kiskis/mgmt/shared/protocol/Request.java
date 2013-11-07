@@ -28,6 +28,8 @@ public class Request {
     private String runAs;
     private List<String> args;
     private Map<String, String> environment;
+    private Integer pid;
+    private Long timeout;
 
     public String getSource() {
         return source;
@@ -133,8 +135,40 @@ public class Request {
         this.environment = environment;
     }
 
+    public Long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(Long timeout) {
+        this.timeout = timeout;
+    }
+
+    public Integer getPid() {
+        return pid;
+    }
+
+    public void setPid(Integer pid) {
+        this.pid = pid;
+    }
+
     @Override
     public String toString() {
-        return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment + '}';
+        return "Request{" +
+                "source='" + source + '\'' +
+                ", type=" + type +
+                ", uuid='" + uuid + '\'' +
+                ", requestSequenceNumber=" + requestSequenceNumber +
+                ", workingDirectory='" + workingDirectory + '\'' +
+                ", program='" + program + '\'' +
+                ", stdOut=" + stdOut +
+                ", stdErr=" + stdErr +
+                ", stdOutPath='" + stdOutPath + '\'' +
+                ", stdErrPath='" + stdErrPath + '\'' +
+                ", runAs='" + runAs + '\'' +
+                ", args=" + args +
+                ", environment=" + environment +
+                ", pid=" + pid +
+                ", timeout=" + timeout +
+                '}';
     }
 }
