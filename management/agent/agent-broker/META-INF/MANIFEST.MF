@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383817628057
+Bnd-LastModified: 1383819022043
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Description: Agent Broker Bundle

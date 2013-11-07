@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383817634681
+Bnd-LastModified: 1383819028878
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Description: Packages Manager Bundle

@@ -35,6 +35,7 @@
         <module>manager-packages</module>
         <module>motd</module>
         <module>ui</module>
+        <module>modules</module>
         <module>server-karaf</module>
     </modules>
 
