@@ -2,7 +2,6 @@ package org.safehaus.kiskis.mgmt.server.broker.impl;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.safehaus.kiskis.mgmt.registry.ProductRegistry;
 
 import org.safehaus.kiskismgmt.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
@@ -18,11 +17,10 @@ public class ResponseStorage implements RegisteredHostInterface {
     private Set<Agent> agents;
     private List<AgentOutput> agentOutputs;
     private Set<Product> products;
-    private ProductRegistry registry;
 
     public ResponseStorage() {
         agents = new HashSet<Agent>();
-        agentOutputs = new CopyOnWriteArrayList();
+        agentOutputs = new CopyOnWriteArrayList<AgentOutput>();
         // TODO init set of pruducts
         Agent a1 = new Agent();
         a1.setUuid("1");
@@ -43,10 +41,6 @@ public class ResponseStorage implements RegisteredHostInterface {
         //System.out.println("Reading list of agents");
         //To change body of implemented methods use File | Settings | File Templates.
         return agents;
-    }
-
-    public void setRegistry(ProductRegistry registry) {
-        this.registry = registry;
     }
 
     @Override
@@ -95,8 +89,6 @@ public class ResponseStorage implements RegisteredHostInterface {
     public Request sendAgentResponse(Response response) {
         Request req = null;
         //TO-DO Create result from Response for ui
-
-        System.out.println(registry.getProducts().size());
         
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {

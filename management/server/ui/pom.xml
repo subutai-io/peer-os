@@ -1,49 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <artifactId>mgmt-server-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mgmt-server-ui</artifactId>
-    <name>Kiskis Management Server UI</name>
-    <description>Server UI Bundle</description>
 
-    <packaging>war</packaging>
+    <artifactId>mgmt-ui</artifactId>
+    <name>Kiskis Management UI</name>
+    <description>Kiskis Management User Interface</description>
+    <packaging>pom</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.3.0</version>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <inherited>true</inherited>
-                <extensions>true</extensions>
-                <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
-                    <unpackBundle>true</unpackBundle>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.server.ui</Bundle-SymbolicName>
-                        <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true
-                        </Export-Package>
-                        <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
-                        <Embed-Directory>WEB-INF/lib</Embed-Directory>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Web-ContextPath>mgmt-server-ui</Web-ContextPath>
-                        <Webapp-Context>mgmt-server-ui</Webapp-Context>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>vaadin-services</module>
+        <module>vaadin-bridge</module>
+        <module>vaadin-ui</module>
+    </modules>
 </project>

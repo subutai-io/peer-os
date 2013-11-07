@@ -13,17 +13,28 @@
     <name>Kiskis Management Server Parent</name>
     <packaging>pom</packaging>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <vaadin.version>6.8.12</vaadin.version>
+        <gwt.version>2.3.0</gwt.version>
+        <gwt.plugin.version>2.2.0</gwt.plugin.version>
+        <servlet.version>2.5</servlet.version>
+        <!--Dependencies of ActiveMQ and Vaadin-->
+        <commons-net.version>2.0</commons-net.version>
+        <geronimo.version>1.1.1</geronimo.version>
+        <geronimo-spec.version>2.1-rc4</geronimo-spec.version>
+        <jmdns.version>3.4.1</jmdns.version>
+        <xalan.version>2.7.1</xalan.version>
+        <gson.version>2.2.4</gson.version>
+    </properties>
+
     <modules>
         <module>server</module>
         <module>server-broker</module>
-        <module>ui</module>
-        <module>backend</module>
         <module>manager-hostname</module>
         <module>manager-packages</module>
         <module>motd</module>
-        <module>bundle-api</module>
-        <module>bundle-api-impl</module>
-        <module>mgmt-bundle-impl</module>
+        <module>ui</module>
         <module>server-karaf</module>
     </modules>
 

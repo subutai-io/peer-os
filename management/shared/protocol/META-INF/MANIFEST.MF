@@ -1,22 +1,22 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383660034634
+Bnd-LastModified: 1383817328091
 Build-Jdk: 1.7.0_25
-Built-By: dilshat
+Built-By: daralbaev
 Bundle-Description: Shared Protocol Bundle
 Bundle-ManifestVersion: 2
 Bundle-Name: Kiskis Management Shared Protocol
 Bundle-SymbolicName: org.safehaus.kiskis.mgmt.shared.protocol
 Bundle-Version: 0.0.1.SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
-Export-Package: org.safehaus.kiskis.mgmt.shared.protocol.interfaces.agen
- t;uses:="org.safehaus.kiskismgmt.protocol";version="0.0.1.SNAPSHOT",org
- .safehaus.kiskis.mgmt.shared.protocol.interfaces;uses:="org.safehaus.ki
- skis.mgmt.shared.protocol.commands,org.safehaus.kiskismgmt.protocol";ve
- rsion="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.protocol.interfa
- ces.server;uses:="org.safehaus.kiskismgmt.protocol";version="0.0.1.SNAP
- SHOT",org.safehaus.kiskis.mgmt.shared.protocol.commands;version="0.0.1.
- SNAPSHOT",org.safehaus.kiskis.mgmt.shared.protocol.products;uses:="org.
+Export-Package: org.safehaus.kiskismgmt.protocol;version="0.0.1.SNAPSHOT
+ ",org.safehaus.kiskis.mgmt.shared.protocol.interfaces.agent;uses:="org.
  safehaus.kiskismgmt.protocol";version="0.0.1.SNAPSHOT",org.safehaus.kis
- kismgmt.protocol;version="0.0.1.SNAPSHOT"
+ kis.mgmt.shared.protocol.interfaces;uses:="org.safehaus.kiskis.mgmt.sha
+ red.protocol.commands,org.safehaus.kiskismgmt.protocol";version="0.0.1.
+ SNAPSHOT",org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server;us
+ es:="org.safehaus.kiskismgmt.protocol";version="0.0.1.SNAPSHOT",org.saf
+ ehaus.kiskis.mgmt.shared.protocol.products;uses:="org.safehaus.kiskismg
+ mt.protocol";version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.p
+ rotocol.commands;version="0.0.1.SNAPSHOT"
 Import-Package: com.google.gson;version="[2.2,3)"
 Tool: Bnd-2.1.0.20130426-122213

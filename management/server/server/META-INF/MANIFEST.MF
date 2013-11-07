@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383660043145
+Bnd-LastModified: 1383817336632
 Build-Jdk: 1.7.0_25
-Built-By: dilshat
+Built-By: daralbaev
 Bundle-Activator: org.safehaus.kiskis.mgmt.server.Activator
 Bundle-Description: Kiskis Management Server Bundle
 Bundle-ManifestVersion: 2

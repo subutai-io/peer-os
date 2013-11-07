@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383660042826
+Bnd-LastModified: 1383817336371
 Build-Jdk: 1.7.0_25
-Built-By: dilshat
+Built-By: daralbaev
 Bundle-Activator: org.safehaus.kiskis.mgmt.server.broker.Activator
 Bundle-Blueprint: OSGI-INF/blueprint/context.xml
 Bundle-Description: Server Broker Bundle
@@ -13,18 +13,16 @@ Created-By: Apache Maven Bundle Plugin
 Export-Package: org.safehaus.kiskis.mgmt.server.broker;version="0.0.1.SN
  APSHOT";uses:="org.osgi.framework,org.safehaus.kiskis.mgmt.shared.proto
  col.interfaces.server",org.safehaus.kiskis.mgmt.server.broker.impl;vers
- ion="0.0.1.SNAPSHOT";uses:="org.safehaus.kiskis.mgmt.registry,org.safeh
- aus.kiskis.mgmt.shared.protocol.commands,org.safehaus.kiskis.mgmt.share
- d.protocol.interfaces,org.safehaus.kiskis.mgmt.shared.protocol.interfac
- es.server,org.safehaus.kiskismgmt.protocol"
+ ion="0.0.1.SNAPSHOT";uses:="org.safehaus.kiskis.mgmt.shared.protocol.co
+ mmands,org.safehaus.kiskis.mgmt.shared.protocol.interfaces,org.safehaus
+ .kiskis.mgmt.shared.protocol.interfaces.server,org.safehaus.kiskismgmt.
+ protocol"
 Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.interfaces.serv
  er.RegisteredHostInterface;service.exported.interfaces="*"
 Import-Package: org.osgi.framework;version="[1.6,2)",org.osgi.service.bl
- ueprint;version="[1.0.0,2.0.0)",org.safehaus.kiskis.mgmt.registry;versi
- on="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.commands;version=
- "[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.interfaces;version="
- [0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server;ver
- sion="[0.0,1)",org.safehaus.kiskismgmt.protocol;version="[0.0,1)"
-Import-Service: org.safehaus.kiskis.mgmt.registry.ProductRegistry;multip
- le:=false
+ ueprint;version="[1.0.0,2.0.0)",org.safehaus.kiskis.mgmt.shared.protoco
+ l.commands;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.i
+ nterfaces;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.in
+ terfaces.server;version="[0.0,1)",org.safehaus.kiskismgmt.protocol;vers
+ ion="[0.0,1)"
 Tool: Bnd-2.1.0.20130426-122213
