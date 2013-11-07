@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.server.broker;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.CommandSendInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 
 /**
  *
@@ -34,9 +34,9 @@ public class Activator implements BundleActivator {
         }
     }
     
-    public static CommandSendInterface getCommandSender() {
+    public static CommandTransportInterface getCommandSender() {
         ServiceReference refCommandSender =
-                    Activator.context.getServiceReference(CommandSendInterface.class.getName());
-        return ((CommandSendInterface) Activator.context.getService(refCommandSender));
+                    Activator.context.getServiceReference(CommandTransportInterface.class.getName());
+        return ((CommandTransportInterface) Activator.context.getService(refCommandSender));
     }
 }

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383819021723
+Bnd-LastModified: 1383831721484
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Activator: org.safehaus.kiskis.mgmt.shared.communication.Activato
@@ -12,15 +12,16 @@ Bundle-SymbolicName: org.safehaus.kiskis.mgmt.shared.communication
 Bundle-Version: 0.0.1.SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
 Export-Package: org.safehaus.kiskis.mgmt.shared.communication;uses:="org
- .osgi.framework,org.safehaus.kiskis.mgmt.shared.protocol.interfaces.ser
- ver";version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.communica
- tion.util;version="0.0.1.SNAPSHOT";uses:="org.safehaus.kiskismgmt.proto
- col"
-Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.interfaces.serv
- er.CommandSendInterface;service.exported.interfaces="*"
+ .osgi.framework,org.safehaus.kiskis.mgmt.shared.protocol.api";version="
+ 0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.communication.util;vers
+ ion="0.0.1.SNAPSHOT";uses:="org.safehaus.kiskis.mgmt.shared.protocol,or
+ g.safehaus.kiskis.mgmt.shared.protocol.api"
+Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTran
+ sportInterface;service.exported.interfaces="*"
 Import-Package: com.google.gson;version="[2.2,3)",javax.jms;version="[1.
  1,2)",org.apache.activemq,org.apache.activemq.broker,org.osgi.framework
  ;version="[1.6,2)",org.osgi.service.blueprint;version="[1.0.0,2.0.0)",o
- rg.safehaus.kiskis.mgmt.shared.protocol.interfaces.server;version="[0.0
- ,1)",org.safehaus.kiskismgmt.protocol;version="[0.0,1)"
+ rg.safehaus.kiskis.mgmt.shared.protocol;version="[0.0,1)",org.safehaus.
+ kiskis.mgmt.shared.protocol.api;version="[0.0,1)",org.safehaus.kiskis.m
+ gmt.shared.protocol.settings;version="[0.0,1)"
 Tool: Bnd-2.1.0.20130426-122213

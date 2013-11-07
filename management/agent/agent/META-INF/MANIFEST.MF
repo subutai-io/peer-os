@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383819022246
+Bnd-LastModified: 1383831722429
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Activator: org.safehaus.kiskis.mgmt.agent.Activator

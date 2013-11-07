@@ -6,8 +6,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.communication.impl.ServerMessageBroker;
-import org.safehaus.kiskismgmt.protocol.Common;
-import org.safehaus.kiskis.mgmt.shared.protocol.interfaces.server.RegisteredHostInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import javax.jms.*;
 import java.util.logging.Level;
@@ -28,7 +28,7 @@ public class Activator implements BundleActivator {
         try {
             Activator.context = context;
 //            Activator.refServerBroker =
-//                    context.getServiceReference(RegisteredHostInterface.class.getName());
+//                    context.getServiceReference(BrokerInterface.class.getName());
 
             broker.setPersistent(false);
             broker.setUseJmx(false);
@@ -67,9 +67,9 @@ public class Activator implements BundleActivator {
         }
     }
 
-    public static RegisteredHostInterface getServerBroker() {
+    public static BrokerInterface getServerBroker() {
         ServiceReference refServerBroker =
-                    Activator.context.getServiceReference(RegisteredHostInterface.class.getName());
-        return ((RegisteredHostInterface) Activator.context.getService(refServerBroker));
+                    Activator.context.getServiceReference(BrokerInterface.class.getName());
+        return ((BrokerInterface) Activator.context.getService(refServerBroker));
     }
 }

@@ -1,9 +1,8 @@
 package org.safehaus.kiskis.mgmt.shared.communication.util;
 
 import com.google.gson.Gson;
-import org.safehaus.kiskismgmt.protocol.ICommand;
-import org.safehaus.kiskismgmt.protocol.Request;
-import org.safehaus.kiskismgmt.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,8 +19,8 @@ public class JsonGenerator{
         gson = new Gson();
     }
 
-    public static ICommand fromJson(String json) {
-        return gson.fromJson(json, ICommand.class);
+    public static CommandInterface fromJson(String json) {
+        return gson.fromJson(json, CommandInterface.class);
     }
 
     public static String toJson(Request request) {

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383819028381
+Bnd-LastModified: 1383831728463
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Activator: org.safehaus.kiskis.mgmt.server.broker.Activator
@@ -12,17 +12,13 @@ Bundle-Version: 0.0.1.SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
 Export-Package: org.safehaus.kiskis.mgmt.server.broker;version="0.0.1.SN
  APSHOT";uses:="org.osgi.framework,org.safehaus.kiskis.mgmt.shared.proto
- col.interfaces.server",org.safehaus.kiskis.mgmt.server.broker.impl;vers
- ion="0.0.1.SNAPSHOT";uses:="org.safehaus.kiskis.mgmt.shared.protocol.co
- mmands,org.safehaus.kiskis.mgmt.shared.protocol.interfaces,org.safehaus
- .kiskis.mgmt.shared.protocol.interfaces.server,org.safehaus.kiskismgmt.
- protocol"
-Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.interfaces.serv
- er.RegisteredHostInterface;service.exported.interfaces="*"
+ col.api",org.safehaus.kiskis.mgmt.server.broker.impl;version="0.0.1.SNA
+ PSHOT";uses:="org.safehaus.kiskis.mgmt.shared.protocol,org.safehaus.kis
+ kis.mgmt.shared.protocol.api"
+Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInter
+ face;service.exported.interfaces="*"
 Import-Package: org.osgi.framework;version="[1.6,2)",org.osgi.service.bl
  ueprint;version="[1.0.0,2.0.0)",org.safehaus.kiskis.mgmt.shared.protoco
- l.commands;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.i
- nterfaces;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.in
- terfaces.server;version="[0.0,1)",org.safehaus.kiskismgmt.protocol;vers
- ion="[0.0,1)"
+ l;version="[0.0,1)",org.safehaus.kiskis.mgmt.shared.protocol.api;versio
+ n="[0.0,1)"
 Tool: Bnd-2.1.0.20130426-122213

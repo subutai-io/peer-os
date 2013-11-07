@@ -2,14 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskismgmt.protocol;
+package org.safehaus.kiskis.mgmt.shared.protocol;
+
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
 
 /**
  *
  * @author dilshat
  * Wrapper object for proper JSON generation
  */
-public class Command implements ICommand {
+public class Command implements CommandInterface {
 
     Request command;
     Response response;

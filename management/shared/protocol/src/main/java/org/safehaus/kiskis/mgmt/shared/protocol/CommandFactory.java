@@ -2,18 +2,22 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskismgmt.protocol;
+package org.safehaus.kiskis.mgmt.shared.protocol;
 
 /**
  *
  * @author dilshat
  */
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+
 import java.util.List;
 import java.util.Map;
 
 public class CommandFactory {
     
-    public static ICommand createRequest(RequestType type, String uuid, String source, Long reqSeqNum,
+    public static CommandInterface createRequest(RequestType type, String uuid, String source, Long reqSeqNum,
             String workDir, String program, OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath, String stdErrPath, String runAs, List<String> args, Map<String, String> envVars) {
         Request req = new Request();
         req.setSource(source);
@@ -33,7 +37,7 @@ public class CommandFactory {
         return new Command(req);
     }
     
-    public static ICommand createResponse(ResponseType type, String uuid, String source, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid, String macAddress, String hostname, List<String> ips) {
+    public static CommandInterface createResponse(ResponseType type, String uuid, String source, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid, String macAddress, String hostname, List<String> ips) {
         Response res = new Response();
         res.setSource(source);
         res.setType(type);

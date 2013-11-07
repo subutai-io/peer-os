@@ -2,9 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskismgmt.protocol;
+package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import com.google.gson.Gson;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
 
 /**
  *
@@ -31,7 +32,7 @@ public class CommandJson {
         return null;
     }
 
-    public static String getJson(ICommand cmd) {
+    public static String getJson(CommandInterface cmd) {
         return gson.toJson(cmd);
     }
     

@@ -1,10 +1,7 @@
 package org.safehaus.kiskis.mgmt.agent.broker;
 
-//import org.safehaus.kiskismgmt.protocol.Request;
+//import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
-/**
- * Describes a {@link org.safehaus.kiskis.mgmt.shared.protocol.elements.Request} which will be executed on agent host's side
- */
 public class AgentSideAction /*implements Request*/ {
 
 //    @Override
