@@ -6,6 +6,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
 
 import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,17 +19,23 @@ import java.util.List;
 public class AgentManager implements AgentManagerInterface {
     private PersistenceAgentInterface persistenceAgent;
     private CommandManagerInterface commandManager;
+    List<Agent> registeredAgents;
 
     @Override
     public List<Agent> getAgentList() {
         System.out.println(this.getClass().getName() + " getAgentList called");
-        return null;
+        return registeredAgents;
     }
 
     @Override
     public boolean registerAgent(Agent agent) {
         System.out.println(this.getClass().getName() + " registerAgent called");
-        System.out.println(agent.toString());
+        registeredAgents.add(agent);
+        Response response = new Response();
+        response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
+        response.setUuid(agent.getUuid());        
+        Command command = new Command(response);        
+        commandManager.saveCommand(command);
         return false;
     }
 

@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.broker.impl;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
@@ -14,6 +15,7 @@ public class Broker implements BrokerInterface {
 
     private CommandManagerInterface commandManager;
     private AgentManagerInterface agentManager;
+
     /**
      * For Communication Bundle
      *
@@ -25,6 +27,17 @@ public class Broker implements BrokerInterface {
         Request req = null;
         //TO-DO Distribute response to Agent or Command Bundle
         System.out.println(response.toString());
+        switch (response.getType()) {
+            case REGISTRATION_REQUEST: {
+                Agent agent = new Agent();
+                agent.setUuid(response.getUuid());
+                agent.setHostname(response.getHostname());
+                agent.setMacAddress(response.getMacAddress());
+                agentManager.registerAgent(agent);
+                break;
+            }
+            
+        }
         return req;
     }
 

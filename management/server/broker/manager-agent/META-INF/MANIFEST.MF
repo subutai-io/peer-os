@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1383913019797
+Build-Jdk: 1.7.0_25
+Built-By: bahadyr
+Bundle-Blueprint: OSGI-INF/blueprint/context.xml
+Bundle-Description: Kiskis Management Server Agent
+Bundle-ManifestVersion: 2
+Bundle-Name: Kiskis Management Server Agent
+Bundle-SymbolicName: org.safehaus.kiskis.mgmt.server.agent
+Bundle-Version: 0.0.1.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: org.safehaus.kiskis.mgmt.server.agent;version="0.0.1.SNA
+ PSHOT";uses:="org.safehaus.kiskis.mgmt.shared.protocol,org.safehaus.kis
+ kis.mgmt.shared.protocol.api",org.safehaus.kiskis.mgmt.server.agent.imp
+ l;version="0.0.1.SNAPSHOT"
+Export-Service: org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManage
+ rInterface;service.exported.interfaces="*"
+Import-Package: org.osgi.service.blueprint;version="[1.0.0,2.0.0)",org.s
+ afehaus.kiskis.mgmt.shared.protocol;version="[0.0,1)",org.safehaus.kisk
+ is.mgmt.shared.protocol.api;version="[0.0,1)",org.safehaus.kiskis.mgmt.
+ shared.protocol.enums;version="[0.0,1)"
+Import-Service: org.safehaus.kiskis.mgmt.shared.protocol.api.CommandMana
+ gerInterface;multiple:=false,org.safehaus.kiskis.mgmt.shared.protocol.a
+ pi.PersistenceAgentInterface;multiple:=false
+Tool: Bnd-2.1.0.20130426-122213
