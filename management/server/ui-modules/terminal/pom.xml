@@ -9,10 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>test-module</artifactId>
+    <artifactId>terminal-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Test Module</name>
-    <description>Kiskis Management Test Module</description>
+    <name>Kiskis Management Terminal Module</name>
+    <description>Kiskis Management Terminal Module</description>
 
     <build>
         <plugins>
@@ -54,6 +54,11 @@
         <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>ui-vaadin-services</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

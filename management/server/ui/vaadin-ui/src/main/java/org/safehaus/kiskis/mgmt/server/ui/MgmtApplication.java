@@ -18,30 +18,32 @@ import java.util.Iterator;
 public class MgmtApplication extends Application implements ModuleServiceListener {
 
 //    @WebServlet(urlPatterns = "/*")
-    public static class Servlet extends AbstractApplicationServlet {
-
-        @Resource(mappedName = "vaadin-moduleService")
-        ModuleService moduleService;
-
-        @Override
-        protected Class<? extends Application> getApplicationClass() {
-            return MgmtApplication.class;
-        }
-
-        @Override
-        protected Application getNewApplication(HttpServletRequest request)
-                throws ServletException {
-            return new MgmtApplication(moduleService);
-        }
-
-    }
+//    public static class Servlet extends AbstractApplicationServlet {
+//
+//        @Resource(mappedName = "vaadin-moduleService")
+//        ModuleService moduleService;
+//
+//        @Override
+//        protected Class<? extends Application> getApplicationClass() {
+//            return MgmtApplication.class;
+//        }
+//
+//        @Override
+//        protected Application getNewApplication(HttpServletRequest request)
+//                throws ServletException {
+//            return new MgmtApplication(moduleService);
+//        }
+//
+//    }
 
     private ModuleService moduleService;
 
-    public MgmtApplication(ModuleService moduleService) {
+    public MgmtApplication(String title, ModuleService moduleService) {
         this.moduleService = moduleService;
+        this.title = title;
     }
 
+    private String title;
     private TabSheet tabs;
 
     @Override
@@ -53,7 +55,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             tabs.addTab(module.createComponent(), module.getName(), null);
         }
 
-        setMainWindow(new Window("Module Demo Application", tabs));
+        setMainWindow(new Window(title, tabs));
 
         System.out.println("ModuleDemoApp: Application initializing, adding module service listener");
         moduleService.addListener(this);

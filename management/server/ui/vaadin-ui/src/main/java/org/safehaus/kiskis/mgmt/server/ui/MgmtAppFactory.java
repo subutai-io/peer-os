@@ -26,7 +26,7 @@ public class MgmtAppFactory implements ApplicationFactory {
 
     @Override
     public Application newInstance() {
-        return new MgmtApplication(this.moduleService);
+        return new MgmtApplication(title, this.moduleService);
     }
 
     public void setModuleService(ModuleService moduleService) {
