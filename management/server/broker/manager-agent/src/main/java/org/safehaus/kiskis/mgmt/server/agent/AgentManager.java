@@ -19,19 +19,21 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 public class AgentManager implements AgentManagerInterface {
     private PersistenceAgentInterface persistenceAgent;
     private CommandManagerInterface commandManager;
+    List<Agent> registeredAgents;
 
     @Override
     public List<Agent> getAgentList() {
         System.out.println(this.getClass().getName() + " getAgentList called");
-        return null;
+        return registeredAgents;
     }
 
     @Override
     public boolean registerAgent(Agent agent) {
         System.out.println(this.getClass().getName() + " registerAgent called");
+        registeredAgents.add(agent);
         Response response = new Response();
         response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
-        response.setUuid(agent.getUuid());
+        response.setUuid(agent.getUuid());        
         Command command = new Command(response);        
         commandManager.saveCommand(command);
         return false;
