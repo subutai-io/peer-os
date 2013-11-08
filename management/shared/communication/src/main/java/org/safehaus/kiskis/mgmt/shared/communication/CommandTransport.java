@@ -35,11 +35,11 @@ public class CommandTransport implements CommandTransportInterface {
 
         public void run() {
             try {
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Common.MQ_HOST);
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Common.MQ_URL);
                 Connection connection = connectionFactory.createConnection(Common.MQ_USERNAME, Common.MQ_PASSWORD);
                 connection.start();
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                Destination destination = session.createQueue(command.getCommand().getUuid());
+                Destination destination = session.createQueue(command.getResponse().getUuid());
                 javax.jms.MessageProducer producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 String json = CommandJson.getJson(command);

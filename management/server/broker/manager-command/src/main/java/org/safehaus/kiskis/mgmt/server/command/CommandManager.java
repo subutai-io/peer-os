@@ -28,7 +28,7 @@ public class CommandManager implements CommandManagerInterface {
     @Override
     public boolean saveCommand(Command command) {
         System.out.println(this.getClass().getName() + " saveCommand called");
-        System.out.println(command.toString());
+        commandTransport.sendCommand(command);
         return false;
     }
 

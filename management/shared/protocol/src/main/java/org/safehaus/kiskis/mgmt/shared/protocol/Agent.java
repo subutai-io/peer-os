@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class Agent {
     private String uuid;
-    private String mac;
+    private String macAddress;
     private String hostname;
     private List<String> listIP;
     private boolean isLXC;
@@ -21,12 +21,12 @@ public class Agent {
         this.uuid = uuid;
     }
 
-    public String getMac() {
-        return mac;
+    public String getMacAddress() {
+        return macAddress;
     }
 
-    public void setMac(String mac) {
-        this.mac = mac;
+    public void setMacAddress(String mac) {
+        this.macAddress = mac;
     }
 
     public String getHostname() {
@@ -57,7 +57,7 @@ public class Agent {
     public String toString() {
         return "Agent{" +
                 "uuid='" + uuid + '\'' +
-                ", mac='" + mac + '\'' +
+                ", mac='" + macAddress + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", listIP=" + listIP +
                 ", isLXC=" + isLXC +

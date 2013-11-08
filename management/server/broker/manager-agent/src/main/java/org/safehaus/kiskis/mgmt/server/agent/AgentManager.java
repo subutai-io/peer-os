@@ -6,6 +6,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
 
 import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,7 +29,11 @@ public class AgentManager implements AgentManagerInterface {
     @Override
     public boolean registerAgent(Agent agent) {
         System.out.println(this.getClass().getName() + " registerAgent called");
-        System.out.println(agent.toString());
+        Response response = new Response();
+        response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
+        response.setUuid(agent.getUuid());
+        Command command = new Command(response);        
+        commandManager.saveCommand(command);
         return false;
     }
 
