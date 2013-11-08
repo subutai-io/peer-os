@@ -11,7 +11,6 @@ import java.util.List;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM

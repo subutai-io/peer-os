@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.broker.impl;
 
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -12,6 +13,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
  * change this template use File | Settings | File Templates.
  */
 public class Broker implements BrokerInterface {
+
+    private static final Logger LOG = Logger.getLogger(Broker.class.getName());
 
     private CommandManagerInterface commandManager;
     private AgentManagerInterface agentManager;
