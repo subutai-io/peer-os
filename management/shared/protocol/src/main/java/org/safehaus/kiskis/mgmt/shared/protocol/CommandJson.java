@@ -17,8 +17,8 @@ public class CommandJson {
 
     public static Request getRequest(String json) {
         Command cmd = gson.fromJson(json, Command.class);
-        if (cmd.request != null) {
-            return (Request) cmd.request;
+        if (cmd.command != null) {
+            return (Request) cmd.command;
         }
 
         return null;

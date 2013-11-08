@@ -13,23 +13,23 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
  */
 public class Command implements CommandInterface {
 
-    Request request;
+    Request command;
     Response response;
 
     public Command(Object message) {
         if (message instanceof Request) {
-            this.request = (Request) message;
+            this.command = (Request) message;
         } else if (message instanceof Response) {
             this.response = (Response) message;
         }
     }
 
-    public Request getRequest() {
-        return request;
+    public Request getCommand() {
+        return command;
     }
 
-    public void setRequest(Request requst) {
-        this.request = requst;
+    public void setCommand(Request command) {
+        this.command = command;
     }
 
     public Response getResponse() {

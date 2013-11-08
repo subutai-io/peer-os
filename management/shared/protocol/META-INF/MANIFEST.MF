@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383915685973
+Bnd-LastModified: 1383916128497
 Build-Jdk: 1.7.0_25
 Built-By: bahadyr
 Bundle-Description: Shared Protocol Bundle
