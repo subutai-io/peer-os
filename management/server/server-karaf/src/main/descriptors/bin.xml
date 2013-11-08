@@ -21,6 +21,7 @@
                 <exclude>RELEASE-NOTES</exclude>
                 <exclude>karaf-manual*.html</exclude>
                 <exclude>karaf-manual*.pdf</exclude>
+                <exclude>etc/org.apache.karaf.features.cfg</exclude>
             </excludes>
         </fileSet>
 
@@ -43,6 +44,7 @@
             <directory>target/dependencies/kiskis-server</directory>
             <includes>
                 <include>*.jar</include>
+                <include>*.war</include>
             </includes>
             <outputDirectory>system/kiskis-server</outputDirectory>
         </fileSet>

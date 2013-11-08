@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383916128497
+Bnd-LastModified: 1383919765472
 Build-Jdk: 1.7.0_25
-Built-By: bahadyr
+Built-By: dilshat
 Bundle-Description: Shared Protocol Bundle
 Bundle-ManifestVersion: 2
 Bundle-Name: Kiskis Management Shared Protocol
@@ -12,8 +12,8 @@ Export-Package: org.safehaus.kiskis.mgmt.shared.protocol;uses:="org.safe
  haus.kiskis.mgmt.shared.protocol.api,org.safehaus.kiskis.mgmt.shared.pr
  otocol.enums";version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.
  protocol.enums;version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared
- .protocol.api;uses:="org.safehaus.kiskis.mgmt.shared.protocol";version=
- "0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.protocol.settings;vers
- ion="0.0.1.SNAPSHOT"
+ .protocol.settings;version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.sh
+ ared.protocol.api;version="0.0.1.SNAPSHOT";uses:="org.safehaus.kiskis.m
+ gmt.shared.protocol"
 Import-Package: com.google.gson;version="[2.2,3)"
 Tool: Bnd-2.1.0.20130426-122213
