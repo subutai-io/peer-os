@@ -33,7 +33,7 @@ public class AgentManager implements AgentManagerInterface {
         System.out.println(this.getClass().getName() + " registerAgent called");
         registeredAgents.add(agent);
         Response response = new Response();
-        response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
+        response.setType(ResponseType.REGISTRATION_REQUEST_DONE);
         response.setUuid(agent.getUuid());
         Command command = new Command(response);
         commandManager.saveCommand(command);

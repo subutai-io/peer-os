@@ -10,5 +10,5 @@ package org.safehaus.kiskis.mgmt.shared.protocol.enums;
  */
 public enum RequestType {
 
-    EXECUTE_REQUEST, REGISTRATION_REQUEST_DONE, HEARTBEAT_REQUEST, TERMINATE_REQUEST;
+    EXECUTE_REQUEST, HEARTBEAT_REQUEST, TERMINATE_REQUEST;
 }
