@@ -55,7 +55,12 @@ public class CommandTransport implements CommandTransportInterface {
 
     public void setBrokerService(BrokerInterface brokerService) {
         this.brokerService = brokerService;
-        System.out.println(this.getClass().getName() + " BrokerInterface initialized");
+        if(brokerService != null){
+            System.out.println("......." + this.getClass().getName() + " BrokerInterface initialized");
+        } else {
+            System.out.println("......." + this.getClass().getName() + " BrokerInterface not initialized");
+        }
+
     }
 
     public void init() {
