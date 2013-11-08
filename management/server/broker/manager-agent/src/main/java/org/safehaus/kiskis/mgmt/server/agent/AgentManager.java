@@ -36,11 +36,14 @@ public class AgentManager implements AgentManagerInterface {
     public boolean registerAgent(Agent agent) {
         System.out.println(this.getClass().getName() + " registerAgent called");
         registeredAgents.add(agent);
-        Request request=  new Request();
+        persistenceAgent.saveAgent(agent);
+
+        Request request = new Request();
         request.setType(RequestType.REGISTRATION_REQUEST_DONE);
         request.setUuid(agent.getUuid());
         Command command = new Command(request);
-        commandManager.saveCommand(command);
+        commandManager.executeCommand(command);
+
         return false;
     }
 
