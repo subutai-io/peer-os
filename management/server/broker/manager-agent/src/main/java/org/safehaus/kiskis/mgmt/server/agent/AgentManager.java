@@ -6,6 +6,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
 
 import java.util.List;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -33,8 +34,8 @@ public class AgentManager implements AgentManagerInterface {
         registeredAgents.add(agent);
         Response response = new Response();
         response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
-        response.setUuid(agent.getUuid());        
-        Command command = new Command(response);        
+        response.setUuid(agent.getUuid());
+        Command command = new Command(response);
         commandManager.saveCommand(command);
         return false;
     }
