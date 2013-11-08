@@ -17,25 +17,6 @@ import java.util.Iterator;
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener {
 
-//    @WebServlet(urlPatterns = "/*")
-//    public static class Servlet extends AbstractApplicationServlet {
-//
-//        @Resource(mappedName = "vaadin-moduleService")
-//        ModuleService moduleService;
-//
-//        @Override
-//        protected Class<? extends Application> getApplicationClass() {
-//            return MgmtApplication.class;
-//        }
-//
-//        @Override
-//        protected Application getNewApplication(HttpServletRequest request)
-//                throws ServletException {
-//            return new MgmtApplication(moduleService);
-//        }
-//
-//    }
-
     private ModuleService moduleService;
 
     public MgmtApplication(String title, ModuleService moduleService) {
@@ -56,25 +37,25 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         }
 
         setMainWindow(new Window(title, tabs));
+        setTheme("runo");
 
-        System.out.println("ModuleDemoApp: Application initializing, adding module service listener");
         moduleService.addListener(this);
     }
 
     @Override
     public void close() {
-        System.out.println("ModuleDemoApp: Application closing, removing module service listener");
+        System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
         moduleService.removeListener(this);
         super.close();
     }
 
     public void moduleRegistered(ModuleService source, Module module) {
-        System.out.println("ModuleDemoApp: Module registered, adding tab");
+        System.out.println("Kiskis Management Vaadin UI: Module registered, adding tab");
         tabs.addTab(module.createComponent(), module.getName(), null);
     }
 
     public void moduleUnregistered(ModuleService source, Module module) {
-        System.out.println("ModuleDemoApp: Module unregistered, removing tab");
+        System.out.println("Kiskis Management Vaadin UI: Module unregistered, removing tab");
         Iterator<Component> it = tabs.getComponentIterator();
         while (it.hasNext()) {
             Component c = it.next();
