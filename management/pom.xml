@@ -7,7 +7,7 @@
     <artifactId>mgmt-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>Kiskis Management Server Warm-Up Project Parent</name>
+    <name>Kiskis Management Server Project Parent</name>
 
     <packaging>pom</packaging>
 
