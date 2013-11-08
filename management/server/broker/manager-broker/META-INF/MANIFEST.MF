@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383907476802
+Bnd-LastModified: 1383912740983
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Blueprint: OSGI-INF/blueprint/context.xml
