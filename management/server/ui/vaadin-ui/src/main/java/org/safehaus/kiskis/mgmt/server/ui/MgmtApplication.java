@@ -1,30 +1,30 @@
 package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
-import com.vaadin.terminal.gwt.server.AbstractApplicationServlet;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
-import javax.annotation.Resource;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener {
 
     private ModuleService moduleService;
+    private AgentManagerInterface agentManagerService;
 
-    public MgmtApplication(String title, ModuleService moduleService) {
+    public MgmtApplication(String title, ModuleService moduleService, AgentManagerInterface agentManagerService) {
         this.moduleService = moduleService;
+        this.agentManagerService = agentManagerService;
         this.title = title;
     }
 
     private String title;
     private TabSheet tabs;
+    private MgmtAgentManager agents;
 
     @Override
     public void init() {
@@ -41,8 +41,8 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         layout.setExpandRatio(horizontalSplit, 1);
         horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
 
-
-        //horizontalSplit.setFirstComponent(initTree());
+        agents = new MgmtAgentManager(this.agentManagerService);
+        horizontalSplit.setFirstComponent(agents);
 
         tabs = new TabSheet();
         tabs.setSizeFull();
