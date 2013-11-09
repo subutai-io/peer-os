@@ -14,19 +14,6 @@
 
     <description>Kiskis Management Server Custom Karaf Distribution</description>
 
-    <properties>
-        <vaadin.version>6.8.12</vaadin.version>
-        <activemq.version>5.8.0</activemq.version>
-        <gwt.version>2.3.0</gwt.version>
-        <gwt.plugin.version>2.2.0</gwt.plugin.version>
-        <commons-net.version>2.0</commons-net.version>
-        <geronimo.version>1.1.1</geronimo.version>
-        <geronimo-spec.version>2.1-rc4</geronimo-spec.version>
-        <jmdns.version>3.4.1</jmdns.version>
-        <xalan.version>2.7.1</xalan.version>
-        <gson.version>2.2.4</gson.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.karaf</groupId>
@@ -86,8 +73,52 @@
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>2.0.0-beta2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cassandra</groupId>
+            <artifactId>cassandra-all</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cassandra</groupId>
+            <artifactId>cassandra-thrift</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.jpountz.lz4</groupId>
+            <artifactId>lz4</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty</artifactId>
+            <version>3.7.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>
@@ -146,6 +177,95 @@
                         <configuration>
                             <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
                             <artifactItems>
+                                <!--UI Dependencies-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin-bridge</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin-services</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                
+                                <artifactItem>
+                                    <groupId>com.datastax.cassandra</groupId>
+                                    <artifactId>cassandra-driver-core</artifactId>
+                                    <version>2.0.0-beta2</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.cassandra</groupId>
+                                    <artifactId>cassandra-all</artifactId>
+                                    <version>2.0.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.cassandra</groupId>
+                                    <artifactId>cassandra-thrift</artifactId>
+                                    <version>2.0.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>net.jpountz.lz4</groupId>
+                                    <artifactId>lz4</artifactId>
+                                    <version>1.2.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.google.guava</groupId>
+                                    <artifactId>guava</artifactId>
+                                    <version>15.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>io.netty</groupId>
+                                    <artifactId>netty</artifactId>
+                                    <version>3.7.0.Final</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.codahale.metrics</groupId>
+                                    <artifactId>metrics-core</artifactId>
+                                    <version>3.0.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-core-asl</artifactId>
+                                    <version>1.9.13</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-mapper-asl</artifactId>
+                                    <version>1.9.13</version>
+                                </artifactItem>
+                                
+                                <!--UI Dependencies-->
+
+                                <!--Broker Dependencies-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-broker</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-agent</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-command</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-persistence</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!--Broker Dependencies-->
+
+                                <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
@@ -156,36 +276,8 @@
                                     <artifactId>mgmt-shared-communication</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-broker</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-manager-hostname</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-manager-packages</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-vaadinbridge</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
+                                <!--Shared Dependencies-->
+
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin</artifactId>

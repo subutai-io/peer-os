@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.broker.impl;
 
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -13,6 +14,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
  */
 public class Broker implements BrokerInterface {
 
+    private static final Logger LOG = Logger.getLogger(Broker.class.getName());
+
     private CommandManagerInterface commandManager;
     private AgentManagerInterface agentManager;
 
@@ -23,7 +26,7 @@ public class Broker implements BrokerInterface {
      * @return
      */
     @Override
-    public Request distribute(Response response) {
+    public Request distributeResponse(Response response) {
         Request req = null;
         System.out.println(this.getClass().getName() + " distribute is called");
         //TO-DO Distribute response to Agent or Command Bundle
@@ -31,8 +34,8 @@ public class Broker implements BrokerInterface {
             case REGISTRATION_REQUEST: {
                 Agent agent = new Agent();
                 agent.setUuid(response.getUuid());
-//                agent.setHostname(response.getHostname());
-//                agent.setMacAddress(response.getMacAddress());
+                agent.setHostname(response.getHostname());
+                agent.setMacAddress(response.getMacAddress());
                 agentManager.registerAgent(agent);
                 break;
             }
