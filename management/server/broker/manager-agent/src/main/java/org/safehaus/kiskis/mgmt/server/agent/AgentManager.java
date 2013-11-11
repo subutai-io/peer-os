@@ -45,7 +45,7 @@ public class AgentManager implements AgentManagerInterface {
         request.setType(RequestType.REGISTRATION_REQUEST_DONE);
         request.setUuid(agent.getUuid());
         Command command = new Command(request);
-        commandManager.saveCommand(command);
+        commandManager.executeCommand(command);
         return false;
     }
 

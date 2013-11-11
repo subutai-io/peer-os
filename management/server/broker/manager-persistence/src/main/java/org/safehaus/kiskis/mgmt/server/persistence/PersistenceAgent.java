@@ -38,7 +38,7 @@ public class PersistenceAgent implements PersistenceAgentInterface {
     @Override
     public boolean saveAgent(Agent agent) {
         System.out.println(this.getClass().getName() + " saveAgent called");
-        ResultSet rs = session.execute("insert into users (key, full_name) values  ('kiskis', 'bahadyr')");
+        ResultSet rs = session.execute("insert into users (key, full_name) values  ('test', 'test')");
         if (rs != null) {
             System.out.println("saved into cassandra " + agent.toString());
             return true;
@@ -53,8 +53,8 @@ public class PersistenceAgent implements PersistenceAgentInterface {
     }
 
     public void destroy() {
-//        session.shutdown();
-//        cluster.shutdown();
+        session.shutdown();
+        cluster.shutdown();
         System.out.println(this.getClass().getName() + " stopped");
     }
 }
