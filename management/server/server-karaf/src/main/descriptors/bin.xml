@@ -60,6 +60,12 @@
             <lineEnding>unix</lineEnding>
             <fileMode>0644</fileMode>
         </fileSet>
+        <fileSet>
+            <directory>target/classes</directory>
+            <outputDirectory>/</outputDirectory>
+            <!--<lineEnding>unix</lineEnding>-->
+            <fileMode>0644</fileMode>
+        </fileSet>
 
         <fileSet>
             <directory>target/features-repo</directory>
