@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    <reference id="persistenceAgentService" availability="optional"
+               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface"/>
+    <reference id="commandManagerService" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface"/>
+
+    <bean id="agentManagerService"
+          class="org.safehaus.kiskis.mgmt.server.agent.AgentManager">
+        <property name="persistenceAgentService" ref="persistenceAgentService"/>
+        <property name="commandManagerService" ref="commandManagerService"/>
+    </bean>
+    <service ref="agentManagerService"
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"
+            ranking="2">
+        <service-properties>
+            <!-- This property is only important for the DOSGi tutorial -->
+            <entry key="service.exported.interfaces" value="*"/>
+        </service-properties>
+    </service>
+</blueprint>

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1383926012746
+Bnd-LastModified: 1384162472239
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Blueprint: OSGI-INF/blueprint/context.xml
@@ -20,5 +20,5 @@ Import-Package: org.osgi.service.blueprint;version="[1.0.0,2.0.0)",org.s
  is.mgmt.shared.protocol.api;version="[0.0,1)"
 Import-Service: org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTran
  sportInterface;multiple:=false,org.safehaus.kiskis.mgmt.shared.protocol
- .api.PersistenceCommandInterface;multiple:=false
+ .api.PersistenceCommandInterface;multiple:=false;availability:=optional
 Tool: Bnd-2.1.0.20130426-122213

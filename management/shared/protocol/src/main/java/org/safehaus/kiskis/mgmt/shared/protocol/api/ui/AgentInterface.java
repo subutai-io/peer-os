@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol.api.ui;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,5 +12,5 @@ import java.util.List;
  * Time: 9:37 PM
  */
 public interface AgentInterface {
-    public void agentRegistered(List<Agent> agentList);
+    public void agentRegistered(Set<Agent> agents);
 }

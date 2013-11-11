@@ -5,13 +5,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:40 PM
  */
 public interface AgentManagerInterface {
 
-    List<Agent> getAgentList();
+    Set<Agent> getAgentList();
 
     boolean registerAgent(Agent agent);
 

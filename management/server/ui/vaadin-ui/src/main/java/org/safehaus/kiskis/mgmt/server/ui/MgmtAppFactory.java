@@ -10,7 +10,7 @@ public class MgmtAppFactory implements ApplicationFactory {
 
     private final String title;
     private ModuleService moduleService;
-    private AgentManagerInterface agentManagerService;
+    private MgmtAgentManager agentManager;
 
     public MgmtAppFactory(String title) {
         this.title = title;
@@ -28,7 +28,7 @@ public class MgmtAppFactory implements ApplicationFactory {
 
     @Override
     public Application newInstance() {
-        return new MgmtApplication(title, this.moduleService, this.agentManagerService);
+        return new MgmtApplication(title, this.moduleService, this.agentManager);
     }
 
     public void setModuleService(ModuleService moduleService) {
@@ -36,6 +36,6 @@ public class MgmtAppFactory implements ApplicationFactory {
     }
 
     public void setAgentManagerService(AgentManagerInterface agentManagerService) {
-        this.agentManagerService = agentManagerService;
+        this.agentManager = new MgmtAgentManager(agentManagerService);
     }
 }

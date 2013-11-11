@@ -8,8 +8,7 @@ import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,10 +20,7 @@ import java.util.Set;
 public class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentInterface {
 
-    private static final String[] cities = new String[]{"Berlin", "Brussels",
-            "Helsinki", "Madrid", "Oslo", "Paris", "Stockholm"};
-
-    private List<Agent> agentList;
+    private Set<Agent> agents;
     private ListSelect listSelectAgents;
     private AgentManagerInterface agentManagerService;
 
@@ -45,25 +41,39 @@ public class MgmtAgentManager extends VerticalLayout implements
         addComponent(listSelectAgents);
     }
 
-    private void refreshAgents(){
-        listSelectAgents.removeAllItems();
-        for (Agent anAgentList : agentList) {
-            listSelectAgents.addItem(anAgentList.getHostname());
-        }
-    }
-
     /*
      * Shows a notification when a selection is made.
      */
     public void valueChange(Property.ValueChangeEvent event) {
-        Set<String> agents = (Set<String>) event.getProperty().getValue();
-        AppData.setAgentList(agents);
-        getWindow().showNotification("Selected cities: " + agents);
+        if (event.getProperty().getValue() instanceof Set) {
+            Set<String> agents = (Set<String>) event.getProperty().getValue();
+
+            AppData.setAgentList(agents);
+            getWindow().showNotification("Selected agents: " + agents);
+        }
     }
 
     @Override
-    public void agentRegistered(List<Agent> agentList) {
-         this.agentList =agentList;
-        refreshAgents();
+    public void agentRegistered(Set<Agent> agents) {
+        Set<Agent> agentsToRemove = new HashSet<Agent>();
+        Set<Agent> agentsToAdd = new HashSet<Agent>();
+        agentsToRemove.addAll(this.agents);
+        agentsToAdd.addAll(agents);
+
+        agentsToRemove.removeAll(agents);
+        agentsToAdd.removeAll(this.agents);
+        this.agents = agents;
+
+        refreshAgents(agentsToRemove, agentsToAdd);
+    }
+
+    private void refreshAgents(Set<Agent> agentsToRemove, Set<Agent> agentsToAdd) {
+        for(Agent a : agentsToRemove){
+            listSelectAgents.removeItem(a.getUuid());
+        }
+
+        for(Agent a : agentsToAdd){
+            listSelectAgents.addItem(a.getUuid());
+        }
     }
 }

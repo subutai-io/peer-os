@@ -14,11 +14,11 @@ import java.util.Iterator;
 public class MgmtApplication extends Application implements ModuleServiceListener {
 
     private ModuleService moduleService;
-    private AgentManagerInterface agentManagerService;
+    private MgmtAgentManager agentManager;
 
-    public MgmtApplication(String title, ModuleService moduleService, AgentManagerInterface agentManagerService) {
+    public MgmtApplication(String title, ModuleService moduleService, MgmtAgentManager agentManager) {
         this.moduleService = moduleService;
-        this.agentManagerService = agentManagerService;
+        this.agentManager = agentManager;
         this.title = title;
     }
 
@@ -41,8 +41,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         layout.setExpandRatio(horizontalSplit, 1);
         horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
 
-        agents = new MgmtAgentManager(this.agentManagerService);
-        horizontalSplit.setFirstComponent(agents);
+        horizontalSplit.setFirstComponent(agentManager);
 
         tabs = new TabSheet();
         tabs.setSizeFull();
