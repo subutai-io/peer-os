@@ -40,12 +40,14 @@ public class AgentManager implements AgentManagerInterface {
     public synchronized boolean registerAgent(Agent agent) {
         System.out.println(this.getClass().getName() + " registerAgent called");
         registeredAgents.add(agent);
-
-        Request request=  new Request();
-        request.setType(RequestType.REGISTRATION_REQUEST_DONE);
-        request.setUuid(agent.getUuid());
-        Command command = new Command(request);
-        commandManager.executeCommand(command);
+        if (persistenceAgent.saveAgent(agent)) {
+            Request request = new Request();
+            request.setType(RequestType.REGISTRATION_REQUEST_DONE);
+            request.setUuid(agent.getUuid());
+            Command command = new Command(request);
+            commandManager.executeCommand(command);
+            return true;
+        }
         return false;
     }
 
@@ -54,7 +56,7 @@ public class AgentManager implements AgentManagerInterface {
     public synchronized void registerAgentInterface(AgentInterface module) {
         modules.add(module);
         for (AgentListener listener : (ArrayList<AgentListener>) listeners.clone()) {
-            if(listener != null){
+            if (listener != null) {
                 listener.agentRegistered(this, module);
             }
         }

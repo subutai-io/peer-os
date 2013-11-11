@@ -26,8 +26,10 @@ public class CommandManager implements CommandManagerInterface {
     @Override
     public boolean executeCommand(Command command) {
         System.out.println(this.getClass().getName() + " saveCommand called");
-        persistenceCommand.saveCommand(command);
-        commandTransport.sendCommand(command);
+        if (persistenceCommand.saveCommand(command)) {
+            commandTransport.sendCommand(command);
+            return true;
+        }
         return false;
     }
 
