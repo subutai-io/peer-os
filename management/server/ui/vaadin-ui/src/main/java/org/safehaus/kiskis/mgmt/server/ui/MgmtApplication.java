@@ -14,22 +14,24 @@ import java.util.Iterator;
 public class MgmtApplication extends Application implements ModuleServiceListener {
 
     private ModuleService moduleService;
-    private MgmtAgentManager agentManager;
+    private AgentManagerInterface agentManagerService;
 
-    public MgmtApplication(String title, ModuleService moduleService, MgmtAgentManager agentManager) {
+    public MgmtApplication(String title, ModuleService moduleService, AgentManagerInterface agentManagerService) {
         this.moduleService = moduleService;
-        this.agentManager = agentManager;
+        this.agentManagerService = agentManagerService;
         this.title = title;
     }
 
     private String title;
     private TabSheet tabs;
-    private MgmtAgentManager agents;
 
     @Override
     public void init() {
         // Create the application data instance
         AppData sessionData = new AppData(this);
+
+        // Register it as a listener in the application context
+        getContext().addTransactionListener(sessionData);
 
         setMainWindow(new Window(title));
 
@@ -41,7 +43,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         layout.setExpandRatio(horizontalSplit, 1);
         horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
 
-        horizontalSplit.setFirstComponent(agentManager);
+        horizontalSplit.setFirstComponent(new MgmtAgentManager(agentManagerService));
 
         tabs = new TabSheet();
         tabs.setSizeFull();
@@ -56,7 +58,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         setTheme("runo");
 
         moduleService.addListener(this);
-        getMainWindow().executeJavaScript("setInterval(function() { javascript:vaadin.forceSync(); }, 5000);");
+        //getMainWindow().executeJavaScript("setInterval(function() { javascript:vaadin.forceSync(); }, 5000);");
     }
 
     @Override

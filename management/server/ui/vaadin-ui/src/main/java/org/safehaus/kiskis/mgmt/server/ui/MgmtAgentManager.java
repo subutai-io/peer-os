@@ -3,12 +3,14 @@ package org.safehaus.kiskis.mgmt.server.ui;
 import com.vaadin.data.Property;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentInterface;
+import com.vaadin.ui.Window;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,27 +20,36 @@ import java.util.*;
  */
 @SuppressWarnings("serial")
 public class MgmtAgentManager extends VerticalLayout implements
-        Property.ValueChangeListener, AgentInterface {
+        Property.ValueChangeListener, AgentListener {
 
-    private Set<Agent> agents;
+    private Set<Agent> registeredAgents;
     private ListSelect listSelectAgents;
+    private int id;
     private AgentManagerInterface agentManagerService;
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
-        this.agentManagerService = agentManagerService;
-        agentManagerService.registerAgentInterface(this);
+
 
         setSizeFull();
         setSpacing(true);
 
-        listSelectAgents = new ListSelect("Please select some agents");
+        listSelectAgents = new ListSelect("Please select some Registered Agents");
         listSelectAgents.setRows(7);
         listSelectAgents.setNullSelectionAllowed(true);
         listSelectAgents.setMultiSelect(true);
         listSelectAgents.setImmediate(true);
         listSelectAgents.addListener(this);
         listSelectAgents.setSizeFull();
+
         addComponent(listSelectAgents);
+
+        id = ThreadLocalRandom.current().nextInt(1, 1000000);
+        agentManagerService.addListener(this);
+
+
+        this.registeredAgents = new HashSet<Agent>();
+        this.registeredAgents.addAll(agentManagerService.getRegisteredAgents());
+        refreshAgents(this.registeredAgents, false);
     }
 
     /*
@@ -49,31 +60,47 @@ public class MgmtAgentManager extends VerticalLayout implements
             Set<String> agents = (Set<String>) event.getProperty().getValue();
 
             AppData.setAgentList(agents);
-            getWindow().showNotification("Selected agents: " + agents);
+            getWindow().showNotification("Selected registeredAgents: " + agents);
         }
     }
 
     @Override
     public void agentRegistered(Set<Agent> agents) {
-        Set<Agent> agentsToRemove = new HashSet<Agent>();
-        Set<Agent> agentsToAdd = new HashSet<Agent>();
-        agentsToRemove.addAll(this.agents);
-        agentsToAdd.addAll(agents);
 
-        agentsToRemove.removeAll(agents);
-        agentsToAdd.removeAll(this.agents);
-        this.agents = agents;
+        try {
+            Set<Agent> setToRemove = new HashSet<Agent>();
+            Set<Agent> setToAdd = new HashSet<Agent>();
+            setToRemove.addAll(registeredAgents);
+            setToRemove.removeAll(agents);
+            refreshAgents(setToRemove, true);
 
-        refreshAgents(agentsToRemove, agentsToAdd);
+            setToAdd.addAll(agents);
+            setToAdd.removeAll(registeredAgents);
+            refreshAgents(setToAdd, false);
+
+            registeredAgents.clear();
+            registeredAgents.addAll(agents);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            return;
+        }
     }
 
-    private void refreshAgents(Set<Agent> agentsToRemove, Set<Agent> agentsToAdd) {
-        for(Agent a : agentsToRemove){
-            listSelectAgents.removeItem(a.getUuid());
-        }
+    @Override
+    public int getId() {
+        return this.id;
+    }
 
-        for(Agent a : agentsToAdd){
-            listSelectAgents.addItem(a.getUuid());
+    private void refreshAgents(Set<Agent> agentsToAdd, boolean isRemove) {
+        if (agentsToAdd != null) {
+            for (Agent a : agentsToAdd) {
+                if (isRemove) {
+                    listSelectAgents.removeItem(a.getUuid());
+                } else {
+                    listSelectAgents.addItem(a.getUuid());
+                }
+            }
         }
     }
 }

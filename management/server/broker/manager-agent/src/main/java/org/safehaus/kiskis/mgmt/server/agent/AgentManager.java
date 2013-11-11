@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
@@ -20,8 +19,7 @@ public class AgentManager implements AgentManagerInterface {
 
     private PersistenceAgentInterface persistenceAgent;
     private CommandManagerInterface commandManager;
-    Set<Agent> registeredAgents;
-    private ArrayList<AgentInterface> modules = new ArrayList<AgentInterface>();
+    private Set<Agent> registeredAgents;
     private ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
 
     public AgentManager() {
@@ -29,54 +27,43 @@ public class AgentManager implements AgentManagerInterface {
     }
 
     @Override
-    public Set<Agent> getAgentList() {
-        System.out.println(this.getClass().getName() + " getAgentList called");
-        return registeredAgents;
+    public Set<Agent> getRegisteredAgents() {
+        return Collections.unmodifiableSet(registeredAgents);
     }
 
     @Override
     public synchronized boolean registerAgent(Agent agent) {
-        System.out.println(this.getClass().getName() + " registerAgent called");
-        registeredAgents.add(agent);
+        boolean added = registeredAgents.add(agent);
         //persistenceAgent.saveAgent(agent);
-        notifyModules();
 
-        Request request = new Request();
+        /*Request request = new Request();
         request.setType(RequestType.REGISTRATION_REQUEST_DONE);
         request.setUuid(agent.getUuid());
         Command command = new Command(request);
-        commandManager.executeCommand(command);
+        commandManager.executeCommand(command);*/
+
+        if(added){
+            notifyModules();
+        }
         return false;
     }
 
     private void notifyModules() {
-        for (AgentInterface ai : modules) {
-            System.out.println("Registered agents count: " + registeredAgents.size());
-            System.out.println(ai.toString());
-            ai.agentRegistered(registeredAgents);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public synchronized void registerAgentInterface(AgentInterface module) {
-        modules.add(module);
-        for (AgentListener listener : (ArrayList<AgentListener>) listeners.clone()) {
-            if (listener != null) {
-                listener.agentRegistered(this, module);
+        for (AgentListener ai : listeners) {
+            if (ai != null) {
+                System.out.println("Agents count: " + registeredAgents.size());
+                System.out.println("Notify listener: " + ai.getId());
+                ai.agentRegistered(getRegisteredAgents());
+            } else {
+                listeners.remove(ai);
             }
         }
-        System.out.println("New agent listener registered");
-    }
-
-    @Override
-    public List<AgentInterface> getModules() {
-        return Collections.unmodifiableList(modules);
     }
 
     @Override
     public synchronized void addListener(AgentListener listener) {
         listeners.add(listener);
+        System.out.println("\n" + listener.getId() + "registered\n");
     }
 
     @Override

@@ -40,14 +40,14 @@ public class PersistenceAgentTest {
     }
 
     /**
-     * Test of getAgentList method, of class PersistenceAgent.
+     * Test of getRegisteredAgents method, of class PersistenceAgent.
      */
 //    @Test
     public void testGetAgentList() {
-//        System.out.println("getAgentList");
+//        System.out.println("getRegisteredAgents");
 //        PersistenceAgent instance = new PersistenceAgent();
 //        List<Agent> expResult = null;
-//        List<Agent> result = instance.getAgentList();
+//        List<Agent> result = instance.getRegisteredAgents();
 //        assertEquals(expResult, result);
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");

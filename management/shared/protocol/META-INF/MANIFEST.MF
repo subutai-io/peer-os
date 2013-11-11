@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1384162469422
+Bnd-LastModified: 1384191445116
 Build-Jdk: 1.7.0_25
 Built-By: daralbaev
 Bundle-Description: Shared Protocol Bundle
@@ -11,12 +11,11 @@ Created-By: Apache Maven Bundle Plugin
 Export-Package: org.safehaus.kiskis.mgmt.shared.protocol.api;uses:="org.
  safehaus.kiskis.mgmt.shared.protocol,org.safehaus.kiskis.mgmt.shared.pr
  otocol.api.ui";version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared
- .protocol.api.ui;uses:="org.safehaus.kiskis.mgmt.shared.protocol,org.sa
- fehaus.kiskis.mgmt.shared.protocol.api";version="0.0.1.SNAPSHOT",org.sa
- fehaus.kiskis.mgmt.shared.protocol;uses:="org.safehaus.kiskis.mgmt.shar
- ed.protocol.api,org.safehaus.kiskis.mgmt.shared.protocol.enums";version
- ="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.protocol.enums;versio
- n="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.protocol.settings;ve
- rsion="0.0.1.SNAPSHOT"
+ .protocol.api.ui;uses:="org.safehaus.kiskis.mgmt.shared.protocol";versi
+ on="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.shared.protocol;uses:="org
+ .safehaus.kiskis.mgmt.shared.protocol.api,org.safehaus.kiskis.mgmt.shar
+ ed.protocol.enums";version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.sh
+ ared.protocol.enums;version="0.0.1.SNAPSHOT",org.safehaus.kiskis.mgmt.s
+ hared.protocol.settings;version="0.0.1.SNAPSHOT"
 Import-Package: com.google.gson;version="[2.2,3)"
 Tool: Bnd-2.1.0.20130426-122213

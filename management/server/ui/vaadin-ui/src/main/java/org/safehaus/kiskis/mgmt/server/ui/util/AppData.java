@@ -76,4 +76,8 @@ public class AppData
     public static void setAgentList(Set<String> agentList) {
         instance.get().agentList = agentList;
     }
+
+    public static Application getApplication(){
+        return instance.get().app;
+    }
 }

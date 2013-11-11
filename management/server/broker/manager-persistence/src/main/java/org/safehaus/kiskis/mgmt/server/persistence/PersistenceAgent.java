@@ -31,7 +31,7 @@ public class PersistenceAgent implements PersistenceAgentInterface {
 
     @Override
     public List<Agent> getAgentList() {
-        System.out.println(this.getClass().getName() + " getAgentList called");
+        System.out.println(this.getClass().getName() + " getRegisteredAgents called");
         return null;
     }
 
