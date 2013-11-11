@@ -10,6 +10,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 public class CommandTransport implements CommandTransportInterface {
+
     private BrokerService broker;
     private BrokerInterface brokerService;
 
@@ -35,8 +36,8 @@ public class CommandTransport implements CommandTransportInterface {
 
         public void run() {
             try {
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Common.MQ_URL);
-                Connection connection = connectionFactory.createConnection(Common.MQ_USERNAME, Common.MQ_PASSWORD);
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + Common.MQ_HOST + ":" + Common.MQ_PORT);
+                Connection connection = connectionFactory.createConnection();
                 connection.start();
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 Destination destination = session.createQueue(command.getCommand().getUuid());
@@ -55,7 +56,7 @@ public class CommandTransport implements CommandTransportInterface {
 
     public void setBrokerService(BrokerInterface brokerService) {
         this.brokerService = brokerService;
-        if(brokerService != null){
+        if (brokerService != null) {
             System.out.println("......." + this.getClass().getName() + " BrokerInterface initialized");
         } else {
             System.out.println("......." + this.getClass().getName() + " BrokerInterface not initialized");
@@ -65,10 +66,16 @@ public class CommandTransport implements CommandTransportInterface {
 
     public void init() {
         try {
+            System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/broker.ks");
+            System.setProperty("javax.net.ssl.keyStorePassword", "broker");
+            System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/client.ts");
+            System.setProperty("javax.net.ssl.trustStorePassword", "client");
+
+
             broker = new BrokerService();
-            broker.setPersistent(false);
+            broker.setPersistent(true);
             broker.setUseJmx(false);
-            broker.addConnector("tcp://0.0.0.0:" + Common.MQ_PORT);
+            broker.addConnector("ssl://0.0.0.0:" + Common.MQ_PORT);
             broker.start();
             setupListener();
         } catch (Exception ex) {
@@ -85,7 +92,7 @@ public class CommandTransport implements CommandTransportInterface {
     }
 
     private void setupListener() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://" + Common.MQ_HOST + ":" + Common.MQ_PORT);
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + Common.MQ_HOST + ":" + Common.MQ_PORT);
         Connection connection;
         try {
             connection = connectionFactory.createConnection();

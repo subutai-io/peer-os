@@ -63,7 +63,6 @@ public class AgentManager implements AgentManagerInterface {
     @Override
     public synchronized void addListener(AgentListener listener) {
         listeners.add(listener);
-        System.out.println("\n" + listener.getId() + "registered\n");
     }
 
     @Override
