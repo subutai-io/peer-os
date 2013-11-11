@@ -24,9 +24,13 @@ public class PersistenceAgent implements PersistenceAgentInterface {
     private final String keyspaceName = "kiskis";
 
     public PersistenceAgent() {
-        System.out.println("Consctructor initialized...");
-        cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
-        session = cluster.connect(keyspaceName);
+        try {
+            System.out.println("Consctructor initialized...");
+            cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
+            session = cluster.connect(keyspaceName);
+        } catch (Exception e) {
+            System.out.println("can not connect to cassandra.");
+        }
     }
 
     @Override
