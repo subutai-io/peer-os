@@ -5,7 +5,6 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.enums;
 
 /**
- *
  * @author Dilshat
  */
 public enum RequestType {

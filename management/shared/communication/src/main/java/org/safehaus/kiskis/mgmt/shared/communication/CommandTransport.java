@@ -1,13 +1,15 @@
 package org.safehaus.kiskis.mgmt.shared.communication;
 
-import javax.jms.*;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
+import javax.jms.*;
 
 public class CommandTransport implements CommandTransportInterface {
 

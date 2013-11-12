@@ -15,25 +15,23 @@
  */
 package org.safehaus.kiskis.mgmt.motd.client;
 
-import org.safehaus.kiskis.mgmt.motd.api.service.MotdService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.motd.api.service.MotdService;
 
 public class Activator implements BundleActivator {
 
     public void start(BundleContext context) {
         ServiceReference ref = context.getServiceReference(MotdService.class.getName());
-        if(ref != null) {
+        if (ref != null) {
             try {
-                MotdService motd =(MotdService) context.getService(ref);
+                MotdService motd = (MotdService) context.getService(ref);
                 System.out.println("Message of the day : " + motd.getMessageOfTheDay());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Error trying to connect to motd service : " + e.getMessage());
             }
-        }
-        else {
+        } else {
             System.out.println("Cannot find any registered services");
         }
     }

@@ -1,20 +1,16 @@
 package org.safehaus.kiskis.mgmt.server.persistence;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -26,7 +22,7 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
     private Cluster cluster;
     private Session session;
     private final int cassandraPort = 9042;
-//    private final String cassandraHost = "localhost";
+    //    private final String cassandraHost = "localhost";
     private final String cassandraHost = "192.168.1.106";
     private final String keyspaceName = "kiskis";
     private long requestsequencenumber = 0l;

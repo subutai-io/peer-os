@@ -1,16 +1,18 @@
 package org.safehaus.kiskis.mgmt.server.agent;
 
-import java.util.*;
-
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
-
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
@@ -41,8 +43,7 @@ public class AgentManager implements AgentManagerInterface {
             Command command = new Command(request);
             commandManager.executeCommand(command);
 
-            boolean added = registeredAgents.add(agent);
-            if (added) {
+            if (registeredAgents.add(agent)) {
                 notifyModules();
             }
             return true;

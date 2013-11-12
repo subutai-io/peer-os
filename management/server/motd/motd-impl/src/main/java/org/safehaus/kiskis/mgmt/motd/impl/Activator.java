@@ -15,10 +15,9 @@
  */
 package org.safehaus.kiskis.mgmt.motd.impl;
 
-import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.motd.api.service.MotdService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.safehaus.kiskis.mgmt.motd.api.service.MotdService;
 
 public class Activator implements BundleActivator {
 

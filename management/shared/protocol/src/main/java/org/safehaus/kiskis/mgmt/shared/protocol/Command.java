@@ -7,9 +7,8 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
 
 /**
- *
  * @author dilshat
- * Wrapper object for proper JSON generation
+ *         Wrapper object for proper JSON generation
  */
 public class Command implements CommandInterface {
 

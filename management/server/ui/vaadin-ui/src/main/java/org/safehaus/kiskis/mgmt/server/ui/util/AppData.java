@@ -6,10 +6,8 @@ package org.safehaus.kiskis.mgmt.server.ui.util;
 
 import com.vaadin.Application;
 import com.vaadin.service.ApplicationContext.TransactionListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -77,7 +75,7 @@ public class AppData
         instance.get().agentList = agentList;
     }
 
-    public static Application getApplication(){
+    public static Application getApplication() {
         return instance.get().app;
     }
 }

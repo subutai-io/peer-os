@@ -199,7 +199,7 @@
                                     <artifactId>ui-vaadin</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                
+
                                 <artifactItem>
                                     <groupId>com.datastax.cassandra</groupId>
                                     <artifactId>cassandra-driver-core</artifactId>
@@ -245,7 +245,7 @@
                                     <artifactId>jackson-mapper-asl</artifactId>
                                     <version>1.9.13</version>
                                 </artifactItem>
-                                
+
                                 <!--UI Dependencies-->
 
                                 <!--Broker Dependencies-->

@@ -58,7 +58,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         setTheme("runo");
 
         moduleService.addListener(this);
-        //getMainWindow().executeJavaScript("setInterval(function() { javascript:vaadin.forceSync(); }, 5000);");
+        getMainWindow().executeJavaScript("setInterval(function() { javascript:vaadin.forceSync(); }, 5000);");
     }
 
     @Override

@@ -12,7 +12,7 @@
     </bean>
     <service ref="agentManagerService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"
-            ranking="2">
+             ranking="2">
         <service-properties>
             <!-- This property is only important for the DOSGi tutorial -->
             <entry key="service.exported.interfaces" value="*"/>

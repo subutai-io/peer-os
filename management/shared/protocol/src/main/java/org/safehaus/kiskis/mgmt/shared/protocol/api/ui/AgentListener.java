@@ -2,7 +2,6 @@ package org.safehaus.kiskis.mgmt.shared.protocol.api.ui;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-import java.util.List;
 import java.util.Set;
 
 /**

@@ -2,26 +2,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <!--test jira-->
     <groupId>org.safehaus.kiskis.mgmt</groupId>
     <artifactId>mgmt-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>Kiskis Management Server Warm-Up Project Parent</name>
+    <name>Kiskis Management Server Project Parent</name>
 
     <packaging>pom</packaging>
 
+    <!-- this is just a comment for testing -->
     <properties>
         <karaf.version>2.3.1</karaf.version>
+        <osgi.version>4.3.0</osgi.version>
+        <activemq.version>5.8.0</activemq.version>
     </properties>
 
     <modules>
         <module>shared</module>
-        <module>agent</module>
         <module>server</module>
     </modules>
 
-    <description>Parent project for the Kiskis Management Warm-up Project Artifacts</description>
+    <description>Parent project for the Kiskis Management Project Artifacts</description>
 
 </project>
 

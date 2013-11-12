@@ -11,6 +11,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public interface BrokerInterface {
     /**
      * For Communication Bundle
+     *
      * @param response
      * @return
      */

@@ -14,8 +14,7 @@ public class Activator implements BundleActivator {
         System.out.println("Starting : " + context.getBundle().getSymbolicName());
         try {
             System.out.println("Message : " + myService.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Err : " + e.getMessage());
         }
     }

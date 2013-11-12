@@ -15,10 +15,10 @@
  */
 package org.safehaus.kiskis.mgmt.motd.rest;
 
-import org.safehaus.kiskis.mgmt.motd.api.service.MotdService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.motd.api.service.MotdService;
 
 public class MotdRestServiceImpl implements MotdRestService {
 
@@ -27,16 +27,14 @@ public class MotdRestServiceImpl implements MotdRestService {
     public MotdRestServiceImpl() {
         BundleContext context = FrameworkUtil.getBundle(MotdRestServiceImpl.class).getBundleContext();
         ServiceReference ref = context.getServiceReference(MotdService.class.getName());
-        if(ref != null) {
+        if (ref != null) {
             try {
-                motdService =(MotdService) context.getService(ref);
+                motdService = (MotdService) context.getService(ref);
                 System.out.println("Message of the day: " + motdService.getMessageOfTheDay());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Error trying to connect to motd service: " + e.getMessage());
             }
-        }
-        else {
+        } else {
             System.out.println("Cannot find any registered services");
         }
 
@@ -45,12 +43,9 @@ public class MotdRestServiceImpl implements MotdRestService {
 
     public String getMessage() {
         String message = "<html><title>Message of the Day REST service</title><head>Message of the Day REST service</head><body><p>";
-        try
-        {
+        try {
             message += "<a href=\"http://www.safehaus.org\">" + motdService.getMessageOfTheDay() + "</a>";
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             message += "Cannot connect to the motd service : " + e.getMessage();
         }
         return message + "</p></body></html>";

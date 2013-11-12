@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.broker.impl;
 
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -8,6 +7,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
+
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 10/10/13 Time: 4:48 PM To
@@ -32,22 +33,23 @@ public class Broker implements BrokerInterface {
         Request req = null;
         System.out.println(this.getClass().getName() + " distribute is called");
         //TO-DO Distribute response to Agent or Command Bundle
-        persistenceCommand.saveResponse(response);
-        switch (response.getType()) {
-            case REGISTRATION_REQUEST: {
-                Agent agent = new Agent();
-                agent.setUuid(response.getUuid());
-                agent.setHostname(response.getHostname());
-                agent.setMacAddress(response.getMacAddress());
-                if (agentManager.registerAgent(agent)) {
-                    System.out.println("Agent is registered");
-                } else {
-                    System.out.println("Error registering agent");
-                };
-                break;
+        if (persistenceCommand.saveResponse(response)) {
+            switch (response.getType()) {
+                case REGISTRATION_REQUEST: {
+                    Agent agent = new Agent();
+                    agent.setUuid(response.getUuid());
+                    agent.setHostname(response.getHostname());
+                    agent.setMacAddress(response.getMacAddress());
+                    if (agentManager.registerAgent(agent)) {
+                        System.out.println("Agent is registered");
+                    } else {
+                        System.out.println("Error registering agent");
+                    }
+                    break;
+                }
             }
-
         }
+
         return req;
     }
 

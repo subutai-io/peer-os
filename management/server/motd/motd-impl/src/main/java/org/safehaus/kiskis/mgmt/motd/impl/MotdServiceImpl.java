@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.motd.api.service.MotdService;
  */
 public class MotdServiceImpl implements MotdService {
 
-    public String getMessageOfTheDay () {
+    public String getMessageOfTheDay() {
         return "It's a good day as any!";
     }
 }

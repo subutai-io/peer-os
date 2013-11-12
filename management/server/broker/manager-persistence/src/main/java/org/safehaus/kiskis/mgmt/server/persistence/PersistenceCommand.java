@@ -1,16 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.persistence;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
-
-import java.util.List;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:05 PM
  */
-public class PersistenceCommand  {
+public class PersistenceCommand {
 //implements PersistenceCommandInterface
 //    @Override
 //    public List<Command> getCommandList(Agent agent) {

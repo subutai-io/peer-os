@@ -3,13 +3,13 @@ package org.safehaus.kiskis.mgmt.server.ui;
 import com.vaadin.data.Property;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -60,7 +60,6 @@ public class MgmtAgentManager extends VerticalLayout implements
             Set<String> agents = (Set<String>) event.getProperty().getValue();
 
             AppData.setAgentList(agents);
-            getWindow().showNotification("Selected registeredAgents: " + agents);
         }
     }
 

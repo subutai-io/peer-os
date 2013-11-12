@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
 
 /**
- *
  * @author dilshat
  */
 public class CommandJson {
@@ -35,7 +34,7 @@ public class CommandJson {
     public static String getJson(CommandInterface cmd) {
         return gson.toJson(cmd);
     }
-    
+
 //    public static String getJson(Request request) {
 //        return gson.toJson(request);
 //    }
