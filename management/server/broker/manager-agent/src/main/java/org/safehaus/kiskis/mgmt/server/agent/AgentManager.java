@@ -33,17 +33,19 @@ public class AgentManager implements AgentManagerInterface {
 
     @Override
     public synchronized boolean registerAgent(Agent agent) {
-        boolean added = registeredAgents.add(agent);
-        //persistenceAgent.saveAgent(agent);
+        if (persistenceAgent.saveAgent(agent)) {
 
-        /*Request request = new Request();
-        request.setType(RequestType.REGISTRATION_REQUEST_DONE);
-        request.setUuid(agent.getUuid());
-        Command command = new Command(request);
-        commandManager.executeCommand(command);*/
+            Request request = new Request();
+            request.setType(RequestType.REGISTRATION_REQUEST_DONE);
+            request.setUuid(agent.getUuid());
+            Command command = new Command(request);
+            commandManager.executeCommand(command);
 
-        if(added){
-            notifyModules();
+            boolean added = registeredAgents.add(agent);
+            if (added) {
+                notifyModules();
+            }
+            return true;
         }
         return false;
     }

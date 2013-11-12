@@ -26,7 +26,8 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
     private Cluster cluster;
     private Session session;
     private final int cassandraPort = 9042;
-    private final String cassandraHost = "localhost";
+//    private final String cassandraHost = "localhost";
+    private final String cassandraHost = "192.168.1.106";
     private final String keyspaceName = "kiskis";
     private long requestsequencenumber = 0l;
 
@@ -95,7 +96,7 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
     public boolean saveResponse(Response response) {
         System.out.println(this.getClass().getName() + " saveResponse called");
         System.out.println(response.toString());
-        PreparedStatement stmt = session.prepare("insert into response (uuid, stdout, responsesequecenumber) "
+        PreparedStatement stmt = session.prepare("insert into response (uuid, stdout, responsesequencenumber) "
                 + "values (?, ?, ?);");
         BoundStatement boundStatement = new BoundStatement(stmt);
         ResultSet rs = session.execute(boundStatement.bind(response.getUuid(), "stdout" + response.getStdOut(),
