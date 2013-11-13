@@ -1,11 +1,21 @@
 /**
- *  \brief     KiskisAgent.cpp
- *  \details   KiskisAgent Software main process
- *  \author    Emin INAL
- *  \author    Bilal BAL
- *  \version   1.0
- *  \date      Sep 27, 2013
- *  \copyright GNU Public License.
+ *  @brief     KiskisAgent.cpp
+ *  @class     KiskisAgent.cpp
+ *  @details   This is KiskisAgent Software main process.
+ *  		   It's main responsibility is that send and receive messages from ActiveMQ broker.
+ *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Sep 27, 2013
+ *  @copyright GNU Public License.
+ */
+
+/** \mainpage  Welcome to Project KiskisAgent
+ *	\section   KisKisAgent
+ * 			   The Kiskis Agent is a simple daemon designed to connect securely to an AMQP server to reliably receive and send messages on queues and topics.
+ * 	 	 	   It's purpose is to perform a very simple reduced set of instructions to manage any system administration task.
+ * 	 	 	   The agent may run on physical servers, virtual machines or inside Linux Containers.
  */
 #include "KACommand.h"
 #include "KAResponse.h"
@@ -19,6 +29,12 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
+/**
+ *  \details   KiskisAgent's settings.xml is read by this function.
+ *  		   url: Broker address is fetched. (for instance: url = "failover://(ssl://localhost:61167))
+ *  		   connectionOptions: ReconnectDelay and Reconnect feature settings.
+ *  		   loglevel: Debugging Loglevel. (0-8)
+ */
 int getSettings(string & url, string & connectionOptions, string & loglevel)
 {
 	pugi::xml_document doc;
@@ -37,9 +53,14 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 
 	return 0;
 }
+/**
+ *  \details   UUID of the KiskisAgent is fetched from statically using this function.
+ *  		   Example uuid:"ff28d7c7-54b4-4291-b246-faf3dd493544"
+ */
 bool getUuid(string& Uuid)
 {
-	try{
+	try
+	{
 		ifstream file("/etc/KiskisAgent/config/uuid.txt");	//opening mac.txt
 		getline(file,Uuid);
 		file.close();
@@ -49,12 +70,17 @@ bool getUuid(string& Uuid)
 		}
 		return true;
 	}
-	catch(const std::exception& error){
+	catch(const std::exception& error)
+	{
 		cout << error.what()<< endl;
 	}
 	return false;
 }
-
+/**
+ *  \details   threadSend function sends string messages in the Shared Memory buffer to ActiveMQ Broker.
+ *  		   This is a thread with working concurrently with main thread.
+ *  		   It is main purpose that checking the Shared Memory Buffer in Blocking mode and sending them to Broker
+ */
 void threadSend(message_queue *mq,KAConnection *connection)
 {
 	try
@@ -71,11 +97,17 @@ void threadSend(message_queue *mq,KAConnection *connection)
 		}
 		message_queue::remove("message_queue");
 	}
-	catch(interprocess_exception &ex){
+	catch(interprocess_exception &ex)
+	{
 		message_queue::remove("message_queue");
 		std::cout << ex.what() << std::endl;
 	}
 }
+/**
+ *  \details   This function is the main thread of KiskisAgent.
+ *  		   It sends and receives messages from ActiveMQ broker.
+ *  		   It is also responsible from creation new process.
+ */
 int main(int argc,char *argv[],char *envp[])
 {
 	string url,connectionOptions,loglevel;

@@ -1,12 +1,12 @@
-/*
- *============================================================================
- Name        : KAStreamReader.h
- Author      : Emin INAL
- Date		 : Oct 30, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAStreamReader Class will be used for capturing intermediate responses
-==============================================================================
+/**
+ *  @brief     KAStreamReader.h
+ *  @class     KAStreamReader.h
+ *  @details   KAStreamReader Class is used for capturing intermediate responses.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Oct 30, 2013
+ *  @copyright GNU Public License.
  */
 #ifndef KASTREAMREADER_H_
 #define KASTREAMREADER_H_

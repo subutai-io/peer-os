@@ -1,15 +1,7 @@
-/*
- *============================================================================
- Name        : KAConnection.cpp
- Author      : Emin INAL & Bilal BAL
- Date		 : Sep 4, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAConnection class is designed for communication with AMQP ActiveMQ broker.
-==============================================================================
- */
 #include "KAConnection.h"
-
+/**
+ *  \details   Default constructor of KAConnection class.
+ */
 KAConnection::KAConnection(string brokerURI, string serverURI, string clientURI)
 {
 	this->brokerURI=brokerURI;
@@ -23,10 +15,18 @@ KAConnection::KAConnection(string brokerURI, string serverURI, string clientURI)
 	this->clientURI=clientURI;
 	this->receiverdestination=NULL;
 }
+/**
+ *  \details   Default destructor of KAConnection class.
+ */
 KAConnection::~KAConnection()
 {
 	//closeConnection();								//destroy all pointers
 }
+/**
+ *  \details   openSession method is one of the most important function of the KAConnection class.
+ *  		   It tries to open a connection to ActiveMQ Broker.
+ *  		   if this operation is successfully done it returns true. Otherwise it returns false.
+ */
 bool KAConnection::openSession()
 {							//opening a TCP session on Broker
 	try
@@ -59,6 +59,9 @@ bool KAConnection::openSession()
 	}
 	return false;
 }
+/**
+ *  \details   This method sends the given strings to ActiveMQ Broker.
+ */
 void KAConnection::sendMessage(string mymessage)
 {				//sending a message to queue
 	try
@@ -72,6 +75,13 @@ void KAConnection::sendMessage(string mymessage)
 		cout << error.what()<< endl;;
 	}
 }
+/**
+ *  \details   fetchMessage method is one of the most important function of the KAConnection class.
+ *  		   It tries to fetch a message from ActiveMQ Broker in blocking mode.
+ *  		   It reads the message from SERVICE_QUEUE sequentially
+ *  		   if new message comes, it returns true and returning reference textmessage which has a real message.
+ *  		   otherwise it just return false.
+ */
 bool KAConnection::fetchMessage(string& textmessage)
 {		//fetch a message from queue with no wait
 	Message* message = receiver->receive();				//return true if the message exist on queue
@@ -87,78 +97,136 @@ bool KAConnection::fetchMessage(string& textmessage)
 		return false;
 	}
 }
+/**
+ *  \details   setting "senderdestination" private variable of the KAConnection class.
+ */
 void KAConnection::setSenderDestination(Destination* mydestination)
 {	//setting sender pointer
 	senderdestination = mydestination;
 }
+/**
+ *  \details   getting "senderdestination" private variable of the KAConnection class.
+ */
 Destination* KAConnection::getSenderDestination()
 {						//gettin sender pointer
 	return senderdestination;
 }
+/**
+ *  \details   getting "sender" private variable of the KAConnection class.
+ */
 MessageProducer* KAConnection::getSender()
 {						//getting sender pointer
 	return sender;
 }
+/**
+ *  \details   setting "sender" private variable of the KAConnection class.
+ */
 void KAConnection::setSender(MessageProducer* mysender)
 {		//setting sender pointer
 	sender = mysender;
 }
+/**
+ *  \details   getting "sendmessage" private variable of the KAConnection class.
+ */
 TextMessage* KAConnection::getSendMessage()
 {						//getting sendmessage pointer
 	return sendmessage;
 }
+/**
+ *  \details   setting "sendmessage" private variable of the KAConnection class.
+ */
 void KAConnection::setSendMessage(TextMessage* mymessage)
 {			//setting sendmessage pointer
 	this->sendmessage=mymessage;
 }
+/**
+ *  \details   getting "session" private variable of the KAConnection class.
+ */
 Session* KAConnection::getSession()
 {					//getting session pointer
 	return session;
 }
+/**
+ *  \details   setting "session" private variable of the KAConnection class.
+ */
 void KAConnection::setSesion(Session* mysession)
 { 		//setting session pointer
 	session = mysession;
 }
+/**
+ *  \details   getting "brokerURI" private variable of the KAConnection class.
+ */
 string KAConnection::getBrokerURI()
 {					//getting Broker URI
 	return brokerURI;
 }
+/**
+ *  \details   setting "brokerURI" private variable of the KAConnection class.
+ */
 void KAConnection::setBrokerURI(string mybrokerURI)
 {	//setting Broker URI
 	brokerURI=mybrokerURI;
 }
+/**
+ *  \details   getting "connection" private variable of the KAConnection class.
+ */
 Connection* KAConnection::getConnection()
 {				//getting Connection pointer
 	return connection;
 }
+/**
+ *  \details   setting "connection" private variable of the KAConnection class.
+ */
 void KAConnection::setConnection(Connection* myconnection)
 {		//setting connection pointer
 	connection = myconnection;
 }
+/**
+ *  \details   getting "receiver" private variable of the KAConnection class.
+ */
 MessageConsumer * KAConnection::getReceiver()
 {						//getting receiver
 	return receiver;
 }
+/**
+ *  \details   setting "receiver" private variable of the KAConnection class.
+ */
 void KAConnection::setReciever(MessageConsumer* myreceiver)
 {			//setting receiver
 	receiver = myreceiver;
 }
+/**
+ *  \details   getting "receivedmessage" private variable of the KAConnection class.
+ */
 TextMessage* KAConnection::getReceivedMessage()
 {						//getting receivedmesssage pointer
 	return receivedmessage;
 }
+/**
+ *  \details   setting "receivedmessage" private variable of the KAConnection class.
+ */
 void KAConnection::setReceivedMessage(TextMessage* mymessage)
 {			//setting receivedmesssage pointer
 	this->receivedmessage=mymessage;
 }
+/**
+ *  \details   setting "receiverdestination" private variable of the KAConnection class.
+ */
 void KAConnection::setReceiverDestination(Destination* mydestination)
 {
 	receiverdestination = mydestination;
 }
+/**
+ *  \details   getting "receiverdestination" private variable of the KAConnection class.
+ */
 Destination* KAConnection::getReceiverDestination()
 {
 	return receiverdestination;
 }
+/**
+ *  \details   This method close the connections and session to the ActiveMQ Broker
+ *   		   It also clear the all pointers in the called KAConnection instance.
+ */
 void KAConnection::close()
 {			// Destroy all resources.
 	// Close open resources such as session and connection.

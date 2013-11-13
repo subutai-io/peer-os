@@ -1,12 +1,12 @@
-/*
- *============================================================================
- Name        : KAConnection.h
- Author      : Emin INAL
- Date		 : Sep 4, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAConnection class is designed for communication with AMQP ACtiveMQ broker.
-=============================================================================
+/**
+ *  @brief     KAConnection.h
+ *  @class     KAConnection.h
+ *  @details   KAConnection class is designed for communication with AMQP ACtiveMQ broker.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Sep 4, 2013
+ *  @copyright GNU Public License.
  */
 #ifndef KACONNECTION_H_
 #define KACONNECTION_H_
@@ -57,7 +57,7 @@ using namespace cms;
 class KAConnection : public Runnable , public ExceptionListener, public DefaultTransportListener
 {
 public:
-	KAConnection(string brokerURI, string serverURI, string clientURI);
+	KAConnection(string,string,string);
 	~KAConnection();
 
 	string getBrokerURI();
