@@ -1,14 +1,7 @@
-/*
- *============================================================================
- Name        : KAResponse.cpp
- Author      : Emin INAL
- Date		 : Aug 29, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAResponse class is Designed for Sending Response Messages to Broker
-==============================================================================
- */
 #include "KAResponse.h"
+/**
+ *  \details   Default constructor of the KAResponse class.
+ */
 KAResponse::KAResponse()
 {
 	// TODO Auto-generated constructor stub
@@ -21,10 +14,16 @@ KAResponse::KAResponse()
 	setStandardOutput("");
 	setExitCode(-1);
 }
+/**
+ *  \details   Default destructor of the KAResponse class.
+ */
 KAResponse::~KAResponse()
 {
 	// TODO Auto-generated destructor stub
 }
+/**
+ *  \details   This method clears the all pricate variables in the given KAResponse instance.
+ */
 void KAResponse::clear()
 {		//clear the all variables..
 	setType("");
@@ -35,6 +34,12 @@ void KAResponse::clear()
 	setStandardError("");
 	setStandardOutput("");
 }
+/**
+ *  \details   serialize function creates a JSON strings from called instance.
+ *  		   This is one of the most frequently used function is the class.
+ *  		   It also check the existing variable(NULL or not) when serializing the instance.
+ *  		   It returns given reference output strings.
+ */
 void KAResponse::serialize(string& output)
 {
 	Json::Value environment;
@@ -59,6 +64,12 @@ void KAResponse::serialize(string& output)
 		root["response"]["responseSequenceNumber"]=getResponseSequenceNumber();
 	output = writer.write(root);		//Json Response string is created
 }
+/**
+ *  \details   serializeDone method serialize the Done response JSon string from called instance.
+ *     		   This is one of the most frequently used function is the class.
+ *     		   It also check the existing variable(NULL or not) when serializing the instance.
+ *  		   It returns given reference output strings.
+ */
 void KAResponse::serializeDone(string& output)
 {			//Serialize a Done Response  to a Json String
 	Json::Value environment;
@@ -79,6 +90,13 @@ void KAResponse::serializeDone(string& output)
 		root["response"]["exitCode"] = getExitCode();
 	output = writer.write(root);		//Json Response Done string is created
 }
+/**
+ *  \details   deserialize function deserialize the given Json strings to KAResponse instance.
+ *     		   This is one of the most frequently used function is the class.
+ *  		   It also check the existing variable in the JSON strings when deserializing the instance.
+ *  		   it uses reference input and deserialize it to called KAResponse instance
+ *  		   it returns true if the given input string is true formatted otherwise return false.
+ */
 bool KAResponse::deserialize(string& input)
 {													//Deserialize a Json String to Response instance
 	Json::FastWriter writer;						//return true: if Deserialization is successfull
@@ -154,66 +172,114 @@ bool KAResponse::deserialize(string& input)
 	}
 	return true;
 }
+/**
+ *  \details   getting "pid" private variable of KAResponse instance
+ */
 string& KAResponse::getPid()
 {						//getting pid
 	return this->pid;
 }
+/**
+ *  \details   setting "pid" private variable of KAResponse instance
+ */
 void KAResponse::setPid(const string& pid)
 {			//setting pid
 	this->pid=pid;
 }
+/**
+ *  \details   getting "exitCode" private variable of KAResponse instance
+ */
 int KAResponse::getExitCode()
 {					//getting ExitCode
 	return this->exitCode;
 }
+/**
+ *  \details   setting "exitCode" private variable of KAResponse instance
+ */
 void KAResponse::setExitCode(int exitcode)
 {			//setting ExitCode
 	this->exitCode = exitcode;
 }
+/**
+ *  \details   getting "type" private variable of KAResponse instance
+ */
 string& KAResponse::getType()
 {								//getting Type
 	return this->type;
 }
+/**
+ *  \details   setting "type" private variable of KAResponse instance
+ */
 void KAResponse::setType(const string& type)
 {				//setting Type
 	this->type = type;
 }
+/**
+ *  \details   getting "uuid" private variable of KAResponse instance
+ */
 string& KAResponse::getUuid()
 {								//getting uuid
 	return this->uuid;
 }
+/**
+ *  \details   setting "uuid" private variable of KAResponse instance
+ */
 void KAResponse::setUuid(const string& uuid)
 {				//setting uuid
 	this->uuid = uuid;
 }
+/**
+ *  \details   getting "requestSequenceNumber" private variable of KAResponse instance
+ */
 int KAResponse::getRequestSequenceNumber()
 {								//getting RequestSeqnumber
 	return this->requestSequenceNumber;
 }
+/**
+ *  \details   setting "requestSequenceNumber" private variable of KAResponse instance
+ */
 void KAResponse::setRequestSequenceNumber(int requestSequenceNumber)
 {	//setting RequestSeqnumber
 	this->requestSequenceNumber = requestSequenceNumber;
 }
+/**
+ *  \details   getting "responseSequenceNumber" private variable of KAResponse instance
+ */
 int KAResponse::getResponseSequenceNumber()
 {									//getting ResponseSeqnumber
 	return this->responseSequenceNumber;
 }
+/**
+ *  \details   setting "responseSequenceNumber" private variable of KAResponse instance
+ */
 void KAResponse::setResponseSequenceNumber(int responseSequenceNumber)
 {			//setting ResponseSeqnumber
 	this->responseSequenceNumber = responseSequenceNumber;
 }
+/**
+ *  \details   getting "stdErr" private variable of KAResponse instance
+ */
 string& KAResponse::getStandardError()
 {						//getting standard err
 	return this->stdErr;
 }
+/**
+ *  \details   setting "stdErr" private variable of KAResponse instance
+ */
 void KAResponse::setStandardError(const string& mystderr)
 {		//setting standard err
 	this->stdErr = mystderr;
 }
+/**
+ *  \details   getting "stdOut" private variable of KAResponse instance
+ */
 string& KAResponse::getStandardOutput()
 {						//getting standard out
 	return this->stdOut;
 }
+/**
+ *  \details   setting "stdOut" private variable of KAResponse instance
+ */
 void KAResponse::setStandardOutput(const string& mystdout)
 { 	//setting standard out
 	this->stdOut = mystdout;

@@ -1,15 +1,7 @@
-/*
- *============================================================================
- Name        : KACommand.cpp
- Author      : Emin INAL
- Date		 : Aug 28, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KACommand Class is designed for marshaling and unmarshalling command instance.
-==============================================================================
- */
 #include "KACommand.h"
-
+/**
+ *  \details   Default constructor of KACommand class.
+ */
 KACommand::KACommand()
 {			//Setting default values..
 	// TODO Auto-generated constructor stub
@@ -28,14 +20,14 @@ KACommand::KACommand()
 	getEnvironment().clear();
 }
 /**
- *  \details   Destructor function
+ *  \details   Default destructor of KACommand class.
  */
 KACommand::~KACommand()
 {
 	// TODO Auto-generated destructor stub
 }
 /**
- *  \details   Clear the all variables
+ *  \details   This method clears given instance's all private and public variables.
  */
 void KACommand::clear()
 {		//clear the all variables..
@@ -53,6 +45,12 @@ void KACommand::clear()
 	getArguments().clear();
 	getEnvironment().clear();
 }
+/**
+ *  \details   serialize function creates a JSON strings from called instance.
+ *  		   This is one of the most frequently used function is the class.
+ *  		   It also check the existing variable(NULL or not) when serializing the instance.
+ *  		   It returns given reference output strings.
+ */
 void KACommand::serialize(string& output)
 {			//Serialize a Command instance to a Json String
 	Json::Value env;
@@ -97,6 +95,13 @@ void KACommand::serialize(string& output)
 	}
 	output = writer.write(root); 				//Json command string is created
 }
+/**
+ *  \details   deserialize function deserialize the given Json strings to KACommand instance.
+ *     		   This is one of the most frequently used function is the class.
+ *  		   It also check the existing variable in the JSON strings when deserializing the instance.
+ *  		   it uses reference input and deserialize it to called KAcommand instance
+ *  		   it returns true if the given input string is true formatted otherwise return false.
+ */
 bool KACommand::deserialize(string& input)
 {														//Deserialize a Json String to Command instance
 	Json::FastWriter writer;							//return false if parsing error
@@ -177,10 +182,17 @@ bool KACommand::deserialize(string& input)
 	}
 	return true;
 }
+/**
+ *  \details   getting "envioronment" private variable of KACommand instance
+ */
 list<pair<string,string> >& KACommand::getEnvironment()
 {					//getting EnvPath
 	return this->environment;
 }
+/**
+ *  \details   setting "envioronment" private variable of KACommand instance
+ *  		   environment parameter is set and used in execution.
+ */
 void KACommand::setEnvironment(list<pair<string,string> >& envr)
 {			//setting EnvPath
 	this->environment.clear();
@@ -193,22 +205,41 @@ void KACommand::setEnvironment(list<pair<string,string> >& envr)
 		environment.push_back(dummy);
 	}
 }
+/**
+ *  \details   getting "pid" private variable of KACommand instance
+ */
 string& KACommand::getPid()
 {
 	return this->pid;
 }
+/**
+ *  \details   setting "pid" private variable of KACommand instance.
+ *  		   It carries the process id of the execution.
+ */
 void KACommand::setPid(const string& pid)
 {
 	this->pid=pid;
 }
+/**
+ *  \details   setting "uuid" private variable of KACommand instance
+ */
 void KACommand::setUuid(const string& uu_id)
 {					//setting UUid
 	this->uuid = uu_id;
 }
+/**
+ *  \details   getting "uuid" private variable of KACommand instance.
+ *  		   It is command specific uuid parameter.
+ *  		   It should be match with KiskisAgent static uuid.
+ */
 string& KACommand::getUuid()
 {								//getting UUid
 	return this->uuid;
 }
+/**
+ *  \details   setting "args" private vector variable of KACommand instance.
+ *  		   This is the list of arguments vector that is used in execution.
+ */
 void KACommand::setArguments(vector<string> myvector)
 {		//setting Argument vector
 
@@ -217,88 +248,166 @@ void KACommand::setArguments(vector<string> myvector)
 		this->args.push_back(myvector[index]);
 	}
 }
+/**
+ *  \details   getting "args" private vector variable of KACommand instance.
+ *  		   This is the list of arguments vector that is used in execution.
+ */
 vector<string>& KACommand::getArguments()
 {					//getting Argument vector
 
 	return this->args;
 }
-
+/**
+ *  \details   getting "workingDirectory" private variable of KACommand instance.
+ */
 string& KACommand::getWorkingDirectory()
 {						//getting Current Working directory
 	return this->workingDirectory;
 }
+/**
+ *  \details   setting "workingDirectory" private variable of KACommand instance.
+ */
 void KACommand::setWorkingDirectory(const string& workingdirectory)
 {			//setting Current Working directory
 	this->workingDirectory = workingdirectory;
 }
+/**
+ *  \details   getting "program" private variable of KACommand instance.
+ */
 string& KACommand::getProgram()
 {					//getting Program path
 	return this->program;
 }
+/**
+ *  \details   setting "program" private variable of KACommand instance.
+ *  		   This variable is an absolute program path.
+ *  		   For instance: "/bin/ls" or "/usr/bin/tail"
+ */
 void KACommand::setProgram(const string& myprogram)
 {	//setting Program path
 	this->program = myprogram;
 }
+/**
+ *  \details   getting "requestSequenceNumber" private variable of KACommand instance.
+ */
 int KACommand::getRequestSequenceNumber()
 {					//getting RequestSeqnum
 	return this->requestSequenceNumber;
 }
+/**
+ *  \details   setting "requestSequenceNumber" private variable of KACommand instance.
+ *  		   This variable holds the sequenceNumber of the KACommand instance.
+ */
 void KACommand::setRequestSequenceNumber(int requestSequenceNumber)
 {	//setting RequestSeqnum
 	this->requestSequenceNumber = requestSequenceNumber;
 }
+/**
+ *  \details   getting "runAs" private variable of KACommand instance.
+ */
 string& KACommand::getRunAs()
 {						//getting runAs
 	return this->runAs;
 }
+/**
+ *  \details   setting "runAs" private variable of KACommand instance.
+ *  		   This is the user of execution.
+ *  		   It should be: "root", "Alex" , "Emin" etc..
+ */
 void KACommand::setRunAs(const string& runAs)
 {		//setting runAs
 	this->runAs = runAs;
 }
+/**
+ *  \details   getting "stdErr" private variable of KACommand instance.
+ */
 string& KACommand::getStandardError()
 {						//getting standard err
 	return this->stdErr;
 }
+/**
+ *  \details   getting "stdErrPath" private variable of KACommand instance.
+ */
 string& KACommand::getStandardErrPath()
 {					//getting standard errpath
 	return this->stdErrPath;
 }
+/**
+ *  \details   setting "stdErr" private variable of KACommand instance.
+ *  			It has the mode of Error.
+ *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
+ */
 void KACommand::setStandardError(const string& mystderr)
 {		//setting standard err
 	this->stdErr = mystderr;
 }
+/**
+ *  \details   setting "stdErrPath" private variable of KACommand instance.
+ *  		   This variable holds the path and file name for capturing error responses
+ */
 void KACommand::setStandardErrPath(const string& mystderrpath)
 {		//setting standard errpath
 	this->stdErrPath=mystderrpath;
 }
+/**
+ *  \details   getting "stdOut" private variable of KACommand instance.
+ */
 string& KACommand::getStandardOutput()
 {						//getting standard out
 	return this->stdOut;
 }
+/**
+ *  \details   getting "stdOuthPath" private variable of KACommand instance.
+ */
 string& KACommand::getStandardOutputPath()
 {					//getting standard outpath
 	return this->stdOuthPath;
 }
+/**
+ *  \details   setting "stdOut" private variable of KACommand instance.
+ *  			It has the mode of Output.
+ *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
+ */
 void KACommand::setStandardOutput(const string& mystdout)
 { 	//setting standard out
 	this->stdOut = mystdout;
 }
+/**
+ *  \details   setting "stdOuthPath" private variable of KACommand instance.
+ *  		   This variable holds the path and file name for capturing error responses
+ */
 void KACommand::setStandardOutPath(const string& mystdoutpath)
 {		//setting standard outpath
 	this->stdOuthPath=mystdoutpath;
 }
+/**
+ *  \details   getting "type" private variable of KACommand instance.
+ */
 string& KACommand::getType()
 {						//getting command type
 	return this->type;
 }
+/**
+ *  \details   setting "type" private variable of KACommand instance.
+ *  		   This holds the type of command.
+ *  		   it should be: "EXECUTE_REQUEST" or "REGISTRATION_REQUEST_DONE" or "HEARTBEAT_REQUEST" or "TERMINATE_REQUEST"
+ */
 void KACommand::setType(const string& mytype)
 { 		//setting command type
 	this->type = mytype;
 }
+/**
+ *  \details   getting "timeout" private variable of KACommand instance.
+ */
 int KACommand::getTimeout()
 {
 	return this->timeout;
 }
+/**
+ *  \details   setting "timeout" private variable of KACommand instance.
+ *  		   This holds the timeout value of the command.
+ *  		   Command is terminated due to this variable value
+ */
 void KACommand::setTimeout(int timeout)
 {
 	this->timeout = timeout;

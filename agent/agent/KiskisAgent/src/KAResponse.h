@@ -1,12 +1,12 @@
-/*
- *============================================================================
- Name        : KAResponse.h
- Author      : Emin INAL
- Date		 : Aug 29, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAResponse class is designed for marshaling and unmarshalling response messages
-==============================================================================
+/**
+ *  @brief     KAResponse.h
+ *  @class     KAResponse.h
+ *  @details   KAResponse class is designed for marshaling and unmarshalling response messages.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Aug 29, 2013
+ *  @copyright GNU Public License.
  */
 #ifndef KARESPONSE_H_
 #define KARESPONSE_H_

@@ -1,22 +1,14 @@
-/*
- *============================================================================
- Name        : KACommand.h
- Author      : Emin INAL
- Date		 : Aug 28, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KACommand Class is designed for marshaling and unmarshalling command instance.
-==============================================================================
-*/
 /**
- *  \brief     KACommand.h
- *  \details   KACommand Class is designed for marshaling and unmarshalling command instance.
- *  \author    Emin INAL
- *  \version   1.0
- *  \date      Aug 28, 2013
- *  \copyright GNU Public License.
+ *  @brief     KACommand.h
+ *  @class     KACommand.h
+ *  @details   KACommand Class is designed for marshaling and unmarshalling command instance.
+ *  		   This class's instance can serialize and deserialize JSON/string datas.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Aug 28, 2013
+ *  @copyright GNU Public License.
  */
-
 #ifndef KACOMMAND_H_
 #define KACOMMAND_H_
 #include <syslog.h>

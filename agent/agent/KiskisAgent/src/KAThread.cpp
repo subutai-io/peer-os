@@ -1,22 +1,22 @@
-/*
- *============================================================================
- Name        : KAThread.cpp
- Author      : Bilal Bal & Emin Inal
- Date		 : Sep 5, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAThread Class is designed for management of threads. Each Threads concurrently execute command.
-==============================================================================
- */
 #include "KAThread.h"
+/**
+ *  \details   Default constructor of the KAThread class.
+ */
 KAThread::KAThread()
 {
 	// TODO Auto-generated constructor stub
 }
+/**
+ *  \details   Default destructor of the KAThread class.
+ */
 KAThread::~KAThread()
 {
 	// TODO Auto-generated destructor stub
 }
+/**
+ *  \details   This method checks CurrentWorking Directory in the command
+ *  		   If given CWD does not exist on system, it returns false otherwise it returns true.
+ */
 bool KAThread::checkCWD(KACommand *command)
 {
 	if ((chdir(command->getWorkingDirectory().c_str())) < 0)
@@ -26,6 +26,10 @@ bool KAThread::checkCWD(KACommand *command)
 	else
 		return true;
 }
+/**
+ *  \details   This method checks and add user Directory in the command
+ *  		   If given CWD does not exist on system, it returns false otherwise it returns true.
+ */
 bool KAThread::checkUID(KACommand *command)
 {
 	if(uid.getIDs(ruid,euid,command->getRunAs()))
@@ -39,9 +43,13 @@ bool KAThread::checkUID(KACommand *command)
 		return false;
 	}
 }
+/**
+ *  \details   This method creates execution string.
+ *  		   It combines (environment parameters set if it is exist) && program + arguments.
+ *  		   It returns this combined string to be execution.
+ */
 string KAThread::createExecString(KACommand *command)
 {
-
 	string arg,env;
 	exec.clear();
 	for(unsigned int i=0;i<command->getArguments().size();i++)	//getting arguments for creating Execution string
@@ -65,7 +73,10 @@ string KAThread::createExecString(KACommand *command)
 	}
 	return exec;
 }
-
+/**
+ *  \details   This method check lastly buffer results and sends the buffers to the ActiveMQ broker.
+ *  		   This method is only called when the timeout occured or process is done.
+ */
 void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,string* outBuff,
 		string* errBuff,string* processpid,int* responsecount)
 {
@@ -79,7 +90,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 			if(command->getStandardOutput()!="CAPTURE" && command->getStandardError()!="CAPTURE")
 			{
 				/*
-				 * send main buffers without block output and error
+				 * send main buffers without blocking output and error
 				 */
 				string message = response.createResponseMessage(command->getUuid(),*processpid,
 						command->getRequestSequenceNumber(),*responsecount,*errBuff,*outBuff);
@@ -91,7 +102,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 			else if(command->getStandardOutput()!="CAPTURE")
 			{
 				/*
-				 * send main buffers with block error buff
+				 * send main buffers with blocking error buff
 				 */
 				errBuff->clear();
 				string message = response.createResponseMessage(command->getUuid(),*processpid,
@@ -102,10 +113,10 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 			}
 			else if(command->getStandardError()!="CAPTURE")
 			{
-				outBuff->clear();
 				/*
-				 * send main buffers without block output buff
+				 * send main buffers with blocking output buff
 				 */
+				outBuff->clear();
 				string message = response.createResponseMessage(command->getUuid(),*processpid,
 						command->getRequestSequenceNumber(),*responsecount,*errBuff,*outBuff);
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
@@ -123,7 +134,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 			if(command->getStandardOutput()!="CAPTURE")
 			{
 				/*
-				 * send main buffers without block output (errbuff size is zero
+				 * send main buffers without block output. (errbuff size is zero)
 				 */
 				errBuff->clear();
 				string message = response.createResponseMessage(command->getUuid(),*processpid,
@@ -160,11 +171,14 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 		}
 	}
 }
+/**
+ *  \details   This method check buffer results and sends the buffers to the ActiveMQ broker.
+ *  		   This method calls when any buffer result overflow 1000 bytes.
+ */
 void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,string* outBuff,string* errBuff,
 		KACommand* command,string* processpid,int* responsecount)
 {
 	KAResponsePack response;
-	syslog(LOG_DEBUG,"<LOG_DEBUG>::<KAThread::checkandsend2> " "<0> outbuff: %s", outBuff->c_str());
 	if(Stream->getIdentity()=="output")
 	{
 		if( Stream->getMode()=="RETURN" || Stream->getMode()=="CAPTURE_AND_RETURN" )	//send to ActiveMQ
@@ -183,7 +197,7 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 			else	//stderr is not in capture mode so it will not be blocked
 			{
 				/*
-				 * send main buffers without block error
+				 * send main buffers without blocking error
 				 */
 				string message = response.createResponseMessage(command->getUuid(),*processpid,
 						command->getRequestSequenceNumber(),*responsecount,*errBuff,*outBuff);
@@ -202,7 +216,6 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 				 * send main buffers with blocking output
 				 */
 				outBuff->clear();
-
 				string message = response.createResponseMessage(command->getUuid(),*processpid,
 						command->getRequestSequenceNumber(),*responsecount,*errBuff,*outBuff);
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
@@ -211,7 +224,7 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 			else	//stdout is not in capture mode so it will not be blocked
 			{
 				/*
-				 * send main buffers without block output
+				 * send main buffers without blocking output
 				 */
 				string message = response.createResponseMessage(command->getUuid(),*processpid,
 						command->getRequestSequenceNumber(),*responsecount,*errBuff,*outBuff);
@@ -221,6 +234,10 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 		}
 	}
 }
+/**
+ *  \details   This method is mainly writes the buffers to the files if the modes are capture.
+ *  		   This method calls when any response comes to the error or output buffer.
+ */
 void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,string* outBuff,string* errBuff,
 		KACommand* command,string* processpid,int* responsecount)
 {
@@ -294,6 +311,10 @@ void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,
 		}
 	}
 }
+/**
+ *  \details   This method is one of the most important method of the KAThread class.
+ *  		   It captures intermediate response from pipeline.
+ */
 void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamReader* Stream, bool* flag,
 		mutex* mymutex,string* outBuff,string* errBuff,string* processpid,int* responsecount)
 {
@@ -325,7 +346,6 @@ void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamRe
 			if (Stream->getReadResult() > 0)
 			{
 				*flag=true;
-
 				mymutex->lock();
 				checkAndWrite(messageQueue,Stream,outBuff,errBuff,command,processpid,responsecount);
 				mymutex->unlock();
@@ -340,6 +360,11 @@ void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamRe
 		}
 	}
 }
+/**
+ *  \details   This method is creating the capturing threads and timeout thread.
+ *  		   It also gets the process id of the execution.
+ *  		   It manages the lifecycle of the threads and handles capturing and sending execution responses using these threads.
+ */
 int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		KAStreamReader* errorStream,KAStreamReader* outputStream,int newpid)
 {
@@ -350,7 +375,8 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 	int status;
 	string processpid=toString(newpid);
 	pid_t result = waitpid(newpid, &status, WNOHANG);
-	while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
+	while ((result = waitpid(newpid, &status, WNOHANG)) == 0)
+	{
 		processpid="pgrep -P "+toString(newpid);
 		processpid = this->getProcessPid(processpid.c_str());
 		processpid="pgrep -P "+processpid;
@@ -417,7 +443,6 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		outputStream->setReadResult(0);
 		outputStream->setSelectResult(0);
 	}
-
 	if( errorStream->getReadResult() == 0 && outputStream->getReadResult() == 0 )
 	{
 		/*
@@ -444,6 +469,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		}
 		else
 		{
+
 		}
 	}
 	if( errorStream->getSelectResult() == 0 && outputStream->getSelectResult() == 0 )
@@ -462,10 +488,18 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		}
 		else
 		{
+
 		}
 	}
 	return true;
 }
+/**
+ *  \details   This method is the main method that forking a new process.
+ *  		   It execute the command.
+ *  		   It also uses Output and Error Streams for capturing the execution responses.
+ *  		   if the execution successfully done, it returns true.
+ *  		   Otherwise it returns false.
+ */
 bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command)
 {
 	signal(SIGCHLD, SIG_IGN);		//when the child process done it will be raped by kernel. We do not allowed zombie processes.
@@ -531,16 +565,23 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command)
 		cout << "ERROR!!" << endl;
 		return false;
 	}
-	else if( pid > 0 )	//parent continue its process and return back
+	else if( pid > 0 )	//parent continue its process and return back.
 	{
 		return true;	//parent successfully done
 	}
 	return true; //child successfully done
 }
+/**
+ *  \details   getting "uid" private variable of KAThread instance.
+ */
 KAUserID& KAThread::getUserID()
 {
 	return this->uid;
 }
+/**
+ *  \details   This method checks the flag result that indicates activity on the error and output streams.
+ *  		   If there is no activity during 60 seconds(default timeout) this thread sends a I'm alive message to the ActiveMQ Broker.
+ */
 void KAThread::taskTimeout(message_queue *messageQueue,bool* myflag,KACommand* command,
 		string* pid,string* outBuff,string* errBuff,int* responsecount)
 {
@@ -566,7 +607,9 @@ void KAThread::taskTimeout(message_queue *messageQueue,bool* myflag,KACommand* c
 			{
 				if(outBuff->empty() && errBuff->empty())
 				{
-					//send I'm alive message
+					/*
+					 * sending I'm alive message
+					 */
 					string message = myresponse.createResponseMessage(command->getUuid(),*pid,
 							command->getRequestSequenceNumber(),-1,"","");
 					while(!messageQueue->try_send(message.data(), message.size(), 0));
@@ -588,7 +631,9 @@ void KAThread::taskTimeout(message_queue *messageQueue,bool* myflag,KACommand* c
 					{
 						errBuff->clear();
 					}
-					//send I'm alive message
+					/*
+					 * sending I'm alive message
+					 */
 					string message = myresponse.createResponseMessage(command->getUuid(),*pid,
 							command->getRequestSequenceNumber(),-1,*errBuff,*outBuff);
 					while(!messageQueue->try_send(message.data(), message.size(), 0));
@@ -600,10 +645,15 @@ void KAThread::taskTimeout(message_queue *messageQueue,bool* myflag,KACommand* c
 			}
 		}
 	}
-	catch(const std::exception& error)
+	catch ( const std::exception& error )
 	{
+		cout<<error.what()<<endl;
 	}
 }
+/**
+ *  \details   This method executes the given command and returns its answer.
+ *  		   This is used for getting pid of the execution.
+ */
 string KAThread::getProcessPid(const char* cmd)
 {
 	FILE* pipe = popen(cmd, "r");
@@ -624,6 +674,9 @@ string KAThread::getProcessPid(const char* cmd)
 	pclose(pipe);
 	return result;
 }
+/**
+ *  \details   This method designed for Typically conversion from integer to string.
+ */
 string KAThread::toString(int intcont)
 {		//integer to string conversion
 	ostringstream dummy;

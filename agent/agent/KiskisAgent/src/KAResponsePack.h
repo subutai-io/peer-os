@@ -1,12 +1,12 @@
-/*
- *============================================================================
- Name        : KAResponsePack.h
- Author      : Bilal BAL & Emin INAL
- Date		 : Sep 4, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAResponsePack class is designed for sending response chunk messages to Broker
-==============================================================================
+/**
+ *  @brief     KAResponsePack.h
+ *  @class     KAResponsePack.h
+ *  @details   KAResponsePack class is designed for creating message packets to be sent to ActiveMQ Broker.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Aug 29, 2013
+ *  @copyright GNU Public License.
  */
 #ifndef KARESPONSEPACK_H_
 #define KARESPONSEPACK_H_
