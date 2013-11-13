@@ -5,6 +5,6 @@
 *.o
 *.mk
 *.a
-agent/Daemon/Debug/*
-agent/Daemon/Release/*
+agent/KiskisAgent/Debug/*
+agent/KiskisAgent/Release/*
 
