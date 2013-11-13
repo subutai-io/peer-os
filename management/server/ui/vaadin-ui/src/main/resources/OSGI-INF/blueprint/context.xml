@@ -23,7 +23,8 @@
         <argument value="${title}"/>
     </bean>
 
-    <service ref="appFactory" interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory">
+    <service ref="appFactory" interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory"
+             ranking="3">
         <service-properties>
             <entry key="alias" value="/mgmt-ui"/>
         </service-properties>

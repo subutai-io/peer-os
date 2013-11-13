@@ -2,6 +2,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules;
 
 
 import com.vaadin.ui.*;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
@@ -15,16 +17,18 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 public class Terminal implements Module {
 
     private ModuleService service;
-    private CommandManagerInterface commandManagerService;
+    private BundleContext context;
 
-    public class ModuleComponent extends CustomComponent implements
+    public static class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
 
         private TextArea textAreaCommand;
         private TextArea textAreaOutput;
         private Button buttonSend;
+        private BundleContext context;
 
-        public ModuleComponent() {
+        public ModuleComponent(BundleContext context) {
+            this.context = context;
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -57,7 +61,13 @@ public class Terminal implements Module {
 
             setCompositionRoot(verticalLayout);
 
-            Terminal.this.commandManagerService.addListener(this);
+            try {
+                System.out.println("~~~~~~~~~~~~~~~~~~~~");
+                System.out.println("Adding " + getName());
+                getCommandManager().addListener(this);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
         public void buttonClick(Button.ClickEvent event) {
@@ -67,7 +77,11 @@ public class Terminal implements Module {
                 r.setSource("Terminal");
 
                 Command command = new Command(r);
-                boolean isOk = Terminal.this.commandManagerService.executeCommand(command);
+                try{
+                    getCommandManager().executeCommand(command);
+                } catch (Exception ex){
+                    ex.printStackTrace();
+                }
             }
         }
 
@@ -94,7 +108,13 @@ public class Terminal implements Module {
 
         @Override
         public synchronized String getName() {
-            return Terminal.this.getName();
+            return "Terminal";
+        }
+
+        private CommandManagerInterface getCommandManager(){
+            ServiceReference reference = context
+                    .getServiceReference(CommandManagerInterface.class.getName());
+            return (CommandManagerInterface) context.getService(reference);
         }
     }
 
@@ -103,7 +123,7 @@ public class Terminal implements Module {
     }
 
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(context);
     }
 
     public void setModuleService(ModuleService service) {
@@ -112,12 +132,11 @@ public class Terminal implements Module {
         this.service.registerModule(this);
     }
 
-    //public void unsetModuleService(ModuleService service) {
     public void unsetModuleService(ModuleService service) {
         this.service.unregisterModule(this);
     }
 
-    public void setCommandManagerService(CommandManagerInterface commandManagerService) {
-        this.commandManagerService = commandManagerService;
+    public void setContext(BundleContext context){
+        this.context = context;
     }
 }
