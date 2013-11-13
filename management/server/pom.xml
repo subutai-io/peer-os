@@ -28,13 +28,13 @@
     </properties>
 
     <modules>
+        <module>apt-repo</module>
         <module>motd</module>
         <module>broker</module>
         <module>ui</module>
         <module>ui-modules</module>
         <module>server-karaf</module>
-    <module>apt-repo</module>
-  </modules>
+    </modules>
 
     <description>Parent project for the Kiskis Management Server Artifacts</description>
 
