@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     <bean id="persistenceAgentService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence"
-          init-method="init" destroy-method="destroy">
+          init-method="init" destroy-method="destroy" scope="singleton">
     </bean>
     <service ref="persistenceAgentService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface">
@@ -11,7 +11,7 @@
         </service-properties>
     </service>
 
-    <bean id="persistenceCommandService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence">
+    <bean id="persistenceCommandService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence" scope="singleton">
     </bean>
     <service ref="persistenceCommandService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface">

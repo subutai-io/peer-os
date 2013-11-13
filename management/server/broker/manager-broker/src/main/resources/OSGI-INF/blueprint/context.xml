@@ -5,7 +5,7 @@
     <reference id="agentManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"/>
 
-    <bean id="brokerService" class="org.safehaus.kiskis.mgmt.server.broker.impl.Broker">
+    <bean id="brokerService" class="org.safehaus.kiskis.mgmt.server.broker.impl.Broker" scope="singleton">
         <property name="commandManagerService" ref="commandManagerService"/>
         <property name="agentManagerService" ref="agentManagerService"/>
     </bean>

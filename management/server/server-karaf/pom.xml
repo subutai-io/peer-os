@@ -329,6 +329,14 @@
                                     <artifactId>gson</artifactId>
                                     <version>${gson.version}</version>
                                 </artifactItem>
+                                <!--Apt Repo Exposer-->
+                                
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>apt-repo</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!--Apt Repo Exposer-->
                             </artifactItems>
                         </configuration>
                     </execution>

@@ -8,7 +8,7 @@
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface"/>
 
     <bean id="commandManagerService"
-          class="org.safehaus.kiskis.mgmt.server.command.CommandManager">
+          class="org.safehaus.kiskis.mgmt.server.command.CommandManager" scope="singleton">
         <property name="persistenceCommandService" ref="persistenceCommandService"/>
         <property name="communicationService" ref="communicationService"/>
     </bean>
