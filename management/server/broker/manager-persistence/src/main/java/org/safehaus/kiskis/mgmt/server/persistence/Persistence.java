@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 public class Persistence implements PersistenceAgentInterface, PersistenceCommandInterface {
 
     private static final Logger LOG = Logger.getLogger(Persistence.class.getName());
-
     private Cluster cluster;
     private Session session;
     private final int cassandraPort = 9042;
@@ -29,7 +28,7 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
 
     public Persistence() {
         try {
-            System.out.println("Consctructor initialized...");
+            System.out.println("Persistence constructor called...");
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
             session = cluster.connect(keyspaceName);
         } catch (Exception e) {

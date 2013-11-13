@@ -4,17 +4,17 @@
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface"/>
     <bean id="communicationService"
           class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"
-          init-method="init" destroy-method="destroy">
+          init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="brokerService" ref="brokerService"/>
     </bean>
 
     <!--    <reference-list id="brokerService" availability="mandatory"
-                        interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface">
-            <reference-listener
-                    bind-method="setBrokerService" unbind-method="unsetBrokerService">
-                <bean class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"/>
-            </reference-listener>
-        </reference-list>-->
+                    interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface">
+        <reference-listener
+                bind-method="setBrokerService" unbind-method="unsetBrokerService">
+            <bean class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"/>
+        </reference-listener>
+    </reference-list>-->
 
     <service ref="communicationService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface">

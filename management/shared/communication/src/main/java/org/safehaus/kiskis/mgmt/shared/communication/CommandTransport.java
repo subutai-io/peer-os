@@ -67,29 +67,35 @@ public class CommandTransport implements CommandTransportInterface {
     }
 
     public void init() {
-        try {
-            System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/broker.ks");
-            System.setProperty("javax.net.ssl.keyStorePassword", "broker");
-            System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/client.ts");
-            System.setProperty("javax.net.ssl.trustStorePassword", "client");
+        if (broker == null) {
+            try {
+                System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/broker.ks");
+                System.setProperty("javax.net.ssl.keyStorePassword", Common.KEYSTORE_PASS);
+                System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/client.ts");
+                System.setProperty("javax.net.ssl.trustStorePassword", Common.TRUSTSTORE_PASS);
 
 
-            broker = new BrokerService();
-            broker.setPersistent(true);
-            broker.setUseJmx(false);
-            broker.addConnector("ssl://0.0.0.0:" + Common.MQ_PORT);
-            broker.start();
-            setupListener();
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
+                broker = new BrokerService();
+                broker.setPersistent(true);
+                broker.setUseJmx(false);
+                broker.addConnector("ssl://0.0.0.0:" + Common.MQ_PORT);
+                broker.start();
+                setupListener();
+                System.out.println("ActiveMQ started...");
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
         }
     }
 
     public void destroy() {
-        try {
-            broker.stop();
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
+        if (broker != null) {
+            try {
+                broker.stop();
+                System.out.println("ActiveMQ stopped...");
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
         }
     }
 
@@ -104,7 +110,6 @@ public class CommandTransport implements CommandTransportInterface {
 
             MessageConsumer consumer = session.createConsumer(adminQueue);
             consumer.setMessageListener(new CommunicationMessageListener(session, brokerService));
-            System.out.println("ActiveMQ started...");
         } catch (JMSException ex) {
             System.out.println(ex.toString());
         }
