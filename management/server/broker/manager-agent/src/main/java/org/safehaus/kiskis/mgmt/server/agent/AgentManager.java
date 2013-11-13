@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
@@ -34,7 +35,9 @@ public class AgentManager implements AgentManagerInterface {
     }
 
     @Override
-    public synchronized boolean registerAgent(Agent agent) {
+    public synchronized void registerAgent(Response response) {
+        Agent agent = getAgent(response);
+
         if (persistenceAgent.saveAgent(agent)) {
 
             Request request = new Request();
@@ -46,9 +49,19 @@ public class AgentManager implements AgentManagerInterface {
             if (registeredAgents.add(agent)) {
                 notifyModules();
             }
-            return true;
+            System.out.println(agent + "Agent is registered");
+        } else {
+            System.out.println(agent + "Error registering agent");
         }
-        return false;
+    }
+
+    private Agent getAgent(Response response) {
+        Agent agent = new Agent();
+        agent.setUuid(response.getUuid());
+        agent.setHostname(response.getHostname());
+        agent.setMacAddress(response.getMacAddress());
+
+        return agent;
     }
 
     private void notifyModules() {

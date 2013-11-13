@@ -15,6 +15,6 @@ public interface BrokerInterface {
      * @param response
      * @return
      */
-    public Request distributeResponse(Response response);
+    public void distributeResponse(Response response);
 
 }

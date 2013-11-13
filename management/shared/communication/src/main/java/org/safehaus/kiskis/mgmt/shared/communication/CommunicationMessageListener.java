@@ -38,7 +38,7 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             String jsonCmd = txtMsg.getText();
             Response response = CommandJson.getResponse(jsonCmd);
-            Request req = brokerService.distributeResponse(response);
+            brokerService.distributeResponse(response);
         } catch (JMSException ex) {
             LOG.info(ex.getMessage());
             System.out.println("onMessage " + ex.getMessage());

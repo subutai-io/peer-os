@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 import java.util.Set;
@@ -10,10 +11,9 @@ import java.util.Set;
  */
 public interface AgentManagerInterface {
 
-    Set<Agent> getRegisteredAgents();
+    public Set<Agent> getRegisteredAgents();
 
-    boolean registerAgent(Agent agent);
-
+    public void registerAgent(Response response);
 
     public void addListener(AgentListener listener);
 

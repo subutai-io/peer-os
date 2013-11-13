@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-
-    <reference id="persistenceCommandService" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface"/>
     <reference id="commandManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface"/>
     <reference id="agentManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"/>
 
     <bean id="brokerService" class="org.safehaus.kiskis.mgmt.server.broker.impl.Broker">
-        <property name="persistenceCommandService" ref="persistenceCommandService"/>
         <property name="commandManagerService" ref="commandManagerService"/>
         <property name="agentManagerService" ref="agentManagerService"/>
     </bean>
