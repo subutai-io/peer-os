@@ -22,6 +22,7 @@
 #include "KAUserID.h"
 #include "KAResponsePack.h"
 #include "KAThread.h"
+#include "KALogger.h"
 #include "KAConnection.h"
 #include "pugixml/pugixml.hpp"
 #include <boost/uuid/uuid.hpp>
@@ -173,6 +174,8 @@ int main(int argc,char *argv[],char *envp[])
 			,5                       //max message number
 			,2500             //max message size
 	);
+	KALogger logMain;
+	logMain.openLogFile(getpid(),0);
 
 	boost::thread thread1(threadSend,&messageQueue,&connection);
 
@@ -195,7 +198,7 @@ int main(int argc,char *argv[],char *envp[])
 					else if(command.getType()=="EXECUTE_REQUEST")	//execution request will be executed in other process.
 					{
 						KAThread* mypointer = new KAThread;
-						mypointer->threadFunction(&messageQueue,&command);
+						while(!mypointer->threadFunction(&messageQueue,&command,&level));
 						delete mypointer;
 					}
 					else if(command.getType()=="HEARTBEAT_REQUEST")
@@ -228,6 +231,7 @@ int main(int argc,char *argv[],char *envp[])
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
+	logMain.closeLogFile();
 	kill(getpid(),SIGKILL);
 	activemq::library::ActiveMQCPP::shutdownLibrary();
 	return 0;
