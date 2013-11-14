@@ -1,22 +1,21 @@
-/*
- *============================================================================
- Name        : KAResponsePack.cpp
- Author      : Bilal BAL & Emin INAL
- Date		 : Sep 4, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAResponsePack class is designed for sending response chunk messages to Broker
-==============================================================================
- */
 #include "KAResponsePack.h"
+/**
+ *  \details   Default constructor of the KAResponsePack class.
+ */
 KAResponsePack::KAResponsePack()
 {
 	// TODO Auto-generated constructor stub
 }
+/**
+ *  \details   Default destructor of the KAResponsePack class.
+ */
 KAResponsePack::~KAResponsePack()
 {
 	// TODO Auto-generated destructor stub
 }
+/**
+ *  \details   This method creates default chunk message.
+ */
 string KAResponsePack::createResponseMessage(string uuid,string pid,int requestSeqNum,int responseSeqNum,string error,string output)
 {
 	this->setType("EXECUTE_RESPONSE");			//creating Response chunk message
@@ -29,6 +28,9 @@ string KAResponsePack::createResponseMessage(string uuid,string pid,int requestS
 	this->serialize(sendout);
 	return sendout;
 }
+/**
+ *  \details   This method creates Exit done message.
+ */
 string KAResponsePack::createExitMessage(string uuid,string pid,int requestSeqNum,int responseSeqNum)	//Creating Exit message
 {
 	this->setType("EXECUTE_RESPONSE_DONE");
@@ -40,6 +42,9 @@ string KAResponsePack::createExitMessage(string uuid,string pid,int requestSeqNu
 	this->serializeDone(sendout);
 	return sendout;
 }
+/**
+ *  \details   This method creates Registration message.
+ */
 string KAResponsePack::createRegistrationMessage(string uuid)	//Creating Registration Message
 {
 	this->setType("REGISTRATION_REQUEST");
@@ -47,6 +52,9 @@ string KAResponsePack::createRegistrationMessage(string uuid)	//Creating Registr
 	this->serialize(sendout);
 	return sendout;
 }
+/**
+ *  \details   This method creates HeartBeat message.
+ */
 string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum)	//Creating HeartBeat Message
 {
 	this->setType("HEARTBEAT_RESPONSE");
@@ -56,6 +64,9 @@ string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum)	//C
 	this->serialize(sendout);
 	return sendout;
 }
+/**
+ *  \details   This method creates Termination message.
+ */
 string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum)	//Creating Terminate Message
 {
 	this->setType("TERMINATE_RESPONSE_DONE");
@@ -65,6 +76,9 @@ string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum)	//C
 	this->serialize(sendout);
 	return sendout;
 }
+/**
+ *  \details   This method creates Timeout message.
+ */
 string KAResponsePack::createTimeoutMessage(string uuid,string pid,int requestSeqNum,int responseSeqNum,string stdOut,string stdErr)	//Creating Timeout Message
 {
 	this->setType("EXECUTE_TIMEOUTED");

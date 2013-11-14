@@ -19,6 +19,7 @@
 #include "KAConnection.h"
 #include "KAResponsePack.h"
 #include "KAStreamReader.h"
+#include "KALogger.h"
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
@@ -35,7 +36,7 @@ class KAThread
 public:
 	KAThread();
 	virtual ~KAThread();
-	bool threadFunction(message_queue*,KACommand*);			//Execute command concurrently
+	bool threadFunction(message_queue*,KACommand*,int*);			//Execute command concurrently
 	bool checkCWD(KACommand*);
 	bool checkUID(KACommand*);
 	string createExecString(KACommand*);
@@ -44,17 +45,27 @@ public:
 	KAUserID& getUserID();
 	KAResponsePack& getResponse();
 	static string getProcessPid(const char*);
-	static void taskTimeout(message_queue*,bool*,KACommand*,string*,string*,string*,int*);
-	static void capture(message_queue*,KACommand*,KAStreamReader*,bool*,mutex*,string*,string*,string*,int*);
-	static void checkAndWrite(message_queue*,KAStreamReader*,string*,string*,KACommand*,string*,int*);
-	static void checkAndSend(message_queue*,KAStreamReader*,string*,string*,KACommand*,string*,int*);
-	static void lastCheckAndSend(message_queue *,KACommand*,string*,string*,string*,int*);
-	int optionReadSend(message_queue*,KACommand*,KAStreamReader*,KAStreamReader*,int);
+	typedef struct numbers
+	{
+		int *responsecount;
+		string *processpid;
+		bool *flag;
+		KALogger *logger;
+	};
+	static void taskTimeout(message_queue*,KACommand*,string*,string*,string*,struct numbers*,int* loglevel);
+	static void capture(message_queue*,KACommand*,KAStreamReader*,mutex*,string*,string*,struct numbers*,int*);
+	static void checkAndWrite(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,int*);
+	static void checkAndSend(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,int*);
+	static void lastCheckAndSend(message_queue *,KACommand*,string*,string*,struct numbers*,int*);
+	int optionReadSend(message_queue*,KACommand*,KAStreamReader*,KAStreamReader*,int,int*);
 private:
 	KAUserID uid;
 	pid_t pid;
 	KAResponsePack response;
 	string argument,exec,sendout,environment;
 	uid_t euid, ruid;
+	KALogger logger;
+
+
 };
 #endif /* KATHREAD_H_ */

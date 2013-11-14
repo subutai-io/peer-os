@@ -1,22 +1,21 @@
-/*
- *============================================================================
- Name        : KAUserID.cpp
- Author      : Bilal Bal
- Date		 : Sep 4, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAUserID class is designed for checking UID on system it also used setting, undo operations of user rights.
-==============================================================================
- */
 #include "KAUserID.h"
+/**
+ *  \details   Default constructor of the KAUserID class.
+ */
 KAUserID::KAUserID()
 {
 	// TODO Auto-generated constructor stub
 }
+/**
+ *  \details   Default destructor of the KAUserID class.
+ */
 KAUserID::~KAUserID()
 {
 	// TODO Auto-generated destructor stub
 }
+/**
+ *  \details   This method set the user rights to the given user.
+ */
 void KAUserID::doSetuid (uid_t &euid)
 {
 	int status;
@@ -32,6 +31,9 @@ void KAUserID::doSetuid (uid_t &euid)
 		exit (status);
 	}
 }
+/**
+ *  \details   This method can undo user rights to the root.
+ */
 void KAUserID::undoSetuid(uid_t &ruid)
 {
 	int status;
@@ -47,6 +49,10 @@ void KAUserID::undoSetuid(uid_t &ruid)
 		exit (status);
 	}
 }
+/**
+ *  \details   This method checks given user on the system.
+ *  		   If the user found on system it returns true. Otherwise it returns false.
+ */
 bool KAUserID::getIDs(uid_t& ruid,uid_t&  euid,string runAs)	//getting UID on system
 {
 	struct passwd *pw;
@@ -62,6 +68,10 @@ bool KAUserID::getIDs(uid_t& ruid,uid_t&  euid,string runAs)	//getting UID on sy
 		return true;
 	}
 }
+/**
+ *  \details   This method checks given user is root or not.
+ *  		   If the user is root, it returns true. Otherwise it returns false.
+ */
 bool KAUserID::checkRootUser()
 {
 	uid_t ruid = getuid();	//if the user is root = 0

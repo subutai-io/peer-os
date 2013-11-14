@@ -1,17 +1,28 @@
 /**
- *  \brief     KiskisAgent.cpp
- *  \details   KiskisAgent Software main process
- *  \author    Emin INAL
- *  \author    Bilal BAL
- *  \version   1.0
- *  \date      Sep 27, 2013
- *  \copyright GNU Public License.
+ *  @brief     KiskisAgent.cpp
+ *  @class     KiskisAgent.cpp
+ *  @details   This is KiskisAgent Software main process.
+ *  		   It's main responsibility is that send and receive messages from ActiveMQ broker.
+ *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Sep 27, 2013
+ *  @copyright GNU Public License.
+ */
+
+/** \mainpage  Welcome to Project KiskisAgent
+ *	\section   KisKisAgent
+ * 			   The Kiskis Agent is a simple daemon designed to connect securely to an AMQP server to reliably receive and send messages on queues and topics.
+ * 	 	 	   It's purpose is to perform a very simple reduced set of instructions to manage any system administration task.
+ * 	 	 	   The agent may run on physical servers, virtual machines or inside Linux Containers.
  */
 #include "KACommand.h"
 #include "KAResponse.h"
 #include "KAUserID.h"
 #include "KAResponsePack.h"
 #include "KAThread.h"
+#include "KALogger.h"
 #include "KAConnection.h"
 #include "pugixml/pugixml.hpp"
 #include <boost/uuid/uuid.hpp>
@@ -19,28 +30,39 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
+
+/**
+ *  \details   KiskisAgent's settings.xml is read by this function.
+ *  		   url: Broker address is fetched. (for instance: url = "failover://(ssl://localhost:61167))
+ *  		   connectionOptions: ReconnectDelay and Reconnect feature settings.
+ *  		   loglevel: Debugging Loglevel. (0-8)
+ */
 int getSettings(string & url, string & connectionOptions, string & loglevel)
 {
 	pugi::xml_document doc;
 
-	if(doc.load_file("/etc/KiskisAgent/config/settings.xml").status)		//if the settings file does not exist
+	if(doc.load_file("/KISKIS-AGENT/config/settings.xml").status)		//if the settings file does not exist
 	{
 		return 100;
 	}
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
 
-	url = "failover://(ssl://" + url +":"+  doc.child("Settings").child_value("Port") + ")";		//combine url and port
+	url = "failover://(tcp://" + url +":"+  doc.child("Settings").child_value("Port") + ")";		//combine url and port
 
 	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
 
 	return 0;
 }
+/**
+ *  \details   UUID of the KiskisAgent is fetched from statically using this function.
+ *  		   Example uuid:"ff28d7c7-54b4-4291-b246-faf3dd493544"
+ */
 bool getUuid(string& Uuid)
 {
 	try{
-		ifstream file("/etc/KiskisAgent/config/uuid.txt");	//opening mac.txt
+		ifstream file("/KISKIS-AGENT/config/uuid.txt");	//opening mac.txt
 		getline(file,Uuid);
 		file.close();
 		if(Uuid.empty())		//if mac is null or not reading successfully
@@ -54,7 +76,11 @@ bool getUuid(string& Uuid)
 	}
 	return false;
 }
-
+/**
+ *  \details   threadSend function sends string messages in the Shared Memory buffer to ActiveMQ Broker.
+ *  		   This is a thread with working concurrently with main thread.
+ *  		   It is main purpose that checking the Shared Memory Buffer in Blocking mode and sending them to Broker
+ */
 void threadSend(message_queue *mq,KAConnection *connection)
 {
 	try
@@ -76,6 +102,11 @@ void threadSend(message_queue *mq,KAConnection *connection)
 		std::cout << ex.what() << std::endl;
 	}
 }
+/**
+ *  \details   This function is the main thread of KiskisAgent.
+ *  		   It sends and receives messages from ActiveMQ broker.
+ *  		   It is also responsible from creation new process.
+ */
 int main(int argc,char *argv[],char *envp[])
 {
 	string url,connectionOptions,loglevel;
@@ -84,9 +115,9 @@ int main(int argc,char *argv[],char *envp[])
 	string clientaddress;
 
 	activemq::library::ActiveMQCPP::initializeLibrary();
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/KiskisAgent/config/client_ks.pem");
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"123456");
-	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/KiskisAgent/config/client_ts.pem" );
+//	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/KiskisAgent/config/client_ks.pem");
+//	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"123456");
+//	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/KiskisAgent/config/client_ts.pem" );
 
 	if(getSettings(url,connectionOptions,loglevel))	//if there is an error from reading settings.xml
 	{
@@ -141,6 +172,8 @@ int main(int argc,char *argv[],char *envp[])
 			,5                       //max message number
 			,2500             //max message size
 	);
+	KALogger logMain;
+	logMain.openLogFile(getpid(),0);
 
 	boost::thread thread1(threadSend,&messageQueue,&connection);
 
@@ -163,7 +196,7 @@ int main(int argc,char *argv[],char *envp[])
 					else if(command.getType()=="EXECUTE_REQUEST")	//execution request will be executed in other process.
 					{
 						KAThread* mypointer = new KAThread;
-						mypointer->threadFunction(&messageQueue,&command);
+						while(!mypointer->threadFunction(&messageQueue,&command,&level));
 						delete mypointer;
 					}
 					else if(command.getType()=="HEARTBEAT_REQUEST")
@@ -196,6 +229,7 @@ int main(int argc,char *argv[],char *envp[])
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
+	logMain.closeLogFile();
 	kill(getpid(),SIGKILL);
 	activemq::library::ActiveMQCPP::shutdownLibrary();
 	return 0;

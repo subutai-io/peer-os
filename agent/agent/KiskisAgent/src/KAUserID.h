@@ -1,12 +1,12 @@
-/*
- *============================================================================
- Name        : KAUserID.h
- Author      : Bilal Bal
- Date		 : Sep 4, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAUserID class is designed for checking UID on system it also used setting, undo operations of user rights.
-==============================================================================
+/**
+ *  @brief     KAUserID.h
+ *  @class     KAUserID.h
+ *  @details   KAUserID class is designed for checking UserID on system it also uses set and undo operations of user rights.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Sep 4, 2013
+ *  @copyright GNU Public License.
  */
 #ifndef KAUSERID_H_
 #define KAUSERID_H_
