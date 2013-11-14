@@ -21,8 +21,8 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
     private Cluster cluster;
     private Session session;
     private final int cassandraPort = 9042;
-    private final String cassandraHost = "localhost";
-//    private final String cassandraHost = "192.168.1.106";
+//    private final String cassandraHost = "localhost";
+    private final String cassandraHost = "192.168.1.106";
     private final String keyspaceName = "kiskis";
     private long requestsequencenumber = 0l;
 
