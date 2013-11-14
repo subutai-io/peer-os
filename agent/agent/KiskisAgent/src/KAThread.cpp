@@ -78,9 +78,9 @@ string KAThread::createExecString(KACommand *command)
  *  		   This method is only called when the timeout occured or process is done.
  */
 void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,string* outBuff,
-		string* errBuff,numbers* block,int*loglevel)
+		string* errBuff,numbers* block)
 {
-	block->logger->writeLog(loglevel,3,block->logger->setLogData("LC&S"));
+	block->logger->writeLog(3,block->logger->setLogData("LC&S"));
 	unsigned int outBuffsize = outBuff->size();					//real output buffer size
 	unsigned int errBuffsize = errBuff->size();					//real error buffer size
 	KAResponsePack response;
@@ -177,9 +177,9 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
  *  		   This method calls when any buffer result overflow 1000 bytes.
  */
 void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,string* outBuff,string* errBuff,
-		KACommand* command,numbers* block,int* loglevel)
+		KACommand* command,numbers* block)
 {
-	block->logger->writeLog(loglevel,3,block->logger->setLogData("C&S"));
+	block->logger->writeLog(3,block->logger->setLogData("C&S"));
 	KAResponsePack response;
 	if(Stream->getIdentity()=="output")
 	{
@@ -242,9 +242,9 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
  *  		   This method calls when any response comes to the error or output buffer.
  */
 void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,string* outBuff,string* errBuff,
-		KACommand* command,numbers* block,int* loglevel)
+		KACommand* command,numbers* block)
 {
-	block->logger->writeLog(loglevel,3,block->logger->setLogData("C&R"));
+	block->logger->writeLog(3,block->logger->setLogData("C&R"));
 	/*
 	 * Appending output and error buffer results to real buffers
 	 */
@@ -285,7 +285,7 @@ void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,
 			string divisionErr= errBuff->substr(1000,(errBuffsize-1000));	//cut the excess string from buffer
 			*errBuff = errBuff->substr(0,1000);
 
-			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block,loglevel);
+			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block);
 
 			outBuff->clear();
 			errBuff->clear();
@@ -296,7 +296,7 @@ void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,
 		{
 			string divisionOut = outBuff->substr(1000,(outBuffsize-1000));	//cut the excess string from buffer
 			*outBuff = outBuff->substr(0,1000);
-			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block,loglevel);
+			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block);
 
 			outBuff->clear();
 			errBuff->clear();
@@ -307,7 +307,7 @@ void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,
 			string divisionErr = errBuff->substr(1000,(errBuffsize-1000));	//cut the excess string from buffer
 			*errBuff = errBuff->substr(0,1000);
 
-			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block,loglevel);
+			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block);
 
 			outBuff->clear();
 			errBuff->clear();
@@ -320,9 +320,9 @@ void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,
  *  		   It captures intermediate response from pipeline.
  */
 void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamReader* Stream,
-		mutex* mymutex,string* outBuff,string* errBuff,numbers* block,int* loglevel)
+		mutex* mymutex,string* outBuff,string* errBuff,numbers* block)
 {
-	block->logger->writeLog(loglevel,3,block->logger->setLogData("capture"));
+	block->logger->writeLog(3,block->logger->setLogData("capture"));
 	Stream->setTimeout(command->getTimeout());
 	Stream->prepareFileDec();
 	while(true)
@@ -353,7 +353,7 @@ void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamRe
 				*(block->flag)=true;
 
 				mymutex->lock();
-				checkAndWrite(messageQueue,Stream,outBuff,errBuff,command,block,loglevel);
+				checkAndWrite(messageQueue,Stream,outBuff,errBuff,command,block);
 				mymutex->unlock();
 			}
 			else
@@ -372,13 +372,13 @@ void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamRe
  *  		   It manages the lifecycle of the threads and handles capturing and sending execution responses using these threads.
  */
 int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
-		KAStreamReader* errorStream,KAStreamReader* outputStream,int newpid,int*loglevel)
+		KAStreamReader* errorStream,KAStreamReader* outputStream,int newpid)
 {
 	/*
 	 *	Getting system pid of child process
 	 *	For example, after this block, processpid should be pid of running command (e.g. tail)
 	 */
-	logger.writeLog(loglevel,3,logger.setLogData("optionreadsend"));
+	logger.writeLog(3,logger.setLogData("optionreadsend"));
 	int status;
 	string processpid=toString(newpid);
 	pid_t result = waitpid(newpid, &status, WNOHANG);
@@ -417,15 +417,15 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 	 */
 	if(command->getTimeout()==0)
 	{
-		boost::thread timeoutthread(taskTimeout,messageQueue,command,&processpid,&outBuff,&errBuff,&block,loglevel);
+		boost::thread timeoutthread(taskTimeout,messageQueue,command,&processpid,&outBuff,&errBuff,&block);
 	}
 	if(command->getStandardOutput()!="NO" && command->getStandardError()!="NO" )
 	{
 		/*
 		 * StandardOutput and StandardError will not be ignored
 		 */
-		boost::thread outthread(capture,messageQueue,command,outputStream,&mymutex,&outBuff,&errBuff,&block,loglevel);
-		boost::thread errorthread(capture,messageQueue,command,errorStream,&mymutex,&outBuff,&errBuff,&block,loglevel);
+		boost::thread outthread(capture,messageQueue,command,outputStream,&mymutex,&outBuff,&errBuff,&block);
+		boost::thread errorthread(capture,messageQueue,command,errorStream,&mymutex,&outBuff,&errBuff,&block);
 
 		outthread.join();
 		errorthread.join();
@@ -435,7 +435,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		/*
 		 * StandardOutput will be ignored
 		 */
-		boost::thread outthread(capture,messageQueue,command,outputStream,&mymutex,&outBuff,&errBuff,&block,loglevel);
+		boost::thread outthread(capture,messageQueue,command,outputStream,&mymutex,&outBuff,&errBuff,&block);
 		outthread.join();
 		errorStream->setReadResult(0);
 		errorStream->setSelectResult(0);
@@ -445,7 +445,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		/*
 		 * StandardError will be ignored
 		 */
-		boost::thread errorthread(capture,messageQueue,command,errorStream,&mymutex,&outBuff,&errBuff,&block,loglevel);
+		boost::thread errorthread(capture,messageQueue,command,errorStream,&mymutex,&outBuff,&errBuff,&block);
 		errorthread.join();
 		outputStream->setReadResult(0);
 		outputStream->setSelectResult(0);
@@ -455,7 +455,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		/*
 		 * Execute Done Response is sending..
 		 */
-		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block,loglevel);
+		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block);
 		string message = response.createExitMessage(command->getUuid(),processpid,
 				command->getRequestSequenceNumber(),responsecount);
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
@@ -483,7 +483,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		/*
 		 * Timeout Response is sending..
 		 */
-		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block,loglevel);
+		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block);
 		string message = response.createTimeoutMessage(command->getUuid(),processpid,
 				command->getRequestSequenceNumber(),responsecount,"","");
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
@@ -505,7 +505,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
  *  		   if the execution successfully done, it returns true.
  *  		   Otherwise it returns false.
  */
-bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,int *loglevel)
+bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command)
 {
 	signal(SIGCHLD, SIG_IGN);		//when the child process done it will be raped by kernel. We do not allowed zombie processes.
 	pid=fork();						//creating a child process
@@ -514,7 +514,7 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,int
 		logger.openLogFile(getpid(),command->getRequestSequenceNumber());
 		string pidparnumstr = toString(getpid());		//geting pid number of the process
 		string processpid="";	//processpid for execution
-		logger.writeLog(loglevel,3,logger.setLogData("threadFunctionasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasda","asdasdads","1"));
+		logger.writeLog(3,logger.setLogData("threadFunctionasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasda","asdasdads","1"));
 		KAStreamReader outputStream(command->getStandardOutput(),command->getStandardOutputPath(),"output");
 		KAStreamReader errorStream(command->getStandardError(),command->getStandardErrPath(),"error");
 		if(outputStream.openPipe()==false || errorStream.openPipe()==false)
@@ -567,7 +567,7 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,int
 			{
 				errorStream.closePipe(1);
 				outputStream.closePipe(1);
-				optionReadSend(messageQueue,command,&errorStream,&outputStream,newpid,loglevel);
+				optionReadSend(messageQueue,command,&errorStream,&outputStream,newpid);
 				errorStream.closePipe(0);
 				outputStream.closePipe(0);
 				logger.closeLogFile();
@@ -592,6 +592,20 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,int
 	return true; //child successfully done
 }
 /**
+ *  \details   getting "logger" private variable of KAThread instance.
+ */
+KALogger& KAThread::getLogger()
+{
+	return this->logger;
+}
+/**
+ *  \details   setting "logger" private variable of KAThread instance.
+ */
+void KAThread::setLogger(KALogger mylogger)
+{
+	this->logger=mylogger;
+}
+/**
  *  \details   getting "uid" private variable of KAThread instance.
  */
 KAUserID& KAThread::getUserID()
@@ -603,9 +617,9 @@ KAUserID& KAThread::getUserID()
  *  		   If there is no activity during 60 seconds(default timeout) this thread sends a I'm alive message to the ActiveMQ Broker.
  */
 void KAThread::taskTimeout(message_queue *messageQueue,KACommand* command,
-		string* pid,string* outBuff,string* errBuff,numbers* block,int* loglevel)
+		string* pid,string* outBuff,string* errBuff,numbers* block)
 {
-	block->logger->writeLog(loglevel,3,block->logger->setLogData("taskTimeout"));
+	block->logger->writeLog(3,block->logger->setLogData("taskTimeout"));
 	try
 	{
 		KAResponsePack myresponse;

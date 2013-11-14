@@ -21,12 +21,16 @@ public:
 	virtual ~KALogger();
 	string getLocaltime();
 	string toString(int);
-	void writeLog(int*,int,string);
+	void writeLog(int,string);
 	void openLogFile(int,int);
+	void openLogFileWithName(string);
 	void closeLogFile();
 	string setLogData(string,string="",string="",string="",string="");
+	int getLogLevel();
+	void setLogLevel(int loglevel);
 private:
 	FILE* logFile;
+	int loglevel;
 };
 
 #endif /* KALOGGER_H_ */

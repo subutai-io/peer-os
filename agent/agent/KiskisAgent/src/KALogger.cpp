@@ -14,6 +14,22 @@ KALogger::~KALogger()
 	// TODO Auto-generated destructor stub
 }
 /**
+ *  \details   getting "loglevel" private variable of the KALogger instance.
+ */
+int KALogger::getLogLevel()
+{
+	return this->loglevel;
+}
+/**
+ *  \details   setting "loglevel" private variable of the KALogger instance.
+ *  		   This level indicates that the loglevel status.
+ *  		   it should be between (0-7) -> (Emergency-Debug)
+ */
+void KALogger::setLogLevel(int loglevel)
+{
+	this->loglevel=loglevel;
+}
+/**
  *  \details   This method creates local time values as a string.
  *  		   The return value as dd-mm-yy hh:mm::ss
  */
@@ -38,8 +54,16 @@ string KALogger::toString(int intcont)
 void KALogger::openLogFile(int pid,int requestSequenceNumber)
 {
 	boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-	string logFileName = "/KISKIS-AGENT/logs/" + toString(now.time_of_day().total_milliseconds()) + "-"+toString(pid)+"-"+toString(requestSequenceNumber);
+	string logFileName = "/var/log/KiskisAgent/" + toString(now.time_of_day().total_milliseconds()) + "-"+toString(pid)+"-"+toString(requestSequenceNumber);
 	this->logFile = fopen(logFileName.c_str(),"a+");;
+}
+/**
+ *  \details   This method opens a log file with given name.
+ */
+void KALogger::openLogFileWithName(string logfilename)
+{
+	logfilename = "/var/log/KiskisAgent/" + logfilename;
+	this->logFile = fopen(logfilename.c_str(),"a+");;
 }
 /**
  *  \details   This method closed the log file.
@@ -55,9 +79,9 @@ string KALogger::setLogData(string text,string param1,string value1,string param
 /**
  *  \details   This method writes the logs to log files according to 8 log level.
  */
-void KALogger::writeLog(int* logLevelSetting,int level,string log)
+void KALogger::writeLog(int level,string log)
 {
-	switch(*logLevelSetting)
+	switch(this->loglevel)
 	{
 	case 7:
 		switch(level)
@@ -243,6 +267,5 @@ void KALogger::writeLog(int* logLevelSetting,int level,string log)
 										break;
 									}
 									break;
-
 	}
 }

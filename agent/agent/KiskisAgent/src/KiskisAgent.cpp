@@ -38,11 +38,16 @@
  */
 int getSettings(string & url, string & connectionOptions, string & loglevel)
 {
+	KALogger DummyLogger;
+	DummyLogger.openLogFileWithName("KiskisAgentMain.log");
+	DummyLogger.setLogLevel(7);
+
 	pugi::xml_document doc;
 
 	if(doc.load_file("/etc/KiskisAgent/config/settings.xml").status)		//if the settings file does not exist
 	{
 		return 100;
+		exit(1);
 	}
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
@@ -52,6 +57,7 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
 
+	DummyLogger.closeLogFile();
 	return 0;
 }
 /**
@@ -116,16 +122,13 @@ int main(int argc,char *argv[],char *envp[])
 	string serveraddress="SERVICE_QUEUE";
 	string clientaddress;
 
-	activemq::library::ActiveMQCPP::initializeLibrary();
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/KiskisAgent/config/client_ks.pem");
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"123456");
-	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/KiskisAgent/config/client_ts.pem" );
+	getSettings(url,connectionOptions,loglevel);
+	int level;
+	stringstream(loglevel) >> level;
+	KALogger logMain;
+	logMain.openLogFileWithName("KiskisAgentMain.log");
+	logMain.setLogLevel(level);
 
-	if(getSettings(url,connectionOptions,loglevel))	//if there is an error from reading settings.xml
-	{
-		cout << "settings.xml cannot be read!! KiskisAgent is going to close.."<<endl;
-		return 100;
-	}
 	if(!getUuid(Uuid))
 	{						//get UUID of the agent if it exist. if it does not it will be regenerated..
 		boost::uuids::random_generator gen;
@@ -137,8 +140,11 @@ int main(int argc,char *argv[],char *envp[])
 		file << Uuid;
 		file.close();
 	}
-	int level;
-	stringstream(loglevel) >> level;
+
+	activemq::library::ActiveMQCPP::initializeLibrary();
+	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/KiskisAgent/config/client_ks.pem");
+	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"123456");
+	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/KiskisAgent/config/client_ts.pem" );
 
 	clientaddress = Uuid;
 	KAThread thread;
@@ -174,9 +180,6 @@ int main(int argc,char *argv[],char *envp[])
 			,5                       //max message number
 			,2500             //max message size
 	);
-	KALogger logMain;
-	logMain.openLogFile(getpid(),0);
-
 	boost::thread thread1(threadSend,&messageQueue,&connection);
 
 	/* Change the file mode mask */
@@ -198,7 +201,8 @@ int main(int argc,char *argv[],char *envp[])
 					else if(command.getType()=="EXECUTE_REQUEST")	//execution request will be executed in other process.
 					{
 						KAThread* mypointer = new KAThread;
-						while(!mypointer->threadFunction(&messageQueue,&command,&level));
+						mypointer->getLogger().setLogLevel(level);
+						mypointer->threadFunction(&messageQueue,&command);
 						delete mypointer;
 					}
 					else if(command.getType()=="HEARTBEAT_REQUEST")
