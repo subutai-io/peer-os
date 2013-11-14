@@ -1,12 +1,13 @@
-/*
- *============================================================================
- Name        : KAThread.cpp
- Author      : Bilal Bal
- Date		 : Sep 5, 2013
- Version     : 1.0
- Copyright   : Your copyright notice
- Description : KAThread Class is designed for management of threads. Each Threads concurrently execute and command.
-==============================================================================
+/**
+ *  @brief     KAThread.h
+ *  @class     KAThread.h
+ *  @details   KAThread Class is designed to handle executions.
+ *  		   Each Execution runs concurrently and does the given command job.
+ *  @author    Emin INAL
+ *  @author    Bilal BAL
+ *  @version   1.0
+ *  @date      Aug 29, 2013
+ *  @copyright GNU Public License.
  */
 #ifndef KATHREAD_H_
 #define KATHREAD_H_
