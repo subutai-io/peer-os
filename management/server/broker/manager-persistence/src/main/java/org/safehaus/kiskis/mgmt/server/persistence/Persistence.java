@@ -48,7 +48,6 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
             agent.setLXC(row.getBool("islxc"));
             agent.setListIP(row.getList("listip", String.class));
             agent.setMacAddress(row.getString("macaddress"));
-            System.out.println(agent);
             list.add(agent);
         }
         return list;

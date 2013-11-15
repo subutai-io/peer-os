@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.cassandra.cql3.Constants;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import static org.junit.Assert.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -50,7 +52,7 @@ public class PersistenceTest {
     /**
      * Test of getAgentList method, of class Persistence.
      */
-//    @Test
+    @Test
     public void testGetAgentList() {
         System.out.println("getAgentList");
         Persistence instance = new Persistence();
@@ -64,7 +66,7 @@ public class PersistenceTest {
     /**
      * Test of saveAgent method, of class Persistence.
      */
-//    @Test
+    @Test
     public void testSaveAgent() {
         System.out.println("saveAgent");
         Agent agent = new Agent();
