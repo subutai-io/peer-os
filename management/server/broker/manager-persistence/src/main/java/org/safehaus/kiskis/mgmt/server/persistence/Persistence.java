@@ -45,7 +45,7 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
             Row row = it.next();
             agent.setUuid(row.getString("uuid"));
             agent.setHostname(row.getString("hostname"));
-            agent.setLXC(row.getBool("isxlc"));
+            agent.setLXC(row.getBool("islxc"));
             agent.setListIP(row.getList("listip", String.class));
             agent.setMacAddress(row.getString("macaddress"));
             System.out.println(agent);
@@ -62,7 +62,7 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
      */
     @Override
     public boolean saveAgent(Agent agent) {
-        String cql = "insert into agents (uuid, hostname, isxlc, listip, macaddress) "
+        String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress) "
                 + "values (?,?,?,?,?)";
         PreparedStatement stmt = session.prepare(cql);
         BoundStatement boundStatement = new BoundStatement(stmt);
