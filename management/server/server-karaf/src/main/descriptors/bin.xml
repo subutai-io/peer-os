@@ -21,6 +21,8 @@
                 <exclude>RELEASE-NOTES</exclude>
                 <exclude>karaf-manual*.html</exclude>
                 <exclude>karaf-manual*.pdf</exclude>
+                <exclude>etc/org.apache.karaf.features.cfg</exclude>
+                <exclude>etc/AmqConfig.cfg</exclude>
             </excludes>
         </fileSet>
 
@@ -43,6 +45,7 @@
             <directory>target/dependencies/kiskis-server</directory>
             <includes>
                 <include>*.jar</include>
+                <include>*.war</include>
             </includes>
             <outputDirectory>system/kiskis-server</outputDirectory>
         </fileSet>
@@ -56,6 +59,12 @@
             <directory>target/classes/etc</directory>
             <outputDirectory>/etc/</outputDirectory>
             <lineEnding>unix</lineEnding>
+            <fileMode>0644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>target/classes</directory>
+            <outputDirectory>/</outputDirectory>
+            <!--<lineEnding>unix</lineEnding>-->
             <fileMode>0644</fileMode>
         </fileSet>
 
