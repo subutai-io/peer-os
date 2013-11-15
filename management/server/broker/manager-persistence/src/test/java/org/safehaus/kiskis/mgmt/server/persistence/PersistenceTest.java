@@ -51,11 +51,11 @@ public class PersistenceTest {
     /**
      * Test of getAgentList method, of class Persistence.
      */
-    @Test
+//    @Test
     public void testGetAgentList() {
         System.out.println("getAgentList");
         Persistence instance = new Persistence();
-        List<Agent> result = instance.getAgentList();  
+        List<Agent> result = instance.getAgentList();
         Agent agent = new Agent();
         agent.setUuid("uuid");
         assertEquals(true, result.contains(agent));
@@ -65,7 +65,7 @@ public class PersistenceTest {
     /**
      * Test of saveAgent method, of class Persistence.
      */
-    @Test
+//    @Test
     public void testSaveAgent() {
         System.out.println("saveAgent");
         Agent agent = new Agent();
@@ -127,31 +127,32 @@ public class PersistenceTest {
     /**
      * Test of saveCommand method, of class Persistence.
      */
-//    @Test
+    @Test
     public void testSaveCommand() {
         System.out.println("saveCommand");
         Request request = new Request();
-        request.setSource("source");
-        List<String> args = new ArrayList<String>();
-        args.add("arg1");
-        args.add("arg2");
-        request.setArgs(args);
-        Map<String, String> env = new HashMap<String, String>();
-        env.put("envkey", "envvalue");
-        request.setEnvironment(env);
-        request.setPid(Integer.SIZE);
-        request.setProgram("program");
-        request.setRequestSequenceNumber(Long.MIN_VALUE);
-        request.setRunAs("runas");
-        request.setSource("source");
+        request.setType(RequestType.REGISTRATION_REQUEST_DONE);
+//        request.setSource("source");
+//        List<String> args = new ArrayList<String>();
+//        args.add("arg1");
+//        args.add("arg2");
+//        request.setArgs(args);
+//        Map<String, String> env = new HashMap<String, String>();
+//        env.put("envkey", "envvalue");
+//        request.setEnvironment(env);
+//        request.setEnvironment(null);
+//        request.setPid(Integer.SIZE);
+//        request.setProgram("program");
+//        request.setRequestSequenceNumber(Long.MIN_VALUE);
+//        request.setRunAs("runas");
+//        request.setSource("source");
         request.setStdErr(OutputRedirection.RETURN);
-        request.setStdErrPath("path");
+//        request.setStdErrPath("path");
         request.setStdOut(OutputRedirection.NO);
-        request.setStdOutPath("path");
-        request.setTimeout(Long.MIN_VALUE);
-        request.setType(RequestType.EXECUTE_REQUEST);
-        request.setUuid("uuid");
-        request.setWorkingDirectory("/working/directory");
+//        request.setStdOutPath("path");
+//        request.setTimeout(Long.MIN_VALUE);
+//        request.setUuid("uuid");
+//        request.setWorkingDirectory("/working/directory");
         Command command = new Command(request);
         Persistence instance = new Persistence();
         boolean expResult = true;

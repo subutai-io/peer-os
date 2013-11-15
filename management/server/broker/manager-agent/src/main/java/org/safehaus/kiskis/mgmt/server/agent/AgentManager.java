@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
@@ -44,6 +44,9 @@ public class AgentManager implements AgentManagerInterface {
             Request request = new Request();
             request.setType(RequestType.REGISTRATION_REQUEST_DONE);
             request.setUuid(agent.getUuid());
+            request.setSource(response.getSource());
+            request.setStdErr(OutputRedirection.NO);
+            request.setStdOut(OutputRedirection.NO);
             Command command = new Command(request);
             commandManager.executeCommand(command);
 
@@ -51,7 +54,7 @@ public class AgentManager implements AgentManagerInterface {
                 notifyModules();
             }
             System.out.println(agent + "Agent is registered");
-            System.out.println("Dynamic service lookup: " + ServiceLocator.getService(CommandManagerInterface.class));
+//            System.out.println("Dynamic service lookup: " + ServiceLocator.getService(CommandManagerInterface.class));
         } else {
             System.out.println(agent + "Error registering agent");
         }
@@ -62,6 +65,7 @@ public class AgentManager implements AgentManagerInterface {
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
         agent.setMacAddress(response.getMacAddress());
+        agent.setListIP(response.ips);
 
         return agent;
     }

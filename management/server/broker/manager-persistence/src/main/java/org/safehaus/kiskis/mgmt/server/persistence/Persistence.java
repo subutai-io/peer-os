@@ -102,6 +102,7 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
         BoundStatement boundStatement = new BoundStatement(stmt);
 
         Request request = command.getCommand();
+        System.out.println(request);
         ResultSet rs = session.execute(boundStatement.bind(request.getSource(), requestsequencenumber++,
                 request.getType().toString(), request.getUuid(), request.getWorkingDirectory(),
                 request.getProgram(), request.getStdOut().toString(), request.getStdErr().toString(),
