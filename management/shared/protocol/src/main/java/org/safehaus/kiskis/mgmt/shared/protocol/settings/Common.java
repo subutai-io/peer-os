@@ -17,7 +17,7 @@ public class Common {
 //    public static String MQ_USERNAME = "karaf";
 //    public static String MQ_PASSWORD = "karaf";
     public static int cassandraPort = 9042;
-    public  static String cassandraHost = "localhost";
+    public static String cassandraHost = "localhost";
 //    private final String cassandraHost = "192.168.1.106";
-    public  static String keyspaceName = "kiskis";
+    public static String keyspaceName = "kiskis";
 }
