@@ -38,10 +38,6 @@
  */
 int getSettings(string & url, string & connectionOptions, string & loglevel)
 {
-	KALogger DummyLogger;
-	DummyLogger.openLogFileWithName("KiskisAgentMain.log");
-	DummyLogger.setLogLevel(7);
-
 	pugi::xml_document doc;
 
 	if(doc.load_file("/etc/KiskisAgent/config/settings.xml").status)		//if the settings file does not exist
@@ -52,12 +48,12 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
 
-	url = "failover://(ssl://" + url +":"+  doc.child("Settings").child_value("Port") + ")";		//combine url and port
+//	url = "failover://ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
+
+	url = "ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
 
 	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
-
-	DummyLogger.closeLogFile();
 	return 0;
 }
 /**
@@ -88,7 +84,7 @@ bool getUuid(string& Uuid)
  *  		   This is a thread with working concurrently with main thread.
  *  		   It is main purpose that checking the Shared Memory Buffer in Blocking mode and sending them to Broker
  */
-void threadSend(message_queue *mq,KAConnection *connection)
+void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 {
 	try
 	{
@@ -99,6 +95,7 @@ void threadSend(message_queue *mq,KAConnection *connection)
 		{
 			str.resize(2500);
 			mq->receive(&str[0],str.size(),recvd_size,priority);
+		//	logMain->writeLog(7,logMain->setLogData("<KiskisAgent>::<threadsend>","New message comes to messagequeue to be sent:",str));
 			connection->sendMessage(str);
 			str.clear();
 		}
@@ -108,6 +105,7 @@ void threadSend(message_queue *mq,KAConnection *connection)
 	{
 		message_queue::remove("message_queue");
 		std::cout << ex.what() << std::endl;
+		logMain->writeLog(3,logMain->setLogData("<KiskisAgent>::<threadsend>","New excception Handled:",ex.what()));
 	}
 }
 /**
@@ -121,13 +119,42 @@ int main(int argc,char *argv[],char *envp[])
 	string Uuid;
 	string serveraddress="SERVICE_QUEUE";
 	string clientaddress;
-
-	getSettings(url,connectionOptions,loglevel);
+	KAThread thread;
 	int level;
-	stringstream(loglevel) >> level;
+
+	if(! thread.getUserID().checkRootUser())
+	{
+		//user is not root KiskisAgent Will be closed
+		cout << "Main Process User is not root.. KiskisAgent is going to be closed.."<<endl;
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
+		return 300;
+	}
 	KALogger logMain;
 	logMain.openLogFileWithName("KiskisAgentMain.log");
-	logMain.setLogLevel(level);
+	logMain.setLogLevel(7);
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent is starting.."));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is reading.."));
+
+
+	if(!getSettings(url,connectionOptions,loglevel))
+	{
+
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","URL:",url));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","ConnectionOptions:",connectionOptions));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","LogLevel:",loglevel));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is read successfully.."));
+		stringstream(loglevel) >> level;
+		logMain.setLogLevel(level);
+	}
+	else
+	{
+		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","Settings.xml cannot be read KiskisAgent is closing.."));
+		logMain.closeLogFile();
+		return 100;
+	}
+
 
 	if(!getUuid(Uuid))
 	{						//get UUID of the agent if it exist. if it does not it will be regenerated..
@@ -139,48 +166,51 @@ int main(int argc,char *argv[],char *envp[])
 		ofstream file("/etc/KiskisAgent/config/uuid.txt");
 		file << Uuid;
 		file.close();
+		logMain.writeLog(1,logMain.setLogData("<KiskisAgent>","KiskisAgent UUID:",Uuid));
 	}
+
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent UUID:",Uuid));
 
 	activemq::library::ActiveMQCPP::initializeLibrary();
 	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/KiskisAgent/config/client_ks.pem");
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"123456");
+	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"client");
 	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/KiskisAgent/config/client_ts.pem" );
 
 	clientaddress = Uuid;
-	KAThread thread;
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection url:",url));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Server Address:",serveraddress));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Cleint Address:",clientaddress));
 	KAConnection connection(url,serveraddress,clientaddress);
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying to open Connection with ActiveMQ Broker: ",url));
 	KACommand command;
 	KAResponsePack response;
 	string input;
 	string sendout;
 
-	if(! thread.getUserID().checkRootUser())
-	{
-		//user is not root KiskisAgent Will be closed
-		cout << "Main Process User is not root.. KiskisAgent is going to be closed.."<<endl;
-		close(STDIN_FILENO);
-		close(STDOUT_FILENO);
-		close(STDERR_FILENO);
-
-		return 300;
-	}
-
 	response.setUuid(Uuid); 	//setting Uuid for response messages.
 	if(!connection.openSession())
 	{
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection could not be established withActiveMQ Broker: ",url));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent is closing.."));
+		logMain.closeLogFile();
 		return 400;
 	}
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection Successfully opened with ActiveMQ Broker: ",url));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Registration Message is sending to ActiveMQ Broker.."));
 
 	sendout = response.createRegistrationMessage(response.getUuid());
+	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration Message:",sendout));
 	connection.sendMessage(sendout);
 
+	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Shared Memory MessageQueue is initializing.."));
 	message_queue messageQueue
 	(open_or_create              //only create
 			,"message_queue"           //name
-			,5                       //max message number
+			,100                       //max message number
 			,2500             //max message size
 	);
-	boost::thread thread1(threadSend,&messageQueue,&connection);
+	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Thread is starting.."));
+	boost::thread thread1(threadSend,&messageQueue,&connection,&logMain);
 
 	/* Change the file mode mask */
 	umask(0);
@@ -194,12 +224,16 @@ int main(int argc,char *argv[],char *envp[])
 			{
 				if(command.deserialize(input))
 				{
+		//			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","New Message is received"));
+		//			logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","New Message:",input));
 					if(command.getType()=="REGISTRATION_REQUEST_DONE") //type is registration done
 					{
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration is done.."));
 						//agent is registered to server now
 					}
 					else if(command.getType()=="EXECUTE_REQUEST")	//execution request will be executed in other process.
 					{
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Execute operation is starting.."));
 						KAThread* mypointer = new KAThread;
 						mypointer->getLogger().setLogLevel(level);
 						mypointer->threadFunction(&messageQueue,&command);
@@ -207,34 +241,41 @@ int main(int argc,char *argv[],char *envp[])
 					}
 					else if(command.getType()=="HEARTBEAT_REQUEST")
 					{
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Heartbeat message has been taken.."));
 						connection.sendMessage(response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber()));
 					}
 					else if(command.getType()=="TERMINATE_REQUEST")
 					{
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",command.getPid()));
 						if(atoi(command.getPid().c_str()))
 						{
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Killing given PID.."));
 							kill(atoi(command.getPid().c_str()),SIGKILL);
 						}
 						else
 						{
+
 						}
 						connection.sendMessage(response.createTerminateMessage(Uuid,command.getRequestSequenceNumber()));
 					}
 				}
 				else
 				{
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Failed at parsing Json String: ",input));
 					connection.sendMessage(response.createResponseMessage(Uuid,"9999999",command.getRequestSequenceNumber(),819,"Failed to Parse Json!!!",""));
 				}
 			}
 		}
 		catch(const std::exception& error)
 		{
+			logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Exception is raised: ",error.what()));
 			cout<<error.what()<<endl;
 		}
 	}
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
+	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","KiskisAgent is closing Successfully.."));
 	logMain.closeLogFile();
 	kill(getpid(),SIGKILL);
 	activemq::library::ActiveMQCPP::shutdownLibrary();
