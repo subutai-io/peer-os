@@ -5,19 +5,19 @@
 KACommand::KACommand()
 {			//Setting default values..
 	// TODO Auto-generated constructor stub
-	setType("");
-	setWorkingDirectory("");
-	setUuid("");
-	setPid("");
-	setRequestSequenceNumber(-1);
-	setStandardError("");
-	setStandardErrPath("");
-	setStandardOutput("");
-	setStandardOutPath("");
-	setRunAs("");
-	setTimeout(60);
-	getArguments().clear();
-	getEnvironment().clear();
+	this->setType("");
+	this->setWorkingDirectory("");
+	this->setUuid("");
+	this->setPid("");
+	this->setRequestSequenceNumber(-1);
+	this->setStandardError("");
+	this->setStandardErrPath("");
+	this->setStandardOutput("");
+	this->setStandardOutPath("");
+	this->setRunAs("");
+	this->setTimeout(60);
+	this->getArguments().clear();
+	this->getEnvironment().clear();
 }
 /**
  *  \details   Default destructor of KACommand class.
@@ -31,19 +31,19 @@ KACommand::~KACommand()
  */
 void KACommand::clear()
 {		//clear the all variables..
-	setType("");
-	setWorkingDirectory("");
-	setUuid("");
-	setPid("");
-	setRequestSequenceNumber(-1);
-	setStandardError("");
-	setStandardErrPath("");
-	setStandardOutput("");
-	setStandardOutPath("");
-	setRunAs("");
-	setTimeout(60);
-	getArguments().clear();
-	getEnvironment().clear();
+	this->setType("");
+	this->setWorkingDirectory("");
+	this->setUuid("");
+	this->setPid("");
+	this->setRequestSequenceNumber(-1);
+	this->setStandardError("");
+	this->setStandardErrPath("");
+	this->setStandardOutput("");
+	this->setStandardOutPath("");
+	this->setRunAs("");
+	this->setTimeout(60);
+	this->getArguments().clear();
+	this->getEnvironment().clear();
 }
 /**
  *  \details   serialize function creates a JSON strings from called instance.
@@ -58,36 +58,36 @@ void KACommand::serialize(string& output)
 	Json::Value root;
 
 	//mandatory arguments
-	if(!getType().empty())
-		root["command"]["type"] = getType();
-	if(!getStandardOutput().empty())
-		root["command"]["stdOut"]=getStandardOutput();
-	if(!getStandardError().empty())
-		root["command"]["stdErr"]=getStandardError();
-	if(!getUuid().empty())
-		root["command"]["uuid"]=getUuid();
-	if(!getPid().empty())
-		root["command"]["pid"]=getPid();								//check the pid is assigned or not
-	if(!getWorkingDirectory().empty())									//check the workingDirectory is assigned or not
-		root["command"]["workingDirectory"]=getWorkingDirectory();
-	if(getRequestSequenceNumber() >= 0)									//check the requestSequenceNumber is assigned or not
-		root["command"]["requestSequenceNumber"]=getRequestSequenceNumber();
-	if(!getProgram().empty())											//check the program is assigned or not
-		root["command"]["program"]=getProgram();
-	if(!getRunAs().empty())												//check the runAs is assigned or not
-		root["command"]["runAs"]=getRunAs();
-	if(!getStandardErrPath().empty())											//check the StandardErrPath is assigned or not
-		root["command"]["stdErrPath"]=getStandardErrPath();
-	if(!getStandardOutputPath().empty())											//check the StandardOutPath is assigned or not
-		root["command"]["stdOutPath"]=getStandardOutputPath();
-	if(getTimeout()!=60)											//check the TimeoutValue is assigned or not
-		root["command"]["timeout"]=getTimeout();
-	for(unsigned int index=0; index < getArguments().size(); index++)	//automatically check the size of the argument list
-		root["command"]["args"][index]=getArguments()[index];
-	if(getEnvironment().size() > 0)
+	if((!this->getType().empty()))
+		root["command"]["type"] = this->getType();
+	if(!(this->getStandardOutput().empty()))
+		root["command"]["stdOut"] = this->getStandardOutput();
+	if(!(this->getStandardError().empty()))
+		root["command"]["stdErr"] = this->getStandardError();
+	if(!(this->getUuid().empty()))
+		root["command"]["uuid"] = this->getUuid();
+	if(!(this->getPid().empty()))
+		root["command"]["pid"] = this->getPid();								//check the pid is assigned or not
+	if(!(this->getWorkingDirectory().empty()))									//check the workingDirectory is assigned or not
+		root["command"]["workingDirectory"] = this->getWorkingDirectory();
+	if(this->getRequestSequenceNumber() >= 0)									//check the requestSequenceNumber is assigned or not
+		root["command"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
+	if(!(this->getProgram().empty()))											//check the program is assigned or not
+		root["command"]["program"] = this->getProgram();
+	if(!(this->getRunAs().empty()))												//check the runAs is assigned or not
+		root["command"]["runAs"] = this->getRunAs();
+	if(!(this->getStandardErrPath().empty()))											//check the StandardErrPath is assigned or not
+		root["command"]["stdErrPath"] = this->getStandardErrPath();
+	if(!(this->getStandardOutputPath().empty()))											//check the StandardOutPath is assigned or not
+		root["command"]["stdOutPath"] = this->getStandardOutputPath();
+	if(this->getTimeout()!=60)											//check the TimeoutValue is assigned or not
+		root["command"]["timeout"] = this->getTimeout();
+	for(unsigned int index=0; index < this->getArguments().size(); index++)	//automatically check the size of the argument list
+		root["command"]["args"][index]=this->getArguments()[index];
+	if(this->getEnvironment().size() > 0)
 	{
 		//automatically check the size of the envirenment list
-		for(std::list<pair<string,string> >::iterator it = getEnvironment().begin(); it != getEnvironment().end(); it++ )
+		for(std::list<pair<string,string> >::iterator it = this->getEnvironment().begin(); it != this->getEnvironment().end(); it++ )
 		{
 			env[it->first.c_str()] = it->second.c_str();	//adding env parameters to env Jsonstring
 		}
@@ -120,42 +120,43 @@ bool KACommand::deserialize(string& input)
 	//Start mandatory parameters deserialization
 	if(!root["command"]["type"].isNull())
 	{				//initialize type parameter if it is not null
-		setType(root["command"]["type"].asString());
+		this->setType(root["command"]["type"].asString());
 	}
 	if(!root["command"]["stdOut"].isNull())
 	{
-		setStandardOutput(root["command"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
+		this->setStandardOutput(root["command"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
 	}
 	if(!root["command"]["stdOutPath"].isNull())
 	{
-		setStandardOutPath(root["command"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
+		this->setStandardOutPath(root["command"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
 	}
 	if(!root["command"]["stdErr"].isNull())
 	{
-		setStandardError(root["command"]["stdErr"].asString());		//initialize standardError parameter if it is not null
+		this->setStandardError(root["command"]["stdErr"].asString());		//initialize standardError parameter if it is not null
 	}
 	if(!root["command"]["stdErrPath"].isNull())
 	{
-		setStandardErrPath(root["command"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
+		this->setStandardErrPath(root["command"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
 	}
 	if(!root["command"]["uuid"].isNull())
 	{
-		setUuid(root["command"]["uuid"].asString());				//initialize UUID parameter if it is not null
+		this->setUuid(root["command"]["uuid"].asString());				//initialize UUID parameter if it is not null
 	}
-	if(!root["command"]["pid"].isNull()){
-		setPid(root["command"]["pid"].asString());				//initialize pid parameter if it is not null
+	if(!root["command"]["pid"].isNull())
+	{
+		this->setPid(root["command"]["pid"].asString());				//initialize pid parameter if it is not null
 	}
 	if(!root["command"]["workingDirectory"].isNull())
 	{
-		setWorkingDirectory(root["command"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
+		this->setWorkingDirectory(root["command"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
 	}
 	if(!root["command"]["requestSequenceNumber"].isNull())
 	{
-		setRequestSequenceNumber(root["command"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
+		this->setRequestSequenceNumber(root["command"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
 	}
 	if(!root["command"]["program"].isNull())
 	{
-		setProgram(root["command"]["program"].asString());		//initialize program parameter if it is not null
+		this->setProgram(root["command"]["program"].asString());		//initialize program parameter if it is not null
 	}
 	if(!root["command"]["runAs"].isNull())
 	{
@@ -163,7 +164,7 @@ bool KACommand::deserialize(string& input)
 	}
 	if(!root["command"]["timeout"].isNull())
 	{
-		setTimeout(root["command"]["timeout"].asInt());		//initialize runAs parameter if it is not null
+		this->setTimeout(root["command"]["timeout"].asInt());		//initialize runAs parameter if it is not null
 	}
 	Json::Value::Members members = root["command"]["environment"].getMemberNames();		//get environment members
 
@@ -178,7 +179,7 @@ bool KACommand::deserialize(string& input)
 	for(unsigned int index=0; index < root["command"]["args"].size(); index++)	//set arguments
 	{
 		arg =  root["command"]["args"][index].asString();
-		getArguments().push_back(arg);
+		this->getArguments().push_back(arg);
 	}
 	return true;
 }
@@ -202,7 +203,7 @@ void KACommand::setEnvironment(list<pair<string,string> >& envr)
 	{
 		dummy.first = it->first.c_str();
 		dummy.second = it->second.c_str();
-		environment.push_back(dummy);
+		this->environment.push_back(dummy);
 	}
 }
 /**

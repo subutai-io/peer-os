@@ -268,4 +268,5 @@ void KALogger::writeLog(int level,string log)
 									}
 									break;
 	}
+	fflush(logFile);
 }
