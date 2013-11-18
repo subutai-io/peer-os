@@ -131,4 +131,9 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
                 response.getSource(), response.getStdOut()));
         return rs != null;
     }
+
+    @Override
+    public List<Response> getResponses() {
+        throw new UnsupportedOperationException("not done yet");
+    }
 }

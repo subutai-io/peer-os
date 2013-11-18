@@ -23,8 +23,8 @@ public class AgentManager implements AgentManagerInterface {
 
     private PersistenceAgentInterface persistenceAgent;
     private CommandManagerInterface commandManager;
-    private Set<Agent> registeredAgents;
-    private ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
+    private final Set<Agent> registeredAgents;
+    private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
 
     public AgentManager() {
         registeredAgents = new HashSet<Agent>();

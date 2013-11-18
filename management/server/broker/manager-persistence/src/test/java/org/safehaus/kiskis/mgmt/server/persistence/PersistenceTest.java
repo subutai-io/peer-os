@@ -127,7 +127,7 @@ public class PersistenceTest {
     /**
      * Test of saveCommand method, of class Persistence.
      */
-    @Test
+//    @Test
     public void testSaveCommand() {
         System.out.println("saveCommand");
         Request request = new Request();
