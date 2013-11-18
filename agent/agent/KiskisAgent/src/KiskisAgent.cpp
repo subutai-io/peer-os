@@ -48,9 +48,7 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
 
-//	url = "failover://ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
-
-	url = "ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
+	url = "failover://ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
 
 	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
@@ -95,7 +93,7 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 		{
 			str.resize(2500);
 			mq->receive(&str[0],str.size(),recvd_size,priority);
-		//	logMain->writeLog(7,logMain->setLogData("<KiskisAgent>::<threadsend>","New message comes to messagequeue to be sent:",str));
+			logMain->writeLog(7,logMain->setLogData("<KiskisAgent>::<threadsend>","New message comes to messagequeue to be sent:",str));
 			connection->sendMessage(str);
 			str.clear();
 		}
@@ -224,8 +222,8 @@ int main(int argc,char *argv[],char *envp[])
 			{
 				if(command.deserialize(input))
 				{
-		//			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","New Message is received"));
-		//			logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","New Message:",input));
+					logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","New Message is received"));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","New Message:",input));
 					if(command.getType()=="REGISTRATION_REQUEST_DONE") //type is registration done
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration is done.."));
