@@ -18,7 +18,7 @@ public class Terminal implements Module {
 
     private ModuleService service;
     private BundleContext context;
-    private static final String name = "LXC";
+    private static final String name = "Hadoop";
 
     public static class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
