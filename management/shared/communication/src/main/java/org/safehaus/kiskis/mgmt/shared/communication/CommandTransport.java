@@ -81,7 +81,8 @@ public class CommandTransport implements CommandTransportInterface {
 
         public void run() {
             try {
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + host + ":" + port);
+//                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + host + ":" + port);
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
                 Connection connection = connectionFactory.createConnection();
                 connection.start();
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -152,7 +153,8 @@ public class CommandTransport implements CommandTransportInterface {
     }
 
     private void setupListener() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + this.amqHost + ":" + this.amqPort);
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+//        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + this.amqHost + ":" + this.amqPort);
         Connection connection;
         try {
             connection = connectionFactory.createConnection();
