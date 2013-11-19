@@ -5,11 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
-import java.util.List;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.List;
+
 /**
- *
  * @author bahadyr
  */
 public class Task {

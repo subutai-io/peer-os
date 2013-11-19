@@ -20,7 +20,7 @@ public class Terminal implements Module {
 
     private ModuleService service;
     private BundleContext context;
-    private static final String name = "LXC";
+    private static final String name = "Cassandra";
 
     public static class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
@@ -68,10 +68,10 @@ public class Terminal implements Module {
                 System.out.println("Adding " + getName());
                 getCommandManager().addListener(this);
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
 
-        @Override
         public void buttonClick(Button.ClickEvent event) {
             Set<String> agents = AppData.getAgentList();
             if (agents != null && agents.size() > 0) {
@@ -84,6 +84,7 @@ public class Terminal implements Module {
                     try {
                         getCommandManager().executeCommand(command);
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
             } else {
@@ -128,18 +129,16 @@ public class Terminal implements Module {
         }
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public Component createComponent() {
         return new ModuleComponent(context);
     }
 
     public void setModuleService(ModuleService service) {
-        System.out.println(name + " registering with ModuleService");
+        System.out.println("Terminal: registering with ModuleService");
         this.service = service;
         this.service.registerModule(this);
     }

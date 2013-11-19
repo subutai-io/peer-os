@@ -7,7 +7,7 @@
 
     <bean id="agentManagerService"
           class="org.safehaus.kiskis.mgmt.server.agent.AgentManager"
-            init-method="init" destroy-method="destroy">
+          init-method="init" destroy-method="destroy">
         <property name="persistenceAgentService" ref="persistenceAgentService"/>
         <property name="commandManagerService" ref="commandManagerService"/>
         <property name="context" ref="blueprintBundleContext"/>

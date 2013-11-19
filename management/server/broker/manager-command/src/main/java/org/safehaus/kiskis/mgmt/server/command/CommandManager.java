@@ -5,7 +5,10 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;

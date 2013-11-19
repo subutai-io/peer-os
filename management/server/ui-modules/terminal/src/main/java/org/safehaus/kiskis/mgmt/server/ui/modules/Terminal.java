@@ -88,8 +88,8 @@ public class Terminal implements Module {
 
         @Override
         public void outputCommand(Response response) {
-            try{
-                if(response != null && agents != null && agents.contains(response.getUuid())){
+            try {
+                if (response != null && agents != null && agents.contains(response.getUuid())) {
                     System.out.println("");
                     System.out.println(response);
                     System.out.println("");
@@ -112,7 +112,7 @@ public class Terminal implements Module {
                     textAreaOutput.setValue(output);
                     textAreaOutput.setCursorPosition(output.length() - 1);
                 }
-            } catch(Exception ex){
+            } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
                 ex.printStackTrace();
             }

@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.enums;
 
 /**
- *
  * @author bahadyr
  */
 public enum TaskStatus {

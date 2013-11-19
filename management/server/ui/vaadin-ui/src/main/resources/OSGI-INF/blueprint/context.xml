@@ -17,16 +17,17 @@
     <reference id="agentManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"/>
 
-    <bean id="appFactory" class="org.safehaus.kiskis.mgmt.server.ui.MgmtAppFactory">
-        <property name="moduleService" ref="moduleService"/>
-        <property name="agentManagerService" ref="agentManagerService"/>
-        <argument value="${title}"/>
-    </bean>
 
-    <service ref="appFactory" interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory">
+    <service interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory"
+             ranking="3">
         <service-properties>
             <entry key="alias" value="/mgmt-ui"/>
         </service-properties>
+        <bean class="org.safehaus.kiskis.mgmt.server.ui.MgmtAppFactory">
+            <property name="moduleService" ref="moduleService"/>
+            <property name="agentManagerService" ref="agentManagerService"/>
+            <argument value="${title}"/>
+        </bean>
     </service>
 
 </blueprint>

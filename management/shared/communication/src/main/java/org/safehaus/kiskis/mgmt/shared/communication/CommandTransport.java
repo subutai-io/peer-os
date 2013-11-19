@@ -7,9 +7,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
+
 import javax.jms.*;
 
-public class CommandTransport implements CommandTransportInterface{
+public class CommandTransport implements CommandTransportInterface {
 
     private BrokerService broker;
     private int amqPort;

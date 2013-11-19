@@ -2,8 +2,6 @@ package org.safehaus.kiskis.mgmt.shared.protocol.api.ui;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * User: daralbaev

@@ -7,7 +7,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,17 +23,13 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
     private static final Logger LOG = Logger.getLogger(Persistence.class.getName());
     private Cluster cluster;
     private Session session;
-    private final int cassandraPort = 9042;
-    //    private final String cassandraHost = "localhost";
-    private final String cassandraHost = "192.168.1.106";
-    private final String keyspaceName = "kiskis";
     private long requestsequencenumber = 0l;
 
     public Persistence() {
         try {
             System.out.println("Persistence constructor called...");
-            cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
-            session = cluster.connect(keyspaceName);
+            cluster = Cluster.builder().withPort(Common.cassandraPort).addContactPoint(Common.cassandraHost).build();
+            session = cluster.connect(Common.keyspaceName);
         } catch (Exception e) {
             System.out.println("can not connect to cassandra.");
         }
@@ -38,21 +37,37 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
 
     @Override
     public List<Agent> getAgentList() {
-        System.out.println(this.getClass().getName() + " getAgentList called");
-        return null;
+        List<Agent> list = new ArrayList<Agent>();
+        ResultSet rs = session.execute("select * from agents");
+        Iterator<Row> it = rs.iterator();
+        while (it.hasNext()) {
+            Agent agent = new Agent();
+            Row row = it.next();
+            agent.setUuid(row.getString("uuid"));
+            agent.setHostname(row.getString("hostname"));
+            agent.setLXC(row.getBool("islxc"));
+            agent.setListIP(row.getList("listip", String.class));
+            agent.setMacAddress(row.getString("macaddress"));
+            list.add(agent);
+        }
+        return list;
     }
 
+    /**
+     * Saved Agent data into Cassandra agents table
+     *
+     * @param agent
+     * @return the result in boolean
+     */
     @Override
     public boolean saveAgent(Agent agent) {
-        System.out.println(this.getClass().getName() + " saveAgent called");
-        String cql = "insert into agents (uuid, hostname) values ('" + agent.getUuid() + "', 'a" + agent.getHostname() + "')";
-        System.out.println(cql);
-        ResultSet rs = session.execute(cql);
-        if (rs != null) {
-            System.out.println("saved into cassandra " + agent.toString());
-            return true;
-        }
-        return false;
+        String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress) "
+                + "values (?,?,?,?,?)";
+        PreparedStatement stmt = session.prepare(cql);
+        BoundStatement boundStatement = new BoundStatement(stmt);
+        ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
+                agent.getHostname(), agent.isLXC(), agent.getListIP(), agent.getMacAddress()));
+        return rs != null;
     }
 
     // TODO Remove this method and reference in blueprint
@@ -71,35 +86,54 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Saves command into cassandra
+     *
+     * @param command
+     * @return boolean result
+     */
     @Override
     public boolean saveCommand(Command command) {
-        System.out.println(this.getClass().getName() + " saveCommand called");
-        PreparedStatement stmt = session.prepare("insert into request (uuid, program, requestsequencenumber) "
-                + "values (?, ?, ?);");
+        String cql = "insert into request (source, requestsequencenumber, type, uuid, "
+                + "workingdirectory, program, outputredirectionstdout, outputredirectionstderr, "
+                + "stdoutpath, erroutpath, runsas, args, environment, pid, timeout) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        PreparedStatement stmt = session.prepare(cql);
         BoundStatement boundStatement = new BoundStatement(stmt);
+
         Request request = command.getCommand();
-        ResultSet rs = session.execute(boundStatement.bind(request.getUuid(), request.getProgram(),
-                requestsequencenumber++));
-        if (rs != null) {
-            System.out.println("request saved into cassandra " + request.toString());
-            return true;
-        }
-        return false;
+        System.out.println(request);
+        ResultSet rs = session.execute(boundStatement.bind(request.getSource(), requestsequencenumber++,
+                request.getType().toString(), request.getUuid(), request.getWorkingDirectory(),
+                request.getProgram(), request.getStdOut().toString(), request.getStdErr().toString(),
+                request.getStdOutPath(), request.getStdErrPath(), request.getRunAs(), request.getArgs(),
+                request.getEnvironment(), request.getPid(), request.getTimeout()));
+        return rs != null;
+    }
+
+    /**
+     * Saves response to cassandra
+     *
+     * @param response
+     * @return boolean result
+     */
+    @Override
+    public boolean saveResponse(Response response) {
+        String cql = "insert into response (uuid, responsesequencenumber, exitcode, errout, hostname, ips, "
+                + "macaddress, pid, requestsequencenumber, responsetype, source, stdout) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        PreparedStatement stmt = session.prepare(cql);
+        BoundStatement boundStatement = new BoundStatement(stmt);
+        ResultSet rs = session.execute(boundStatement.bind(response.getUuid(),
+                (Long) response.getResponseSequenceNumber() == null ? -1l : response.getResponseSequenceNumber(),
+                response.getExitCode(), response.getStdOut(), response.getHostname(), response.getIps(),
+                response.getMacAddress(), response.getPid(), response.getRequestSequenceNumber(), response.getType().toString(),
+                response.getSource(), response.getStdOut()));
+        return rs != null;
     }
 
     @Override
-    public boolean saveResponse(Response response) {
-        System.out.println(this.getClass().getName() + " saveResponse called");
-        System.out.println(response.toString());
-        PreparedStatement stmt = session.prepare("insert into response (uuid, stdout, responsesequencenumber) "
-                + "values (?, ?, ?);");
-        BoundStatement boundStatement = new BoundStatement(stmt);
-        ResultSet rs = session.execute(boundStatement.bind(response.getUuid(), "stdout" + response.getStdOut(),
-                (Long) response.getResponseSequenceNumber() == null ? -1l : response.getResponseSequenceNumber()));
-        if (rs != null) {
-            System.out.println("response saved into cassandra " + response.toString());
-            return true;
-        }
-        return false;
+    public List<Response> getResponses() {
+        throw new UnsupportedOperationException("not done yet");
     }
 }

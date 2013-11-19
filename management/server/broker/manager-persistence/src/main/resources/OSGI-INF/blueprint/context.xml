@@ -11,7 +11,8 @@
         </service-properties>
     </service>
 
-    <bean id="persistenceCommandService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence" scope="singleton">
+    <bean id="persistenceCommandService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence"
+          scope="singleton">
     </bean>
     <service ref="persistenceCommandService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface">

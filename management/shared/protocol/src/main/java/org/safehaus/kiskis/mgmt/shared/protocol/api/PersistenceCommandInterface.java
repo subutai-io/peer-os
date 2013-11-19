@@ -17,5 +17,7 @@ public interface PersistenceCommandInterface {
 
     boolean saveCommand(Command command);
 
+    List<Response> getResponses();
+
     boolean saveResponse(Response response);
 }
