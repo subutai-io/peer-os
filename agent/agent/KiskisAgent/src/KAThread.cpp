@@ -566,12 +566,14 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
  *  		   if the execution successfully done, it returns true.
  *  		   Otherwise it returns false.
  */
-bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command)
+bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,char* argv[])
 {
 	signal(SIGCHLD, SIG_IGN);		//when the child process done it will be raped by kernel. We do not allowed zombie processes.
 	pid=fork();						//creating a child process
 	if(pid==0)		//child process is starting
 	{
+		int argv0size = strlen(argv[0]);
+		strncpy(argv[0],"ksks-agent-child",argv0size);
 		logger.openLogFile(getpid(),command->getRequestSequenceNumber());
 		string pidparnumstr = toString(getpid());		//geting pid number of the process
 		string processpid="";	//processpid for execution

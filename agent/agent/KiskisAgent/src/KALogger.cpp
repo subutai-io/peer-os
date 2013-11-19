@@ -54,7 +54,7 @@ string KALogger::toString(int intcont)
 void KALogger::openLogFile(int pid,int requestSequenceNumber)
 {
 	boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-	string logFileName = "/var/log/KiskisAgent/" + toString(now.time_of_day().total_milliseconds()) + "-"+toString(pid)+"-"+toString(requestSequenceNumber);
+	string logFileName = "/var/log/ksks-agent/" + toString(now.time_of_day().total_milliseconds()) + "-"+toString(pid)+"-"+toString(requestSequenceNumber);
 	this->logFile = fopen(logFileName.c_str(),"a+");;
 }
 /**
@@ -62,7 +62,7 @@ void KALogger::openLogFile(int pid,int requestSequenceNumber)
  */
 void KALogger::openLogFileWithName(string logfilename)
 {
-	logfilename = "/var/log/KiskisAgent/" + logfilename;
+	logfilename = "/var/log/ksks-agent/" + logfilename;
 	this->logFile = fopen(logfilename.c_str(),"a+");;
 }
 /**

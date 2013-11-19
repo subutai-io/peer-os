@@ -37,7 +37,7 @@ class KAThread
 public:
 	KAThread();
 	virtual ~KAThread();
-	bool threadFunction(message_queue*,KACommand*);			//Execute command concurrently
+	bool threadFunction(message_queue*,KACommand*,char*[]);			//Execute command concurrently
 	bool checkCWD(KACommand*);
 	bool checkUID(KACommand*);
 	string createExecString(KACommand*);

@@ -40,7 +40,7 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 {
 	pugi::xml_document doc;
 
-	if(doc.load_file("/etc/KiskisAgent/config/settings.xml").status)		//if the settings file does not exist
+	if(doc.load_file("/etc/ksks-agent/config/settings.xml").status)		//if the settings file does not exist
 	{
 		return 100;
 		exit(1);
@@ -62,7 +62,7 @@ bool getUuid(string& Uuid)
 {
 	try
 	{
-		ifstream file("/etc/KiskisAgent/config/uuid.txt");	//opening mac.txt
+		ifstream file("/etc/ksks-agent/config/uuid.txt");	//opening mac.txt
 		getline(file,Uuid);
 		file.close();
 		if(Uuid.empty())		//if mac is null or not reading successfully
@@ -103,7 +103,7 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 	{
 		message_queue::remove("message_queue");
 		std::cout << ex.what() << std::endl;
-		logMain->writeLog(3,logMain->setLogData("<KiskisAgent>::<threadsend>","New excception Handled:",ex.what()));
+		logMain->writeLog(3,logMain->setLogData("<KiskisAgent>::<threadsend>","New exception Handled:",ex.what()));
 	}
 }
 /**
@@ -170,9 +170,9 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent UUID:",Uuid));
 
 	activemq::library::ActiveMQCPP::initializeLibrary();
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/KiskisAgent/config/client_ks.pem");
+	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/ksks-agent/config/client_ks.pem");
 	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"client");
-	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/KiskisAgent/config/client_ts.pem" );
+	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/ksks-agent/config/client_ts.pem" );
 
 	clientaddress = Uuid;
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection url:",url));
@@ -234,7 +234,7 @@ int main(int argc,char *argv[],char *envp[])
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Execute operation is starting.."));
 						KAThread* mypointer = new KAThread;
 						mypointer->getLogger().setLogLevel(level);
-						mypointer->threadFunction(&messageQueue,&command);
+						mypointer->threadFunction(&messageQueue,&command,argv);
 						delete mypointer;
 					}
 					else if(command.getType()=="HEARTBEAT_REQUEST")
