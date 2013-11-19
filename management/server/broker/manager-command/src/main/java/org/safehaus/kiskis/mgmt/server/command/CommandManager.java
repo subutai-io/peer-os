@@ -1,11 +1,11 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;
@@ -14,10 +14,10 @@ import java.util.List;
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
  */
-public class CommandManager implements CommandManagerInterface {
+public class CommandManager implements CommandManagerInterface, BrokerListener {
 
+    private BundleContext context;
     private PersistenceCommandInterface persistenceCommand;
-    private CommandTransportInterface commandTransport;
     private ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
 
     @Override
@@ -31,7 +31,7 @@ public class CommandManager implements CommandManagerInterface {
     public void executeCommand(Command command) {
         try {
             if (persistenceCommand.saveCommand(command)) {
-                commandTransport.sendCommand(command);
+                getCommandTransport().sendCommand(command);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -39,16 +39,21 @@ public class CommandManager implements CommandManagerInterface {
     }
 
     @Override
-    public synchronized void registerCommand(Response response) {
-        System.out.println("~~~~~~~ Command registered");
-        System.out.println(response);
-        System.out.println();
-        try {
-            if (persistenceCommand.saveResponse(response)) {
-                notifyListeners(response);
+    public synchronized void getCommand(Response response) {
+        switch (response.getType()) {
+            case EXECUTE_RESPONSE: {
+                if (persistenceCommand.saveResponse(response)) {
+                    notifyListeners(response);
+                }
+                break;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            case EXECUTE_RESPONSE_DONE: {
+                persistenceCommand.saveResponse(response);
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
 
@@ -68,14 +73,6 @@ public class CommandManager implements CommandManagerInterface {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    public void setPersistenceCommandService(PersistenceCommandInterface persistenceCommand) {
-        this.persistenceCommand = persistenceCommand;
-    }
-
-    public void setCommunicationService(CommandTransportInterface commandTransport) {
-        this.commandTransport = commandTransport;
     }
 
     @Override
@@ -98,4 +95,25 @@ public class CommandManager implements CommandManagerInterface {
         }
     }
 
+    public void init() {
+        getCommandTransport().addListener(this);
+    }
+
+    public void destroy() {
+        getCommandTransport().removeListener(this);
+    }
+
+    public void setPersistenceCommandService(PersistenceCommandInterface persistenceCommand) {
+        this.persistenceCommand = persistenceCommand;
+    }
+
+    public void setContext(BundleContext context) {
+        this.context = context;
+    }
+
+    private CommandTransportInterface getCommandTransport() {
+        ServiceReference reference = context
+                .getServiceReference(CommandTransportInterface.class.getName());
+        return (CommandTransportInterface) context.getService(reference);
+    }
 }

@@ -5,20 +5,59 @@ import org.apache.activemq.broker.BrokerService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
-
 import javax.jms.*;
 
-public class CommandTransport implements CommandTransportInterface {
+public class CommandTransport implements CommandTransportInterface{
 
     private BrokerService broker;
-    private BrokerInterface brokerService;
+    private int amqPort;
+    private String amqHost;
+    private String amqBindAddress;
+    private String amqServiceQueue;
+    private String amqBrokerCertificateName;
+    private String amqBrokerTrustStoreName;
+    private String amqBrokerCertificatePwd;
+    private String amqBrokerTrustStorePwd;
+    Session listenerSession;
+    private CommunicationMessageListener communicationMessageListener;
+
+    public void setAmqPort(int amqPort) {
+        this.amqPort = amqPort;
+    }
+
+    public void setAmqHost(String amqHost) {
+        this.amqHost = amqHost;
+    }
+
+    public void setAmqBindAddress(String amqBindAddress) {
+        this.amqBindAddress = amqBindAddress;
+    }
+
+    public void setAmqServiceQueue(String amqServiceQueue) {
+        this.amqServiceQueue = amqServiceQueue;
+    }
+
+    public void setAmqBrokerCertificateName(String amqBrokerCertificateName) {
+        this.amqBrokerCertificateName = amqBrokerCertificateName;
+    }
+
+    public void setAmqBrokerTrustStoreName(String amqBrokerTrustStoreName) {
+        this.amqBrokerTrustStoreName = amqBrokerTrustStoreName;
+    }
+
+    public void setAmqBrokerCertificatePwd(String amqBrokerCertificatePwd) {
+        this.amqBrokerCertificatePwd = amqBrokerCertificatePwd;
+    }
+
+    public void setAmqBrokerTrustStorePwd(String amqBrokerTrustStorePwd) {
+        this.amqBrokerTrustStorePwd = amqBrokerTrustStorePwd;
+    }
 
     @Override
     public Response sendCommand(Command command) {
-        thread(new CommandProducer(command), false);
+        thread(new CommandProducer(command, amqHost, amqPort), false);
         return null;
     }
 
@@ -30,15 +69,20 @@ public class CommandTransport implements CommandTransportInterface {
 
     public static class CommandProducer implements Runnable {
 
+        String host;
+        int port;
         Command command;
 
-        public CommandProducer(Command command) {
+        public CommandProducer(Command command, String host, int port) {
             this.command = command;
+            this.port = port;
+            this.host = host;
         }
 
         public void run() {
             try {
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + Common.MQ_HOST + ":" + Common.MQ_PORT);
+//                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + host + ":" + port);
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
                 Connection connection = connectionFactory.createConnection();
                 connection.start();
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -56,62 +100,73 @@ public class CommandTransport implements CommandTransportInterface {
         }
     }
 
-    public void setBrokerService(BrokerInterface brokerService) {
-        this.brokerService = brokerService;
-        if (brokerService != null) {
-            System.out.println("......." + this.getClass().getName() + " BrokerInterface initialized");
-        } else {
-            System.out.println("......." + this.getClass().getName() + " BrokerInterface not initialized");
-        }
-
-    }
-
     public void init() {
-        if (broker == null) {
-            try {
-                System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/broker.ks");
-                System.setProperty("javax.net.ssl.keyStorePassword", Common.KEYSTORE_PASS);
-                System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/client.ts");
-                System.setProperty("javax.net.ssl.trustStorePassword", Common.TRUSTSTORE_PASS);
 
-
-                broker = new BrokerService();
-                broker.setPersistent(true);
-                broker.setUseJmx(false);
-                broker.addConnector("ssl://0.0.0.0:" + Common.MQ_PORT);
-                broker.start();
-                setupListener();
-                System.out.println("ActiveMQ started...");
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
-            }
+        try {
+            listenerSession.close();
+        } catch (Exception e) {
         }
+        try {
+
+            broker.stop();
+            broker.waitUntilStopped();
+        } catch (Exception e) {
+        }
+
+        try {
+            System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/" + this.amqBrokerCertificateName);
+            System.setProperty("javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd);
+            System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/" + this.amqBrokerTrustStoreName);
+            System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
+
+            broker = new BrokerService();
+            broker.setPersistent(true);
+            broker.setUseJmx(false);
+            broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort);
+            broker.start();
+            broker.waitUntilStarted();
+            setupListener();
+            System.out.println("ActiveMQ started...");
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
     }
 
     public void destroy() {
-        if (broker != null) {
-            try {
-                broker.stop();
-                System.out.println("ActiveMQ stopped...");
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
-            }
+        try {
+            broker.stop();
+            System.out.println("ActiveMQ stopped...");
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
         }
     }
 
     private void setupListener() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + Common.MQ_HOST + ":" + Common.MQ_PORT);
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+//        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + this.amqHost + ":" + this.amqPort);
         Connection connection;
         try {
             connection = connectionFactory.createConnection();
             connection.start();
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination adminQueue = session.createQueue(Common.MQ_SERVICE_QUEUE);
+            listenerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Destination adminQueue = listenerSession.createQueue(this.amqServiceQueue);
 
-            MessageConsumer consumer = session.createConsumer(adminQueue);
-            consumer.setMessageListener(new CommunicationMessageListener(session, brokerService));
+            MessageConsumer consumer = listenerSession.createConsumer(adminQueue);
+            communicationMessageListener = new CommunicationMessageListener(listenerSession);
+            consumer.setMessageListener(communicationMessageListener);
         } catch (JMSException ex) {
             System.out.println(ex.toString());
         }
+    }
+
+    @Override
+    public synchronized void addListener(BrokerListener listener) {
+        communicationMessageListener.addListener(listener);
+    }
+
+    @Override
+    public synchronized void removeListener(BrokerListener listener) {
+        communicationMessageListener.removeListener(listener);
     }
 }

@@ -8,13 +8,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 /**
  * Used by Management Server components query and manage the managed Agents
  */
-public interface BrokerInterface {
+public interface BrokerListener {
     /**
      * For Communication Bundle
      *
      * @param response
      * @return
      */
-    public void distributeResponse(Response response);
+    public void getCommand(Response response);
 
 }

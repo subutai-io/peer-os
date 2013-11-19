@@ -9,4 +9,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  */
 public interface CommandTransportInterface {
     public Response sendCommand(Command command);
+
+    public void addListener(BrokerListener listener);
+
+    public void removeListener(BrokerListener listener);
 }

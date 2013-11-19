@@ -13,8 +13,6 @@ public interface AgentManagerInterface {
 
     public Set<Agent> getRegisteredAgents();
 
-    public void registerAgent(Response response);
-
     public void addListener(AgentListener listener);
 
     public void removeListener(AgentListener listener);

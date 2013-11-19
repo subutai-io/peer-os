@@ -1,25 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <reference id="brokerService" availability="optional"
-               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+    <!-- Allow the use of system properties -->
+    <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+
+    <cm:property-placeholder persistent-id="AmqConfig" update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="amqPort" value="61616"/>
+            <cm:property name="amqHost" value="locahost"/>
+            <cm:property name="amqBindAddress" value="0.0.0.0"/>
+            <cm:property name="amqServiceQueue" value="SERVICE_QUEUE"/>
+            <cm:property name="amqBrokerCertificateName" value="broker.ks"/>
+            <cm:property name="amqBrokerTrustStoreName" value="broker.ts"/>
+            <cm:property name="amqBrokerCertificatePwd" value="broker"/>
+            <cm:property name="amqBrokerTrustStorePwd" value="broker"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
     <bean id="communicationService"
           class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"
           init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
-        <property name="brokerService" ref="brokerService"/>
+        <property name="amqPort" value="${amqPort}"/>
+        <property name="amqHost" value="${amqHost}"/>
+        <property name="amqBindAddress" value="${amqBindAddress}"/>
+        <property name="amqServiceQueue" value="${amqServiceQueue}"/>
+        <property name="amqBrokerCertificateName" value="${amqBrokerCertificateName}"/>
+        <property name="amqBrokerTrustStoreName" value="${amqBrokerTrustStoreName}"/>
+        <property name="amqBrokerCertificatePwd" value="${amqBrokerCertificatePwd}"/>
+        <property name="amqBrokerTrustStorePwd" value="${amqBrokerTrustStorePwd}"/>
     </bean>
-
-    <!--    <reference-list id="brokerService" availability="mandatory"
-                    interface="org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface">
-        <reference-listener
-                bind-method="setBrokerService" unbind-method="unsetBrokerService">
-            <bean class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"/>
-        </reference-listener>
-    </reference-list>-->
 
     <service ref="communicationService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface">
         <service-properties>
-            <!-- This property is only important for the DOSGi tutorial -->
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
     </service>

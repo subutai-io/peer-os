@@ -1,12 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.agent;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
@@ -18,12 +15,13 @@ import java.util.Set;
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
  */
-public class AgentManager implements AgentManagerInterface {
+public class AgentManager implements AgentManagerInterface, BrokerListener {
 
+    private BundleContext context;
     private PersistenceAgentInterface persistenceAgent;
     private CommandManagerInterface commandManager;
-    private Set<Agent> registeredAgents;
-    private ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
+    private final Set<Agent> registeredAgents;
+    private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
 
     public AgentManager() {
         registeredAgents = new HashSet<Agent>();
@@ -35,14 +33,33 @@ public class AgentManager implements AgentManagerInterface {
     }
 
     @Override
-    public synchronized void registerAgent(Response response) {
-        Agent agent = getAgent(response);
+    public synchronized void getCommand(Response response) {
+        switch (response.getType()) {
+            case REGISTRATION_REQUEST: {
+                saveAgent(response);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    private void saveAgent(Response response) {
+        Agent agent = new Agent();
+        agent.setUuid(response.getUuid());
+        agent.setHostname(response.getHostname());
+        agent.setMacAddress(response.getMacAddress());
+        agent.setListIP(response.ips);
 
         if (persistenceAgent.saveAgent(agent)) {
 
             Request request = new Request();
             request.setType(RequestType.REGISTRATION_REQUEST_DONE);
             request.setUuid(agent.getUuid());
+            request.setSource(response.getSource());
+            request.setStdErr(OutputRedirection.NO);
+            request.setStdOut(OutputRedirection.NO);
             Command command = new Command(request);
             commandManager.executeCommand(command);
 
@@ -53,15 +70,6 @@ public class AgentManager implements AgentManagerInterface {
         } else {
             System.out.println(agent + "Error registering agent");
         }
-    }
-
-    private Agent getAgent(Response response) {
-        Agent agent = new Agent();
-        agent.setUuid(response.getUuid());
-        agent.setHostname(response.getHostname());
-        agent.setMacAddress(response.getMacAddress());
-
-        return agent;
     }
 
     private void notifyModules() {
@@ -86,6 +94,14 @@ public class AgentManager implements AgentManagerInterface {
         listeners.remove(listener);
     }
 
+    public void init() {
+        getCommandTransport().addListener(this);
+    }
+
+    public void destroy() {
+        getCommandTransport().removeListener(this);
+    }
+
     public void setPersistenceAgentService(PersistenceAgentInterface persistenceAgent) {
         this.persistenceAgent = persistenceAgent;
         System.out.println(this.getClass().getName() + " PersistenceAgentInterface initialized");
@@ -94,5 +110,16 @@ public class AgentManager implements AgentManagerInterface {
     public void setCommandManagerService(CommandManagerInterface commandManager) {
         this.commandManager = commandManager;
         System.out.println(this.getClass().getName() + " CommandManagerInterface initialized");
+
+    }
+
+    public void setContext(BundleContext context) {
+        this.context = context;
+    }
+
+    private CommandTransportInterface getCommandTransport() {
+        ServiceReference reference = context
+                .getServiceReference(CommandTransportInterface.class.getName());
+        return (CommandTransportInterface) context.getService(reference);
     }
 }

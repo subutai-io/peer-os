@@ -14,9 +14,7 @@ public interface CommandManagerInterface {
 
     List<Command> getCommandList(Agent agent);
 
-    boolean executeCommand(Command command);
-
-    void registerCommand(Response response);
+    void executeCommand(Command command);
 
     void addListener(CommandListener listener);
 
