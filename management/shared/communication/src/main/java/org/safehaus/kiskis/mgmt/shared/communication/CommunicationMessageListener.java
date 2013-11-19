@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.shared.communication;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerInterface;
 
@@ -15,8 +14,8 @@ public class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
 
-    private Session session;
-    private BrokerInterface brokerService;
+    private final Session session;
+    private final BrokerInterface brokerService;
 
     /**
      * @param session
@@ -38,6 +37,7 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             String jsonCmd = txtMsg.getText();
             Response response = CommandJson.getResponse(jsonCmd);
+
             brokerService.distributeResponse(response);
         } catch (JMSException ex) {
             LOG.info(ex.getMessage());

@@ -60,6 +60,7 @@ public class MgmtAgentManager extends VerticalLayout implements
             Set<String> agents = (Set<String>) event.getProperty().getValue();
 
             AppData.setAgentList(agents);
+            getWindow().showNotification(agents.toString());
         }
     }
 

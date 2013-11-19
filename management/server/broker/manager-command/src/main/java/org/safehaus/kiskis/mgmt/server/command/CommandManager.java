@@ -28,32 +28,37 @@ public class CommandManager implements CommandManagerInterface {
     }
 
     @Override
-    public synchronized boolean executeCommand(Command command) {
-        System.out.println(this.getClass().getName() + " saveCommand called");
-        if (persistenceCommand.saveCommand(command)) {
-            commandTransport.sendCommand(command);
-
-            return true;
+    public void executeCommand(Command command) {
+        try{
+            if (persistenceCommand.saveCommand(command)) {
+                commandTransport.sendCommand(command);
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
-
-        return false;
     }
 
     @Override
     public synchronized void registerCommand(Response response) {
-        if(persistenceCommand.saveResponse(response)) {
-            notifyListeners(response);
+        System.out.println("~~~~~~~ Command registered");
+        System.out.println(response);
+        System.out.println();
+        try{
+            if(persistenceCommand.saveResponse(response)) {
+                notifyListeners(response);
+            }
+        }  catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 
     private void notifyListeners(Response response) {
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        System.out.println(listeners.size());
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         try {
+            System.out.println("Количество модулей:" + listeners.size());
             for (CommandListener ai : listeners) {
-                if (ai != null) {
+                if (ai != null && ai.getName() != null) {
                     if (ai.getName().equals(response.getSource())) {
+                        System.out.println("~~~~~~~ Listeners notified");
                         ai.outputCommand(response);
                     }
                 } else {
@@ -67,22 +72,29 @@ public class CommandManager implements CommandManagerInterface {
 
     public void setPersistenceCommandService(PersistenceCommandInterface persistenceCommand) {
         this.persistenceCommand = persistenceCommand;
-        System.out.println(this.getClass().getName() + " PersistenceCommandInterface initialized");
     }
 
     public void setCommunicationService(CommandTransportInterface commandTransport) {
         this.commandTransport = commandTransport;
-        System.out.println(this.getClass().getName() + " CommandTransportInterface initialized");
     }
 
     @Override
     public synchronized void addListener(CommandListener listener) {
-        listeners.add(listener);
+        try{
+            System.out.println("Adding module listener : " + listener.getName());
+            listeners.add(listener);
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public synchronized void removeListener(CommandListener listener) {
-        listeners.remove(listener);
+        try{
+            listeners.remove(listener);
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
 }

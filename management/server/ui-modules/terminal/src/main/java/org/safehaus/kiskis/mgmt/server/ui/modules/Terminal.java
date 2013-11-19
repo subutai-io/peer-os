@@ -2,6 +2,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules;
 
 
 import com.vaadin.ui.*;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
@@ -12,19 +14,25 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
+import java.util.Set;
+
 public class Terminal implements Module {
 
-    private ModuleService service;
-    private CommandManagerInterface commandManagerService;
+    public static final String MODULE_NAME = "Terminal";
+    private BundleContext context;
+    private static ModuleComponent component;
 
-    public class ModuleComponent extends CustomComponent implements
+    public static class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
 
         private TextArea textAreaCommand;
         private TextArea textAreaOutput;
         private Button buttonSend;
+        private BundleContext context;
+        private Set<String> agents;
 
-        public ModuleComponent() {
+        public ModuleComponent(BundleContext context) {
+            this.context = context;
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -46,7 +54,6 @@ public class Terminal implements Module {
 
             Label labelOutput = new Label("Commands output");
             textAreaOutput = new TextArea();
-//            textAreaOutput.setReadOnly(true);
             textAreaOutput.setRows(20);
             textAreaOutput.setColumns(100);
             textAreaOutput.setImmediate(true);
@@ -57,67 +64,101 @@ public class Terminal implements Module {
 
             setCompositionRoot(verticalLayout);
 
-            Terminal.this.commandManagerService.addListener(this);
+            getCommandManager().addListener(this);
         }
 
         public void buttonClick(Button.ClickEvent event) {
-            for (String agent : AppData.getAgentList()) {
-                Request r = CommandJson.getRequest(textAreaCommand.getValue().toString());
-                r.setUuid(agent);
-                r.setSource("Terminal");
+            try {
+                agents = AppData.getAgentList();
+                if (agents != null && agents.size() > 0) {
+                    for (String agent : agents) {
+                        Request r = CommandJson.getRequest(textAreaCommand.getValue().toString());
+                        r.setUuid(agent);
+                        r.setSource(Terminal.MODULE_NAME);
 
-                Command command = new Command(r);
-                boolean isOk = Terminal.this.commandManagerService.executeCommand(command);
+                        Command command = new Command(r);
+                        getCommandManager().executeCommand(command);
+                    }
+                } else {
+                    getWindow().showNotification("Select agent!");
+                }
+            } catch (Exception ex) {
+                System.out.println("buttonClick event Exception");
+                ex.printStackTrace();
             }
         }
 
         @Override
-        public synchronized void outputCommand(Response response) {
-            System.out.println("");
-            System.out.println(response);
-            System.out.println("");
+        public void outputCommand(Response response) {
+            try{
+                if(response != null && agents != null && agents.contains(response.getUuid())){
+                    System.out.println("");
+                    System.out.println(response);
+                    System.out.println("");
 
-//            textAreaOutput.setReadOnly(false);
+                    StringBuilder output = new StringBuilder();
+                    output.append(textAreaOutput.getValue());
 
-            StringBuilder output = new StringBuilder();
-            output.append(textAreaOutput.getValue());
-
-            if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
-                output.append(response.getStdErr().trim());
+                    if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
+                        output.append("\n");
+                        output.append("ERROR\n");
+                        output.append(response.getStdErr().trim());
+                        output.append("\n");
+                    }
+                    if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
+                        output.append("\n");
+                        output.append("OK\n");
+                        output.append(response.getStdOut().trim());
+                        output.append("\n");
+                    }
+                    textAreaOutput.setValue(output);
+                    textAreaOutput.setCursorPosition(output.length() - 1);
+                }
+            } catch(Exception ex){
+                System.out.println("outputCommand event Exception");
+                ex.printStackTrace();
             }
-            if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                output.append(response.getStdOut().trim());
-            }
-            textAreaOutput.setValue(output);
-//            textAreaOutput.setReadOnly(true);
+
         }
 
         @Override
         public synchronized String getName() {
-            return Terminal.this.getName();
+            return Terminal.MODULE_NAME;
+        }
+
+        private CommandManagerInterface getCommandManager() {
+            ServiceReference reference = context
+                    .getServiceReference(CommandManagerInterface.class.getName());
+            return (CommandManagerInterface) context.getService(reference);
         }
     }
 
     public String getName() {
-        return "Terminal";
+        return Terminal.MODULE_NAME;
     }
 
     public Component createComponent() {
-        return new ModuleComponent();
+        component = new ModuleComponent(context);
+        return component;
+//        return new ModuleComponent(context);
     }
 
     public void setModuleService(ModuleService service) {
         System.out.println("Terminal: registering with ModuleService");
-        this.service = service;
-        this.service.registerModule(this);
+        service.registerModule(this);
     }
 
-    //public void unsetModuleService(ModuleService service) {
     public void unsetModuleService(ModuleService service) {
-        this.service.unregisterModule(this);
+        service.unregisterModule(this);
     }
 
-    public void setCommandManagerService(CommandManagerInterface commandManagerService) {
-        this.commandManagerService = commandManagerService;
+    public void setContext(BundleContext context) {
+        this.context = context;
+    }
+
+    private CommandManagerInterface getCommandManager() {
+        ServiceReference reference = context
+                .getServiceReference(CommandManagerInterface.class.getName());
+        return (CommandManagerInterface) context.getService(reference);
     }
 }

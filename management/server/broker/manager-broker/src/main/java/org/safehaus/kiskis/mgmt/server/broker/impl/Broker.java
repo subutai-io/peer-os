@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.broker.impl;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
@@ -22,7 +21,7 @@ public class Broker implements BrokerInterface {
      * @return
      */
     @Override
-    public synchronized void distributeResponse(Response response) {
+    public void distributeResponse(Response response) {
         Request req = null;
         //TO-DO Distribute response to Agent or Command Bundle
         switch (response.getType()) {
