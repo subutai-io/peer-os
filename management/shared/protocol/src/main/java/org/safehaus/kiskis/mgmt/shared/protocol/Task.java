@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public class Task {
 
     private String uid;
+    private String description;
     private List<Request> requests;
     private List<Response> response;
     private TaskStatus taskStatus;
