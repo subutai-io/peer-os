@@ -15,6 +15,7 @@ import java.util.List;
 public class Task {
 
     private String uid;
+    private String description;
     private List<Request> requests;
     private List<Response> response;
     private TaskStatus taskStatus;
@@ -49,6 +50,14 @@ public class Task {
 
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }
