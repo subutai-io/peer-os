@@ -1,0 +1,8 @@
+<Settings>
+<BrokerIP>172.16.1.125</BrokerIP>
+<Port>61616</Port>
+<reconnect>true</reconnect>
+<reconnect_timeout>10</reconnect_timeout>
+<reconnect_interval_max>10</reconnect_interval_max>
+<log_level>7</log_level>
+</Settings>

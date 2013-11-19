@@ -37,15 +37,16 @@ class KAThread
 public:
 	KAThread();
 	virtual ~KAThread();
-	bool threadFunction(message_queue*,KACommand*,int*);			//Execute command concurrently
+	bool threadFunction(message_queue*,KACommand*,char*[]);			//Execute command concurrently
 	bool checkCWD(KACommand*);
 	bool checkUID(KACommand*);
 	string createExecString(KACommand*);
 	int toInteger(string*);
-	string toString(int);
 	KAUserID& getUserID();
 	KAResponsePack& getResponse();
 	static string getProcessPid(const char*);
+	KALogger& getLogger();
+	void setLogger(KALogger);
 	typedef struct numbers
 	{
 		int *responsecount;
@@ -53,12 +54,13 @@ public:
 		bool *flag;
 		KALogger *logger;
 	};
-	static void taskTimeout(message_queue*,KACommand*,string*,string*,string*,struct numbers*,int* loglevel);
-	static void capture(message_queue*,KACommand*,KAStreamReader*,mutex*,string*,string*,struct numbers*,int*);
-	static void checkAndWrite(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,int*);
-	static void checkAndSend(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,int*);
-	static void lastCheckAndSend(message_queue *,KACommand*,string*,string*,struct numbers*,int*);
-	int optionReadSend(message_queue*,KACommand*,KAStreamReader*,KAStreamReader*,int,int*);
+	static void taskTimeout(message_queue*,KACommand*,string*,string*,string*,struct numbers*,KALogger*);
+	static void capture(message_queue*,KACommand*,KAStreamReader*,mutex*,string*,string*,struct numbers*,KALogger*);
+	static void checkAndWrite(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,KALogger*);
+	static void checkAndSend(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,KALogger*);
+	static void lastCheckAndSend(message_queue *,KACommand*,string*,string*,struct numbers*,KALogger*);
+	int optionReadSend(message_queue*,KACommand*,KAStreamReader*,KAStreamReader*,int);
+	static string toString(int);
 private:
 	KAUserID uid;
 	pid_t pid;
