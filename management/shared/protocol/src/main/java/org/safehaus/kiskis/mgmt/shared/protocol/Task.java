@@ -52,4 +52,12 @@ public class Task {
         this.taskStatus = taskStatus;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }
