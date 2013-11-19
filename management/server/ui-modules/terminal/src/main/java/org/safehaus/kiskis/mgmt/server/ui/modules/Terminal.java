@@ -28,11 +28,11 @@ public class Terminal implements Module {
         private TextArea textAreaCommand;
         private TextArea textAreaOutput;
         private Button buttonSend;
-        private BundleContext context;
         private Set<String> agents;
+        private CommandManagerInterface commandManagerInterface;
 
-        public ModuleComponent(BundleContext context) {
-            this.context = context;
+        public ModuleComponent(CommandManagerInterface commandManagerInterface) {
+            this.commandManagerInterface = commandManagerInterface;
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -63,8 +63,6 @@ public class Terminal implements Module {
             verticalLayout.addComponent(textAreaOutput);
 
             setCompositionRoot(verticalLayout);
-
-            getCommandManager().addListener(this);
         }
 
         public void buttonClick(Button.ClickEvent event) {
@@ -77,7 +75,7 @@ public class Terminal implements Module {
                         r.setSource(Terminal.MODULE_NAME);
 
                         Command command = new Command(r);
-                        getCommandManager().executeCommand(command);
+                        commandManagerInterface.executeCommand(command);
                     }
                 } else {
                     getWindow().showNotification("Select agent!");
@@ -122,14 +120,8 @@ public class Terminal implements Module {
         }
 
         @Override
-        public synchronized String getName() {
+        public String getName() {
             return Terminal.MODULE_NAME;
-        }
-
-        private CommandManagerInterface getCommandManager() {
-            ServiceReference reference = context
-                    .getServiceReference(CommandManagerInterface.class.getName());
-            return (CommandManagerInterface) context.getService(reference);
         }
     }
 
@@ -138,7 +130,10 @@ public class Terminal implements Module {
     }
 
     public Component createComponent() {
-        component = new ModuleComponent(context);
+        CommandManagerInterface commandManagerInterface = getCommandManager();
+        component = new ModuleComponent(commandManagerInterface);
+        commandManagerInterface.addListener(component);
+
         return component;
 //        return new ModuleComponent(context);
     }
@@ -149,6 +144,7 @@ public class Terminal implements Module {
     }
 
     public void unsetModuleService(ModuleService service) {
+        getCommandManager().removeListener(component);
         service.unregisterModule(this);
     }
 

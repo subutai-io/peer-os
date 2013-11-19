@@ -29,11 +29,11 @@ public class CommandManager implements CommandManagerInterface {
 
     @Override
     public void executeCommand(Command command) {
-        try{
+        try {
             if (persistenceCommand.saveCommand(command)) {
                 commandTransport.sendCommand(command);
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -43,11 +43,11 @@ public class CommandManager implements CommandManagerInterface {
         System.out.println("~~~~~~~ Command registered");
         System.out.println(response);
         System.out.println();
-        try{
-            if(persistenceCommand.saveResponse(response)) {
+        try {
+            if (persistenceCommand.saveResponse(response)) {
                 notifyListeners(response);
             }
-        }  catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -55,7 +55,7 @@ public class CommandManager implements CommandManagerInterface {
     private void notifyListeners(Response response) {
         try {
             System.out.println("Количество модулей:" + listeners.size());
-            for (CommandListener ai : listeners) {
+            for (CommandListener ai : (ArrayList<CommandListener>) listeners.clone()) {
                 if (ai != null && ai.getName() != null) {
                     if (ai.getName().equals(response.getSource())) {
                         System.out.println("~~~~~~~ Listeners notified");
@@ -80,19 +80,20 @@ public class CommandManager implements CommandManagerInterface {
 
     @Override
     public synchronized void addListener(CommandListener listener) {
-        try{
+        try {
             System.out.println("Adding module listener : " + listener.getName());
             listeners.add(listener);
-        } catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
     public synchronized void removeListener(CommandListener listener) {
-        try{
+        try {
+            System.out.println("Removing module listener : " + listener.getName());
             listeners.remove(listener);
-        } catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
