@@ -24,15 +24,23 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
     private Cluster cluster;
     private Session session;
     private long requestsequencenumber = 0l;
+    private String cassandraHost;
+    private String cassandraKeyspace;
+    private int cassandraPort;
 
-    public Persistence() {
-        try {
-            System.out.println("Persistence constructor called...");
-            cluster = Cluster.builder().withPort(Common.cassandraPort).addContactPoint(Common.cassandraHost).build();
-            session = cluster.connect(Common.keyspaceName);
-        } catch (Exception e) {
-            System.out.println("can not connect to cassandra.");
-        }
+    public void setCassandraKeyspace(String cassandraKeyspace) {
+        this.cassandraKeyspace = cassandraKeyspace;
+        System.out.println("Settings cassandra keyspace " + cassandraKeyspace);
+    }
+
+    public void setCassandraHost(String cassandraHost) {
+        this.cassandraHost = cassandraHost;
+        System.out.println("Settings cassandra host " + cassandraHost);
+    }
+
+    public void setCassandraPort(int cassandraPort) {
+        this.cassandraPort = cassandraPort;
+        System.out.println("Settings cassandra port " + cassandraPort);
     }
 
     @Override
@@ -72,13 +80,20 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
 
     // TODO Remove this method and reference in blueprint
     public void init() {
-        System.out.println(this.getClass().getName() + " started");
-        LOG.log(Level.INFO, "{0}initializing", this.getClass().getName());
+        System.out.println("Persistence initialized");
+        cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
+        session = cluster.connect(cassandraKeyspace);
     }
 
     public void destroy() {
-        session.shutdown();
-        cluster.shutdown();
+        try {
+            session.shutdown();
+        } catch (Exception e) {
+        }
+        try {
+            cluster.shutdown();
+        } catch (Exception e) {
+        }
         System.out.println(this.getClass().getName() + " stopped");
     }
 

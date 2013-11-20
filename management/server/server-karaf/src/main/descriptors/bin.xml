@@ -23,7 +23,8 @@
                 <exclude>karaf-manual*.pdf</exclude>
                 <exclude>etc/org.apache.karaf.features.cfg</exclude>
                 <exclude>etc/AmqConfig.cfg</exclude>
-                <exclude>etc/CassandraConfig.cfg</exclude>
+                <exclude>etc/CassConfig.cfg</exclude>
+                <exclude>etc/AptRepoConfig.cfg</exclude>
             </excludes>
         </fileSet>
 
