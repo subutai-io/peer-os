@@ -15,7 +15,7 @@ import com.vaadin.ui.TextField;
  */
 public class Step3 extends FormLayout {
 
-    public Step3() {
+    public Step3(final Terminal.ModuleComponent aThis) {
         setCaption("Installation");
         setMargin(true);
 
@@ -26,8 +26,18 @@ public class Step3 extends FormLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                aThis.showNext();
             }
         });
+        Button back = new Button("Back");
+        back.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                aThis.showBack();
+            }
+        });
+        addComponent(back);
         addComponent(next);
 
     }

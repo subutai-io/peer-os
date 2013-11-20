@@ -15,23 +15,33 @@ import com.vaadin.ui.TextField;
  *
  * @author bahadyr
  */
-public class Step43 extends Panel {
-    
-    public Step43() {
-        super("Configuration");
-        addStyleName("panelexample");
-        
-        setWidth(Sizeable.UNITS_PERCENTAGE, 100);
-        
-        final FormLayout form = new FormLayout();
-        
-        form.setMargin(true);
-        
-        form.addComponent(new TextField("Name"));
-        form.addComponent(new TextField("Email"));
+public class Step43 extends FormLayout {
+
+    public Step43(final Terminal.ModuleComponent aThis) {
+        setCaption("Configuration: Choose directories");
+        setMargin(true);
+
+        addComponent(new TextField("Name"));
+        addComponent(new TextField("Email"));
         Button next = new Button("Next");
-        form.addComponent(next);
-        setContent(form);
+        next.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                aThis.showNext();
+            }
+        });
+        Button back = new Button("Back");
+        back.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                aThis.showBack();
+            }
+        });
+        addComponent(back);
+        addComponent(next);
+
     }
-    
+
 }

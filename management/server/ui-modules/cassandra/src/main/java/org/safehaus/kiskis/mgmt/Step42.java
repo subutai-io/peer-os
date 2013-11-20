@@ -15,8 +15,8 @@ import com.vaadin.ui.TextField;
  */
 public class Step42 extends FormLayout {
 
-    public Step42() {
-        setCaption("List nodes");
+    public Step42(final Terminal.ModuleComponent aThis) {
+        setCaption("Configuration: Choose your seeds");
         setMargin(true);
 
         addComponent(new TextField("Name"));
@@ -26,11 +26,20 @@ public class Step42 extends FormLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                aThis.showNext();
             }
         });
+        Button back = new Button("Back");
+        back.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                aThis.showBack();
+            }
+        });
+        addComponent(back);
         addComponent(next);
 
     }
 
 }
-

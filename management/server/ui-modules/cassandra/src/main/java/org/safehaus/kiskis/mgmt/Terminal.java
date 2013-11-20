@@ -72,6 +72,31 @@ public class Terminal implements Module {
                     verticalLayout.addComponent(step2);
                     break;
                 }
+                case 3: {
+                    Step3 step3 = new Step3(this);
+                    verticalLayout.addComponent(step3);
+                    break;
+                }
+                case 4: {
+                    Step41 step41 = new Step41(this);
+                    verticalLayout.addComponent(step41);
+                    break;
+                }
+                case 5: {
+                    Step42 step42 = new Step42(this);
+                    verticalLayout.addComponent(step42);
+                    break;
+                }
+                case 6: {
+                    Step43 step43 = new Step43(this);
+                    verticalLayout.addComponent(step43);
+                    break;
+                }
+                case 7: {
+                    Step5 step5 = new Step5(this);
+                    verticalLayout.addComponent(step5);
+                    break;
+                }
             }
         }
 
