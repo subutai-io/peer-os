@@ -54,6 +54,7 @@ public class Terminal implements Module {
 
         public void showNext() {
             System.out.println("next");
+            
             verticalLayout.removeComponent(step1);
             Step2 step2 = new Step2();
             verticalLayout.addComponent(step2);

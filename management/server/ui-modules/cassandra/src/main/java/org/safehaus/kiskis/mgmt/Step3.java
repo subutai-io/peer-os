@@ -5,33 +5,31 @@
  */
 package org.safehaus.kiskis.mgmt;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 
 /**
  *
  * @author bahadyr
  */
-public class Step3 extends Panel {
+public class Step3 extends FormLayout {
 
     public Step3() {
-        super("Installation");
-        addStyleName("panelexample");
+        setCaption("Installation");
+        setMargin(true);
 
-        setWidth(Sizeable.UNITS_PERCENTAGE, 100);
-
-        final FormLayout form = new FormLayout();
-
-        form.setMargin(true);
-
-        form.addComponent(new TextField("Name"));
-        form.addComponent(new TextField("Email"));
+        addComponent(new TextField("Name"));
+        addComponent(new TextField("Email"));
         Button next = new Button("Next");
-        form.addComponent(next);
-        setContent(form);
+        next.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+            }
+        });
+        addComponent(next);
+
     }
 
 }

@@ -5,10 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 
 /**
