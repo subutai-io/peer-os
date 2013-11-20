@@ -22,6 +22,8 @@
                 <exclude>karaf-manual*.html</exclude>
                 <exclude>karaf-manual*.pdf</exclude>
                 <exclude>etc/org.apache.karaf.features.cfg</exclude>
+                <exclude>etc/AmqConfig.cfg</exclude>
+                <exclude>etc/CassandraConfig.cfg</exclude>
             </excludes>
         </fileSet>
 
