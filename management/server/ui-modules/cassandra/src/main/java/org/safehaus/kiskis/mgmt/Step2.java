@@ -5,19 +5,20 @@
  */
 package org.safehaus.kiskis.mgmt;
 
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Form;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 
 /**
  *
  * @author bahadyr
  */
-public class Step1 extends FormLayout {
+public class Step2 extends FormLayout {
 
-    public Step1(final Terminal.ModuleComponent aThis) {
-        setCaption("Welcome");
+    public Step2() {
+        setCaption("List nodes");
         setMargin(true);
 
         addComponent(new TextField("Name"));
@@ -27,12 +28,10 @@ public class Step1 extends FormLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showNext();
             }
         });
         addComponent(next);
 
     }
-
 
 }

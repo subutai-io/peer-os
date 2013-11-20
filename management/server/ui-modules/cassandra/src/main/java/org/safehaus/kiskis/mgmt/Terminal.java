@@ -21,20 +21,23 @@ public class Terminal implements Module {
     private BundleContext context;
     private static final String name = "Cassandra";
 
-    public static class ModuleComponent extends CustomComponent implements
+    public static final class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
 
         private TextArea textAreaCommand;
         private TextArea textAreaOutput;
         private Button buttonSend;
         private BundleContext context;
+        VerticalLayout verticalLayout;
+        int step = 0;
+        Step1 step1;
 
         public ModuleComponent(BundleContext context) {
             this.context = context;
 
-            VerticalLayout verticalLayout = new VerticalLayout();
+            verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
-            Step1 step1 = new Step1();
+            step1 = new Step1(this);
 
             verticalLayout.addComponent(step1);
 
@@ -49,6 +52,14 @@ public class Terminal implements Module {
             }
         }
 
+        public void showNext() {
+            System.out.println("next");
+            verticalLayout.removeComponent(step1);
+            Step2 step2 = new Step2();
+            verticalLayout.addComponent(step2);
+        }
+
+        @Override
         public void buttonClick(Button.ClickEvent event) {
             Set<String> agents = AppData.getAgentList();
             if (agents != null && agents.size() > 0) {
