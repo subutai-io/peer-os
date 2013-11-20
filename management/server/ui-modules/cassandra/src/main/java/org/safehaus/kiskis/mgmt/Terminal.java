@@ -97,6 +97,12 @@ public class Terminal implements Module {
                     verticalLayout.addComponent(step5);
                     break;
                 }
+                default: {
+                    step = 1;
+                    Step1 step1 = new Step1(this);
+                    verticalLayout.addComponent(step1);
+                    break;
+                }
             }
         }
 
