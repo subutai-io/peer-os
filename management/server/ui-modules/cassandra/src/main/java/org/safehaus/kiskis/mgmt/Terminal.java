@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt;
 
-
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -35,31 +34,9 @@ public class Terminal implements Module {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
+            Step1 step1 = new Step1();
 
-            Label labelText = new Label("Enter command:");
-            textAreaCommand = new TextArea();
-            textAreaCommand.setRows(20);
-            textAreaCommand.setColumns(100);
-            textAreaCommand.setImmediate(true);
-            textAreaCommand.setWordwrap(true);
-
-            verticalLayout.addComponent(labelText);
-            verticalLayout.addComponent(textAreaCommand);
-
-            buttonSend = new Button("Send");
-            buttonSend.setDescription("Sends command to agent");
-            buttonSend.addListener(this); // react to clicks
-            verticalLayout.addComponent(buttonSend);
-
-            Label labelOutput = new Label("Commands output");
-            textAreaOutput = new TextArea();
-            textAreaOutput.setRows(20);
-            textAreaOutput.setColumns(100);
-            textAreaOutput.setImmediate(true);
-            textAreaOutput.setWordwrap(false);
-
-            verticalLayout.addComponent(labelOutput);
-            verticalLayout.addComponent(textAreaOutput);
+            verticalLayout.addComponent(step1);
 
             setCompositionRoot(verticalLayout);
 
