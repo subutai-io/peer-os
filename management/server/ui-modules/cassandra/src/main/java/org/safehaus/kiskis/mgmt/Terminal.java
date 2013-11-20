@@ -29,18 +29,14 @@ public class Terminal implements Module {
         private Button buttonSend;
         private BundleContext context;
         VerticalLayout verticalLayout;
-        int step = 0;
-        Step1 step1;
+        int step = 1;
 
         public ModuleComponent(BundleContext context) {
             this.context = context;
 
             verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
-            step1 = new Step1(this);
-
-            verticalLayout.addComponent(step1);
-
+            putForm();
             setCompositionRoot(verticalLayout);
 
             try {
@@ -53,15 +49,30 @@ public class Terminal implements Module {
         }
 
         public void showNext() {
-            System.out.println("next");
-            
-            verticalLayout.removeComponent(step1);
-            Step2 step2 = new Step2();
-            verticalLayout.addComponent(step2);
+            step++;
+            putForm();
         }
-        
+
         public void showBack() {
-            
+            step--;
+            putForm();
+        }
+
+        private void putForm() {
+            verticalLayout.removeAllComponents();
+            System.out.println(step);
+            switch (step) {
+                case 1: {
+                    Step1 step1 = new Step1(this);
+                    verticalLayout.addComponent(step1);
+                    break;
+                }
+                case 2: {
+                    Step2 step2 = new Step2(this);
+                    verticalLayout.addComponent(step2);
+                    break;
+                }
+            }
         }
 
         @Override
