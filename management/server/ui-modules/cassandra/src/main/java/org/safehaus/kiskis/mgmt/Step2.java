@@ -28,6 +28,15 @@ public class Step2 extends FormLayout {
             public void buttonClick(Button.ClickEvent event) {
             }
         });
+        Button back = new Button("Back");
+        next.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+
+            }
+        });
+        addComponent(back);
         addComponent(next);
 
     }

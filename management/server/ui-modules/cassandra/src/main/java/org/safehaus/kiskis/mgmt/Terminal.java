@@ -59,6 +59,10 @@ public class Terminal implements Module {
             Step2 step2 = new Step2();
             verticalLayout.addComponent(step2);
         }
+        
+        public void showBack() {
+            
+        }
 
         @Override
         public void buttonClick(Button.ClickEvent event) {
