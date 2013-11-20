@@ -19,19 +19,29 @@ import java.util.logging.Logger;
  */
 public class AptRepoExposer {
 
-    Server server;
+    private Server server;
+    private String aptRepoPath;
+    private int aptRepoPort;
+
+    public void setAptRepoPath(String aptRepoPath) {
+        this.aptRepoPath = aptRepoPath;
+    }
+
+    public void setAptRepoPort(int aptRepoPort) {
+        this.aptRepoPort = aptRepoPort;
+    }
 
     public void init() {
         if (server == null) {
             try {
                 server = new Server();
                 SelectChannelConnector connector = new SelectChannelConnector();
-                connector.setPort(Common.APT_REPO_EXPOSER_PORT);
+                connector.setPort(aptRepoPort);
                 server.addConnector(connector);
 
                 ResourceHandler resource_handler = new ResourceHandler();
                 resource_handler.setDirectoriesListed(true);
-                resource_handler.setResourceBase(Common.APT_REPO_PATH);
+                resource_handler.setResourceBase(aptRepoPath);
 
                 HandlerList handlers = new HandlerList();
                 handlers.setHandlers(new Handler[]{resource_handler});
