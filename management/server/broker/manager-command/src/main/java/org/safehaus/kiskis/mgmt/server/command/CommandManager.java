@@ -44,26 +44,31 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
                 persistenceCommand.saveResponse(response);
+                notifyListeners(response);
                 break;
             }
             case EXECUTE_RESPONSE_DONE: {
                 persistenceCommand.saveResponse(response);
+                notifyListeners(response);
                 break;
             }
             default: {
                 break;
             }
         }
-        notifyListeners(response);
     }
 
     private void notifyListeners(Response response) {
         try {
             System.out.println("Количество модулей:" + listeners.size());
             for (CommandListener ai : (ArrayList<CommandListener>) listeners.clone()) {
-                if (ai != null && ai.getName() != null) {
+                if (ai != null && ai.getName() != null && response.getSource() != null) {
                     if (ai.getName().equals(response.getSource())) {
                         System.out.println("~~~~~~~ Listeners notified");
+                        ai.outputCommand(response);
+                    }
+                    if(response.getSource() == null){
+                        System.out.println("~~~~~~~ Source null");
                         ai.outputCommand(response);
                     }
                 } else {

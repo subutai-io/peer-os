@@ -51,6 +51,7 @@ public class CommunicationMessageListener implements MessageListener {
                 }
             }
         } catch (Exception ex) {
+            System.out.println("Notify listener");
             ex.printStackTrace();
         }
     }

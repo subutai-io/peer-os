@@ -53,7 +53,11 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
         agent.setMacAddress(response.getMacAddress());
-        agent.setIsLXC(response.isIsLxc());
+        if (response.isIsLxc() == null) {
+            agent.setIsLXC(false);
+        } else {
+            agent.setIsLXC(response.isIsLxc());
+        }
         agent.setListIP(response.getIps());
 
         if (persistenceAgent.saveAgent(agent)) {
@@ -115,7 +119,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void init() {
         try {
-            if(getCommandTransport() != null){
+            if (getCommandTransport() != null) {
                 getCommandTransport().addListener(this);
             }
         } catch (Exception ex) {
@@ -125,7 +129,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void destroy() {
         try {
-            if(getCommandTransport() != null){
+            if (getCommandTransport() != null) {
                 getCommandTransport().removeListener(this);
             }
         } catch (Exception ex) {
@@ -147,10 +151,10 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     private CommandTransportInterface getCommandTransport() {
-        if(context != null){
+        if (context != null) {
             ServiceReference reference = context
                     .getServiceReference(CommandTransportInterface.class.getName());
-            if(reference != null){
+            if (reference != null) {
                 return (CommandTransportInterface) context.getService(reference);
             }
         }
