@@ -29,15 +29,19 @@ public class Terminal implements Module {
         private Button buttonSend;
         private BundleContext context;
         VerticalLayout verticalLayout;
+        Panel panel;
         int step = 1;
 
         public ModuleComponent(BundleContext context) {
             this.context = context;
-
+            panel = new Panel();
+            panel.setWidth("400px");
+            panel.setHeight("500px");
             verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
             putForm();
-            setCompositionRoot(verticalLayout);
+            panel.setContent(verticalLayout);
+            setCompositionRoot(panel);
 
             try {
                 System.out.println("~~~~~~~~~~~~~~~~~~~~");

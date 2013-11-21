@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 
 /**
  *
@@ -19,9 +19,14 @@ public class Step1 extends FormLayout {
         setCaption("Welcome");
         setMargin(true);
 
-        Label l = new Label();
-        l.setCaption("Welcome Cassandra installation wizard. Please follow the steps carefully. When you are finished the wizard, you will have complete working cassandra servers. ");
-        addComponent(l);
+        Panel panel = new Panel();
+        panel.setWidth("300px");
+        panel.setCaption("Welcome Cassandra installation wizard. "
+                + "Please follow the steps carefully. "
+                + "When you are finished the wizard, you will have complete "
+                + "working cassandra servers. ");
+        
+        addComponent(panel);
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
