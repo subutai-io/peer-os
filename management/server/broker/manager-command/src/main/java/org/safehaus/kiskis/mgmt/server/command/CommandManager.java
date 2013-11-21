@@ -43,9 +43,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
-                if (persistenceCommand.saveResponse(response)) {
-                    notifyListeners(response);
-                }
+                persistenceCommand.saveResponse(response);
                 break;
             }
             case EXECUTE_RESPONSE_DONE: {
@@ -56,6 +54,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                 break;
             }
         }
+        notifyListeners(response);
     }
 
     private void notifyListeners(Response response) {
