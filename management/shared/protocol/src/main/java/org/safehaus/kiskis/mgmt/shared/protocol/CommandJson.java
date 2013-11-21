@@ -21,6 +21,7 @@ public class CommandJson {
                 return (Request) cmd.command;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
@@ -34,6 +35,7 @@ public class CommandJson {
                 return (Response) cmd.response;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return null;

@@ -70,17 +70,33 @@ public class Terminal implements Module {
                 agents = AppData.getAgentList();
                 if (agents != null && agents.size() > 0) {
                     for (String agent : agents) {
-                        Request r = CommandJson.getRequest(textAreaCommand.getValue().toString());
-                        r.setUuid(agent);
-                        r.setSource(Terminal.MODULE_NAME);
+                        String json = textAreaCommand.getValue().toString().trim();
+                        json = json.replaceAll(" ", "").replaceAll("\n", "")
+                                .replaceAll("\t", "")
+                                .replaceAll("\r", "")
+                                .replaceAll("\u2002", "");
+                        Request r = CommandJson.getRequest(json);
 
-                        Command command = new Command(r);
-                        commandManagerInterface.executeCommand(command);
+                        System.out.println();
+                        for (char c : json.toCharArray()) {
+                            System.out.print((int) c);
+                            System.out.print(" " + c + "\t");
+                        }
+                        System.out.println();
+
+                        if (r != null) {
+                            r.setUuid(agent);
+                            r.setSource(Terminal.MODULE_NAME);
+
+                            Command command = new Command(r);
+                            commandManagerInterface.executeCommand(command);
+                        }
                     }
                 } else {
                     getWindow().showNotification("Select agent!");
                 }
             } catch (Exception ex) {
+                getWindow().showNotification(ex.toString());
                 System.out.println("buttonClick event Exception");
                 ex.printStackTrace();
             }
