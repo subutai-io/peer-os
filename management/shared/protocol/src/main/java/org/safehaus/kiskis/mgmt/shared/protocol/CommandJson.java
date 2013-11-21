@@ -16,7 +16,7 @@ public class CommandJson {
 
     public static Request getRequest(String json) {
         try {
-            Command cmd = gson.fromJson(json, Command.class);
+            Command cmd = gson.fromJson(json.replaceAll("\u2002", ""), Command.class);
             if (cmd.command != null) {
                 return (Request) cmd.command;
             }
@@ -30,7 +30,7 @@ public class CommandJson {
 
     public static Response getResponse(String json) {
         try {
-            Command cmd = gson.fromJson(json, Command.class);
+            Command cmd = gson.fromJson(json.replaceAll("\u2002", ""), Command.class);
             if (cmd.response != null) {
                 return (Response) cmd.response;
             }
