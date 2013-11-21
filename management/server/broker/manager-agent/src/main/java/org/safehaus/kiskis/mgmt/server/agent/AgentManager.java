@@ -115,7 +115,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void init() {
         try {
-            getCommandTransport().addListener(this);
+            if(getCommandTransport() != null){
+                getCommandTransport().addListener(this);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -123,7 +125,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void destroy() {
         try {
-            getCommandTransport().removeListener(this);
+            if(getCommandTransport() != null){
+                getCommandTransport().removeListener(this);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -143,8 +147,14 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     private CommandTransportInterface getCommandTransport() {
-        ServiceReference reference = context
-                .getServiceReference(CommandTransportInterface.class.getName());
-        return (CommandTransportInterface) context.getService(reference);
+        if(context != null){
+            ServiceReference reference = context
+                    .getServiceReference(CommandTransportInterface.class.getName());
+            if(reference != null){
+                return (CommandTransportInterface) context.getService(reference);
+            }
+        }
+
+        return null;
     }
 }

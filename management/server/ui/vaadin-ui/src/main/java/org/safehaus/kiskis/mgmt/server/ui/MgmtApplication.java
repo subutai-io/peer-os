@@ -15,6 +15,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     private ModuleService moduleService;
     private AgentManagerInterface agentManagerService;
+    private Window window;
 
     public MgmtApplication(String title, ModuleService moduleService, AgentManagerInterface agentManagerService) {
         this.moduleService = moduleService;
@@ -27,13 +28,14 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void init() {
+        window = new Window(title);
         // Create the application data instance
         AppData sessionData = new AppData(this);
 
         // Register it as a listener in the application context
         getContext().addTransactionListener(sessionData);
 
-        setMainWindow(new Window(title));
+        setMainWindow(window);
 
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
@@ -58,13 +60,27 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         setTheme("runo");
 
         moduleService.addListener(this);
-        getMainWindow().executeJavaScript("setInterval(function() { javascript:vaadin.forceSync(); }, 5000);");
+        getMainWindow().addListener(new Window.CloseListener() {
+            @Override
+            public void windowClose(Window.CloseEvent e) {
+                // Do something.
+                System.out.println(e.getWindow().getName() +
+                        " was closed");
+            }
+        });
+        getMainWindow().executeJavaScript("function refreshMe() { javascript:vaadin.forceSync(); setTimeout(refreshMe, 5000); }; setTimeout(refreshMe, 5000);");
     }
 
     @Override
     public void close() {
         System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
-        moduleService.removeListener(this);
+//        try{
+//            if(moduleService != null){
+//                moduleService.removeListener(this);
+//            }
+//        } catch (Exception ex){
+//            ex.printStackTrace();
+//        }
         super.close();
     }
 

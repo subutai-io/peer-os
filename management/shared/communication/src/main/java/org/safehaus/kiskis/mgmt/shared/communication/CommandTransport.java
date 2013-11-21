@@ -137,6 +137,7 @@ public class CommandTransport implements CommandTransportInterface {
     public void destroy() {
         try {
             broker.stop();
+            communicationMessageListener.destroy();
             System.out.println("ActiveMQ stopped...");
         } catch (Exception ex) {
             System.out.println(ex.toString());

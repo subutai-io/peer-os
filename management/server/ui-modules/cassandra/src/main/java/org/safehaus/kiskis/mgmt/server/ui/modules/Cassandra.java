@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules;
 
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -67,7 +68,7 @@ public class Cassandra implements Module {
     }
 
     public Component createComponent() {
-        CommandManagerInterface commandManagerInterface = getCommandManager();
+        CommandManagerInterface commandManagerInterface = getService();
         component = new ModuleComponent(commandManagerInterface);
         commandManagerInterface.addListener(component);
 
@@ -81,7 +82,9 @@ public class Cassandra implements Module {
     }
 
     public void unsetModuleService(ModuleService service) {
-        getCommandManager().removeListener(component);
+        if (getCommandManager() != null) {
+            getCommandManager().removeListener(component);
+        }
         service.unregisterModule(this);
     }
 
@@ -90,8 +93,21 @@ public class Cassandra implements Module {
     }
 
     private CommandManagerInterface getCommandManager() {
-        ServiceReference reference = context
-                .getServiceReference(CommandManagerInterface.class.getName());
-        return (CommandManagerInterface) context.getService(reference);
+        if (context != null) {
+            ServiceReference reference = context
+                    .getServiceReference(CommandManagerInterface.class.getName());
+            if (reference != null) {
+                return (CommandManagerInterface) context.getService(reference);
+            }
+        }
+
+        return null;
+    }
+
+    public CommandManagerInterface getService() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(Cassandra.class).getBundleContext();
+        ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+        return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
     }
 }

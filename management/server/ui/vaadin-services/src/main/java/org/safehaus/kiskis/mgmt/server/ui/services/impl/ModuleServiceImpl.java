@@ -17,18 +17,26 @@ public class ModuleServiceImpl implements ModuleService {
     @SuppressWarnings("unchecked")
     public synchronized void registerModule(Module module) {
         System.out.println("ModuleServiceImpl: Registering module " + module);
-        modules.add(module);
-        for (ModuleServiceListener listener : (ArrayList<ModuleServiceListener>) listeners.clone()) {
-            listener.moduleRegistered(this, module);
+        try {
+            modules.add(module);
+            for (ModuleServiceListener listener : (ArrayList<ModuleServiceListener>) listeners.clone()) {
+                listener.moduleRegistered(this, module);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
     @SuppressWarnings("unchecked")
     public synchronized void unregisterModule(Module module) {
         System.out.println("ModuleServiceImpl: Unregistering module " + module);
-        modules.remove(module);
-        for (ModuleServiceListener listener : (ArrayList<ModuleServiceListener>) listeners.clone()) {
-            listener.moduleUnregistered(this, module);
+        try {
+            modules.remove(module);
+            for (ModuleServiceListener listener : (ArrayList<ModuleServiceListener>) listeners.clone()) {
+                listener.moduleUnregistered(this, module);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -38,13 +46,21 @@ public class ModuleServiceImpl implements ModuleService {
 
     public synchronized void addListener(ModuleServiceListener listener) {
         System.out.println("ModuleServiceImpl: Adding listener " + listener);
-        listeners.add(listener);
+        try {
+            listeners.add(listener);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public synchronized void removeListener(ModuleServiceListener listener) {
-        System.out.println("ModuleServiceImpl: Removing listener " + listener);
-        listeners.remove(listener);
+        if(listener !=null){
+            System.out.println("ModuleServiceImpl: Removing listener " + listener);
+            try {
+                listeners.remove(listener);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
-
-
 }

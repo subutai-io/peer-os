@@ -70,4 +70,10 @@ public class CommunicationMessageListener implements MessageListener {
             ex.printStackTrace();
         }
     }
+
+    public void destroy(){
+        if(listeners != null){
+            listeners.clear();
+        }
+    }
 }
