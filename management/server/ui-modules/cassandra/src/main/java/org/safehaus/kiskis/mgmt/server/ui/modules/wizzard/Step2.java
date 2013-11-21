@@ -72,6 +72,7 @@ public class Step2 extends Panel {
         Button next = new Button("Install");
         next.addListener(new Button.ClickListener() {
 
+            @Override
             public void buttonClick(Button.ClickEvent event) {
                 aThis.showNext();
             }
@@ -79,6 +80,7 @@ public class Step2 extends Panel {
         Button back = new Button("Back");
         back.addListener(new Button.ClickListener() {
 
+            @Override
             public void buttonClick(Button.ClickEvent event) {
                 aThis.showBack();
             }
