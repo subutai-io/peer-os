@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 
 /**
@@ -19,8 +20,12 @@ public class Step2 extends FormLayout {
         setCaption("List nodes");
         setMargin(true);
 
-        addComponent(new TextField("Name"));
-        addComponent(new TextField("Email"));
+        addComponent(new Label("Please enter the list of hosts to be included in the cluster"));
+        addComponent(new Label("Target hosts"));
+        addComponent(new Label("Enter a list of hosts "));
+        
+        
+        
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
