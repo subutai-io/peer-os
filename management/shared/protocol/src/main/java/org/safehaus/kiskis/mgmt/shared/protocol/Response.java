@@ -26,13 +26,13 @@ public class Response {
     public String macAddress;
     public String hostname;
     public List<String> ips;
-    public boolean isLxc;
+    public Boolean isLxc;
 
-    public boolean isIsLxc() {
+    public Boolean isIsLxc() {
         return isLxc;
     }
 
-    public void setIsLxc(boolean isLxc) {
+    public void setIsLxc(Boolean isLxc) {
         this.isLxc = isLxc;
     }
 

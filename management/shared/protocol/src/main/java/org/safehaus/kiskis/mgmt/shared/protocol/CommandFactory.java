@@ -38,7 +38,7 @@ public class CommandFactory {
         return new Command(req);
     }
 
-    public static CommandInterface createResponse(ResponseType type, String uuid, String source, String taskUuid, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid, String macAddress, String hostname, List<String> ips, boolean isLxc) {
+    public static CommandInterface createResponse(ResponseType type, String uuid, String source, String taskUuid, Integer exitCode, String stdOut, String stdErr, Long reqSeqNum, Long resSeqnum, Integer pid, String macAddress, String hostname, List<String> ips, Boolean isLxc) {
         Response res = new Response();
         res.setSource(source);
         res.setType(type);
