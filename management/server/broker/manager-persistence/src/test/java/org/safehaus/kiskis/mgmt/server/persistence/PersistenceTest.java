@@ -65,7 +65,7 @@ public class PersistenceTest {
         System.out.println("saveAgent");
         Agent agent = new Agent();
         agent.setHostname("hostname");
-        agent.setLXC(true);
+        agent.setIsLXC(true);
         List<String> listip = new ArrayList<String>();
         listip.add("0.0.0.0");
         agent.setListIP(listip);
@@ -100,21 +100,6 @@ public class PersistenceTest {
         System.out.println("destroy");
         Persistence instance = new Persistence();
         instance.destroy();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getCommandList method, of class Persistence.
-     */
-//    @Test
-    public void testGetCommandList() {
-        System.out.println("getCommandList");
-        Agent agent = null;
-        Persistence instance = new Persistence();
-        List<Command> expResult = null;
-        List<Command> result = instance.getCommandList(agent);
-        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -180,5 +165,4 @@ public class PersistenceTest {
         boolean result = instance.saveResponse(response);
         assertEquals(expResult, result);
     }
-
 }

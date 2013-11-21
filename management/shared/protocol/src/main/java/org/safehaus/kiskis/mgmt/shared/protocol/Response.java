@@ -17,6 +17,7 @@ public class Response {
     private ResponseType type;
     private Integer exitCode; //might be null if not final response chunk
     private String uuid;
+    private String taskUuid;
     private Long requestSequenceNumber;
     private Long responseSequenceNumber;
     private String stdOut;
@@ -25,6 +26,23 @@ public class Response {
     public String macAddress;
     public String hostname;
     public List<String> ips;
+    public boolean isLxc;
+
+    public boolean isIsLxc() {
+        return isLxc;
+    }
+
+    public void setIsLxc(boolean isLxc) {
+        this.isLxc = isLxc;
+    }
+
+    public String getTaskUuid() {
+        return taskUuid;
+    }
+
+    public void setTaskUuid(String taskUuid) {
+        this.taskUuid = taskUuid;
+    }
 
     public List<String> getIps() {
         return ips;
@@ -124,19 +142,6 @@ public class Response {
 
     @Override
     public String toString() {
-        return "Response{" +
-                "source='" + source + '\'' +
-                ", type=" + type +
-                ", exitCode=" + exitCode +
-                ", uuid='" + uuid + '\'' +
-                ", requestSequenceNumber=" + requestSequenceNumber +
-                ", responseSequenceNumber=" + responseSequenceNumber +
-                ", stdOut='" + stdOut + '\'' +
-                ", stdErr='" + stdErr + '\'' +
-                ", pid=" + pid +
-                ", macAddress='" + macAddress + '\'' +
-                ", hostname='" + hostname + '\'' +
-                ", ips=" + ips +
-                '}';
+        return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", ips=" + ips + ", isLxc=" + isLxc + '}';
     }
 }

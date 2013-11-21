@@ -39,6 +39,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 saveAgent(response);
                 break;
             }
+            case HEARTBEAT_RESPONSE: {
+                updateAgent(response);
+            }
             default: {
                 break;
             }
@@ -50,7 +53,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
         agent.setMacAddress(response.getMacAddress());
-        agent.setListIP(response.ips);
+        agent.setIsLXC(response.isIsLxc());
+        agent.setListIP(response.getIps());
 
         if (persistenceAgent.saveAgent(agent)) {
 
@@ -69,6 +73,21 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             System.out.println(agent + "Agent is registered");
         } else {
             System.out.println(agent + "Error registering agent");
+        }
+    }
+
+    private void updateAgent(Response response) {
+        Agent agent = new Agent();
+        agent.setUuid(response.getUuid());
+        agent.setHostname(response.getHostname());
+        agent.setMacAddress(response.getMacAddress());
+        agent.setIsLXC(response.isIsLxc());
+        agent.setListIP(response.getIps());
+
+        if (persistenceAgent.updateAgent(agent)) {
+            System.out.println(agent + "Agent is updated");
+        } else {
+            System.out.println(agent + "Error updating agent");
         }
     }
 

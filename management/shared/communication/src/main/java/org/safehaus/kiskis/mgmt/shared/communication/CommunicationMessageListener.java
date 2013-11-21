@@ -31,7 +31,9 @@ public class CommunicationMessageListener implements MessageListener {
         TextMessage txtMsg = (TextMessage) message;
         try {
             String jsonCmd = txtMsg.getText();
+//            System.out.println("Received:" + jsonCmd);
             Response response = CommandJson.getResponse(jsonCmd);
+//            System.out.println("Response: " + response);
 
             notifyListeners(response);
         } catch (JMSException ex) {

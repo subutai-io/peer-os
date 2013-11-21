@@ -15,8 +15,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  */
 public interface PersistenceInterface {
 
-    //Commands section
-    List<Command> getCommandList(Agent agent);
+//    //Commands section
+//    List<Command> getCommandList(Agent agent);
 
     boolean saveCommand(Command command);
 

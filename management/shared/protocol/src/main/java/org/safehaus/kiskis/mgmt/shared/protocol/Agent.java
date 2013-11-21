@@ -1,17 +1,36 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import java.util.Date;
 import java.util.List;
 
 /**
- * Used to define a physical host on the whole network. It could be management server or the agent.
- * It just defines a host in the network.
+ * Used to define a physical host on the whole network. It could be management
+ * server or the agent. It just defines a host in the network.
  */
 public class Agent {
+
     private String uuid;
     private String macAddress;
     private String hostname;
     private List<String> listIP;
     private boolean isLXC;
+    private Date lastHeartbeat;
+
+    public boolean isIsLXC() {
+        return isLXC;
+    }
+
+    public void setIsLXC(boolean isLXC) {
+        this.isLXC = isLXC;
+    }
+
+    public Date getLastHeartbeat() {
+        return lastHeartbeat;
+    }
+
+    public void setLastHeartbeat(Date lastHeartbeat) {
+        this.lastHeartbeat = lastHeartbeat;
+    }
 
     public String getUuid() {
         return uuid;
@@ -45,33 +64,25 @@ public class Agent {
         this.listIP = listIP;
     }
 
-    public boolean isLXC() {
-        return isLXC;
-    }
-
-    public void setLXC(boolean LXC) {
-        isLXC = LXC;
-    }
-
     @Override
     public String toString() {
-        return "Agent{" +
-                "uuid='" + uuid + '\'' +
-                ", mac='" + macAddress + '\'' +
-                ", hostname='" + hostname + '\'' +
-                ", listIP=" + listIP +
-                ", isLXC=" + isLXC +
-                '}';
+        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP=" + listIP + ", isLXC=" + isLXC + ", lastHeartbeat=" + lastHeartbeat + '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Agent agent = (Agent) o;
 
-        if (uuid != null ? !uuid.equals(agent.uuid) : agent.uuid != null) return false;
+        if (uuid != null ? !uuid.equals(agent.uuid) : agent.uuid != null) {
+            return false;
+        }
 
         return true;
     }

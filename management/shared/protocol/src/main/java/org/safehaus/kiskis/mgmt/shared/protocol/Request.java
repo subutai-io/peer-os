@@ -14,21 +14,30 @@ import java.util.Map;
  */
 public class Request {
 
-    private String source;
-    private RequestType type;
-    private String uuid;
-    private Long requestSequenceNumber;
-    private String workingDirectory;
-    private String program;
-    private OutputRedirection stdOut;
-    private OutputRedirection stdErr;
-    private String stdOutPath;
-    private String stdErrPath;
-    private String runAs;
-    private List<String> args;
-    private Map<String, String> environment;
-    private Integer pid;
-    private Long timeout;
+    private String source = null;
+    private RequestType type = null;
+    private String uuid = null;
+    private String taskUuid = null;
+    private Long requestSequenceNumber = null;
+    private String workingDirectory = null;
+    private String program = null;
+    private OutputRedirection stdOut = null;
+    private OutputRedirection stdErr = null;
+    private String stdOutPath = null;
+    private String stdErrPath = null;
+    private String runAs = null;
+    private List<String> args = null;
+    private Map<String, String> environment = null;
+    private Integer pid = null;
+    private Long timeout = null;
+
+    public String getTaskUuid() {
+        return taskUuid;
+    }
+
+    public void setTaskUuid(String taskUuid) {
+        this.taskUuid = taskUuid;
+    }
 
     public String getSource() {
         return source;
@@ -152,22 +161,6 @@ public class Request {
 
     @Override
     public String toString() {
-        return "Request{" +
-                "source='" + source + '\'' +
-                ", type=" + type +
-                ", uuid='" + uuid + '\'' +
-                ", requestSequenceNumber=" + requestSequenceNumber +
-                ", workingDirectory='" + workingDirectory + '\'' +
-                ", program='" + program + '\'' +
-                ", stdOut=" + stdOut +
-                ", stdErr=" + stdErr +
-                ", stdOutPath='" + stdOutPath + '\'' +
-                ", stdErrPath='" + stdErrPath + '\'' +
-                ", runAs='" + runAs + '\'' +
-                ", args=" + args +
-                ", environment=" + environment +
-                ", pid=" + pid +
-                ", timeout=" + timeout +
-                '}';
+        return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment + ", pid=" + pid + ", timeout=" + timeout + '}';
     }
 }
