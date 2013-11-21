@@ -109,6 +109,9 @@ public class Terminal implements Module {
                         output.append(response.getStdOut().trim());
                         output.append("\n");
                     }
+                    if(response != null){
+                        output.append(response.toString());
+                    }
                     textAreaOutput.setValue(output);
                     textAreaOutput.setCursorPosition(output.length() - 1);
                 }
