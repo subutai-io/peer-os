@@ -37,7 +37,6 @@ public class CassandraWizard extends Window {
 
     private void putForm() {
         verticalLayout.removeAllComponents();
-        System.out.println(step);
         switch (step) {
             case 1: {
                 Step1 step1 = new Step1(this);
