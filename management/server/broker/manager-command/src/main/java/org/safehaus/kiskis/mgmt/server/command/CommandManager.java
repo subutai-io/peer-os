@@ -27,7 +27,6 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 //        System.out.println(agent.toString());
 //        return null;
 //    }
-
     @Override
     public void executeCommand(Command command) {
         try {
@@ -42,6 +41,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     @Override
     public synchronized void getCommand(Response response) {
         switch (response.getType()) {
+            case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
                 if (persistenceCommand.saveResponse(response)) {
                     notifyListeners(response);
