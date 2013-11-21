@@ -13,6 +13,7 @@ import java.util.Iterator;
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener {
 
+    private ModuleServiceListener app;
     private ModuleService moduleService;
     private AgentManagerInterface agentManagerService;
     private Window window;
@@ -28,6 +29,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void init() {
+        app = this;
         window = new Window(title);
         // Create the application data instance
         AppData sessionData = new AppData(this);
@@ -63,9 +65,13 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         getMainWindow().addListener(new Window.CloseListener() {
             @Override
             public void windowClose(Window.CloseEvent e) {
-                // Do something.
-                System.out.println(e.getWindow().getName() +
-                        " was closed");
+                try {
+                    if (moduleService != null) {
+                        moduleService.removeListener(app);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         getMainWindow().executeJavaScript("function refreshMe() { javascript:vaadin.forceSync(); setTimeout(refreshMe, 5000); }; setTimeout(refreshMe, 5000);");
@@ -74,13 +80,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     @Override
     public void close() {
         System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
-//        try{
-//            if(moduleService != null){
-//                moduleService.removeListener(this);
-//            }
-//        } catch (Exception ex){
-//            ex.printStackTrace();
-//        }
         super.close();
     }
 
