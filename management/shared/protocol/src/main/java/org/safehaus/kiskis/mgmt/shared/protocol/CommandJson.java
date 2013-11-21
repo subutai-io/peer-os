@@ -15,26 +15,38 @@ public class CommandJson {
     private static Gson gson = new Gson();
 
     public static Request getRequest(String json) {
-        Command cmd = gson.fromJson(json, Command.class);
-        if (cmd.command != null) {
-            return (Request) cmd.command;
+        try {
+            Command cmd = gson.fromJson(json, Command.class);
+            if (cmd.command != null) {
+                return (Request) cmd.command;
+            }
+        } catch (Exception e) {
         }
+
 
         return null;
     }
 
     public static Response getResponse(String json) {
-        Command cmd = gson.fromJson(json, Command.class);
-        if (cmd.response != null) {
-            return (Response) cmd.response;
+        try {
+            Command cmd = gson.fromJson(json, Command.class);
+            if (cmd.response != null) {
+                return (Response) cmd.response;
+            }
+        } catch (Exception e) {
         }
+
         return null;
     }
 
     public static String getJson(CommandInterface cmd) {
-        return gson.toJson(cmd);
-    }
+        try {
 
+            return gson.toJson(cmd);
+        } catch (Exception e) {
+        }
+        return null;
+    }
 //    public static String getJson(Request request) {
 //        return gson.toJson(request);
 //    }
