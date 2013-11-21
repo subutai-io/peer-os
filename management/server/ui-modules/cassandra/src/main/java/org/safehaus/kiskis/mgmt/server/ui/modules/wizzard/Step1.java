@@ -19,7 +19,7 @@ public class Step1 extends Panel {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.setHeight(600, Sizeable.UNITS_PIXELS);
+        verticalLayout.setHeight(400, Sizeable.UNITS_PIXELS);
         verticalLayout.setMargin(true);
 
         GridLayout grid = new GridLayout(6, 10);

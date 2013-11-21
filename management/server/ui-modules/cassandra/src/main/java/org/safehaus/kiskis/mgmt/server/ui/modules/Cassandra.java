@@ -42,6 +42,7 @@ public class Cassandra implements Module {
             setCompositionRoot(verticalLayout);
         }
 
+        @Override
         public void buttonClick(Button.ClickEvent event) {
             getApplication().getMainWindow().addWindow(subwindow);
         }
@@ -63,10 +64,12 @@ public class Cassandra implements Module {
         }
     }
 
+    @Override
     public String getName() {
         return Cassandra.MODULE_NAME;
     }
 
+    @Override
     public Component createComponent() {
         CommandManagerInterface commandManagerInterface = getService();
         component = new ModuleComponent(commandManagerInterface);
