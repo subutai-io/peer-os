@@ -1,18 +1,21 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
+import java.util.List;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-import java.util.List;
-
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 11/7/13
- * Time: 10:40 PM
+ *
+ * @author dilshat
  */
-public interface PersistenceCommandInterface {
+public interface PersistenceInterface {
+
+    //Commands section
     List<Command> getCommandList(Agent agent);
 
     boolean saveCommand(Command command);
@@ -20,4 +23,11 @@ public interface PersistenceCommandInterface {
     List<Response> getResponses();
 
     boolean saveResponse(Response response);
+
+    //Agents section
+    List<Agent> getAgentList();
+
+    boolean saveAgent(Agent agent);
+
+    boolean updateAgent(Agent agent);
 }

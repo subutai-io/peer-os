@@ -13,13 +13,13 @@ import org.junit.BeforeClass;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 
 /**
  * @author bahadyr
@@ -104,7 +104,7 @@ public class AgentManagerTest {
 //    @Test
     public void testSetPersistenceAgentService() {
         System.out.println("setPersistenceAgentService");
-        PersistenceAgentInterface persistenceAgent = null;
+        PersistenceInterface persistenceAgent = null;
         AgentManager instance = new AgentManager();
         instance.setPersistenceAgentService(persistenceAgent);
         // TODO review the generated test code and remove the default call to fail.

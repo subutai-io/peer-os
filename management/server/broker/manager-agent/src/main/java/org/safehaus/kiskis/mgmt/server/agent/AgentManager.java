@@ -18,7 +18,7 @@ import java.util.Set;
 public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     private BundleContext context;
-    private PersistenceAgentInterface persistenceAgent;
+    private PersistenceInterface persistenceAgent;
     private CommandManagerInterface commandManager;
     private final Set<Agent> registeredAgents;
     private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
@@ -102,14 +102,12 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         getCommandTransport().removeListener(this);
     }
 
-    public void setPersistenceAgentService(PersistenceAgentInterface persistenceAgent) {
+    public void setPersistenceAgentService(PersistenceInterface persistenceAgent) {
         this.persistenceAgent = persistenceAgent;
-        System.out.println(this.getClass().getName() + " PersistenceAgentInterface initialized");
     }
 
     public void setCommandManagerService(CommandManagerInterface commandManager) {
         this.commandManager = commandManager;
-        System.out.println(this.getClass().getName() + " CommandManagerInterface initialized");
 
     }
 

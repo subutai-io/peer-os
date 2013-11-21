@@ -5,20 +5,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
  */
-public class Persistence implements PersistenceAgentInterface, PersistenceCommandInterface {
+public class Persistence implements PersistenceInterface {
 
     private static final Logger LOG = Logger.getLogger(Persistence.class.getName());
     private Cluster cluster;
@@ -30,17 +27,14 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
 
     public void setCassandraKeyspace(String cassandraKeyspace) {
         this.cassandraKeyspace = cassandraKeyspace;
-        System.out.println("Settings cassandra keyspace " + cassandraKeyspace);
     }
 
     public void setCassandraHost(String cassandraHost) {
         this.cassandraHost = cassandraHost;
-        System.out.println("Settings cassandra host " + cassandraHost);
     }
 
     public void setCassandraPort(int cassandraPort) {
         this.cassandraPort = cassandraPort;
-        System.out.println("Settings cassandra port " + cassandraPort);
     }
 
     @Override
@@ -150,5 +144,9 @@ public class Persistence implements PersistenceAgentInterface, PersistenceComman
     @Override
     public List<Response> getResponses() {
         throw new UnsupportedOperationException("not done yet");
+    }
+
+    public boolean updateAgent(Agent agent) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

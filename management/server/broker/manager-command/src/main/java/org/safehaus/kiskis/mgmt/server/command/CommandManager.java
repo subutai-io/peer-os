@@ -8,7 +8,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.List;
 public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     private BundleContext context;
-    private PersistenceCommandInterface persistenceCommand;
+    private PersistenceInterface persistenceCommand;
     private ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
 
     @Override
@@ -106,7 +106,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         getCommandTransport().removeListener(this);
     }
 
-    public void setPersistenceCommandService(PersistenceCommandInterface persistenceCommand) {
+    public void setPersistenceCommandService(PersistenceInterface persistenceCommand) {
         this.persistenceCommand = persistenceCommand;
     }
 
