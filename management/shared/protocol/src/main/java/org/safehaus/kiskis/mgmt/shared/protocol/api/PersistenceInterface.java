@@ -8,6 +8,7 @@ import java.util.List;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
  *
@@ -30,4 +31,6 @@ public interface PersistenceInterface {
     boolean saveAgent(Agent agent);
 
     boolean updateAgent(Agent agent);
+    
+    String saveTask(Task task);
 }

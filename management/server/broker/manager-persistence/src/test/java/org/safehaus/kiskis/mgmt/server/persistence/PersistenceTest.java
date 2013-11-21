@@ -18,6 +18,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.junit.Test;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * @author bahadyr
@@ -164,5 +166,20 @@ public class PersistenceTest {
         boolean expResult = true;
         boolean result = instance.saveResponse(response);
         assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testSaveTask() {
+        System.out.println("saveTask");
+        Persistence instance = new Persistence();
+        instance.setCassandraHost("172.16.1.125");
+        instance.setCassandraPort(9042);
+        instance.setCassandraKeyspace("kiskis");
+        instance.init();
+        Task task = new Task();
+        task.setDescription("desc");
+        task.setTaskStatus(TaskStatus.SUCCESS);
+        String uuid = instance.saveTask(task);
+        assertEquals(uuid, uuid);
     }
 }

@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
+import org.apache.cassandra.utils.UUIDGen;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 
 /**
@@ -157,5 +160,18 @@ public class Persistence implements PersistenceInterface {
                 agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
                 agent.getMacAddress(), new Date(), agent.getUuid()));
         return rs != null;
+    }
+
+    @Override
+    public String saveTask(Task task) {
+        String cql = "insert into tasks (uid, description, status) "
+                + "values (?, ?, ?);";
+        PreparedStatement stmt = session.prepare(cql);
+
+        BoundStatement boundStatement = new BoundStatement(stmt);
+        UUID uuid = UUIDGen.getTimeUUID();
+        session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
+
+        return uuid.toString();
     }
 }
