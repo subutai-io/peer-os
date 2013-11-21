@@ -58,8 +58,8 @@ public class Step42 extends Panel {
 
 
         TwinColSelect l = new TwinColSelect();
-        for (int i = 0; i < cities.length; i++) {
-            l.addItem(cities[i]);
+        for (String citie : cities) {
+            l.addItem(citie);
         }
         l.setRows(10);
         l.setNullSelectionAllowed(true);
@@ -75,6 +75,7 @@ public class Step42 extends Panel {
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
+            @Override
             public void buttonClick(Button.ClickEvent event) {
                 aThis.showNext();
             }
@@ -82,6 +83,7 @@ public class Step42 extends Panel {
         Button back = new Button("Back");
         back.addListener(new Button.ClickListener() {
 
+            @Override
             public void buttonClick(Button.ClickEvent event) {
                 aThis.showBack();
             }
