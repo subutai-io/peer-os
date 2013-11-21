@@ -25,7 +25,6 @@ public class MgmtAgentManager extends VerticalLayout implements
     private Set<Agent> registeredAgents;
     private ListSelect listSelectAgents;
     private int id;
-    private AgentManagerInterface agentManagerService;
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
 

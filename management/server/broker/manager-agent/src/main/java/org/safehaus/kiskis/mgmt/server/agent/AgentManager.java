@@ -114,11 +114,19 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     public void init() {
-        getCommandTransport().addListener(this);
+        try {
+            getCommandTransport().addListener(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void destroy() {
-        getCommandTransport().removeListener(this);
+        try {
+            getCommandTransport().removeListener(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void setPersistenceAgentService(PersistenceInterface persistenceAgent) {

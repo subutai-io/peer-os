@@ -169,17 +169,17 @@ public class PersistenceTest {
     }
 
 //    @Test
-    public void testSaveTask() {
-        System.out.println("saveTask");
-        Persistence instance = new Persistence();
-        instance.setCassandraHost("172.16.1.125");
-        instance.setCassandraPort(9042);
-        instance.setCassandraKeyspace("kiskis");
-        instance.init();
-        Task task = new Task();
-        task.setDescription("desc");
-        task.setTaskStatus(TaskStatus.SUCCESS);
-        String uuid = instance.saveTask(task);
-        assertEquals(uuid, uuid);
-    }
+//    public void testSaveTask() {
+//        System.out.println("saveTask");
+//        Persistence instance = new Persistence();
+//        instance.setCassandraHost("172.16.1.125");
+//        instance.setCassandraPort(9042);
+//        instance.setCassandraKeyspace("kiskis");
+//        instance.init();
+//        Task task = new Task();
+//        task.setDescription("desc");
+//        task.setTaskStatus(TaskStatus.SUCCESS);
+//        String uuid = instance.saveTask(task);
+//        assertEquals(uuid, uuid);
+//    }
 }

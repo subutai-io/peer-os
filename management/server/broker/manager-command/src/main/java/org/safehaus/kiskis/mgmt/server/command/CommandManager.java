@@ -97,11 +97,19 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     public void init() {
-        getCommandTransport().addListener(this);
+        try {
+            getCommandTransport().addListener(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void destroy() {
-        getCommandTransport().removeListener(this);
+        try {
+            getCommandTransport().removeListener(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void setPersistenceCommandService(PersistenceInterface persistenceCommand) {
