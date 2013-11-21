@@ -17,8 +17,8 @@ public class CassandraWizard extends Window {
 
         verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);
-        verticalLayout.setHeight(650, Sizeable.UNITS_PIXELS);
-        verticalLayout.setWidth(900, Sizeable.UNITS_PIXELS);
+        verticalLayout.setHeight(500, Sizeable.UNITS_PIXELS);
+        verticalLayout.setWidth(800, Sizeable.UNITS_PIXELS);
 
         putForm();
 
@@ -37,7 +37,6 @@ public class CassandraWizard extends Window {
 
     private void putForm() {
         verticalLayout.removeAllComponents();
-        System.out.println(step);
         switch (step) {
             case 1: {
                 Step1 step1 = new Step1(this);

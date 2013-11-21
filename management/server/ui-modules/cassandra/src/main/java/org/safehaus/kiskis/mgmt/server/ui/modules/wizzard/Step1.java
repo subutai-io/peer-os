@@ -50,6 +50,7 @@ public class Step1 extends Panel {
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
+            @Override
             public void buttonClick(Button.ClickEvent event) {
                 aThis.showNext();
             }
