@@ -48,6 +48,7 @@ public class Cassandra implements Module {
         @Override
         public void outputCommand(Response response) {
             try {
+                System.out.println("CASSANDRA");
                 System.out.println(response);
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");

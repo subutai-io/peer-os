@@ -40,6 +40,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     @Override
     public synchronized void getCommand(Response response) {
+        System.out.println("Response received by CommandManager");
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
@@ -66,11 +67,11 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                     if (ai.getName().equals(response.getSource())) {
                         System.out.println("~~~~~~~ Listeners notified");
                         ai.outputCommand(response);
-                    }
-                    if(response.getSource() == null){
-                        System.out.println("~~~~~~~ Source null");
+                    } else {
+                        System.out.println("~~~~~~~ Notify all");
                         ai.outputCommand(response);
                     }
+
                 } else {
                     listeners.remove(ai);
                 }

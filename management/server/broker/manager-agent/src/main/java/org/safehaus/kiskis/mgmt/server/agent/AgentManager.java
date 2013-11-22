@@ -88,7 +88,11 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
         agent.setMacAddress(response.getMacAddress());
-        agent.setIsLXC(response.isIsLxc());
+        if (response.isIsLxc() == null) {
+            agent.setIsLXC(false);
+        } else {
+            agent.setIsLXC(response.isIsLxc());
+        }
         agent.setListIP(response.getIps());
 
         if (persistenceAgent.updateAgent(agent)) {

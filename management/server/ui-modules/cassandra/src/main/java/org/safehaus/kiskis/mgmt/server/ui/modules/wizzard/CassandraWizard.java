@@ -3,16 +3,18 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.wizzard;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 public class CassandraWizard extends Window {
 
+    private CommandManagerInterface commandManagerInterface;
+
     VerticalLayout verticalLayout;
-    CommandManagerInterface commandManagerInterface;
     Task task = new Task();
     Step1 step1;
     Step2 step2;
@@ -22,7 +24,7 @@ public class CassandraWizard extends Window {
     Step43 step43;
     int step = 1;
 
-    public CassandraWizard(CommandManagerInterface commandManagerInterface) {
+    public CassandraWizard(final CommandManagerInterface commandManagerInterface) {
         setModal(true);
 
         this.commandManagerInterface = commandManagerInterface;
