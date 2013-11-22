@@ -64,24 +64,15 @@ public class Terminal implements Module {
             setCompositionRoot(verticalLayout);
         }
 
+        @Override
         public void buttonClick(Button.ClickEvent event) {
             try {
                 agents = AppData.getAgentList();
                 if (agents != null && agents.size() > 0) {
                     for (String agent : agents) {
                         String json = textAreaCommand.getValue().toString().trim();
-                        json = json.replaceAll(" ", "").replaceAll("\n", "")
-                                .replaceAll("\t", "")
-                                .replaceAll("\r", "")
-                                .replaceAll("\u2002", "");
-                        Request r = CommandJson.getRequest(json);
 
-                        System.out.println();
-                        for (char c : json.toCharArray()) {
-                            System.out.print((int) c);
-                            System.out.print(" " + c + "\t");
-                        }
-                        System.out.println();
+                        Request r = CommandJson.getRequest(json);
 
                         if (r != null) {
                             r.setUuid(agent);
@@ -97,7 +88,6 @@ public class Terminal implements Module {
             } catch (Exception ex) {
                 getWindow().showNotification(ex.toString());
                 System.out.println("buttonClick event Exception");
-                ex.printStackTrace();
             }
         }
 
@@ -130,7 +120,6 @@ public class Terminal implements Module {
                 }
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
-                ex.printStackTrace();
             }
 
         }
@@ -141,10 +130,12 @@ public class Terminal implements Module {
         }
     }
 
+    @Override
     public String getName() {
         return Terminal.MODULE_NAME;
     }
 
+    @Override
     public Component createComponent() {
         CommandManagerInterface commandManagerInterface = getCommandManager();
         component = new ModuleComponent(commandManagerInterface);
