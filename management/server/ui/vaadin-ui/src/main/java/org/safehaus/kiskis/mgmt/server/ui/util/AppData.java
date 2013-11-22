@@ -6,6 +6,7 @@ package org.safehaus.kiskis.mgmt.server.ui.util;
 
 import com.vaadin.Application;
 import com.vaadin.service.ApplicationContext.TransactionListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -24,7 +25,8 @@ public class AppData
     private static ThreadLocal<AppData> instance =
             new ThreadLocal<AppData>();
     //
-    private Set<String> agentList;
+    private Set<String> selectedAgentList;
+    private Set<Agent> agentList;
 
     public AppData(Application app) {
         this.app = app;
@@ -67,15 +69,23 @@ public class AppData
         return instance.get().bundle.getString(msgId);
     }
 
-    public static Set<String> getAgentList() {
-        return instance.get().agentList;
+    public static Set<String> getSelectedAgentList() {
+        return instance.get().selectedAgentList;
     }
 
-    public static void setAgentList(Set<String> agentList) {
-        instance.get().agentList = agentList;
+    public static void setSelectedAgentList(Set<String> agentList) {
+        instance.get().selectedAgentList = agentList;
     }
 
     public static Application getApplication() {
         return instance.get().app;
+    }
+
+    public static Set<Agent> getAgentList() {
+        return instance.get().agentList;
+    }
+
+    public static void setAgentList(Set<Agent> agentList) {
+        instance.get().agentList = agentList;
     }
 }
