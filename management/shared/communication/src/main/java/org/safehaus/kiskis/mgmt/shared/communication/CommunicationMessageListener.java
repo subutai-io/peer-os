@@ -35,8 +35,11 @@ public class CommunicationMessageListener implements MessageListener {
             System.out.println("Received:" + jsonCmd);
             Response response = CommandJson.getResponse(jsonCmd);
 
-
-            notifyListeners(response);
+            if (response != null) {
+                notifyListeners(response);
+            } else {
+                System.out.println("Could not parse response");
+            }
         } catch (JMSException ex) {
             System.out.println("onMessage " + ex.getMessage());
         }
