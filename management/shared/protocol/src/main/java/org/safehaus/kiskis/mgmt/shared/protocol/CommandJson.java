@@ -54,25 +54,25 @@ public class CommandJson {
             char ch = s.charAt(i);
             switch (ch) {
                 case '"':
-                    sb.append("\\\"");
+                    sb.append("\"");
                     break;
                 case '\\':
-                    sb.append("\\\\");
+                    sb.append("\\");
                     break;
                 case '\b':
-                    sb.append("\\b");
+                    sb.append("\b");
                     break;
                 case '\f':
-                    sb.append("\\f");
+                    sb.append("\f");
                     break;
                 case '\n':
-                    sb.append("\\n");
+                    sb.append("\n");
                     break;
                 case '\r':
-                    sb.append("\\r");
+                    sb.append("\r");
                     break;
                 case '\t':
-                    sb.append("\\t");
+                    sb.append("\t");
                     break;
                 case '/':
                     sb.append("\\/");
@@ -90,6 +90,6 @@ public class CommandJson {
                     }
             }
         }
-        return sb.toString().replace("\\\"", "\"");
+        return sb.toString();
     }
 }
