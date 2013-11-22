@@ -54,7 +54,7 @@ public class CommandJson {
             char ch = s.charAt(i);
             switch (ch) {
                 case '"':
-                    sb.append("\"");
+                    sb.append("\\\"");
                     break;
                 case '\\':
                     sb.append("\\\\");
@@ -90,6 +90,6 @@ public class CommandJson {
                     }
             }
         }
-        return sb.toString();
+        return sb.toString().replace("\\\"", "\"");
     }
 }
