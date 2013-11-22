@@ -24,7 +24,7 @@
 #include "KAThread.h"
 #include "KALogger.h"
 #include "KAConnection.h"
-#include "pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
