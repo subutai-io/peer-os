@@ -13,6 +13,13 @@ KAResponse::KAResponse()
 	setStandardError("");
 	setStandardOutput("");
 	setExitCode(-1);
+	setSource("");
+	setTaskUuid("");
+	setMacAddress("");
+	setIsLxc(false);
+	setHostname("");
+	getIps().clear();
+
 }
 /**
  *  \details   Default destructor of the KAResponse class.
@@ -33,6 +40,12 @@ void KAResponse::clear()
 	setResponseSequenceNumber(-1);
 	setStandardError("");
 	setStandardOutput("");
+	setSource("");
+	setTaskUuid("");
+	setMacAddress("");
+	setIsLxc(false);
+	setHostname("");
+	getIps().clear();
 }
 /**
  *  \details   serialize function creates a JSON strings from called instance.
@@ -43,26 +56,63 @@ void KAResponse::clear()
 void KAResponse::serialize(string& output)
 {
 	Json::Value environment;
-	Json::StyledWriter writer;
 	Json::Value root;
+	Json::FastWriter writer;
+	Json::Features myfeatures;
+	myfeatures.all();
 
 	//mandatory arguments
 
-	if(!getStandardOutput().empty())
-		root["response"]["stdOut"] = getStandardOutput();
-	if(!getStandardError().empty())
-		root["response"]["stdErr"] = getStandardError();
-	if(!getType().empty())
-		root["response"]["type"] = getType();
-	if(!getUuid().empty())
-		root["response"]["uuid"] = getUuid();
-	if(!getPid().empty())
-		root["response"]["pid"] = getPid();										//check the pid is assigned or not
-	if(getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
-		root["response"]["requestSequenceNumber"]=getRequestSequenceNumber();
-	if(getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
-		root["response"]["responseSequenceNumber"]=getResponseSequenceNumber();
-	output = writer.write(root);		//Json Response string is created
+	if(!(this->getStandardOutput().empty()))
+	{
+		root["response"]["stdOut"] = this->getStandardOutput();
+	}
+	if(!(this->getStandardError().empty()))
+	{
+		root["response"]["stdErr"] = this->getStandardError();
+	}
+	if(!(this->getType().empty()))
+	{
+		root["response"]["type"] = this->getType();
+	}
+	if(!(this->getUuid().empty()))
+	{
+		root["response"]["uuid"] = this->getUuid();
+	}
+	if(!(this->getPid().empty()))
+	{
+		root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
+	}
+	if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
+	{
+		root["response"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
+	}
+	if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
+	{
+		root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
+	}
+	for(unsigned int index=0; index < this->getIps().size(); index++)
+	{	//automatically check the size of the ips list
+		root["response"]["ips"][index]=this->getIps()[index];
+	}
+	if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
+	{
+		root["response"]["taskUuid"] = this->getTaskUuid();
+	}
+	if(!(this->getHostname().empty()))											//check the hostname is assigned or not
+	{
+		root["response"]["hostname"] = this->getHostname();
+	}
+	if(!(this->getMacAddress().empty()))											//check the macAddress is assigned or not
+	{
+		root["response"]["macAddress"] = this->getMacAddress();
+	}
+	if(!(this->getSource().empty()))											//check the macAddress is assigned or not
+	{
+		root["response"]["source"] = this->getSource();
+	}
+	root["response"]["isLxc"] = this->getIsLxc();
+	output = writer.write(root);
 }
 /**
  *  \details   serializeDone method serialize the Done response JSon string from called instance.
@@ -73,104 +123,44 @@ void KAResponse::serialize(string& output)
 void KAResponse::serializeDone(string& output)
 {			//Serialize a Done Response  to a Json String
 	Json::Value environment;
-	Json::StyledWriter writer;
 	Json::Value root;
+	Json::FastWriter writer;
+	Json::Features myfeatures;
+	myfeatures.all();
 
-	if(!getType().empty())
-		root["response"]["type"] = getType();
-	if(!getUuid().empty())
-		root["response"]["uuid"] = getUuid();
-	if(getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
-		root["response"]["requestSequenceNumber"]=getRequestSequenceNumber();
-	if(getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
-		root["response"]["responseSequenceNumber"]=getResponseSequenceNumber();
-	if(!getPid().empty())
-		root["response"]["pid"] = getPid();										//check the pid is assigned or not
-	if(getExitCode() >= 0)
-		root["response"]["exitCode"] = getExitCode();
-	output = writer.write(root);		//Json Response Done string is created
-}
-/**
- *  \details   deserialize function deserialize the given Json strings to KAResponse instance.
- *     		   This is one of the most frequently used function is the class.
- *  		   It also check the existing variable in the JSON strings when deserializing the instance.
- *  		   it uses reference input and deserialize it to called KAResponse instance
- *  		   it returns true if the given input string is true formatted otherwise return false.
- */
-bool KAResponse::deserialize(string& input)
-{													//Deserialize a Json String to Response instance
-	Json::FastWriter writer;						//return true: if Deserialization is successfull
-	Json::Reader reader;							//return false: if Deserialization unsuccessfull
-	Json::Value root;
-	clear(); //clear all arguments firstly..
-
-	bool parsedSuccess = reader.parse(input,root,false);			//Parsing Json String to Response instance
-
-	if(!parsedSuccess)											//if parsing is not successfull
+	if(!(this->getType().empty()))
 	{
-		cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl;
-		return false;
+		root["response"]["type"] = this->getType();
 	}
-
-	if(root["response"]["exitCode"].isNull())	//if incoming message does not contain Exit code it is just a chunk response
+	if(!(this->getUuid().empty()))
 	{
-		if(!root["response"]["type"].isNull())
-		{				//initialize type parameter if it is not null
-			setType(root["response"]["type"].asString());
-		}
-		if(!root["response"]["uuid"].isNull())
-		{
-			setUuid(root["response"]["uuid"].asString());				//initialize UUID parameter if it is not null
-		}
-		if(!root["response"]["stdOut"].isNull())
-		{
-			setStandardOutput(root["response"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
-		}
-		if(!root["response"]["stdErr"].isNull())
-		{
-			setStandardError(root["response"]["stdErr"].asString());		//initialize standardError parameter if it is not null
-		}
-		if(!root["response"]["pid"].isNull())
-		{
-			setPid(root["response"]["pid"].asString());				//initialize pid parameter if it is not null
-		}
-		if(!root["response"]["requestSequenceNumber"].isNull())
-		{
-			setRequestSequenceNumber(root["response"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
-		}
-		if(!root["response"]["responseSequenceNumber"].isNull())
-		{
-			setResponseSequenceNumber(root["response"]["responseSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
-		}
+		root["response"]["uuid"] = this->getUuid();
 	}
-	else
-	{				//if incoming message contain Exit code it is just an exit response
-		if(!root["response"]["type"].isNull())
-		{				//initialize type parameter if it is not null
-			setType(root["response"]["type"].asString());
-		}
-		if(!root["response"]["uuid"].isNull())
-		{
-			setUuid(root["response"]["uuid"].asString());				//initialize UUID parameter if it is not null
-		}
-		if(!root["response"]["pid"].isNull())
-		{
-			setPid(root["response"]["pid"].asString());				//initialize pid parameter if it is not null
-		}
-		if(!root["response"]["exitCode"].isNull())
-		{
-			setExitCode(root["response"]["exitCode"].asInt());				//initialize pid parameter if it is not null
-		}
-		if(!root["response"]["requestSequenceNumber"].isNull())
-		{
-			setRequestSequenceNumber(root["response"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
-		}
-		if(!root["response"]["responseSequenceNumber"].isNull())
-		{
-			setResponseSequenceNumber(root["response"]["responseSequenceNumber"].asInt()); //initialize responseSequenceNumber parameter if it is not null
-		}
+	if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
+	{
+		root["response"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
 	}
-	return true;
+	if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
+	{
+		root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
+	}
+	if(!(this->getPid().empty()))
+	{
+		root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
+	}
+	if(this->getExitCode() >= 0)
+	{
+		root["response"]["exitCode"] = this->getExitCode();
+	}
+	if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
+	{
+		root["response"]["taskUuid"] = this->getTaskUuid();
+	}
+	if(!(this->getSource().empty()))											//check the macAddress is assigned or not
+	{
+		root["response"]["source"] = this->getSource();
+	}
+	output = writer.write(root);	//Json Response Done string is created
 }
 /**
  *  \details   getting "pid" private variable of KAResponse instance
@@ -283,4 +273,101 @@ string& KAResponse::getStandardOutput()
 void KAResponse::setStandardOutput(const string& mystdout)
 { 	//setting standard out
 	this->stdOut = mystdout;
+}
+/**
+ *  \details   getting "hostname" private variable of KAResponse instance.
+ */
+string& KAResponse::getHostname()
+{
+	return this->hostname;
+}
+/**
+ *  \details   setting "hostname" private variable of KAResponse instance.
+ *  		   This holds the hostname of the agent machine
+ */
+void KAResponse::setHostname(const string& hostname)
+{
+	this->hostname = hostname;
+}
+/**
+ *  \details   getting "macAddress" private variable of KAResponse instance.
+ */
+string& KAResponse::getMacAddress()
+{
+	return this->macAddress;
+}
+/**
+ *  \details   setting "macAddress" private variable of KAResponse instance.
+ *  		   This holds the macAddress(eth0) of the agent machine
+ */
+void KAResponse::setMacAddress(const string& macAddress)
+{
+	this->macAddress = macAddress;
+}
+/**
+ *  \details   getting "taskUuid" private variable of KAResponse instance.
+ */
+string& KAResponse::getTaskUuid()
+{
+	return this->taskUuid;
+}
+/**
+ *  \details   setting "taskUuid" private variable of KAResponse instance.
+ *  		   This holds the task uuid of the command
+ */
+void KAResponse::setTaskUuid(const string& taskuuid)
+{
+	this->taskUuid = taskuuid;
+}
+/**
+ *  \details   getting "isLxc" private variable of KAResponse instance.
+ */
+bool& KAResponse::getIsLxc()
+{
+	return this->isLxc;
+}
+/**
+ *  \details   setting "isLxc" private variable of KAResponse instance.
+ *  		   This contains the information that the agent runs on Physical machine or lxc container.
+ *  		   true: this machine is lxc container.
+ *  		   false: this machine is physical.
+ */
+void KAResponse::setIsLxc(bool isLxc)
+{
+	this->isLxc = isLxc;
+}
+/**
+ *  \details   setting "ips" private vector variable of KAResponse instance.
+ *  		   This is the list of ips vector that holds the ip addresses of the machine
+ */
+void KAResponse::setIps(vector<string> myvector)
+{		//setting ips vector
+
+	for(unsigned int index=0 ; index< myvector.size(); index++)
+	{
+		this->ips.push_back(myvector[index]);
+	}
+}
+/**
+ *  \details   getting "ips" private vector variable of KAResponse instance.
+ */
+vector<string>& KAResponse::getIps()
+{					//getting ips vector
+
+	return this->ips;
+}
+/**
+ *  \details   getting "source" private variable of KAResponse instance.
+ */
+string& KAResponse::getSource()
+{
+	return this->source;
+}
+/**
+ *  \details   setting "source" private variable of KAResponse instance.
+ *  		   This holds the task source information of the response
+ */
+void KAResponse::setSource(const string& source)
+{
+	this->source = source;
 }

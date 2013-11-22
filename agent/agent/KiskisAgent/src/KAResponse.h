@@ -33,6 +33,18 @@ public:
 	string& getStandardError();
 	string& getStandardOutput();
 	string& getPid();
+	string& getHostname();
+	string& getMacAddress();
+	string& getTaskUuid();
+	bool& 	getIsLxc();
+	vector<string>& getIps();
+	string& getSource();
+	void setSource(const string&);
+	void setHostname(const string&);
+	void setMacAddress(const string&);
+	void setTaskUuid(const string&);
+	void setIsLxc(bool);
+	void setIps(vector<string>);
 	void setPid(const string&);
 	void setType(const string&);
 	void setUuid(const string&);
@@ -43,7 +55,6 @@ public:
 	void setExitCode(int);
 	void serialize(string&);						//Serializing a Chunk Response message to a Json String
 	void serializeDone(string&);					//Serializing a Last Done Response message to a Json string
-	bool deserialize(string&);						//Deserializing a Json string to Response instance
 	void clear();
 private:
 	string        	type;
@@ -54,5 +65,11 @@ private:
 	string			pid;
 	string       	stdOut;
 	string        	stdErr;
+	string			taskUuid;
+	bool			isLxc;
+	string			macAddress;
+	string			hostname;
+	vector<string>  ips;
+	string			source;
 };
 #endif /* KARESPONSE_H_ */

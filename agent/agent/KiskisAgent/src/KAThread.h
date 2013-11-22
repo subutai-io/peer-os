@@ -68,7 +68,5 @@ private:
 	string argument,exec,sendout,environment;
 	uid_t euid, ruid;
 	KALogger logger;
-
-
 };
 #endif /* KATHREAD_H_ */

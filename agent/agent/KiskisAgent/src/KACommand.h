@@ -40,8 +40,20 @@ public:
 	string& getStandardOutputPath();
 	string& getStandardErrPath();
 	string& getPid();
+	string& getHostname();
+	string& getMacAddress();
+	string& getTaskUuid();
+	bool& 	getIsLxc();
+	vector<string>& getIps();
 	int getTimeout();
 	int getRequestSequenceNumber();
+	string& getSource();
+	void setSource(const string&);
+	void setHostname(const string&);
+	void setMacAddress(const string&);
+	void setTaskUuid(const string&);
+	void setIsLxc(bool);
+	void setIps(vector<string>);
 	void setTimeout(int);
 	void setPid(const string&);
 	void setEnvironment(list<pair<string,string> >&);
@@ -56,7 +68,6 @@ public:
 	void setStandardErrPath(const string&);
 	void setStandardOutPath(const string&);
 	void setType(const string&);
-	void serialize(string&);						//Serializing Command Instance
 	bool deserialize(string&);					//Deserializing Json String to Command Instance
 	void clear();
 private:
@@ -74,5 +85,11 @@ private:
 	string 			stdErrPath;
 	vector<string>	args;
 	list<pair<string,string> > environment;
+	string			taskUuid;
+	bool			isLxc;
+	string			macAddress;
+	string			hostname;
+	vector<string>  ips;
+	string			source;
 };
 #endif /* KACOMMAND_H_ */

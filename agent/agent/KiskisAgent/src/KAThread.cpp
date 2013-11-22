@@ -106,7 +106,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 				 * send main buffers without blocking output and error
 				 */
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend1> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -121,7 +121,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 				 */
 				errBuff->clear();
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend2> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -135,7 +135,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 				 * send main buffers with blocking error buff
 				 */
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend3> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -157,7 +157,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 				 */
 				errBuff->clear();
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend4> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -179,7 +179,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,s
 				 */
 				outBuff->clear();
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend5> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -215,7 +215,7 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 				 */
 				errBuff->clear();
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend1> " "Message was created for sending to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -227,7 +227,7 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 				 * send main buffers without block error
 				 */
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -247,7 +247,7 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 				outBuff->clear();
 
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend3> " "Message was created for sending to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -259,7 +259,7 @@ void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,s
 				 * send main buffers without block output
 				 */
 				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
+						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend4> " "Message was created for sending to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				*block->responsecount=*block->responsecount+1;
@@ -428,18 +428,27 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 	string processpid=toString(newpid);
 	pid_t result = waitpid(newpid, &status, WNOHANG);
 	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
-	while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
-		processpid="pgrep -P "+toString(newpid);
-		processpid = this->getProcessPid(processpid.c_str());
-		processpid="pgrep -P "+processpid;
-		processpid = this->getProcessPid(processpid.c_str());
+	while ((result = waitpid(newpid, &status, WNOHANG)) == 0)
+	{
+		string cmd;
+		processpid.clear();
+		cmd = "pgrep -P "+toString(newpid);
+		processpid = this->getProcessPid(cmd.c_str());
+		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Test1:",processpid));
+
+		cmd.clear();
+		cmd = "pgrep -P "+ processpid;
+		processpid.clear();
+		processpid = this->getProcessPid(cmd.c_str());
+		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Test2:",processpid));
 		if(atoi(processpid.c_str()))
 		{
+			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Test3:",processpid));
 			break;
 		}
 		processpid=toString(newpid);
 	}
-	if(result >0)
+	if(result > 0)
 	{
 		processpid=toString(newpid);
 		//return 1;
@@ -462,7 +471,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 	/*
 	 * timeoutthread is used for send I'm alive message in periodically if there is no activity on stderr and stdout.
 	 */
-	if(command->getTimeout()==0)
+	if(command->getTimeout() == 0)
 	{
 		boost::thread timeoutthread(taskTimeout,messageQueue,command,&processpid,&outBuff,&errBuff,&block,&(this->getLogger()));
 		logger.writeLog(5,logger.setLogData("<KAThread::optionReadSend> " "taskTimeout thread was started"));
@@ -507,10 +516,13 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		/*
 		 * Execute Done Response is sending..
 		 */
+		int exitcode = 0; // to detect is there any error in the message so if there is an error exitcode should be set to 1. Otherwise is 0.
+		if(!errBuff.empty())
+			exitcode = 1;
 		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block,&(this->getLogger()));
 		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "LastCheckSend function has finished at ReadResult"));
 		string message = response.createExitMessage(command->getUuid(),processpid,
-				command->getRequestSequenceNumber(),responsecount);
+				command->getRequestSequenceNumber(),responsecount,command->getSource(),command->getTaskUuid(),exitcode);
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
 		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
 	}
@@ -522,7 +534,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 			pause();
 		}
 		string message = response.createTimeoutMessage(command->getUuid(),processpid,
-				command->getRequestSequenceNumber(),responsecount,"","");
+				command->getRequestSequenceNumber(),responsecount,"","",command->getSource(),command->getTaskUuid());
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
 		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
 		if(atoi(processpid.c_str()))
@@ -543,7 +555,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block,&(this->getLogger()));
 		logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "LastCheckSend function has finished at SelectResult"));
 		string message = response.createTimeoutMessage(command->getUuid(),processpid,
-				command->getRequestSequenceNumber(),responsecount,"","");
+				command->getRequestSequenceNumber(),responsecount,"","",command->getSource(),command->getTaskUuid());
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
 		logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
 		if(atoi(processpid.c_str()))
@@ -596,10 +608,10 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			if(!checkCWD(command))
 			{
 				string message = response.createResponseMessage(command->getUuid(),toString(getpid()),
-						command->getRequestSequenceNumber(),1,"Working Directory Does Not Exist on System","");
+						command->getRequestSequenceNumber(),1,"Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				message = response.createExitMessage(command->getUuid(),processpid,
-						command->getRequestSequenceNumber(),2);
+						command->getRequestSequenceNumber(),2,command->getSource(),command->getTaskUuid(),1);
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
 				kill(getpid(),SIGKILL);		//killing child
@@ -609,10 +621,10 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			if(!checkUID(command))
 			{
 				string message = response.createResponseMessage(command->getUuid(),toString(getpid()),
-						command->getRequestSequenceNumber(),1,"User Does Not Exist on System","");
+						command->getRequestSequenceNumber(),1,"User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				message = response.createExitMessage(command->getUuid(),processpid,
-						command->getRequestSequenceNumber(),2);
+						command->getRequestSequenceNumber(),2,command->getSource(),command->getTaskUuid(),1);
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
 				kill(getpid(),SIGKILL);		//killing child
@@ -712,7 +724,7 @@ void KAThread::taskTimeout(message_queue *messageQueue,KACommand* command,
 			{
 				counter++;
 			}
-			if(counter==60)
+			if(counter==30)
 			{
 				if(outBuff->empty() && errBuff->empty())
 				{
@@ -720,7 +732,7 @@ void KAThread::taskTimeout(message_queue *messageQueue,KACommand* command,
 					 * sending I'm alive message
 					 */
 					string message = myresponse.createResponseMessage(command->getUuid(),*pid,
-							command->getRequestSequenceNumber(),-1,"","");
+							command->getRequestSequenceNumber(),-1,"","",command->getSource(),command->getTaskUuid());
 					while(!messageQueue->try_send(message.data(), message.size(), 0));
 					*block->responsecount=*block->responsecount+1;
 					logger->writeLog(6,logger->setLogData("<KAThread::taskTimeout> " "taskTİmeOut sends message!!","pid",toString(getpid()),"Message:",message));
@@ -728,7 +740,7 @@ void KAThread::taskTimeout(message_queue *messageQueue,KACommand* command,
 				}
 				else
 				{
-					if(command->getStandardOutput()=="CAPTURE"&&command->getStandardError()=="CAPTURE")
+					if(command->getStandardOutput()=="CAPTURE" && command->getStandardError()=="CAPTURE")
 					{
 						errBuff->clear();
 						outBuff->clear();
@@ -745,7 +757,7 @@ void KAThread::taskTimeout(message_queue *messageQueue,KACommand* command,
 					 * sending I'm alive message
 					 */
 					string message = myresponse.createResponseMessage(command->getUuid(),*pid,
-							command->getRequestSequenceNumber(),-1,*errBuff,*outBuff);
+							command->getRequestSequenceNumber(),-1,*errBuff,*outBuff,command->getSource(),command->getTaskUuid());
 					while(!messageQueue->try_send(message.data(), message.size(), 0));
 					outBuff->clear();
 					errBuff->clear();
@@ -779,7 +791,7 @@ string KAThread::getProcessPid(const char* cmd)
 		if(fgets(buffer, 128, pipe) != NULL)
 		{
 			buffer[strlen(buffer)-1]='\0';
-			result += buffer;
+			result = buffer;
 		}
 	}
 	pclose(pipe);

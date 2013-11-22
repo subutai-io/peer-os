@@ -15,9 +15,15 @@ KACommand::KACommand()
 	this->setStandardOutput("");
 	this->setStandardOutPath("");
 	this->setRunAs("");
-	this->setTimeout(60);
+	this->setTimeout(30);
 	this->getArguments().clear();
 	this->getEnvironment().clear();
+	this->setTaskUuid("");
+	this->setMacAddress("");
+	this->setIsLxc(false);
+	this->setHostname("");
+	this->getIps().clear();
+	this->setSource("");
 }
 /**
  *  \details   Default destructor of KACommand class.
@@ -44,56 +50,12 @@ void KACommand::clear()
 	this->setTimeout(60);
 	this->getArguments().clear();
 	this->getEnvironment().clear();
-}
-/**
- *  \details   serialize function creates a JSON strings from called instance.
- *  		   This is one of the most frequently used function is the class.
- *  		   It also check the existing variable(NULL or not) when serializing the instance.
- *  		   It returns given reference output strings.
- */
-void KACommand::serialize(string& output)
-{			//Serialize a Command instance to a Json String
-	Json::Value env;
-	Json::StyledWriter writer;
-	Json::Value root;
-
-	//mandatory arguments
-	if((!this->getType().empty()))
-		root["command"]["type"] = this->getType();
-	if(!(this->getStandardOutput().empty()))
-		root["command"]["stdOut"] = this->getStandardOutput();
-	if(!(this->getStandardError().empty()))
-		root["command"]["stdErr"] = this->getStandardError();
-	if(!(this->getUuid().empty()))
-		root["command"]["uuid"] = this->getUuid();
-	if(!(this->getPid().empty()))
-		root["command"]["pid"] = this->getPid();								//check the pid is assigned or not
-	if(!(this->getWorkingDirectory().empty()))									//check the workingDirectory is assigned or not
-		root["command"]["workingDirectory"] = this->getWorkingDirectory();
-	if(this->getRequestSequenceNumber() >= 0)									//check the requestSequenceNumber is assigned or not
-		root["command"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
-	if(!(this->getProgram().empty()))											//check the program is assigned or not
-		root["command"]["program"] = this->getProgram();
-	if(!(this->getRunAs().empty()))												//check the runAs is assigned or not
-		root["command"]["runAs"] = this->getRunAs();
-	if(!(this->getStandardErrPath().empty()))											//check the StandardErrPath is assigned or not
-		root["command"]["stdErrPath"] = this->getStandardErrPath();
-	if(!(this->getStandardOutputPath().empty()))											//check the StandardOutPath is assigned or not
-		root["command"]["stdOutPath"] = this->getStandardOutputPath();
-	if(this->getTimeout()!=60)											//check the TimeoutValue is assigned or not
-		root["command"]["timeout"] = this->getTimeout();
-	for(unsigned int index=0; index < this->getArguments().size(); index++)	//automatically check the size of the argument list
-		root["command"]["args"][index]=this->getArguments()[index];
-	if(this->getEnvironment().size() > 0)
-	{
-		//automatically check the size of the envirenment list
-		for(std::list<pair<string,string> >::iterator it = this->getEnvironment().begin(); it != this->getEnvironment().end(); it++ )
-		{
-			env[it->first.c_str()] = it->second.c_str();	//adding env parameters to env Jsonstring
-		}
-		root["command"]["environment"]=env;	//envireonment is added to command Json
-	}
-	output = writer.write(root); 				//Json command string is created
+	this->setTaskUuid("");
+	this->setMacAddress("");
+	this->setIsLxc(false);
+	this->setHostname("");
+	this->getIps().clear();
+	this->setSource("");
 }
 /**
  *  \details   deserialize function deserialize the given Json strings to KACommand instance.
@@ -104,7 +66,6 @@ void KACommand::serialize(string& output)
  */
 bool KACommand::deserialize(string& input)
 {														//Deserialize a Json String to Command instance
-	Json::FastWriter writer;							//return false if parsing error
 	Json::Reader reader;								//return true Deserialize operation is successfully done
 	Json::Value root;
 	pair <string,string> dummy;
@@ -181,6 +142,33 @@ bool KACommand::deserialize(string& input)
 		arg =  root["command"]["args"][index].asString();
 		this->getArguments().push_back(arg);
 	}
+	if(!root["command"]["taskUuid"].isNull())
+	{
+		setTaskUuid(root["command"]["taskUuid"].asString());		//initialize taskUuid parameter if it is not null
+	}
+	if(!root["command"]["hostname"].isNull())
+	{
+		setHostname(root["command"]["hostname"].asString());		//initialize hostname parameter if it is not null
+	}
+	if(!root["command"]["macAddress"].isNull())
+	{
+		setMacAddress(root["command"]["macAddress"].asString());		//initialize macAddress parameter if it is not null
+	}
+	if(!root["command"]["isLxc"].isNull())
+	{
+		setIsLxc(root["command"]["isLxc"].asBool());		//initialize isLxc parameter if it is not null
+	}
+	arg.clear();
+	for(unsigned int index=0; index < root["command"]["ips"].size(); index++)	//set ips
+	{
+		arg =  root["command"]["ips"][index].asString();
+		this->getIps().push_back(arg);
+	}
+	if(!root["command"]["source"].isNull())
+	{
+		setSource(root["command"]["source"].asString());		//initialize hostname parameter if it is not null
+	}
+
 	return true;
 }
 /**
@@ -407,9 +395,106 @@ int KACommand::getTimeout()
 /**
  *  \details   setting "timeout" private variable of KACommand instance.
  *  		   This holds the timeout value of the command.
- *  		   Command is terminated due to this variable value
+ *  		   Command is terminated due to this variable value default:30 seconds
  */
 void KACommand::setTimeout(int timeout)
 {
 	this->timeout = timeout;
+}
+/**
+ *  \details   getting "hostname" private variable of KACommand instance.
+ */
+string& KACommand::getHostname()
+{
+	return this->hostname;
+}
+/**
+ *  \details   setting "hostname" private variable of KACommand instance.
+ *  		   This holds the hostname of the agent machine
+ */
+void KACommand::setHostname(const string& hostname)
+{
+	this->hostname = hostname;
+}
+/**
+ *  \details   getting "macAddress" private variable of KACommand instance.
+ */
+string& KACommand::getMacAddress()
+{
+	return this->macAddress;
+}
+/**
+ *  \details   setting "macAddress" private variable of KACommand instance.
+ *  		   This holds the macAddress(eth0) of the agent machine
+ */
+void KACommand::setMacAddress(const string& macAddress)
+{
+	this->macAddress = macAddress;
+}
+/**
+ *  \details   getting "taskUuid" private variable of KACommand instance.
+ */
+string& KACommand::getTaskUuid()
+{
+	return this->taskUuid;
+}
+/**
+ *  \details   setting "taskUuid" private variable of KACommand instance.
+ *  		   This holds the task uuid of the command
+ */
+void KACommand::setTaskUuid(const string& taskuuid)
+{
+	this->taskUuid = taskuuid;
+}
+/**
+ *  \details   getting "isLxc" private variable of KACommand instance.
+ */
+bool& KACommand::getIsLxc()
+{
+	return this->isLxc;
+}
+/**
+ *  \details   setting "isLxc" private variable of KACommand instance.
+ *  		   This contains the information that the agent runs on Physical machine or lxc container.
+ *  		   true: this machine is lxc container.
+ *  		   false: this machine is physical.
+ */
+void KACommand::setIsLxc(bool isLxc)
+{
+	this->isLxc = isLxc;
+}
+/**
+ *  \details   setting "ips" private vector variable of KACommand instance.
+ *  		   This is the list of ips vector that holds the ip addresses of the machine
+ */
+void KACommand::setIps(vector<string> myvector)
+{		//setting ips vector
+
+	for(unsigned int index=0 ; index< myvector.size(); index++)
+	{
+		this->ips.push_back(myvector[index]);
+	}
+}
+/**
+ *  \details   getting "ips" private vector variable of KACommand instance.
+ */
+vector<string>& KACommand::getIps()
+{					//getting ips vector
+
+	return this->ips;
+}
+/**
+ *  \details   getting "source" private variable of KACommand instance.
+ */
+string& KACommand::getSource()
+{
+	return this->source;
+}
+/**
+ *  \details   setting "source" private variable of KACommand instance.
+ *  		   This holds the task source information of the command
+ */
+void KACommand::setSource(const string& source)
+{
+	this->source = source;
 }
