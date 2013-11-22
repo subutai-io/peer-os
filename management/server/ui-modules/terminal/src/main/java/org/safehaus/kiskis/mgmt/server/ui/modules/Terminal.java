@@ -67,7 +67,7 @@ public class Terminal implements Module {
 
         public void buttonClick(Button.ClickEvent event) {
             try {
-                agents = AppData.getAgentList();
+                agents = AppData.getSelectedAgentList();
                 if (agents != null && agents.size() > 0) {
                     for (String agent : agents) {
                         String json = textAreaCommand.getValue().toString().trim();

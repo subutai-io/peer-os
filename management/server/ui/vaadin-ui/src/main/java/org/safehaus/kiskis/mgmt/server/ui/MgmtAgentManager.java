@@ -58,7 +58,7 @@ public class MgmtAgentManager extends VerticalLayout implements
         if (event.getProperty().getValue() instanceof Set) {
             Set<String> agents = (Set<String>) event.getProperty().getValue();
 
-            AppData.setAgentList(agents);
+            AppData.setSelectedAgentList(agents);
             getWindow().showNotification(agents.toString());
         }
     }
@@ -79,6 +79,7 @@ public class MgmtAgentManager extends VerticalLayout implements
 
             registeredAgents.clear();
             registeredAgents.addAll(agents);
+            AppData.setAgentList(registeredAgents);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
