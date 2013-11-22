@@ -8,6 +8,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.wizzard;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
  *
@@ -108,6 +112,8 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                Command command = buildCommand();
+                aThis.runCommand(command);
                 aThis.showNext();
             }
         });
@@ -128,6 +134,20 @@ public class Step3 extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
+    }
+    
+    private Command buildCommand() {
+        Request request = new Request();
+        request.setProgram("ls");
+        request.setType(RequestType.EXECUTE_REQUEST);
+        request.setTaskUuid("someuuid");
+        request.setWorkingDirectory("/");
+        request.setStdOut(OutputRedirection.RETURN);
+        request.setStdErr(OutputRedirection.RETURN);
+        request.setRunAs("root");
+        request.setTimeout(60l);
+        Command command = new Command(request);
+        return command;
     }
 
 }

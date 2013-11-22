@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules;
 
-
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -12,7 +11,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-import java.util.Set;
 
 public class Cassandra implements Module {
 
@@ -23,20 +21,20 @@ public class Cassandra implements Module {
     public static class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
 
-        private Button buttonInstallWizard;
-        private Set<String> agents;
-        private Window subwindow;
-        private CommandManagerInterface commandManagerInterface;
+        private final Button buttonInstallWizard;
+//        private Set<String> agents;
+        private final Window subwindow;
+        private final CommandManagerInterface commandManagerInterface;
 
         public ModuleComponent(CommandManagerInterface commandManagerInterface) {
             this.commandManagerInterface = commandManagerInterface;
 
-            subwindow = new CassandraWizard();
+            subwindow = new CassandraWizard(commandManagerInterface);
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
             buttonInstallWizard = new Button("Cassandra Installation Wizard");
-            buttonInstallWizard.addListener(this); // react to clicks
+            buttonInstallWizard.addListener(ModuleComponent.this); // react to clicks
             verticalLayout.addComponent(buttonInstallWizard);
 
             setCompositionRoot(verticalLayout);

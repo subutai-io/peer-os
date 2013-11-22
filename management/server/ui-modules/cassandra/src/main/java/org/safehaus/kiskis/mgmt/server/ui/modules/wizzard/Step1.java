@@ -27,11 +27,11 @@ public class Step1 extends Panel {
         grid.setSizeFull();
 
         Panel panel = new Panel();
-        Label menu = new Label("Cluster Install Wizard<br>" +
-                " 1) <font color=\"#f14c1a\"><strong>Welcome</strong></font><br>" +
-                " 2) List nodes<br>" +
-                " 3) Installation<br>" +
-                " 4) Configuration<br>");
+        Label menu = new Label("Cluster Install Wizard<br>"
+                + " 1) <font color=\"#f14c1a\"><strong>Welcome</strong></font><br>"
+                + " 2) List nodes<br>"
+                + " 3) Installation<br>"
+                + " 4) Configuration<br>");
 
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
@@ -45,7 +45,6 @@ public class Step1 extends Panel {
         label.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(label, 2, 0, 5, 9);
         grid.setComponentAlignment(label, Alignment.TOP_CENTER);
-
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -61,4 +60,5 @@ public class Step1 extends Panel {
 
         addComponent(verticalLayout);
     }
+
 }
