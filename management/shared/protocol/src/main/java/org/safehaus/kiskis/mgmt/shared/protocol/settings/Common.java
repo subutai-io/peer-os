@@ -20,4 +20,5 @@ public class Common {
 //    public static String cassandraHost = "localhost";
 //    public static String cassandraHost = "172.16.1.125";
 //    public static String keyspaceName = "kiskis";
+    public static int HEARTBEAT_TIMEOUT_SEC = 60;
 }
