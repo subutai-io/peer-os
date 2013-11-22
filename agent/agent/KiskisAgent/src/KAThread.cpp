@@ -363,12 +363,40 @@ void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamRe
 	Stream->setTimeout(command->getTimeout());
 	Stream->prepareFileDec();
 	logger->writeLog(6,logger->setLogData("<KAThread::capture> " "Capturing Started!!"));
+
+	boost::posix_time::ptime startingpoint = boost::posix_time::second_clock::local_time();
+	int startingsec =  startingpoint.time_of_day().seconds();
+
 	while(true)
 	{
+		Stream->startSelection();
 		logger->writeLog(7,logger->setLogData("<KAThread::capture> " "Selection:",toString(Stream->getSelectResult()),"Identity:",Stream->getIdentity()));
 		Stream->clearBuffer();
-		Stream->startSelection();
 
+		if(command->getTimeout()!=0)
+		{
+			boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
+			int currentsec =  current.time_of_day().seconds();
+
+			if((currentsec-startingsec) >= 0)
+			{
+				if((currentsec-startingsec) >= command->getTimeout())
+				{
+					logger->writeLog(4,logger->setLogData("<KAThread::capture> " "Timeout Occured!!"));
+					Stream->setSelectResult(0);
+					break;
+				}
+			}
+			else
+			{
+				if((60+currentsec-startingsec) >= command->getTimeout())
+				{
+					logger->writeLog(4,logger->setLogData("<KAThread::capture> " "Timeout Occured!!"));
+					Stream->setSelectResult(0);
+					break;
+				}
+			}
+		}
 		if (Stream->getSelectResult()==0)
 		{
 			/*

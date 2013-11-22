@@ -6,6 +6,7 @@ KACommand::KACommand()
 {			//Setting default values..
 	// TODO Auto-generated constructor stub
 	this->setType("");
+	this->setProgram("");
 	this->setWorkingDirectory("");
 	this->setUuid("");
 	this->setPid("");
@@ -38,6 +39,7 @@ KACommand::~KACommand()
 void KACommand::clear()
 {		//clear the all variables..
 	this->setType("");
+	this->setProgram("");
 	this->setWorkingDirectory("");
 	this->setUuid("");
 	this->setPid("");
@@ -47,7 +49,7 @@ void KACommand::clear()
 	this->setStandardOutput("");
 	this->setStandardOutPath("");
 	this->setRunAs("");
-	this->setTimeout(60);
+	this->setTimeout(30);
 	this->getArguments().clear();
 	this->getEnvironment().clear();
 	this->setTaskUuid("");

@@ -322,6 +322,7 @@ int main(int argc,char *argv[],char *envp[])
 	{
 		try
 		{
+			command.clear();
 			if(connection.fetchMessage(input)) 	//check and wait if new message comes?
 			{
 				if(command.deserialize(input))
@@ -356,13 +357,11 @@ int main(int argc,char *argv[],char *envp[])
 					else if(command.getType()=="HEARTBEAT_REQUEST")
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Heartbeat message has been taken.."));
-
 						connection.sendMessage(response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,false,command.getSource(),command.getTaskUuid()));
 					}
 					else if(command.getType()=="TERMINATE_REQUEST")
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",command.getPid()));
-						atoi(command.getPid().c_str());
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Killing given PID.."));
 						int retstatus = kill(atoi(command.getPid().c_str()),SIGKILL);
 						if(retstatus==0) //termination is successfully done
