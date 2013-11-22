@@ -11,6 +11,7 @@ import java.util.ArrayList;
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 12:13 AM
  */
 public class CommunicationMessageListener implements MessageListener {
+
     private final Session session;
     private ArrayList<BrokerListener> listeners = new ArrayList<BrokerListener>();
 
@@ -33,9 +34,12 @@ public class CommunicationMessageListener implements MessageListener {
             String jsonCmd = txtMsg.getText();
             System.out.println("Received:" + jsonCmd);
             Response response = CommandJson.getResponse(jsonCmd);
-            System.out.println("Response: " + response);
 
-            notifyListeners(response);
+            if (response != null) {
+                notifyListeners(response);
+            } else {
+                System.out.println("Could not parse response");
+            }
         } catch (JMSException ex) {
             System.out.println("onMessage " + ex.getMessage());
         }
@@ -72,8 +76,8 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
-    public void destroy(){
-        if(listeners != null){
+    public void destroy() {
+        if (listeners != null) {
             listeners.clear();
         }
     }
