@@ -91,6 +91,7 @@ public class CommandTransport implements CommandTransportInterface {
                 javax.jms.MessageProducer producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 String json = CommandJson.getJson(command);
+                System.out.println("Sending: " + json);
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
                 session.close();
