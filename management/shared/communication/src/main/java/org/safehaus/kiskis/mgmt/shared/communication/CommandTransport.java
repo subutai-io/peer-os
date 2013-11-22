@@ -9,6 +9,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 
 import javax.jms.*;
+import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
+import org.apache.activemq.broker.region.policy.OldestMessageWithLowestPriorityEvictionStrategy;
+import org.apache.activemq.broker.region.policy.PendingMessageLimitStrategy;
+import org.apache.activemq.broker.region.policy.PolicyEntry;
+import org.apache.activemq.broker.region.policy.PolicyMap;
 
 public class CommandTransport implements CommandTransportInterface {
 
@@ -122,6 +127,18 @@ public class CommandTransport implements CommandTransportInterface {
             System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
 
             broker = new BrokerService();
+            //***policy
+            PolicyMap policy = new PolicyMap();
+            PolicyEntry pentry = new PolicyEntry();
+            OldestMessageWithLowestPriorityEvictionStrategy eviction = new OldestMessageWithLowestPriorityEvictionStrategy();
+            eviction.setEvictExpiredMessagesHighWatermark(1000);
+            pentry.setMessageEvictionStrategy(eviction);
+            ConstantPendingMessageLimitStrategy limit = new ConstantPendingMessageLimitStrategy();
+            limit.setLimit(100);
+            pentry.setPendingMessageLimitStrategy(limit);
+            policy.setDefaultEntry(pentry);
+            broker.setDestinationPolicy(policy);
+            //***policy
             broker.setPersistent(true);
             broker.setUseJmx(false);
             broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort);

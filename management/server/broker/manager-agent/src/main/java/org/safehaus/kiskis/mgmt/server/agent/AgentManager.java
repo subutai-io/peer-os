@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
@@ -22,6 +24,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private CommandManagerInterface commandManager;
     private final Set<Agent> registeredAgents;
     private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
+    ExecutorService executorService;
 
     public AgentManager() {
         registeredAgents = new HashSet<Agent>();
@@ -121,6 +124,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         try {
             if (getCommandTransport() != null) {
                 getCommandTransport().addListener(this);
+                executorService = Executors.newSingleThreadExecutor();
+                executorService.execute(new AgentHeartBeat(this, getCommandTransport()));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -132,6 +137,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             if (getCommandTransport() != null) {
                 getCommandTransport().removeListener(this);
             }
+            executorService.shutdownNow();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
