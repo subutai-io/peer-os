@@ -28,7 +28,6 @@ public class MgmtAgentManager extends VerticalLayout implements
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
 
-
         setSizeFull();
         setSpacing(true);
 
@@ -59,8 +58,31 @@ public class MgmtAgentManager extends VerticalLayout implements
             Set<String> agents = (Set<String>) event.getProperty().getValue();
 
             AppData.setSelectedAgentList(agents);
-            getWindow().showNotification(agents.toString());
+            setSelectedAgents(agents);
         }
+    }
+
+    private void setSelectedAgents(Set<String> list) {
+        Set<Agent> selectedList = new HashSet<Agent>();
+
+        for (String uuid : list) {
+            Agent agent = findAgent(uuid);
+            if (agent != null) {
+                selectedList.add(agent);
+            }
+        }
+
+        AppData.setAgentList(selectedList);
+    }
+
+    private Agent findAgent(String uuid) {
+        for (Agent agent : registeredAgents) {
+            if (agent.getUuid().equals(uuid)) {
+                return agent;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -79,7 +101,6 @@ public class MgmtAgentManager extends VerticalLayout implements
 
             registeredAgents.clear();
             registeredAgents.addAll(agents);
-            AppData.setAgentList(registeredAgents);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

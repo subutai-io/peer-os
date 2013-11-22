@@ -6,13 +6,14 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Dilshat
  */
-public class Request {
+public class Request implements Serializable {
 
     private String source = null;
     private RequestType type = null;

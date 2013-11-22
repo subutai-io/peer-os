@@ -6,12 +6,13 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Dilshat
  */
-public class Response {
+public class Response  implements Serializable {
 
     private String source;
     private ResponseType type;
