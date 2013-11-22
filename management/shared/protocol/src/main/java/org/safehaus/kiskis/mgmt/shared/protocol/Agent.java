@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * Used to define a physical host on the whole network. It could be management
  * server or the agent. It just defines a host in the network.
  */
-public class Agent {
+public class Agent implements Serializable {
 
     private String uuid;
     private String macAddress;

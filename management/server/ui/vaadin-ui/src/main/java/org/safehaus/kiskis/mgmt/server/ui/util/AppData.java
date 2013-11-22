@@ -9,6 +9,7 @@ import com.vaadin.service.ApplicationContext.TransactionListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -30,6 +31,7 @@ public class AppData
 
     public AppData(Application app) {
         this.app = app;
+        agentList = new HashSet<Agent>();
 
         // It's usable from now on in the current request
         instance.set(this);

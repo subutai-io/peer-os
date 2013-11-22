@@ -7,12 +7,13 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author bahadyr
  */
-public class Task {
+public class Task  implements Serializable {
 
     private String uid;
     private String description;
