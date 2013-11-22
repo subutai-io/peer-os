@@ -7,7 +7,7 @@ KAResponse::KAResponse()
 	// TODO Auto-generated constructor stub
 	setType("");
 	setUuid("");
-	setPid("");
+	setPid(-1);
 	setRequestSequenceNumber(-1);
 	setResponseSequenceNumber(-1);
 	setStandardError("");
@@ -35,7 +35,7 @@ void KAResponse::clear()
 {		//clear the all variables..
 	setType("");
 	setUuid("");
-	setPid("");
+	setPid(-1);
 	setRequestSequenceNumber(-1);
 	setResponseSequenceNumber(-1);
 	setStandardError("");
@@ -79,7 +79,7 @@ void KAResponse::serialize(string& output)
 	{
 		root["response"]["uuid"] = this->getUuid();
 	}
-	if(!(this->getPid().empty()))
+	if(this->getPid() >= 0)
 	{
 		root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
 	}
@@ -144,7 +144,7 @@ void KAResponse::serializeDone(string& output)
 	{
 		root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
 	}
-	if(!(this->getPid().empty()))
+	if(this->getPid() >= 0)
 	{
 		root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
 	}
@@ -165,14 +165,14 @@ void KAResponse::serializeDone(string& output)
 /**
  *  \details   getting "pid" private variable of KAResponse instance
  */
-string& KAResponse::getPid()
+int KAResponse::getPid()
 {						//getting pid
 	return this->pid;
 }
 /**
  *  \details   setting "pid" private variable of KAResponse instance
  */
-void KAResponse::setPid(const string& pid)
+void KAResponse::setPid(int pid)
 {			//setting pid
 	this->pid=pid;
 }

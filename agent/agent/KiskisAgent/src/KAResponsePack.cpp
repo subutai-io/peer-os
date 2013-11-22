@@ -16,7 +16,7 @@ KAResponsePack::~KAResponsePack()
 /**
  *  \details   This method creates default chunk message.
  */
-string KAResponsePack::createResponseMessage(string uuid,string pid,int requestSeqNum,int responseSeqNum,
+string KAResponsePack::createResponseMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string error,string output,string source,string taskuuid)
 {
 	this->setType("EXECUTE_RESPONSE");			//creating Response chunk message
@@ -34,7 +34,7 @@ string KAResponsePack::createResponseMessage(string uuid,string pid,int requestS
 /**
  *  \details   This method creates Exit done message.
  */
-string KAResponsePack::createExitMessage(string uuid,string pid,int requestSeqNum,int responseSeqNum,
+string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string source, string taskuuid,int exitcode)	//Creating Exit message
 {
 	this->setType("EXECUTE_RESPONSE_DONE");
@@ -110,7 +110,7 @@ string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,
 /**
  *  \details   This method creates Timeout message.
  */
-string KAResponsePack::createTimeoutMessage(string uuid,string pid,int requestSeqNum,int responseSeqNum,
+string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string stdOut,string stdErr,string source,string taskuuid)	//Creating Timeout Message
 {
 	this->setType("EXECUTE_TIMEOUTED");

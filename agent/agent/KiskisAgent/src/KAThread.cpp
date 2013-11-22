@@ -453,35 +453,31 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 	 *	For example, after this block, processpid should be pid of running command (e.g. tail)
 	 */
 	int status;
-	string processpid=toString(newpid);
+	int processpid = newpid;
 	pid_t result = waitpid(newpid, &status, WNOHANG);
 	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
 	while ((result = waitpid(newpid, &status, WNOHANG)) == 0)
 	{
 		string cmd;
-		processpid.clear();
 		cmd = "pgrep -P "+toString(newpid);
-		processpid = this->getProcessPid(cmd.c_str());
-		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Test1:",processpid));
+		cmd = this->getProcessPid(cmd.c_str());
 
-		cmd.clear();
-		cmd = "pgrep -P "+ processpid;
-		processpid.clear();
-		processpid = this->getProcessPid(cmd.c_str());
-		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Test2:",processpid));
-		if(atoi(processpid.c_str()))
+		cmd = "pgrep -P "+ cmd;
+		cmd = this->getProcessPid(cmd.c_str());
+
+		processpid = atoi(cmd.c_str());
+		if(processpid)
 		{
-			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Test3:",processpid));
 			break;
 		}
-		processpid=toString(newpid);
+		processpid=newpid;
 	}
 	if(result > 0)
 	{
-		processpid=toString(newpid);
+		processpid=newpid;
 		//return 1;
 	}
-	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Find pid finished","current pid:",processpid));
+	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Find pid finished","current pid:",toString(processpid)));
 
 	/*
 	 * if the execution is done process pid could not be read and should be skipped now..
@@ -565,14 +561,14 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 				command->getRequestSequenceNumber(),responsecount,"","",command->getSource(),command->getTaskUuid());
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
 		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
-		if(atoi(processpid.c_str()))
+		if(processpid)
 		{
-			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process will be killed.","pid:",processpid));
-			kill(atoi(processpid.c_str()),SIGKILL); //killing the process after timeout
+			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process will be killed.","pid:",toString(processpid)));
+			kill(processpid,SIGKILL); //killing the process after timeout
 		}
 		else
 		{
-			logger.writeLog(3,logger.setLogData("<KAThread::optionReadSend> " "Process pid is not valid.","pid:",processpid));
+			logger.writeLog(3,logger.setLogData("<KAThread::optionReadSend> " "Process pid is not valid.","pid:",toString(processpid)));
 		}
 	}
 	if( errorStream->getSelectResult() == 0 && outputStream->getSelectResult() == 0 )
@@ -586,14 +582,14 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 				command->getRequestSequenceNumber(),responsecount,"","",command->getSource(),command->getTaskUuid());
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
 		logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
-		if(atoi(processpid.c_str()))
+		if(processpid)
 		{
-			logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "Process will be killed.","pid:",processpid));
-			kill(atoi(processpid.c_str()),SIGKILL); //killing the process after timeout
+			logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "Process will be killed.","pid:",toString(processpid)));
+			kill(processpid,SIGKILL); //killing the process after timeout
 		}
 		else
 		{
-			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process pid is not valid.","pid:",processpid));
+			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process pid is not valid.","pid:",toString(processpid)));
 		}
 	}
 	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Capturing is Done!!"));
@@ -635,10 +631,10 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 
 			if(!checkCWD(command))
 			{
-				string message = response.createResponseMessage(command->getUuid(),toString(getpid()),
+				string message = response.createResponseMessage(command->getUuid(),getpid(),
 						command->getRequestSequenceNumber(),1,"Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				message = response.createExitMessage(command->getUuid(),processpid,
+				message = response.createExitMessage(command->getUuid(),atoi(processpid.c_str()),
 						command->getRequestSequenceNumber(),2,command->getSource(),command->getTaskUuid(),1);
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
@@ -648,10 +644,10 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			}
 			if(!checkUID(command))
 			{
-				string message = response.createResponseMessage(command->getUuid(),toString(getpid()),
+				string message = response.createResponseMessage(command->getUuid(),getpid(),
 						command->getRequestSequenceNumber(),1,"User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				message = response.createExitMessage(command->getUuid(),processpid,
+				message = response.createExitMessage(command->getUuid(),atoi(processpid.c_str()),
 						command->getRequestSequenceNumber(),2,command->getSource(),command->getTaskUuid(),1);
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
@@ -731,7 +727,7 @@ KAUserID& KAThread::getUserID()
  *  		   If there is no activity during 60 seconds(default timeout) this thread sends a I'm alive message to the ActiveMQ Broker.
  */
 void KAThread::taskTimeout(message_queue *messageQueue,KACommand* command,
-		string* pid,string* outBuff,string* errBuff,numbers* block,KALogger* logger)
+		int* pid,string* outBuff,string* errBuff,numbers* block,KALogger* logger)
 {
 	logger->writeLog(6,logger->setLogData("<KAThread::taskTimeout> " "taskTİmeOut is starting!!","pid",toString(getpid())));
 	try

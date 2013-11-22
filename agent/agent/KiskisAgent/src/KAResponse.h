@@ -32,7 +32,7 @@ public:
 	int getExitCode();
 	string& getStandardError();
 	string& getStandardOutput();
-	string& getPid();
+	int getPid();
 	string& getHostname();
 	string& getMacAddress();
 	string& getTaskUuid();
@@ -45,7 +45,7 @@ public:
 	void setTaskUuid(const string&);
 	void setIsLxc(bool);
 	void setIps(vector<string>);
-	void setPid(const string&);
+	void setPid(int);
 	void setType(const string&);
 	void setUuid(const string&);
 	void setRequestSequenceNumber(int);
@@ -62,7 +62,7 @@ private:
 	int			 	requestSequenceNumber;
 	int			 	responseSequenceNumber;
 	int				exitCode;
-	string			pid;
+	int				pid;
 	string       	stdOut;
 	string        	stdErr;
 	string			taskUuid;

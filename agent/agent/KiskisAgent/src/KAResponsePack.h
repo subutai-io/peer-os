@@ -17,13 +17,13 @@ class KAResponsePack : public KAResponse
 public:
 	KAResponsePack();
 	virtual ~KAResponsePack();
-	string createResponseMessage(string,string,int,int,string,string,string,string);			//Creating Response chunk messasge
-	string createExitMessage(string,string, int, int,string,string,int);						//Creating Response Exit_DONE messasge
+	string createResponseMessage(string,int,int,int,string,string,string,string);			//Creating Response chunk messasge
+	string createExitMessage(string,int, int, int,string,string,int);						//Creating Response Exit_DONE messasge
 	string createRegistrationMessage(string,string,string,bool);  								//Creating Registration Message
 	string createTerminateMessage(string,int,string); 											//Creating Terminate_DONE Message
 	string createFailTerminateMessage(string,int,string);										//Creating Fail Terminate Message
 	string createHeartBeatMessage(string,int,string,string,bool,string,string);					//Creating HeartBeat Message
-	string createTimeoutMessage(string,string,int,int,string,string,string,string);
+	string createTimeoutMessage(string,int,int,int,string,string,string,string);
 private:
 	string sendout;
 };

@@ -39,7 +39,7 @@ public:
 	string& getType();
 	string& getStandardOutputPath();
 	string& getStandardErrPath();
-	string& getPid();
+	int getPid();
 	string& getHostname();
 	string& getMacAddress();
 	string& getTaskUuid();
@@ -55,7 +55,7 @@ public:
 	void setIsLxc(bool);
 	void setIps(vector<string>);
 	void setTimeout(int);
-	void setPid(const string&);
+	void setPid(int);
 	void setEnvironment(list<pair<string,string> >&);
 	void setArguments(vector<string>);
 	void setUuid(const string&);
@@ -74,7 +74,7 @@ private:
 	string        	type;
 	string        	program;
 	string		    uuid;
-	string			pid;
+	int				pid;
 	int			 	requestSequenceNumber;
 	int				timeout;
 	string       	stdOut;

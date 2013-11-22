@@ -357,27 +357,33 @@ int main(int argc,char *argv[],char *envp[])
 					else if(command.getType()=="HEARTBEAT_REQUEST")
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Heartbeat message has been taken.."));
-						connection.sendMessage(response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,false,command.getSource(),command.getTaskUuid()));
+						string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,false,command.getSource(),command.getTaskUuid());
+						connection.sendMessage(resp);
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
 					}
 					else if(command.getType()=="TERMINATE_REQUEST")
 					{
-						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",command.getPid()));
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",toString(command.getPid())));
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Killing given PID.."));
-						int retstatus = kill(atoi(command.getPid().c_str()),SIGKILL);
+						int retstatus = kill(command.getPid(),SIGKILL);
 						if(retstatus==0) //termination is successfully done
 						{
-							connection.sendMessage(response.createTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource()));
+							string resp = response.createTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
+							connection.sendMessage(resp);
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate success Response:", resp));
 						}
 						else if (retstatus ==-1) //termination is failed
 						{
-							connection.sendMessage(response.createFailTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource()));
+							string resp = response.createFailTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
+							connection.sendMessage(resp);
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate Fail Response:", resp));
 						}
 					}
 				}
 				else
 				{
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Failed at parsing Json String: ",input));
-					connection.sendMessage(response.createResponseMessage(Uuid,"9999999",command.getRequestSequenceNumber(),819,"Failed to Parse Json!!!","",command.getSource(),command.getTaskUuid()));
+					connection.sendMessage(response.createResponseMessage(Uuid,9999999,command.getRequestSequenceNumber(),819,"Failed to Parse Json!!!","",command.getSource(),command.getTaskUuid()));
 				}
 			}
 		}

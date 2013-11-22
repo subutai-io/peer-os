@@ -50,11 +50,11 @@ public:
 	typedef struct numbers
 	{
 		int *responsecount;
-		string *processpid;
+		int *processpid;
 		bool *flag;
 		KALogger *logger;
 	};
-	static void taskTimeout(message_queue*,KACommand*,string*,string*,string*,struct numbers*,KALogger*);
+	static void taskTimeout(message_queue*,KACommand*,int*,string*,string*,struct numbers*,KALogger*);
 	static void capture(message_queue*,KACommand*,KAStreamReader*,mutex*,string*,string*,struct numbers*,KALogger*);
 	static void checkAndWrite(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,KALogger*);
 	static void checkAndSend(message_queue*,KAStreamReader*,string*,string*,KACommand*,struct numbers*,KALogger*);

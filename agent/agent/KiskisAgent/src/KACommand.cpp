@@ -9,7 +9,7 @@ KACommand::KACommand()
 	this->setProgram("");
 	this->setWorkingDirectory("");
 	this->setUuid("");
-	this->setPid("");
+	this->setPid(-1);
 	this->setRequestSequenceNumber(-1);
 	this->setStandardError("");
 	this->setStandardErrPath("");
@@ -42,7 +42,7 @@ void KACommand::clear()
 	this->setProgram("");
 	this->setWorkingDirectory("");
 	this->setUuid("");
-	this->setPid("");
+	this->setPid(-1);
 	this->setRequestSequenceNumber(-1);
 	this->setStandardError("");
 	this->setStandardErrPath("");
@@ -107,7 +107,7 @@ bool KACommand::deserialize(string& input)
 	}
 	if(!root["command"]["pid"].isNull())
 	{
-		this->setPid(root["command"]["pid"].asString());				//initialize pid parameter if it is not null
+		this->setPid(root["command"]["pid"].asInt());					//initialize pid parameter if it is not null
 	}
 	if(!root["command"]["workingDirectory"].isNull())
 	{
@@ -199,7 +199,7 @@ void KACommand::setEnvironment(list<pair<string,string> >& envr)
 /**
  *  \details   getting "pid" private variable of KACommand instance
  */
-string& KACommand::getPid()
+int KACommand::getPid()
 {
 	return this->pid;
 }
@@ -207,7 +207,7 @@ string& KACommand::getPid()
  *  \details   setting "pid" private variable of KACommand instance.
  *  		   It carries the process id of the execution.
  */
-void KACommand::setPid(const string& pid)
+void KACommand::setPid(int pid)
 {
 	this->pid=pid;
 }
