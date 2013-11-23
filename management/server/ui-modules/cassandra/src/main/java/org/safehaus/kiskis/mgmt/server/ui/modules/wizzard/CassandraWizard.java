@@ -3,12 +3,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.wizzard;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 public class CassandraWizard extends Window {
 
@@ -32,7 +29,7 @@ public class CassandraWizard extends Window {
 
         verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);
-        verticalLayout.setHeight(500, Sizeable.UNITS_PIXELS);
+        verticalLayout.setHeight(400, Sizeable.UNITS_PIXELS);
         verticalLayout.setWidth(800, Sizeable.UNITS_PIXELS);
 
         putForm();

@@ -11,6 +11,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;
+import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -41,15 +43,15 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     @Override
     public synchronized void getCommand(Response response) {
         System.out.println("Response received by CommandManager");
+        persistenceCommand.saveResponse(response);
+
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
-                persistenceCommand.saveResponse(response);
                 notifyListeners(response);
                 break;
             }
             case EXECUTE_RESPONSE_DONE: {
-                persistenceCommand.saveResponse(response);
                 notifyListeners(response);
                 break;
             }
@@ -139,5 +141,25 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         }
 
         return null;
+    }
+
+    public List<Request> getCommands() {
+        try {
+            return persistenceCommand.getRequests("taskuuid");
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public List<Response> getResponses() {
+        try {
+            return persistenceCommand.getResponses("taskuuid");
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public void saveResponse(Response response) {
+        persistenceCommand.saveResponse(response);
     }
 }

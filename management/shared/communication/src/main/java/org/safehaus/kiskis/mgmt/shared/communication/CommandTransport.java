@@ -11,7 +11,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import javax.jms.*;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
 import org.apache.activemq.broker.region.policy.OldestMessageWithLowestPriorityEvictionStrategy;
-import org.apache.activemq.broker.region.policy.PendingMessageLimitStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 

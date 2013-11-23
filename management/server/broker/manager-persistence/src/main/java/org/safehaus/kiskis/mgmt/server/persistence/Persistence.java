@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.apache.cassandra.utils.UUIDGen;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -146,8 +147,20 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public List<Response> getResponses() {
-        throw new UnsupportedOperationException("not done yet");
+    public List<Response> getResponses(String taskuuid) {
+        List<Response> list = new ArrayList<Response>();
+        ResultSet rs = session.execute("select * from response");
+        Iterator<Row> it = rs.iterator();
+        while (it.hasNext()) {
+            Response response = new Response();
+            Row row = it.next();
+            response.setType(ResponseType.valueOf(row.getString("responsetype")));
+            response.setUuid(row.getString("uuid"));
+            response.setExitCode(row.getInt("exitcode"));
+            response.setStdOut(row.getString("stdout"));
+            list.add(response);
+        }
+        return list;
     }
 
     @Override
@@ -172,5 +185,18 @@ public class Persistence implements PersistenceInterface {
         session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
 
         return uuid.toString();
+    }
+
+    public List<Request> getRequests(String taskuuid) {
+        List<Request> list = new ArrayList<Request>();
+        ResultSet rs = session.execute("select * from request");
+        Iterator<Row> it = rs.iterator();
+        while (it.hasNext()) {
+            Request request = new Request();
+            Row row = it.next();
+            request.setProgram(row.getString("program"));
+            list.add(request);
+        }
+        return list;
     }
 }

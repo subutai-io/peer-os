@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules;
 
 import com.vaadin.ui.*;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -22,15 +23,17 @@ public class Terminal implements Module {
     private static ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
-            Button.ClickListener, CommandListener {
+            CommandListener {
 
-        private TextArea textAreaCommand;
-        private TextArea textAreaOutput;
-        private Button buttonSend;
+        private final TextArea textAreaCommand;
+        private final TextArea textAreaOutput;
+        private final Button buttonSend;
+        private final Button getRequests;
+        private final Button getResponses;
         private Set<String> agents;
-        private CommandManagerInterface commandManagerInterface;
+        private final CommandManagerInterface commandManagerInterface;
 
-        public ModuleComponent(CommandManagerInterface commandManagerInterface) {
+        public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
             this.commandManagerInterface = commandManagerInterface;
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -39,7 +42,7 @@ public class Terminal implements Module {
             Label labelText = new Label("Enter command:");
             textAreaCommand = new TextArea();
             textAreaCommand.setRows(20);
-            textAreaCommand.setColumns(100);
+            textAreaCommand.setColumns(80);
             textAreaCommand.setImmediate(true);
             textAreaCommand.setWordwrap(true);
 
@@ -48,13 +51,78 @@ public class Terminal implements Module {
 
             buttonSend = new Button("Send");
             buttonSend.setDescription("Sends command to agent");
-            buttonSend.addListener(this); // react to clicks
+            buttonSend.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    try {
+                        agents = AppData.getSelectedAgentList();
+                        if (agents != null && agents.size() > 0) {
+                            for (String agent : agents) {
+                                String json = textAreaCommand.getValue().toString().trim();
+
+                                Request r = CommandJson.getRequest(json);
+
+                                if (r != null) {
+                                    r.setUuid(agent);
+                                    r.setSource(Terminal.MODULE_NAME);
+
+                                    Command command = new Command(r);
+                                    commandManagerInterface.executeCommand(command);
+                                }
+                            }
+                        } else {
+                            getWindow().showNotification("Select agent!");
+                        }
+                    } catch (Exception ex) {
+                        getWindow().showNotification(ex.toString());
+                        System.out.println("buttonClick event Exception");
+                    }
+                }
+            });
+
             verticalLayout.addComponent(buttonSend);
+
+            getRequests = new Button("Get requests");
+            getRequests.setDescription("Gets requests from Cassandra");
+            getRequests.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    List<Request> listofrequest = commandManagerInterface.getCommands();
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < listofrequest.size(); i++) {
+                        Request request = listofrequest.get(i);
+                        sb.append(request.getProgram()).append("\n");
+                    }
+                    textAreaOutput.setValue(sb.toString());
+                }
+            }); // react to clicks
+            verticalLayout.addComponent(getRequests);
+
+            getResponses = new Button("Get responses");
+            getResponses.setDescription("Gets requests from Cassandra");
+            getResponses.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    List<Response> list = commandManagerInterface.getResponses();
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < list.size(); i++) {
+                        Response response = list.get(i);
+                        sb.append("Task UUID: ").append(response.getTaskUuid()).append("\n");
+                        sb.append(response.getUuid()).append(" ").append(response.getType()).append("\n");
+                        sb.append(response.getExitCode()).append("\n");
+                    }
+                    textAreaOutput.setValue(sb.toString());
+                }
+            }); // react to clicks
+            verticalLayout.addComponent(getResponses);
 
             Label labelOutput = new Label("Commands output");
             textAreaOutput = new TextArea();
             textAreaOutput.setRows(20);
-            textAreaOutput.setColumns(100);
+            textAreaOutput.setColumns(80);
             textAreaOutput.setImmediate(true);
             textAreaOutput.setWordwrap(false);
 
@@ -65,39 +133,11 @@ public class Terminal implements Module {
         }
 
         @Override
-        public void buttonClick(Button.ClickEvent event) {
-            try {
-                agents = AppData.getSelectedAgentList();
-                if (agents != null && agents.size() > 0) {
-                    for (String agent : agents) {
-                        String json = textAreaCommand.getValue().toString().trim();
-
-                        Request r = CommandJson.getRequest(json);
-
-                        if (r != null) {
-                            r.setUuid(agent);
-                            r.setSource(Terminal.MODULE_NAME);
-
-                            Command command = new Command(r);
-                            commandManagerInterface.executeCommand(command);
-                        }
-                    }
-                } else {
-                    getWindow().showNotification("Select agent!");
-                }
-            } catch (Exception ex) {
-                getWindow().showNotification(ex.toString());
-                System.out.println("buttonClick event Exception");
-            }
-        }
-
-        @Override
         public void outputCommand(Response response) {
+            commandManagerInterface.saveResponse(response);
             try {
                 if (response != null && agents != null && agents.contains(response.getUuid())) {
-                    System.out.println("");
-                    System.out.println(response);
-                    System.out.println("");
+                    System.out.println("TERMINAL outputCommand(Response response) called");
 
                     StringBuilder output = new StringBuilder();
                     output.append(textAreaOutput.getValue());

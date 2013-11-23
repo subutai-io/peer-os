@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class CommunicationMessageListener implements MessageListener {
 
     private final Session session;
-    private ArrayList<BrokerListener> listeners = new ArrayList<BrokerListener>();
+    private final ArrayList<BrokerListener> listeners = new ArrayList<BrokerListener>();
 
     /**
      * @param session

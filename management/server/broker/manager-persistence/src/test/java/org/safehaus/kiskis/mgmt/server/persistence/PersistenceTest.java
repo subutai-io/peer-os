@@ -182,4 +182,16 @@ public class PersistenceTest {
 //        String uuid = instance.saveTask(task);
 //        assertEquals(uuid, uuid);
 //    }
+    
+//    @Test
+    public void testGetRequests() {
+        System.out.println("saveTask");
+        Persistence instance = new Persistence();
+        instance.setCassandraHost("localhost");
+        instance.setCassandraPort(9042);
+        instance.setCassandraKeyspace("kiskis");
+        instance.init();
+        List<Request> list = instance.getRequests("test");
+        assertEquals(0, list.size());
+    }
 }

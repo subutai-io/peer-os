@@ -11,7 +11,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-
 public class Cassandra implements Module {
 
     public static final String MODULE_NAME = "Cassandra";
@@ -19,10 +18,9 @@ public class Cassandra implements Module {
     private static ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
-            Button.ClickListener, CommandListener {
+            CommandListener {
 
         private final Button buttonInstallWizard;
-//        private Set<String> agents;
         private final Window subwindow;
         private final CommandManagerInterface commandManagerInterface;
 
@@ -34,22 +32,23 @@ public class Cassandra implements Module {
             verticalLayout.setSpacing(true);
 
             buttonInstallWizard = new Button("Cassandra Installation Wizard");
-            buttonInstallWizard.addListener(ModuleComponent.this); // react to clicks
+            buttonInstallWizard.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    getApplication().getMainWindow().addWindow(subwindow);
+                }
+            }); // react to clicks
             verticalLayout.addComponent(buttonInstallWizard);
 
             setCompositionRoot(verticalLayout);
         }
 
         @Override
-        public void buttonClick(Button.ClickEvent event) {
-            getApplication().getMainWindow().addWindow(subwindow);
-        }
-
-        @Override
         public void outputCommand(Response response) {
+            commandManagerInterface.saveResponse(response);
             try {
-                System.out.println("CASSANDRA");
-                System.out.println(response);
+                System.out.println("CASSANDRA outputCommand(Response response) called");
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
                 ex.printStackTrace();
