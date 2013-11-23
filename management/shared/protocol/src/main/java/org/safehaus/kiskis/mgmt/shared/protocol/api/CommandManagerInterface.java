@@ -4,6 +4,7 @@ import java.util.List;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 /**
@@ -23,4 +24,6 @@ public interface CommandManagerInterface {
     public List<Response> getResponses();
 
     public void saveResponse(Response response);
+
+    public List<Task> getTasks();
 }

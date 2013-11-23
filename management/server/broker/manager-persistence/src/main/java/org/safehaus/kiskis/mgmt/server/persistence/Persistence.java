@@ -16,6 +16,7 @@ import org.apache.cassandra.utils.UUIDGen;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -187,6 +188,7 @@ public class Persistence implements PersistenceInterface {
         return uuid.toString();
     }
 
+    @Override
     public List<Request> getRequests(String taskuuid) {
         List<Request> list = new ArrayList<Request>();
         ResultSet rs = session.execute("select * from request");
@@ -196,6 +198,22 @@ public class Persistence implements PersistenceInterface {
             Row row = it.next();
             request.setProgram(row.getString("program"));
             list.add(request);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Task> getTasks() {
+        List<Task> list = new ArrayList<Task>();
+        ResultSet rs = session.execute("select * from tasks");
+        Iterator<Row> it = rs.iterator();
+        while (it.hasNext()) {
+            Row row = it.next();
+            Task task = new Task();
+            task.setUid(row.getUUID("uid").toString());
+            task.setDescription(row.getString("description"));
+            task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
+            list.add(task);
         }
         return list;
     }

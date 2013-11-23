@@ -35,4 +35,6 @@ public interface PersistenceInterface {
     boolean updateAgent(Agent agent);
 
     String saveTask(Task task);
+    
+    List<Task> getTasks();
 }

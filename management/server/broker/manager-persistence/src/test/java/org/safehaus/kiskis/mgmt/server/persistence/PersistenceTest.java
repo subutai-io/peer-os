@@ -19,14 +19,19 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Test;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * @author bahadyr
  */
 public class PersistenceTest {
 
+    Persistence instance = new Persistence();
+
     public PersistenceTest() {
+        instance.setCassandraHost("localhost");
+        instance.setCassandraPort(9042);
+        instance.setCassandraKeyspace("kiskis");
+        instance.init();
     }
 
     @BeforeClass
@@ -182,16 +187,18 @@ public class PersistenceTest {
 //        String uuid = instance.saveTask(task);
 //        assertEquals(uuid, uuid);
 //    }
-    
 //    @Test
     public void testGetRequests() {
-        System.out.println("saveTask");
-        Persistence instance = new Persistence();
-        instance.setCassandraHost("localhost");
-        instance.setCassandraPort(9042);
-        instance.setCassandraKeyspace("kiskis");
-        instance.init();
+        System.out.println("saveRequests");
         List<Request> list = instance.getRequests("test");
         assertEquals(0, list.size());
     }
+
+    @Test
+    public void testGetTasks() {
+        System.out.println("getTasks");
+        List<Task> list = instance.getTasks();
+        assertEquals(false, list.isEmpty());
+    }
+
 }

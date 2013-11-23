@@ -13,6 +13,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.ArrayList;
 import java.util.List;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -161,5 +162,9 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public void saveResponse(Response response) {
         persistenceCommand.saveResponse(response);
+    }
+
+    public List<Task> getTasks() {
+        return persistenceCommand.getTasks();
     }
 }
