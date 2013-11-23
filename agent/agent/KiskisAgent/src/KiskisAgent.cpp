@@ -29,6 +29,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
+#include <time.h>
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */

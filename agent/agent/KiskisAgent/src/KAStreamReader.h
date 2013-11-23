@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <string.h>
+#include <time.h>
 
 using namespace std;
 class KAStreamReader

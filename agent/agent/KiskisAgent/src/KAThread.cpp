@@ -360,12 +360,16 @@ void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,
 void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamReader* Stream,
 		mutex* mymutex,string* outBuff,string* errBuff,numbers* block,KALogger* logger)
 {
-	Stream->setTimeout(command->getTimeout());
+	unsigned int exectimeout = command->getTimeout();
+
+	Stream->setTimeout(exectimeout);
 	Stream->prepareFileDec();
 	logger->writeLog(6,logger->setLogData("<KAThread::capture> " "Capturing Started!!"));
 
-	boost::posix_time::ptime startingpoint = boost::posix_time::second_clock::local_time();
-	int startingsec =  startingpoint.time_of_day().seconds();
+	bool overflag = false;
+	unsigned int count = 0;
+	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
+	unsigned int startsec  =  start.time_of_day().seconds();
 
 	while(true)
 	{
@@ -373,30 +377,42 @@ void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamRe
 		logger->writeLog(7,logger->setLogData("<KAThread::capture> " "Selection:",toString(Stream->getSelectResult()),"Identity:",Stream->getIdentity()));
 		Stream->clearBuffer();
 
-		if(command->getTimeout()!=0)
+		if (exectimeout != 0)
 		{
 			boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
-			int currentsec =  current.time_of_day().seconds();
+			unsigned int currentsec  =  current.time_of_day().seconds();
 
-			if((currentsec-startingsec) >= 0)
+			if((currentsec > startsec) && overflag==false)
 			{
-				if((currentsec-startingsec) >= command->getTimeout())
+				if(currentsec != 59)
 				{
-					logger->writeLog(4,logger->setLogData("<KAThread::capture> " "Timeout Occured!!"));
-					Stream->setSelectResult(0);
-					break;
+					count = count + (currentsec - startsec);
+					startsec = currentsec;
 				}
+				else
+				{
+					count = count + (currentsec - startsec);
+					overflag = true;
+					startsec = 0;
+				}
+			}
+			if(currentsec == 59)
+			{
+				overflag = true;
+				startsec=0;
 			}
 			else
 			{
-				if((60+currentsec-startingsec) >= command->getTimeout())
-				{
-					logger->writeLog(4,logger->setLogData("<KAThread::capture> " "Timeout Occured!!"));
-					Stream->setSelectResult(0);
-					break;
-				}
+				overflag = false;
+			}
+			if(count >= exectimeout) //timeout
+			{
+				logger->writeLog(4,logger->setLogData("<KAThread::capture> " "Timeout Occured!!"));
+				Stream->setSelectResult(0);
+				break;
 			}
 		}
+
 		if (Stream->getSelectResult()==0)
 		{
 			/*
@@ -452,6 +468,8 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 	 *	Getting system pid of child process
 	 *	For example, after this block, processpid should be pid of running command (e.g. tail)
 	 */
+	bool CWDERR=false;
+	bool UIDERR=false;
 	int status;
 	int processpid = newpid;
 	pid_t result = waitpid(newpid, &status, WNOHANG);
@@ -482,6 +500,25 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 	/*
 	 * if the execution is done process pid could not be read and should be skipped now..
 	 */
+
+	if(!checkCWD(command))
+	{
+		CWDERR=true;
+		string message = response.createResponseMessage(command->getUuid(),processpid,
+				command->getRequestSequenceNumber(),1,"Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+		while(!messageQueue->try_send(message.data(), message.size(), 0));
+		logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+		//problem about absolute path
+	}
+	if(!checkUID(command))
+	{
+		UIDERR=true;
+		string message = response.createResponseMessage(command->getUuid(),processpid,
+				command->getRequestSequenceNumber(),1,"User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+		while(!messageQueue->try_send(message.data(), message.size(), 0));
+		logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
+		//problem about UID
+	}
 
 	int responsecount=1;
 	bool flag=false;			//flag for acrivity check for stderr and stdout
@@ -541,7 +578,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
 		 * Execute Done Response is sending..
 		 */
 		int exitcode = 0; // to detect is there any error in the message so if there is an error exitcode should be set to 1. Otherwise is 0.
-		if(!errBuff.empty())
+		if(!errBuff.empty() || CWDERR == true || UIDERR == true)
 			exitcode = 1;
 		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block,&(this->getLogger()));
 		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "LastCheckSend function has finished at ReadResult"));
@@ -631,12 +668,6 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 
 			if(!checkCWD(command))
 			{
-				string message = response.createResponseMessage(command->getUuid(),getpid(),
-						command->getRequestSequenceNumber(),1,"Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				message = response.createExitMessage(command->getUuid(),atoi(processpid.c_str()),
-						command->getRequestSequenceNumber(),2,command->getSource(),command->getTaskUuid(),1);
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
 				kill(getpid(),SIGKILL);		//killing child
 				exit(1);
@@ -644,12 +675,6 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			}
 			if(!checkUID(command))
 			{
-				string message = response.createResponseMessage(command->getUuid(),getpid(),
-						command->getRequestSequenceNumber(),1,"User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				message = response.createExitMessage(command->getUuid(),atoi(processpid.c_str()),
-						command->getRequestSequenceNumber(),2,command->getSource(),command->getTaskUuid(),1);
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
 				kill(getpid(),SIGKILL);		//killing child
 				exit(1);
