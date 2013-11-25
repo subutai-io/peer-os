@@ -10,5 +10,5 @@ package org.safehaus.kiskis.mgmt.shared.protocol.enums;
  */
 public enum TaskStatus {
 
-    SUCCESS, FAIL;
+    NEW, SUCCESS, FAIL;
 }

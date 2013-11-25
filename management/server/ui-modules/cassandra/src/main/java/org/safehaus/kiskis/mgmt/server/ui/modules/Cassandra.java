@@ -7,6 +7,7 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
@@ -21,13 +22,12 @@ public class Cassandra implements Module {
             CommandListener {
 
         private final Button buttonInstallWizard;
-        private final Window subwindow;
+//        private final Window subwindow;
         private final CommandManagerInterface commandManagerInterface;
 
-        public ModuleComponent(CommandManagerInterface commandManagerInterface) {
+        public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
             this.commandManagerInterface = commandManagerInterface;
 
-            subwindow = new CassandraWizard(commandManagerInterface);
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
@@ -36,11 +36,13 @@ public class Cassandra implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    getApplication().getMainWindow().addWindow(subwindow);
+                    if (AppData.getSelectedAgentList() != null) {
+                        final Window subwindow = new CassandraWizard(commandManagerInterface);
+                        getApplication().getMainWindow().addWindow(subwindow);
+                    }
                 }
             }); // react to clicks
             verticalLayout.addComponent(buttonInstallWizard);
-
             setCompositionRoot(verticalLayout);
         }
 
