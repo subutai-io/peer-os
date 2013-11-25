@@ -24,7 +24,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private CommandManagerInterface commandManager;
     private final Set<Agent> registeredAgents;
     private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
-    ExecutorService executorService;
+    private ExecutorService executorService;
+    private int heartbeatTimeoutSec;
 
     public AgentManager() {
         registeredAgents = new HashSet<Agent>();
@@ -129,7 +130,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             if (getCommandTransport() != null) {
                 getCommandTransport().addListener(this);
                 executorService = Executors.newSingleThreadExecutor();
-                executorService.execute(new AgentHeartBeat(this, getCommandTransport()));
+                executorService.execute(new AgentHeartBeat(this, getCommandTransport(), heartbeatTimeoutSec));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -170,5 +171,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
 
         return null;
+    }
+
+    public void setHeartbeatTimeoutSec(int heartbeatTimeoutSec) {
+        this.heartbeatTimeoutSec = heartbeatTimeoutSec;
     }
 }
