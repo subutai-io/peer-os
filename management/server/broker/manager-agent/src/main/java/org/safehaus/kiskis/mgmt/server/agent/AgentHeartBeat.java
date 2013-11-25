@@ -37,14 +37,16 @@ public class AgentHeartBeat implements Runnable {
                 //send hearbeats
                 if (commandSender != null) {
                     Set<Agent> agents = agentManager.getRegisteredAgents();
-                    for (Agent agent : agents) {
-                        commandSender.sendCommand((Command) CommandFactory.createRequest(
-                                RequestType.HEARTBEAT_REQUEST,
-                                agent.getUuid(),
-                                "HEARTBEAT",
-                                null, null, null, null, null, null, null, null, null, null, null));
+                    if (!agents.isEmpty()) {
+                        System.out.println("Sending heartbeat to agents");
+                        for (Agent agent : agents) {
+                            commandSender.sendCommand((Command) CommandFactory.createRequest(
+                                    RequestType.HEARTBEAT_REQUEST,
+                                    agent.getUuid(),
+                                    "HEARTBEAT",
+                                    null, null, null, null, null, null, null, null, null, null, null));
+                        }
                     }
-                    System.out.println("Sending heartbeat to agents");
                 }
                 Thread.sleep(timeoutSec * 1000);
             } catch (Exception ex) {
