@@ -187,18 +187,25 @@ public class PersistenceTest {
 //        String uuid = instance.saveTask(task);
 //        assertEquals(uuid, uuid);
 //    }
-//    @Test
+    @Test
     public void testGetRequests() {
         System.out.println("saveRequests");
         List<Request> list = instance.getRequests("test");
-        assertEquals(0, list.size());
+        assertEquals(false, list.isEmpty());
     }
 
-    @Test
+//    @Test
     public void testGetTasks() {
         System.out.println("getTasks");
         List<Task> list = instance.getTasks();
         assertEquals(false, list == null);
+    }
+
+    @Test
+    public void testGetResponses() {
+        System.out.println("getResponses");
+        List<Response> list = instance.getResponses("");
+        assertEquals(false, list.isEmpty());
     }
 
 }

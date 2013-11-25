@@ -10,6 +10,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -110,7 +111,6 @@ public class Persistence implements PersistenceInterface {
 //    public List<Command> getCommandList(Agent agent) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
-
     /**
      * Saves command into cassandra
      *
@@ -180,6 +180,17 @@ public class Persistence implements PersistenceInterface {
                 response.setUuid(row.getString("uuid"));
                 response.setExitCode(row.getInt("exitcode"));
                 response.setStdOut(row.getString("stdout"));
+                response.setHostname(row.getString("hostname"));
+                response.setIps(row.getList("ips", String.class));
+                response.setMacAddress(row.getString("macaddress"));
+                response.setPid(row.getInt("pid"));
+                response.setRequestSequenceNumber(row.getLong("requestsequencenumber"));
+                response.setResponseSequenceNumber(row.getLong("responsesequencenumber"));
+                response.setSource(row.getString("source"));
+                response.setStdErr(row.getString("errout"));
+                response.setStdOut(row.getString("stdout"));
+                response.setTaskUuid(row.getString("taskuuid"));
+                response.setType(ResponseType.valueOf(row.getString("responsetype")));
                 list.add(response);
             }
 
@@ -233,6 +244,22 @@ public class Persistence implements PersistenceInterface {
             for (Row row : rs) {
                 Request request = new Request();
                 request.setProgram(row.getString("program"));
+                request.setArgs(row.getList("args", String.class));
+                request.setEnvironment(row.getMap("environment", String.class, String.class));
+                request.setPid(row.getInt("pid"));
+                request.setProgram(row.getString("program"));
+                request.setRequestSequenceNumber(row.getLong("requestsequencenumber"));
+                request.setRunAs(row.getString("runsas"));
+                request.setSource(row.getString("source"));
+                request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                request.setStdErrPath(row.getString("erroutpath"));
+                request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
+                request.setStdOutPath(row.getString("stdoutpath"));
+                request.setTaskUuid(row.getString("taskuuid"));
+                request.setTimeout(row.getLong("timeout"));
+                request.setType(RequestType.valueOf(row.getString("type")));
+                request.setUuid(row.getString("uuid"));
+                request.setWorkingDirectory(row.getString("workingdirectory"));
                 list.add(request);
             }
 
