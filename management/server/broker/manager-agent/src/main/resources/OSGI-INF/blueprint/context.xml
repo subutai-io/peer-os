@@ -1,5 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+    <!-- Allow the use of system properties -->
+    <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+    
+    <cm:property-placeholder persistent-id="MiscConfig" update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="heartbeatTimeoutSec" value="300"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+    
     <reference id="persistenceAgentService" availability="optional"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface"/>
     <reference id="commandManagerService" availability="mandatory"
@@ -11,6 +23,7 @@
         <property name="persistenceAgentService" ref="persistenceAgentService"/>
         <property name="commandManagerService" ref="commandManagerService"/>
         <property name="context" ref="blueprintBundleContext"/>
+        <property name="heartbeatTimeoutSec" value="${heartbeatTimeoutSec}"/>  
     </bean>
     <service ref="agentManagerService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"

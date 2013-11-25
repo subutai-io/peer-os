@@ -23,10 +23,12 @@ public class AgentHeartBeat implements Runnable {
 
     private AgentManagerInterface agentManager;
     private CommandTransportInterface commandSender;
+    private int timeoutSec;
 
-    public AgentHeartBeat(AgentManagerInterface agentManager, CommandTransportInterface commandSender) {
+    public AgentHeartBeat(AgentManagerInterface agentManager, CommandTransportInterface commandSender, int timeoutSec) {
         this.commandSender = commandSender;
         this.agentManager = agentManager;
+        this.timeoutSec = timeoutSec;
     }
 
     public void run() {
@@ -44,7 +46,7 @@ public class AgentHeartBeat implements Runnable {
                     }
                     System.out.println("Sending heartbeat to agents");
                 }
-                Thread.sleep(Common.HEARTBEAT_TIMEOUT_SEC * 1000);
+                Thread.sleep(timeoutSec * 1000);
             } catch (Exception ex) {
                 Logger.getLogger(AgentHeartBeat.class.getName()).log(Level.SEVERE, null, ex);
             }
