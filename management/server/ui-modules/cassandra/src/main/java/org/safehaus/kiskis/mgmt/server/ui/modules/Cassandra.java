@@ -22,11 +22,10 @@ public class Cassandra implements Module {
             CommandListener {
 
         private final Button buttonInstallWizard;
-        private final Window subwindow;
+        private Window subwindow;
 
         public ModuleComponent(CommandManagerInterface commandManagerInterface) {
 
-            subwindow = new CassandraWizard();
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
@@ -35,6 +34,7 @@ public class Cassandra implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    subwindow = new CassandraWizard();
                     getApplication().getMainWindow().addWindow(subwindow);
                 }
             }); // react to clicks
@@ -94,9 +94,9 @@ public class Cassandra implements Module {
     public static CommandManagerInterface getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(Cassandra.class).getBundleContext();
-        if(ctx!=null){
+        if (ctx != null) {
             ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
-            if(serviceReference != null){
+            if (serviceReference != null) {
                 return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
             }
         }
