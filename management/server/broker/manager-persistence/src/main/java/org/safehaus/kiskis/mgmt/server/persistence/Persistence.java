@@ -1,13 +1,15 @@
 package org.safehaus.kiskis.mgmt.server.persistence;
 
 import com.datastax.driver.core.*;
-import org.apache.cassandra.utils.UUIDGen;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,10 +43,8 @@ public class Persistence implements PersistenceInterface {
         List<Agent> list = new ArrayList<Agent>();
         try {
             ResultSet rs = session.execute("select * from agents");
-            Iterator<Row> it = rs.iterator();
-            while (it.hasNext()) {
+            for (Row row : rs) {
                 Agent agent = new Agent();
-                Row row = it.next();
                 agent.setUuid(row.getString("uuid"));
                 agent.setHostname(row.getString("hostname"));
                 agent.setIsLXC(row.getBool("islxc"));
@@ -172,10 +172,8 @@ public class Persistence implements PersistenceInterface {
         List<Response> list = new ArrayList<Response>();
         try {
             ResultSet rs = session.execute("select * from response");
-            Iterator<Row> it = rs.iterator();
-            while (it.hasNext()) {
+            for (Row row : rs) {
                 Response response = new Response();
-                Row row = it.next();
                 response.setType(ResponseType.valueOf(row.getString("responsetype")));
                 response.setUuid(row.getString("uuid"));
                 response.setExitCode(row.getInt("exitcode"));

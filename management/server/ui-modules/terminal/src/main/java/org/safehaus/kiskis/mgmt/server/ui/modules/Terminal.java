@@ -163,13 +163,12 @@ public class Terminal implements Module {
                 public void buttonClick(Button.ClickEvent event) {
                     List<Request> listofrequest = commandManagerInterface.getCommands();
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < listofrequest.size(); i++) {
-                        Request request = listofrequest.get(i);
+                    for (Request request : listofrequest) {
                         sb.append(request).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
                 }
-            }); // react to clicks
+            });
             return button;
         }
 
@@ -182,8 +181,7 @@ public class Terminal implements Module {
                 public void buttonClick(Button.ClickEvent event) {
                     List<Response> list = commandManagerInterface.getResponses();
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < list.size(); i++) {
-                        Response response = list.get(i);
+                    for (Response response : list) {
                         sb.append("Task UUID: ").append(response.getTaskUuid()).append("\n");
                         sb.append(response).append(" ").append(response.getType()).append("\n");
                         sb.append(response.getExitCode()).append("\n");
@@ -203,13 +201,12 @@ public class Terminal implements Module {
                 public void buttonClick(Button.ClickEvent event) {
                     List<Task> list = commandManagerInterface.getTasks();
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < list.size(); i++) {
-                        Task task = list.get(i);
+                    for (Task task : list) {
                         sb.append(task).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
                 }
-            }); // react to clicks
+            });
             return button;
         }
     }
@@ -226,7 +223,6 @@ public class Terminal implements Module {
         commandManagerInterface.addListener(component);
 
         return component;
-//        return new ModuleComponent(context);
     }
 
     public void setModuleService(ModuleService service) {
