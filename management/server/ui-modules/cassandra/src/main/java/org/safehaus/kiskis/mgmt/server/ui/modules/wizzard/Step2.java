@@ -10,9 +10,7 @@ import com.vaadin.ui.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
