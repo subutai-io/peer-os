@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.cassandra.utils.UUIDGen;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -46,18 +47,22 @@ public class Persistence implements PersistenceInterface {
     @Override
     public List<Agent> getAgentList() {
         List<Agent> list = new ArrayList<Agent>();
-        ResultSet rs = session.execute("select * from agents");
-        Iterator<Row> it = rs.iterator();
-        while (it.hasNext()) {
-            Agent agent = new Agent();
-            Row row = it.next();
-            agent.setUuid(row.getString("uuid"));
-            agent.setHostname(row.getString("hostname"));
-            agent.setIsLXC(row.getBool("islxc"));
-            agent.setLastHeartbeat(row.getDate("lastheartbeat"));
-            agent.setListIP(row.getList("listip", String.class));
-            agent.setMacAddress(row.getString("macaddress"));
-            list.add(agent);
+        try {
+            ResultSet rs = session.execute("select * from agents");
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
+                Agent agent = new Agent();
+                Row row = it.next();
+                agent.setUuid(row.getString("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                list.add(agent);
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getAgentList", ex);
         }
         return list;
     }
@@ -70,21 +75,32 @@ public class Persistence implements PersistenceInterface {
      */
     @Override
     public boolean saveAgent(Agent agent) {
-        String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
-                + "values (?,?,?,?,?,?)";
-        PreparedStatement stmt = session.prepare(cql);
-        BoundStatement boundStatement = new BoundStatement(stmt);
-        ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
-                agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                agent.getMacAddress(), new Date()));
-        return rs != null;
+        try {
+            String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
+                    + "values (?,?,?,?,?,?)";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
+                    agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
+                    agent.getMacAddress(), new Date()));
+            return true;
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
+        }
+        return false;
     }
 
     // TODO Remove this method and reference in blueprint
     public void init() {
-        cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
-        session = cluster.connect(cassandraKeyspace);
-        System.out.println("Persistence started");
+        try {
+            cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
+            session = cluster.connect(cassandraKeyspace);
+            System.out.println("Persistence started");
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in init", ex);
+        }
     }
 
     public void destroy() {
@@ -110,20 +126,25 @@ public class Persistence implements PersistenceInterface {
      */
     @Override
     public boolean saveCommand(Command command) {
-        String cql = "insert into request (source, requestsequencenumber, type, uuid, taskuuid, "
-                + "workingdirectory, program, outputredirectionstdout, outputredirectionstderr, "
-                + "stdoutpath, erroutpath, runsas, args, environment, pid, timeout) "
-                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        PreparedStatement stmt = session.prepare(cql);
-        BoundStatement boundStatement = new BoundStatement(stmt);
+        try {
+            String cql = "insert into request (source, requestsequencenumber, type, uuid, taskuuid, "
+                    + "workingdirectory, program, outputredirectionstdout, outputredirectionstderr, "
+                    + "stdoutpath, erroutpath, runsas, args, environment, pid, timeout) "
+                    + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
 
-        Request request = command.getCommand();
-        ResultSet rs = session.execute(boundStatement.bind(request.getSource(), requestsequencenumber++,
-                request.getType() + "", request.getUuid(), request.getTaskUuid(), request.getWorkingDirectory(),
-                request.getProgram(), request.getStdOut() + "", request.getStdErr() + "",
-                request.getStdOutPath(), request.getStdErrPath(), request.getRunAs(), request.getArgs(),
-                request.getEnvironment(), request.getPid(), request.getTimeout()));
-        return rs != null;
+            Request request = command.getCommand();
+            ResultSet rs = session.execute(boundStatement.bind(request.getSource(), requestsequencenumber++,
+                    request.getType() + "", request.getUuid(), request.getTaskUuid(), request.getWorkingDirectory(),
+                    request.getProgram(), request.getStdOut() + "", request.getStdErr() + "",
+                    request.getStdOutPath(), request.getStdErrPath(), request.getRunAs(), request.getArgs(),
+                    request.getEnvironment(), request.getPid(), request.getTimeout()));
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveCommand", ex);
+        }
+        return false;
     }
 
     /**
@@ -134,70 +155,98 @@ public class Persistence implements PersistenceInterface {
      */
     @Override
     public boolean saveResponse(Response response) {
-        String cql = "insert into response (uuid, taskuuid, responsesequencenumber, exitcode, errout, hostname, ips, "
-                + "macaddress, pid, requestsequencenumber, responsetype, source, stdout, islxc) "
-                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        PreparedStatement stmt = session.prepare(cql);
-        BoundStatement boundStatement = new BoundStatement(stmt);
-        ResultSet rs = session.execute(boundStatement.bind(response.getUuid(), response.getTaskUuid(),
-                (Long) response.getResponseSequenceNumber() == null ? -1l : response.getResponseSequenceNumber(),
-                response.getExitCode(), response.getStdErr(), response.getHostname(), response.getIps(),
-                response.getMacAddress(), response.getPid(), response.getRequestSequenceNumber(), response.getType().toString(),
-                response.getSource(), response.getStdOut(), response.isLxc));
-        return rs != null;
+        try {
+
+            String cql = "insert into response (uuid, taskuuid, responsesequencenumber, exitcode, errout, hostname, ips, "
+                    + "macaddress, pid, requestsequencenumber, responsetype, source, stdout, islxc) "
+                    + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(response.getUuid(), response.getTaskUuid(),
+                    (Long) response.getResponseSequenceNumber() == null ? -1l : response.getResponseSequenceNumber(),
+                    response.getExitCode(), response.getStdErr(), response.getHostname(), response.getIps(),
+                    response.getMacAddress(), response.getPid(), response.getRequestSequenceNumber(), response.getType().toString(),
+                    response.getSource(), response.getStdOut(), response.isLxc));
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveResponse", ex);
+        }
+        return false;
     }
 
     @Override
     public List<Response> getResponses(String taskuuid) {
         List<Response> list = new ArrayList<Response>();
-        ResultSet rs = session.execute("select * from response");
-        Iterator<Row> it = rs.iterator();
-        while (it.hasNext()) {
-            Response response = new Response();
-            Row row = it.next();
-            response.setType(ResponseType.valueOf(row.getString("responsetype")));
-            response.setUuid(row.getString("uuid"));
-            response.setExitCode(row.getInt("exitcode"));
-            response.setStdOut(row.getString("stdout"));
-            list.add(response);
+        try {
+            ResultSet rs = session.execute("select * from response");
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
+                Response response = new Response();
+                Row row = it.next();
+                response.setType(ResponseType.valueOf(row.getString("responsetype")));
+                response.setUuid(row.getString("uuid"));
+                response.setExitCode(row.getInt("exitcode"));
+                response.setStdOut(row.getString("stdout"));
+                list.add(response);
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getResponses", ex);
         }
         return list;
     }
 
     @Override
     public boolean updateAgent(Agent agent) {
-        String cql = "update agents set hostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
-        PreparedStatement stmt = session.prepare(cql);
-        BoundStatement boundStatement = new BoundStatement(stmt);
-        ResultSet rs = session.execute(boundStatement.bind(
-                agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                agent.getMacAddress(), new Date(), agent.getUuid()));
-        return rs != null;
+        try {
+            String cql = "update agents set hostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(
+                    agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
+                    agent.getMacAddress(), new Date(), agent.getUuid()));
+            return true;
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in updateAgent", ex);
+        }
+        return false;
     }
 
     @Override
     public String saveTask(Task task) {
-        String cql = "insert into tasks (uid, description, status) "
-                + "values (?, ?, ?);";
-        PreparedStatement stmt = session.prepare(cql);
+        try {
+            String cql = "insert into tasks (uid, description, status) "
+                    + "values (?, ?, ?);";
+            PreparedStatement stmt = session.prepare(cql);
 
-        BoundStatement boundStatement = new BoundStatement(stmt);
-        UUID uuid = UUIDGen.getTimeUUID();
-        session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            UUID uuid = UUIDGen.getTimeUUID();
+            session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
 
-        return uuid.toString();
+            return uuid.toString();
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveTask", ex);
+        }
+        return null;
     }
 
     @Override
     public List<Request> getRequests(String taskuuid) {
         List<Request> list = new ArrayList<Request>();
-        ResultSet rs = session.execute("select * from request");
-        Iterator<Row> it = rs.iterator();
-        while (it.hasNext()) {
-            Request request = new Request();
-            Row row = it.next();
-            request.setProgram(row.getString("program"));
-            list.add(request);
+        try {
+            ResultSet rs = session.execute("select * from request");
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
+                Request request = new Request();
+                Row row = it.next();
+                request.setProgram(row.getString("program"));
+                list.add(request);
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequests", ex);
         }
         return list;
     }
@@ -205,15 +254,20 @@ public class Persistence implements PersistenceInterface {
     @Override
     public List<Task> getTasks() {
         List<Task> list = new ArrayList<Task>();
-        ResultSet rs = session.execute("select * from tasks");
-        Iterator<Row> it = rs.iterator();
-        while (it.hasNext()) {
-            Row row = it.next();
-            Task task = new Task();
-            task.setUid(row.getUUID("uid").toString());
-            task.setDescription(row.getString("description"));
-            task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
-            list.add(task);
+        try {
+            ResultSet rs = session.execute("select * from tasks");
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
+                Row row = it.next();
+                Task task = new Task();
+                task.setUid(row.getUUID("uid").toString());
+                task.setDescription(row.getString("description"));
+                task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
+                list.add(task);
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getTasks", ex);
         }
         return list;
     }

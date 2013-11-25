@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.agent;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+//import org.osgi.framework.BundleContext;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
@@ -13,15 +12,19 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
  */
 public class AgentManager implements AgentManagerInterface, BrokerListener {
 
-    private BundleContext context;
+    private static final Logger LOG = Logger.getLogger(AgentManager.class.getName());
+//    private BundleContext context;
     private PersistenceInterface persistenceAgent;
     private CommandManagerInterface commandManager;
+    private CommandTransportInterface commandTransportInterface;
     private final Set<Agent> registeredAgents;
     private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
     private ExecutorService executorService;
@@ -127,24 +130,24 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void init() {
         try {
-            if (getCommandTransport() != null) {
-                getCommandTransport().addListener(this);
+            if (commandTransportInterface != null) {
+                commandTransportInterface.addListener(this);
                 executorService = Executors.newSingleThreadExecutor();
-                executorService.execute(new AgentHeartBeat(this, getCommandTransport(), heartbeatTimeoutSec));
+                executorService.execute(new AgentHeartBeat(this, commandTransportInterface, heartbeatTimeoutSec));
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in init", ex);
         }
     }
 
     public void destroy() {
         try {
-            if (getCommandTransport() != null) {
-                getCommandTransport().removeListener(this);
+            if (commandTransportInterface != null) {
+                commandTransportInterface.removeListener(this);
             }
             executorService.shutdownNow();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
     }
 
@@ -157,22 +160,25 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     }
 
-    public void setContext(BundleContext context) {
-        this.context = context;
+    public void setCommandTransportInterface(CommandTransportInterface commandTransportInterface) {
+        this.commandTransportInterface = commandTransportInterface;
     }
 
-    private CommandTransportInterface getCommandTransport() {
-        if (context != null) {
-            ServiceReference reference = context
-                    .getServiceReference(CommandTransportInterface.class.getName());
-            if (reference != null) {
-                return (CommandTransportInterface) context.getService(reference);
-            }
-        }
+//    public void setContext(BundleContext context) {
+//        this.context = context;
+//    }
 
-        return null;
-    }
-
+//    private CommandTransportInterface getCommandTransport() {
+//        if (context != null) {
+//            ServiceReference reference = context
+//                    .getServiceReference(CommandTransportInterface.class.getName());
+//            if (reference != null) {
+//                return (CommandTransportInterface) context.getService(reference);
+//            }
+//        }
+//
+//        return null;
+//    }
     public void setHeartbeatTimeoutSec(int heartbeatTimeoutSec) {
         this.heartbeatTimeoutSec = heartbeatTimeoutSec;
     }

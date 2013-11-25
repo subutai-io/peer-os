@@ -13,7 +13,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
@@ -21,6 +20,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class AgentHeartBeat implements Runnable {
 
+    private static final Logger LOG = Logger.getLogger(AgentHeartBeat.class.getName());
     private AgentManagerInterface agentManager;
     private CommandTransportInterface commandSender;
     private int timeoutSec;
@@ -48,7 +48,7 @@ public class AgentHeartBeat implements Runnable {
                 }
                 Thread.sleep(timeoutSec * 1000);
             } catch (Exception ex) {
-                Logger.getLogger(AgentHeartBeat.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "Error in AgentHeartBeat.run", ex);
             }
         }
     }

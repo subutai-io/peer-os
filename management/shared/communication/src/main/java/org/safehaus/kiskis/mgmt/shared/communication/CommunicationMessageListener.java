@@ -6,20 +6,23 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 
 import javax.jms.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 12:13 AM
  */
 public class CommunicationMessageListener implements MessageListener {
 
-    private final Session session;
+    private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
+//    private final Session session;
     private final ArrayList<BrokerListener> listeners = new ArrayList<BrokerListener>();
 
     /**
      * @param session
      */
-    public CommunicationMessageListener(Session session) {
-        this.session = session;
+    public CommunicationMessageListener() {
+//        this.session = session;
     }
 
     /**
@@ -41,7 +44,7 @@ public class CommunicationMessageListener implements MessageListener {
                 System.out.println("Could not parse response");
             }
         } catch (JMSException ex) {
-            System.out.println("onMessage " + ex.getMessage());
+            LOG.log(Level.SEVERE, "Error in onMessage", ex);
         }
     }
 
@@ -49,14 +52,14 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             for (BrokerListener ai : (ArrayList<BrokerListener>) listeners.clone()) {
                 if (ai != null) {
+                    System.out.println("Notifying");
                     ai.getCommand(response);
                 } else {
                     listeners.remove(ai);
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Notify listener");
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in notifyListeners", ex);
         }
     }
 
@@ -64,7 +67,7 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             listeners.add(listener);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in addListener", ex);
         }
     }
 
@@ -72,7 +75,7 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             listeners.remove(listener);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in remvoeListener", ex);
         }
     }
 
