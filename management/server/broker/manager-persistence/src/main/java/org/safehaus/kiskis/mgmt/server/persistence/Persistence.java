@@ -14,13 +14,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.cassandra.utils.UUIDGen;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -67,8 +64,7 @@ public class Persistence implements PersistenceInterface {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getAgentList", ex);
         }
-
-        return null;
+        return list;
     }
 
     /**
@@ -111,20 +107,17 @@ public class Persistence implements PersistenceInterface {
         try {
             session.shutdown();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         try {
             cluster.shutdown();
-            System.out.println(this.getClass().getName() + " stopped");
         } catch (Exception e) {
-            e.printStackTrace();
         }
+        System.out.println(this.getClass().getName() + " stopped");
     }
 
 //    public List<Command> getCommandList(Agent agent) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
-
     /**
      * Saves command into cassandra
      *
@@ -200,8 +193,7 @@ public class Persistence implements PersistenceInterface {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getResponses", ex);
         }
-
-        return null;
+        return list;
     }
 
     @Override
@@ -256,8 +248,7 @@ public class Persistence implements PersistenceInterface {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getRequests", ex);
         }
-
-        return null;
+        return list;
     }
 
     @Override
