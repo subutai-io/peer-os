@@ -78,9 +78,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             if (registeredAgents.add(agent)) {
                 notifyModules();
             }
-            System.out.println(agent + "Agent is registered");
+            System.out.println(agent + "\nAgent is registered");
         } else {
-            System.out.println(agent + "Error registering agent");
+            System.out.println(agent + "\nError registering agent");
         }
     }
 
@@ -97,9 +97,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         agent.setListIP(response.getIps());
 
         if (persistenceAgent.updateAgent(agent)) {
-            System.out.println(agent + "Agent is updated");
+            System.out.println(agent + "\nAgent is updated");
         } else {
-            System.out.println(agent + "Error updating agent");
+            System.out.println(agent + "\nError updating agent");
         }
     }
 
