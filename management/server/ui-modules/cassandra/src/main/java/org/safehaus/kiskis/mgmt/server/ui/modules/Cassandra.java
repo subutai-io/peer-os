@@ -7,7 +7,6 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
@@ -16,26 +15,18 @@ public class Cassandra implements Module {
 
     public static final String MODULE_NAME = "Cassandra";
     private BundleContext context;
+
     private static ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
         private final Button buttonInstallWizard;
-<<<<<<< HEAD
         private final Window subwindow;
 
         public ModuleComponent(CommandManagerInterface commandManagerInterface) {
 
             subwindow = new CassandraWizard();
-=======
-//        private final Window subwindow;
-        private final CommandManagerInterface commandManagerInterface;
-
-        public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
-            this.commandManagerInterface = commandManagerInterface;
-
->>>>>>> e2c558a17237805b11bbce4207893831159d0076
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
@@ -44,13 +35,11 @@ public class Cassandra implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    if (AppData.getSelectedAgentList() != null) {
-                        final Window subwindow = new CassandraWizard(commandManagerInterface);
-                        getApplication().getMainWindow().addWindow(subwindow);
-                    }
+                    getApplication().getMainWindow().addWindow(subwindow);
                 }
             }); // react to clicks
             verticalLayout.addComponent(buttonInstallWizard);
+
             setCompositionRoot(verticalLayout);
         }
 

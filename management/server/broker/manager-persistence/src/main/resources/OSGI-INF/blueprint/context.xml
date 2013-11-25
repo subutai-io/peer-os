@@ -5,7 +5,7 @@
 
     <!-- Allow the use of system properties -->
     <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-    
+
     <cm:property-placeholder persistent-id="CassConfig" update-strategy="none">
         <cm:default-properties>
             <cm:property name="cassandraHost" value="localhost"/>
@@ -13,45 +13,17 @@
             <cm:property name="cassandraKeyspace" value="kiskis"/>
         </cm:default-properties>
     </cm:property-placeholder>
-    
+
     <bean id="persistenceService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence"
           init-method="init" destroy-method="destroy" scope="singleton">
         <property name="cassandraHost" value="${cassandraHost}"/>
-        <property name="cassandraPort" value="${cassandraPort}"/>        
-        <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>        
+        <property name="cassandraPort" value="${cassandraPort}"/>
+        <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>
     </bean>
     <service ref="persistenceService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
-    </service>    
-        
-<!--    <bean id="persistenceAgentService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence"
-          init-method="init" destroy-method="destroy" scope="singleton">
-        <property name="cassandraHost" value="${cassandraHost}"/>
-        <property name="cassandraPort" value="${cassandraPort}"/>        
-        <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>        
-    </bean>
-    <service ref="persistenceAgentService"
-             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceAgentInterface">
-        <service-properties>
-             This property is only important for the DOSGi tutorial 
-            <entry key="service.exported.interfaces" value="*"/>
-        </service-properties>
     </service>
-
-    <bean id="persistenceCommandService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence"
-          init-method="init" destroy-method="destroy" scope="singleton">
-        <property name="cassandraHost" value="${cassandraHost}"/>
-        <property name="cassandraPort" value="${cassandraPort}"/>        
-        <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>            
-    </bean>
-    <service ref="persistenceCommandService"
-             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceCommandInterface">
-        <service-properties>
-             This property is only important for the DOSGi tutorial 
-            <entry key="service.exported.interfaces" value="*"/>
-        </service-properties>
-    </service>-->
 </blueprint>
