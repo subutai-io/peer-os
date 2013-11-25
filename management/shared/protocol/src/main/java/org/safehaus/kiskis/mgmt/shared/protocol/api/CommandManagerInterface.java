@@ -25,5 +25,7 @@ public interface CommandManagerInterface {
 
     public void saveResponse(Response response);
 
+    public String saveTask(Task task);
+
     public List<Task> getTasks();
 }

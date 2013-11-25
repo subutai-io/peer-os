@@ -164,6 +164,10 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         persistenceCommand.saveResponse(response);
     }
 
+    public String saveTask(Task task) {
+        return persistenceCommand.saveTask(task);
+    }
+
     public List<Task> getTasks() {
         return persistenceCommand.getTasks();
     }

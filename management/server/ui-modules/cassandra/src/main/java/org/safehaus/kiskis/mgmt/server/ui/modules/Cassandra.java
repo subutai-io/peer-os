@@ -22,12 +22,10 @@ public class Cassandra implements Module {
 
         private final Button buttonInstallWizard;
         private final Window subwindow;
-        private final CommandManagerInterface commandManagerInterface;
 
         public ModuleComponent(CommandManagerInterface commandManagerInterface) {
-            this.commandManagerInterface = commandManagerInterface;
 
-            subwindow = new CassandraWizard(commandManagerInterface);
+            subwindow = new CassandraWizard();
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
@@ -46,8 +44,8 @@ public class Cassandra implements Module {
 
         @Override
         public void outputCommand(Response response) {
-            commandManagerInterface.saveResponse(response);
             try {
+                getCommandManager().saveResponse(response);
                 System.out.println("CASSANDRA outputCommand(Response response) called");
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
@@ -69,12 +67,11 @@ public class Cassandra implements Module {
 
     @Override
     public Component createComponent() {
-        CommandManagerInterface commandManagerInterface = getService();
+        CommandManagerInterface commandManagerInterface = getCommandManager();
         component = new ModuleComponent(commandManagerInterface);
         commandManagerInterface.addListener(component);
 
         return component;
-//        return new ModuleComponent(context);
     }
 
     public void setModuleService(ModuleService service) {
@@ -93,22 +90,16 @@ public class Cassandra implements Module {
         this.context = context;
     }
 
-    private CommandManagerInterface getCommandManager() {
-        if (context != null) {
-            ServiceReference reference = context
-                    .getServiceReference(CommandManagerInterface.class.getName());
-            if (reference != null) {
-                return (CommandManagerInterface) context.getService(reference);
+    public static CommandManagerInterface getCommandManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(Cassandra.class).getBundleContext();
+        if(ctx!=null){
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            if(serviceReference != null){
+                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
             }
         }
 
         return null;
-    }
-
-    public CommandManagerInterface getService() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(Cassandra.class).getBundleContext();
-        ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
-        return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
     }
 }
