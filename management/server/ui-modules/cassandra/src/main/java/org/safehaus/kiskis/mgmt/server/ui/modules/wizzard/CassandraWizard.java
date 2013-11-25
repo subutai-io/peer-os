@@ -84,7 +84,7 @@ public class CassandraWizard extends Window {
                 break;
             }
             case 6: {
-                step43 = new Step43(this);
+                Step43 step43 = new Step43(this);
                 verticalLayout.addComponent(step43);
                 break;
             }
