@@ -1,10 +1,23 @@
+/**   @copyright 2013 Safehaus.org
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include "KAResponsePack.h"
 /**
  *  \details   Default constructor of the KAResponsePack class.
  */
 KAResponsePack::KAResponsePack()
 {
-	// TODO Auto-generated constructor stub
 }
 /**
  *  \details   Default destructor of the KAResponsePack class.
@@ -28,6 +41,7 @@ string KAResponsePack::createResponseMessage(string uuid,int pid,int requestSeqN
 	this->setStandardOutput(output);
 	this->setStandardError(error);
 	this->setPid(pid);
+	this->setIsLxc(-100);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -45,13 +59,14 @@ string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,i
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(responseSeqNum);
 	this->setExitCode(exitcode);
+	this->setIsLxc(-100);
 	this->serializeDone(sendout);
 	return sendout;
 }
 /**
  *  \details   This method creates Registration message.
  */
-string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,string hostname,bool islxc)
+string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,string hostname,int islxc)
 {	//Creating Registration Message
 	this->setType("REGISTRATION_REQUEST");
 	this->setMacAddress(macaddress);
@@ -65,7 +80,7 @@ string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,s
  *  \details   This method creates HeartBeat message.
  */
 string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string macaddress,
-		string hostname,bool islxc,string source,string taskuuid)	//Creating HeartBeat Message
+		string hostname,int islxc,string source,string taskuuid)	//Creating HeartBeat Message
 {
 	this->setType("HEARTBEAT_RESPONSE");
 	this->setSource(source);
@@ -90,6 +105,7 @@ string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,stri
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
+	this->setIsLxc(-100);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -104,6 +120,7 @@ string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
+	this->setIsLxc(-100);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -122,6 +139,7 @@ string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNu
 	this->setResponseSequenceNumber(responseSeqNum);
 	this->setStandardOutput(stdOut);
 	this->setStandardError(stdErr);
+	this->setIsLxc(-100);
 	this->serialize(sendout);
 	return sendout;
 }

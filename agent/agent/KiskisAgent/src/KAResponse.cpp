@@ -1,3 +1,17 @@
+/**   @copyright 2013 Safehaus.org
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include "KAResponse.h"
 /**
  *  \details   Default constructor of the KAResponse class.
@@ -16,10 +30,9 @@ KAResponse::KAResponse()
 	setSource("");
 	setTaskUuid("");
 	setMacAddress("");
-	setIsLxc(false);
+	setIsLxc(-1);
 	setHostname("");
 	getIps().clear();
-
 }
 /**
  *  \details   Default destructor of the KAResponse class.
@@ -43,7 +56,7 @@ void KAResponse::clear()
 	setSource("");
 	setTaskUuid("");
 	setMacAddress("");
-	setIsLxc(false);
+	setIsLxc(-1);
 	setHostname("");
 	getIps().clear();
 }
@@ -111,7 +124,11 @@ void KAResponse::serialize(string& output)
 	{
 		root["response"]["source"] = this->getSource();
 	}
-	root["response"]["isLxc"] = this->getIsLxc();
+	if(this->getIsLxc() >= 0 )											//check the macAddress is assigned or not
+	{
+		root["response"]["isLxc"] = bool (this->getIsLxc());
+	}
+
 	output = writer.write(root);
 }
 /**
@@ -322,7 +339,7 @@ void KAResponse::setTaskUuid(const string& taskuuid)
 /**
  *  \details   getting "isLxc" private variable of KAResponse instance.
  */
-bool& KAResponse::getIsLxc()
+int& KAResponse::getIsLxc()
 {
 	return this->isLxc;
 }
@@ -332,7 +349,7 @@ bool& KAResponse::getIsLxc()
  *  		   true: this machine is lxc container.
  *  		   false: this machine is physical.
  */
-void KAResponse::setIsLxc(bool isLxc)
+void KAResponse::setIsLxc(int isLxc)
 {
 	this->isLxc = isLxc;
 }

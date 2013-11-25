@@ -1,3 +1,17 @@
+/**   @copyright 2013 Safehaus.org
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include "KACommand.h"
 /**
  *  \details   Default constructor of KACommand class.
@@ -21,7 +35,6 @@ KACommand::KACommand()
 	this->getEnvironment().clear();
 	this->setTaskUuid("");
 	this->setMacAddress("");
-	this->setIsLxc(false);
 	this->setHostname("");
 	this->getIps().clear();
 	this->setSource("");
@@ -54,7 +67,6 @@ void KACommand::clear()
 	this->getEnvironment().clear();
 	this->setTaskUuid("");
 	this->setMacAddress("");
-	this->setIsLxc(false);
 	this->setHostname("");
 	this->getIps().clear();
 	this->setSource("");
@@ -155,10 +167,6 @@ bool KACommand::deserialize(string& input)
 	if(!root["command"]["macAddress"].isNull())
 	{
 		setMacAddress(root["command"]["macAddress"].asString());		//initialize macAddress parameter if it is not null
-	}
-	if(!root["command"]["isLxc"].isNull())
-	{
-		setIsLxc(root["command"]["isLxc"].asBool());		//initialize isLxc parameter if it is not null
 	}
 	arg.clear();
 	for(unsigned int index=0; index < root["command"]["ips"].size(); index++)	//set ips
@@ -447,23 +455,6 @@ string& KACommand::getTaskUuid()
 void KACommand::setTaskUuid(const string& taskuuid)
 {
 	this->taskUuid = taskuuid;
-}
-/**
- *  \details   getting "isLxc" private variable of KACommand instance.
- */
-bool& KACommand::getIsLxc()
-{
-	return this->isLxc;
-}
-/**
- *  \details   setting "isLxc" private variable of KACommand instance.
- *  		   This contains the information that the agent runs on Physical machine or lxc container.
- *  		   true: this machine is lxc container.
- *  		   false: this machine is physical.
- */
-void KACommand::setIsLxc(bool isLxc)
-{
-	this->isLxc = isLxc;
 }
 /**
  *  \details   setting "ips" private vector variable of KACommand instance.

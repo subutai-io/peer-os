@@ -1,3 +1,17 @@
+/**   @copyright 2013 Safehaus.org
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include "KALogger.h"
 /**
  *  \details   Default constructor of the KALogger class.
@@ -36,6 +50,7 @@ void KALogger::setLogLevel(int loglevel)
 string KALogger::getLocaltime()
 {
 	boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+
 	return toString(now.date().day().as_number()) +"-"+ toString(now.date().month().as_number())+"-" +toString(now.date().year()) +" "+ toString(now.time_of_day().hours())+":"+toString(now.time_of_day().minutes())+":"+toString(now.time_of_day().seconds());
 }
 /**
@@ -54,7 +69,10 @@ string KALogger::toString(int intcont)
 void KALogger::openLogFile(int pid,int requestSequenceNumber)
 {
 	boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-	string logFileName = "/var/log/ksks-agent/" + toString(now.time_of_day().total_milliseconds()) + "-"+toString(pid)+"-"+toString(requestSequenceNumber);
+	string logFileName = "/var/log/ksks-agent/"
+			+toString(now.date().year()) + toString(now.date().month().as_number()) + toString(now.date().day().as_number())
+			+"-"+ toString(now.time_of_day().total_milliseconds())
+			+"-"+toString(pid)+"-"+toString(requestSequenceNumber);
 	this->logFile = fopen(logFileName.c_str(),"a+");;
 }
 /**

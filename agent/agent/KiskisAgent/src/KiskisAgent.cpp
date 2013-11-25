@@ -1,3 +1,23 @@
+/**   @copyright 2013 Safehaus.org
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+/**   @copyright 2013 Safehaus.org
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /**
  *  @brief     KiskisAgent.cpp
  *  @class     KiskisAgent.cpp
@@ -6,9 +26,8 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0
+ *  @version   1.0.0
  *  @date      Sep 27, 2013
- *  @copyright GNU Public License.
  */
 
 /** \mainpage  Welcome to Project KiskisAgent
@@ -202,6 +221,7 @@ int main(int argc,char *argv[],char *envp[])
 {
 	string url,connectionOptions,loglevel;
 	string Uuid,macaddress,hostname;
+	int isLxc = -1;
 	vector<string> ipadress;
 	string serveraddress="SERVICE_QUEUE";
 	string clientaddress;
@@ -245,23 +265,39 @@ int main(int argc,char *argv[],char *envp[])
 
 		const std::string tmp = boost::lexical_cast<std::string>(u);
 		Uuid = tmp;
-		ofstream file("/etc/KiskisAgent/config/uuid.txt");
+		ofstream file("/etc/ksks-agent/config/uuid.txt");
 		file << Uuid;
 		file.close();
 		logMain.writeLog(1,logMain.setLogData("<KiskisAgent>","KiskisAgent UUID:",Uuid));
 	}
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent UUID:",Uuid));
-	if(!getMacAddress(macaddress))
+	if(!getMacAddress(macaddress))	//getting MacAddress
 	{
 		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","MacAddress cannot be read !!"));
 	}
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent MacID:",macaddress));
-	if(!getHostname(hostname))
+	if(!getHostname(hostname))		//getting Hostname
 	{
 		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","Hostname cannot be read !!"));
 	}
+	else	// Hostname is read successfully
+	{
+		int ret = hostname.find("lxc");	//checking type of machine that physical or lxc
+		if(ret == -1)
+		{
+			isLxc = 0;
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is not a Lxc Container.."));
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+		}
+		else
+		{
+			isLxc = 1;
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is a Lxc Container.."));
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+		}
+	}
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent Hostname:",hostname));
-	if(!getIpAddresses(ipadress))
+	if(!getIpAddresses(ipadress))	//getting IPs
 	{
 		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","IpAddresses cannot be read !!"));
 	}
@@ -287,7 +323,7 @@ int main(int argc,char *argv[],char *envp[])
 	string sendout;
 
 	response.setIps(ipadress);
-	response.setIsLxc(false);
+	response.setIsLxc(isLxc);
 	response.setHostname(hostname);
 	response.setMacAddress(macaddress);
 	response.setUuid(Uuid); 	//setting Uuid for response messages.
@@ -352,13 +388,19 @@ int main(int argc,char *argv[],char *envp[])
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Execute operation is starting.."));
 						KAThread* mypointer = new KAThread;
 						mypointer->getLogger().setLogLevel(level);
+						mypointer->getResponse().setIsLxc(isLxc);
 						mypointer->threadFunction(&messageQueue,&command,argv);
 						delete mypointer;
 					}
 					else if(command.getType()=="HEARTBEAT_REQUEST")
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Heartbeat message has been taken.."));
-						string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,false,command.getSource(),command.getTaskUuid());
+						response.clear();
+						response.setIps(ipadress);
+						response.setIsLxc(isLxc);
+						response.setHostname(hostname);
+						response.setMacAddress(macaddress);
+						string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,isLxc,command.getSource(),command.getTaskUuid());
 						connection.sendMessage(resp);
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
 					}
@@ -367,13 +409,13 @@ int main(int argc,char *argv[],char *envp[])
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",toString(command.getPid())));
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Killing given PID.."));
 						int retstatus = kill(command.getPid(),SIGKILL);
-						if(retstatus==0) //termination is successfully done
+						if(retstatus == 0) //termination is successfully done
 						{
 							string resp = response.createTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
 							connection.sendMessage(resp);
 							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate success Response:", resp));
 						}
-						else if (retstatus ==-1) //termination is failed
+						else if (retstatus == -1) //termination is failed
 						{
 							string resp = response.createFailTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
 							connection.sendMessage(resp);
