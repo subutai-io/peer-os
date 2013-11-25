@@ -197,8 +197,7 @@ public class Terminal implements Module {
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < list.size(); i++) {
                         Task task = list.get(i);
-                        sb.append(task.getUid()).append(" ").
-                                append(task.getDescription()).append(" ").append(task.getTaskStatus());
+                        sb.append(task.getUid()).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
                 }

@@ -3,6 +3,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.wizzard;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.modules.Cassandra;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -21,10 +25,10 @@ public class CassandraWizard extends Window {
     Step43 step43;
     int step = 1;
 
-    public CassandraWizard(final CommandManagerInterface commandManagerInterface) {
+    public CassandraWizard() {
         setModal(true);
 
-        this.commandManagerInterface = commandManagerInterface;
+        this.commandManagerInterface = getCommandManager();
         setCaption("Cassandra Wizard");
 
         verticalLayout = new VerticalLayout();
@@ -91,5 +95,18 @@ public class CassandraWizard extends Window {
                 break;
             }
         }
+    }
+
+    public CommandManagerInterface getCommandManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(Cassandra.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 }
