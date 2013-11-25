@@ -39,7 +39,7 @@ public class Terminal implements Module {
             verticalLayout.setSpacing(true);
 
             Label labelText = new Label("Enter command:");
-            
+
             textAreaCommand = new TextArea();
             textAreaCommand.setRows(20);
             textAreaCommand.setColumns(80);
@@ -61,7 +61,7 @@ public class Terminal implements Module {
             hLayout.addComponent(getTasks);
 
             verticalLayout.addComponent(hLayout);
-            
+
             Label labelOutput = new Label("Commands output");
             textAreaOutput = new TextArea();
             textAreaOutput.setRows(20);
@@ -182,9 +182,7 @@ public class Terminal implements Module {
                     List<Response> list = commandManagerInterface.getResponses();
                     StringBuilder sb = new StringBuilder();
                     for (Response response : list) {
-                        sb.append("Task UUID: ").append(response.getTaskUuid()).append("\n");
-                        sb.append(response).append(" ").append(response.getType()).append("\n");
-                        sb.append(response.getExitCode()).append("\n");
+                        sb.append(response).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
                 }
