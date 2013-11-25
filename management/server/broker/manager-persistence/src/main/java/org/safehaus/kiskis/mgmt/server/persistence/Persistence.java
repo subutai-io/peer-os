@@ -259,7 +259,7 @@ public class Persistence implements PersistenceInterface {
             Task task = new Task();
             task.setUid(row.getUUID("uid").toString());
             task.setDescription(row.getString("description"));
-            task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
+//            task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
             list.add(task);
         }
         return list;

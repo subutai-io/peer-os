@@ -198,6 +198,10 @@ public class PersistenceTest {
     public void testGetTasks() {
         System.out.println("getTasks");
         List<Task> list = instance.getTasks();
+        for (int i = 0; i < list.size(); i++) {
+            Task task = list.get(i);
+            System.out.println(task.getUid());
+        }
         assertEquals(false, list.isEmpty());
     }
 
