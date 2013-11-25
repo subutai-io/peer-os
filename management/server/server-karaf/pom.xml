@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.eaio.uuid</groupId>
+            <artifactId>uuid</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.karaf</groupId>
             <artifactId>apache-karaf</artifactId>
             <version>${karaf.version}</version>
@@ -183,6 +188,11 @@
                         <configuration>
                             <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
                             <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.eaio.uuid</groupId>
+                                    <artifactId>uuid</artifactId>
+                                    <version>3.2</version>
+                                </artifactItem>
                                 <!--UI Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>

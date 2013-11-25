@@ -16,6 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public class Terminal implements Module {
 
@@ -127,8 +128,15 @@ public class Terminal implements Module {
                                 Request r = CommandJson.getRequest(json);
 
                                 if (r != null) {
+                                    Task task = new Task();
+                                    task.setDescription("JSON executing");
+                                    task.setTaskStatus(TaskStatus.NEW);
+                                    String uuid = commandManagerInterface.saveTask(task);
+                                    task.setUid(uuid);
+
                                     r.setUuid(agent);
                                     r.setSource(Terminal.MODULE_NAME);
+                                    r.setTaskUuid(task.getUid());
 
                                     Command command = new Command(r);
                                     commandManagerInterface.executeCommand(command);
@@ -157,7 +165,7 @@ public class Terminal implements Module {
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < listofrequest.size(); i++) {
                         Request request = listofrequest.get(i);
-                        sb.append(request.getProgram()).append("\n");
+                        sb.append(request).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
                 }
@@ -177,7 +185,7 @@ public class Terminal implements Module {
                     for (int i = 0; i < list.size(); i++) {
                         Response response = list.get(i);
                         sb.append("Task UUID: ").append(response.getTaskUuid()).append("\n");
-                        sb.append(response.getUuid()).append(" ").append(response.getType()).append("\n");
+                        sb.append(response).append(" ").append(response.getType()).append("\n");
                         sb.append(response.getExitCode()).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
@@ -197,7 +205,7 @@ public class Terminal implements Module {
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < list.size(); i++) {
                         Task task = list.get(i);
-                        sb.append(task.getUid()).append("\n");
+                        sb.append(task).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
                 }

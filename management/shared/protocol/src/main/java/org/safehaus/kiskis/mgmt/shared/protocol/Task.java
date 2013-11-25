@@ -61,4 +61,14 @@ public class Task  implements Serializable {
         this.description = description;
     }
 
+    @Override
+    public String toString() {
+        return "Task{" +
+                "uid='" + uid + '\'' +
+                ", description='" + description + '\'' +
+                ", requests=" + requests +
+                ", response=" + response +
+                ", taskStatus=" + taskStatus +
+                '}';
+    }
 }

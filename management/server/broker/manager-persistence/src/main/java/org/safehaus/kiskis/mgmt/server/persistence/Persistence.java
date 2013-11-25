@@ -5,9 +5,11 @@ import org.apache.cassandra.utils.UUIDGen;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -88,11 +90,11 @@ public class Persistence implements PersistenceInterface {
 
     // TODO Remove this method and reference in blueprint
     public void init() {
-        try{
+        try {
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
             session = cluster.connect(cassandraKeyspace);
             System.out.println("Persistence started");
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -123,7 +125,7 @@ public class Persistence implements PersistenceInterface {
      */
     @Override
     public boolean saveCommand(Command command) {
-        try{
+        try {
             String cql = "insert into request (source, requestsequencenumber, type, uuid, taskuuid, "
                     + "workingdirectory, program, outputredirectionstdout, outputredirectionstderr, "
                     + "stdoutpath, erroutpath, runsas, args, environment, pid, timeout) "
@@ -138,7 +140,7 @@ public class Persistence implements PersistenceInterface {
                     request.getStdOutPath(), request.getStdErrPath(), request.getRunAs(), request.getArgs(),
                     request.getEnvironment(), request.getPid(), request.getTimeout()));
             return rs != null;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -153,7 +155,7 @@ public class Persistence implements PersistenceInterface {
      */
     @Override
     public boolean saveResponse(Response response) {
-        try{
+        try {
             String cql = "insert into response (uuid, taskuuid, responsesequencenumber, exitcode, errout, hostname, ips, "
                     + "macaddress, pid, requestsequencenumber, responsetype, source, stdout, islxc) "
                     + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -165,7 +167,7 @@ public class Persistence implements PersistenceInterface {
                     response.getMacAddress(), response.getPid(), response.getRequestSequenceNumber(), response.getType().toString(),
                     response.getSource(), response.getStdOut(), response.isLxc));
             return rs != null;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -174,7 +176,7 @@ public class Persistence implements PersistenceInterface {
 
     @Override
     public List<Response> getResponses(String taskuuid) {
-        try{
+        try {
             List<Response> list = new ArrayList<Response>();
             ResultSet rs = session.execute("select * from response");
             for (Object r : rs) {
@@ -187,7 +189,7 @@ public class Persistence implements PersistenceInterface {
                 list.add(response);
             }
             return list;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -196,7 +198,7 @@ public class Persistence implements PersistenceInterface {
 
     @Override
     public boolean updateAgent(Agent agent) {
-        try{
+        try {
             String cql = "update agents set hostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
@@ -204,7 +206,7 @@ public class Persistence implements PersistenceInterface {
                     agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
                     agent.getMacAddress(), new Date(), agent.getUuid()));
             return rs != null;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -213,17 +215,17 @@ public class Persistence implements PersistenceInterface {
 
     @Override
     public String saveTask(Task task) {
-        try{
+        try {
             String cql = "insert into tasks (uid, description, status) "
                     + "values (?, ?, ?);";
             PreparedStatement stmt = session.prepare(cql);
 
             BoundStatement boundStatement = new BoundStatement(stmt);
-            UUID uuid = UUIDGen.getTimeUUID();
+            UUID uuid =Persistence.getTimeUUID();
             session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
 
             return uuid.toString();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -232,7 +234,7 @@ public class Persistence implements PersistenceInterface {
 
     @Override
     public List<Request> getRequests(String taskuuid) {
-        try{
+        try {
             List<Request> list = new ArrayList<Request>();
             ResultSet rs = session.execute("select * from request");
             for (Object r : rs) {
@@ -242,7 +244,7 @@ public class Persistence implements PersistenceInterface {
                 list.add(request);
             }
             return list;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -251,17 +253,42 @@ public class Persistence implements PersistenceInterface {
 
     @Override
     public List<Task> getTasks() {
-        List<Task> list = new ArrayList<Task>();
-        ResultSet rs = session.execute("select * from tasks");
-        Iterator<Row> it = rs.iterator();
-        while (it.hasNext()) {
-            Row row = it.next();
-            Task task = new Task();
-            task.setUid(row.getUUID("uid").toString());
-            task.setDescription(row.getString("description"));
+        try {
+            List<Task> list = new ArrayList<Task>();
+            ResultSet rs = session.execute("select * from tasks");
+            for (Row row : rs) {
+                Task task = new Task();
+                task.setUid(row.getUUID("uid").toString());
+                task.setDescription(row.getString("description"));
 //            task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
-            list.add(task);
+                list.add(task);
+            }
+            return list;
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        return list;
+
+        return null;
+    }
+
+    public java.util.UUID uuidForDate(Date d) {
+        /*
+          Magic number obtained from #cassandra's thobbs, who
+          claims to have stolen it from a Python library.
+        */
+        final long NUM_100NS_INTERVALS_SINCE_UUID_EPOCH = 0x01b21dd213814000L;
+
+        long origTime = d.getTime();
+        long time = origTime * 10000 + NUM_100NS_INTERVALS_SINCE_UUID_EPOCH;
+        long timeLow = time & 0xffffffffL;
+        long timeMid = time & 0xffff00000000L;
+        long timeHi = time & 0xfff000000000000L;
+        long upperLong = (timeLow << 32) | (timeMid >> 16) | (1 << 12) | (timeHi >> 48);
+        return new java.util.UUID(upperLong, 0xC000000000000000L);
+    }
+
+    public static java.util.UUID getTimeUUID()
+    {
+        return java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
     }
 }
