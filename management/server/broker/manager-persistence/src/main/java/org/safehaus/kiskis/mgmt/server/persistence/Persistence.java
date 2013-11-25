@@ -1,23 +1,15 @@
 package org.safehaus.kiskis.mgmt.server.persistence;
 
 import com.datastax.driver.core.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.cassandra.utils.UUIDGen;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -118,6 +110,7 @@ public class Persistence implements PersistenceInterface {
 //    public List<Command> getCommandList(Agent agent) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
+
     /**
      * Saves command into cassandra
      *
@@ -221,7 +214,7 @@ public class Persistence implements PersistenceInterface {
             PreparedStatement stmt = session.prepare(cql);
 
             BoundStatement boundStatement = new BoundStatement(stmt);
-            UUID uuid = UUIDGen.getTimeUUID();
+            UUID uuid = Persistence.getTimeUUID();
             session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
 
             return uuid.toString();
@@ -237,10 +230,8 @@ public class Persistence implements PersistenceInterface {
         List<Request> list = new ArrayList<Request>();
         try {
             ResultSet rs = session.execute("select * from request");
-            Iterator<Row> it = rs.iterator();
-            while (it.hasNext()) {
+            for (Row row : rs) {
                 Request request = new Request();
-                Row row = it.next();
                 request.setProgram(row.getString("program"));
                 list.add(request);
             }
@@ -256,9 +247,7 @@ public class Persistence implements PersistenceInterface {
         List<Task> list = new ArrayList<Task>();
         try {
             ResultSet rs = session.execute("select * from tasks");
-            Iterator<Row> it = rs.iterator();
-            while (it.hasNext()) {
-                Row row = it.next();
+            for (Row row : rs) {
                 Task task = new Task();
                 task.setUid(row.getUUID("uid").toString());
                 task.setDescription(row.getString("description"));
@@ -270,5 +259,9 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
         }
         return list;
+    }
+
+    public static java.util.UUID getTimeUUID() {
+        return java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
     }
 }
