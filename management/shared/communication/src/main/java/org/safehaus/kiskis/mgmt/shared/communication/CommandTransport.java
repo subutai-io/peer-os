@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.shared.communication;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -16,6 +18,7 @@ import org.apache.activemq.broker.region.policy.PolicyMap;
 
 public class CommandTransport implements CommandTransportInterface {
 
+    private static final Logger LOG = Logger.getLogger(CommandTransport.class.getName());
     private BrokerService broker;
     private int amqPort;
     private String amqHost;
@@ -25,7 +28,7 @@ public class CommandTransport implements CommandTransportInterface {
     private String amqBrokerTrustStoreName;
     private String amqBrokerCertificatePwd;
     private String amqBrokerTrustStorePwd;
-    Session listenerSession;
+    private Session listenerSession;
     private CommunicationMessageListener communicationMessageListener;
 
     public void setAmqPort(int amqPort) {
@@ -100,8 +103,8 @@ public class CommandTransport implements CommandTransportInterface {
                 producer.send(message);
                 session.close();
                 connection.close();
-            } catch (JMSException e) {
-                System.out.println("Caught: " + e);
+            } catch (JMSException ex) {
+                LOG.log(Level.SEVERE, "Error in CommandProducer.run", ex);
             }
         }
     }
@@ -146,7 +149,7 @@ public class CommandTransport implements CommandTransportInterface {
             setupListener();
             System.out.println("ActiveMQ started...");
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            LOG.log(Level.SEVERE, "Error in init", ex);
         }
 
     }
@@ -157,7 +160,7 @@ public class CommandTransport implements CommandTransportInterface {
             communicationMessageListener.destroy();
             System.out.println("ActiveMQ stopped...");
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
     }
 
@@ -172,10 +175,10 @@ public class CommandTransport implements CommandTransportInterface {
             Destination adminQueue = listenerSession.createQueue(this.amqServiceQueue);
 
             MessageConsumer consumer = listenerSession.createConsumer(adminQueue);
-            communicationMessageListener = new CommunicationMessageListener(listenerSession);
+            communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener(communicationMessageListener);
         } catch (JMSException ex) {
-            System.out.println(ex.toString());
+            LOG.log(Level.SEVERE, "Error in setupListener", ex);
         }
     }
 

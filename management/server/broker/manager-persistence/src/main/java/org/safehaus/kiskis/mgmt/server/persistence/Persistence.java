@@ -1,16 +1,23 @@
 package org.safehaus.kiskis.mgmt.server.persistence;
 
 import com.datastax.driver.core.*;
-import org.apache.cassandra.utils.UUIDGen;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.cassandra.utils.UUIDGen;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -39,14 +46,13 @@ public class Persistence implements PersistenceInterface {
 
     @Override
     public List<Agent> getAgentList() {
-
+        List<Agent> list = new ArrayList<Agent>();
         try {
-            List<Agent> list = new ArrayList<Agent>();
-
             ResultSet rs = session.execute("select * from agents");
-            for (Object r : rs) {
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
                 Agent agent = new Agent();
-                Row row = (Row) r;
+                Row row = it.next();
                 agent.setUuid(row.getString("uuid"));
                 agent.setHostname(row.getString("hostname"));
                 agent.setIsLXC(row.getBool("islxc"));
@@ -54,14 +60,11 @@ public class Persistence implements PersistenceInterface {
                 agent.setListIP(row.getList("listip", String.class));
                 agent.setMacAddress(row.getString("macaddress"));
                 list.add(agent);
-
-                return list;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in getAgentList", ex);
         }
-
-        return null;
+        return list;
     }
 
     /**
@@ -80,11 +83,11 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
                     agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
                     agent.getMacAddress(), new Date()));
-            return rs != null;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+            return true;
 
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
+        }
         return false;
     }
 
@@ -94,8 +97,9 @@ public class Persistence implements PersistenceInterface {
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
             session = cluster.connect(cassandraKeyspace);
             System.out.println("Persistence started");
+
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in init", ex);
         }
     }
 
@@ -103,20 +107,17 @@ public class Persistence implements PersistenceInterface {
         try {
             session.shutdown();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         try {
             cluster.shutdown();
-            System.out.println(this.getClass().getName() + " stopped");
         } catch (Exception e) {
-            e.printStackTrace();
         }
+        System.out.println(this.getClass().getName() + " stopped");
     }
 
 //    public List<Command> getCommandList(Agent agent) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
-
     /**
      * Saves command into cassandra
      *
@@ -139,11 +140,10 @@ public class Persistence implements PersistenceInterface {
                     request.getProgram(), request.getStdOut() + "", request.getStdErr() + "",
                     request.getStdOutPath(), request.getStdErrPath(), request.getRunAs(), request.getArgs(),
                     request.getEnvironment(), request.getPid(), request.getTimeout()));
-            return rs != null;
+            return true;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in saveCommand", ex);
         }
-
         return false;
     }
 
@@ -156,6 +156,7 @@ public class Persistence implements PersistenceInterface {
     @Override
     public boolean saveResponse(Response response) {
         try {
+
             String cql = "insert into response (uuid, taskuuid, responsesequencenumber, exitcode, errout, hostname, ips, "
                     + "macaddress, pid, requestsequencenumber, responsetype, source, stdout, islxc) "
                     + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -166,34 +167,33 @@ public class Persistence implements PersistenceInterface {
                     response.getExitCode(), response.getStdErr(), response.getHostname(), response.getIps(),
                     response.getMacAddress(), response.getPid(), response.getRequestSequenceNumber(), response.getType().toString(),
                     response.getSource(), response.getStdOut(), response.isLxc));
-            return rs != null;
+            return true;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in saveResponse", ex);
         }
-
         return false;
     }
 
     @Override
     public List<Response> getResponses(String taskuuid) {
+        List<Response> list = new ArrayList<Response>();
         try {
-            List<Response> list = new ArrayList<Response>();
             ResultSet rs = session.execute("select * from response");
-            for (Object r : rs) {
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
                 Response response = new Response();
-                Row row = (Row) r;
+                Row row = it.next();
                 response.setType(ResponseType.valueOf(row.getString("responsetype")));
                 response.setUuid(row.getString("uuid"));
                 response.setExitCode(row.getInt("exitcode"));
                 response.setStdOut(row.getString("stdout"));
                 list.add(response);
             }
-            return list;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
 
-        return null;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getResponses", ex);
+        }
+        return list;
     }
 
     @Override
@@ -205,11 +205,11 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute(boundStatement.bind(
                     agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
                     agent.getMacAddress(), new Date(), agent.getUuid()));
-            return rs != null;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+            return true;
 
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in updateAgent", ex);
+        }
         return false;
     }
 
@@ -221,74 +221,54 @@ public class Persistence implements PersistenceInterface {
             PreparedStatement stmt = session.prepare(cql);
 
             BoundStatement boundStatement = new BoundStatement(stmt);
-            UUID uuid =Persistence.getTimeUUID();
+            UUID uuid = UUIDGen.getTimeUUID();
             session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
 
             return uuid.toString();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
 
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveTask", ex);
+        }
         return null;
     }
 
     @Override
     public List<Request> getRequests(String taskuuid) {
+        List<Request> list = new ArrayList<Request>();
         try {
-            List<Request> list = new ArrayList<Request>();
             ResultSet rs = session.execute("select * from request");
-            for (Object r : rs) {
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
                 Request request = new Request();
-                Row row = (Row) r;
+                Row row = it.next();
                 request.setProgram(row.getString("program"));
                 list.add(request);
             }
-            return list;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
 
-        return null;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequests", ex);
+        }
+        return list;
     }
 
     @Override
     public List<Task> getTasks() {
+        List<Task> list = new ArrayList<Task>();
         try {
-            List<Task> list = new ArrayList<Task>();
             ResultSet rs = session.execute("select * from tasks");
-            for (Row row : rs) {
+            Iterator<Row> it = rs.iterator();
+            while (it.hasNext()) {
+                Row row = it.next();
                 Task task = new Task();
                 task.setUid(row.getUUID("uid").toString());
                 task.setDescription(row.getString("description"));
-//            task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
+                task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
                 list.add(task);
             }
-            return list;
+
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in getTasks", ex);
         }
-
-        return null;
-    }
-
-    public java.util.UUID uuidForDate(Date d) {
-        /*
-          Magic number obtained from #cassandra's thobbs, who
-          claims to have stolen it from a Python library.
-        */
-        final long NUM_100NS_INTERVALS_SINCE_UUID_EPOCH = 0x01b21dd213814000L;
-
-        long origTime = d.getTime();
-        long time = origTime * 10000 + NUM_100NS_INTERVALS_SINCE_UUID_EPOCH;
-        long timeLow = time & 0xffffffffL;
-        long timeMid = time & 0xffff00000000L;
-        long timeHi = time & 0xfff000000000000L;
-        long upperLong = (timeLow << 32) | (timeMid >> 16) | (1 << 12) | (timeHi >> 48);
-        return new java.util.UUID(upperLong, 0xC000000000000000L);
-    }
-
-    public static java.util.UUID getTimeUUID()
-    {
-        return java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        return list;
     }
 }

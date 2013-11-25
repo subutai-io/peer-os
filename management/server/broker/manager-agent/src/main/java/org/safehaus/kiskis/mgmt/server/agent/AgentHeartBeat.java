@@ -13,7 +13,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
@@ -21,6 +20,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class AgentHeartBeat implements Runnable {
 
+    private static final Logger LOG = Logger.getLogger(AgentHeartBeat.class.getName());
     private AgentManagerInterface agentManager;
     private CommandTransportInterface commandSender;
     private int timeoutSec;
@@ -37,18 +37,20 @@ public class AgentHeartBeat implements Runnable {
                 //send hearbeats
                 if (commandSender != null) {
                     Set<Agent> agents = agentManager.getRegisteredAgents();
-                    for (Agent agent : agents) {
-                        commandSender.sendCommand((Command) CommandFactory.createRequest(
-                                RequestType.HEARTBEAT_REQUEST,
-                                agent.getUuid(),
-                                "HEARTBEAT",
-                                null, null, null, null, null, null, null, null, null, null, null));
+                    if (!agents.isEmpty()) {
+                        System.out.println("Sending heartbeat to agents");
+                        for (Agent agent : agents) {
+                            commandSender.sendCommand((Command) CommandFactory.createRequest(
+                                    RequestType.HEARTBEAT_REQUEST,
+                                    agent.getUuid(),
+                                    "HEARTBEAT",
+                                    null, null, null, null, null, null, null, null, null, null, null));
+                        }
                     }
-                    System.out.println("Sending heartbeat to agents");
                 }
                 Thread.sleep(timeoutSec * 1000);
             } catch (Exception ex) {
-                Logger.getLogger(AgentHeartBeat.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "Error in AgentHeartBeat.run", ex);
             }
         }
     }

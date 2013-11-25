@@ -12,17 +12,20 @@
         </cm:default-properties>
     </cm:property-placeholder>
     
-    <reference id="persistenceAgentService" availability="optional"
+    <reference id="persistenceAgentService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface"/>
     <reference id="commandManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface"/>
+    <reference id="commandTransportInterface" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface"/>
 
     <bean id="agentManagerService"
           class="org.safehaus.kiskis.mgmt.server.agent.AgentManager"
-          init-method="init" destroy-method="destroy">
+          init-method="init" destroy-method="destroy" depends-on="persistenceAgentService">
         <property name="persistenceAgentService" ref="persistenceAgentService"/>
         <property name="commandManagerService" ref="commandManagerService"/>
-        <property name="context" ref="blueprintBundleContext"/>
+        <property name="commandTransportInterface" ref="commandTransportInterface"/>
+        <!--<property name="context" ref="blueprintBundleContext"/>-->
         <property name="heartbeatTimeoutSec" value="${heartbeatTimeoutSec}"/>  
     </bean>
     <service ref="agentManagerService"

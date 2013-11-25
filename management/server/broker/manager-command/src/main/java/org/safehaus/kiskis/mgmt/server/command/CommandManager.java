@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+//import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
@@ -12,6 +11,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
@@ -20,8 +21,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
  */
 public class CommandManager implements CommandManagerInterface, BrokerListener {
 
-    private BundleContext context;
+    private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
+//    private BundleContext context;
     private PersistenceInterface persistenceCommand;
+    private CommandTransportInterface communicationService;
     private ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
 
 //    @Override
@@ -34,10 +37,10 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     public void executeCommand(Command command) {
         try {
             if (persistenceCommand.saveCommand(command)) {
-                getCommandTransport().sendCommand(command);
+                communicationService.sendCommand(command);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in executeCommand", ex);
         }
     }
 
@@ -80,7 +83,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in notifyListeners", ex);
         }
     }
 
@@ -90,7 +93,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             System.out.println("Adding module listener : " + listener.getName());
             listeners.add(listener);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in addListener", ex);
         }
     }
 
@@ -100,27 +103,27 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             System.out.println("Removing module listener : " + listener.getName());
             listeners.remove(listener);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in removeListener", ex);
         }
     }
 
     public void init() {
         try {
-            if (getCommandTransport() != null) {
-                getCommandTransport().addListener(this);
+            if (communicationService != null) {
+                communicationService.addListener(this);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in init", ex);
         }
     }
 
     public void destroy() {
         try {
-            if (getCommandTransport() != null) {
-                getCommandTransport().removeListener(this);
+            if (communicationService != null) {
+                communicationService.removeListener(this);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
     }
 
@@ -128,26 +131,29 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         this.persistenceCommand = persistenceCommand;
     }
 
-    public void setContext(BundleContext context) {
-        this.context = context;
+    public void setCommunicationService(CommandTransportInterface communicationService) {
+        this.communicationService = communicationService;
     }
 
-    private CommandTransportInterface getCommandTransport() {
-        if (context != null) {
-            ServiceReference reference = context
-                    .getServiceReference(CommandTransportInterface.class.getName());
-            if (reference != null) {
-                return (CommandTransportInterface) context.getService(reference);
-            }
-        }
-
-        return null;
-    }
-
+//    public void setContext(BundleContext context) {
+//        this.context = context;
+//    }
+//    private CommandTransportInterface getCommandTransport() {
+//        if (context != null) {
+//            ServiceReference reference = context
+//                    .getServiceReference(CommandTransportInterface.class.getName());
+//            if (reference != null) {
+//                return (CommandTransportInterface) context.getService(reference);
+//            }
+//        }
+//
+//        return null;
+//    }
     public List<Request> getCommands() {
         try {
             return persistenceCommand.getRequests("taskuuid");
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCommands", ex);
         }
         return null;
     }
@@ -155,7 +161,8 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     public List<Response> getResponses() {
         try {
             return persistenceCommand.getResponses("taskuuid");
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getResponses", ex);
         }
         return null;
     }
