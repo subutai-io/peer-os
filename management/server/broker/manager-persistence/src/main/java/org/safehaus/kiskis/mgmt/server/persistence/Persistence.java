@@ -61,7 +61,7 @@ public class Persistence implements PersistenceInterface {
                 list.add(agent);
             }
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getAgentList", ex);
+            LOG.log(Level.SEVERE, "Error in getAgentsByHeartbeat", ex);
         }
         return list;
     }
@@ -86,7 +86,7 @@ public class Persistence implements PersistenceInterface {
                 list.add(agent);
             }
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getAgentList", ex);
+            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
         }
         return list;
     }
