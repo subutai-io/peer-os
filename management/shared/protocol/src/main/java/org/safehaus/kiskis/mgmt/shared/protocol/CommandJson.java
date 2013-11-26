@@ -41,7 +41,6 @@ public class CommandJson {
 
     public static String getJson(CommandInterface cmd) {
         try {
-
             return gson.toJson(cmd);
         } catch (Exception e) {
         }
