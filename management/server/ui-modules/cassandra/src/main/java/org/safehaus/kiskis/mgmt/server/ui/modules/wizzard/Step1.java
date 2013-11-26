@@ -15,7 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  */
 public class Step1 extends Panel {
 
-    public Step1(final CassandraWizard aThis) {
+    public Step1(final CassandraWizard cassandraWizard) {
         setCaption("Welcome");
         setSizeFull();
 
@@ -53,7 +53,7 @@ public class Step1 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showNext();
+                cassandraWizard.showNext();
             }
         });
 
@@ -65,9 +65,9 @@ public class Step1 extends Panel {
         Task task = new Task();
         task.setDescription("Cassandra Wizard installing");
         task.setTaskStatus(TaskStatus.NEW);
-        String uuid = aThis.getCommandManager().saveTask(task);
+        String uuid = cassandraWizard.getCommandManager().saveTask(task);
         task.setUid(uuid);
-        aThis.setTask(task);
+        cassandraWizard.setTask(task);
     }
 
 }

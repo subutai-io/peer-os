@@ -178,4 +178,8 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     public List<Task> getTasks() {
         return persistenceCommand.getTasks();
     }
+
+    public boolean truncateTables() {
+        return persistenceCommand.truncateTables();
+    }
 }

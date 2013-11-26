@@ -53,12 +53,14 @@ public class Terminal implements Module {
             Button getRequests = genGetRequestButton();
             Button getResponses = genGetResponsesButton();
             Button getTasks = getGetTasksButton();
+            Button truncateTables = getTruncateTablesButton();
             HorizontalLayout hLayout = new HorizontalLayout();
 
             hLayout.addComponent(buttonSend);
             hLayout.addComponent(getRequests);
             hLayout.addComponent(getResponses);
             hLayout.addComponent(getTasks);
+            hLayout.addComponent(truncateTables);
 
             verticalLayout.addComponent(hLayout);
 
@@ -203,6 +205,21 @@ public class Terminal implements Module {
                         sb.append(task).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
+                }
+            });
+            return button;
+        }
+
+        private Button getTruncateTablesButton() {
+            Button button = new Button("Truncate tables");
+            button.setDescription("Gets tasks from Cassandra");
+            button.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    if (commandManagerInterface.truncateTables()) {
+                        textAreaOutput.setValue("Tables truncated");
+                    }
                 }
             });
             return button;

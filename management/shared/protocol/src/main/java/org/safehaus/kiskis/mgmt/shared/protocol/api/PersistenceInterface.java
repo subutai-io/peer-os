@@ -37,4 +37,6 @@ public interface PersistenceInterface {
     String saveTask(Task task);
     
     List<Task> getTasks();
+
+    public boolean truncateTables();
 }

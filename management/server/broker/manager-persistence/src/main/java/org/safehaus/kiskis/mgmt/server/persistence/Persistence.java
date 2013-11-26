@@ -289,4 +289,16 @@ public class Persistence implements PersistenceInterface {
     public static java.util.UUID getTimeUUID() {
         return java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
     }
+
+    public boolean truncateTables() {
+        try {
+            session.execute("truncate tasks");
+            session.execute("truncate request");
+            session.execute("truncate response");
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getTasks", ex);
+            return false;
+        }
+        return true;
+    }
 }
