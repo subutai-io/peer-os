@@ -47,15 +47,15 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     @Override
     public synchronized void getCommand(Response response) {
         System.out.println("Response received by CommandManager");
-        persistenceCommand.saveResponse(response);
-
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
+                persistenceCommand.saveResponse(response);
                 notifyListeners(response);
                 break;
             }
             case EXECUTE_RESPONSE_DONE: {
+                persistenceCommand.saveResponse(response);
                 notifyListeners(response);
                 break;
             }
