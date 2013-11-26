@@ -47,13 +47,15 @@ public class CassandraWizard extends Window {
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(true);
         progressBar.setValue(0f);
-        progressBar.setWidth("100%");
+        progressBar.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        progressBar.setHeight(20, Sizeable.UNITS_PIXELS);
         gridLayout.addComponent(progressBar, 0, 0);
         gridLayout.setComponentAlignment(progressBar, Alignment.TOP_CENTER);
 
         verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);
-        verticalLayout.setSizeFull();
+        verticalLayout.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         gridLayout.addComponent(verticalLayout, 0, 1, 0, 8);
         gridLayout.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
 
@@ -138,7 +140,7 @@ public class CassandraWizard extends Window {
         this.task = task;
     }
 
-    public void setTextAreaTerminal(Response response) {
+    public void setOutput(Response response) {
         if (response.getTaskUuid().equals(task.getUid())) {
             StringBuilder output = new StringBuilder();
             output.append(textAreaTerminal.getValue());
