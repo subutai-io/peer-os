@@ -8,7 +8,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,11 +41,36 @@ public class Persistence implements PersistenceInterface {
         this.cassandraPort = cassandraPort;
     }
 
+//    @Override
+//    public List<Agent> getAgentList() {
+//        List<Agent> list = new ArrayList<Agent>();
+//        try {
+//            ResultSet rs = session.execute("select * from agents");
+//            for (Row row : rs) {
+//                Agent agent = new Agent();
+//                agent.setUuid(row.getString("uuid"));
+//                agent.setHostname(row.getString("hostname"));
+//                agent.setIsLXC(row.getBool("islxc"));
+//                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+//                agent.setListIP(row.getList("listip", String.class));
+//                agent.setMacAddress(row.getString("macaddress"));
+//                list.add(agent);
+//            }
+//        } catch (Exception ex) {
+//            LOG.log(Level.SEVERE, "Error in getAgentList", ex);
+//        }
+//        return list;
+//    }
     @Override
-    public List<Agent> getAgentList() {
-        List<Agent> list = new ArrayList<Agent>();
+    public Set<Agent> getAgentsByHeartbeat(long from, long to) {
+        Set<Agent> list = new HashSet<Agent>();
         try {
-            ResultSet rs = session.execute("select * from agents");
+            String cql = "select * from agents where lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(
+                    new Date(System.currentTimeMillis() - from * 60 * 1000),
+                    new Date(System.currentTimeMillis() - to * 60 * 1000)));
             for (Row row : rs) {
                 Agent agent = new Agent();
                 agent.setUuid(row.getString("uuid"));
@@ -60,28 +87,29 @@ public class Persistence implements PersistenceInterface {
         return list;
     }
 
-    /**
-     * Saved Agent data into Cassandra agents table
-     *
-     * @param agent
-     * @return the result in boolean
-     */
     @Override
-    public boolean saveAgent(Agent agent) {
+    public Set<Agent> getRegisteredAgents(long freshness) {
+        Set<Agent> list = new HashSet<Agent>();
         try {
-            String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
-                    + "values (?,?,?,?,?,?)";
+            String cql = "select * from agents where lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
-                    agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                    agent.getMacAddress(), new Date()));
-            return true;
-
+            ResultSet rs = session.execute(boundStatement.bind(
+                    new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
+            for (Row row : rs) {
+                Agent agent = new Agent();
+                agent.setUuid(row.getString("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                list.add(agent);
+            }
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
+            LOG.log(Level.SEVERE, "Error in getAgentList", ex);
         }
-        return false;
+        return list;
     }
 
     // TODO Remove this method and reference in blueprint
@@ -198,19 +226,55 @@ public class Persistence implements PersistenceInterface {
         return list;
     }
 
+    /**
+     * Saved Agent data into Cassandra agents table
+     *
+     * @param agent
+     * @return the result in boolean
+     */
     @Override
-    public boolean updateAgent(Agent agent) {
+    public boolean saveAgent(Agent agent) {
         try {
-            String cql = "update agents set hostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
+            String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
+                    + "values (?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(
+            ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
                     agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                    agent.getMacAddress(), new Date(), agent.getUuid()));
+                    agent.getMacAddress(), new Date()));
             return true;
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in updateAgent", ex);
+            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
+        }
+        return false;
+    }
+
+    /**
+     * Saved Agent data into Cassandra agents table
+     *
+     * @param agent
+     * @return the result in boolean
+     */
+    @Override
+    public boolean removeAgent(Agent agent) {
+        try {
+            String cql = "delete from agents where uuid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(agent.getUuid()));
+            return true;
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateAgent(Agent agent) {
+        if (removeAgent(agent)) {
+            return saveAgent(agent);
         }
         return false;
     }

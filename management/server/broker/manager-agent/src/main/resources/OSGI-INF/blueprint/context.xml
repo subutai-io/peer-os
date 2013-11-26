@@ -9,6 +9,9 @@
     <cm:property-placeholder persistent-id="MiscConfig" update-strategy="none">
         <cm:default-properties>
             <cm:property name="heartbeatTimeoutSec" value="300"/>
+            <cm:property name="heartbeatFromMin" value="30"/>
+            <cm:property name="heartbeatToMin" value="5"/>
+            <cm:property name="agentFreshnessMin" value="30"/>
         </cm:default-properties>
     </cm:property-placeholder>
     
@@ -27,6 +30,9 @@
         <property name="commandTransportInterface" ref="commandTransportInterface"/>
         <!--<property name="context" ref="blueprintBundleContext"/>-->
         <property name="heartbeatTimeoutSec" value="${heartbeatTimeoutSec}"/>  
+        <property name="heartbeatFromMin" value="${heartbeatFromMin}"/>  
+        <property name="heartbeatToMin" value="${heartbeatToMin}"/>  
+        <property name="agentFreshnessMin" value="${agentFreshnessMin}"/>  
     </bean>
     <service ref="agentManagerService"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"

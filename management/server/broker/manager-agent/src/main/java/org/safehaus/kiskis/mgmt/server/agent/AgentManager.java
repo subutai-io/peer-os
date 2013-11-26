@@ -7,7 +7,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +28,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
     private ExecutorService executorService;
     private int heartbeatTimeoutSec;
+    private int heartbeatFromMin;
+    private int heartbeatToMin;
+    private int agentFreshnessMin;
 
     public AgentManager() {
         registeredAgents = new HashSet<Agent>();
@@ -36,18 +38,23 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     @Override
     public Set<Agent> getRegisteredAgents() {
-        return Collections.unmodifiableSet(registeredAgents);
+        return persistenceAgent.getRegisteredAgents(agentFreshnessMin);
+    }
+
+    @Override
+    public Set<Agent> getAgentsToHeartbeat() {
+        return persistenceAgent.getAgentsByHeartbeat(heartbeatFromMin, heartbeatToMin);
     }
 
     @Override
     public synchronized void getCommand(Response response) {
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
-                saveAgent(response);
+                updateAgent(response, true);
                 break;
             }
             case HEARTBEAT_RESPONSE: {
-                updateAgent(response);
+                updateAgent(response, false);
             }
             default: {
                 break;
@@ -55,7 +62,38 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
     }
 
-    private void saveAgent(Response response) {
+//    private void saveAgent(Response response) {
+//        Agent agent = new Agent();
+//        agent.setUuid(response.getUuid());
+//        agent.setHostname(response.getHostname());
+//        agent.setMacAddress(response.getMacAddress());
+//        if (response.isIsLxc() == null) {
+//            agent.setIsLXC(false);
+//        } else {
+//            agent.setIsLXC(response.isIsLxc());
+//        }
+//        agent.setListIP(response.getIps());
+//
+//        if (persistenceAgent.saveAgent(agent)) {
+//
+//            Request request = new Request();
+//            request.setType(RequestType.REGISTRATION_REQUEST_DONE);
+//            request.setUuid(agent.getUuid());
+//            request.setSource(response.getSource());
+//            request.setStdErr(OutputRedirection.NO);
+//            request.setStdOut(OutputRedirection.NO);
+//            Command command = new Command(request);
+//            commandManager.executeCommand(command);
+//
+//            if (registeredAgents.add(agent)) {
+//                notifyModules();
+//            }
+//            System.out.println(agent + "\nAgent is registered");
+//        } else {
+//            System.out.println(agent + "\nError registering agent");
+//        }
+//    }
+    private void updateAgent(Response response, boolean register) {
         Agent agent = new Agent();
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
@@ -67,42 +105,25 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
         agent.setListIP(response.getIps());
 
-        if (persistenceAgent.saveAgent(agent)) {
-
-            Request request = new Request();
-            request.setType(RequestType.REGISTRATION_REQUEST_DONE);
-            request.setUuid(agent.getUuid());
-            request.setSource(response.getSource());
-            request.setStdErr(OutputRedirection.NO);
-            request.setStdOut(OutputRedirection.NO);
-            Command command = new Command(request);
-            commandManager.executeCommand(command);
-
-            if (registeredAgents.add(agent)) {
-                notifyModules();
-            }
-            System.out.println(agent + "\nAgent is registered");
-        } else {
-            System.out.println(agent + "\nError registering agent");
-        }
-    }
-
-    private void updateAgent(Response response) {
-        Agent agent = new Agent();
-        agent.setUuid(response.getUuid());
-        agent.setHostname(response.getHostname());
-        agent.setMacAddress(response.getMacAddress());
-        if (response.isIsLxc() == null) {
-            agent.setIsLXC(false);
-        } else {
-            agent.setIsLXC(response.isIsLxc());
-        }
-        agent.setListIP(response.getIps());
 
         if (persistenceAgent.updateAgent(agent)) {
-            System.out.println(agent + "\nAgent is updated");
+            if (register) {
+                Request request = new Request();
+                request.setType(RequestType.REGISTRATION_REQUEST_DONE);
+                request.setUuid(agent.getUuid());
+                request.setSource(response.getSource());
+                request.setStdErr(OutputRedirection.NO);
+                request.setStdOut(OutputRedirection.NO);
+                Command command = new Command(request);
+                commandManager.executeCommand(command);
+
+                if (registeredAgents.add(agent)) {
+                    notifyModules();
+                }
+            }
+            System.out.println(String.format(agent + "\nAgent is %s", register ? "registered" : "updated"));
         } else {
-            System.out.println(agent + "\nError updating agent");
+            System.out.println(String.format(agent + "\nError %s agent", register ? "registering" : "updating"));
         }
     }
 
@@ -164,22 +185,19 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         this.commandTransportInterface = commandTransportInterface;
     }
 
-//    public void setContext(BundleContext context) {
-//        this.context = context;
-//    }
-
-//    private CommandTransportInterface getCommandTransport() {
-//        if (context != null) {
-//            ServiceReference reference = context
-//                    .getServiceReference(CommandTransportInterface.class.getName());
-//            if (reference != null) {
-//                return (CommandTransportInterface) context.getService(reference);
-//            }
-//        }
-//
-//        return null;
-//    }
     public void setHeartbeatTimeoutSec(int heartbeatTimeoutSec) {
         this.heartbeatTimeoutSec = heartbeatTimeoutSec;
+    }
+
+    public void setHeartbeatFromMin(int heartbeatFromMin) {
+        this.heartbeatFromMin = heartbeatFromMin;
+    }
+
+    public void setHeartbeatToMin(int heartbeatToMin) {
+        this.heartbeatToMin = heartbeatToMin;
+    }
+
+    public void setAgentFreshnessMin(int agentFreshnessMin) {
+        this.agentFreshnessMin = agentFreshnessMin;
     }
 }

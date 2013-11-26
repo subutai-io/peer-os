@@ -12,6 +12,8 @@ public interface AgentManagerInterface {
 
     public Set<Agent> getRegisteredAgents();
 
+    public Set<Agent> getAgentsToHeartbeat();
+
     public void addListener(AgentListener listener);
 
     public void removeListener(AgentListener listener);

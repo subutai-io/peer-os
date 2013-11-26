@@ -5,6 +5,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
 import java.util.List;
+import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -28,14 +29,19 @@ public interface PersistenceInterface {
     boolean saveResponse(Response response);
 
     //Agents section
-    List<Agent> getAgentList();
+//    List<Agent> getAgentList();
+    Set<Agent> getRegisteredAgents(long freshness);
+
+    Set<Agent> getAgentsByHeartbeat(long from, long to);
 
     boolean saveAgent(Agent agent);
 
     boolean updateAgent(Agent agent);
 
+    boolean removeAgent(Agent agent);
+
     String saveTask(Task task);
-    
+
     List<Task> getTasks();
 
     public boolean truncateTables();

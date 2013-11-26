@@ -36,7 +36,7 @@ public class AgentHeartBeat implements Runnable {
             try {
                 //send hearbeats
                 if (commandSender != null) {
-                    Set<Agent> agents = agentManager.getRegisteredAgents();
+                    Set<Agent> agents = agentManager.getAgentsToHeartbeat();
                     if (!agents.isEmpty()) {
                         System.out.println("Sending heartbeat to agents");
                         for (Agent agent : agents) {

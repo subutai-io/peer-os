@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import org.junit.Test;
 
 /**
  * @author bahadyr
@@ -53,16 +52,16 @@ public class PersistenceTest {
     /**
      * Test of getAgentList method, of class Persistence.
      */
-//    @Test
-    public void testGetAgentList() {
-        System.out.println("getAgentList");
-        Persistence instance = new Persistence();
-        List<Agent> result = instance.getAgentList();
-        Agent agent = new Agent();
-        agent.setUuid("uuid");
-        assertEquals(true, result.contains(agent));
-        // TODO review the generated test code and remove the default call to fail.
-    }
+////    @Test
+//    public void testGetAgentList() {
+//        System.out.println("getAgentList");
+//        Persistence instance = new Persistence();
+//        List<Agent> result = instance.getAgentList();
+//        Agent agent = new Agent();
+//        agent.setUuid("uuid");
+//        assertEquals(true, result.contains(agent));
+//        // TODO review the generated test code and remove the default call to fail.
+//    }
 
     /**
      * Test of saveAgent method, of class Persistence.
