@@ -11,9 +11,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
-public class CassandraWizard extends Window {
+public final class CassandraWizard extends Window {
 
-    private CommandManagerInterface commandManagerInterface;
+    private final CommandManagerInterface commandManagerInterface;
 
     VerticalLayout verticalLayout;
     Task task;
@@ -84,7 +84,7 @@ public class CassandraWizard extends Window {
                 break;
             }
             case 6: {
-                Step43 step43 = new Step43(this);
+                step43 = new Step43(this);
                 verticalLayout.addComponent(step43);
                 break;
             }

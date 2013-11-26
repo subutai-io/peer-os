@@ -28,4 +28,6 @@ public interface CommandManagerInterface {
     public String saveTask(Task task);
 
     public List<Task> getTasks();
+
+    public boolean truncateTables();
 }
