@@ -7,6 +7,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * @author bahadyr
@@ -59,6 +61,13 @@ public class Step1 extends Panel {
         verticalLayout.addComponent(next);
 
         addComponent(verticalLayout);
+
+        Task task = new Task();
+        task.setDescription("Cassandra Wizard installing");
+        task.setTaskStatus(TaskStatus.NEW);
+        String uuid = aThis.getCommandManager().saveTask(task);
+        task.setUid(uuid);
+        aThis.setTask(task);
     }
 
 }

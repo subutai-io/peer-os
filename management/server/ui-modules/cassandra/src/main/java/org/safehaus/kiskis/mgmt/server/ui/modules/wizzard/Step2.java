@@ -7,14 +7,14 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bahadyr
@@ -24,8 +24,11 @@ public class Step2 extends Panel {
 //    private static final List<String> hosts = Arrays.asList(new String[]{
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
     List<String> hosts;
+    CassandraWizard parent;
 
     public Step2(final CassandraWizard aThis) {
+        parent = aThis;
+
         setCaption("List nodes");
         setSizeFull();
 
@@ -105,12 +108,13 @@ public class Step2 extends Panel {
     }
 
     private Command buildCommand(String uuid) {
+
         Request request = new Request();
         request.setSource("Cassandra Wizard");
         request.setProgram("ls");
         request.setUuid(uuid);
         request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid("someuuid");
+        request.setTaskUuid(parent.getTask().getUid());
         request.setWorkingDirectory("/");
         request.setStdOut(OutputRedirection.RETURN);
         request.setStdErr(OutputRedirection.RETURN);
@@ -118,6 +122,7 @@ public class Step2 extends Panel {
         request.setTimeout(60l);
         request.setRequestSequenceNumber(1l);
         Command command = new Command(request);
+
         return command;
     }
 

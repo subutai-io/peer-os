@@ -16,7 +16,7 @@ public class CassandraWizard extends Window {
     private CommandManagerInterface commandManagerInterface;
 
     VerticalLayout verticalLayout;
-    Task task = new Task();
+    Task task;
     Step1 step1;
     Step2 step2;
     Step3 step3;
@@ -95,6 +95,14 @@ public class CassandraWizard extends Window {
                 break;
             }
         }
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
     }
 
     public CommandManagerInterface getCommandManager() {
