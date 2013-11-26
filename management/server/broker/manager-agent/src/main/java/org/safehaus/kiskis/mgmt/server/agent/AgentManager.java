@@ -103,9 +103,9 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                     notifyModules();
                 }
             }
-            System.out.println(String.format(agent + "\nAgent is %s", register ? "registered" : "updated"));
+            System.out.println(agent + String.format("\nAgent is %s", register ? "registered" : "updated"));
         } else {
-            System.out.println(String.format(agent + "\nError %s agent", register ? "registering" : "updating"));
+            System.out.println(agent + String.format("\nError %s agent", register ? "registering" : "updating"));
         }
     }
 

@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
@@ -41,26 +40,6 @@ public class Persistence implements PersistenceInterface {
         this.cassandraPort = cassandraPort;
     }
 
-//    @Override
-//    public List<Agent> getAgentList() {
-//        List<Agent> list = new ArrayList<Agent>();
-//        try {
-//            ResultSet rs = session.execute("select * from agents");
-//            for (Row row : rs) {
-//                Agent agent = new Agent();
-//                agent.setUuid(row.getString("uuid"));
-//                agent.setHostname(row.getString("hostname"));
-//                agent.setIsLXC(row.getBool("islxc"));
-//                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
-//                agent.setListIP(row.getList("listip", String.class));
-//                agent.setMacAddress(row.getString("macaddress"));
-//                list.add(agent);
-//            }
-//        } catch (Exception ex) {
-//            LOG.log(Level.SEVERE, "Error in getAgentList", ex);
-//        }
-//        return list;
-//    }
     @Override
     public Set<Agent> getAgentsByHeartbeat(long from, long to) {
         Set<Agent> list = new HashSet<Agent>();
@@ -136,9 +115,6 @@ public class Persistence implements PersistenceInterface {
         System.out.println(this.getClass().getName() + " stopped");
     }
 
-//    public List<Command> getCommandList(Agent agent) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
     /**
      * Saves command into cassandra
      *
@@ -287,7 +263,7 @@ public class Persistence implements PersistenceInterface {
             PreparedStatement stmt = session.prepare(cql);
 
             BoundStatement boundStatement = new BoundStatement(stmt);
-            
+
             session.execute(boundStatement.bind(task.getUid(), task.getDescription(), task.getTaskStatus().toString()));
 
             return task.getUid().toString();
@@ -349,10 +325,6 @@ public class Persistence implements PersistenceInterface {
         }
         return list;
     }
-
-//    public static java.util.UUID getTimeUUID() {
-//        return java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
-//    }
 
     public boolean truncateTables() {
         try {
