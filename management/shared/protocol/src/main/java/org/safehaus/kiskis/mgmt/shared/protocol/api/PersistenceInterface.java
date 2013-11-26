@@ -34,7 +34,7 @@ public interface PersistenceInterface {
 
     Set<Agent> getAgentsByHeartbeat(long from, long to);
 
-    boolean saveAgent(Agent agent);
+//    boolean saveAgent(Agent agent);
 
     boolean updateAgent(Agent agent);
 

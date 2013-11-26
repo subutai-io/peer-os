@@ -62,7 +62,6 @@ public class PersistenceTest {
 //        assertEquals(true, result.contains(agent));
 //        // TODO review the generated test code and remove the default call to fail.
 //    }
-
     /**
      * Test of saveAgent method, of class Persistence.
      */
@@ -79,7 +78,7 @@ public class PersistenceTest {
         agent.setUuid("uuid");
         Persistence instance = new Persistence();
         boolean expResult = true;
-        boolean result = instance.saveAgent(agent);
+        boolean result = instance.updateAgent(agent);
         assertEquals(expResult, result);
 
         // TODO review the generated test code and remove the default call to fail.
@@ -206,5 +205,4 @@ public class PersistenceTest {
         List<Response> list = instance.getResponses("");
         assertEquals(false, list.isEmpty());
     }
-
 }

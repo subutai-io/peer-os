@@ -208,8 +208,8 @@ public class Persistence implements PersistenceInterface {
      * @param agent
      * @return the result in boolean
      */
-    @Override
-    public boolean saveAgent(Agent agent) {
+//    @Override
+    private boolean saveAgent(Agent agent) {
         try {
             String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
                     + "values (?,?,?,?,?,?)";
