@@ -64,15 +64,6 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     private void updateAgent(Response response, boolean register) {
-        Task task = new Task();
-        task.setDescription("Agent registration");
-        task.setTaskStatus(TaskStatus.NEW);
-        task.setReqSeqNumber(0l);
-        commandManager.saveTask(task);
-
-        response.setTaskUuid(task.getUid().toString());
-        persistenceAgent.saveResponse(response);
-
         Agent agent = new Agent();
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
@@ -86,6 +77,14 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
         if (persistenceAgent.updateAgent(agent)) {
             if (register) {
+                Task task = new Task();
+                task.setDescription("Agent registration");
+                task.setTaskStatus(TaskStatus.NEW);
+                task.setReqSeqNumber(0l);
+                commandManager.saveTask(task);
+                response.setTaskUuid(task.getUid().toString());
+                persistenceAgent.saveResponse(response);
+                //
                 Request request = new Request();
                 request.setTaskUuid(task.getUid().toString());
                 request.setRequestSequenceNumber(task.getReqSeqNumber());
@@ -96,8 +95,10 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 request.setStdOut(OutputRedirection.NO);
                 Command command = new Command(request);
                 commandManager.executeCommand(command);
+                //
                 task.setTaskStatus(TaskStatus.SUCCESS);
                 persistenceAgent.saveTask(task);
+                //
 
                 if (registeredAgents.add(agent)) {
                     notifyModules();
