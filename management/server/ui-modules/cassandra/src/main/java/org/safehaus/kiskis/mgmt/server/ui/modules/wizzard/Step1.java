@@ -66,7 +66,6 @@ public class Step1 extends Panel {
         task.setDescription("Cassandra Wizard installing");
         task.setTaskStatus(TaskStatus.NEW);
         String uuid = cassandraWizard.getCommandManager().saveTask(task);
-        task.setUid(uuid);
         cassandraWizard.setTask(task);
     }
 

@@ -134,11 +134,11 @@ public class Terminal implements Module {
                                     task.setDescription("JSON executing");
                                     task.setTaskStatus(TaskStatus.NEW);
                                     String uuid = commandManagerInterface.saveTask(task);
-                                    task.setUid(uuid);
+//                                    task.setUid(uuid);
 
                                     r.setUuid(agent);
                                     r.setSource(Terminal.MODULE_NAME);
-                                    r.setTaskUuid(task.getUid());
+                                    r.setTaskUuid(task.getUid().toString());
 
                                     Command command = new Command(r);
                                     commandManagerInterface.executeCommand(command);
