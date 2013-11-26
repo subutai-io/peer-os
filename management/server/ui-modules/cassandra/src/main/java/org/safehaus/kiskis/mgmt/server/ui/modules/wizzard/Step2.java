@@ -114,7 +114,7 @@ public class Step2 extends Panel {
         request.setProgram("ls");
         request.setUuid(uuid);
         request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid(parent.getTask().getUid());
+        request.setTaskUuid(parent.getTask().getUid().toString());
         request.setWorkingDirectory("/");
         request.setStdOut(OutputRedirection.RETURN);
         request.setStdErr(OutputRedirection.RETURN);
