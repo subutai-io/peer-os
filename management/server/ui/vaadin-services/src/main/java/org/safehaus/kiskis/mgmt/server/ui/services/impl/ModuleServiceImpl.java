@@ -55,7 +55,7 @@ public class ModuleServiceImpl implements ModuleService {
 
     public synchronized void removeListener(ModuleServiceListener listener) {
         if(listener !=null){
-            System.out.println("ModuleServiceImpl: Removing listener " + listener);
+//            System.out.println("ModuleServiceImpl: Removing listener " + listener);
             try {
                 listeners.remove(listener);
             } catch (Exception ex) {
