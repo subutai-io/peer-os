@@ -34,8 +34,7 @@ public class Step42 extends Panel {
                 " 1) Welcome<br>" +
                 " 2) List nodes<br>" +
                 " 3) Installation<br>" +
-                " 4) <font color=\"#f14c1a\"><strong>Configuration</strong></font><br>" +
-                " 5) Start");
+                " 4) <font color=\"#f14c1a\"><strong>Configuration</strong></font><br>");
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
 
