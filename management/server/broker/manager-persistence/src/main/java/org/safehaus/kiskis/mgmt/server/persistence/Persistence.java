@@ -223,10 +223,10 @@ public class Persistence implements PersistenceInterface {
             PreparedStatement stmt = session.prepare(cql);
 
             BoundStatement boundStatement = new BoundStatement(stmt);
-            UUID uuid = Persistence.getTimeUUID();
-            session.execute(boundStatement.bind(uuid, task.getDescription(), task.getTaskStatus().toString()));
+            
+            session.execute(boundStatement.bind(task.getUid(), task.getDescription(), task.getTaskStatus().toString()));
 
-            return uuid.toString();
+            return task.getUid().toString();
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveTask", ex);
@@ -274,7 +274,7 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute("select * from tasks");
             for (Row row : rs) {
                 Task task = new Task();
-                task.setUid(row.getUUID("uid").toString());
+                task.setUid(row.getUUID("uid"));
                 task.setDescription(row.getString("description"));
                 task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
                 list.add(task);
@@ -286,9 +286,9 @@ public class Persistence implements PersistenceInterface {
         return list;
     }
 
-    public static java.util.UUID getTimeUUID() {
-        return java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
-    }
+//    public static java.util.UUID getTimeUUID() {
+//        return java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+//    }
 
     public boolean truncateTables() {
         try {

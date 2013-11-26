@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
@@ -56,6 +57,16 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     private void saveAgent(Response response) {
+        Task task = new Task();
+        task.setDescription("Agent registration");
+        task.setTaskStatus(TaskStatus.NEW);
+        task.setReqSeqNumber(0l);
+        String taskUuid = commandManager.saveTask(task);
+//        task.setUid(taskUuid);
+
+        response.setTaskUuid(task.getUid().toString());
+        persistenceAgent.saveResponse(response);
+
         Agent agent = new Agent();
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
@@ -70,6 +81,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         if (persistenceAgent.saveAgent(agent)) {
 
             Request request = new Request();
+            request.setTaskUuid(task.getUid().toString());
+            request.setRequestSequenceNumber(task.getReqSeqNumber());
             request.setType(RequestType.REGISTRATION_REQUEST_DONE);
             request.setUuid(agent.getUuid());
             request.setSource(response.getSource());
@@ -77,6 +90,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             request.setStdOut(OutputRedirection.NO);
             Command command = new Command(request);
             commandManager.executeCommand(command);
+            task.setTaskStatus(TaskStatus.SUCCESS);
+            persistenceAgent.saveTask(task);
 
             if (registeredAgents.add(agent)) {
                 notifyModules();
@@ -167,7 +182,6 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 //    public void setContext(BundleContext context) {
 //        this.context = context;
 //    }
-
 //    private CommandTransportInterface getCommandTransport() {
 //        if (context != null) {
 //            ServiceReference reference = context

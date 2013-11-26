@@ -8,41 +8,41 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.UUID;
 
 /**
  * @author bahadyr
  */
-public class Task  implements Serializable {
+public class Task implements Serializable {
 
-    private String uid;
+    private UUID uid;
     private String description;
-    private List<Request> requests;
-    private List<Response> response;
     private TaskStatus taskStatus;
+    private long reqSeqNumber;
 
-    public String getUid() {
+    public Task() {
+        uid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+//        uid = uuid.toString();
+    }
+
+    public long getIncrementedReqSeqNumber() {
+        return reqSeqNumber++;
+    }
+
+    public long getReqSeqNumber() {
+        return reqSeqNumber;
+    }
+
+    public void setReqSeqNumber(long reqSeqNumber) {
+        this.reqSeqNumber = reqSeqNumber;
+    }
+
+    public UUID getUid() {
         return uid;
     }
 
-    public void setUid(String uid) {
+    public void setUid(UUID uid) {
         this.uid = uid;
-    }
-
-    public List<Request> getRequests() {
-        return requests;
-    }
-
-    public void setRequests(List<Request> requests) {
-        this.requests = requests;
-    }
-
-    public List<Response> getResponse() {
-        return response;
-    }
-
-    public void setResponse(List<Response> response) {
-        this.response = response;
     }
 
     public TaskStatus getTaskStatus() {
@@ -63,12 +63,7 @@ public class Task  implements Serializable {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "uid='" + uid + '\'' +
-                ", description='" + description + '\'' +
-                ", requests=" + requests +
-                ", response=" + response +
-                ", taskStatus=" + taskStatus +
-                '}';
+        return "Task{" + "uid=" + uid + ", description=" + description + ", taskStatus=" + taskStatus + ", reqSeqNumber=" + reqSeqNumber + '}';
     }
+
 }
