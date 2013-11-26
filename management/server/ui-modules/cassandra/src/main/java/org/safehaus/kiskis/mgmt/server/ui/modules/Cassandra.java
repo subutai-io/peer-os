@@ -22,7 +22,7 @@ public class Cassandra implements Module {
             CommandListener {
 
         private final Button buttonInstallWizard;
-        private Window subwindow;
+        private CassandraWizard subwindow;
 
         public ModuleComponent(CommandManagerInterface commandManagerInterface) {
 
@@ -37,7 +37,7 @@ public class Cassandra implements Module {
                     subwindow = new CassandraWizard();
                     getApplication().getMainWindow().addWindow(subwindow);
                 }
-            }); // react to clicks
+            });
             verticalLayout.addComponent(buttonInstallWizard);
 
             setCompositionRoot(verticalLayout);
@@ -46,8 +46,9 @@ public class Cassandra implements Module {
         @Override
         public void outputCommand(Response response) {
             try {
-                getCommandManager().saveResponse(response);
-                System.out.println("CASSANDRA outputCommand(Response response) called");
+                if(response != null && subwindow.isVisible()){
+                    subwindow.setOutput(response);
+                }
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
                 ex.printStackTrace();
