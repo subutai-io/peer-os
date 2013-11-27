@@ -33,7 +33,6 @@ public class Terminal implements Module {
         private final TextField textFieldProgram;
         private final TextField textFieldRunAs;
         private final TextField textFieldArgs;
-        private final TextField textFieldEnv;
         private final TextField textFieldTimeout;
 
         private final TextArea textAreaCommand;
@@ -57,7 +56,6 @@ public class Terminal implements Module {
             textFieldRunAs.setValue("root");
 
             textFieldArgs = new TextField("Args");
-            textFieldEnv = new TextField("Environment");
 
             textFieldTimeout = new TextField("Timeout");
             textFieldTimeout.setValue("180");
@@ -65,7 +63,7 @@ public class Terminal implements Module {
             Label labelText = new Label("Enter command:");
 
             textAreaCommand = new TextArea();
-            textAreaCommand.setRows(10);
+            textAreaCommand.setRows(5);
             textAreaCommand.setColumns(80);
             textAreaCommand.setImmediate(true);
             textAreaCommand.setWordwrap(true);

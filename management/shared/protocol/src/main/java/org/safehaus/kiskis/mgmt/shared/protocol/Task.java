@@ -26,7 +26,7 @@ public class Task implements Serializable {
     }
 
     public long getIncrementedReqSeqNumber() {
-        return reqSeqNumber++;
+        return ++reqSeqNumber;
     }
 
     public long getReqSeqNumber() {
