@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
@@ -42,6 +43,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+        horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
         layout.addComponent(horizontalSplit);
 
         layout.setExpandRatio(horizontalSplit, 1);
