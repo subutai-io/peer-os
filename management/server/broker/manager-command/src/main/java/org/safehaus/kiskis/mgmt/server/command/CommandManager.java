@@ -1,8 +1,11 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
 //import org.osgi.framework.ServiceReference;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
@@ -13,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -22,12 +23,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
-//    private BundleContext context;
+    //    private BundleContext context;
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
     private ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
 
-//    @Override
+    //    @Override
 //    public List<Command> getCommandList(Agent agent) {
 //        System.out.println(this.getClass().getName() + " getCommandList called");
 //        System.out.println(agent.toString());
@@ -135,20 +136,6 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         this.communicationService = communicationService;
     }
 
-//    public void setContext(BundleContext context) {
-//        this.context = context;
-//    }
-//    private CommandTransportInterface getCommandTransport() {
-//        if (context != null) {
-//            ServiceReference reference = context
-//                    .getServiceReference(CommandTransportInterface.class.getName());
-//            if (reference != null) {
-//                return (CommandTransportInterface) context.getService(reference);
-//            }
-//        }
-//
-//        return null;
-//    }
     public List<Request> getCommands() {
         try {
             return persistenceCommand.getRequests("taskuuid");
@@ -160,11 +147,37 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public List<Response> getResponses() {
         try {
-            return persistenceCommand.getResponses("taskuuid");
+            return persistenceCommand.getResponses("taskuuid", 1);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getResponses", ex);
         }
         return null;
+    }
+
+    public Response getResponse(String taskuuid, Integer requestSequenceNumber) {
+        Response response = null;
+        try {
+            List<Response> list = persistenceCommand.getResponses(taskuuid, requestSequenceNumber);
+
+            String stdOut = "", stdErr = "";
+            for (Response r : list) {
+                response = r;
+                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null")) {
+                    stdOut += r.getStdOut();
+                }
+                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null")) {
+                    stdErr += r.getStdErr();
+                }
+            }
+
+            if (response != null) {
+                response.setStdOut(stdOut);
+                response.setStdErr(stdErr);
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCommands", ex);
+        }
+        return response;
     }
 
     public void saveResponse(Response response) {

@@ -172,10 +172,16 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public List<Response> getResponses(String taskuuid) {
+    public List<Response> getResponses(String taskuuid, Integer requestSequenceNumber) {
         List<Response> list = new ArrayList<Response>();
         try {
-            ResultSet rs = session.execute("select * from response");
+            String cql = "select * from response " +
+                    "WHERE taskuuid = ? " +
+                    "and requestsequencenumber = ? and responsesequencenumber >= 0 " +
+                    "ORDER BY requestsequencenumber, responsesequencenumber";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(taskuuid, requestSequenceNumber));
             for (Row row : rs) {
                 Response response = new Response();
                 response.setType(ResponseType.valueOf(row.getString("responsetype")));

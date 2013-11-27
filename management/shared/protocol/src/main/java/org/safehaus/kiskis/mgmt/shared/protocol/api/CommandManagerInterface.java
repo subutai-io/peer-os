@@ -23,6 +23,8 @@ public interface CommandManagerInterface {
 
     public List<Response> getResponses();
 
+    public Response getResponse(String taskuuid, Integer requestSequenceNumber);
+
     public void saveResponse(Response response);
 
     public String saveTask(Task task);

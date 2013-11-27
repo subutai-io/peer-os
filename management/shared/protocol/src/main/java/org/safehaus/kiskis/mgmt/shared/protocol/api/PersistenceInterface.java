@@ -24,7 +24,7 @@ public interface PersistenceInterface {
 
     List<Request> getRequests(String taskuuid);
 
-    List<Response> getResponses(String taskuuid);
+    List<Response> getResponses(String taskuuid, Integer requestSequenceNumber);
 
     boolean saveResponse(Response response);
 

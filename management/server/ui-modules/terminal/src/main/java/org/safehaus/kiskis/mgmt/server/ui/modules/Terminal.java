@@ -1,22 +1,18 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules;
 
 import com.vaadin.ui.*;
-import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
-
-import java.util.Set;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
+import java.util.List;
+import java.util.Set;
 
 public class Terminal implements Module {
 
@@ -133,8 +129,7 @@ public class Terminal implements Module {
                                     Task task = new Task();
                                     task.setDescription("JSON executing");
                                     task.setTaskStatus(TaskStatus.NEW);
-                                    String uuid = commandManagerInterface.saveTask(task);
-//                                    task.setUid(uuid);
+                                    commandManagerInterface.saveTask(task);
 
                                     r.setUuid(agent);
                                     r.setSource(Terminal.MODULE_NAME);
@@ -181,14 +176,24 @@ public class Terminal implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    List<Response> list = commandManagerInterface.getResponses();
-                    StringBuilder sb = new StringBuilder();
-                    for (Response response : list) {
-                        sb.append(response).append("\n");
+                    String[] attr = textAreaCommand.getValue().toString().trim().split(" ");
+
+                    if (attr.length == 2) {
+                        try {
+                            String taskUuid = attr[0];
+                            int requestSequenceNumber = Integer.parseInt(attr[1]);
+
+                            Response response = commandManagerInterface.getResponse(taskUuid, requestSequenceNumber);
+                            textAreaOutput.setValue(response);
+                        } catch (NumberFormatException ex) {
+                            getWindow().showNotification("Enter task uuid and requestsequencenumber " +
+                                    "delimited with space");
+                        }
+                    } else {
+                        getWindow().showNotification("Enter task uuid and requestsequencenumber delimited with space");
                     }
-                    textAreaOutput.setValue(sb.toString());
                 }
-            }); // react to clicks
+            });
             return button;
         }
 
