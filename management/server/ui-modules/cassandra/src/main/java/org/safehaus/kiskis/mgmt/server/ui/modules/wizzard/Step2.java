@@ -25,9 +25,11 @@ public class Step2 extends Panel {
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
     List<String> hosts;
     CassandraWizard parent;
+    String installationCommand = "apt-get --force-yes --assume-yes install ksks-zookeeper";
+    String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-zookeeper";
 
-    public Step2(final CassandraWizard aThis) {
-        parent = aThis;
+    public Step2(final CassandraWizard cassandraWizard) {
+        parent = cassandraWizard;
 
         setCaption("List nodes");
         setSizeFull();
@@ -82,10 +84,12 @@ public class Step2 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 for (String uuid : hosts) {
-                    Command command = buildCommand(uuid);
-                    aThis.runCommand(command);
+                    long reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
+                    String taskUuid = cassandraWizard.getTask().getUid().toString();
+                    Command command = buildCommand(uuid, installationCommand, reqSeqNumber, taskUuid);
+                    cassandraWizard.runCommand(command);
                 }
-                aThis.showNext();
+                cassandraWizard.showNext();
             }
         });
         Button back = new Button("Back");
@@ -93,7 +97,12 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showBack();
+                for (String uuid : hosts) {
+                    long reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
+                    String taskUuid = cassandraWizard.getTask().getUid().toString();
+                    Command command = buildCommand(uuid, purgeCommand, reqSeqNumber, taskUuid);
+                    cassandraWizard.runCommand(command);
+                }
             }
         });
 
@@ -107,20 +116,20 @@ public class Step2 extends Panel {
         addComponent(verticalLayout);
     }
 
-    private Command buildCommand(String uuid) {
+    private Command buildCommand(String uuid, String program, long reqSeqNumber, String taskUuid) {
 
         Request request = new Request();
         request.setSource("Cassandra Wizard");
-        request.setProgram("ls");
+        request.setProgram(program);
         request.setUuid(uuid);
         request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid(parent.getTask().getUid().toString());
+        request.setTaskUuid(taskUuid);
         request.setWorkingDirectory("/");
         request.setStdOut(OutputRedirection.RETURN);
         request.setStdErr(OutputRedirection.RETURN);
         request.setRunAs("root");
-        request.setTimeout(60l);
-        request.setRequestSequenceNumber(1l);
+        request.setTimeout(0l);
+        request.setRequestSequenceNumber(reqSeqNumber);
         Command command = new Command(request);
 
         return command;

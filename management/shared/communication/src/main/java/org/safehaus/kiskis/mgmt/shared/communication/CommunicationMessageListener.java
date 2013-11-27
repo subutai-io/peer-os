@@ -52,7 +52,7 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             for (BrokerListener ai : (ArrayList<BrokerListener>) listeners.clone()) {
                 if (ai != null) {
-                    System.out.println("Notifying");
+//                    System.out.println("Notifying");
                     ai.getCommand(response);
                 } else {
                     listeners.remove(ai);

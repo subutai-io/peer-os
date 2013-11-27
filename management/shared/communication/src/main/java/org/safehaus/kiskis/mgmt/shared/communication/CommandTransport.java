@@ -144,6 +144,7 @@ public class CommandTransport implements CommandTransportInterface {
             broker.setPersistent(true);
             broker.setUseJmx(false);
             broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort);
+//            broker.addConnector("amqp://0.0.0.0:5672?maximumConnections=1000&wireformat.maxFrameSize=104857600");
             broker.start();
             broker.waitUntilStarted();
             setupListener();

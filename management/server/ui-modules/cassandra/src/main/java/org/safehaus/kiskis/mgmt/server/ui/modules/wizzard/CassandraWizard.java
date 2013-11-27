@@ -11,17 +11,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
+public final class CassandraWizard extends Window {
 
-public class CassandraWizard extends Window {
+    private final CommandManagerInterface commandManagerInterface;
 
-    private CommandManagerInterface commandManagerInterface;
-
-    private VerticalLayout verticalLayout;
+    private final VerticalLayout verticalLayout;
     private Task task;
 
-    private TextArea textAreaTerminal;
-    private ProgressIndicator progressBar;
-    private static int MAX_STEPS = 5;
+    private final TextArea textAreaTerminal;
+    private final ProgressIndicator progressBar;
+    private static final int MAX_STEPS = 5;
 
     Step1 step1;
     Step2 step2;
@@ -60,7 +59,7 @@ public class CassandraWizard extends Window {
         gridLayout.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
 
         textAreaTerminal = new TextArea();
-        textAreaTerminal.setRows(5);
+        textAreaTerminal.setRows(10);
         textAreaTerminal.setColumns(65);
         textAreaTerminal.setImmediate(true);
         textAreaTerminal.setWordwrap(true);
@@ -121,7 +120,7 @@ public class CassandraWizard extends Window {
             }
             case 6: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                Step43 step43 = new Step43(this);
+                step43 = new Step43(this);
                 verticalLayout.addComponent(step43);
                 break;
             }
@@ -144,18 +143,32 @@ public class CassandraWizard extends Window {
         if (response.getTaskUuid().equals(task.getUid().toString())) {
             StringBuilder output = new StringBuilder();
             output.append(textAreaTerminal.getValue());
-
             if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
-                output.append("\n");
-                output.append("ERROR\n");
-                output.append(response.getStdErr().trim());
-                output.append("\n");
+                output.append("ERROR ").append(response.getStdErr().trim());
             }
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                output.append("\n");
-                output.append("OK\n");
-                output.append(response.getStdOut().trim());
-                output.append("\n");
+                output.append("OK ").append(response.getStdOut().trim());
+            }
+            switch (step) {
+                case 1: {
+                    break;
+                }
+                case 2: {
+                    break;
+                }
+                case 3: {
+                    step3.updateUI(response.getStdOut() + " " + response.getStdErr());
+                }
+                case 4: {
+                    break;
+                }
+                case 5: {
+                    break;
+                }
+                case 6: {
+                    break;
+                }
+
             }
 
             textAreaTerminal.setValue(output);
