@@ -23,7 +23,7 @@ public interface CommandManagerInterface {
 
     public List<Response> getResponses();
 
-    public Response getResponse(String taskuuid, Integer requestSequenceNumber);
+    public Response getResponse(String taskuuid, Long requestSequenceNumber);
 
     public void saveResponse(Response response);
 

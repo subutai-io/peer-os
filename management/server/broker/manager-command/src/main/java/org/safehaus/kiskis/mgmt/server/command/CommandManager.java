@@ -147,14 +147,14 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public List<Response> getResponses() {
         try {
-            return persistenceCommand.getResponses("taskuuid", 1);
+            return persistenceCommand.getResponses("taskuuid", 1l);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getResponses", ex);
         }
         return null;
     }
 
-    public Response getResponse(String taskuuid, Integer requestSequenceNumber) {
+    public Response getResponse(String taskuuid, Long requestSequenceNumber) {
         Response response = null;
         try {
             List<Response> list = persistenceCommand.getResponses(taskuuid, requestSequenceNumber);

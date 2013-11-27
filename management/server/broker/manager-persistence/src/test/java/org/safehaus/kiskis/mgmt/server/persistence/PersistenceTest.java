@@ -202,7 +202,7 @@ public class PersistenceTest {
 //    @Test
     public void testGetResponses() {
         System.out.println("getResponses");
-        List<Response> list = instance.getResponses("");
+        List<Response> list = instance.getResponses("", 1l);
         assertEquals(false, list.isEmpty());
     }
 }

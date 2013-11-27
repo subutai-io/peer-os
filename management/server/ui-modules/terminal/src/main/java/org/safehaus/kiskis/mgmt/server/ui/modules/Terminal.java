@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules;
 
+import com.google.common.base.Strings;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -9,8 +10,11 @@ import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +27,15 @@ public class Terminal implements Module {
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
+        private Task task;
+
+        private final TextField textFieldWorkingDirectory;
+        private final TextField textFieldProgram;
+        private final TextField textFieldRunAs;
+        private final TextField textFieldArgs;
+        private final TextField textFieldEnv;
+        private final TextField textFieldTimeout;
+
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
         private Set<String> agents;
@@ -34,16 +47,37 @@ public class Terminal implements Module {
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
+            textFieldWorkingDirectory = new TextField("Working Directory");
+            textFieldWorkingDirectory.setValue("/home");
+
+            textFieldProgram = new TextField("Program");
+            textFieldProgram.setValue("ls");
+
+            textFieldRunAs = new TextField("Run As");
+            textFieldRunAs.setValue("root");
+
+            textFieldArgs = new TextField("Args");
+            textFieldEnv = new TextField("Environment");
+
+            textFieldTimeout = new TextField("Timeout");
+            textFieldTimeout.setValue("180");
+
             Label labelText = new Label("Enter command:");
 
             textAreaCommand = new TextArea();
-            textAreaCommand.setRows(20);
+            textAreaCommand.setRows(10);
             textAreaCommand.setColumns(80);
             textAreaCommand.setImmediate(true);
             textAreaCommand.setWordwrap(true);
 
             verticalLayout.addComponent(labelText);
             verticalLayout.addComponent(textAreaCommand);
+
+            verticalLayout.addComponent(textFieldWorkingDirectory);
+            verticalLayout.addComponent(textFieldProgram);
+            verticalLayout.addComponent(textFieldRunAs);
+            verticalLayout.addComponent(textFieldArgs);
+            verticalLayout.addComponent(textFieldTimeout);
 
             Button buttonSend = genSendButton();
             Button getRequests = genGetRequestButton();
@@ -66,6 +100,7 @@ public class Terminal implements Module {
             textAreaOutput.setColumns(80);
             textAreaOutput.setImmediate(true);
             textAreaOutput.setWordwrap(false);
+            textAreaOutput.setStyle("color:white; background-color:black;");
 
             verticalLayout.addComponent(labelOutput);
             verticalLayout.addComponent(textAreaOutput);
@@ -77,27 +112,23 @@ public class Terminal implements Module {
         public void outputCommand(Response response) {
             commandManagerInterface.saveResponse(response);
             try {
-                if (response != null && agents != null && agents.contains(response.getUuid())) {
-                    System.out.println("TERMINAL outputCommand(Response response) called");
+                if (response != null &&
+                        !Strings.isNullOrEmpty(response.getTaskUuid()) &&
+                        response.getTaskUuid().equals(task.getUid().toString())) {
+//                    System.out.println("TERMINAL outputCommand(Response response) called");
 
-                    StringBuilder output = new StringBuilder();
-                    output.append(textAreaOutput.getValue());
-
-                    if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
-                        output.append("\n");
-                        output.append("ERROR\n");
-                        output.append(response.getStdErr().trim());
-                        output.append("\n");
+                    if(response.getType() == ResponseType.EXECUTE_RESPONSE_DONE){
+                        task.setTaskStatus(TaskStatus.SUCCESS);
+                        commandManagerInterface.saveTask(task);
                     }
-                    if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                        output.append("\n");
-                        output.append("OK\n");
-                        output.append(response.getStdOut().trim());
-                        output.append("\n");
-                    }
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("\n");
+                    Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
+                            response.getRequestSequenceNumber());
+                    sb.append(result);
 
-                    textAreaOutput.setValue(output);
-                    textAreaOutput.setCursorPosition(output.length() - 1);
+                    textAreaOutput.setValue(sb);
+                    textAreaOutput.setCursorPosition(sb.length() -1);
                 }
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
@@ -121,19 +152,47 @@ public class Terminal implements Module {
                         agents = AppData.getSelectedAgentList();
                         if (agents != null && agents.size() > 0) {
                             for (String agent : agents) {
-                                String json = textAreaCommand.getValue().toString().trim();
+                                if(!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())){
+                                    String json = textAreaCommand.getValue().toString().trim();
 
-                                Request r = CommandJson.getRequest(json);
+                                    Request r = CommandJson.getRequest(json);
 
-                                if (r != null) {
-                                    Task task = new Task();
+                                    if (r != null) {
+                                        task = new Task();
+                                        task.setDescription("JSON executing");
+                                        task.setTaskStatus(TaskStatus.NEW);
+                                        commandManagerInterface.saveTask(task);
+
+                                        r.setUuid(agent);
+                                        r.setSource(Terminal.MODULE_NAME);
+                                        r.setTaskUuid(task.getUid().toString());
+
+                                        Command command = new Command(r);
+                                        commandManagerInterface.executeCommand(command);
+                                    }
+                                } else {
+                                    task = new Task();
                                     task.setDescription("JSON executing");
                                     task.setTaskStatus(TaskStatus.NEW);
                                     commandManagerInterface.saveTask(task);
 
+                                    Request r = new Request();
+
                                     r.setUuid(agent);
                                     r.setSource(Terminal.MODULE_NAME);
                                     r.setTaskUuid(task.getUid().toString());
+                                    r.setType(RequestType.EXECUTE_REQUEST);
+                                    r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+                                    r.setWorkingDirectory(textFieldWorkingDirectory.getValue().toString());
+                                    r.setProgram(textFieldProgram.getValue().toString());
+                                    r.setStdOut(OutputRedirection.CAPTURE_AND_RETURN);
+                                    r.setStdErr(OutputRedirection.CAPTURE);
+                                    r.setRunAs(textFieldRunAs.getValue().toString());
+
+                                    String[] args = textFieldArgs.getValue().toString().split(" ");
+                                    r.setArgs(Arrays.asList(args));
+
+                                    r.setTimeout(Long.parseLong(textFieldTimeout.getValue().toString()));
 
                                     Command command = new Command(r);
                                     commandManagerInterface.executeCommand(command);
@@ -176,18 +235,22 @@ public class Terminal implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    String[] attr = textAreaCommand.getValue().toString().trim().split(" ");
+                    if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
+                        String[] attr = textAreaCommand.getValue().toString().trim().split(" ");
 
-                    if (attr.length == 2) {
-                        try {
-                            String taskUuid = attr[0];
-                            int requestSequenceNumber = Integer.parseInt(attr[1]);
+                        if (attr.length == 2) {
+                            try {
+                                String taskUuid = attr[0];
+                                long requestSequenceNumber = Long.parseLong(attr[1]);
 
-                            Response response = commandManagerInterface.getResponse(taskUuid, requestSequenceNumber);
-                            textAreaOutput.setValue(response);
-                        } catch (NumberFormatException ex) {
-                            getWindow().showNotification("Enter task uuid and requestsequencenumber " +
-                                    "delimited with space");
+                                Response response = commandManagerInterface.getResponse(taskUuid, requestSequenceNumber);
+                                textAreaOutput.setValue(response);
+                            } catch (NumberFormatException ex) {
+                                getWindow().showNotification("Enter task uuid and requestsequencenumber " +
+                                        "delimited with space");
+                            }
+                        } else {
+                            getWindow().showNotification("Enter task uuid and requestsequencenumber delimited with space");
                         }
                     } else {
                         getWindow().showNotification("Enter task uuid and requestsequencenumber delimited with space");

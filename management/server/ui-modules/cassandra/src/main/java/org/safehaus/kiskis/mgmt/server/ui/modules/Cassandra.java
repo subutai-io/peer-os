@@ -46,7 +46,7 @@ public class Cassandra implements Module {
         @Override
         public void outputCommand(Response response) {
             try {
-                if(response != null && subwindow.isVisible()){
+                if(response != null && subwindow != null && subwindow.isVisible()){
                     subwindow.setOutput(response);
                 }
             } catch (Exception ex) {

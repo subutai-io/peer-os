@@ -172,7 +172,7 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public List<Response> getResponses(String taskuuid, Integer requestSequenceNumber) {
+    public List<Response> getResponses(String taskuuid, Long requestSequenceNumber) {
         List<Response> list = new ArrayList<Response>();
         try {
             String cql = "select * from response " +
