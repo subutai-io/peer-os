@@ -30,7 +30,6 @@
 
     <modules>
         <module>apt-repo</module>
-        <module>motd</module>
         <module>broker</module>
         <module>ui</module>
         <module>ui-modules</module>
