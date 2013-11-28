@@ -35,14 +35,97 @@ public class Persistence implements PersistenceInterface {
         this.cassandraPort = cassandraPort;
     }
 
+    /**
+     * Saved Agent data into Cassandra agents table
+     *
+     * @param agent
+     * @return the result in boolean
+     */
+    @Override
+    public boolean saveAgent(Agent agent) {
+        if (agent != null) {
+            try {
+                String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
+                        + "values (?,?,?,?,?,?)";
+                PreparedStatement stmt = session.prepare(cql);
+                BoundStatement boundStatement = new BoundStatement(stmt);
+                ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
+                        agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
+                        agent.getMacAddress(), new Date()));
+                return true;
+
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Error in saveAgent", ex);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Saved Agent data into Cassandra agents table
+     *
+     * @param agent
+     * @return the result in boolean
+     */
+//    @Override
+//    public boolean removeAgent(Agent agent) {
+//        try {
+//            if (agent != null) {
+//                String cql = "delete from agents where uuid = ?";
+//                PreparedStatement stmt = session.prepare(cql);
+//                BoundStatement boundStatement = new BoundStatement(stmt);
+//                ResultSet rs = session.execute(boundStatement.bind(agent.getUuid()));
+//            }
+//            return true;
+//
+//        } catch (Exception ex) {
+//            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
+//        }
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean updateAgent(Agent agent) {
+//        try {
+//            if (agent != null) {
+//                String cql =
+//                        "update agents set hostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
+//                PreparedStatement stmt = session.prepare(cql);
+//                BoundStatement boundStatement = new BoundStatement(stmt);
+//                ResultSet rs = session.execute(boundStatement.bind(agent.getHostname(), agent.isIsLXC(), agent.getListIP(), agent.getMacAddress(), new Date(), agent.getUuid()));
+//            }
+//            return true;
+//
+//        } catch (Exception ex) {
+//            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
+//        }
+//        return false;
+//    }
+
     @Override
     public Set<Agent> getAgentsByHeartbeat(long from, long to) {
         Set<Agent> list = new HashSet<Agent>();
         try {
-            String cql = "select * from agents where lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
+            String cql = "select * from agents where islxc = false and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(
+                    new Date(System.currentTimeMillis() - from * 60 * 1000),
+                    new Date(System.currentTimeMillis() - to * 60 * 1000)));
+            for (Row row : rs) {
+                Agent agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                list.add(agent);
+            }
+            cql = "select * from agents where islxc = true and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
+            stmt = session.prepare(cql);
+            boundStatement = new BoundStatement(stmt);
+            rs = session.execute(boundStatement.bind(
                     new Date(System.currentTimeMillis() - from * 60 * 1000),
                     new Date(System.currentTimeMillis() - to * 60 * 1000)));
             for (Row row : rs) {
@@ -64,8 +147,16 @@ public class Persistence implements PersistenceInterface {
     @Override
     public Set<Agent> getRegisteredAgents(long freshness) {
         Set<Agent> list = new HashSet<Agent>();
+        list.addAll(getRegisteredLxcAgents(freshness));
+        list.addAll(getRegisteredPhysicalAgents(freshness));
+        return list;
+    }
+
+    @Override
+    public Set<Agent> getRegisteredLxcAgents(long freshness) {
+        Set<Agent> list = new HashSet<Agent>();
         try {
-            String cql = "select * from agents where lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
+            String cql = "select * from agents where islxc = true and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(
@@ -80,6 +171,33 @@ public class Persistence implements PersistenceInterface {
                 agent.setMacAddress(row.getString("macaddress"));
                 list.add(agent);
             }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
+        }
+        return list;
+    }
+
+    @Override
+    public Set<Agent> getRegisteredPhysicalAgents(long freshness) {
+        Set<Agent> list = new HashSet<Agent>();
+        try {
+            String cql = "select * from agents where islxc = false and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(
+                    new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
+            for (Row row : rs) {
+                Agent agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                list.add(agent);
+            }
+
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
         }
@@ -172,10 +290,10 @@ public class Persistence implements PersistenceInterface {
     public List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber) {
         List<Response> list = new ArrayList<Response>();
         try {
-            String cql = "select * from responses " +
-                    "WHERE taskuuid = ? " +
-                    "and reqseqnum = ? and resseqnum >= 0 " +
-                    "ORDER BY reqseqnum, resseqnum";
+            String cql = "select * from responses "
+                    + "WHERE taskuuid = ? "
+                    + "and reqseqnum = ? and resseqnum >= 0 "
+                    + "ORDER BY reqseqnum, resseqnum";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(taskuuid, requestSequenceNumber));
@@ -203,61 +321,6 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getResponses", ex);
         }
         return list;
-    }
-
-    /**
-     * Saved Agent data into Cassandra agents table
-     *
-     * @param agent
-     * @return the result in boolean
-     */
-//    @Override
-    private boolean saveAgent(Agent agent) {
-        try {
-            String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
-                    + "values (?,?,?,?,?,?)";
-            PreparedStatement stmt = session.prepare(cql);
-            BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
-                    agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                    agent.getMacAddress(), new Date()));
-            return true;
-
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
-        }
-        return false;
-    }
-
-    /**
-     * Saved Agent data into Cassandra agents table
-     *
-     * @param agent
-     * @return the result in boolean
-     */
-    @Override
-    public boolean removeAgent(Agent agent) {
-        try {
-            if (agent != null) {
-                String cql = "delete from agents where uuid = ?";
-                PreparedStatement stmt = session.prepare(cql);
-                BoundStatement boundStatement = new BoundStatement(stmt);
-                ResultSet rs = session.execute(boundStatement.bind(agent.getUuid()));
-            }
-            return true;
-
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean updateAgent(Agent agent) {
-        if (removeAgent(agent)) {
-            return saveAgent(agent);
-        }
-        return false;
     }
 
     @Override

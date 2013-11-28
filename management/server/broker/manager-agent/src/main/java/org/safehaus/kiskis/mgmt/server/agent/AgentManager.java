@@ -75,7 +75,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
         agent.setListIP(response.getIps());
 
-        if (persistenceAgent.updateAgent(agent)) {
+        if (persistenceAgent.saveAgent(agent)) {
             if (register) {
                 Task task = new Task();
                 task.setDescription("Agent registration");
@@ -100,7 +100,6 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 task.setTaskStatus(TaskStatus.SUCCESS);
                 persistenceAgent.saveTask(task);
                 //
-
                 if (registeredAgents.add(agent)) {
                     notifyModules();
                 }

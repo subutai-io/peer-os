@@ -79,7 +79,7 @@ public class PersistenceTest {
 //        agent.setUuid("uuid");
         Persistence instance = new Persistence();
         boolean expResult = true;
-        boolean result = instance.updateAgent(agent);
+        boolean result = instance.saveAgent(agent);
         assertEquals(expResult, result);
 
         // TODO review the generated test code and remove the default call to fail.

@@ -32,11 +32,17 @@ public interface PersistenceInterface {
 
     Set<Agent> getRegisteredAgents(long freshness);
 
+    Set<Agent> getRegisteredLxcAgents(long freshness);
+
+    Set<Agent> getRegisteredPhysicalAgents(long freshness);
+
     Set<Agent> getAgentsByHeartbeat(long from, long to);
 
-    boolean updateAgent(Agent agent);
+    boolean saveAgent(Agent agent);
 
-    boolean removeAgent(Agent agent);
+//    boolean updateAgent(Agent agent);
+//
+//    boolean removeAgent(Agent agent);
 
     String saveTask(Task task);
 
