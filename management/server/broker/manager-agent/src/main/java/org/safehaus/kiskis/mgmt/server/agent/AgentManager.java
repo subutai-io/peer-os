@@ -200,7 +200,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
      */
     public Set<Agent> getChildLxcAgents(Agent physicalAgent) {
         Set<Agent> childLxcAgents = new HashSet<Agent>();
-        if (physicalAgent != null && physicalAgent.isIsLXC() == false && physicalAgent.getHostname() != null) {
+        if (physicalAgent != null && !physicalAgent.isIsLXC() && physicalAgent.getHostname() != null) {
             Set<Agent> lxcAgents = getRegisteredLxcAgents();
             for (Agent lxcAgent : lxcAgents) {
                 if (lxcAgent.getHostname() != null && lxcAgent.getHostname().startsWith(physicalAgent.getHostname() + "_lxc_")) {

@@ -3,11 +3,13 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 import com.google.common.base.Strings;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
@@ -83,6 +85,8 @@ public class Terminal implements Module {
             Button getResponses = genGetResponsesButton();
             Button getTasks = getGetTasksButton();
             Button truncateTables = getTruncateTablesButton();
+            Button buttonGetPhysicalAgents = getPhysicalAgents();
+            Button buttonGetLxcAgents = getLxcAgents();
             HorizontalLayout hLayout = new HorizontalLayout();
 
             hLayout.addComponent(buttonSend);
@@ -90,6 +94,8 @@ public class Terminal implements Module {
             hLayout.addComponent(getResponses);
             hLayout.addComponent(getTasks);
             hLayout.addComponent(truncateTables);
+            hLayout.addComponent(buttonGetPhysicalAgents);
+            hLayout.addComponent(buttonGetLxcAgents);
 
             verticalLayout.addComponent(hLayout);
 
@@ -139,6 +145,44 @@ public class Terminal implements Module {
         @Override
         public String getName() {
             return Terminal.MODULE_NAME;
+        }
+
+        private Button getPhysicalAgents() {
+            Button button = new Button("Get physical agents");
+            button.setDescription("Gets agents from Cassandra");
+            button.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Set<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
+                    StringBuilder sb = new StringBuilder();
+
+                    for (Agent agent : agents) {
+                        sb.append(agent).append("\n");
+
+                        Set<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
+                        for(Agent lxcAgent : childAgents){
+                            sb.append("\t").append(lxcAgent).append("\n");
+                        }
+                    }
+                    textAreaOutput.setValue(sb.toString());
+                }
+            });
+            return button;
+        }
+
+        private Button getLxcAgents() {
+            Button button = new Button("Get LXC agents");
+            button.setDescription("Gets LXC agents from Cassandra");
+            button.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Set<Agent> agents = getAgentManager().getRegisteredLxcAgents();
+                    textAreaOutput.setValue(agents.toString());
+                }
+            });
+            return button;
         }
 
         private Button genSendButton() {
@@ -323,9 +367,29 @@ public class Terminal implements Module {
         this.context = context;
     }
 
-    private CommandManagerInterface getCommandManager() {
-        ServiceReference reference = context
-                .getServiceReference(CommandManagerInterface.class.getName());
-        return (CommandManagerInterface) context.getService(reference);
+    public static CommandManagerInterface getCommandManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(Terminal.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
+    }
+
+    public static AgentManagerInterface getAgentManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(Terminal.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 }
