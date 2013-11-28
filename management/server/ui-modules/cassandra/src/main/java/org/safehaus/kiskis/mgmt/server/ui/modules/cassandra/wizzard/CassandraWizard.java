@@ -150,7 +150,7 @@ public final class CassandraWizard extends Window {
     }
 
     public void setOutput(Response response) {
-        if (response.getTaskUuid().equals(task.getUuid().toString())) {
+        if (response.getTaskUuid().toString().equals(task.getUuid().toString())) {
             StringBuilder output = new StringBuilder();
             output.append(textAreaTerminal.getValue());
             if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {

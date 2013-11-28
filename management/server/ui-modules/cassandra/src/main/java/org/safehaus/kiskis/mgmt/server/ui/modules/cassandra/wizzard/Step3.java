@@ -83,12 +83,7 @@ public class Step3 extends Panel {
     int j = 2;
 
     void updateUI(String msg) {
-
-        Label label1 = new Label(msg);
-        label1.setContentMode(Label.CONTENT_XHTML);
         System.out.println(msg);
-//        grid.addComponent(label1, 2, 1, 5, );
-//        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
     }
 
 }
