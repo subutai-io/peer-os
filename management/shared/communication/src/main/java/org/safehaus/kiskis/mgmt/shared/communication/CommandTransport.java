@@ -17,76 +17,96 @@ import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 
 public class CommandTransport implements CommandTransportInterface {
-
+    
     private static final Logger LOG = Logger.getLogger(CommandTransport.class.getName());
     private BrokerService broker;
-    private int amqPort;
-    private String amqHost;
+    private Session listenerSession;
+    private CommunicationMessageListener communicationMessageListener;
+//    private String amqHost;
     private String amqBindAddress;
     private String amqServiceQueue;
     private String amqBrokerCertificateName;
     private String amqBrokerTrustStoreName;
     private String amqBrokerCertificatePwd;
     private String amqBrokerTrustStorePwd;
-    private Session listenerSession;
-    private CommunicationMessageListener communicationMessageListener;
-
+    private int amqPort;
+    private int amqExpiredMessagesHighWatermark;
+    private int amqConstantPendingMessageLimit;
+    private int amqExpireMessagesPeriodSec;
+    private int amqOfflineDurableSubscriberTimeoutSec;
+    private int amqOfflineDurableSubscriberTaskScheduleSec;
+    
     public void setAmqPort(int amqPort) {
         this.amqPort = amqPort;
     }
 
-    public void setAmqHost(String amqHost) {
-        this.amqHost = amqHost;
-    }
-
+//    public void setAmqHost(String amqHost) {
+//        this.amqHost = amqHost;
+//    }
     public void setAmqBindAddress(String amqBindAddress) {
         this.amqBindAddress = amqBindAddress;
     }
-
+    
     public void setAmqServiceQueue(String amqServiceQueue) {
         this.amqServiceQueue = amqServiceQueue;
     }
-
+    
     public void setAmqBrokerCertificateName(String amqBrokerCertificateName) {
         this.amqBrokerCertificateName = amqBrokerCertificateName;
     }
-
+    
     public void setAmqBrokerTrustStoreName(String amqBrokerTrustStoreName) {
         this.amqBrokerTrustStoreName = amqBrokerTrustStoreName;
     }
-
+    
     public void setAmqBrokerCertificatePwd(String amqBrokerCertificatePwd) {
         this.amqBrokerCertificatePwd = amqBrokerCertificatePwd;
     }
-
+    
     public void setAmqBrokerTrustStorePwd(String amqBrokerTrustStorePwd) {
         this.amqBrokerTrustStorePwd = amqBrokerTrustStorePwd;
     }
-
+    
+    public void setAmqExpiredMessagesHighWatermark(int amqExpiredMessagesHighWatermark) {
+        this.amqExpiredMessagesHighWatermark = amqExpiredMessagesHighWatermark;
+    }
+    
+    public void setAmqConstantPendingMessageLimit(int amqConstantPendingMessageLimit) {
+        this.amqConstantPendingMessageLimit = amqConstantPendingMessageLimit;
+    }
+    
+    public void setAmqExpireMessagesPeriodSec(int amqExpireMessagesPeriodSec) {
+        this.amqExpireMessagesPeriodSec = amqExpireMessagesPeriodSec;
+    }
+    
+    public void setAmqOfflineDurableSubscriberTimeoutSec(int amqOfflineDurableSubscriberTimeoutSec) {
+        this.amqOfflineDurableSubscriberTimeoutSec = amqOfflineDurableSubscriberTimeoutSec;
+    }
+    
+    public void setAmqOfflineDurableSubscriberTaskScheduleSec(int amqOfflineDurableSubscriberTaskScheduleSec) {
+        this.amqOfflineDurableSubscriberTaskScheduleSec = amqOfflineDurableSubscriberTaskScheduleSec;
+    }
+    
     @Override
     public Response sendCommand(Command command) {
-        thread(new CommandProducer(command, amqHost, amqPort), false);
+        thread(new CommandProducer(command), false);
         return null;
     }
-
+    
     public static void thread(Runnable runnable, boolean daemon) {
         Thread brokerThread = new Thread(runnable);
         brokerThread.setDaemon(daemon);
         brokerThread.start();
     }
-
+    
     public static class CommandProducer implements Runnable {
-
-        String host;
-        int port;
+        
         Command command;
-
-        public CommandProducer(Command command, String host, int port) {
+        
+        public CommandProducer(Command command) {
             this.command = command;
-            this.port = port;
-            this.host = host;
         }
-
+        
         public void run() {
             try {
 //                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + host + ":" + port);
@@ -108,37 +128,40 @@ public class CommandTransport implements CommandTransportInterface {
             }
         }
     }
-
+    
     public void init() {
-
+        
         try {
             listenerSession.close();
         } catch (Exception e) {
         }
         try {
-
+            
             broker.stop();
             broker.waitUntilStopped();
         } catch (Exception e) {
         }
-
+        
         try {
             System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/" + this.amqBrokerCertificateName);
             System.setProperty("javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd);
             System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/" + this.amqBrokerTrustStoreName);
             System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
-
+            
             broker = new BrokerService();
             //***policy
             PolicyMap policy = new PolicyMap();
             PolicyEntry pentry = new PolicyEntry();
+            pentry.setExpireMessagesPeriod(amqExpireMessagesPeriodSec * 1000);
             OldestMessageWithLowestPriorityEvictionStrategy eviction = new OldestMessageWithLowestPriorityEvictionStrategy();
-            eviction.setEvictExpiredMessagesHighWatermark(1000);
+            eviction.setEvictExpiredMessagesHighWatermark(amqExpiredMessagesHighWatermark);
             pentry.setMessageEvictionStrategy(eviction);
             ConstantPendingMessageLimitStrategy limit = new ConstantPendingMessageLimitStrategy();
-            limit.setLimit(100);
+            limit.setLimit(amqConstantPendingMessageLimit);
             pentry.setPendingMessageLimitStrategy(limit);
             policy.setDefaultEntry(pentry);
+            broker.setOfflineDurableSubscriberTimeout(amqOfflineDurableSubscriberTimeoutSec * 1000);
+            broker.setOfflineDurableSubscriberTaskSchedule(amqOfflineDurableSubscriberTaskScheduleSec * 1000);
             broker.setDestinationPolicy(policy);
             //***policy
             broker.setPersistent(true);
@@ -152,9 +175,9 @@ public class CommandTransport implements CommandTransportInterface {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
-
+        
     }
-
+    
     public void destroy() {
         try {
             broker.stop();
@@ -164,7 +187,7 @@ public class CommandTransport implements CommandTransportInterface {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
     }
-
+    
     private void setupListener() {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
 //        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + this.amqHost + ":" + this.amqPort);
@@ -174,7 +197,7 @@ public class CommandTransport implements CommandTransportInterface {
             connection.start();
             listenerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination adminQueue = listenerSession.createQueue(this.amqServiceQueue);
-
+            
             MessageConsumer consumer = listenerSession.createConsumer(adminQueue);
             communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener(communicationMessageListener);
@@ -182,12 +205,12 @@ public class CommandTransport implements CommandTransportInterface {
             LOG.log(Level.SEVERE, "Error in setupListener", ex);
         }
     }
-
+    
     @Override
     public synchronized void addListener(BrokerListener listener) {
         communicationMessageListener.addListener(listener);
     }
-
+    
     @Override
     public synchronized void removeListener(BrokerListener listener) {
         communicationMessageListener.removeListener(listener);
