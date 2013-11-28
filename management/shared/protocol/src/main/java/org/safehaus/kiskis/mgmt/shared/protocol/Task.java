@@ -22,7 +22,7 @@ public class Task implements Serializable {
 
     public Task() {
         uid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
-//        uid = uuid.toString();
+        reqSeqNumber = 0l;
     }
 
     public long getIncrementedReqSeqNumber() {

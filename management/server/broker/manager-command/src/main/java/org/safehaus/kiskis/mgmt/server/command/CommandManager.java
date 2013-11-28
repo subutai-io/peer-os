@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -194,5 +195,9 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public boolean truncateTables() {
         return persistenceCommand.truncateTables();
+    }
+
+    public boolean saveClusterData(ClusterData cluster) {
+        return  persistenceCommand.saveClusterData(cluster);
     }
 }

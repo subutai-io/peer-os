@@ -175,10 +175,10 @@ public class Persistence implements PersistenceInterface {
     public List<Response> getResponses(String taskuuid, Long requestSequenceNumber) {
         List<Response> list = new ArrayList<Response>();
         try {
-            String cql = "select * from response " +
-                    "WHERE taskuuid = ? " +
-                    "and requestsequencenumber = ? and responsesequencenumber >= 0 " +
-                    "ORDER BY requestsequencenumber, responsesequencenumber";
+            String cql = "select * from response "
+                    + "WHERE taskuuid = ? "
+                    + "and requestsequencenumber = ? and responsesequencenumber >= 0 "
+                    + "ORDER BY requestsequencenumber, responsesequencenumber";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(taskuuid, requestSequenceNumber));
@@ -339,6 +339,24 @@ public class Persistence implements PersistenceInterface {
             session.execute("truncate response");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean saveClusterData(ClusterData cluster) {
+        try {
+            String cql = "insert into clusterdata (uid, name, commitlogdir, datadir, "
+                    + "nodes, savedcachedir, seeds) "
+                    + "values (?,?,?,?,?,?,?)";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(cluster.getUuid(), cluster.getName(),
+                    cluster.getCommitLogDir(), cluster.getDataDir(), cluster.getNodes(),
+                    cluster.getSavedCacheDir(), cluster.getSeeds()));
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
             return false;
         }
         return true;
