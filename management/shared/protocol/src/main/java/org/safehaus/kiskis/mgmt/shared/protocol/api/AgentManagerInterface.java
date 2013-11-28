@@ -12,6 +12,12 @@ public interface AgentManagerInterface {
 
     public Set<Agent> getRegisteredAgents();
 
+    public Set<Agent> getRegisteredLxcAgents();
+
+    public Set<Agent> getRegisteredPhysicalAgents();
+
+    public Set<Agent> getChildLxcAgents(Agent agent);
+
     public Set<Agent> getAgentsToHeartbeat();
 
     public void addListener(AgentListener listener);
