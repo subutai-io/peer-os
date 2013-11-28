@@ -3,10 +3,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol.api;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 /**
@@ -32,4 +29,6 @@ public interface CommandManagerInterface {
     public List<Task> getTasks();
 
     public boolean truncateTables();
+
+    public boolean saveClusterData(ClusterData cluster);
 }

@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -15,15 +16,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author bahadyr
  */
 public class Step2 extends Panel {
 
-//    private static final List<String> hosts = Arrays.asList(new String[]{
+    //    private static final List<String> hosts = Arrays.asList(new String[]{
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
-    List<String> hosts;
+    List<Agent> hosts;
     CassandraWizard parent;
     String installationCommand = "apt-get";
     String purgeCommand = "apt-get";
@@ -69,7 +71,7 @@ public class Step2 extends Panel {
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
         // 'Shorthand' constructor - also supports data binding using Containers
-        hosts = new ArrayList<String>(AppData.getSelectedAgentList());
+        hosts = new ArrayList<Agent>(AppData.getAgentList());
         cassandraWizard.getCluster().setNodes(hosts);
         ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", hosts);
 
@@ -84,15 +86,15 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (String uuid : hosts) {
-                    long reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
-                    String taskUuid = cassandraWizard.getTask().getUid().toString();
+                for (Agent agent : hosts) {
+                    int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
+                    UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
                     args.add("--force-yes");
                     args.add("--assume-yes");
                     args.add("install");
                     args.add("ksks-cassandra");
-                    Command command = buildCommand(uuid, installationCommand, reqSeqNumber, taskUuid, args);
+                    Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
                 }
                 cassandraWizard.showNext();
@@ -103,15 +105,15 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (String uuid : hosts) {
-                    long reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
-                    String taskUuid = cassandraWizard.getTask().getUid().toString();
+                for (Agent agent : hosts) {
+                    int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
+                    UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
                     args.add("--force-yes");
                     args.add("--assume-yes");
                     args.add("purge");
                     args.add("ksks-cassandra");
-                    Command command = buildCommand(uuid, purgeCommand, reqSeqNumber, taskUuid, args);
+                    Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
                 }
             }
@@ -127,7 +129,7 @@ public class Step2 extends Panel {
         addComponent(verticalLayout);
     }
 
-    private Command buildCommand(String uuid, String program, long reqSeqNumber, String taskUuid, List<String> args) {
+    private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
 
         Request request = new Request();
         request.setSource("Cassandra Wizard");
@@ -139,7 +141,7 @@ public class Step2 extends Panel {
         request.setStdOut(OutputRedirection.RETURN);
         request.setStdErr(OutputRedirection.RETURN);
         request.setRunAs("root");
-        request.setTimeout(0l);
+        request.setTimeout(0);
         request.setArgs(args);
         request.setRequestSequenceNumber(reqSeqNumber);
         Command command = new Command(request);

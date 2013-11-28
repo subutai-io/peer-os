@@ -216,7 +216,7 @@ public class PersistenceTest {
         cd.setDataDir("datadir");
         List<String> nodes = new ArrayList<String>();
         nodes.add("node1");
-        cd.setNodes(nodes);
+//        cd.setNodes(nodes);
         cd.setSavedCacheDir("savedir");
         
         boolean result = instance.saveClusterData(cd);

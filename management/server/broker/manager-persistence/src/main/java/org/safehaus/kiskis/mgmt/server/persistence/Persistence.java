@@ -342,4 +342,23 @@ public class Persistence implements PersistenceInterface {
         }
         return true;
     }
+
+    @Override
+    public boolean saveClusterData(ClusterData cluster) {
+        try {
+            String cql = "insert into clusterdata (uid, name, commitlogdir, datadir, "
+                    + "nodes, savedcachedir, seeds) "
+                    + "values (?,?,?,?,?,?,?)";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(cluster.getUuid(), cluster.getName(),
+                    cluster.getCommitLogDir(), cluster.getDataDir(), cluster.getNodes(),
+                    cluster.getSavedCacheDir(), cluster.getSeeds()));
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
+            return false;
+        }
+        return true;
+    }
 }

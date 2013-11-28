@@ -72,7 +72,6 @@ public class MgmtAgentManager extends VerticalLayout implements
         }
 
         AppData.setAgentList(selectedList);
-        getWindow().showNotification(selectedList.toString());
         getWindow().showNotification(
                 "Selected agents",
                 selectedList.toString(),

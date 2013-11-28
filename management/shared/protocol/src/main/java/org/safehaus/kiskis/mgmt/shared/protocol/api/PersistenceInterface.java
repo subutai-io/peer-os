@@ -22,7 +22,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 public interface PersistenceInterface {
 
 //    //Commands section
-//    List<Command> getCommandList(Agent agent);
     boolean saveCommand(Command command);
 
     List<Request> getRequests(UUID taskuuid);
@@ -31,13 +30,9 @@ public interface PersistenceInterface {
 
     boolean saveResponse(Response response);
 
-    //Agents section
-//    List<Agent> getAgentList();
     Set<Agent> getRegisteredAgents(long freshness);
 
     Set<Agent> getAgentsByHeartbeat(long from, long to);
-
-//    boolean saveAgent(Agent agent);
 
     boolean updateAgent(Agent agent);
 

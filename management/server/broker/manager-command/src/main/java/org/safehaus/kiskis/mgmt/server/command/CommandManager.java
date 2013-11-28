@@ -25,7 +25,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
-    //    private BundleContext context;
+
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
     private ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();

@@ -9,7 +9,6 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 
 /**
- *
  * @author bahadyr
  */
 public class Step3 extends Panel {
