@@ -16,7 +16,7 @@ public class Step42 extends Panel {
     private static final String[] cities = new String[]{"cassandra-node1", "cassandra-node2", "cassandra-node3",
             "cassandra-node4", "cassandra-node5"};
 
-    public Step42(final CassandraWizard aThis) {
+    public Step42(final CassandraWizard cassandraWizard) {
         setCaption("Configuration");
         setSizeFull();
 
@@ -57,6 +57,7 @@ public class Step42 extends Panel {
 
 
         TwinColSelect l = new TwinColSelect();
+//        l.setMultiSelect(true);
         for (String citie : cities) {
             l.addItem(citie);
         }
@@ -76,7 +77,9 @@ public class Step42 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showNext();
+                // TODO add seeds to cluster object 
+                cassandraWizard.getCluster().setSeeds(null);
+                cassandraWizard.showNext();
             }
         });
         Button back = new Button("Back");
@@ -84,7 +87,7 @@ public class Step42 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showBack();
+                cassandraWizard.showBack();
             }
         });
 

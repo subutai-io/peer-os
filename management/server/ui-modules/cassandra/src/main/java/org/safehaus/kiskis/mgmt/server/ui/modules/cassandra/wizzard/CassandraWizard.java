@@ -6,6 +6,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
+import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -17,6 +18,7 @@ public final class CassandraWizard extends Window {
 
     private final VerticalLayout verticalLayout;
     private Task task;
+    ClusterData cluster;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
@@ -34,7 +36,7 @@ public final class CassandraWizard extends Window {
         setModal(true);
 
         this.commandManagerInterface = getCommandManager();
-        setCaption("CassandraModule Wizard");
+        setCaption("Cassandra Wizard");
 
         GridLayout gridLayout = new GridLayout(1, 10);
         gridLayout.setSpacing(true);
@@ -121,6 +123,7 @@ public final class CassandraWizard extends Window {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 step43 = new Step43(this);
                 verticalLayout.addComponent(step43);
+                commandManagerInterface.saveClusterData(cluster);
                 break;
             }
             default: {
@@ -138,6 +141,14 @@ public final class CassandraWizard extends Window {
         this.task = task;
     }
 
+    public ClusterData getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(ClusterData cluster) {
+        this.cluster = cluster;
+    }
+
     public void setOutput(Response response) {
         if (response.getTaskUuid().equals(task.getUuid().toString())) {
             StringBuilder output = new StringBuilder();
@@ -148,26 +159,32 @@ public final class CassandraWizard extends Window {
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
                 output.append("OK ").append(response.getStdOut().trim());
             }
-            switch (step) {
-                case 1: {
-                    break;
-                }
-                case 2: {
-                    break;
-                }
-                case 3: {
-                    step3.updateUI(response.getStdOut() + " " + response.getStdErr());
-                }
-                case 4: {
-                    break;
-                }
-                case 5: {
-                    break;
-                }
-                case 6: {
-                    break;
-                }
+            System.out.println(response.getType() + " " + response.getExitCode());
+            switch (response.getType()) {
+                case EXECUTE_RESPONSE_DONE: {
+                    switch (step) {
+                        case 1: {
+                            break;
+                        }
+                        case 2: {
+                            break;
+                        }
+                        case 3: {
+                            step3.updateUI("Exit code: " + response.getType());
+                            break;
+                        }
+                        case 4: {
+                            break;
+                        }
+                        case 5: {
+                            break;
+                        }
+                        case 6: {
+                            break;
+                        }
 
+                    }
+                }
             }
 
             textAreaTerminal.setValue(output);

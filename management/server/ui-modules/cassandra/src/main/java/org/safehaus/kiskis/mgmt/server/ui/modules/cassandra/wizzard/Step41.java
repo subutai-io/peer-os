@@ -14,7 +14,7 @@ import com.vaadin.ui.*;
  */
 public class Step41 extends Panel {
 
-    public Step41(final CassandraWizard aThis) {
+    public Step41(final CassandraWizard cassandraWizard) {
         setCaption("Configuration");
         setSizeFull();
 
@@ -28,19 +28,18 @@ public class Step41 extends Panel {
         grid.setSizeFull();
 
         Panel panel = new Panel();
-        Label menu = new Label("Cluster Install Wizard<br>" +
-                " 1) Welcome<br>" +
-                " 2) List nodes<br>" +
-                " 3) Installation<br>" +
-                " 4) <font color=\"#f14c1a\"><strong>Configuration</strong></font><br>");
+        Label menu = new Label("Cluster Install Wizard<br>"
+                + " 1) Welcome<br>"
+                + " 2) List nodes<br>"
+                + " 3) Installation<br>"
+                + " 4) <font color=\"#f14c1a\"><strong>Configuration</strong></font><br>");
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
 
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-
-        TextField editor = new TextField("Name your Cluster:");
+        final TextField editor = new TextField("Name your Cluster:");
 
         grid.addComponent(editor, 2, 0, 5, 1);
         grid.setComponentAlignment(editor, Alignment.MIDDLE_CENTER);
@@ -50,7 +49,8 @@ public class Step41 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showNext();
+                cassandraWizard.getCluster().setName(editor.getValue().toString());
+                cassandraWizard.showNext();
             }
         });
         Button back = new Button("Back");
@@ -58,7 +58,7 @@ public class Step41 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showBack();
+                cassandraWizard.showBack();
             }
         });
 

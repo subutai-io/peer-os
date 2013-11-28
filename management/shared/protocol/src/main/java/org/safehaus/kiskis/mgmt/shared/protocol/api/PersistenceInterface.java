@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -47,4 +48,6 @@ public interface PersistenceInterface {
     List<Task> getTasks();
 
     public boolean truncateTables();
+
+    public boolean saveClusterData(ClusterData cluster);
 }

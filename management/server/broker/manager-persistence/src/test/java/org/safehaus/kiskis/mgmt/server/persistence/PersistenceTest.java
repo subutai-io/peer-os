@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.junit.Test;
 
 /**
  * @author bahadyr
@@ -204,5 +205,21 @@ public class PersistenceTest {
         System.out.println("getResponses");
 //        List<Response> list = instance.getResponses("", 1l);
 //        assertEquals(false, list.isEmpty());
+    }
+    
+//    @Test
+    public void testSaveClusterData() {
+        System.out.println("saveClusterData");
+        ClusterData cd = new ClusterData();
+        cd.setName("name");
+        cd.setCommitLogDir("comdir");
+        cd.setDataDir("datadir");
+        List<String> nodes = new ArrayList<String>();
+        nodes.add("node1");
+        cd.setNodes(nodes);
+        cd.setSavedCacheDir("savedir");
+        
+        boolean result = instance.saveClusterData(cd);
+        assertEquals(true, result);
     }
 }
