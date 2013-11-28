@@ -39,18 +39,24 @@ public class Step41 extends Panel {
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        final TextField editor = new TextField("Name your Cluster:");
+        final TextField clusterName = new TextField("Name your Cluster:");
 
-        grid.addComponent(editor, 2, 0, 5, 1);
-        grid.setComponentAlignment(editor, Alignment.MIDDLE_CENTER);
+        grid.addComponent(clusterName, 2, 0, 5, 1);
+        grid.setComponentAlignment(clusterName, Alignment.MIDDLE_CENTER);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cassandraWizard.getCluster().setName(editor.getValue().toString());
-                cassandraWizard.showNext();
+                if (clusterName.getValue().toString().length() > 0) {
+                    cassandraWizard.getCluster().setName(clusterName.getValue().toString());
+                    cassandraWizard.showNext();
+                } else {
+                    getWindow().showNotification(
+                            "Please provide cluster name.",
+                            Window.Notification.TYPE_TRAY_NOTIFICATION);
+                }
             }
         });
         Button back = new Button("Back");

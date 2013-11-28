@@ -51,4 +51,6 @@ public interface PersistenceInterface {
     public boolean truncateTables();
 
     public boolean saveClusterData(ClusterData cluster);
+
+    public List<ClusterData> getClusterData();
 }

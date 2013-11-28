@@ -1,12 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
 import com.vaadin.ui.*;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
+import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
@@ -22,13 +24,22 @@ public class CassandraModule implements Module {
             CommandListener {
 
         private final Button buttonInstallWizard;
+        private final Button getClusters;
         private CassandraWizard subwindow;
+        private TextArea textArea;
 
-        public ModuleComponent(CommandManagerInterface commandManagerInterface) {
+        public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
+            textArea = new TextArea();
+            textArea.setRows(10);
+            textArea.setColumns(65);
+            textArea.setImmediate(true);
+            textArea.setWordwrap(true);
+            
+            
             buttonInstallWizard = new Button("CassandraModule Installation Wizard");
             buttonInstallWizard.addListener(new Button.ClickListener() {
 
@@ -40,13 +51,33 @@ public class CassandraModule implements Module {
             });
             verticalLayout.addComponent(buttonInstallWizard);
 
+            getClusters = new Button("Get Cassandra clusters");
+            getClusters.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    List<ClusterData> cdList = commandManagerInterface.getClusterData();
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < cdList.size(); i++) {
+                        ClusterData clusterData = cdList.get(i);
+                        sb.append(clusterData.getName()).append("\n");
+                    }
+                    textArea.setValue(sb.toString());
+                }
+            });
+
+            verticalLayout.addComponent(getClusters);
+
+            
+            verticalLayout.addComponent(textArea);
+
             setCompositionRoot(verticalLayout);
         }
 
         @Override
         public void outputCommand(Response response) {
             try {
-                if(response != null && subwindow != null && subwindow.isVisible()){
+                if (response != null && subwindow != null && subwindow.isVisible()) {
                     subwindow.setOutput(response);
                 }
             } catch (Exception ex) {
