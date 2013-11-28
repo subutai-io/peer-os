@@ -7,10 +7,7 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
@@ -74,11 +71,11 @@ public class Terminal implements Module {
 
         @Override
         public void buttonClick(Button.ClickEvent event) {
-            Set<String> agents = AppData.getSelectedAgentList();
+            Set<Agent> agents = AppData.getAgentList();
             if (agents != null && agents.size() > 0) {
-                for (String agent : agents) {
+                for (Agent agent : agents) {
                     Request r = CommandJson.getRequest(textAreaCommand.getValue().toString());
-                    r.setUuid(agent);
+                    r.setUuid(agent.getUuid());
                     r.setSource(name);
 
                     Command command = new Command(r);

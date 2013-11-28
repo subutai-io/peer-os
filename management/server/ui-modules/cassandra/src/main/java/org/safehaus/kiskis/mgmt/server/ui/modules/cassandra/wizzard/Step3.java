@@ -145,12 +145,12 @@ public class Step3 extends Panel {
         Request request = new Request();
         request.setProgram("ls");
         request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid("someuuid");
+//        request.setTaskUuid("someuuid");
         request.setWorkingDirectory("/");
         request.setStdOut(OutputRedirection.RETURN);
         request.setStdErr(OutputRedirection.RETURN);
         request.setRunAs("root");
-        request.setTimeout(60l);
+//        request.setTimeout(60l);
         Command command = new Command(request);
         return command;
     }

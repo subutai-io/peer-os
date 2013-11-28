@@ -15,14 +15,9 @@ import java.util.logging.Logger;
 public class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
-//    private final Session session;
     private final ArrayList<BrokerListener> listeners = new ArrayList<BrokerListener>();
 
-    /**
-     * @param session
-     */
     public CommunicationMessageListener() {
-//        this.session = session;
     }
 
     /**
@@ -35,7 +30,6 @@ public class CommunicationMessageListener implements MessageListener {
         TextMessage txtMsg = (TextMessage) message;
         try {
             String jsonCmd = txtMsg.getText();
-            System.out.println("Received:" + jsonCmd);
             Response response = CommandJson.getResponse(jsonCmd);
 
             if (response != null) {
@@ -52,7 +46,6 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             for (BrokerListener ai : (ArrayList<BrokerListener>) listeners.clone()) {
                 if (ai != null) {
-//                    System.out.println("Notifying");
                     ai.getCommand(response);
                 } else {
                     listeners.remove(ai);

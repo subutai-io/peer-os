@@ -94,7 +94,7 @@ public class CommandTransport implements CommandTransportInterface {
                 Connection connection = connectionFactory.createConnection();
                 connection.start();
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                Destination destination = session.createQueue(command.getCommand().getUuid());
+                Destination destination = session.createQueue(command.getCommand().getUuid().toString());
                 javax.jms.MessageProducer producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 String json = CommandJson.getJson(command);

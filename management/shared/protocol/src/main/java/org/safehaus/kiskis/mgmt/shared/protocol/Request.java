@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Dilshat
@@ -17,9 +18,9 @@ public class Request implements Serializable {
 
     private String source = null;
     private RequestType type = null;
-    private String uuid = null;
-    private String taskUuid = null;
-    private Long requestSequenceNumber = null;
+    private UUID uuid = null;
+    private UUID taskUuid = null;
+    private Integer requestSequenceNumber = null;
     private String workingDirectory = null;
     private String program = null;
     private OutputRedirection stdOut = null;
@@ -30,13 +31,13 @@ public class Request implements Serializable {
     private List<String> args = null;
     private Map<String, String> environment = null;
     private Integer pid = null;
-    private Long timeout = null;
+    private Integer timeout = null;
 
-    public String getTaskUuid() {
+    public UUID getTaskUuid() {
         return taskUuid;
     }
 
-    public void setTaskUuid(String taskUuid) {
+    public void setTaskUuid(UUID taskUuid) {
         this.taskUuid = taskUuid;
     }
 
@@ -56,19 +57,19 @@ public class Request implements Serializable {
         this.type = type;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
-    public Long getRequestSequenceNumber() {
+    public Integer getRequestSequenceNumber() {
         return requestSequenceNumber;
     }
 
-    public void setRequestSequenceNumber(Long requestSequenceNumber) {
+    public void setRequestSequenceNumber(Integer requestSequenceNumber) {
         this.requestSequenceNumber = requestSequenceNumber;
     }
 
@@ -144,11 +145,11 @@ public class Request implements Serializable {
         this.environment = environment;
     }
 
-    public Long getTimeout() {
+    public Integer getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(Long timeout) {
+    public void setTimeout(Integer timeout) {
         this.timeout = timeout;
     }
 

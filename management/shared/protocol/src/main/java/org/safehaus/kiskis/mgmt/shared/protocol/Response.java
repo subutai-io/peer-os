@@ -8,19 +8,20 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Dilshat
  */
-public class Response  implements Serializable {
+public class Response implements Serializable {
 
     private String source;
     private ResponseType type;
     private Integer exitCode; //might be null if not final response chunk
-    private String uuid;
-    private String taskUuid;
-    private Long requestSequenceNumber;
-    private Long responseSequenceNumber;
+    private UUID uuid;
+    private UUID taskUuid;
+    private Integer requestSequenceNumber;
+    private Integer responseSequenceNumber;
     private String stdOut;
     private String stdErr;
     private Integer pid;
@@ -35,14 +36,6 @@ public class Response  implements Serializable {
 
     public void setIsLxc(Boolean isLxc) {
         this.isLxc = isLxc;
-    }
-
-    public String getTaskUuid() {
-        return taskUuid;
-    }
-
-    public void setTaskUuid(String taskUuid) {
-        this.taskUuid = taskUuid;
     }
 
     public List<String> getIps() {
@@ -93,27 +86,31 @@ public class Response  implements Serializable {
         this.exitCode = exitCode;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
-    public Long getRequestSequenceNumber() {
+    public void setTaskUuid(UUID taskUuid) {
+        this.taskUuid = taskUuid;
+    }
+
+    public Integer getRequestSequenceNumber() {
         return requestSequenceNumber;
     }
 
-    public void setRequestSequenceNumber(Long requestSequenceNumber) {
+    public void setRequestSequenceNumber(Integer requestSequenceNumber) {
         this.requestSequenceNumber = requestSequenceNumber;
     }
 
-    public Long getResponseSequenceNumber() {
+    public Integer getResponseSequenceNumber() {
         return responseSequenceNumber;
     }
 
-    public void setResponseSequenceNumber(Long responseSequenceNumber) {
+    public void setResponseSequenceNumber(Integer responseSequenceNumber) {
         this.responseSequenceNumber = responseSequenceNumber;
     }
 
@@ -139,6 +136,10 @@ public class Response  implements Serializable {
 
     public void setPid(Integer pid) {
         this.pid = pid;
+    }
+
+    public UUID getTaskUuid() {
+        return taskUuid;
     }
 
     @Override

@@ -15,34 +15,34 @@ import java.util.UUID;
  */
 public class Task implements Serializable {
 
-    private UUID uid;
+    private UUID uuid;
     private String description;
     private TaskStatus taskStatus;
-    private long reqSeqNumber;
+    private Integer reqSeqNumber;
 
     public Task() {
-        uid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
-//        uid = uuid.toString();
+        uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        reqSeqNumber = 0;
     }
 
-    public long getIncrementedReqSeqNumber() {
+    public Integer getIncrementedReqSeqNumber() {
         return ++reqSeqNumber;
     }
 
-    public long getReqSeqNumber() {
+    public Integer getReqSeqNumber() {
         return reqSeqNumber;
     }
 
-    public void setReqSeqNumber(long reqSeqNumber) {
+    public void setReqSeqNumber(Integer reqSeqNumber) {
         this.reqSeqNumber = reqSeqNumber;
     }
 
-    public UUID getUid() {
-        return uid;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setUid(UUID uid) {
-        this.uid = uid;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public TaskStatus getTaskStatus() {
@@ -63,7 +63,7 @@ public class Task implements Serializable {
 
     @Override
     public String toString() {
-        return "Task{" + "uid=" + uid + ", description=" + description + ", taskStatus=" + taskStatus + ", reqSeqNumber=" + reqSeqNumber + '}';
+        return "Task{" + "uuid=" + uuid + ", description=" + description + ", taskStatus=" + taskStatus + ", reqSeqNumber=" + reqSeqNumber + '}';
     }
 
 }

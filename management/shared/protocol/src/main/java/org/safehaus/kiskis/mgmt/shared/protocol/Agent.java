@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Used to define a physical host on the whole network. It could be management
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public class Agent implements Serializable {
 
-    private String uuid;
+    private UUID uuid;
     private String macAddress;
     private String hostname;
     private List<String> listIP;
@@ -33,11 +34,11 @@ public class Agent implements Serializable {
         this.lastHeartbeat = lastHeartbeat;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 

@@ -6,6 +6,8 @@ package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -22,9 +24,9 @@ public interface PersistenceInterface {
 //    List<Command> getCommandList(Agent agent);
     boolean saveCommand(Command command);
 
-    List<Request> getRequests(String taskuuid);
+    List<Request> getRequests(UUID taskuuid);
 
-    List<Response> getResponses(String taskuuid, Long requestSequenceNumber);
+    List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber);
 
     boolean saveResponse(Response response);
 

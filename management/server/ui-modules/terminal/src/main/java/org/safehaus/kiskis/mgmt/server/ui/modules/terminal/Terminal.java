@@ -17,6 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class Terminal implements Module {
 
@@ -37,7 +38,7 @@ public class Terminal implements Module {
 
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
-        private Set<String> agents;
+        private Set<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
@@ -110,24 +111,25 @@ public class Terminal implements Module {
         public void outputCommand(Response response) {
             commandManagerInterface.saveResponse(response);
             try {
-                if (response != null &&
-                        !Strings.isNullOrEmpty(response.getTaskUuid()) &&
-                        response.getTaskUuid().equals(task.getUid().toString())) {
-//                    System.out.println("TERMINAL outputCommand(Response response) called");
+                StringBuilder sb = new StringBuilder();
 
-                    if(response.getType() == ResponseType.EXECUTE_RESPONSE_DONE){
+                if (response != null &&
+                        response.getTaskUuid() != null &&
+                        response.getTaskUuid().compareTo(task.getUuid()) == 0) {
+
+                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                         task.setTaskStatus(TaskStatus.SUCCESS);
                         commandManagerInterface.saveTask(task);
                     }
-                    StringBuilder sb = new StringBuilder();
+
                     sb.append("\n");
                     Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
                             response.getRequestSequenceNumber());
                     sb.append(result);
-
-                    textAreaOutput.setValue(sb);
-                    textAreaOutput.setCursorPosition(sb.length() -1);
                 }
+
+                textAreaOutput.setValue(sb);
+                textAreaOutput.setCursorPosition(sb.length() - 1);
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
             }
@@ -147,10 +149,10 @@ public class Terminal implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     try {
-                        agents = AppData.getSelectedAgentList();
+                        agents = AppData.getAgentList();
                         if (agents != null && agents.size() > 0) {
-                            for (String agent : agents) {
-                                if(!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())){
+                            for (Agent agent : agents) {
+                                if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
                                     String json = textAreaCommand.getValue().toString().trim();
 
                                     Request r = CommandJson.getRequest(json);
@@ -161,9 +163,9 @@ public class Terminal implements Module {
                                         task.setTaskStatus(TaskStatus.NEW);
                                         commandManagerInterface.saveTask(task);
 
-                                        r.setUuid(agent);
+                                        r.setUuid(agent.getUuid());
                                         r.setSource(Terminal.MODULE_NAME);
-                                        r.setTaskUuid(task.getUid().toString());
+                                        r.setTaskUuid(task.getUuid());
 
                                         Command command = new Command(r);
                                         commandManagerInterface.executeCommand(command);
@@ -176,9 +178,9 @@ public class Terminal implements Module {
 
                                     Request r = new Request();
 
-                                    r.setUuid(agent);
+                                    r.setUuid(agent.getUuid());
                                     r.setSource(Terminal.MODULE_NAME);
-                                    r.setTaskUuid(task.getUid().toString());
+                                    r.setTaskUuid(task.getUuid());
                                     r.setType(RequestType.EXECUTE_REQUEST);
                                     r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
                                     r.setWorkingDirectory(textFieldWorkingDirectory.getValue().toString());
@@ -190,7 +192,7 @@ public class Terminal implements Module {
                                     String[] args = textFieldArgs.getValue().toString().split(" ");
                                     r.setArgs(Arrays.asList(args));
 
-                                    r.setTimeout(Long.parseLong(textFieldTimeout.getValue().toString()));
+                                    r.setTimeout(Integer.parseInt(textFieldTimeout.getValue().toString()));
 
                                     Command command = new Command(r);
                                     commandManagerInterface.executeCommand(command);
@@ -202,6 +204,7 @@ public class Terminal implements Module {
                     } catch (Exception ex) {
                         getWindow().showNotification(ex.toString());
                         System.out.println("buttonClick event Exception");
+                        ex.printStackTrace();
                     }
                 }
             });
@@ -239,9 +242,9 @@ public class Terminal implements Module {
                         if (attr.length == 2) {
                             try {
                                 String taskUuid = attr[0];
-                                long requestSequenceNumber = Long.parseLong(attr[1]);
+                                int requestSequenceNumber = Integer.parseInt(attr[1]);
 
-                                Response response = commandManagerInterface.getResponse(taskUuid, requestSequenceNumber);
+                                Response response = commandManagerInterface.getResponse(UUID.fromString(taskUuid), requestSequenceNumber);
                                 textAreaOutput.setValue(response);
                             } catch (NumberFormatException ex) {
                                 getWindow().showNotification("Enter task uuid and requestsequencenumber " +

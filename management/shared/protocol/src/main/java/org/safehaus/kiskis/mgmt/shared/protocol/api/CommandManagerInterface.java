@@ -1,6 +1,8 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
 import java.util.List;
+import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -21,9 +23,7 @@ public interface CommandManagerInterface {
 
     public List<Request> getCommands();
 
-    public List<Response> getResponses();
-
-    public Response getResponse(String taskuuid, Long requestSequenceNumber);
+    public Response getResponse(UUID taskuuid, Integer requestSequenceNumber);
 
     public void saveResponse(Response response);
 

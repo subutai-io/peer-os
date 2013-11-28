@@ -80,13 +80,14 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 Task task = new Task();
                 task.setDescription("Agent registration");
                 task.setTaskStatus(TaskStatus.NEW);
-                task.setReqSeqNumber(0l);
+                task.setReqSeqNumber(0);
                 commandManager.saveTask(task);
-                response.setTaskUuid(task.getUid().toString());
+                response.setTaskUuid(task.getUuid());
+                response.setRequestSequenceNumber(task.getReqSeqNumber());
                 persistenceAgent.saveResponse(response);
                 //
                 Request request = new Request();
-                request.setTaskUuid(task.getUid().toString());
+                request.setTaskUuid(task.getUuid());
                 request.setRequestSequenceNumber(task.getReqSeqNumber());
                 request.setType(RequestType.REGISTRATION_REQUEST_DONE);
                 request.setUuid(agent.getUuid());
@@ -113,8 +114,6 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private void notifyModules() {
         for (AgentListener ai : listeners) {
             if (ai != null) {
-                System.out.println("Agents count: " + registeredAgents.size());
-                System.out.println("Notify listener: " + ai.getId());
                 ai.agentRegistered(getRegisteredAgents());
             } else {
                 listeners.remove(ai);

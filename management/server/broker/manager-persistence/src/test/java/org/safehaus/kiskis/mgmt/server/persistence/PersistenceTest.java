@@ -75,7 +75,7 @@ public class PersistenceTest {
         listip.add("0.0.0.0");
         agent.setListIP(listip);
         agent.setMacAddress("mac");
-        agent.setUuid("uuid");
+//        agent.setUuid("uuid");
         Persistence instance = new Persistence();
         boolean expResult = true;
         boolean result = instance.updateAgent(agent);
@@ -152,9 +152,9 @@ public class PersistenceTest {
     public void testSaveResponse() {
         System.out.println("saveResponse");
         Response response = new Response();
-        response.setUuid("uuid");
+//        response.setUuid("uuid");
         response.setStdOut("stdout");
-        response.setResponseSequenceNumber(Long.MIN_VALUE);
+//        response.setResponseSequenceNumber(Long.MIN_VALUE);
         response.setExitCode(Integer.SIZE);
         response.setStdErr("errout");
         List<String> listip = new ArrayList<String>();
@@ -162,7 +162,7 @@ public class PersistenceTest {
         response.setIps(listip);
         response.setMacAddress("macaddress");
         response.setPid(Integer.SIZE);
-        response.setRequestSequenceNumber(Long.MIN_VALUE);
+//        response.setRequestSequenceNumber(Long.MIN_VALUE);
         response.setType(ResponseType.EXECUTE_RESPONSE);
         response.setSource("source");
         Persistence instance = new Persistence();
@@ -188,8 +188,8 @@ public class PersistenceTest {
 //    @Test
     public void testGetRequests() {
         System.out.println("saveRequests");
-        List<Request> list = instance.getRequests("test");
-        assertEquals(false, list.isEmpty());
+//        List<Request> list = instance.getRequests("test");
+//        assertEquals(false, list.isEmpty());
     }
 
 //    @Test
@@ -202,7 +202,7 @@ public class PersistenceTest {
 //    @Test
     public void testGetResponses() {
         System.out.println("getResponses");
-        List<Response> list = instance.getResponses("", 1l);
-        assertEquals(false, list.isEmpty());
+//        List<Response> list = instance.getResponses("", 1l);
+//        assertEquals(false, list.isEmpty());
     }
 }

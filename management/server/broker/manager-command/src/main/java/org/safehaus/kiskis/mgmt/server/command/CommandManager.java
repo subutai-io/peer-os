@@ -14,6 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,12 +29,6 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     private CommandTransportInterface communicationService;
     private ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
 
-    //    @Override
-//    public List<Command> getCommandList(Agent agent) {
-//        System.out.println(this.getClass().getName() + " getCommandList called");
-//        System.out.println(agent.toString());
-//        return null;
-//    }
     @Override
     public void executeCommand(Command command) {
         try {
@@ -47,7 +42,6 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     @Override
     public synchronized void getCommand(Response response) {
-//        System.out.println("Response received by CommandManager");
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
@@ -72,10 +66,8 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             for (CommandListener ai : (ArrayList<CommandListener>) listeners.clone()) {
                 if (ai != null && ai.getName() != null && response.getSource() != null) {
                     if (ai.getName().equals(response.getSource())) {
-//                        System.out.println("~~~~~~~ Listeners notified");
                         ai.outputCommand(response);
                     } else {
-//                        System.out.println("~~~~~~~ Notify all");
                         ai.outputCommand(response);
                     }
 
@@ -138,23 +130,14 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public List<Request> getCommands() {
         try {
-            return persistenceCommand.getRequests("taskuuid");
+            return persistenceCommand.getRequests(null);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCommands", ex);
         }
         return null;
     }
 
-    public List<Response> getResponses() {
-        try {
-            return persistenceCommand.getResponses("taskuuid", 1l);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getResponses", ex);
-        }
-        return null;
-    }
-
-    public Response getResponse(String taskuuid, Long requestSequenceNumber) {
+    public Response getResponse(UUID taskuuid, Integer requestSequenceNumber) {
         Response response = null;
         try {
             List<Response> list = persistenceCommand.getResponses(taskuuid, requestSequenceNumber);

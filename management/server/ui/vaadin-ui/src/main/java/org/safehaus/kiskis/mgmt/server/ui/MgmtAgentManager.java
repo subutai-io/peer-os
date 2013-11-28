@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui;
 import com.vaadin.data.Property;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
@@ -56,8 +57,6 @@ public class MgmtAgentManager extends VerticalLayout implements
     public void valueChange(Property.ValueChangeEvent event) {
         if (event.getProperty().getValue() instanceof Set) {
             Set<String> agents = (Set<String>) event.getProperty().getValue();
-
-            AppData.setSelectedAgentList(agents);
             setSelectedAgents(agents);
         }
     }
@@ -65,19 +64,24 @@ public class MgmtAgentManager extends VerticalLayout implements
     private void setSelectedAgents(Set<String> list) {
         Set<Agent> selectedList = new HashSet<Agent>();
 
-        for (String uuid : list) {
-            Agent agent = findAgent(uuid);
+        for (String hostname : list) {
+            Agent agent = findAgent(hostname);
             if (agent != null) {
                 selectedList.add(agent);
             }
         }
 
         AppData.setAgentList(selectedList);
+        getWindow().showNotification(selectedList.toString());
+        getWindow().showNotification(
+                "Selected agents",
+                selectedList.toString(),
+                Window.Notification.TYPE_TRAY_NOTIFICATION);
     }
 
-    private Agent findAgent(String uuid) {
+    private Agent findAgent(String hostname) {
         for (Agent agent : registeredAgents) {
-            if (agent.getUuid().equals(uuid)) {
+            if (agent.getHostname().equals(hostname)) {
                 return agent;
             }
         }
@@ -103,8 +107,6 @@ public class MgmtAgentManager extends VerticalLayout implements
             registeredAgents.addAll(agents);
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            return;
         }
     }
 
@@ -117,9 +119,9 @@ public class MgmtAgentManager extends VerticalLayout implements
         if (agentsToAdd != null) {
             for (Agent a : agentsToAdd) {
                 if (isRemove) {
-                    listSelectAgents.removeItem(a.getUuid());
+                    listSelectAgents.removeItem(a.getHostname());
                 } else {
-                    listSelectAgents.addItem(a.getUuid());
+                    listSelectAgents.addItem(a.getHostname());
                 }
             }
         }

@@ -14,6 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author bahadyr
@@ -121,7 +122,7 @@ public class Step2 extends Panel {
         addComponent(verticalLayout);
     }
 
-    private Command buildCommand(String uuid, String program, long reqSeqNumber, String taskUuid) {
+    private Command buildCommand(UUID uuid, String program, Integer reqSeqNumber, UUID taskUuid) {
 
         Request request = new Request();
         request.setSource("HadoopModule Wizard");
@@ -133,7 +134,7 @@ public class Step2 extends Panel {
         request.setStdOut(OutputRedirection.RETURN);
         request.setStdErr(OutputRedirection.RETURN);
         request.setRunAs("root");
-        request.setTimeout(0l);
+        request.setTimeout(0);
         request.setRequestSequenceNumber(reqSeqNumber);
         Command command = new Command(request);
 

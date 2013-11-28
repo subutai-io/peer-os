@@ -5,13 +5,16 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
+
+import java.lang.reflect.Type;
 
 /**
  * @author dilshat
  */
 public class CommandJson {
-
     private static Gson gson = new Gson();
 
     public static Request getRequest(String json) {
