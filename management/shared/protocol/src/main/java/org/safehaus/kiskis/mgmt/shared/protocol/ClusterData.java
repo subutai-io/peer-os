@@ -16,8 +16,8 @@ public class ClusterData {
 
     private UUID uuid;
     private String name;
-    private List<Agent> nodes;
-    private List<Agent> seeds;
+    private List<UUID> nodes;
+    private List<UUID> seeds;
     private String dataDir;
     private String commitLogDir;
     private String savedCacheDir;
@@ -42,19 +42,19 @@ public class ClusterData {
         this.name = name;
     }
 
-    public List<Agent> getNodes() {
+    public List<UUID> getNodes() {
         return nodes;
     }
 
-    public void setNodes(List<Agent> nodes) {
+    public void setNodes(List<UUID> nodes) {
         this.nodes = nodes;
     }
 
-    public List<Agent> getSeeds() {
+    public List<UUID> getSeeds() {
         return seeds;
     }
 
-    public void setSeeds(List<Agent> seeds) {
+    public void setSeeds(List<UUID> seeds) {
         this.seeds = seeds;
     }
 

@@ -101,7 +101,6 @@ public class Persistence implements PersistenceInterface {
 //        }
 //        return false;
 //    }
-
     @Override
     public Set<Agent> getAgentsByHeartbeat(long from, long to) {
         Set<Agent> list = new HashSet<Agent>();
@@ -423,5 +422,24 @@ public class Persistence implements PersistenceInterface {
             return false;
         }
         return true;
+    }
+
+    public List<ClusterData> getClusterData() {
+        List<ClusterData> list = new ArrayList<ClusterData>();
+        try {
+            String cql = "select * from clusterdata";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(cql);
+            for (Row row : rs) {
+                ClusterData cd = new ClusterData();
+                cd.setName(row.getString("name"));
+                list.add(cd);
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
+        }
+        return list;
     }
 }

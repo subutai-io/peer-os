@@ -62,10 +62,19 @@ public class Step43 extends FormLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cassandraWizard.getCluster().setDataDir(textFieldDataDir.getValue().toString());
-                cassandraWizard.getCluster().setCommitLogDir(textFieldCommitLogDir.getValue().toString());
-                cassandraWizard.getCluster().setSavedCacheDir(textFieldSavedCachesDir.getValue().toString());
-                cassandraWizard.showNext();
+                String dataDir = textFieldDataDir.getValue().toString();
+                String commitDir = textFieldCommitLogDir.getValue().toString();
+                String cacheDir = textFieldSavedCachesDir.getValue().toString();
+                if (dataDir.length() > 0 && commitDir.length() > 0 && cacheDir.length() > 0) {
+                    cassandraWizard.getCluster().setDataDir(dataDir);
+                    cassandraWizard.getCluster().setCommitLogDir(commitDir);
+                    cassandraWizard.getCluster().setSavedCacheDir(cacheDir);
+                    cassandraWizard.showNext();
+                } else {
+                    getWindow().showNotification(
+                            "Please fill the form.",
+                            Window.Notification.TYPE_TRAY_NOTIFICATION);
+                }
             }
         });
         Button back = new Button("Back");

@@ -28,7 +28,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-    private ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
+    private final ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
 
     @Override
     public void executeCommand(Command command) {
@@ -182,5 +182,9 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public boolean saveClusterData(ClusterData cluster) {
         return  persistenceCommand.saveClusterData(cluster);
+    }
+
+    public List<ClusterData> getClusterData() {
+        return persistenceCommand.getClusterData();
     }
 }

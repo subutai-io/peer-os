@@ -14,8 +14,10 @@ import com.vaadin.ui.*;
 public class Step3 extends Panel {
 
     GridLayout grid;
+    VerticalLayout verticalLayoutForm;
+    Button next;
 
-    public Step3(final CassandraWizard aThis) {
+    public Step3(final CassandraWizard cassandraWizard) {
         setCaption("Installation");
         setSizeFull();
 
@@ -40,25 +42,29 @@ public class Step3 extends Panel {
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
+        verticalLayoutForm = new VerticalLayout();
+        verticalLayoutForm.setSizeFull();
+        verticalLayout.setSpacing(true);
+
         Label label = new Label("Please enter the list of hosts to be included in the cluster");
         label.setContentMode(Label.CONTENT_XHTML);
-
-        grid.addComponent(label, 2, 0, 5, 0);
-        grid.setComponentAlignment(label, Alignment.TOP_CENTER);
+        verticalLayoutForm.addComponent(label);
 
         Label label1 = new Label("<strong>Status of nodes</strong><br>"
                 + "<br>");
         label1.setContentMode(Label.CONTENT_XHTML);
+        verticalLayoutForm.addComponent(label1);
 
-        grid.addComponent(label1, 2, 1, 5, 1);
-        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
+        grid.addComponent(verticalLayoutForm, 2, 0, 5, 9);
+        grid.setComponentAlignment(verticalLayoutForm, Alignment.MIDDLE_CENTER);
 
-        Button next = new Button("Next");
+        next = new Button("Next");
+        next.setEnabled(false);
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showNext();
+                cassandraWizard.showNext();
             }
         });
         Button back = new Button("Back");
@@ -66,7 +72,7 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                aThis.showBack();
+                cassandraWizard.showBack();
             }
         });
 
@@ -80,10 +86,11 @@ public class Step3 extends Panel {
         addComponent(verticalLayout);
     }
 
-    int j = 2;
-
     void updateUI(String msg) {
-        System.out.println(msg);
+        Label label1 = new Label("<strong>" + msg + "</strong><br>");
+        label1.setContentMode(Label.CONTENT_XHTML);
+        verticalLayoutForm.addComponent(label1);
+        next.setEnabled(true);
     }
 
 }

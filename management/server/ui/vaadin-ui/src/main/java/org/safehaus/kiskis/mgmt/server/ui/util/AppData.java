@@ -22,9 +22,9 @@ public class AppData
 
     private ResourceBundle bundle;
     private Locale locale;   // Current locale
-    private Application app; // For distinguishing between apps
-    private static ThreadLocal<AppData> instance =
-            new ThreadLocal<AppData>();
+    private final Application app; // For distinguishing between apps
+    private static final ThreadLocal<AppData> instance
+            = new ThreadLocal<AppData>();
     //
     private Set<String> selectedAgentList;
     private Set<Agent> agentList;
@@ -34,12 +34,12 @@ public class AppData
         agentList = new HashSet<Agent>();
 
         // It's usable from now on in the current request
-        instance.set(this);
+        instance.set(AppData.this);
     }
 
     @Override
     public void transactionStart(Application application,
-                                 Object transactionData) {
+            Object transactionData) {
         // Set this data instance of this application
         // as the one active in the current thread. 
         if (this.app == application) {
@@ -49,7 +49,7 @@ public class AppData
 
     @Override
     public void transactionEnd(Application application,
-                               Object transactionData) {
+            Object transactionData) {
         // Clear the reference to avoid potential problems
         if (this.app == application) {
             instance.set(null);
@@ -57,10 +57,10 @@ public class AppData
     }
 
     public static void initLocale(Locale locale,
-                                  String bundleName) {
+            String bundleName) {
         instance.get().locale = locale;
-        instance.get().bundle =
-                ResourceBundle.getBundle(bundleName, locale);
+        instance.get().bundle
+                = ResourceBundle.getBundle(bundleName, locale);
     }
 
     public static Locale getLocale() {

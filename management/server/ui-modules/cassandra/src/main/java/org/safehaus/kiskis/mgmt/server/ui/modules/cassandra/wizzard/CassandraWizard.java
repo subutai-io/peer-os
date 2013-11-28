@@ -159,7 +159,6 @@ public final class CassandraWizard extends Window {
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
                 output.append("OK ").append(response.getStdOut().trim());
             }
-            System.out.println(response.getType() + " " + response.getExitCode());
             switch (response.getType()) {
                 case EXECUTE_RESPONSE_DONE: {
                     switch (step) {
@@ -170,7 +169,9 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 3: {
-                            step3.updateUI("Exit code: " + response.getType());
+                            step3.updateUI(response.getRequestSequenceNumber() + " "
+                                    + response.getTaskUuid() + " "
+                                    + " " + (response.getExitCode() == 0 ? "Success" : "Fail"));
                             break;
                         }
                         case 4: {
