@@ -192,9 +192,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     /**
      * assume the following: lets say that physical agent's hostname is
-     * "the.host.name" then its child lxc agents will be like
-     * "the.host.name_lxc_hostname-of-lxc" (e.g.
-     * the.host.name_lxc_hadoop-node-1)
+     * "py01" then its child lxc agents will be like
+     * "py01_lxc_hadoop-node-1"
      *
      * @param physicalAgent - physical agent
      * @return child lxc agents of a physical agent
