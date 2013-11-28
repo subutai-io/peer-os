@@ -147,8 +147,8 @@ public class Persistence implements PersistenceInterface {
     @Override
     public Set<Agent> getRegisteredAgents(long freshness) {
         Set<Agent> list = new HashSet<Agent>();
-        list.addAll(getRegisteredLxcAgents(freshness));
         list.addAll(getRegisteredPhysicalAgents(freshness));
+        list.addAll(getRegisteredLxcAgents(freshness));
         return list;
     }
 
@@ -396,6 +396,7 @@ public class Persistence implements PersistenceInterface {
 
     public boolean truncateTables() {
         try {
+            session.execute("truncate agents");
             session.execute("truncate tasks");
             session.execute("truncate requests");
             session.execute("truncate responses");

@@ -5,11 +5,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
-
-import java.lang.reflect.Type;
 
 /**
  * @author dilshat
@@ -47,6 +43,26 @@ public class CommandJson {
             return gson.toJson(cmd);
         } catch (Exception e) {
         }
+        return null;
+    }
+
+    public static String getAgentJson(Object agent) {
+        try {
+            return gson.toJson(agent);
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public static Agent getAgent(String json) {
+        try {
+            Agent agent = gson.fromJson(escape(json), Agent.class);
+            if (agent != null) {
+                return agent;
+            }
+        } catch (Exception e) {
+        }
+
         return null;
     }
 

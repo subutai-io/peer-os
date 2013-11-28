@@ -48,6 +48,7 @@ public class Terminal implements Module {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
+            verticalLayout.setMargin(true);
 
             textFieldWorkingDirectory = new TextField("Working Directory");
             textFieldWorkingDirectory.setValue("/home");
