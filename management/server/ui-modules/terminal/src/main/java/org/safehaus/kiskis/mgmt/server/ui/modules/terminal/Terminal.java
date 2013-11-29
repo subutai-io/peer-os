@@ -162,7 +162,7 @@ public class Terminal implements Module {
                         sb.append(agent).append("\n");
 
                         Set<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
-                        for(Agent lxcAgent : childAgents){
+                        for (Agent lxcAgent : childAgents) {
                             sb.append("\t").append(lxcAgent).append("\n");
                         }
                     }
@@ -180,7 +180,12 @@ public class Terminal implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     Set<Agent> agents = getAgentManager().getRegisteredLxcAgents();
-                    textAreaOutput.setValue(agents.toString());
+                    StringBuilder sb = new StringBuilder();
+
+                    for (Agent agent : agents) {
+                        sb.append(agent).append("\n");
+                    }
+                    textAreaOutput.setValue(sb.toString());
                 }
             });
             return button;
@@ -360,8 +365,10 @@ public class Terminal implements Module {
     }
 
     public void unsetModuleService(ModuleService service) {
-        getCommandManager().removeListener(component);
-        service.unregisterModule(this);
+        if (getCommandManager() != null) {
+            getCommandManager().removeListener(component);
+            service.unregisterModule(this);
+        }
     }
 
     public void setContext(BundleContext context) {

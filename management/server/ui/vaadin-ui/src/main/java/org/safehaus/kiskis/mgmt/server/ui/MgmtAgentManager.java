@@ -10,7 +10,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
@@ -44,7 +43,7 @@ public class MgmtAgentManager extends VerticalLayout implements
         tree.setImmediate(true);
         tree.addListener(this);
         addComponent(tree);
-        addComponent(getLxcAgents());
+        addComponent(getRefreshButton());
 
         id = ThreadLocalRandom.current().nextInt(1, 1000000);
         agentManagerService.addListener(this);
@@ -71,15 +70,16 @@ public class MgmtAgentManager extends VerticalLayout implements
         }
     }
 
-    private Button getLxcAgents() {
-        Button button = new Button("Delete agents");
+    private Button getRefreshButton() {
+        Button button = new Button("Refresh agents");
         button.setDescription("Gets LXC agents from Cassandra");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Set<Agent> agents = AppData.getAgentList();
-                refreshNodecontainer(agents, true, null);
+                container.removeAllItems();
+                registeredAgents.clear();
+                refreshAgents();
             }
         });
         return button;
@@ -88,6 +88,7 @@ public class MgmtAgentManager extends VerticalLayout implements
     @Override
     public void agentRegistered(Set<Agent> agents) {
         try {
+            System.out.println("\nagents size: " + agents.size());
             refreshAgents();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -114,7 +115,7 @@ public class MgmtAgentManager extends VerticalLayout implements
         return container;
     }
 
-    private void refreshAgents(){
+    private void refreshAgents() {
         Set<Agent> setToRemove = new HashSet<Agent>();
         Set<Agent> setToAdd = new HashSet<Agent>();
 
@@ -122,44 +123,51 @@ public class MgmtAgentManager extends VerticalLayout implements
         setToRemove.clear();
         setToRemove.addAll(registeredAgents);
         setToRemove.removeAll(agentManagerInterface.getRegisteredAgents());
-        refreshNodecontainer(setToRemove, true, null);
+        refreshNodeContainer(setToRemove, true, null);
+
 
         // add physical agents
         setToAdd.clear();
         setToAdd.addAll(agentManagerInterface.getRegisteredPhysicalAgents());
-        setToAdd.removeAll(registeredAgents);
-        refreshNodecontainer(setToAdd, false, null);
+        refreshNodeContainer(setToAdd, false, null);
 
-        for(Agent agent : registeredAgents){
+        for (Agent agent : setToAdd) {
             // add lxc agents
             Set<Agent> setToAddChild = new HashSet<Agent>();
             setToAddChild.clear();
             setToAddChild.addAll(agentManagerInterface.getChildLxcAgents(agent));
-            setToAddChild.removeAll(registeredAgents);
-            refreshNodecontainer(setToAddChild, false, agent);
+            refreshNodeContainer(setToAddChild, false, agent);
+
+            System.out.println("\nTo Add Child");
+            System.out.println(setToAddChild);
         }
 
         registeredAgents.clear();
         registeredAgents.addAll(agentManagerInterface.getRegisteredAgents());
     }
 
-    public void refreshNodecontainer(Set<Agent> agents, boolean delete, Agent parent){
-        if(delete){
-            for(Agent agent : agents){
+    public void refreshNodeContainer(Set<Agent> agents, boolean delete, Agent parent) {
+        if (delete) {
+            for (Agent agent : agents) {
                 container.removeItemRecursively(agent.getHostname());
             }
         } else {
-            for(Agent agent : agents){
-                Item item = null;
-                item = container.addItem(agent.getHostname());
-                item.getItemProperty("name").setValue(agent.getUuid());
-                item.getItemProperty("value").setValue(agent);
-                if(!agent.isIsLXC()){
-                    container.setChildrenAllowed(agent.getUuid(), true);
-                } else {
-                    item.getItemProperty("icon").setValue(new ThemeResource("icons/16/folder.png"));
-                    container.setParent(agent.getHostname(), parent.getHostname());
-                    container.setChildrenAllowed(agent.getHostname(), false);
+            for (Agent agent : agents) {
+                if(container.getItem(agent.getHostname()) == null){
+                    if (agent.getUuid() != null && agent.getHostname() != null) {
+                        Item item = container.addItem(agent.getHostname());
+                        if (item != null) {
+                            item.getItemProperty("name").setValue(agent.getUuid());
+                            item.getItemProperty("value").setValue(agent);
+                            if (!agent.isIsLXC()) {
+                                container.setChildrenAllowed(agent.getUuid(), true);
+                            } else {
+                                item.getItemProperty("icon").setValue(new ThemeResource("icons/16/folder.png"));
+                                container.setParent(agent.getHostname(), parent.getHostname());
+                                container.setChildrenAllowed(agent.getHostname(), false);
+                            }
+                        }
+                    }
                 }
             }
         }
