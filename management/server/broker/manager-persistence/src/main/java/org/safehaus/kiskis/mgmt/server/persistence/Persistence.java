@@ -45,13 +45,14 @@ public class Persistence implements PersistenceInterface {
     public boolean saveAgent(Agent agent) {
         if (agent != null) {
             try {
-                String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat) "
-                        + "values (?,?,?,?,?,?)";
+                String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname) "
+                        + "values (?,?,?,?,?,?,?)";
                 PreparedStatement stmt = session.prepare(cql);
                 BoundStatement boundStatement = new BoundStatement(stmt);
+
                 ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
                         agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                        agent.getMacAddress(), new Date()));
+                        agent.getMacAddress(), new Date(), agent.getParentHostName()));
                 return true;
 
             } catch (Exception ex) {
@@ -119,6 +120,7 @@ public class Persistence implements PersistenceInterface {
                 agent.setLastHeartbeat(row.getDate("lastheartbeat"));
                 agent.setListIP(row.getList("listip", String.class));
                 agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
                 list.add(agent);
             }
             cql = "select * from agents where islxc = true and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
@@ -135,6 +137,7 @@ public class Persistence implements PersistenceInterface {
                 agent.setLastHeartbeat(row.getDate("lastheartbeat"));
                 agent.setListIP(row.getList("listip", String.class));
                 agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
                 list.add(agent);
             }
         } catch (Exception ex) {
@@ -168,6 +171,7 @@ public class Persistence implements PersistenceInterface {
                 agent.setLastHeartbeat(row.getDate("lastheartbeat"));
                 agent.setListIP(row.getList("listip", String.class));
                 agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
                 list.add(agent);
             }
 
@@ -194,6 +198,33 @@ public class Persistence implements PersistenceInterface {
                 agent.setLastHeartbeat(row.getDate("lastheartbeat"));
                 agent.setListIP(row.getList("listip", String.class));
                 agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+                list.add(agent);
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
+        }
+        return list;
+    }
+
+    public Set<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness) {
+        Set<Agent> list = new HashSet<Agent>();
+        try {
+            String cql = "select * from agents where islxc = true and parenthostname = ? and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(parent.getHostname(),
+                    new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
+            for (Row row : rs) {
+                Agent agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
                 list.add(agent);
             }
 

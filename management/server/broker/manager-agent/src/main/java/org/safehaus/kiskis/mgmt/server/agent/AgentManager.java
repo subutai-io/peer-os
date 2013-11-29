@@ -64,6 +64,13 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             agent.setIsLXC(response.isIsLxc());
         }
         agent.setListIP(response.getIps());
+        if (agent.isIsLXC()) {
+            if (agent.getHostname() != null) {
+                agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf("_lxc_")));
+            } else {
+                agent.setParentHostName("UNKNOWN");
+            }
+        }
 
         if (persistenceAgent.saveAgent(agent)) {
             if (register) {
@@ -191,23 +198,13 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     /**
-     * assume the following: lets say that physical agent's hostname is
-     * "py01" then its child lxc agents will be like
-     * "py01_lxc_hadoop-node-1"
+     * assume the following: lets say that physical agent's hostname is "py01"
+     * then its child lxc agents will be like "py01_lxc_hadoop-node-1"
      *
      * @param physicalAgent - physical agent
      * @return child lxc agents of a physical agent
      */
     public Set<Agent> getChildLxcAgents(Agent physicalAgent) {
-        Set<Agent> childLxcAgents = new HashSet<Agent>();
-        if (physicalAgent != null && !physicalAgent.isIsLXC() && physicalAgent.getHostname() != null) {
-            Set<Agent> lxcAgents = getRegisteredLxcAgents();
-            for (Agent lxcAgent : lxcAgents) {
-                if (lxcAgent.getHostname() != null && lxcAgent.getHostname().startsWith(physicalAgent.getHostname() + "_lxc_")) {
-                    childLxcAgents.add(lxcAgent);
-                }
-            }
-        }
-        return childLxcAgents;
+        return persistenceAgent.getRegisteredChildLxcAgents(physicalAgent, agentFreshnessMin);
     }
 }

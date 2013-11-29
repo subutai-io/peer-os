@@ -17,6 +17,15 @@ public class Agent implements Serializable {
     private List<String> listIP;
     private boolean isLXC;
     private Date lastHeartbeat;
+    private String parentHostName;
+
+    public String getParentHostName() {
+        return parentHostName;
+    }
+
+    public void setParentHostName(String parentHostName) {
+        this.parentHostName = parentHostName;
+    }
 
     public boolean isIsLXC() {
         return isLXC;
@@ -68,7 +77,7 @@ public class Agent implements Serializable {
 
     @Override
     public String toString() {
-        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP=" + listIP + ", isLXC=" + isLXC + ", lastHeartbeat=" + lastHeartbeat + '}';
+        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP=" + listIP + ", isLXC=" + isLXC + ", lastHeartbeat=" + lastHeartbeat + ", parentHostName=" + parentHostName + '}';
     }
 
     @Override
