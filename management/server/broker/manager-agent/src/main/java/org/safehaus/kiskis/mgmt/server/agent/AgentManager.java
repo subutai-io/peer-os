@@ -53,7 +53,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
     }
 
-    private void updateAgent(Response response, boolean register) {
+    private synchronized void updateAgent(Response response, boolean register) {
         Agent agent = new Agent();
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
@@ -107,7 +107,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
     }
 
-    private void notifyModules() {
+    private synchronized void notifyModules() {
         for (AgentListener ai : listeners) {
             if (ai != null) {
                 ai.agentRegistered(getRegisteredAgents());
