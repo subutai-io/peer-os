@@ -90,10 +90,10 @@ public class Persistence implements PersistenceInterface {
 //        try {
 //            if (agent != null) {
 //                String cql =
-//                        "update agents set hostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
+//                        "update agents set hostname = ?, parenthostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
 //                PreparedStatement stmt = session.prepare(cql);
 //                BoundStatement boundStatement = new BoundStatement(stmt);
-//                ResultSet rs = session.execute(boundStatement.bind(agent.getHostname(), agent.isIsLXC(), agent.getListIP(), agent.getMacAddress(), new Date(), agent.getUuid()));
+//                ResultSet rs = session.execute(boundStatement.bind(agent.getHostname(), agent.getParentHostName() agent.isIsLXC(), agent.getListIP(), agent.getMacAddress(), new Date(), agent.getUuid()));
 //            }
 //            return true;
 //
@@ -102,6 +102,7 @@ public class Persistence implements PersistenceInterface {
 //        }
 //        return false;
 //    }
+//    
     @Override
     public Set<Agent> getAgentsByHeartbeat(long from, long to) {
         Set<Agent> list = new HashSet<Agent>();
@@ -176,7 +177,7 @@ public class Persistence implements PersistenceInterface {
             }
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
+            LOG.log(Level.SEVERE, "Error in getRegisteredLxcAgents", ex);
         }
         return list;
     }
@@ -203,7 +204,7 @@ public class Persistence implements PersistenceInterface {
             }
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
+            LOG.log(Level.SEVERE, "Error in getRegisteredPhysicalAgents", ex);
         }
         return list;
     }
@@ -229,7 +230,7 @@ public class Persistence implements PersistenceInterface {
             }
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
+            LOG.log(Level.SEVERE, "Error in getRegisteredChildLxcAgents", ex);
         }
         return list;
     }

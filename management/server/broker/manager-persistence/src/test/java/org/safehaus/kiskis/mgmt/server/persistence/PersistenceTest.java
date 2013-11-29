@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -25,21 +26,23 @@ import org.junit.Test;
  */
 public class PersistenceTest {
 
-    Persistence instance = new Persistence();
+    static Persistence instance;
 
     public PersistenceTest() {
+    }
+
+    @BeforeClass
+    public static void setUpClass() {
+        instance = new Persistence();
         instance.setCassandraHost("localhost");
         instance.setCassandraPort(9042);
         instance.setCassandraKeyspace("kiskis");
         instance.init();
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
     @AfterClass
     public static void tearDownClass() {
+        instance.destroy();
     }
 
     @Before
@@ -48,6 +51,42 @@ public class PersistenceTest {
 
     @After
     public void tearDown() {
+    }
+
+//    @Test
+    public void testGetRegisteredAgents() {
+        Set<Agent> agents = instance.getRegisteredAgents(300);
+        for (Agent agent : agents) {
+            System.out.println(agent);
+        }
+    }
+
+    @Test
+    public void testGetLxcAgents() {
+        Set<Agent> agents = instance.getRegisteredLxcAgents(300);
+        for (Agent agent : agents) {
+            System.out.println(agent);
+        }
+    }
+
+//    @Test
+    public void testGetChildLxcAgents() {
+        Set<Agent> phyAgents = instance.getRegisteredPhysicalAgents(300);
+        for (Agent phyAgent : phyAgents) {
+            Set<Agent> agents = instance.getRegisteredChildLxcAgents(phyAgent, 300);
+            System.out.println("Parent: " + phyAgent);
+            for (Agent agent : agents) {
+                System.out.println("Child: " + agent);
+            }
+        }
+    }
+
+//    @Test
+    public void testGetPhysicalAgents() {
+        Set<Agent> agents = instance.getRegisteredPhysicalAgents(300);
+        for (Agent agent : agents) {
+            System.out.println(agent);
+        }
     }
 
     /**
@@ -206,7 +245,7 @@ public class PersistenceTest {
 //        List<Response> list = instance.getResponses("", 1l);
 //        assertEquals(false, list.isEmpty());
     }
-    
+
 //    @Test
     public void testSaveClusterData() {
         System.out.println("saveClusterData");
@@ -218,7 +257,7 @@ public class PersistenceTest {
         nodes.add("node1");
 //        cd.setNodes(nodes);
         cd.setSavedCacheDir("savedir");
-        
+
         boolean result = instance.saveClusterData(cd);
         assertEquals(true, result);
     }
