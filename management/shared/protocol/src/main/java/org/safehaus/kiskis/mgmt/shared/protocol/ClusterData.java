@@ -9,10 +9,17 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- *
  * @author bahadyr
  */
 public class ClusterData {
+
+    public static final String UUID_LABEL = "uuid",
+            NAME_LABEL = "name",
+            NODES_LABEL = "nodes",
+            SEEDS_LABEL = "seeds",
+            DATADIR_LABEL = "dataDir",
+            COMMITLOGDIR_LABEL = "commitLogDir",
+            SAVEDCACHEDIR_LOG = "savedCacheDir";
 
     private UUID uuid;
     private String name;
