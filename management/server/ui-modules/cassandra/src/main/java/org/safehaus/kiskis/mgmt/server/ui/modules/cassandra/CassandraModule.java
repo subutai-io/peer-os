@@ -1,7 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
+import com.vaadin.data.Container;
+import com.vaadin.data.Item;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.*;
-import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -12,6 +14,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+
+import java.util.List;
+import java.util.UUID;
 
 public class CassandraModule implements Module {
 
@@ -26,20 +31,22 @@ public class CassandraModule implements Module {
         private final Button buttonInstallWizard;
         private final Button getClusters;
         private CassandraWizard subwindow;
-        private TextArea textArea;
+        private Table table;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
-            textArea = new TextArea();
-            textArea.setRows(10);
-            textArea.setColumns(65);
-            textArea.setImmediate(true);
-            textArea.setWordwrap(true);
-            
-            
+            // Create table
+            final Table table = new Table("", getCassandraContainer());
+            table.setColumnExpandRatio(ClusterData.NAME_LABEL, 1);
+            table.setSortDisabled(true);
+            table.setWidth("100%");
+            table.setPageLength(6);
+            table.setFooterVisible(true);
+            table.setImmediate(true);
+
             buttonInstallWizard = new Button("CassandraModule Installation Wizard");
             buttonInstallWizard.addListener(new Button.ClickListener() {
 
@@ -56,20 +63,12 @@ public class CassandraModule implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    List<ClusterData> cdList = commandManagerInterface.getClusterData();
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < cdList.size(); i++) {
-                        ClusterData clusterData = cdList.get(i);
-                        sb.append(clusterData.getName()).append("\n");
-                    }
-                    textArea.setValue(sb.toString());
+                    table.setContainerDataSource(getCassandraContainer());
                 }
             });
 
             verticalLayout.addComponent(getClusters);
-
-            
-            verticalLayout.addComponent(textArea);
+            verticalLayout.addComponent(table);
 
             setCompositionRoot(verticalLayout);
         }
@@ -90,6 +89,41 @@ public class CassandraModule implements Module {
         @Override
         public String getName() {
             return CassandraModule.MODULE_NAME;
+        }
+
+        public IndexedContainer getCassandraContainer() {
+            IndexedContainer container = new IndexedContainer();
+
+            // Create the container properties
+            container.addContainerProperty(ClusterData.UUID_LABEL, UUID.class, "");
+            container.addContainerProperty(ClusterData.NAME_LABEL, String.class, "");
+            container.addContainerProperty(ClusterData.NODES_LABEL, Integer.class, 0);
+            container.addContainerProperty(ClusterData.SEEDS_LABEL, Integer.class, 0);
+            container.addContainerProperty(ClusterData.DATADIR_LABEL, String.class, "");
+            container.addContainerProperty(ClusterData.COMMITLOGDIR_LABEL, String.class, "");
+            container.addContainerProperty(ClusterData.SAVEDCACHEDIR_LOG, String.class, "");
+            container.addContainerProperty("Start/Stop", Button.class, "");
+
+            // Create some orders
+            List<ClusterData> cdList = getCommandManager().getClusterData();
+            for (ClusterData cluster : cdList) {
+                addOrderToContainer(container, cluster);
+            }
+
+            return container;
+        }
+
+        private void addOrderToContainer(Container container, ClusterData cd) {
+            Object itemId = container.addItem();
+            Item item = container.getItem(itemId);
+            item.getItemProperty(ClusterData.UUID_LABEL).setValue(cd.getUuid());
+            item.getItemProperty(ClusterData.NAME_LABEL).setValue(cd.getName());
+            item.getItemProperty(ClusterData.NODES_LABEL).setValue(cd.getNodes() == null ? 0 : cd.getNodes().size());
+            item.getItemProperty(ClusterData.SEEDS_LABEL).setValue(cd.getSeeds() == null ? 0 : cd.getSeeds().size());
+            item.getItemProperty(ClusterData.DATADIR_LABEL).setValue(cd.getDataDir());
+            item.getItemProperty(ClusterData.COMMITLOGDIR_LABEL).setValue(cd.getCommitLogDir());
+            item.getItemProperty(ClusterData.SAVEDCACHEDIR_LOG).setValue(cd.getSavedCacheDir());
+            item.getItemProperty("Start/Stop").setValue(new Button("Start or Stop"));
         }
     }
 

@@ -466,7 +466,12 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute(cql);
             for (Row row : rs) {
                 ClusterData cd = new ClusterData();
+                cd.setUuid(row.getUUID("uid"));
                 cd.setName(row.getString("name"));
+                cd.setDataDir(row.getString("datadir"));
+                cd.setSavedCacheDir(row.getString("savedcachedir"));
+                cd.setCommitLogDir(row.getString("commitlogdir"));
+//                cd.setNodes(row.getList(UUID.class, row.getli));
                 list.add(cd);
             }
 
