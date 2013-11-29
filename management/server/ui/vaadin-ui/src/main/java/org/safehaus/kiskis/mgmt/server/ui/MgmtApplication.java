@@ -76,7 +76,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 }
             }
         });
-        getMainWindow().executeJavaScript("function refreshMe() { javascript:vaadin.forceSync(); setTimeout(refreshMe, 5000); }; setTimeout(refreshMe, 5000);");
+        getMainWindow().executeJavaScript("setInterval(function(){javascript:vaadin.forceSync()},5000);");
     }
 
     @Override
