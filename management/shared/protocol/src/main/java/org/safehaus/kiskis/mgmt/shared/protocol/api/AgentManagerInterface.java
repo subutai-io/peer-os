@@ -18,6 +18,8 @@ public interface AgentManagerInterface {
 
     public Set<Agent> getChildLxcAgents(Agent agent);
 
+    public Set<Agent> getUnknownChildLxcAgents();
+
     public Set<Agent> getAgentsToHeartbeat();
 
     public void addListener(AgentListener listener);

@@ -208,4 +208,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     public Set<Agent> getChildLxcAgents(Agent physicalAgent) {
         return persistenceAgent.getRegisteredChildLxcAgents(physicalAgent, agentFreshnessMin);
     }
+
+    public Set<Agent> getUnknownChildLxcAgents() {
+        return persistenceAgent.getUnknownChildLxcAgents(agentFreshnessMin);
+    }
 }
