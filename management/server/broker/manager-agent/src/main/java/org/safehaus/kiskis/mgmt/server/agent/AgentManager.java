@@ -66,7 +66,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
         agent.setListIP(response.getIps());
         if (agent.isIsLXC()) {
-            if (agent.getHostname() != null && agent.getHostname().contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+            if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
                 agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
             } else {
                 agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
