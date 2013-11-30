@@ -10,6 +10,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -209,6 +210,7 @@ public class Persistence implements PersistenceInterface {
         return list;
     }
 
+    @Override
     public Set<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness) {
         Set<Agent> list = new HashSet<Agent>();
         try {
@@ -216,6 +218,33 @@ public class Persistence implements PersistenceInterface {
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(parent.getHostname(),
+                    new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
+            for (Row row : rs) {
+                Agent agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+                list.add(agent);
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRegisteredChildLxcAgents", ex);
+        }
+        return list;
+    }
+
+    @Override
+    public Set<Agent> getUnknownChildLxcAgents(long freshness) {
+        Set<Agent> list = new HashSet<Agent>();
+        try {
+            String cql = "select * from agents where islxc = true and parenthostname = ? and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(Common.UNKNOWN_LXC_PARENT_NAME,
                     new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
             for (Row row : rs) {
                 Agent agent = new Agent();

@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
@@ -65,10 +66,10 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
         }
         agent.setListIP(response.getIps());
         if (agent.isIsLXC()) {
-            if (agent.getHostname() != null) {
-                agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf("_lxc_")));
+            if (agent.getHostname() != null && agent.getHostname().contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
             } else {
-                agent.setParentHostName("UNKNOWN");
+                agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
             }
         }
 

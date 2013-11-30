@@ -34,6 +34,8 @@ public interface PersistenceInterface {
 
     Set<Agent> getRegisteredLxcAgents(long freshness);
 
+    Set<Agent> getUnknownChildLxcAgents(long freshness);
+
     Set<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness);
 
     Set<Agent> getRegisteredPhysicalAgents(long freshness);
