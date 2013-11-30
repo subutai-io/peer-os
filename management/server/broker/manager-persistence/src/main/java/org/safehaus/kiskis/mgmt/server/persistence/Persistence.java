@@ -419,6 +419,7 @@ public class Persistence implements PersistenceInterface {
             session.execute("truncate tasks");
             session.execute("truncate requests");
             session.execute("truncate responses");
+            session.execute("truncate clusterdata");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
             return false;
@@ -468,5 +469,29 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
         }
         return list;
+    }
+
+    @Override
+    public Agent getAgent(UUID uuid) {
+        Agent agent = new Agent();
+        try {
+            String cql = "select * from agents where uuid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            for (Row row : rs) {
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getAgent", ex);
+        }
+        return agent;
     }
 }

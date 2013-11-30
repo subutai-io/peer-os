@@ -4,11 +4,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:40 PM
  */
 public interface AgentManagerInterface {
+
+    public Agent getAgent(UUID uuid);
 
     public Set<Agent> getRegisteredAgents();
 

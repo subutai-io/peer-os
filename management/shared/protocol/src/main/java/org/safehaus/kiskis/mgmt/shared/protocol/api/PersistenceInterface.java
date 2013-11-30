@@ -42,11 +42,10 @@ public interface PersistenceInterface {
 
     Set<Agent> getAgentsByHeartbeat(long from, long to);
 
+    Agent getAgent(UUID uuid);
+
     boolean saveAgent(Agent agent);
 
-//    boolean updateAgent(Agent agent);
-//
-//    boolean removeAgent(Agent agent);
     String saveTask(Task task);
 
     List<Task> getTasks();
