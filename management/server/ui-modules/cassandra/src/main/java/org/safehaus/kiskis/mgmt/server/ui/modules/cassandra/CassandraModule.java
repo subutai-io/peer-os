@@ -17,7 +17,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class CassandraModule implements Module {
@@ -34,6 +33,7 @@ public class CassandraModule implements Module {
         private final Button getClusters;
         private CassandraWizard subwindow;
         private Table table;
+        private IndexedContainer container;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
 
@@ -97,10 +97,8 @@ public class CassandraModule implements Module {
             table.setImmediate(true);
             table.addListener(new Table.ValueChangeListener() {
                 public void valueChange(Property.ValueChangeEvent event) {
-                    Set<?> value = (Set<?>) event.getProperty().getValue();
-                    if (value != null && value.size() > 0) {
-                        getWindow().showNotification("Selected: " + value);
-                    }
+                    getWindow().showNotification("Selected: " +
+                            container.getItem(table.getValue()));
                 }
             });
 
@@ -108,17 +106,18 @@ public class CassandraModule implements Module {
         }
 
         private IndexedContainer getCassandraContainer() {
-            IndexedContainer container = new IndexedContainer();
+            container = new IndexedContainer();
 
             // Create the container properties
             container.addContainerProperty(ClusterData.UUID_LABEL, UUID.class, "");
             container.addContainerProperty(ClusterData.NAME_LABEL, String.class, "");
-            container.addContainerProperty(ClusterData.NODES_LABEL, Integer.class, 0);
-            container.addContainerProperty(ClusterData.SEEDS_LABEL, Integer.class, 0);
             container.addContainerProperty(ClusterData.DATADIR_LABEL, String.class, "");
             container.addContainerProperty(ClusterData.COMMITLOGDIR_LABEL, String.class, "");
             container.addContainerProperty(ClusterData.SAVEDCACHEDIR_LOG, String.class, "");
-            container.addContainerProperty("Start/Stop", Button.class, "");
+            container.addContainerProperty("Start", Button.class, "");
+            container.addContainerProperty("Stop", Button.class, "");
+            container.addContainerProperty(ClusterData.NODES_LABEL, List.class, 0);
+            container.addContainerProperty(ClusterData.SEEDS_LABEL, List.class, 0);
 
             // Create some orders
             List<ClusterData> cdList = getCommandManager().getClusterData();
@@ -134,12 +133,13 @@ public class CassandraModule implements Module {
             Item item = container.getItem(itemId);
             item.getItemProperty(ClusterData.UUID_LABEL).setValue(cd.getUuid());
             item.getItemProperty(ClusterData.NAME_LABEL).setValue(cd.getName());
-            item.getItemProperty(ClusterData.NODES_LABEL).setValue(cd.getNodes() == null ? 0 : cd.getNodes().size());
-            item.getItemProperty(ClusterData.SEEDS_LABEL).setValue(cd.getSeeds() == null ? 0 : cd.getSeeds().size());
             item.getItemProperty(ClusterData.DATADIR_LABEL).setValue(cd.getDataDir());
             item.getItemProperty(ClusterData.COMMITLOGDIR_LABEL).setValue(cd.getCommitLogDir());
             item.getItemProperty(ClusterData.SAVEDCACHEDIR_LOG).setValue(cd.getSavedCacheDir());
-            item.getItemProperty("Start/Stop").setValue(new Button("Start or Stop"));
+            item.getItemProperty("Start").setValue(new Button("Start"));
+            item.getItemProperty("Stop").setValue(new Button("Start"));
+            item.getItemProperty(ClusterData.NODES_LABEL).setValue(cd.getNodes());
+            item.getItemProperty(ClusterData.SEEDS_LABEL).setValue(cd.getSeeds());
         }
     }
 
