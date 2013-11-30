@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -16,6 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class CassandraModule implements Module {
@@ -39,13 +41,7 @@ public class CassandraModule implements Module {
             verticalLayout.setSpacing(true);
 
             // Create table
-            final Table table = new Table("", getCassandraContainer());
-            table.setColumnExpandRatio(ClusterData.NAME_LABEL, 1);
-            table.setSortDisabled(true);
-            table.setWidth("100%");
-            table.setPageLength(6);
-            table.setFooterVisible(true);
-            table.setImmediate(true);
+            table = getTable();
 
             buttonInstallWizard = new Button("CassandraModule Installation Wizard");
             buttonInstallWizard.addListener(new Button.ClickListener() {
@@ -91,7 +87,27 @@ public class CassandraModule implements Module {
             return CassandraModule.MODULE_NAME;
         }
 
-        public IndexedContainer getCassandraContainer() {
+        private Table getTable() {
+            final Table table = new Table("", getCassandraContainer());
+            table.setColumnExpandRatio(ClusterData.NAME_LABEL, 1);
+            table.setWidth("100%");
+            table.setPageLength(6);
+            table.setFooterVisible(true);
+            table.setSelectable(true);
+            table.setImmediate(true);
+            table.addListener(new Table.ValueChangeListener() {
+                public void valueChange(Property.ValueChangeEvent event) {
+                    Set<?> value = (Set<?>) event.getProperty().getValue();
+                    if (value != null && value.size() > 0) {
+                        getWindow().showNotification("Selected: " + value);
+                    }
+                }
+            });
+
+            return table;
+        }
+
+        private IndexedContainer getCassandraContainer() {
             IndexedContainer container = new IndexedContainer();
 
             // Create the container properties
@@ -149,8 +165,8 @@ public class CassandraModule implements Module {
     public void unsetModuleService(ModuleService service) {
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
+            service.unregisterModule(this);
         }
-        service.unregisterModule(this);
     }
 
     public void setContext(BundleContext context) {
@@ -158,7 +174,6 @@ public class CassandraModule implements Module {
     }
 
     public static CommandManagerInterface getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(CassandraModule.class).getBundleContext();
         if (ctx != null) {
             ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());

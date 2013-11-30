@@ -63,47 +63,6 @@ public class Persistence implements PersistenceInterface {
         return false;
     }
 
-    /**
-     * Saved Agent data into Cassandra agents table
-     *
-     * @param agent
-     * @return the result in boolean
-     */
-//    @Override
-//    public boolean removeAgent(Agent agent) {
-//        try {
-//            if (agent != null) {
-//                String cql = "delete from agents where uuid = ?";
-//                PreparedStatement stmt = session.prepare(cql);
-//                BoundStatement boundStatement = new BoundStatement(stmt);
-//                ResultSet rs = session.execute(boundStatement.bind(agent.getUuid()));
-//            }
-//            return true;
-//
-//        } catch (Exception ex) {
-//            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
-//        }
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean updateAgent(Agent agent) {
-//        try {
-//            if (agent != null) {
-//                String cql =
-//                        "update agents set hostname = ?, parenthostname = ?, islxc = ?, listip = ?, macaddress = ?, lastheartbeat = ? where uuid = ?";
-//                PreparedStatement stmt = session.prepare(cql);
-//                BoundStatement boundStatement = new BoundStatement(stmt);
-//                ResultSet rs = session.execute(boundStatement.bind(agent.getHostname(), agent.getParentHostName() agent.isIsLXC(), agent.getListIP(), agent.getMacAddress(), new Date(), agent.getUuid()));
-//            }
-//            return true;
-//
-//        } catch (Exception ex) {
-//            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
-//        }
-//        return false;
-//    }
-//    
     @Override
     public Set<Agent> getAgentsByHeartbeat(long from, long to) {
         Set<Agent> list = new HashSet<Agent>();
@@ -480,7 +439,7 @@ public class Persistence implements PersistenceInterface {
                     cluster.getSavedCacheDir(), cluster.getSeeds()));
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveAgent", ex);
+            LOG.log(Level.SEVERE, "Error in saveClusterData", ex);
             return false;
         }
         return true;
@@ -500,7 +459,8 @@ public class Persistence implements PersistenceInterface {
                 cd.setDataDir(row.getString("datadir"));
                 cd.setSavedCacheDir(row.getString("savedcachedir"));
                 cd.setCommitLogDir(row.getString("commitlogdir"));
-//                cd.setNodes(row.getList(UUID.class, row.getli));
+                cd.setNodes(row.getList("nodes", UUID.class));
+                cd.setSeeds(row.getList("seeds", UUID.class));
                 list.add(cd);
             }
 

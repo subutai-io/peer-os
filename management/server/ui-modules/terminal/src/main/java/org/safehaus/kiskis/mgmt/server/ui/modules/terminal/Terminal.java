@@ -16,10 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Terminal implements Module {
 
@@ -50,6 +47,10 @@ public class Terminal implements Module {
             verticalLayout.setSpacing(true);
             verticalLayout.setMargin(true);
 
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.setSpacing(true);
+            horizontalLayout.setMargin(true);
+
             textFieldWorkingDirectory = new TextField("Working Directory");
             textFieldWorkingDirectory.setValue("/home");
 
@@ -75,12 +76,14 @@ public class Terminal implements Module {
             verticalLayout.addComponent(labelText);
             verticalLayout.addComponent(textAreaCommand);
 
-            verticalLayout.addComponent(textFieldWorkingDirectory);
-            verticalLayout.addComponent(textFieldProgram);
-            verticalLayout.addComponent(textFieldRunAs);
-            verticalLayout.addComponent(textFieldArgs);
-            verticalLayout.addComponent(textFieldTimeout);
+            horizontalLayout.addComponent(textFieldWorkingDirectory);
+            horizontalLayout.addComponent(textFieldProgram);
+            horizontalLayout.addComponent(textFieldRunAs);
+            horizontalLayout.addComponent(textFieldArgs);
+            horizontalLayout.addComponent(textFieldTimeout);
+            verticalLayout.addComponent(horizontalLayout);
 
+            HorizontalLayout hLayout = new HorizontalLayout();
             Button buttonSend = genSendButton();
             Button getRequests = genGetRequestButton();
             Button getResponses = genGetResponsesButton();
@@ -88,7 +91,7 @@ public class Terminal implements Module {
             Button truncateTables = getTruncateTablesButton();
             Button buttonGetPhysicalAgents = getPhysicalAgents();
             Button buttonGetLxcAgents = getLxcAgents();
-            HorizontalLayout hLayout = new HorizontalLayout();
+            Button buttonCreateCluster = getClusterButton();
 
             hLayout.addComponent(buttonSend);
             hLayout.addComponent(getRequests);
@@ -97,6 +100,7 @@ public class Terminal implements Module {
             hLayout.addComponent(truncateTables);
             hLayout.addComponent(buttonGetPhysicalAgents);
             hLayout.addComponent(buttonGetLxcAgents);
+            hLayout.addComponent(buttonCreateCluster);
 
             verticalLayout.addComponent(hLayout);
 
@@ -199,7 +203,7 @@ public class Terminal implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     try {
-                        agents = AppData.getAgentList();
+                        agents = AppData.getSelectedAgentList();
                         if (agents != null && agents.size() > 0) {
                             for (Agent agent : agents) {
                                 if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
@@ -339,6 +343,33 @@ public class Terminal implements Module {
                     if (commandManagerInterface.truncateTables()) {
                         textAreaOutput.setValue("Tables truncated");
                     }
+                }
+            });
+            return button;
+        }
+
+        private Button getClusterButton(){
+            Button button = new Button("Create cluster data");
+            button.setDescription("Creates Cluster Data");
+            button.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    ClusterData clusterData = new ClusterData();
+                    clusterData.setName(textAreaCommand.getValue().toString());
+                    clusterData.setCommitLogDir("Commit log Dir");
+                    clusterData.setDataDir("Data dir");
+                    clusterData.setSavedCacheDir("Saved Cache Dir");
+
+                    Set<Agent> agents = AppData.getSelectedAgentList();
+                    List<UUID> listUuid = new ArrayList<UUID>();
+                    for(Agent agent : agents){
+                        listUuid.add(agent.getUuid());
+                    }
+                    clusterData.setNodes(listUuid);
+                    clusterData.setSeeds(listUuid);
+                    getCommandManager().saveClusterData(clusterData);
+                    textAreaOutput.setValue(clusterData);
                 }
             });
             return button;

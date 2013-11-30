@@ -71,7 +71,7 @@ public class Terminal implements Module {
 
         @Override
         public void buttonClick(Button.ClickEvent event) {
-            Set<Agent> agents = AppData.getAgentList();
+            Set<Agent> agents = AppData.getSelectedAgentList();
             if (agents != null && agents.size() > 0) {
                 for (Agent agent : agents) {
                     Request r = CommandJson.getRequest(textAreaCommand.getValue().toString());
