@@ -218,9 +218,61 @@ public class Persistence implements PersistenceInterface {
             }
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getRegisteredChildLxcAgents", ex);
+            LOG.log(Level.SEVERE, "Error in getUnknownChildLxcAgents", ex);
         }
         return list;
+    }
+
+    @Override
+    public Agent getRegisteredLxcAgentByHostname(String hostname, long freshness) {
+        Agent agent = null;
+        try {
+            String cql = "select * from agents where islxc = true and hostname = ? LIMIT 1 ALLOW FILTERING";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(Common.UNKNOWN_LXC_PARENT_NAME,
+                    new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
+            Row row = rs.one();
+            if (row != null) {
+                agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRegisteredLxcAgentByHostname", ex);
+        }
+        return agent;
+    }
+
+    @Override
+    public Agent getRegisteredPhysicalAgentByHostname(String hostname, long freshness) {
+        Agent agent = null;
+        try {
+            String cql = "select * from agents where islxc = false and hostname = ? LIMIT 1 ALLOW FILTERING";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(Common.UNKNOWN_LXC_PARENT_NAME,
+                    new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
+            Row row = rs.one();
+            if (row != null) {
+                agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRegisteredPhysicalAgentByHostname", ex);
+        }
+        return agent;
     }
 
     // TODO Remove this method and reference in blueprint
