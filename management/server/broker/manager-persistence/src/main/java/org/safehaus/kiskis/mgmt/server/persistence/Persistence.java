@@ -275,6 +275,30 @@ public class Persistence implements PersistenceInterface {
         return agent;
     }
 
+    @Override
+    public Agent getAgent(UUID uuid) {
+        Agent agent = new Agent();
+        try {
+            String cql = "select * from agents where uuid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            for (Row row : rs) {
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getAgent", ex);
+        }
+        return agent;
+    }
+
     // TODO Remove this method and reference in blueprint
     public void init() {
         try {
@@ -465,6 +489,7 @@ public class Persistence implements PersistenceInterface {
         return list;
     }
 
+    @Override
     public boolean truncateTables() {
         try {
             session.execute("truncate agents");
@@ -480,9 +505,9 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public boolean saveClusterData(ClusterData cluster) {
+    public boolean saveCassandraClusterInfo(CassandraClusterInfo cluster) {
         try {
-            String cql = "insert into clusterdata (uid, name, commitlogdir, datadir, "
+            String cql = "insert into cassandra_cluster_info (uid, name, commitlogdir, datadir, "
                     + "nodes, savedcachedir, seeds) "
                     + "values (?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
@@ -492,21 +517,22 @@ public class Persistence implements PersistenceInterface {
                     cluster.getSavedCacheDir(), cluster.getSeeds()));
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveClusterData", ex);
+            LOG.log(Level.SEVERE, "Error in saveCassandraClusterInfo", ex);
             return false;
         }
         return true;
     }
 
-    public List<ClusterData> getClusterData() {
-        List<ClusterData> list = new ArrayList<ClusterData>();
+    @Override
+    public List<CassandraClusterInfo> getCassandraClusterInfo() {
+        List<CassandraClusterInfo> list = new ArrayList<CassandraClusterInfo>();
         try {
-            String cql = "select * from clusterdata";
-            PreparedStatement stmt = session.prepare(cql);
-            BoundStatement boundStatement = new BoundStatement(stmt);
+            String cql = "select * from cassandra_cluster_info";
+//            PreparedStatement stmt = session.prepare(cql);
+//            BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(cql);
             for (Row row : rs) {
-                ClusterData cd = new ClusterData();
+                CassandraClusterInfo cd = new CassandraClusterInfo();
                 cd.setUuid(row.getUUID("uid"));
                 cd.setName(row.getString("name"));
                 cd.setDataDir(row.getString("datadir"));
@@ -518,32 +544,57 @@ public class Persistence implements PersistenceInterface {
             }
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getRegisteredAgents", ex);
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo", ex);
         }
         return list;
     }
 
     @Override
-    public Agent getAgent(UUID uuid) {
-        Agent agent = new Agent();
+    public boolean saveHadoopClusterInfo(HadoopClusterInfo cluster) {
         try {
-            String cql = "select * from agents where uuid = ?";
+            String cql = "insert into hadoop_cluster_info (uid, cluster_name, name_node, secondary_name_node, "
+                    + "job_tracker, replication_factor, data_nodes, task_trackers, additional_config) "
+                    + "values (?,?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            ResultSet rs = session.execute(boundStatement.bind(cluster.getUid(),
+                    cluster.getClusterName(), cluster.getNameNode(),
+                    cluster.getSecondaryNameNode(), cluster.getJobTracker(),
+                    cluster.getReplicationFactor(), cluster.getDataNodes(),
+                    cluster.getTaskTrackers(), cluster.getAdditionalConfig()));
+            return true;
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveHadoopClusterInfo", ex);
+        }
+        return false;
+    }
+
+    @Override
+    public List<HadoopClusterInfo> getHadoopClusterInfo() {
+        List<HadoopClusterInfo> list = new ArrayList<HadoopClusterInfo>();
+        try {
+            String cql = "select * from hadoop_cluster_info";
+//            PreparedStatement stmt = session.prepare(cql);
+//            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(cql);
             for (Row row : rs) {
-                agent.setUuid(row.getUUID("uuid"));
-                agent.setHostname(row.getString("hostname"));
-                agent.setIsLXC(row.getBool("islxc"));
-                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
-                agent.setListIP(row.getList("listip", String.class));
-                agent.setMacAddress(row.getString("macaddress"));
-                agent.setParentHostName(row.getString("parenthostname"));
+                HadoopClusterInfo cd = new HadoopClusterInfo();
+                cd.setUid(row.getUUID("uid"));
+                cd.setClusterName(row.getString("cluster_name"));
+                cd.setNameNode(row.getUUID("name_node"));
+                cd.setSecondaryNameNode(row.getUUID("secondary_name_node"));
+                cd.setJobTracker(row.getUUID("job_tracker"));
+                cd.setReplicationFactor(row.getInt("replication_factor"));
+                cd.setDataNodes(row.getList("data_nodes", UUID.class));
+                cd.setTaskTrackers(row.getList("task_trackers", UUID.class));
+                cd.setAdditionalConfig(row.getString("additional_config"));
+                list.add(cd);
             }
 
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getAgent", ex);
+            LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
-        return agent;
+        return list;
     }
 }

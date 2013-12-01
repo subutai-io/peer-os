@@ -9,8 +9,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
+import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -56,7 +57,11 @@ public interface PersistenceInterface {
 
     public boolean truncateTables();
 
-    public boolean saveClusterData(ClusterData cluster);
+    public boolean saveCassandraClusterInfo(CassandraClusterInfo cluster);
 
-    public List<ClusterData> getClusterData();
+    public List<CassandraClusterInfo> getCassandraClusterInfo();
+
+    public boolean saveHadoopClusterInfo(HadoopClusterInfo cluster);
+
+    public List<HadoopClusterInfo> getHadoopClusterInfo();
 }

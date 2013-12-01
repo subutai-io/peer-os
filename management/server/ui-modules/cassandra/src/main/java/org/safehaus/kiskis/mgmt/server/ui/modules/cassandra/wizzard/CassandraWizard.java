@@ -6,7 +6,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
-import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
+import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -18,7 +18,7 @@ public final class CassandraWizard extends Window {
 
     private final VerticalLayout verticalLayout;
     private Task task;
-    ClusterData cluster;
+    CassandraClusterInfo cluster;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
@@ -141,11 +141,11 @@ public final class CassandraWizard extends Window {
         this.task = task;
     }
 
-    public ClusterData getCluster() {
+    public CassandraClusterInfo getCluster() {
         return cluster;
     }
 
-    public void setCluster(ClusterData cluster) {
+    public void setCluster(CassandraClusterInfo cluster) {
         this.cluster = cluster;
     }
 

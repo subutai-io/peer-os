@@ -355,7 +355,7 @@ public class Terminal implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    ClusterData clusterData = new ClusterData();
+                    CassandraClusterInfo clusterData = new CassandraClusterInfo();
                     clusterData.setName(textAreaCommand.getValue().toString());
                     clusterData.setCommitLogDir("Commit log Dir");
                     clusterData.setDataDir("Data dir");

@@ -30,7 +30,7 @@ public interface CommandManagerInterface {
 
     public boolean truncateTables();
 
-    public boolean saveClusterData(ClusterData cluster);
+    public boolean saveClusterData(CassandraClusterInfo cluster);
 
-    public List<ClusterData> getClusterData();
+    public List<CassandraClusterInfo> getClusterData();
 }

@@ -249,7 +249,7 @@ public class PersistenceTest {
 //    @Test
     public void testSaveClusterData() {
         System.out.println("saveClusterData");
-        ClusterData cd = new ClusterData();
+        CassandraClusterInfo cd = new CassandraClusterInfo();
         cd.setName("name");
         cd.setCommitLogDir("comdir");
         cd.setDataDir("datadir");
@@ -258,7 +258,7 @@ public class PersistenceTest {
 //        cd.setNodes(nodes);
         cd.setSavedCacheDir("savedir");
 
-        boolean result = instance.saveClusterData(cd);
+        boolean result = instance.saveCassandraClusterInfo(cd);
         assertEquals(true, result);
     }
 }
