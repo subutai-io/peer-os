@@ -40,6 +40,10 @@ public interface PersistenceInterface {
 
     Set<Agent> getRegisteredPhysicalAgents(long freshness);
 
+    Agent getRegisteredLxcAgentByHostname(String hostname, long freshness);
+
+    Agent getRegisteredPhysicalAgentByHostname(String hostname, long freshness);
+
     Set<Agent> getAgentsByHeartbeat(long from, long to);
 
     Agent getAgent(UUID uuid);
