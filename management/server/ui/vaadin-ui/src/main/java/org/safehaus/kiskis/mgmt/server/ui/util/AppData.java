@@ -26,12 +26,11 @@ public class AppData
     private static final ThreadLocal<AppData> instance
             = new ThreadLocal<AppData>();
     //
-    private Set<String> selectedAgentList;
-    private Set<Agent> agentList;
+    private Set<Agent> selectedAgentList;
 
     public AppData(Application app) {
         this.app = app;
-        agentList = new HashSet<Agent>();
+        selectedAgentList = new HashSet<Agent>();
 
         // It's usable from now on in the current request
         instance.set(AppData.this);
@@ -71,23 +70,15 @@ public class AppData
         return instance.get().bundle.getString(msgId);
     }
 
-    public static Set<String> getSelectedAgentList() {
-        return instance.get().selectedAgentList;
-    }
-
-    public static void setSelectedAgentList(Set<String> agentList) {
-        instance.get().selectedAgentList = agentList;
-    }
-
     public static Application getApplication() {
         return instance.get().app;
     }
 
-    public static Set<Agent> getAgentList() {
-        return instance.get().agentList;
+    public static Set<Agent> getSelectedAgentList() {
+        return instance.get().selectedAgentList;
     }
 
-    public static void setAgentList(Set<Agent> agentList) {
-        instance.get().agentList = agentList;
+    public static void setSelectedAgentList(Set<Agent> agentList) {
+        instance.get().selectedAgentList = agentList;
     }
 }

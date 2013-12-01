@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -52,6 +53,11 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 break;
             }
         }
+    }
+
+    @Override
+    public Agent getAgent(UUID uuid){
+        return persistenceAgent.getAgent(uuid);
     }
 
     private synchronized void updateAgent(Response response, boolean register) {

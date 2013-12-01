@@ -71,7 +71,7 @@ public class Step2 extends Panel {
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
         // 'Shorthand' constructor - also supports data binding using Containers
-        hosts = new ArrayList<Agent>(AppData.getAgentList());
+        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
         List<UUID> agentUuids = new ArrayList<UUID>();
         for (Agent agent : hosts) {
             agentUuids.add(agent.getUuid());
