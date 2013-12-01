@@ -49,6 +49,21 @@
             <version>${activemq.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-pool</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>        
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-jms-pool</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>        
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.6</version>
+        </dependency>        
+        <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>${commons-net.version}</version>
@@ -259,7 +274,7 @@
                                 <!--UI Dependencies-->
 
                                 <!--Broker Dependencies-->
-<!--                                <artifactItem>
+                                <!--                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-server-broker</artifactId>
                                     <version>${project.version}</version>
@@ -304,6 +319,21 @@
                                     <artifactId>activemq-all</artifactId>
                                     <version>${activemq.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.activemq</groupId>
+                                    <artifactId>activemq-pool</artifactId>
+                                    <version>${activemq.version}</version>
+                                </artifactItem>                                
+                                <artifactItem>
+                                    <groupId>org.apache.activemq</groupId>
+                                    <artifactId>activemq-jms-pool</artifactId>
+                                    <version>${activemq.version}</version>
+                                </artifactItem>              
+                                <artifactItem>
+                                    <groupId>commons-pool</groupId>
+                                    <artifactId>commons-pool</artifactId>
+                                    <version>1.6</version>
+                                </artifactItem>                                                    
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-jaas</artifactId>

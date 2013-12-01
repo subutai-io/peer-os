@@ -1,12 +1,13 @@
 package org.safehaus.kiskis.mgmt.shared.communication;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 
@@ -15,14 +16,15 @@ import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrat
 import org.apache.activemq.broker.region.policy.OldestMessageWithLowestPriorityEvictionStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
+import org.apache.activemq.pool.PooledConnectionFactory;
 
 public class CommandTransport implements CommandTransportInterface {
-    
+
     private static final Logger LOG = Logger.getLogger(CommandTransport.class.getName());
     private BrokerService broker;
-    private Session listenerSession;
+    private PooledConnectionFactory pooledConnectionFactory;
     private CommunicationMessageListener communicationMessageListener;
-//    private String amqHost;
+    private ExecutorService exec;
     private String amqBindAddress;
     private String amqServiceQueue;
     private String amqBrokerCertificateName;
@@ -35,119 +37,140 @@ public class CommandTransport implements CommandTransportInterface {
     private int amqExpireMessagesPeriodSec;
     private int amqOfflineDurableSubscriberTimeoutSec;
     private int amqOfflineDurableSubscriberTaskScheduleSec;
-    
+    private int amqMaxConnections;
+    private int amqExecutorPoolSize;
+
     public void setAmqPort(int amqPort) {
         this.amqPort = amqPort;
     }
 
-//    public void setAmqHost(String amqHost) {
-//        this.amqHost = amqHost;
-//    }
+    public void setAmqMaxConnections(int amqMaxConnections) {
+        this.amqMaxConnections = amqMaxConnections;
+    }
+
+    public void setAmqExecutorPoolSize(int amqExecutorPoolSize) {
+        this.amqExecutorPoolSize = amqExecutorPoolSize;
+    }
+
     public void setAmqBindAddress(String amqBindAddress) {
         this.amqBindAddress = amqBindAddress;
     }
-    
+
     public void setAmqServiceQueue(String amqServiceQueue) {
         this.amqServiceQueue = amqServiceQueue;
     }
-    
+
     public void setAmqBrokerCertificateName(String amqBrokerCertificateName) {
         this.amqBrokerCertificateName = amqBrokerCertificateName;
     }
-    
+
     public void setAmqBrokerTrustStoreName(String amqBrokerTrustStoreName) {
         this.amqBrokerTrustStoreName = amqBrokerTrustStoreName;
     }
-    
+
     public void setAmqBrokerCertificatePwd(String amqBrokerCertificatePwd) {
         this.amqBrokerCertificatePwd = amqBrokerCertificatePwd;
     }
-    
+
     public void setAmqBrokerTrustStorePwd(String amqBrokerTrustStorePwd) {
         this.amqBrokerTrustStorePwd = amqBrokerTrustStorePwd;
     }
-    
+
     public void setAmqExpiredMessagesHighWatermark(int amqExpiredMessagesHighWatermark) {
         this.amqExpiredMessagesHighWatermark = amqExpiredMessagesHighWatermark;
     }
-    
+
     public void setAmqConstantPendingMessageLimit(int amqConstantPendingMessageLimit) {
         this.amqConstantPendingMessageLimit = amqConstantPendingMessageLimit;
     }
-    
+
     public void setAmqExpireMessagesPeriodSec(int amqExpireMessagesPeriodSec) {
         this.amqExpireMessagesPeriodSec = amqExpireMessagesPeriodSec;
     }
-    
+
     public void setAmqOfflineDurableSubscriberTimeoutSec(int amqOfflineDurableSubscriberTimeoutSec) {
         this.amqOfflineDurableSubscriberTimeoutSec = amqOfflineDurableSubscriberTimeoutSec;
     }
-    
+
     public void setAmqOfflineDurableSubscriberTaskScheduleSec(int amqOfflineDurableSubscriberTaskScheduleSec) {
         this.amqOfflineDurableSubscriberTaskScheduleSec = amqOfflineDurableSubscriberTaskScheduleSec;
     }
-    
+
     @Override
-    public Response sendCommand(Command command) {
-        thread(new CommandProducer(command), false);
-        return null;
+    public void sendCommand(Command command) {
+        exec.submit(new CommandProducer(command));
     }
-    
-    public static void thread(Runnable runnable, boolean daemon) {
-        Thread brokerThread = new Thread(runnable);
-        brokerThread.setDaemon(daemon);
-        brokerThread.start();
-    }
-    
-    public static class CommandProducer implements Runnable {
-        
+
+    public class CommandProducer implements Runnable {
+
         Command command;
-        
+
         public CommandProducer(Command command) {
             this.command = command;
         }
-        
+
         public void run() {
+            Connection connection = null;
+            Session session = null;
+            MessageProducer producer = null;
             try {
-//                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + host + ":" + port);
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
-                Connection connection = connectionFactory.createConnection();
+                connection = pooledConnectionFactory.createConnection();
                 connection.start();
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 Destination destination = session.createQueue(command.getCommand().getUuid().toString());
-                javax.jms.MessageProducer producer = session.createProducer(destination);
+                producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 String json = CommandJson.getJson(command);
                 System.out.println("Sending: " + json);
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
-                session.close();
-                connection.close();
             } catch (JMSException ex) {
                 LOG.log(Level.SEVERE, "Error in CommandProducer.run", ex);
+            } finally {
+                if (producer != null) {
+                    try {
+                        producer.close();
+                    } catch (Exception e) {
+                    }
+                }
+                if (session != null) {
+                    try {
+                        session.close();
+                    } catch (Exception e) {
+                    }
+                }
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (Exception e) {
+                    }
+                }
             }
         }
     }
-    
+
     public void init() {
-        
-        try {
-            listenerSession.close();
-        } catch (Exception e) {
+
+        if (pooledConnectionFactory != null) {
+            try {
+                pooledConnectionFactory.stop();
+            } catch (Exception e) {
+            }
         }
-        try {
-            
-            broker.stop();
-            broker.waitUntilStopped();
-        } catch (Exception e) {
+        if (broker != null) {
+            try {
+                broker.stop();
+                broker.waitUntilStopped();
+            } catch (Exception e) {
+            }
         }
-        
+
         try {
             System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/" + this.amqBrokerCertificateName);
             System.setProperty("javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd);
             System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/" + this.amqBrokerTrustStoreName);
             System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
-            
+
             broker = new BrokerService();
             //***policy
             PolicyMap policy = new PolicyMap();
@@ -167,17 +190,22 @@ public class CommandTransport implements CommandTransportInterface {
             broker.setPersistent(true);
             broker.setUseJmx(false);
             broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort);
-//            broker.addConnector("amqp://0.0.0.0:5672?maximumConnections=1000&wireformat.maxFrameSize=104857600");
             broker.start();
             broker.waitUntilStarted();
+            //executor service setup
+            exec = Executors.newFixedThreadPool(amqExecutorPoolSize);
+            //pooled connetion factory setup
+            pooledConnectionFactory = new PooledConnectionFactory(new ActiveMQConnectionFactory("vm://localhost"));
+            pooledConnectionFactory.setMaxConnections(amqMaxConnections);
+            pooledConnectionFactory.start();
             setupListener();
             System.out.println("ActiveMQ started...");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
-        
+
     }
-    
+
     public void destroy() {
         try {
             broker.stop();
@@ -187,30 +215,27 @@ public class CommandTransport implements CommandTransportInterface {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
     }
-    
+
     private void setupListener() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
-//        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("ssl://" + this.amqHost + ":" + this.amqPort);
-        Connection connection;
         try {
-            connection = connectionFactory.createConnection();
+            Connection connection = pooledConnectionFactory.createConnection();
+            //don not close this connection to not return it to the pool so no consumers are closed
             connection.start();
-            listenerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination adminQueue = listenerSession.createQueue(this.amqServiceQueue);
-            
-            MessageConsumer consumer = listenerSession.createConsumer(adminQueue);
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Destination adminQueue = session.createQueue(this.amqServiceQueue);
+            MessageConsumer consumer = session.createConsumer(adminQueue);
             communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener(communicationMessageListener);
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, "Error in setupListener", ex);
         }
     }
-    
+
     @Override
     public synchronized void addListener(BrokerListener listener) {
         communicationMessageListener.addListener(listener);
     }
-    
+
     @Override
     public synchronized void removeListener(BrokerListener listener) {
         communicationMessageListener.removeListener(listener);
