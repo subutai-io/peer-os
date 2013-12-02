@@ -14,7 +14,7 @@
     <!-- this is just a comment for testing -->
     <properties>
         <karaf.version>2.3.1</karaf.version>
-        <osgi.version>4.3.0</osgi.version>
+        <osgi.version>5.0.0</osgi.version>
         <activemq.version>5.9.0</activemq.version>
     </properties>
 
@@ -24,6 +24,14 @@
     </modules>
 
     <description>Parent project for the Kiskis Management Project Artifacts</description>
+    
+    <repositories>
+        <repository>
+            <id>apache-repo</id>
+            <name>apache-repo</name>
+            <url>https://repository.apache.org/content/groups/public</url>
+        </repository>
+    </repositories>
 
 </project>
 
