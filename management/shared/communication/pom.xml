@@ -40,11 +40,6 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-pool</artifactId>
-            <version>5.9.0</version>
-        </dependency>
     </dependencies>
 
     <build>
