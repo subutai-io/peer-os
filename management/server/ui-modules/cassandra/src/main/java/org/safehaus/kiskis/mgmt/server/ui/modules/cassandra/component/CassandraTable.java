@@ -68,7 +68,7 @@ public class CassandraTable extends Table {
         container.addContainerProperty(CassandraClusterInfo.SEEDS_LABEL, List.class, 0);
 
         // Create some orders
-        List<CassandraClusterInfo> cdList = commandManager.getClusterData();
+        List<CassandraClusterInfo> cdList = commandManager.getCassandraClusterData();
         for (CassandraClusterInfo cluster : cdList) {
             addOrderToContainer(container, cluster);
         }

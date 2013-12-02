@@ -48,7 +48,7 @@
             <artifactId>activemq-jaas</artifactId>
             <version>${activemq.version}</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-pool</artifactId>
             <version>${activemq.version}</version>
@@ -62,7 +62,7 @@
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.6</version>
-        </dependency>        
+        </dependency>        -->
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
@@ -319,7 +319,7 @@
                                     <artifactId>activemq-all</artifactId>
                                     <version>${activemq.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-pool</artifactId>
                                     <version>${activemq.version}</version>
@@ -333,7 +333,7 @@
                                     <groupId>commons-pool</groupId>
                                     <artifactId>commons-pool</artifactId>
                                     <version>1.6</version>
-                                </artifactItem>                                                    
+                                </artifactItem>                                                    -->
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-jaas</artifactId>

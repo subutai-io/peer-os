@@ -9,7 +9,6 @@
     <cm:property-placeholder persistent-id="AmqConfig" update-strategy="none">
         <cm:default-properties>
             <cm:property name="amqPort" value="61616"/>
-            <!--<cm:property name="amqHost" value="locahost"/>-->
             <cm:property name="amqBindAddress" value="0.0.0.0"/>
             <cm:property name="amqServiceQueue" value="SERVICE_QUEUE"/>
             <cm:property name="amqBrokerCertificateName" value="broker.ks"/>
@@ -21,7 +20,7 @@
             <cm:property name="amqExpireMessagesPeriodSec" value="300"/>
             <cm:property name="amqOfflineDurableSubscriberTimeoutSec" value="600"/>
             <cm:property name="amqOfflineDurableSubscriberTaskScheduleSec" value="600"/>
-            <cm:property name="amqMaxConnections" value="10"/>
+            <!--<cm:property name="amqMaxConnections" value="10"/>-->
             <cm:property name="amqExecutorPoolSize" value="9"/>
         </cm:default-properties>
     </cm:property-placeholder>
@@ -30,7 +29,6 @@
           class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"
           init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="amqPort" value="${amqPort}"/>
-        <!--<property name="amqHost" value="${amqHost}"/>-->
         <property name="amqBindAddress" value="${amqBindAddress}"/>
         <property name="amqServiceQueue" value="${amqServiceQueue}"/>
         <property name="amqBrokerCertificateName" value="${amqBrokerCertificateName}"/>
@@ -42,7 +40,7 @@
         <property name="amqExpireMessagesPeriodSec" value="${amqExpireMessagesPeriodSec}"/>
         <property name="amqOfflineDurableSubscriberTimeoutSec" value="${amqOfflineDurableSubscriberTimeoutSec}"/>
         <property name="amqOfflineDurableSubscriberTaskScheduleSec" value="${amqOfflineDurableSubscriberTaskScheduleSec}"/>
-        <property name="amqMaxConnections" value="${amqMaxConnections}"/>
+        <!--<property name="amqMaxConnections" value="${amqMaxConnections}"/>-->
         <property name="amqExecutorPoolSize" value="${amqExecutorPoolSize}"/>
     </bean>
 
