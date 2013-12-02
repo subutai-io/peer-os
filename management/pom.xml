@@ -13,7 +13,7 @@
 
     <!-- this is just a comment for testing -->
     <properties>
-        <karaf.version>2.3.1</karaf.version>
+        <karaf.version>2.3.3</karaf.version>
         <osgi.version>5.0.0</osgi.version>
         <activemq.version>5.9.0</activemq.version>
     </properties>
@@ -31,6 +31,18 @@
             <name>apache-repo</name>
             <url>https://repository.apache.org/content/groups/public</url>
         </repository>
+        
+        <repository>
+            <id>com.springsource.repository.bundles.release</id>
+            <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/release</url>
+        </repository>
+
+        <repository>
+            <id>com.springsource.repository.bundles.external</id>
+            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/external</url>
+        </repository>        
     </repositories>
 
 </project>
