@@ -16,14 +16,14 @@ import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrat
 import org.apache.activemq.broker.region.policy.OldestMessageWithLowestPriorityEvictionStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
-//import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 
 public class CommandTransport implements CommandTransportInterface {
 
     private static final Logger LOG = Logger.getLogger(CommandTransport.class.getName());
     private BrokerService broker;
-//    private PooledConnectionFactory pooledConnectionFactory;
-    private ActiveMQConnectionFactory connectionFactory;
+    private PooledConnectionFactory pooledConnectionFactory;
+//    private ActiveMQConnectionFactory connectionFactory;
     private CommunicationMessageListener communicationMessageListener;
     private ExecutorService exec;
     private String amqBindAddress;
@@ -38,16 +38,16 @@ public class CommandTransport implements CommandTransportInterface {
     private int amqExpireMessagesPeriodSec;
     private int amqOfflineDurableSubscriberTimeoutSec;
     private int amqOfflineDurableSubscriberTaskScheduleSec;
-//    private int amqMaxConnections;
+    private int amqMaxConnections;
     private int amqExecutorPoolSize;
 
     public void setAmqPort(int amqPort) {
         this.amqPort = amqPort;
     }
 
-//    public void setAmqMaxConnections(int amqMaxConnections) {
-//        this.amqMaxConnections = amqMaxConnections;
-//    }
+    public void setAmqMaxConnections(int amqMaxConnections) {
+        this.amqMaxConnections = amqMaxConnections;
+    }
 
     public void setAmqExecutorPoolSize(int amqExecutorPoolSize) {
         this.amqExecutorPoolSize = amqExecutorPoolSize;
@@ -115,8 +115,8 @@ public class CommandTransport implements CommandTransportInterface {
             Session session = null;
             MessageProducer producer = null;
             try {
-//                connection = pooledConnectionFactory.createConnection();
-                connection = connectionFactory.createConnection();
+                connection = pooledConnectionFactory.createConnection();
+//                connection = connectionFactory.createConnection();
                 connection.start();
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 Destination destination = session.createQueue(command.getCommand().getUuid().toString());
@@ -153,12 +153,12 @@ public class CommandTransport implements CommandTransportInterface {
 
     public void init() {
 
-//        if (pooledConnectionFactory != null) {
-//            try {
-//                pooledConnectionFactory.stop();
-//            } catch (Exception e) {
-//            }
-//        }
+        if (pooledConnectionFactory != null) {
+            try {
+                pooledConnectionFactory.stop();
+            } catch (Exception e) {
+            }
+        }
         if (broker != null) {
             try {
                 broker.stop();
@@ -197,10 +197,10 @@ public class CommandTransport implements CommandTransportInterface {
             //executor service setup
             exec = Executors.newFixedThreadPool(amqExecutorPoolSize);
             //pooled connetion factory setup
-//            pooledConnectionFactory = new PooledConnectionFactory(new ActiveMQConnectionFactory("vm://localhost"));
-//            pooledConnectionFactory.setMaxConnections(amqMaxConnections);
-//            pooledConnectionFactory.start();
-            connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+            pooledConnectionFactory = new PooledConnectionFactory(new ActiveMQConnectionFactory("vm://localhost"));
+            pooledConnectionFactory.setMaxConnections(amqMaxConnections);
+            pooledConnectionFactory.start();
+//            connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
             setupListener();
             System.out.println("ActiveMQ started...");
         } catch (Exception ex) {
@@ -221,8 +221,8 @@ public class CommandTransport implements CommandTransportInterface {
 
     private void setupListener() {
         try {
-//            Connection connection = pooledConnectionFactory.createConnection();
-            Connection connection = connectionFactory.createConnection();
+            Connection connection = pooledConnectionFactory.createConnection();
+//            Connection connection = connectionFactory.createConnection();
             //don not close this connection to not return it to the pool so no consumers are closed
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
