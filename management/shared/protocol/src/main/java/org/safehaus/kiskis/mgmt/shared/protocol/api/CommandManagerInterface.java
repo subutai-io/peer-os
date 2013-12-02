@@ -18,7 +18,9 @@ public interface CommandManagerInterface {
 
     void removeListener(CommandListener listener);
 
-    public List<Request> getCommands();
+    public List<Request> getCommands(UUID taskUuid);
+
+    public Integer getResponseCount(UUID taskuuid);
 
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber);
 

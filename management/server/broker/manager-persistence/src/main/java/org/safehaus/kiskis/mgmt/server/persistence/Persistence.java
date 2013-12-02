@@ -6,11 +6,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:57 PM
@@ -382,6 +382,28 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
+    public Integer getResponsesCount(UUID taskUuid){
+        Integer count = 0;
+        try{
+            String cql = "select * from responses where taskuuid = ?;";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(taskUuid));
+            for (Row row : rs) {
+                String type = row.getString("responsetype");
+                if(ResponseType.EXECUTE_RESPONSE_DONE.equals(ResponseType.valueOf(type))
+                        || ResponseType.EXECUTE_TIMEOUTED.equals(ResponseType.valueOf(type))){
+                     ++count;
+                }
+            }
+        }   catch (Exception ex){
+            LOG.log(Level.SEVERE, "Error in getResponsesCount", ex);
+        }
+
+        return count;
+    }
+
+    @Override
     public List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber) {
         List<Response> list = new ArrayList<Response>();
         try {
@@ -426,7 +448,6 @@ public class Persistence implements PersistenceInterface {
             PreparedStatement stmt = session.prepare(cql);
 
             BoundStatement boundStatement = new BoundStatement(stmt);
-
             session.execute(boundStatement.bind(task.getUuid(), task.getDescription(), task.getTaskStatus().toString()));
 
             return task.getUuid().toString();
@@ -441,7 +462,18 @@ public class Persistence implements PersistenceInterface {
     public List<Request> getRequests(UUID taskuuid) {
         List<Request> list = new ArrayList<Request>();
         try {
-            ResultSet rs = session.execute("select * from requests");
+            String cql = "select * from requests";
+            ResultSet rs = null;
+            if (taskuuid == null) {
+                rs = session.execute("select * from requests");
+            } else {
+                cql += " WHERE taskuuid = ?;";
+                PreparedStatement stmt = session.prepare(cql);
+
+                BoundStatement boundStatement = new BoundStatement(stmt);
+                rs = session.execute(boundStatement.bind(taskuuid));
+            }
+
             for (Row row : rs) {
                 Request request = new Request();
                 request.setProgram(row.getString("program"));
@@ -496,7 +528,7 @@ public class Persistence implements PersistenceInterface {
             session.execute("truncate tasks");
             session.execute("truncate requests");
             session.execute("truncate responses");
-            session.execute("truncate clusterdata");
+            session.execute("truncate cassandra_cluster_info");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
             return false;

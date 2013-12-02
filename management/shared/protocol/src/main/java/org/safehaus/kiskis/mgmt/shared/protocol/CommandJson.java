@@ -7,10 +7,14 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 import com.google.gson.Gson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author dilshat
  */
 public class CommandJson {
+    private static final Logger LOG = Logger.getLogger(CommandJson.class.getName());
     private static Gson gson = new Gson();
 
     public static Request getRequest(String json) {
@@ -19,7 +23,8 @@ public class CommandJson {
             if (cmd.command != null) {
                 return (Request) cmd.command;
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
 
 
@@ -32,7 +37,8 @@ public class CommandJson {
             if (cmd.response != null) {
                 return (Response) cmd.response;
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
 
         return null;
@@ -41,7 +47,8 @@ public class CommandJson {
     public static String getJson(CommandInterface cmd) {
         try {
             return gson.toJson(cmd);
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
         return null;
     }
@@ -49,7 +56,8 @@ public class CommandJson {
     public static String getAgentJson(Object agent) {
         try {
             return gson.toJson(agent);
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
         return null;
     }
@@ -60,7 +68,8 @@ public class CommandJson {
             if (agent != null) {
                 return agent;
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
 
         return null;

@@ -77,9 +77,11 @@ public class MgmtAgentManager extends VerticalLayout implements
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+
                 container.removeAllItems();
                 registeredAgents.clear();
                 refreshAgents();
+                AppData.setSelectedAgentList(registeredAgents);
             }
         });
         return button;
@@ -125,7 +127,6 @@ public class MgmtAgentManager extends VerticalLayout implements
         setToRemove.removeAll(agentManagerInterface.getRegisteredAgents());
         refreshNodeContainer(setToRemove, true, null);
 
-
         // add physical agents
         setToAdd.clear();
         setToAdd.addAll(agentManagerInterface.getRegisteredPhysicalAgents());
@@ -137,9 +138,6 @@ public class MgmtAgentManager extends VerticalLayout implements
             setToAddChild.clear();
             setToAddChild.addAll(agentManagerInterface.getChildLxcAgents(agent));
             refreshNodeContainer(setToAddChild, false, agent);
-
-            System.out.println("\nTo Add Child");
-            System.out.println(setToAddChild);
         }
 
         registeredAgents.clear();

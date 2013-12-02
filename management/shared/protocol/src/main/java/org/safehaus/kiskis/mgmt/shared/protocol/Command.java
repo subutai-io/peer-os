@@ -35,6 +35,10 @@ public class Command implements CommandInterface {
         return response;
     }
 
+    public Request getRequest() {
+        return command;
+    }
+
     public void setResponse(Response response) {
         this.response = response;
     }
