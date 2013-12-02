@@ -367,7 +367,7 @@ public class Terminal implements Module {
                     }
                     clusterData.setNodes(listUuid);
                     clusterData.setSeeds(listUuid);
-                    commandManagerInterface.saveClusterData(clusterData);
+                    commandManagerInterface.saveCassandraClusterData(clusterData);
                     textAreaOutput.setValue(clusterData);
                 }
             });
