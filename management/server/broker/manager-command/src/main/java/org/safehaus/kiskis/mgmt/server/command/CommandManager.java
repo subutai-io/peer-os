@@ -1,7 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
-//import org.osgi.framework.ServiceReference;
-
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -25,7 +23,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
-
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
     private final ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
@@ -105,6 +102,8 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         try {
             if (communicationService != null) {
                 communicationService.addListener(this);
+            } else {
+                throw new Exception("Missing communication service");
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
@@ -180,11 +179,11 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         return persistenceCommand.truncateTables();
     }
 
-    public boolean saveClusterData(CassandraClusterInfo cluster) {
-        return  persistenceCommand.saveCassandraClusterInfo(cluster);
+    public boolean saveCassandraClusterData(CassandraClusterInfo cluster) {
+        return persistenceCommand.saveCassandraClusterInfo(cluster);
     }
 
-    public List<CassandraClusterInfo> getClusterData() {
+    public List<CassandraClusterInfo> getCassandraClusterData() {
         return persistenceCommand.getCassandraClusterInfo();
     }
 }

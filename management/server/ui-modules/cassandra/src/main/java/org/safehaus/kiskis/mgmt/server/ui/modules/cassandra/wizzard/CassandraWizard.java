@@ -123,7 +123,7 @@ public final class CassandraWizard extends Window {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 step43 = new Step43(this);
                 verticalLayout.addComponent(step43);
-                commandManagerInterface.saveClusterData(cluster);
+                commandManagerInterface.saveCassandraClusterData(cluster);
                 break;
             }
             default: {

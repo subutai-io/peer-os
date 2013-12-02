@@ -258,7 +258,7 @@ public class Terminal implements Module {
                     } catch (Exception ex) {
                         getWindow().showNotification(ex.toString());
                         System.out.println("buttonClick event Exception");
-                        ex.printStackTrace();
+//                        ex.printStackTrace();
                     }
                 }
             });
@@ -368,7 +368,7 @@ public class Terminal implements Module {
                     }
                     clusterData.setNodes(listUuid);
                     clusterData.setSeeds(listUuid);
-                    getCommandManager().saveClusterData(clusterData);
+                    getCommandManager().saveCassandraClusterData(clusterData);
                     textAreaOutput.setValue(clusterData);
                 }
             });

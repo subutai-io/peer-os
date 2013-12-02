@@ -28,15 +28,13 @@
         <property name="persistenceAgentService" ref="persistenceAgentService"/>
         <property name="commandManagerService" ref="commandManagerService"/>
         <property name="commandTransportInterface" ref="commandTransportInterface"/>
-        <!--<property name="context" ref="blueprintBundleContext"/>-->
         <property name="heartbeatTimeoutSec" value="${heartbeatTimeoutSec}"/>  
         <property name="heartbeatFromMin" value="${heartbeatFromMin}"/>  
         <property name="heartbeatToMin" value="${heartbeatToMin}"/>  
         <property name="agentFreshnessMin" value="${agentFreshnessMin}"/>  
     </bean>
     <service ref="agentManagerService"
-             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"
-             ranking="2">
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
