@@ -18,6 +18,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -129,9 +130,9 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         this.communicationService = communicationService;
     }
 
-    public List<Request> getCommands() {
+    public List<Request> getCommands(UUID taskuuid) {
         try {
-            return persistenceCommand.getRequests(null);
+            return persistenceCommand.getRequests(taskuuid);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCommands", ex);
         }
@@ -147,10 +148,10 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             for (Response r : list) {
                 response = r;
                 if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null")) {
-                    stdOut += r.getStdOut();
+                    stdOut += "\n" + r.getStdOut();
                 }
                 if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null")) {
-                    stdErr += r.getStdErr();
+                    stdErr += "\n" + r.getStdErr();
                 }
             }
 
