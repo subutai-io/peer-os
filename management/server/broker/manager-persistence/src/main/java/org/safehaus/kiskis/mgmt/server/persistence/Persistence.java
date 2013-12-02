@@ -382,6 +382,28 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
+    public Integer getResponsesCount(UUID taskUuid){
+        Integer count = 0;
+        try{
+            String cql = "select * from responses where taskuuid = ?;";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(taskUuid));
+            for (Row row : rs) {
+                String type = row.getString("responsetype");
+                if(ResponseType.EXECUTE_RESPONSE_DONE.equals(ResponseType.valueOf(type))
+                        || ResponseType.EXECUTE_TIMEOUTED.equals(ResponseType.valueOf(type))){
+                     ++count;
+                }
+            }
+        }   catch (Exception ex){
+            LOG.log(Level.SEVERE, "Error in getResponsesCount", ex);
+        }
+
+        return count;
+    }
+
+    @Override
     public List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber) {
         List<Response> list = new ArrayList<Response>();
         try {

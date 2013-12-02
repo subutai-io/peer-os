@@ -12,13 +12,16 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,10 +53,8 @@ public class LxcTable extends Table {
     private IndexedContainer container;
     private Task infoTask;
     private Agent agent;
-    private HashMap<String, Button[]> buttons;
 
     public LxcTable() {
-        buttons = new HashMap<String, Button[]>();
         this.setCaption("LXC containers");
         this.setContainerDataSource(getContainer(new String[]{}));
 
@@ -88,29 +89,28 @@ public class LxcTable extends Table {
         return container;
     }
 
-    private void addOrderToContainer(Container container, String lxc) {
+    private void addOrderToContainer(Container container, final String lxc) {
         Object itemId = container.addItem();
         Item item = container.getItem(itemId);
 
         item.getItemProperty("name").setValue(lxc);
 
-        Button[] buttonsArr = new Button[3];
         Button buttonStart = new Button("Start");
         buttonStart.setEnabled(false);
         item.getItemProperty("Start").setValue(buttonStart);
-        buttonsArr[BUTTON_START] = buttonStart;
 
         Button buttonStop = new Button("Stop");
         buttonStop.setEnabled(false);
         item.getItemProperty("Stop").setValue(buttonStop);
-        buttonsArr[BUTTON_STOP] = buttonStop;
 
         Button buttonDestroy = new Button("Destroy");
-        buttonDestroy.setEnabled(false);
+        buttonDestroy.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Destroy " + lxc + " container");
+            }
+        });
         item.getItemProperty("Destroy").setValue(buttonDestroy);
-        buttonsArr[BUTTON_DESTROY] = buttonDestroy;
-
-        buttons.put("lxc", buttonsArr);
     }
 
     public void refreshDataSource(Agent agent, String[] lxcs) {
@@ -154,52 +154,75 @@ public class LxcTable extends Table {
         if (getCommandManager() != null) {
             boolean isSuccess = true;
             List<Request> requests = getCommandManager().getCommands(infoTask.getUuid());
+            Integer responseCount = getCommandManager().getResponseCount(infoTask.getUuid());
 
-            for (Request request : requests) {
-                Response response = getCommandManager().getResponse(
-                        infoTask.getUuid(),
-                        request.getRequestSequenceNumber());
+            if(requests.size() == responseCount){
+                for (Request request : requests) {
+                    Response response = getCommandManager().getResponse(
+                            infoTask.getUuid(),
+                            request.getRequestSequenceNumber());
 
-                if (response == null) {
-                    return;
-                } else {
-                    if (response.getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
-                        isSuccess = false;
+                    if (response == null) {
+                        return;
+                    } else {
+                        if (response.getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
+                            isSuccess = false;
 
-                        getWindow().showNotification(
-                                "Error",
-                                response.getStdErr(),
-                                Window.Notification.TYPE_ERROR_MESSAGE);
-                    } else if (response.getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
-                        if (response.getExitCode() == 0) {
-                            String lxc = request.getArgs().get(1);
-                            findRow(lxc);
-                            if (buttons.containsKey(lxc)) {
-                                buttons.get(lxc)[BUTTON_START].setEnabled(true);
-                            }
-                        } else {
                             getWindow().showNotification(
                                     "Error",
                                     response.getStdErr(),
                                     Window.Notification.TYPE_ERROR_MESSAGE);
+                        } else if (response.getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
+                            if (response.getExitCode() == 0) {
+                                String lxc = request.getArgs().get(1);
+                                findRow(lxc, response);
+                            } else {
+                                getWindow().showNotification(
+                                        "Error",
+                                        response.getStdErr(),
+                                        Window.Notification.TYPE_ERROR_MESSAGE);
+                            }
                         }
                     }
                 }
-            }
 
-            if (isSuccess) {
-                infoTask.setTaskStatus(TaskStatus.SUCCESS);
-            } else {
-                infoTask.setTaskStatus(TaskStatus.FAIL);
+                if (isSuccess) {
+                    infoTask.setTaskStatus(TaskStatus.SUCCESS);
+                } else {
+                    infoTask.setTaskStatus(TaskStatus.FAIL);
+                }
+                getCommandManager().saveTask(infoTask);
             }
-            getCommandManager().saveTask(infoTask);
         }
     }
 
-    private void findRow(String lcx) {
+    private void findRow(String lxc, Response response) {
         for (Object itemId : container.getItemIds()) {
             Item item = container.getItem(itemId);
-            System.out.println(item.getItemProperty("Start").getValue());
+
+            String name = (String) item.getItemProperty("name").getValue();
+            if(name.equals(lxc)){
+                Button buttonStart = (Button) item.getItemProperty("Start").getValue();
+                Button buttonStop = (Button) item.getItemProperty("Stop").getValue();
+
+                String out = response.getStdOut();
+                out = out.trim();
+
+                if(out.split("\\n").length > 0){
+                    out = out.split("\\n")[0].trim();
+                    if(out.split(":").length == 2){
+                        out = out.split(":")[1].trim();
+                        if(out.equals("STOPPED"))    {
+                            buttonStart.setEnabled(true);
+                            buttonStop.setEnabled(false);
+                        }  else {
+                            buttonStop.setEnabled(true);
+                            buttonStart.setEnabled(false);
+                        }
+                        System.out.println(lxc + " " + out);
+                    }
+                }
+            }
         }
     }
 

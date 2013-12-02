@@ -20,6 +20,8 @@ public interface CommandManagerInterface {
 
     public List<Request> getCommands(UUID taskUuid);
 
+    public Integer getResponseCount(UUID taskuuid);
+
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber);
 
     public void saveResponse(Response response);

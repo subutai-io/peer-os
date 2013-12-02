@@ -139,6 +139,11 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         return null;
     }
 
+    @Override
+    public Integer getResponseCount(UUID taskuuid){
+        return persistenceCommand.getResponsesCount(taskuuid);
+    }
+
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber) {
         Response response = null;
         try {

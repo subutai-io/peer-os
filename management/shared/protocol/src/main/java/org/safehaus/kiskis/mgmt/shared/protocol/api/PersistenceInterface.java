@@ -27,6 +27,8 @@ public interface PersistenceInterface {
 
     List<Request> getRequests(UUID taskuuid);
 
+    Integer getResponsesCount(UUID taskUuid);
+
     List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber);
 
     boolean saveResponse(Response response);
