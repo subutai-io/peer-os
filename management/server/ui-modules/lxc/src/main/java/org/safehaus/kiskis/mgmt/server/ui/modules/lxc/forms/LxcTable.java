@@ -12,16 +12,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,7 +26,6 @@ import java.util.Set;
  * Time: 6:56 PM
  */
 public class LxcTable extends Table {
-    public static final int BUTTON_START = 0, BUTTON_STOP = 1, BUTTON_DESTROY = 2;
     public static final String INFO_LXC = "{\n" +
             "\t  \"command\": {\n" +
             "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
@@ -50,12 +45,72 @@ public class LxcTable extends Table {
             "\t  }\n" +
             "\t}";
 
+    public static final String DESTROY_LXC = "{\n"+
+            "\t  \"command\": {\n"+
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n"+
+            "\t    \"source\": \":source\",\n"+
+            "\t    \"uuid\": \":uuid\",\n"+
+            "\t    \"taskUuid\": \":task\",\n"+
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"+
+            "\t    \"workingDirectory\": \"/\",\n"+
+            "\t    \"program\": \"/usr/bin/lxc-destroy\",\n"+
+            "\t    \"stdOut\": \"RETURN\",\n"+
+            "\t    \"stdErr\": \"RETURN\",\n"+
+            "\t    \"runAs\": \"root\",\n"+
+            "\t    \"args\": [\n"+
+            "\t      \"-n\",\":lxc-host-name\"\n"+
+            "\t    ],\n"+
+            "\t    \"timeout\": 180\n"+
+            "\t  }\n"+
+            "\t}";
+
+    public static final String START_LXC = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": \":source\",\n" +
+            "\t    \"uuid\": \":uuid\",\n" +
+            "\t    \"taskUuid\": \":task\",\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"/usr/bin/lxc-start\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"-n\",\":lxc-host-name\", \"-d\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String STOP_LXC = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": \":source\",\n" +
+            "\t    \"uuid\": \":uuid\",\n" +
+            "\t    \"taskUuid\": \":task\",\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"/usr/bin/lxc-stop\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"-n\",\":lxc-host-name\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
     private IndexedContainer container;
     private Task infoTask;
+    private Task destroyTask;
+    private Task startTask;
+    private Task stopTask;
     private Agent agent;
 
     public LxcTable() {
-        this.setCaption("LXC containers");
+        this.setCaption(" LXC containers");
         this.setContainerDataSource(getContainer(new String[]{}));
 
         this.setWidth("100%");
@@ -76,12 +131,12 @@ public class LxcTable extends Table {
         container.addContainerProperty("Destroy", Button.class, "");
 
         if (lxcs.length > 0) {
-            createTask();
+            createInfoTask();
             // Create some orders
             for (String lxc : lxcs) {
                 if (!Strings.isNullOrEmpty(lxc.trim()) && !lxc.trim().equals("base-container")) {
                     addOrderToContainer(container, lxc.trim());
-                    createRequest(lxc);
+                    createInfoRequest(lxc);
                 }
             }
         }
@@ -97,17 +152,32 @@ public class LxcTable extends Table {
 
         Button buttonStart = new Button("Start");
         buttonStart.setEnabled(false);
+        buttonStart.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                createStartTask();
+                createStartRequest(lxc);
+            }
+        });
         item.getItemProperty("Start").setValue(buttonStart);
 
         Button buttonStop = new Button("Stop");
         buttonStop.setEnabled(false);
+        buttonStop.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                createStopTask();
+                createStopRequest(lxc);
+            }
+        });
         item.getItemProperty("Stop").setValue(buttonStop);
 
         Button buttonDestroy = new Button("Destroy");
         buttonDestroy.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Destroy " + lxc + " container");
+               createDestroyTask();
+                createDestroyRequest(lxc);
             }
         });
         item.getItemProperty("Destroy").setValue(buttonDestroy);
@@ -115,11 +185,40 @@ public class LxcTable extends Table {
 
     public void refreshDataSource(Agent agent, String[] lxcs) {
         this.agent = agent;
+
+        this.setCaption(agent.getHostname() + " LXC containers");
         this.setContainerDataSource(getContainer(lxcs));
         System.out.println(container.getItemIds());
     }
 
-    private void createTask() {
+    private void createStartTask(){
+        startTask = new Task();
+        startTask.setTaskStatus(TaskStatus.NEW);
+        startTask.setDescription("Start lxc container");
+        if (getCommandManager() != null) {
+            getCommandManager().saveTask(startTask);
+        }
+    }
+
+    private void createStopTask(){
+        stopTask = new Task();
+        stopTask.setTaskStatus(TaskStatus.NEW);
+        stopTask.setDescription("Stop lxc container");
+        if (getCommandManager() != null) {
+            getCommandManager().saveTask(stopTask);
+        }
+    }
+
+    private void createDestroyTask(){
+        destroyTask = new Task();
+        destroyTask.setTaskStatus(TaskStatus.NEW);
+        destroyTask.setDescription("Destroy lxc container");
+        if (getCommandManager() != null) {
+            getCommandManager().saveTask(destroyTask);
+        }
+    }
+
+    private void createInfoTask() {
         infoTask = new Task();
         infoTask.setTaskStatus(TaskStatus.NEW);
         infoTask.setDescription("Info lxc container");
@@ -128,7 +227,52 @@ public class LxcTable extends Table {
         }
     }
 
-    private void createRequest(String lxc) {
+    private void createStartRequest(String lxc){
+        String json = START_LXC;
+        json = json.replaceAll(":task", startTask.getUuid().toString());
+        json = json.replaceAll(":source", LxcModule.MODULE_NAME);
+
+        json = json.replaceAll(":uuid", agent.getUuid().toString());
+        json = json.replaceAll(":requestSequenceNumber", startTask.getIncrementedReqSeqNumber().toString());
+        json = json.replaceAll(":lxc-host-name", lxc);
+
+        Request request = CommandJson.getRequest(json);
+        if (getCommandManager() != null) {
+            getCommandManager().executeCommand(new Command(request));
+        }
+    }
+
+    private void createStopRequest(String lxc){
+        String json = STOP_LXC;
+        json = json.replaceAll(":task", stopTask.getUuid().toString());
+        json = json.replaceAll(":source", LxcModule.MODULE_NAME);
+
+        json = json.replaceAll(":uuid", agent.getUuid().toString());
+        json = json.replaceAll(":requestSequenceNumber", stopTask.getIncrementedReqSeqNumber().toString());
+        json = json.replaceAll(":lxc-host-name", lxc);
+
+        Request request = CommandJson.getRequest(json);
+        if (getCommandManager() != null) {
+            getCommandManager().executeCommand(new Command(request));
+        }
+    }
+
+    private void createDestroyRequest(String lxc){
+        String json = DESTROY_LXC;
+        json = json.replaceAll(":task", destroyTask.getUuid().toString());
+        json = json.replaceAll(":source", LxcModule.MODULE_NAME);
+
+        json = json.replaceAll(":uuid", agent.getUuid().toString());
+        json = json.replaceAll(":requestSequenceNumber", destroyTask.getIncrementedReqSeqNumber().toString());
+        json = json.replaceAll(":lxc-host-name", lxc);
+
+        Request request = CommandJson.getRequest(json);
+        if (getCommandManager() != null) {
+            getCommandManager().executeCommand(new Command(request));
+        }
+    }
+
+    private void createInfoRequest(String lxc) {
         String json = INFO_LXC;
         json = json.replaceAll(":task", infoTask.getUuid().toString());
         json = json.replaceAll(":source", LxcModule.MODULE_NAME);
@@ -145,11 +289,13 @@ public class LxcTable extends Table {
 
     public void outputResponse(Response response) {
         if (infoTask != null && response.getTaskUuid().compareTo(infoTask.getUuid()) == 0) {
-            parseResponse();
+            parseResponseInfo();
+        } else {
+
         }
     }
 
-    private void parseResponse() {
+    private void parseResponseInfo() {
 
         if (getCommandManager() != null) {
             boolean isSuccess = true;

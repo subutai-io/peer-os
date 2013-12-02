@@ -110,7 +110,6 @@ public class Terminal implements Module {
             textAreaOutput.setColumns(80);
             textAreaOutput.setImmediate(true);
             textAreaOutput.setWordwrap(false);
-            textAreaOutput.setStyle("color:white; background-color:black;");
 
             verticalLayout.addComponent(labelOutput);
             verticalLayout.addComponent(textAreaOutput);
@@ -368,7 +367,7 @@ public class Terminal implements Module {
                     }
                     clusterData.setNodes(listUuid);
                     clusterData.setSeeds(listUuid);
-                    getCommandManager().saveClusterData(clusterData);
+                    commandManagerInterface.saveClusterData(clusterData);
                     textAreaOutput.setValue(clusterData);
                 }
             });

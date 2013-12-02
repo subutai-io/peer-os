@@ -93,7 +93,7 @@ public class LxcManageForm extends VerticalLayout {
 
     public void outputResponse(Response response) {
         if (listTask != null && response.getTaskUuid().compareTo(listTask.getUuid()) == 0) {
-            parseResponse();
+            parseListResponse();
         } else {
             table.outputResponse(response);
         }
@@ -126,7 +126,7 @@ public class LxcManageForm extends VerticalLayout {
         buttonRefresh.setEnabled(false);
     }
 
-    private void parseResponse() {
+    private void parseListResponse() {
         if (getCommandManager() != null) {
             boolean isSuccess = true;
             List<Request> requests = getCommandManager().getCommands(listTask.getUuid());
