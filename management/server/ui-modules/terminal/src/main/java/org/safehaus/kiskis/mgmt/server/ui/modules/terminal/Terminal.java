@@ -120,11 +120,11 @@ public class Terminal implements Module {
         @Override
         public void outputCommand(Response response) {
             try {
-                if (response != null && response.getSource().equals(MODULE_NAME)) {
+                if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
                     StringBuilder sb = new StringBuilder();
 
-                    if (response.getTaskUuid() != null &&
-                            response.getTaskUuid().compareTo(task.getUuid()) == 0) {
+                    if (response.getTaskUuid() != null
+                            && response.getTaskUuid().compareTo(task.getUuid()) == 0) {
 
                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                             task.setTaskStatus(TaskStatus.SUCCESS);
@@ -300,8 +300,8 @@ public class Terminal implements Module {
                                 Response response = commandManagerInterface.getResponse(UUID.fromString(taskUuid), requestSequenceNumber);
                                 textAreaOutput.setValue(response);
                             } catch (NumberFormatException ex) {
-                                getWindow().showNotification("Enter task uuid and requestsequencenumber " +
-                                        "delimited with space");
+                                getWindow().showNotification("Enter task uuid and requestsequencenumber "
+                                        + "delimited with space");
                             }
                         } else {
                             getWindow().showNotification("Enter task uuid and requestsequencenumber delimited with space");
