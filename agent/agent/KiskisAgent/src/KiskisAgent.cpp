@@ -76,8 +76,7 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
 
-	url = "failover://ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
-
+	url = "failover:ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
 	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
 	return 0;
