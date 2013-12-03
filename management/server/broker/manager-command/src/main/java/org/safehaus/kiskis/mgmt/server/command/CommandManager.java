@@ -10,13 +10,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -26,7 +25,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-    private final ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
+    private final ConcurrentLinkedDeque<CommandListener> listeners = new ConcurrentLinkedDeque<CommandListener>();
 
     @Override
     public void executeCommand(Command command) {
@@ -40,7 +39,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     @Override
-    public synchronized void getCommand(Response response) {
+    public void getCommand(Response response) {
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
@@ -62,14 +61,11 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     private void notifyListeners(Response response) {
         try {
             System.out.println("Module count: " + listeners.size());
-            for (CommandListener ai : (ArrayList<CommandListener>) listeners.clone()) {
-                if (ai != null && ai.getName() != null && response.getSource() != null) {
-                    if (ai.getName().equals(response.getSource())) {
-                        ai.outputCommand(response);
-                    } else {
+            for (CommandListener ai : listeners) {
+                if (ai != null && ai.getName() != null) {
+                    if (response.getSource() != null && ai.getName().equals(response.getSource())) {
                         ai.outputCommand(response);
                     }
-
                 } else {
                     listeners.remove(ai);
                 }
@@ -80,7 +76,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     @Override
-    public synchronized void addListener(CommandListener listener) {
+    public void addListener(CommandListener listener) {
         try {
             System.out.println("Adding module listener : " + listener.getName());
             listeners.add(listener);
@@ -90,7 +86,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     @Override
-    public synchronized void removeListener(CommandListener listener) {
+    public void removeListener(CommandListener listener) {
         try {
             System.out.println("Removing module listener : " + listener.getName());
             listeners.remove(listener);
@@ -139,7 +135,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     @Override
-    public Integer getResponseCount(UUID taskuuid){
+    public Integer getResponseCount(UUID taskuuid) {
         return persistenceCommand.getResponsesCount(taskuuid);
     }
 

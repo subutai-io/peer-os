@@ -6,6 +6,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 
 import javax.jms.*;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
 public class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
-    private final ArrayList<BrokerListener> listeners = new ArrayList<BrokerListener>();
+    private final ConcurrentLinkedDeque<BrokerListener> listeners = new ConcurrentLinkedDeque<BrokerListener>();
 
     public CommunicationMessageListener() {
     }
@@ -44,7 +45,7 @@ public class CommunicationMessageListener implements MessageListener {
 
     private void notifyListeners(Response response) {
         try {
-            for (BrokerListener ai : (ArrayList<BrokerListener>) listeners.clone()) {
+            for (BrokerListener ai : listeners) {
                 if (ai != null) {
                     ai.getCommand(response);
                 } else {
@@ -56,7 +57,7 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
-    public synchronized void addListener(BrokerListener listener) {
+    public void addListener(BrokerListener listener) {
         try {
             listeners.add(listener);
         } catch (Exception ex) {
@@ -64,11 +65,11 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
-    public synchronized void removeListener(BrokerListener listener) {
+    public void removeListener(BrokerListener listener) {
         try {
             listeners.remove(listener);
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in remvoeListener", ex);
+            LOG.log(Level.SEVERE, "Error in removeListener", ex);
         }
     }
 

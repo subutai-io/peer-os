@@ -244,12 +244,20 @@ public class CommandTransport implements CommandTransportInterface {
     }
 
     @Override
-    public synchronized void addListener(BrokerListener listener) {
-        communicationMessageListener.addListener(listener);
+    public void addListener(BrokerListener listener) {
+        try {
+            communicationMessageListener.addListener(listener);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in addListener", ex);
+        }
     }
 
     @Override
-    public synchronized void removeListener(BrokerListener listener) {
-        communicationMessageListener.removeListener(listener);
+    public void removeListener(BrokerListener listener) {
+        try {
+            communicationMessageListener.removeListener(listener);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in removeListener", ex);
+        }
     }
 }

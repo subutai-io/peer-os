@@ -6,10 +6,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -21,25 +20,23 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
  */
 public class AgentManager implements AgentManagerInterface, BrokerListener {
-    
+
     private static final Logger LOG = Logger.getLogger(AgentManager.class.getName());
     private PersistenceInterface persistenceAgent;
     private CommandManagerInterface commandManager;
     private CommandTransportInterface commandTransportInterface;
-    private final Set<Agent> registeredAgents;
-    private final ArrayList<AgentListener> listeners = new ArrayList<AgentListener>();
+    private final ConcurrentLinkedDeque<AgentListener> listeners = new ConcurrentLinkedDeque<AgentListener>();
     private ExecutorService executorService;
     private int heartbeatTimeoutSec;
     private int heartbeatFromMin;
     private int heartbeatToMin;
     private int agentFreshnessMin;
-    
+
     public AgentManager() {
-        registeredAgents = new HashSet<Agent>();
     }
-    
+
     @Override
-    public synchronized void getCommand(Response response) {
+    public void getCommand(Response response) {
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
                 updateAgent(response, true);
@@ -53,13 +50,13 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             }
         }
     }
-    
+
     @Override
     public Agent getAgent(UUID uuid) {
         return persistenceAgent.getAgent(uuid);
     }
-    
-    private synchronized void updateAgent(Response response, boolean register) {
+
+    private void updateAgent(Response response, boolean register) {
         Agent agent = new Agent();
         agent.setUuid(response.getUuid());
         agent.setHostname(response.getHostname());
@@ -77,7 +74,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
             }
         }
-        
+
         if (persistenceAgent.saveAgent(agent)) {
             if (register) {
                 Task task = new Task();
@@ -103,17 +100,15 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 task.setTaskStatus(TaskStatus.SUCCESS);
                 persistenceAgent.saveTask(task);
                 //
-                if (registeredAgents.add(agent)) {
-                    notifyModules();
-                }
+                notifyModules();
             }
             System.out.println(agent + String.format("\nAgent is %s", register ? "registered" : "updated"));
         } else {
             System.out.println(agent + String.format("\nError %s agent", register ? "registering" : "updating"));
         }
     }
-    
-    private synchronized void notifyModules() {
+
+    private void notifyModules() {
         for (AgentListener ai : listeners) {
             if (ai != null) {
                 ai.agentRegistered(getRegisteredAgents());
@@ -122,17 +117,25 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             }
         }
     }
-    
+
     @Override
-    public synchronized void addListener(AgentListener listener) {
-        listeners.add(listener);
+    public void addListener(AgentListener listener) {
+        try {
+            listeners.add(listener);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in addListener", ex);
+        }
     }
-    
+
     @Override
-    public synchronized void removeListener(AgentListener listener) {
-        listeners.remove(listener);
+    public void removeListener(AgentListener listener) {
+        try {
+            listeners.remove(listener);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in removeListener", ex);
+        }
     }
-    
+
     public void init() {
         try {
             if (commandTransportInterface != null) {
@@ -146,7 +149,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
     }
-    
+
     public void destroy() {
         try {
             if (commandTransportInterface != null) {
@@ -157,50 +160,50 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
     }
-    
+
     public void setPersistenceAgentService(PersistenceInterface persistenceAgent) {
         this.persistenceAgent = persistenceAgent;
     }
-    
+
     public void setCommandManagerService(CommandManagerInterface commandManager) {
         this.commandManager = commandManager;
-        
+
     }
-    
+
     public void setCommandTransportInterface(CommandTransportInterface commandTransportInterface) {
         this.commandTransportInterface = commandTransportInterface;
     }
-    
+
     public void setHeartbeatTimeoutSec(int heartbeatTimeoutSec) {
         this.heartbeatTimeoutSec = heartbeatTimeoutSec;
     }
-    
+
     public void setHeartbeatFromMin(int heartbeatFromMin) {
         this.heartbeatFromMin = heartbeatFromMin;
     }
-    
+
     public void setHeartbeatToMin(int heartbeatToMin) {
         this.heartbeatToMin = heartbeatToMin;
     }
-    
+
     public void setAgentFreshnessMin(int agentFreshnessMin) {
         this.agentFreshnessMin = agentFreshnessMin;
     }
-    
+
     @Override
     public Set<Agent> getRegisteredAgents() {
         return persistenceAgent.getRegisteredAgents(agentFreshnessMin);
     }
-    
+
     @Override
     public Set<Agent> getAgentsToHeartbeat() {
         return persistenceAgent.getAgentsByHeartbeat(heartbeatFromMin, heartbeatToMin);
     }
-    
+
     public Set<Agent> getRegisteredLxcAgents() {
         return persistenceAgent.getRegisteredLxcAgents(agentFreshnessMin);
     }
-    
+
     public Set<Agent> getRegisteredPhysicalAgents() {
         return persistenceAgent.getRegisteredPhysicalAgents(agentFreshnessMin);
     }
@@ -215,7 +218,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     public Set<Agent> getChildLxcAgents(Agent physicalAgent) {
         return persistenceAgent.getRegisteredChildLxcAgents(physicalAgent, agentFreshnessMin);
     }
-    
+
     public Set<Agent> getUnknownChildLxcAgents() {
         return persistenceAgent.getUnknownChildLxcAgents(agentFreshnessMin);
     }
