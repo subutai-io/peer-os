@@ -160,7 +160,7 @@ public final class CassandraWizard extends Window {
                 output.append("ERROR ").append(response.getStdErr().trim());
             }
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                output.append("OK    ").append(response.getStdOut().trim());
+                output.append("OK ").append(response.getStdOut().trim());
             }
             switch (response.getType()) {
                 case EXECUTE_RESPONSE_DONE: {
