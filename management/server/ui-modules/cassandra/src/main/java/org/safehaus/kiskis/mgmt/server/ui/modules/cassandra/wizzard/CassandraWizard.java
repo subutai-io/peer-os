@@ -32,6 +32,9 @@ public final class CassandraWizard extends Window {
     Step43 step43;
     int step = 1;
 
+    /**
+     * 
+     */
     public CassandraWizard() {
         setModal(true);
 
@@ -202,7 +205,6 @@ public final class CassandraWizard extends Window {
                 return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
             }
         }
-
         return null;
     }
 }
