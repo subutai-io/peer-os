@@ -118,7 +118,7 @@ public class Terminal implements Module {
         }
 
         @Override
-        public void outputCommand(Response response) {
+        public synchronized void outputCommand(Response response) {
             try {
                 if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
                     StringBuilder sb = new StringBuilder();

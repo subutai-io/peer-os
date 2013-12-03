@@ -66,7 +66,7 @@ public class CassandraModule implements Module {
         }
 
         @Override
-        public void outputCommand(Response response) {
+        public synchronized void outputCommand(Response response) {
             try {
                 if (response != null && response.getSource().equals(MODULE_NAME)) {
                     if (subwindow != null && subwindow.isVisible()) {

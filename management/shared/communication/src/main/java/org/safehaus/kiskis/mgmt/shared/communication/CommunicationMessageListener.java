@@ -31,12 +31,13 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             String jsonCmd = txtMsg.getText();
             Response response = CommandJson.getResponse(jsonCmd);
-
+            System.out.println("Received " + response);
             if (response != null) {
                 notifyListeners(response);
             } else {
                 System.out.println("Could not parse response");
             }
+            System.out.println("Processed notify listeners in Communication");
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, "Error in onMessage", ex);
         }

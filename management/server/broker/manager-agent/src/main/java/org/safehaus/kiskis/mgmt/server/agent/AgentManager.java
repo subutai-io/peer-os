@@ -100,8 +100,8 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
                 task.setTaskStatus(TaskStatus.SUCCESS);
                 persistenceAgent.saveTask(task);
                 //
-                notifyModules();
             }
+            notifyModules();
             System.out.println(agent + String.format("\nAgent is %s", register ? "registered" : "updated"));
         } else {
             System.out.println(agent + String.format("\nError %s agent", register ? "registering" : "updating"));
