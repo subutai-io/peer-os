@@ -49,7 +49,10 @@ public class HadoopModule implements Module {
         @Override
         public void outputCommand(Response response) {
             try {
-                if(response != null && subwindow != null && subwindow.isVisible()){
+                if(response != null
+                        && response.getSource().equals(MODULE_NAME)
+                        && subwindow != null
+                        && subwindow.isVisible()){
                     subwindow.setOutput(response);
                 }
             } catch (Exception ex) {
