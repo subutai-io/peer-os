@@ -25,7 +25,13 @@ public class NodesWindow extends Window {
     private Table table;
     private IndexedContainer container;
     private List<UUID> list;
-
+    
+    
+    /**
+     * 
+     * @param caption
+     * @param list 
+     */
     public NodesWindow(String caption, List<UUID> list){
         this.list = list;
         setCaption(caption);
