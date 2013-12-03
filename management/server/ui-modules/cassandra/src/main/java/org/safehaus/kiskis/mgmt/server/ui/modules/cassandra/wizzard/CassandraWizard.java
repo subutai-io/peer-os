@@ -205,6 +205,8 @@ public final class CassandraWizard extends Window {
                 return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
             }
         }
+        
+        
         return null;
     }
 }
