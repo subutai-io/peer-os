@@ -274,11 +274,6 @@
                                 <!--UI Dependencies-->
 
                                 <!--Broker Dependencies-->
-                                <!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-broker</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-server-agent</artifactId>

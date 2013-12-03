@@ -1,7 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
-//import org.osgi.framework.ServiceReference;
-
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -17,7 +15,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
+import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -25,7 +24,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
-
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
     private final ArrayList<CommandListener> listeners = new ArrayList<CommandListener>();
@@ -105,6 +103,8 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         try {
             if (communicationService != null) {
                 communicationService.addListener(this);
+            } else {
+                throw new Exception("Missing communication service");
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
@@ -129,13 +129,18 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         this.communicationService = communicationService;
     }
 
-    public List<Request> getCommands() {
+    public List<Request> getCommands(UUID taskuuid) {
         try {
-            return persistenceCommand.getRequests(null);
+            return persistenceCommand.getRequests(taskuuid);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCommands", ex);
         }
         return null;
+    }
+
+    @Override
+    public Integer getResponseCount(UUID taskuuid){
+        return persistenceCommand.getResponsesCount(taskuuid);
     }
 
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber) {
@@ -147,10 +152,10 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             for (Response r : list) {
                 response = r;
                 if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null")) {
-                    stdOut += r.getStdOut();
+                    stdOut += "\n" + r.getStdOut();
                 }
                 if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null")) {
-                    stdErr += r.getStdErr();
+                    stdErr += "\n" + r.getStdErr();
                 }
             }
 
@@ -180,11 +185,11 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         return persistenceCommand.truncateTables();
     }
 
-    public boolean saveClusterData(ClusterData cluster) {
-        return  persistenceCommand.saveClusterData(cluster);
+    public boolean saveCassandraClusterData(CassandraClusterInfo cluster) {
+        return persistenceCommand.saveCassandraClusterInfo(cluster);
     }
 
-    public List<ClusterData> getClusterData() {
-        return persistenceCommand.getClusterData();
+    public List<CassandraClusterInfo> getCassandraClusterData() {
+        return persistenceCommand.getCassandraClusterInfo();
     }
 }

@@ -9,7 +9,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
-import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
+import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 import java.util.List;
@@ -42,9 +42,9 @@ public class CassandraTable extends Table {
         this.addListener(new Table.ValueChangeListener() {
             public void valueChange(Property.ValueChangeEvent event) {
                 String caption = container.getItem(event.getProperty().getValue())
-                        .getItemProperty(ClusterData.NAME_LABEL).getValue().toString();
+                        .getItemProperty(CassandraClusterInfo.NAME_LABEL).getValue().toString();
                 List<UUID> list = (List<UUID>) container.getItem(event.getProperty().getValue())
-                        .getItemProperty(ClusterData.NODES_LABEL).getValue();
+                        .getItemProperty(CassandraClusterInfo.NODES_LABEL).getValue();
 
                 Window window = new NodesWindow(caption, list);
                 window.setModal(true);
@@ -57,37 +57,37 @@ public class CassandraTable extends Table {
         container = new IndexedContainer();
 
         // Create the container properties
-        container.addContainerProperty(ClusterData.UUID_LABEL, UUID.class, "");
-        container.addContainerProperty(ClusterData.NAME_LABEL, String.class, "");
-        container.addContainerProperty(ClusterData.DATADIR_LABEL, String.class, "");
-        container.addContainerProperty(ClusterData.COMMITLOGDIR_LABEL, String.class, "");
-        container.addContainerProperty(ClusterData.SAVEDCACHEDIR_LOG, String.class, "");
+        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, UUID.class, "");
+        container.addContainerProperty(CassandraClusterInfo.NAME_LABEL, String.class, "");
+        container.addContainerProperty(CassandraClusterInfo.DATADIR_LABEL, String.class, "");
+        container.addContainerProperty(CassandraClusterInfo.COMMITLOGDIR_LABEL, String.class, "");
+        container.addContainerProperty(CassandraClusterInfo.SAVEDCACHEDIR_LOG, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
-        container.addContainerProperty(ClusterData.NODES_LABEL, List.class, 0);
-        container.addContainerProperty(ClusterData.SEEDS_LABEL, List.class, 0);
+        container.addContainerProperty(CassandraClusterInfo.NODES_LABEL, List.class, 0);
+        container.addContainerProperty(CassandraClusterInfo.SEEDS_LABEL, List.class, 0);
 
         // Create some orders
-        List<ClusterData> cdList = commandManager.getClusterData();
-        for (ClusterData cluster : cdList) {
+        List<CassandraClusterInfo> cdList = commandManager.getCassandraClusterData();
+        for (CassandraClusterInfo cluster : cdList) {
             addOrderToContainer(container, cluster);
         }
 
         return container;
     }
 
-    private void addOrderToContainer(Container container, ClusterData cd) {
+    private void addOrderToContainer(Container container, CassandraClusterInfo cd) {
         Object itemId = container.addItem();
         Item item = container.getItem(itemId);
-        item.getItemProperty(ClusterData.UUID_LABEL).setValue(cd.getUuid());
-        item.getItemProperty(ClusterData.NAME_LABEL).setValue(cd.getName());
-        item.getItemProperty(ClusterData.DATADIR_LABEL).setValue(cd.getDataDir());
-        item.getItemProperty(ClusterData.COMMITLOGDIR_LABEL).setValue(cd.getCommitLogDir());
-        item.getItemProperty(ClusterData.SAVEDCACHEDIR_LOG).setValue(cd.getSavedCacheDir());
+        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cd.getUuid());
+        item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cd.getName());
+        item.getItemProperty(CassandraClusterInfo.DATADIR_LABEL).setValue(cd.getDataDir());
+        item.getItemProperty(CassandraClusterInfo.COMMITLOGDIR_LABEL).setValue(cd.getCommitLogDir());
+        item.getItemProperty(CassandraClusterInfo.SAVEDCACHEDIR_LOG).setValue(cd.getSavedCacheDir());
         item.getItemProperty("Start").setValue(new Button("Start"));
         item.getItemProperty("Stop").setValue(new Button("Stop"));
-        item.getItemProperty(ClusterData.NODES_LABEL).setValue(cd.getNodes());
-        item.getItemProperty(ClusterData.SEEDS_LABEL).setValue(cd.getSeeds());
+        item.getItemProperty(CassandraClusterInfo.NODES_LABEL).setValue(cd.getNodes());
+        item.getItemProperty(CassandraClusterInfo.SEEDS_LABEL).setValue(cd.getSeeds());
     }
 
     public void refreshDatasource() {

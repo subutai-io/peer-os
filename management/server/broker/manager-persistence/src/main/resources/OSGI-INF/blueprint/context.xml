@@ -15,7 +15,7 @@
     </cm:property-placeholder>
 
     <bean id="persistenceService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence"
-          init-method="init" destroy-method="destroy" scope="singleton">
+          init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="cassandraHost" value="${cassandraHost}"/>
         <property name="cassandraPort" value="${cassandraPort}"/>
         <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>

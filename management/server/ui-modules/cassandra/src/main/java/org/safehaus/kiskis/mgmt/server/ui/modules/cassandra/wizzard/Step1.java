@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
+import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -68,7 +68,7 @@ public class Step1 extends Panel {
         task.setTaskStatus(TaskStatus.NEW);
         cassandraWizard.getCommandManager().saveTask(task);
         cassandraWizard.setTask(task);
-        ClusterData cluster = new ClusterData();
+        CassandraClusterInfo cluster = new CassandraClusterInfo();
         cassandraWizard.setCluster(cluster);
     }
 

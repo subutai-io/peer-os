@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-pool</artifactId>
-            <version>${activemq.version}</version>
+            <version>5.9.0</version>
         </dependency>
     </dependencies>
 
@@ -60,7 +60,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.shared.communication</Bundle-SymbolicName>
                         <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true
+                            org.apache.activemq.pool;{local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
                     </instructions>
                 </configuration>

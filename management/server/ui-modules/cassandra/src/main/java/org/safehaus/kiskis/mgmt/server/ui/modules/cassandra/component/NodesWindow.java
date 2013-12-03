@@ -3,7 +3,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.component;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
@@ -11,7 +10,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ClusterData;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.List;

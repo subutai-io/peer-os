@@ -110,7 +110,6 @@ public class Terminal implements Module {
             textAreaOutput.setColumns(80);
             textAreaOutput.setImmediate(true);
             textAreaOutput.setWordwrap(false);
-            textAreaOutput.setStyle("color:white; background-color:black;");
 
             verticalLayout.addComponent(labelOutput);
             verticalLayout.addComponent(textAreaOutput);
@@ -120,29 +119,29 @@ public class Terminal implements Module {
 
         @Override
         public void outputCommand(Response response) {
-            commandManagerInterface.saveResponse(response);
             try {
-                StringBuilder sb = new StringBuilder();
+                if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
+                    StringBuilder sb = new StringBuilder();
 
-                if (response != null &&
-                        response.getTaskUuid() != null &&
-                        response.getTaskUuid().compareTo(task.getUuid()) == 0) {
+                    if (response.getTaskUuid() != null
+                            && response.getTaskUuid().compareTo(task.getUuid()) == 0) {
 
-                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                        task.setTaskStatus(TaskStatus.SUCCESS);
-                        commandManagerInterface.saveTask(task);
+                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                            task.setTaskStatus(TaskStatus.SUCCESS);
+                            commandManagerInterface.saveTask(task);
+                        }
+
+                        sb.append("\n");
+                        Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
+                                response.getRequestSequenceNumber());
+                        sb.append(result);
                     }
 
-                    sb.append("\n");
-                    Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
-                            response.getRequestSequenceNumber());
-                    sb.append(result);
+                    textAreaOutput.setValue(sb);
+                    textAreaOutput.setCursorPosition(sb.length() - 1);
                 }
-
-                textAreaOutput.setValue(sb);
-                textAreaOutput.setCursorPosition(sb.length() - 1);
             } catch (Exception ex) {
-                System.out.println("outputCommand event Exception");
+                ex.printStackTrace();
             }
 
         }
@@ -272,7 +271,7 @@ public class Terminal implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    List<Request> listofrequest = commandManagerInterface.getCommands();
+                    List<Request> listofrequest = commandManagerInterface.getCommands(null);
                     StringBuilder sb = new StringBuilder();
                     for (Request request : listofrequest) {
                         sb.append(request).append("\n");
@@ -301,8 +300,8 @@ public class Terminal implements Module {
                                 Response response = commandManagerInterface.getResponse(UUID.fromString(taskUuid), requestSequenceNumber);
                                 textAreaOutput.setValue(response);
                             } catch (NumberFormatException ex) {
-                                getWindow().showNotification("Enter task uuid and requestsequencenumber " +
-                                        "delimited with space");
+                                getWindow().showNotification("Enter task uuid and requestsequencenumber "
+                                        + "delimited with space");
                             }
                         } else {
                             getWindow().showNotification("Enter task uuid and requestsequencenumber delimited with space");
@@ -348,14 +347,14 @@ public class Terminal implements Module {
             return button;
         }
 
-        private Button getClusterButton(){
+        private Button getClusterButton() {
             Button button = new Button("Create cluster data");
             button.setDescription("Creates Cluster Data");
             button.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    ClusterData clusterData = new ClusterData();
+                    CassandraClusterInfo clusterData = new CassandraClusterInfo();
                     clusterData.setName(textAreaCommand.getValue().toString());
                     clusterData.setCommitLogDir("Commit log Dir");
                     clusterData.setDataDir("Data dir");
@@ -363,12 +362,12 @@ public class Terminal implements Module {
 
                     Set<Agent> agents = AppData.getSelectedAgentList();
                     List<UUID> listUuid = new ArrayList<UUID>();
-                    for(Agent agent : agents){
+                    for (Agent agent : agents) {
                         listUuid.add(agent.getUuid());
                     }
                     clusterData.setNodes(listUuid);
                     clusterData.setSeeds(listUuid);
-                    getCommandManager().saveClusterData(clusterData);
+                    commandManagerInterface.saveCassandraClusterData(clusterData);
                     textAreaOutput.setValue(clusterData);
                 }
             });

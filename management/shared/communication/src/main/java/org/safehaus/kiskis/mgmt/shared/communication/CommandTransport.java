@@ -17,12 +17,14 @@ import org.apache.activemq.broker.region.policy.OldestMessageWithLowestPriorityE
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.pool.PooledConnectionFactory;
+//check branch
 
 public class CommandTransport implements CommandTransportInterface {
 
     private static final Logger LOG = Logger.getLogger(CommandTransport.class.getName());
     private BrokerService broker;
     private PooledConnectionFactory pooledConnectionFactory;
+//    private ActiveMQConnectionFactory connectionFactory;
     private CommunicationMessageListener communicationMessageListener;
     private ExecutorService exec;
     private String amqBindAddress;
@@ -115,6 +117,7 @@ public class CommandTransport implements CommandTransportInterface {
             MessageProducer producer = null;
             try {
                 connection = pooledConnectionFactory.createConnection();
+//                connection = connectionFactory.createConnection();
                 connection.start();
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 Destination destination = session.createQueue(command.getCommand().getUuid().toString());
@@ -194,10 +197,11 @@ public class CommandTransport implements CommandTransportInterface {
             broker.waitUntilStarted();
             //executor service setup
             exec = Executors.newFixedThreadPool(amqExecutorPoolSize);
-            //pooled connetion factory setup
+            //pooled connection factory setup
             pooledConnectionFactory = new PooledConnectionFactory(new ActiveMQConnectionFactory("vm://localhost"));
             pooledConnectionFactory.setMaxConnections(amqMaxConnections);
             pooledConnectionFactory.start();
+//            connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
             setupListener();
             System.out.println("ActiveMQ started...");
         } catch (Exception ex) {
@@ -208,8 +212,15 @@ public class CommandTransport implements CommandTransportInterface {
 
     public void destroy() {
         try {
-            broker.stop();
-            communicationMessageListener.destroy();
+            if (pooledConnectionFactory != null) {
+                pooledConnectionFactory.stop();
+            }
+            if (broker != null) {
+                broker.stop();
+            }
+            if (communicationMessageListener != null) {
+                communicationMessageListener.destroy();
+            }
             System.out.println("ActiveMQ stopped...");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
@@ -219,6 +230,7 @@ public class CommandTransport implements CommandTransportInterface {
     private void setupListener() {
         try {
             Connection connection = pooledConnectionFactory.createConnection();
+//            Connection connection = connectionFactory.createConnection();
             //don not close this connection to not return it to the pool so no consumers are closed
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);

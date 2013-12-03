@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * @author bahadyr
  */
-public class ClusterData {
+public class CassandraClusterInfo {
 
     public static final String UUID_LABEL = "uuid",
             NAME_LABEL = "name",
@@ -29,7 +29,7 @@ public class ClusterData {
     private String commitLogDir;
     private String savedCacheDir;
 
-    public ClusterData() {
+    public CassandraClusterInfo() {
         this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
     }
 

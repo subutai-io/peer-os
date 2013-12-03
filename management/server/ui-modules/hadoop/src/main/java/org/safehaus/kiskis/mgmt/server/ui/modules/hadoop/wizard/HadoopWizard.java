@@ -111,27 +111,29 @@ public final class HadoopWizard extends Window {
     }
 
     public void setOutput(Response response) {
-        if (response.getTaskUuid().equals(task.getUuid().toString())) {
-            StringBuilder output = new StringBuilder();
-            output.append(textAreaTerminal.getValue());
-            if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
-                output.append("ERROR ").append(response.getStdErr().trim());
-            }
-            if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                output.append("OK ").append(response.getStdOut().trim());
-            }
-            switch (step) {
-                case 1: {
-                    break;
+        if(task != null){
+            if (response.getTaskUuid().equals(task.getUuid().toString())) {
+                StringBuilder output = new StringBuilder();
+                output.append(textAreaTerminal.getValue());
+                if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
+                    output.append("ERROR ").append(response.getStdErr().trim());
                 }
-                case 2: {
-                    break;
+                if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
+                    output.append("OK ").append(response.getStdOut().trim());
+                }
+                switch (step) {
+                    case 1: {
+                        break;
+                    }
+                    case 2: {
+                        break;
+                    }
+
                 }
 
+                textAreaTerminal.setValue(output);
+                textAreaTerminal.setCursorPosition(output.length() - 1);
             }
-
-            textAreaTerminal.setValue(output);
-            textAreaTerminal.setCursorPosition(output.length() - 1);
         }
     }
 

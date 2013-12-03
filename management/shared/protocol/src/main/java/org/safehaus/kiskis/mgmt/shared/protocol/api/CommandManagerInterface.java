@@ -18,7 +18,9 @@ public interface CommandManagerInterface {
 
     void removeListener(CommandListener listener);
 
-    public List<Request> getCommands();
+    public List<Request> getCommands(UUID taskUuid);
+
+    public Integer getResponseCount(UUID taskuuid);
 
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber);
 
@@ -30,7 +32,7 @@ public interface CommandManagerInterface {
 
     public boolean truncateTables();
 
-    public boolean saveClusterData(ClusterData cluster);
+    public boolean saveCassandraClusterData(CassandraClusterInfo cluster);
 
-    public List<ClusterData> getClusterData();
+    public List<CassandraClusterInfo> getCassandraClusterData();
 }
