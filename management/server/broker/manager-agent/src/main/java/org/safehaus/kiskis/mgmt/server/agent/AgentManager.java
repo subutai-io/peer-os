@@ -8,7 +8,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -25,7 +25,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private PersistenceInterface persistenceAgent;
     private CommandManagerInterface commandManager;
     private CommandTransportInterface commandTransportInterface;
-    private final ConcurrentLinkedDeque<AgentListener> listeners = new ConcurrentLinkedDeque<AgentListener>();
+    private final ConcurrentLinkedQueue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
     private ExecutorService executorService;
     private int heartbeatTimeoutSec;
     private int heartbeatFromMin;

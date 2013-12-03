@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
@@ -25,7 +25,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-    private final ConcurrentLinkedDeque<CommandListener> listeners = new ConcurrentLinkedDeque<CommandListener>();
+    private final ConcurrentLinkedQueue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
 
     @Override
     public void executeCommand(Command command) {

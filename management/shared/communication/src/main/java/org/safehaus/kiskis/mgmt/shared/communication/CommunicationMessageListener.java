@@ -5,8 +5,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 
 import javax.jms.*;
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +15,7 @@ import java.util.logging.Logger;
 public class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
-    private final ConcurrentLinkedDeque<BrokerListener> listeners = new ConcurrentLinkedDeque<BrokerListener>();
+    private final ConcurrentLinkedQueue<BrokerListener> listeners = new ConcurrentLinkedQueue<BrokerListener>();
 
     public CommunicationMessageListener() {
     }
