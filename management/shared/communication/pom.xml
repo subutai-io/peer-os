@@ -60,7 +60,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.shared.communication</Bundle-SymbolicName>
                         <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true
+                            org.apache.activemq.pool;{local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
                     </instructions>
                 </configuration>
