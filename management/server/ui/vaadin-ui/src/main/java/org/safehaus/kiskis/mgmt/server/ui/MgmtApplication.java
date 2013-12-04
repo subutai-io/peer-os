@@ -29,53 +29,57 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void init() {
-        app = this;
-        window = new Window(title);
-        // Create the application data instance
-        AppData sessionData = new AppData(this);
+        try {
+            app = this;
+            window = new Window(title);
+            // Create the application data instance
+            AppData sessionData = new AppData(this);
 
-        // Register it as a listener in the application context
-        getContext().addTransactionListener(sessionData);
+            // Register it as a listener in the application context
+            getContext().addTransactionListener(sessionData);
 
-        setMainWindow(window);
+            setMainWindow(window);
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
-        horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
-        layout.addComponent(horizontalSplit);
+            VerticalLayout layout = new VerticalLayout();
+            layout.setSizeFull();
+            HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+            horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
+            layout.addComponent(horizontalSplit);
 
-        layout.setExpandRatio(horizontalSplit, 1);
-        horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
+            layout.setExpandRatio(horizontalSplit, 1);
+            horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
 
-        horizontalSplit.setFirstComponent(new MgmtAgentManager(agentManagerService));
+            horizontalSplit.setFirstComponent(new MgmtAgentManager(agentManagerService));
 
-        tabs = new TabSheet();
-        tabs.setSizeFull();
-        tabs.setImmediate(true);
+            tabs = new TabSheet();
+            tabs.setSizeFull();
+            tabs.setImmediate(true);
 
-        for (Module module : moduleService.getModules()) {
-            tabs.addTab(module.createComponent(), module.getName(), null);
-        }
-        horizontalSplit.setSecondComponent(tabs);
-
-        getMainWindow().setContent(layout);
-        setTheme("runo");
-
-        moduleService.addListener(this);
-        getMainWindow().addListener(new Window.CloseListener() {
-            @Override
-            public void windowClose(Window.CloseEvent e) {
-                try {
-                    if (moduleService != null) {
-                        moduleService.removeListener(app);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+            for (Module module : moduleService.getModules()) {
+                tabs.addTab(module.createComponent(), module.getName(), null);
             }
-        });
-        setInterval(5000);
+            horizontalSplit.setSecondComponent(tabs);
+
+            getMainWindow().setContent(layout);
+            setTheme("runo");
+
+            moduleService.addListener(this);
+            getMainWindow().addListener(new Window.CloseListener() {
+                @Override
+                public void windowClose(Window.CloseEvent e) {
+                    try {
+                        if (moduleService != null) {
+                            moduleService.removeListener(app);
+                        }
+                    } catch (Exception ex) {
+                        System.out.println(ex);
+                    }
+                }
+            });
+        } catch (Exception ex) {
+        } finally {
+            setInterval(5000);
+        }
     }
 
     private void setInterval(int ms) {
@@ -92,18 +96,19 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     public void close() {
         System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
         super.close();
+        setInterval(5000);
     }
 
+    @Override
     public void moduleRegistered(ModuleService source, Module module) {
         System.out.println("Kiskis Management Vaadin UI: Module registered, adding tab");
         tabs.addTab(module.createComponent(), module.getName(), null);
-        setInterval(5000);
     }
 
+    @Override
     public void moduleUnregistered(ModuleService source, Module module) {
         System.out.println("Kiskis Management Vaadin UI: Module unregistered, removing tab");
         Iterator<Component> it = tabs.getComponentIterator();
-        setInterval(5000);
         while (it.hasNext()) {
             Component c = it.next();
             if (tabs.getTab(c).getCaption().equals(module.getName())) {
