@@ -24,7 +24,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         this.agentManagerService = agentManagerService;
         this.title = title;
     }
-
     private String title;
     private TabSheet tabs;
 
@@ -76,7 +75,17 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 }
             }
         });
-        getMainWindow().executeJavaScript("setInterval(function(){try{javascript:vaadin.forceSync()}catch(e){}},5000);");
+        setInterval(5000);
+    }
+
+    private void setInterval(int ms) {
+        try {
+            getMainWindow().executeJavaScript(
+                    "try{if(intervalHandle){window.clearInterval(intervalHandle);}}catch(e){}; "
+                    + "intervalHandle = window.setInterval(function(){try{javascript:vaadin.forceSync()}catch(e){}},"
+                    + ms + ");");
+        } catch (Exception e) {
+        }
     }
 
     @Override
@@ -88,11 +97,13 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     public void moduleRegistered(ModuleService source, Module module) {
         System.out.println("Kiskis Management Vaadin UI: Module registered, adding tab");
         tabs.addTab(module.createComponent(), module.getName(), null);
+        setInterval(5000);
     }
 
     public void moduleUnregistered(ModuleService source, Module module) {
         System.out.println("Kiskis Management Vaadin UI: Module unregistered, removing tab");
         Iterator<Component> it = tabs.getComponentIterator();
+        setInterval(5000);
         while (it.hasNext()) {
             Component c = it.next();
             if (tabs.getTab(c).getCaption().equals(module.getName())) {
@@ -100,5 +111,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 return;
             }
         }
+
     }
 }

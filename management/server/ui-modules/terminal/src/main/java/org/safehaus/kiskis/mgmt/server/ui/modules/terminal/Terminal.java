@@ -28,13 +28,11 @@ public class Terminal implements Module {
             CommandListener {
 
         private Task task;
-
         private final TextField textFieldWorkingDirectory;
         private final TextField textFieldProgram;
         private final TextField textFieldRunAs;
         private final TextField textFieldArgs;
         private final TextField textFieldTimeout;
-
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
         private Set<Agent> agents;
@@ -134,7 +132,7 @@ public class Terminal implements Module {
                         sb.append("\n");
                         Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
                                 response.getRequestSequenceNumber());
-                        sb.append(result);
+                        sb.append(CommandJson.getJson(new Command(result)));
                     }
 
                     textAreaOutput.setValue(sb);
@@ -155,7 +153,6 @@ public class Terminal implements Module {
             Button button = new Button("Get physical agents");
             button.setDescription("Gets agents from Cassandra");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     Set<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
@@ -179,7 +176,6 @@ public class Terminal implements Module {
             Button button = new Button("Get LXC agents");
             button.setDescription("Gets LXC agents from Cassandra");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     Set<Agent> agents = getAgentManager().getRegisteredLxcAgents();
@@ -198,7 +194,6 @@ public class Terminal implements Module {
             Button button = new Button("Send");
             button.setDescription("Sends command to agent");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     try {
@@ -222,6 +217,8 @@ public class Terminal implements Module {
 
                                         Command command = new Command(r);
                                         commandManagerInterface.executeCommand(command);
+                                    }else{
+                                        textAreaOutput.setValue("ERROR IN COMMAND JSON");
                                     }
                                 } else {
                                     task = new Task();
@@ -268,7 +265,6 @@ public class Terminal implements Module {
             Button button = new Button("Get requests");
             button.setDescription("Gets requests from Cassandra");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     List<Request> listofrequest = commandManagerInterface.getCommands(null);
@@ -286,7 +282,6 @@ public class Terminal implements Module {
             Button button = new Button("Get responses");
             button.setDescription("Gets requests from Cassandra");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
@@ -318,7 +313,6 @@ public class Terminal implements Module {
             Button button = new Button("Get Tasks");
             button.setDescription("Gets tasks from Cassandra");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     List<Task> list = commandManagerInterface.getTasks();
@@ -336,7 +330,6 @@ public class Terminal implements Module {
             Button button = new Button("Truncate tables");
             button.setDescription("Gets tasks from Cassandra");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     if (commandManagerInterface.truncateTables()) {
@@ -351,7 +344,6 @@ public class Terminal implements Module {
             Button button = new Button("Create cluster data");
             button.setDescription("Creates Cluster Data");
             button.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     CassandraClusterInfo clusterData = new CassandraClusterInfo();

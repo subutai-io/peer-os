@@ -5,6 +5,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
 
 import java.util.logging.Level;
@@ -14,8 +15,9 @@ import java.util.logging.Logger;
  * @author dilshat
  */
 public class CommandJson {
+
     private static final Logger LOG = Logger.getLogger(CommandJson.class.getName());
-    private static Gson gson = new Gson();
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static Request getRequest(String json) {
         try {
