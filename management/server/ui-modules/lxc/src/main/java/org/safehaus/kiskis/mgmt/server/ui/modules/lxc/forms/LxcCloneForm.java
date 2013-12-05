@@ -41,14 +41,15 @@ public class LxcCloneForm extends VerticalLayout implements
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name\"\n" +
+            "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name\"," +
+            "\" && cat /dev/null > /etc/resolvconf/resolv.conf.d/original " +
+            "&& cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
             "\t}";
 
     private Set<Agent> physicalAgents;
-    private Panel panel;
     private Task cloneTask;
     private TextField textFieldLxcName;
     private Button buttonClone;
@@ -57,7 +58,7 @@ public class LxcCloneForm extends VerticalLayout implements
     public LxcCloneForm() {
         setSpacing(true);
         // Panel 1 - with caption
-        panel = new Panel("Clone LXC template");
+        Panel panel = new Panel("Clone LXC template");
         textFieldLxcName = new TextField("Clone LXC Template");
         buttonClone = new Button("Clone");
         buttonClone.addListener(this);
