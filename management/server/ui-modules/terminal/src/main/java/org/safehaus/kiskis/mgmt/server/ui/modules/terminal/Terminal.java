@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
 import com.google.common.base.Strings;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -53,7 +54,7 @@ public class Terminal implements Module {
             textFieldWorkingDirectory.setValue("/home");
 
             textFieldProgram = new TextField("Program");
-            textFieldProgram.setWidth("350px");
+            textFieldProgram.setWidth(100, Sizeable.UNITS_PERCENTAGE);
             textFieldProgram.setValue("ls");
 
             textFieldRunAs = new TextField("Run As");
@@ -67,7 +68,7 @@ public class Terminal implements Module {
             Label labelText = new Label("Enter command:");
 
             textAreaCommand = new TextArea();
-            textAreaCommand.setRows(5);
+            textAreaCommand.setRows(10);
             textAreaCommand.setColumns(80);
             textAreaCommand.setImmediate(true);
             textAreaCommand.setWordwrap(true);
@@ -76,11 +77,11 @@ public class Terminal implements Module {
             verticalLayout.addComponent(textAreaCommand);
 
             horizontalLayout.addComponent(textFieldWorkingDirectory);
-            horizontalLayout.addComponent(textFieldProgram);
             horizontalLayout.addComponent(textFieldRunAs);
             horizontalLayout.addComponent(textFieldArgs);
             horizontalLayout.addComponent(textFieldTimeout);
             verticalLayout.addComponent(horizontalLayout);
+            verticalLayout.addComponent(textFieldProgram);
 
             HorizontalLayout hLayout = new HorizontalLayout();
             Button buttonSend = genSendButton();
