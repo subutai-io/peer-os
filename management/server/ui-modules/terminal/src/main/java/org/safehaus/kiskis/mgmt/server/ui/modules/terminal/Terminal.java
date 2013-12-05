@@ -85,6 +85,7 @@ public class Terminal implements Module {
 
             HorizontalLayout hLayout = new HorizontalLayout();
             Button buttonSend = genSendButton();
+            Button buttonClear = genClearButton();
             Button getRequests = genGetRequestButton();
             Button getResponses = genGetResponsesButton();
             Button getTasks = getGetTasksButton();
@@ -94,6 +95,7 @@ public class Terminal implements Module {
             Button buttonCreateCluster = getClusterButton();
 
             hLayout.addComponent(buttonSend);
+            hLayout.addComponent(buttonClear);
             hLayout.addComponent(getRequests);
             hLayout.addComponent(getResponses);
             hLayout.addComponent(getTasks);
@@ -110,7 +112,6 @@ public class Terminal implements Module {
             textAreaOutput.setColumns(80);
             textAreaOutput.setImmediate(true);
             textAreaOutput.setWordwrap(false);
-
             verticalLayout.addComponent(labelOutput);
             verticalLayout.addComponent(textAreaOutput);
 
@@ -258,6 +259,18 @@ public class Terminal implements Module {
                         System.out.println("buttonClick event Exception");
                         ex.printStackTrace();
                     }
+                }
+            });
+            return button;
+        }
+        
+        private Button genClearButton() {
+            Button button = new Button("Clear");
+            button.setDescription("Clears the output text area");
+            button.addListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    textAreaOutput.setValue("");
                 }
             });
             return button;
