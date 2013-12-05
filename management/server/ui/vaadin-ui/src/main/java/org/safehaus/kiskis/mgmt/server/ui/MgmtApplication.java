@@ -78,16 +78,15 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             });
         } catch (Exception ex) {
         } finally {
-            setInterval(5000);
+            setRefreshUIRate(5000);
         }
     }
 
-    private void setInterval(int ms) {
+    private void setRefreshUIRate(int ms) {
         try {
             getMainWindow().executeJavaScript(
-                    "try{if(intervalHandle){window.clearInterval(intervalHandle);}}catch(e){}; "
-                    + "intervalHandle = window.setInterval(function(){try{javascript:vaadin.forceSync()}catch(e){}},"
-                    + ms + ");");
+                    "function refreshUI(){try{javascript:vaadin.forceSync();}catch(e){}finally{setTimeout(refreshUI,"
+                    + ms + ");}}; setTimeout(refreshUI," + ms + ");");
         } catch (Exception e) {
         }
     }
@@ -96,7 +95,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     public void close() {
         System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
         super.close();
-        setInterval(5000);
+        setRefreshUIRate(5000);
     }
 
     @Override
