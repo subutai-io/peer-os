@@ -94,10 +94,10 @@ public class Step2 extends Panel {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
-                    args.add("--force-yes");
-                    args.add("--assume-yes");
-                    args.add("install");
-                    args.add("ksks-cassandra");
+//                    args.add("--force-yes");
+//                    args.add("--assume-yes");
+//                    args.add("install");
+//                    args.add("ksks-cassandra");
                     Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
                 }
@@ -113,10 +113,10 @@ public class Step2 extends Panel {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
-                    args.add("--force-yes");
-                    args.add("--assume-yes");
-                    args.add("purge");
-                    args.add("ksks-cassandra");
+//                    args.add("--force-yes");
+//                    args.add("--assume-yes");
+//                    args.add("purge");
+//                    args.add("ksks-cassandra");
                     Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
                 }
