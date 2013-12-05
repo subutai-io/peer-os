@@ -382,21 +382,21 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Integer getResponsesCount(UUID taskUuid){
+    public Integer getResponsesCount(UUID taskUuid) {
         Integer count = 0;
-        try{
+        try {
             String cql = "select * from responses where taskuuid = ?;";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(taskUuid));
             for (Row row : rs) {
                 String type = row.getString("responsetype");
-                if(ResponseType.EXECUTE_RESPONSE_DONE.equals(ResponseType.valueOf(type))
-                        || ResponseType.EXECUTE_TIMEOUTED.equals(ResponseType.valueOf(type))){
-                     ++count;
+                if (ResponseType.EXECUTE_RESPONSE_DONE.equals(ResponseType.valueOf(type))
+                        || ResponseType.EXECUTE_TIMEOUTED.equals(ResponseType.valueOf(type))) {
+                    ++count;
                 }
             }
-        }   catch (Exception ex){
+        } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getResponsesCount", ex);
         }
 
@@ -463,7 +463,7 @@ public class Persistence implements PersistenceInterface {
         List<Request> list = new ArrayList<Request>();
         try {
             String cql = "select * from requests";
-            ResultSet rs = null;
+            ResultSet rs;
             if (taskuuid == null) {
                 rs = session.execute("select * from requests");
             } else {
@@ -585,7 +585,7 @@ public class Persistence implements PersistenceInterface {
     public boolean saveHadoopClusterInfo(HadoopClusterInfo cluster) {
         try {
             String cql = "insert into hadoop_cluster_info (uid, cluster_name, name_node, secondary_name_node, "
-                    + "job_tracker, replication_factor, data_nodes, task_trackers, additional_config) "
+                    + "job_tracker, replication_factor, data_nodes, task_trackers, ip_mask) "
                     + "values (?,?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
@@ -593,7 +593,7 @@ public class Persistence implements PersistenceInterface {
                     cluster.getClusterName(), cluster.getNameNode(),
                     cluster.getSecondaryNameNode(), cluster.getJobTracker(),
                     cluster.getReplicationFactor(), cluster.getDataNodes(),
-                    cluster.getTaskTrackers(), cluster.getAdditionalConfig()));
+                    cluster.getTaskTrackers(), cluster.getIpMask()));
             return true;
 
         } catch (Exception ex) {
@@ -620,7 +620,7 @@ public class Persistence implements PersistenceInterface {
                 cd.setReplicationFactor(row.getInt("replication_factor"));
                 cd.setDataNodes(row.getList("data_nodes", UUID.class));
                 cd.setTaskTrackers(row.getList("task_trackers", UUID.class));
-                cd.setAdditionalConfig(row.getString("additional_config"));
+                cd.setIpMask(row.getString("ip_mask"));
                 list.add(cd);
             }
 
@@ -628,5 +628,57 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
         return list;
+    }
+
+    public CassandraClusterInfo getCassandraClusterInfo(String clusterName) {
+        CassandraClusterInfo cassandraClusterInfo = null;
+        try {
+            String cql = "select * from cassandra_cluster_info where name = ? limit 1 allow filtering";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(clusterName));
+            Row row = rs.one();
+            if (row != null) {
+                cassandraClusterInfo = new CassandraClusterInfo();
+                cassandraClusterInfo.setUuid(row.getUUID("uid"));
+                cassandraClusterInfo.setName(row.getString("name"));
+                cassandraClusterInfo.setCommitLogDir(row.getString("commitlogdir"));
+                cassandraClusterInfo.setDataDir(row.getString("datadir"));
+                cassandraClusterInfo.setSavedCacheDir(row.getString("savedcachedir"));
+                cassandraClusterInfo.setNodes(row.getList("nodes", UUID.class));
+                cassandraClusterInfo.setSeeds(row.getList("seeds", UUID.class));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+        }
+        return cassandraClusterInfo;
+    }
+
+    public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
+        HadoopClusterInfo hadoopClusterInfo = null;
+        try {
+            String cql = "select * from hadoop_cluster_info where cluster_name = ? limit 1 allow filtering";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(clusterName));
+            Row row = rs.one();
+            if (row != null) {
+                hadoopClusterInfo = new HadoopClusterInfo();
+                hadoopClusterInfo.setUid(row.getUUID("uid"));
+                hadoopClusterInfo.setClusterName(row.getString("cluster_name"));
+                hadoopClusterInfo.setNameNode(row.getUUID("name_node"));
+                hadoopClusterInfo.setSecondaryNameNode(row.getUUID("secondary_name_node"));
+                hadoopClusterInfo.setJobTracker(row.getUUID("job_tracker"));
+                hadoopClusterInfo.setReplicationFactor(row.getInt("replication_factor"));
+                hadoopClusterInfo.setDataNodes(row.getList("data_nodes", UUID.class));
+                hadoopClusterInfo.setTaskTrackers(row.getList("task_trackers", UUID.class));
+                hadoopClusterInfo.setIpMask(row.getString("ip_mask"));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);
+        }
+        return hadoopClusterInfo;
     }
 }

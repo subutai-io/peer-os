@@ -21,7 +21,7 @@ public class HadoopClusterInfo {
             REPLICATION_FACTOR_LABEL = "Replication Factor",
             DATA_NODES_LABEL = "Data Nodes",
             TASK_TRACKERS_LABEL = "Task Trackers",
-            ADDITIONAL_CONFIG_LABEL = "Additional Config";
+            IP_MASK_LABEL = "IP Mask";
     private UUID uid;
     private String clusterName;
     private UUID nameNode;
@@ -30,7 +30,7 @@ public class HadoopClusterInfo {
     private int replicationFactor;
     private List<UUID> dataNodes;
     private List<UUID> taskTrackers;
-    private String additionalConfig;
+    private String ipMask;
 
     public HadoopClusterInfo() {
         this.uid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
@@ -100,16 +100,16 @@ public class HadoopClusterInfo {
         this.taskTrackers = taskTrackers;
     }
 
-    public String getAdditionalConfig() {
-        return additionalConfig;
+    public String getIpMask() {
+        return ipMask;
     }
 
-    public void setAdditionalConfig(String additionalConfig) {
-        this.additionalConfig = additionalConfig;
+    public void setIpMask(String ipMask) {
+        this.ipMask = ipMask;
     }
 
     @Override
     public String toString() {
-        return "HadoopClusterInfo{" + "uid=" + uid + ", clusterName=" + clusterName + ", nameNode=" + nameNode + ", secondaryNameNode=" + secondaryNameNode + ", jobTracker=" + jobTracker + ", replicationFactor=" + replicationFactor + ", dataNodes=" + dataNodes + ", taskTrackers=" + taskTrackers + ", additionalConfig=" + additionalConfig + '}';
+        return "HadoopClusterInfo{" + "uid=" + uid + ", clusterName=" + clusterName + ", nameNode=" + nameNode + ", secondaryNameNode=" + secondaryNameNode + ", jobTracker=" + jobTracker + ", replicationFactor=" + replicationFactor + ", dataNodes=" + dataNodes + ", taskTrackers=" + taskTrackers + ", ipMask=" + ipMask + '}';
     }
 }
