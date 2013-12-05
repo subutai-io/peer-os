@@ -27,8 +27,8 @@ public class Step2 extends Panel {
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
     List<Agent> hosts;
     CassandraWizard parent;
-    String installationCommand = "apt-get";
-    String purgeCommand = "apt-get";
+    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
+    String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
     
     public Step2(final CassandraWizard cassandraWizard) {
         parent = cassandraWizard;

@@ -53,7 +53,7 @@ public class Terminal implements Module {
             textFieldWorkingDirectory.setValue("/home");
 
             textFieldProgram = new TextField("Program");
-            textFieldProgram.setWidth("250px");
+            textFieldProgram.setWidth("350px");
             textFieldProgram.setValue("ls");
 
             textFieldRunAs = new TextField("Run As");
