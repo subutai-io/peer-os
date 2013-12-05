@@ -382,21 +382,21 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Integer getResponsesCount(UUID taskUuid){
+    public Integer getResponsesCount(UUID taskUuid) {
         Integer count = 0;
-        try{
+        try {
             String cql = "select * from responses where taskuuid = ?;";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(taskUuid));
             for (Row row : rs) {
                 String type = row.getString("responsetype");
-                if(ResponseType.EXECUTE_RESPONSE_DONE.equals(ResponseType.valueOf(type))
-                        || ResponseType.EXECUTE_TIMEOUTED.equals(ResponseType.valueOf(type))){
-                     ++count;
+                if (ResponseType.EXECUTE_RESPONSE_DONE.equals(ResponseType.valueOf(type))
+                        || ResponseType.EXECUTE_TIMEOUTED.equals(ResponseType.valueOf(type))) {
+                    ++count;
                 }
             }
-        }   catch (Exception ex){
+        } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getResponsesCount", ex);
         }
 
@@ -585,7 +585,7 @@ public class Persistence implements PersistenceInterface {
     public boolean saveHadoopClusterInfo(HadoopClusterInfo cluster) {
         try {
             String cql = "insert into hadoop_cluster_info (uid, cluster_name, name_node, secondary_name_node, "
-                    + "job_tracker, replication_factor, data_nodes, task_trackers, additional_config) "
+                    + "job_tracker, replication_factor, data_nodes, task_trackers, ip_mask) "
                     + "values (?,?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
@@ -593,7 +593,7 @@ public class Persistence implements PersistenceInterface {
                     cluster.getClusterName(), cluster.getNameNode(),
                     cluster.getSecondaryNameNode(), cluster.getJobTracker(),
                     cluster.getReplicationFactor(), cluster.getDataNodes(),
-                    cluster.getTaskTrackers(), cluster.getAdditionalConfig()));
+                    cluster.getTaskTrackers(), cluster.getIpMask()));
             return true;
 
         } catch (Exception ex) {
@@ -620,7 +620,7 @@ public class Persistence implements PersistenceInterface {
                 cd.setReplicationFactor(row.getInt("replication_factor"));
                 cd.setDataNodes(row.getList("data_nodes", UUID.class));
                 cd.setTaskTrackers(row.getList("task_trackers", UUID.class));
-                cd.setAdditionalConfig(row.getString("additional_config"));
+                cd.setIpMask(row.getString("ip_mask"));
                 list.add(cd);
             }
 
