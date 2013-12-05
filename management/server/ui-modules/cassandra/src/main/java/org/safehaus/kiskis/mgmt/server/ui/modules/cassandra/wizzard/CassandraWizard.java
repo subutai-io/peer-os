@@ -172,9 +172,7 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 3: {
-                            step3.updateUI(response.getRequestSequenceNumber() + " "
-                                    + response.getTaskUuid() + " "
-                                    + " " + (response.getExitCode() == 0 ? "Success" : "Fail"));
+                            step3.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 4: {
