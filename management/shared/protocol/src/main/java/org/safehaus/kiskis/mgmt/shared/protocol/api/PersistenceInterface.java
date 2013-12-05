@@ -63,7 +63,11 @@ public interface PersistenceInterface {
 
     public List<CassandraClusterInfo> getCassandraClusterInfo();
 
+    public CassandraClusterInfo getCassandraClusterInfo(String clusterName);
+
     public boolean saveHadoopClusterInfo(HadoopClusterInfo cluster);
 
     public List<HadoopClusterInfo> getHadoopClusterInfo();
+
+    public HadoopClusterInfo getHadoopClusterInfo(String clusterName);
 }

@@ -463,7 +463,7 @@ public class Persistence implements PersistenceInterface {
         List<Request> list = new ArrayList<Request>();
         try {
             String cql = "select * from requests";
-            ResultSet rs = null;
+            ResultSet rs;
             if (taskuuid == null) {
                 rs = session.execute("select * from requests");
             } else {
@@ -628,5 +628,57 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
         return list;
+    }
+
+    public CassandraClusterInfo getCassandraClusterInfo(String clusterName) {
+        CassandraClusterInfo cassandraClusterInfo = null;
+        try {
+            String cql = "select * from cassandra_cluster_info where name = ? limit 1 allow filtering";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(clusterName));
+            Row row = rs.one();
+            if (row != null) {
+                cassandraClusterInfo = new CassandraClusterInfo();
+                cassandraClusterInfo.setUuid(row.getUUID("uid"));
+                cassandraClusterInfo.setName(row.getString("name"));
+                cassandraClusterInfo.setCommitLogDir(row.getString("commitlogdir"));
+                cassandraClusterInfo.setDataDir(row.getString("datadir"));
+                cassandraClusterInfo.setSavedCacheDir(row.getString("savedcachedir"));
+                cassandraClusterInfo.setNodes(row.getList("nodes", UUID.class));
+                cassandraClusterInfo.setSeeds(row.getList("seeds", UUID.class));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+        }
+        return cassandraClusterInfo;
+    }
+
+    public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
+        HadoopClusterInfo hadoopClusterInfo = null;
+        try {
+            String cql = "select * from hadoop_cluster_info where cluster_name = ? limit 1 allow filtering";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(clusterName));
+            Row row = rs.one();
+            if (row != null) {
+                hadoopClusterInfo = new HadoopClusterInfo();
+                hadoopClusterInfo.setUid(row.getUUID("uid"));
+                hadoopClusterInfo.setClusterName(row.getString("cluster_name"));
+                hadoopClusterInfo.setNameNode(row.getUUID("name_node"));
+                hadoopClusterInfo.setSecondaryNameNode(row.getUUID("secondary_name_node"));
+                hadoopClusterInfo.setJobTracker(row.getUUID("job_tracker"));
+                hadoopClusterInfo.setReplicationFactor(row.getInt("replication_factor"));
+                hadoopClusterInfo.setDataNodes(row.getList("data_nodes", UUID.class));
+                hadoopClusterInfo.setTaskTrackers(row.getList("task_trackers", UUID.class));
+                hadoopClusterInfo.setIpMask(row.getString("ip_mask"));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);
+        }
+        return hadoopClusterInfo;
     }
 }
