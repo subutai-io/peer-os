@@ -76,26 +76,34 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                     }
                 }
             });
+            //
+            final ProgressIndicator indicator =
+                    new ProgressIndicator(new Float(0.0));
+//            indicator.setVisible(false);
+            indicator.setPollingInterval(3000);
+            indicator.setWidth("1px");
+            indicator.setHeight("1px");
+            getMainWindow().addComponent(indicator);
+            //            
         } catch (Exception ex) {
         } finally {
-            setRefreshUIRate(5000);
+//            setRefreshUIRate(5000);
         }
     }
 
-    private void setRefreshUIRate(int ms) {
-        try {
-            getMainWindow().executeJavaScript(
-                    "function refreshUI(){try{javascript:vaadin.forceSync();}catch(e){}finally{setTimeout(refreshUI,"
-                    + ms + ");}}; setTimeout(refreshUI," + ms + ");");
-        } catch (Exception e) {
-        }
-    }
-
+//    private void setRefreshUIRate(int ms) {
+//        try {
+//            getMainWindow().executeJavaScript(
+//                    "function refreshUI(){try{javascript:vaadin.forceSync();}catch(e){}finally{setTimeout(refreshUI,"
+//                    + ms + ");}}; setTimeout(refreshUI," + ms + ");");
+//        } catch (Exception e) {
+//        }
+//    }
     @Override
     public void close() {
         System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
         super.close();
-        setRefreshUIRate(5000);
+//        setRefreshUIRate(5000);
     }
 
     @Override
