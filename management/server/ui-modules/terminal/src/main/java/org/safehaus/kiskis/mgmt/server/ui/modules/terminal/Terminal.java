@@ -322,6 +322,29 @@ public class Terminal implements Module {
                         sb.append(request).append("\n");
                     }
                     textAreaOutput.setValue(sb.toString());
+
+                    if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
+                        String[] attr = textAreaCommand.getValue().toString().trim().split(" ");
+
+                        if (attr.length == 1) {
+                            try {
+                                String taskUuid = attr[0];
+
+                                List<Request> requestList = commandManagerInterface.getCommands(UUID.fromString(taskUuid));
+                                for(Request request : requestList){
+                                    textAreaOutput.setValue("\n");
+                                    textAreaOutput.setValue(request);
+                                }
+                            } catch (NumberFormatException ex) {
+                                getWindow().showNotification("Enter task uuid and requestsequencenumber "
+                                        + "delimited with space");
+                            }
+                        } else {
+                            getWindow().showNotification("Enter task uuid and requestsequencenumber delimited with space");
+                        }
+                    } else {
+                        getWindow().showNotification("Enter task uuid and requestsequencenumber delimited with space");
+                    }
                 }
             });
             return button;
