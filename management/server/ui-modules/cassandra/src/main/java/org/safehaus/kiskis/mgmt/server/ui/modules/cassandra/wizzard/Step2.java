@@ -136,7 +136,7 @@ public class Step2 extends Panel {
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
         
         Request request = new Request();
-        request.setSource("Cassandra Wizard");
+        request.setSource("CassandraModule");
         request.setProgram(program);
         request.setUuid(uuid);
         request.setType(RequestType.EXECUTE_REQUEST);

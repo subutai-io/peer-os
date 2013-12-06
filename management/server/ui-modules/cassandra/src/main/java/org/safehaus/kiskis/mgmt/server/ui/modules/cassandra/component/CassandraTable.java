@@ -22,7 +22,7 @@ import java.util.UUID;
  * Time: 6:56 PM
  */
 public class CassandraTable extends Table {
-    private CommandManagerInterface commandManager;
+    private final CommandManagerInterface commandManager;
     private IndexedContainer container;
     private final CassandraModule.ModuleComponent parent;
 
@@ -40,6 +40,7 @@ public class CassandraTable extends Table {
         this.setSelectable(true);
         this.setImmediate(true);
         this.addListener(new Table.ValueChangeListener() {
+            @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String caption = container.getItem(event.getProperty().getValue())
                         .getItemProperty(CassandraClusterInfo.NAME_LABEL).getValue().toString();
