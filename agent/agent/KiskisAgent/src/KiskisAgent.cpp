@@ -1,3 +1,23 @@
+/**   @copyright 2013 Safehaus.org
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+/**   @copyright 2013 Safehaus.org
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ *    (See accompanying file LICENSE_1_0.txt or copy at
+ *          http://www.boost.org/LICENSE_1_0.txt)
+ */
 /**
  *  @brief     KiskisAgent.cpp
  *  @class     KiskisAgent.cpp
@@ -6,9 +26,8 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0
+ *  @version   1.0.0
  *  @date      Sep 27, 2013
- *  @copyright GNU Public License.
  */
 
 /** \mainpage  Welcome to Project KiskisAgent
@@ -24,12 +43,21 @@
 #include "KAThread.h"
 #include "KALogger.h"
 #include "KAConnection.h"
-#include "pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
-
+#include <time.h>
+/**
+ *  \details   This method designed for Typically conversion from integer to string.
+ */
+string toString(int intcont)
+{		//integer to string conversion
+	ostringstream dummy;
+	dummy << intcont;
+	return dummy.str();
+}
 /**
  *  \details   KiskisAgent's settings.xml is read by this function.
  *  		   url: Broker address is fetched. (for instance: url = "failover://(ssl://localhost:61167))
@@ -48,8 +76,7 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
 
-	url = "failover://ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
-
+	url = "failover:ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
 	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
 	return 0;
@@ -62,13 +89,91 @@ bool getUuid(string& Uuid)
 {
 	try
 	{
-		ifstream file("/etc/ksks-agent/config/uuid.txt");	//opening mac.txt
+		ifstream file("/etc/ksks-agent/config/uuid.txt");	//opening uuid.txt
 		getline(file,Uuid);
 		file.close();
-		if(Uuid.empty())		//if mac is null or not reading successfully
+		if(Uuid.empty())		//if uuid is null or not reading successfully
 		{
 			return false;
 		}
+		return true;
+	}
+	catch(const std::exception& error)
+	{
+		cout << error.what()<< endl;
+	}
+	return false;
+}
+/**
+ *  \details   MACID(eth0) of the KiskisAgent is fetched from statically.
+ */
+bool getMacAddress(string& macaddress)
+{
+	try
+	{
+		ifstream file("/sys/class/net/eth0/address");	//opening macaddress
+		getline(file,macaddress);
+		file.close();
+		if(macaddress.empty())		//if mac is null or not reading successfully
+		{
+			return false;
+		}
+		return true;
+	}
+	catch(const std::exception& error)
+	{
+		cout << error.what()<< endl;
+	}
+	return false;
+}
+/**
+ *  \details   Hostname of the KiskisAgent machine is fetched from statically.
+ */
+bool getHostname(string& hostname)
+{
+	try
+	{
+		ifstream file("/etc/hostname");	//opening hostname
+		getline(file,hostname);
+		file.close();
+		if(hostname.empty())		//if hostname is null or not reading successfully
+		{
+			return false;
+		}
+		return true;
+	}
+	catch(const std::exception& error)
+	{
+		cout << error.what()<< endl;
+	}
+	return false;
+}
+/**
+ *  \details   IpAddress of the KiskisAgent machine is fetched from statically.
+ */
+bool getIpAddresses(vector<string>& myips)
+{
+	try
+	{
+		FILE * fp = popen("ifconfig", "r");
+		if (fp)
+		{
+			char *p=NULL, *e; size_t n;
+			while ((getline(&p, &n, fp) > 0) && p)
+			{
+				if ((p = strstr(p, "inet addr:")))
+				{
+					p+=10;
+					if ((e = strchr(p, ' ')))
+					{
+						*e='\0';
+						myips.push_back(p);
+						//printf("%s\n", p);
+					}
+				}
+			}
+		}
+		pclose(fp);
 		return true;
 	}
 	catch(const std::exception& error)
@@ -88,7 +193,7 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 	{
 		string str;
 		unsigned int priority;
-		message_queue::size_type recvd_size;
+		size_t recvd_size;
 		while(true)
 		{
 			str.resize(2500);
@@ -114,13 +219,15 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 int main(int argc,char *argv[],char *envp[])
 {
 	string url,connectionOptions,loglevel;
-	string Uuid;
+	string Uuid,macaddress,hostname;
+	int isLxc = -1;
+	vector<string> ipadress;
 	string serveraddress="SERVICE_QUEUE";
 	string clientaddress;
 	KAThread thread;
 	int level;
 
-	if(! thread.getUserID().checkRootUser())
+	if(!thread.getUserID().checkRootUser())
 	{
 		//user is not root KiskisAgent Will be closed
 		cout << "Main Process User is not root.. KiskisAgent is going to be closed.."<<endl;
@@ -134,8 +241,6 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.setLogLevel(7);
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent is starting.."));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is reading.."));
-
-
 	if(!getSettings(url,connectionOptions,loglevel))
 	{
 
@@ -152,8 +257,6 @@ int main(int argc,char *argv[],char *envp[])
 		logMain.closeLogFile();
 		return 100;
 	}
-
-
 	if(!getUuid(Uuid))
 	{						//get UUID of the agent if it exist. if it does not it will be regenerated..
 		boost::uuids::random_generator gen;
@@ -161,13 +264,46 @@ int main(int argc,char *argv[],char *envp[])
 
 		const std::string tmp = boost::lexical_cast<std::string>(u);
 		Uuid = tmp;
-		ofstream file("/etc/KiskisAgent/config/uuid.txt");
+		ofstream file("/etc/ksks-agent/config/uuid.txt");
 		file << Uuid;
 		file.close();
 		logMain.writeLog(1,logMain.setLogData("<KiskisAgent>","KiskisAgent UUID:",Uuid));
 	}
-
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent UUID:",Uuid));
+	if(!getMacAddress(macaddress))	//getting MacAddress
+	{
+		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","MacAddress cannot be read !!"));
+	}
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent MacID:",macaddress));
+	if(!getHostname(hostname))		//getting Hostname
+	{
+		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","Hostname cannot be read !!"));
+	}
+	else	// Hostname is read successfully
+	{
+		int ret = hostname.find("lxc");	//checking type of machine that physical or lxc
+		if(ret == -1)
+		{
+			isLxc = 0;
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is not a Lxc Container.."));
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+		}
+		else
+		{
+			isLxc = 1;
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is a Lxc Container.."));
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+		}
+	}
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent Hostname:",hostname));
+	if(!getIpAddresses(ipadress))	//getting IPs
+	{
+		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","IpAddresses cannot be read !!"));
+	}
+	for(unsigned int i=0; i < ipadress.size() ; i++)
+	{
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IpAddresses:",ipadress[i]));
+	}
 
 	activemq::library::ActiveMQCPP::initializeLibrary();
 	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/ksks-agent/config/client_ks.pem");
@@ -185,6 +321,10 @@ int main(int argc,char *argv[],char *envp[])
 	string input;
 	string sendout;
 
+	response.setIps(ipadress);
+	response.setIsLxc(isLxc);
+	response.setHostname(hostname);
+	response.setMacAddress(macaddress);
 	response.setUuid(Uuid); 	//setting Uuid for response messages.
 	if(!connection.openSession())
 	{
@@ -196,7 +336,7 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection Successfully opened with ActiveMQ Broker: ",url));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Registration Message is sending to ActiveMQ Broker.."));
 
-	sendout = response.createRegistrationMessage(response.getUuid());
+	sendout = response.createRegistrationMessage(response.getUuid(),response.getMacAddress(),response.getHostname(),response.getIsLxc());
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration Message:",sendout));
 	connection.sendMessage(sendout);
 
@@ -209,21 +349,34 @@ int main(int argc,char *argv[],char *envp[])
 	);
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Thread is starting.."));
 	boost::thread thread1(threadSend,&messageQueue,&connection,&logMain);
-
 	/* Change the file mode mask */
 	umask(0);
 	//	For responses the type parameter might have the following values: EXECUTE_RESPONSE, EXECUTE_RESPONSE_DONE, REGISTRATION_REQUEST, HEARTBEAT_RESPONSE, TERMINATE_REQUEST_DONE
 	//	For commands the type parameter might have the following values: EXECUTE_REQUEST, REGISTRATION_REQUEST_DONE, HEARTBEAT_REQUEST, TERMINATE_REQUEST
+
 	while(true)
 	{
 		try
 		{
+			command.clear();
 			if(connection.fetchMessage(input)) 	//check and wait if new message comes?
 			{
 				if(command.deserialize(input))
 				{
 					logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","New Message is received"));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","New Message:",input));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command source:",command.getSource()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command type:",command.getType()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command uuid:",command.getUuid()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command TaskUuid:",command.getTaskUuid()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command RequestSequenceNumber:",toString(command.getRequestSequenceNumber())));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command workingDirectory:",command.getWorkingDirectory()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command StdOut:",command.getStandardOutput()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command StdErr:",command.getStandardError()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command Program:",command.getProgram()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command runAs:",command.getRunAs()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command timeout:",toString(command.getTimeout())));
+
 					if(command.getType()=="REGISTRATION_REQUEST_DONE") //type is registration done
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration is done.."));
@@ -234,33 +387,45 @@ int main(int argc,char *argv[],char *envp[])
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Execute operation is starting.."));
 						KAThread* mypointer = new KAThread;
 						mypointer->getLogger().setLogLevel(level);
+						mypointer->getResponse().setIsLxc(isLxc);
 						mypointer->threadFunction(&messageQueue,&command,argv);
 						delete mypointer;
 					}
 					else if(command.getType()=="HEARTBEAT_REQUEST")
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Heartbeat message has been taken.."));
-						connection.sendMessage(response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber()));
+						response.clear();
+						response.setIps(ipadress);
+						response.setIsLxc(isLxc);
+						response.setHostname(hostname);
+						response.setMacAddress(macaddress);
+						string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,isLxc,command.getSource(),command.getTaskUuid());
+						connection.sendMessage(resp);
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
 					}
 					else if(command.getType()=="TERMINATE_REQUEST")
 					{
-						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",command.getPid()));
-						if(atoi(command.getPid().c_str()))
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",toString(command.getPid())));
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Killing given PID.."));
+						int retstatus = kill(command.getPid(),SIGKILL);
+						if(retstatus == 0) //termination is successfully done
 						{
-							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Killing given PID.."));
-							kill(atoi(command.getPid().c_str()),SIGKILL);
+							string resp = response.createTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
+							connection.sendMessage(resp);
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate success Response:", resp));
 						}
-						else
+						else if (retstatus == -1) //termination is failed
 						{
-
+							string resp = response.createFailTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
+							connection.sendMessage(resp);
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate Fail Response:", resp));
 						}
-						connection.sendMessage(response.createTerminateMessage(Uuid,command.getRequestSequenceNumber()));
 					}
 				}
 				else
 				{
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Failed at parsing Json String: ",input));
-					connection.sendMessage(response.createResponseMessage(Uuid,"9999999",command.getRequestSequenceNumber(),819,"Failed to Parse Json!!!",""));
+					connection.sendMessage(response.createResponseMessage(Uuid,9999999,command.getRequestSequenceNumber(),819,"Failed to Parse Json!!!","",command.getSource(),command.getTaskUuid()));
 				}
 			}
 		}
