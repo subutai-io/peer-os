@@ -1,15 +1,25 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.google.common.base.Strings;
+import com.vaadin.data.Item;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public final class HadoopWizard extends Window {
 
@@ -17,6 +27,9 @@ public final class HadoopWizard extends Window {
 
     private final VerticalLayout verticalLayout;
     private Task task;
+    private String clusterName;
+    private List<Agent> lxcList;
+    private IndexedContainer container;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
@@ -26,9 +39,10 @@ public final class HadoopWizard extends Window {
     Step2 step2;
     int step = 1;
 
-    public HadoopWizard() {
+    public HadoopWizard(List<Agent> lxcList) {
         setModal(true);
 
+        this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
         setCaption("HadoopModule Wizard");
 
@@ -41,6 +55,7 @@ public final class HadoopWizard extends Window {
         progressBar = new ProgressIndicator();
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(true);
+        progressBar.setPollingInterval(30000);
         progressBar.setValue(0f);
         progressBar.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         gridLayout.addComponent(progressBar, 0, 0);
@@ -135,6 +150,18 @@ public final class HadoopWizard extends Window {
                 textAreaTerminal.setCursorPosition(output.length() - 1);
             }
         }
+    }
+
+    public String getClusterName() {
+        return clusterName;
+    }
+
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public List<Agent> getLxcList() {
+        return lxcList;
     }
 
     public CommandManagerInterface getCommandManager() {

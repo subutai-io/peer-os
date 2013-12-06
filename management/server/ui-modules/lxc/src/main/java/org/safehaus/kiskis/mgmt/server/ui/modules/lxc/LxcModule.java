@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 public class LxcModule implements Module {
 
+
     private static final Logger LOG = Logger.getLogger(LxcModule.class.getName());
     private ModuleService service;
     private BundleContext context;
@@ -97,11 +98,7 @@ public class LxcModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            //messages queue
-//            if (response != null && response.getSource().equals(MODULE_NAME)) {
             messagesQueue.add(response);
-//            }
-            //messages queue
         }
 
         //messages queue
@@ -151,6 +148,7 @@ public class LxcModule implements Module {
     public void unsetModuleService(ModuleService service) {
         if (service != null) {
             this.service.unregisterModule(this);
+
         }
         component.executor.shutdown();
     }

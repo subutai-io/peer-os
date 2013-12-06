@@ -4,6 +4,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.agent;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +37,7 @@ public class AgentHeartBeat implements Runnable {
             try {
                 //send hearbeats
                 if (commandSender != null) {
-                    Set<Agent> agents = agentManager.getAgentsToHeartbeat();
+                    List<Agent> agents = agentManager.getAgentsToHeartbeat();
                     if (!agents.isEmpty()) {
                         System.out.println("Sending heartbeat to agents");
                         for (Agent agent : agents) {

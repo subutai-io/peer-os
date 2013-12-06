@@ -1,21 +1,19 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -187,5 +185,42 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public List<CassandraClusterInfo> getCassandraClusterData() {
         return persistenceCommand.getCassandraClusterInfo();
+    }
+
+    @Override
+    public List<ParseResult> parseTask(Task task, boolean isResponseDone){
+        List<ParseResult> result = new ArrayList<ParseResult>();
+
+        if(persistenceCommand != null){
+            List<Request> requestList = persistenceCommand.getRequests(task.getUuid());
+            Integer responseCount = persistenceCommand.getResponsesCount(task.getUuid());
+
+            if(isResponseDone){
+                if(requestList.size() != responseCount){
+                    return result;
+                }
+            }
+
+            Integer exitCode = 0;
+            for(Request request : requestList){
+                Response response = getResponse(task.getUuid(), request.getRequestSequenceNumber());
+
+                if(response != null){
+                    result.add(new ParseResult(request, response));
+                    exitCode += response.getExitCode();
+                }
+            }
+
+            if(isResponseDone){
+                if(exitCode == 0){
+                    task.setTaskStatus(TaskStatus.SUCCESS);
+                } else {
+                    task.setTaskStatus(TaskStatus.FAIL);
+                }
+                persistenceCommand.saveTask(task);
+            }
+        }
+
+        return result;
     }
 }

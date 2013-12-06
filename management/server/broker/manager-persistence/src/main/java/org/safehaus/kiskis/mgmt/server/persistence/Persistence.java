@@ -8,7 +8,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,8 +67,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getAgentsByHeartbeat(long from, long to) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getAgentsByHeartbeat(long from, long to) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = false and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -108,16 +111,16 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getRegisteredAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         list.addAll(getRegisteredPhysicalAgents(freshness));
         list.addAll(getRegisteredLxcAgents(freshness));
         return list;
     }
 
     @Override
-    public Set<Agent> getRegisteredLxcAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredLxcAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = true and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -143,8 +146,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getRegisteredPhysicalAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredPhysicalAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = false and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -170,8 +173,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = true and parenthostname = ? and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -197,8 +200,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getUnknownChildLxcAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getUnknownChildLxcAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = true and parenthostname = ? and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -484,9 +487,13 @@ public class Persistence implements PersistenceInterface {
                 request.setRequestSequenceNumber(row.getInt("reqseqnum"));
                 request.setRunAs(row.getString("runsas"));
                 request.setSource(row.getString("source"));
-                request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                if (row.getString("outputredirectionstderr") != null) {
+                    request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                }
                 request.setStdErrPath(row.getString("erroutpath"));
-                request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
+                if (row.getString("outputredirectionstdout") != null) {
+                    request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
+                }
                 request.setStdOutPath(row.getString("stdoutpath"));
                 request.setTaskUuid(row.getUUID("taskuuid"));
                 request.setTimeout(row.getInt("timeout"));
@@ -589,7 +596,7 @@ public class Persistence implements PersistenceInterface {
                     + "values (?,?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(cluster.getUid(),
+            session.execute(boundStatement.bind(cluster.getUid(),
                     cluster.getClusterName(), cluster.getNameNode(),
                     cluster.getSecondaryNameNode(), cluster.getJobTracker(),
                     cluster.getReplicationFactor(), cluster.getDataNodes(),

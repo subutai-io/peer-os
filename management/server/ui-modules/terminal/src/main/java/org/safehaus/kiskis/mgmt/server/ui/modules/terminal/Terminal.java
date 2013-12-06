@@ -43,7 +43,7 @@ public class Terminal implements Module {
         private final TextField textFieldTimeout;
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
-        private Set<Agent> agents;
+        private List<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
         //messages queue
         private final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
@@ -156,17 +156,13 @@ public class Terminal implements Module {
 
         @Override
         public void onCommand(Response response) {
-            //messages queue
-//            if (response != null && response.getSource().equals(MODULE_NAME)) {
             messagesQueue.add(response);
-//            }
-            //messages queue
         }
 
         //messages queue
         private void processAllResponses() {
             if (!messagesQueue.isEmpty()) {
-                Response[] responses = (Response[]) messagesQueue.toArray(new Response[0]);
+                Response[] responses = messagesQueue.toArray(new Response[messagesQueue.size()]);
                 messagesQueue.clear();
                 for (Response response : responses) {
                     processResponse(response);
@@ -213,13 +209,13 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
+                    List<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
                         sb.append(agent).append("\n");
 
-                        Set<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
+                        List<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
                         for (Agent lxcAgent : childAgents) {
                             sb.append("\t").append(lxcAgent).append("\n");
                         }
@@ -236,7 +232,7 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = getAgentManager().getRegisteredLxcAgents();
+                    List<Agent> agents = getAgentManager().getRegisteredLxcAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
@@ -409,7 +405,7 @@ public class Terminal implements Module {
                     clusterData.setDataDir("Data dir");
                     clusterData.setSavedCacheDir("Saved Cache Dir");
 
-                    Set<Agent> agents = AppData.getSelectedAgentList();
+                    List<Agent> agents = AppData.getSelectedAgentList();
                     List<UUID> listUuid = new ArrayList<UUID>();
                     for (Agent agent : agents) {
                         listUuid.add(agent.getUuid());

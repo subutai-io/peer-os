@@ -13,7 +13,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,7 +31,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentListener {
 
     private AgentManagerInterface agentManagerInterface;
-    private Set<Agent> registeredAgents;
+    private List<Agent> registeredAgents;
     private Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
@@ -39,14 +41,15 @@ public final class MgmtAgentManager extends VerticalLayout implements
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
-        setSpacing(true);
+        //setSpacing(true);
+        setMargin(true);
 
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setMultiSelect(true);
         tree.setImmediate(true);
         tree.addListener(this);
-        addComponent(tree);
         addComponent(getRefreshButton());
+        addComponent(tree);
 
         agentManagerService.addListener(this);
 
@@ -76,7 +79,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
         if (event.getProperty().getValue() instanceof Set) {
             Tree t = (Tree) event.getProperty();
 
-            Set<Agent> selectedList = new HashSet<Agent>();
+            List<Agent> selectedList = new ArrayList<Agent>();
 
             for (Object o : (Set<Object>) t.getValue()) {
                 selectedList.add((Agent) tree.getItem(o).getItemProperty("value").getValue());
@@ -113,7 +116,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
     public HierarchicalContainer getNodeContainer() {
 
-        registeredAgents = new HashSet<Agent>();
+        registeredAgents = new ArrayList<Agent>();
         container = new HierarchicalContainer();
         container.addContainerProperty("name", String.class, null);
         container.addContainerProperty("value", Agent.class, null);
@@ -128,16 +131,16 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private void refreshAgents() {
         try {
             //grab all agents
-            Set<Agent> allFreshAgents = agentManagerInterface.getRegisteredAgents();
+            List<Agent> allFreshAgents = agentManagerInterface.getRegisteredAgents();
 
             // clear all agents
-            Set<Agent> setToRemove = new HashSet<Agent>();
+            List<Agent> setToRemove = new ArrayList<Agent>();
             setToRemove.addAll(registeredAgents);
             setToRemove.removeAll(allFreshAgents);
             refreshNodeContainer(setToRemove, true, null);
 
             //grab parents
-            Set<Agent> parents = new HashSet<Agent>();
+            List<Agent> parents = new ArrayList<Agent>();
             for (Agent agent : allFreshAgents) {
                 if (!agent.isIsLXC()) {
                     parents.add(agent);
@@ -148,7 +151,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
             //grab children
             for (Agent parent : parents) {
-                Set<Agent> children = new HashSet<Agent>();
+                List<Agent> children = new ArrayList<Agent>();
                 for (Agent possibleChild : allFreshAgents) {
                     if (possibleChild.isIsLXC() && possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
                         children.add(possibleChild);
@@ -164,7 +167,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
         }
     }
 
-    public void refreshNodeContainer(Set<Agent> agents, boolean delete, Agent parent) {
+    public void refreshNodeContainer(List<Agent> agents, boolean delete, Agent parent) {
         try {
             if (delete) {
                 for (Agent agent : agents) {
