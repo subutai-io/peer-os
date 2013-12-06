@@ -65,7 +65,8 @@ public class Step2 extends Panel {
         verticalLayoutForm.addComponent(label);
 
 
-        TwinColSelect twinColSelectDataNodes = new TwinColSelect("Data Nodes", agents);
+        TwinColSelect twinColSelectDataNodes = new TwinColSelect("", agents);
+        twinColSelectDataNodes.setItemCaptionPropertyId("hostname");
         twinColSelectDataNodes.setRows(10);
         twinColSelectDataNodes.setNullSelectionAllowed(true);
         twinColSelectDataNodes.setMultiSelect(true);
@@ -80,10 +81,7 @@ public class Step2 extends Panel {
         labelTaskTrackerCaption.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(labelTaskTrackerCaption);
 
-        TwinColSelect twinColSelectTaskTrackers = new TwinColSelect();
-        for (String host : hosts) {
-            twinColSelectTaskTrackers.addItem(host);
-        }
+        TwinColSelect twinColSelectTaskTrackers = new TwinColSelect("", agents);
         twinColSelectTaskTrackers.setRows(10);
         twinColSelectTaskTrackers.setNullSelectionAllowed(true);
         twinColSelectTaskTrackers.setMultiSelect(true);
