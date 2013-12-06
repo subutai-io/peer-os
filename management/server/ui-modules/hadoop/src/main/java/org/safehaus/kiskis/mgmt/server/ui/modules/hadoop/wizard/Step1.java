@@ -66,6 +66,7 @@ public class Step1 extends Panel {
         ComboBox comboBoxNameNode = new ComboBox("Name Node");
         comboBoxNameNode.setMultiSelect(false);
         comboBoxNameNode.setContainerDataSource(parent.getContainer());
+        comboBoxNameNode.setItemCaptionPropertyId("id");
         comboBoxNameNode.addListener(new Property.ValueChangeListener(){
             @Override
             public void valueChange(Property.ValueChangeEvent event){
