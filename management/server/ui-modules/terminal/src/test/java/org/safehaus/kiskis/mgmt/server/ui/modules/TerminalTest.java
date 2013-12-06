@@ -100,13 +100,13 @@ public class TerminalTest {
      * Test of setContext method, of class Terminal.
      */
 //    @Test
-    public void testSetContext() {
-        System.out.println("setContext");
-        BundleContext context = null;
-        Terminal instance = new Terminal();
-        instance.setContext(context);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//    public void testSetContext() {
+//        System.out.println("setContext");
+//        BundleContext context = null;
+//        Terminal instance = new Terminal();
+//        instance.setContext(context);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
     
 }
