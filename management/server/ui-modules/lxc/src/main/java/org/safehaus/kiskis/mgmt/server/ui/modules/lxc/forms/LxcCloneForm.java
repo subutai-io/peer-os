@@ -97,6 +97,7 @@ public class LxcCloneForm extends VerticalLayout implements
             } else if (Strings.isNullOrEmpty(textFieldLxcName.getValue().toString())) {
                 getWindow().showNotification("Enter lxc hostname");
             } else {
+                outputPanel.removeAllComponents();
                 createTask();
             }
         }
