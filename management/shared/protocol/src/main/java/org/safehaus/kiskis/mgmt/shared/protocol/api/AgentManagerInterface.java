@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol.api;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,17 +14,17 @@ public interface AgentManagerInterface {
 
     public Agent getAgent(UUID uuid);
 
-    public Set<Agent> getRegisteredAgents();
+    public List<Agent> getRegisteredAgents();
 
-    public Set<Agent> getRegisteredLxcAgents();
+    public List<Agent> getRegisteredLxcAgents();
 
-    public Set<Agent> getRegisteredPhysicalAgents();
+    public List<Agent> getRegisteredPhysicalAgents();
 
-    public Set<Agent> getChildLxcAgents(Agent agent);
+    public List<Agent> getChildLxcAgents(Agent agent);
 
-    public Set<Agent> getUnknownChildLxcAgents();
+    public List<Agent> getUnknownChildLxcAgents();
 
-    public Set<Agent> getAgentsToHeartbeat();
+    public List<Agent> getAgentsToHeartbeat();
 
     public void addListener(AgentListener listener);
 

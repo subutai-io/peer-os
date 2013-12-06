@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.util;
+package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;

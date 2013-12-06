@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -38,7 +39,6 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         }
     }
 
-    @Override
     public void getCommand(Response response) {
         try {
             switch (response.getType()) {
@@ -71,7 +71,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                 if (commandListener != null && commandListener.getName() != null) {
                     System.out.println(commandListener.getName());
                     if (response.getSource() != null && commandListener.getName().equals(response.getSource())) {
-                        commandListener.outputCommand(response);
+                        commandListener.onCommand(response);
                     }
                 } else {
                     listeners.remove(commandListener);
@@ -194,5 +194,13 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public List<CassandraClusterInfo> getCassandraClusterData() {
         return persistenceCommand.getCassandraClusterInfo();
+    }
+
+    public List<ParseResult> parseTask(Task task, boolean isResponseDone) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void onResponse(Response response) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

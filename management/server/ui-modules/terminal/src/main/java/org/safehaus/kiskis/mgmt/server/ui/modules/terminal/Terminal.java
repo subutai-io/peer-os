@@ -31,12 +31,7 @@ public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
     private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
-    private static ModuleComponent component;
-    //messages queue
-    private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-    private static final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    //messages queue
+    private ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
@@ -49,8 +44,13 @@ public class Terminal implements Module {
         private final TextField textFieldTimeout;
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
-        private Set<Agent> agents;
+        private List<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
+        //messages queue
+        private final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
+        private final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
+        private final ExecutorService executor = Executors.newSingleThreadExecutor();
+        //messages queue        
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
             this.commandManagerInterface = commandManagerInterface;
@@ -129,6 +129,13 @@ public class Terminal implements Module {
             verticalLayout.addComponent(textAreaOutput);
 
             setCompositionRoot(verticalLayout);
+            addListener(new ComponentDetachListener() {
+                @Override
+                public void componentDetachedFromContainer(ComponentDetachEvent event) {
+                    System.out.println("Terminal is detached");
+                    executor.shutdown();
+                }
+            });
 
             //messages queue
             executor.execute(new Runnable() {
@@ -139,6 +146,7 @@ public class Terminal implements Module {
                             processAllResponses();
                             Thread.sleep(500);
                         } catch (Exception ex) {
+                            System.out.println("Error in Terminal Queue Processor " + ex);
                         }
                     }
                 }
@@ -147,18 +155,14 @@ public class Terminal implements Module {
         }
 
         @Override
-        public void outputCommand(Response response) {
-            //messages queue
-            if (response != null && response.getSource().equals(MODULE_NAME)) {
-                messagesQueue.add(response);
-            }
-            //messages queue
+        public void onCommand(Response response) {
+            messagesQueue.add(response);
         }
 
         //messages queue
         private void processAllResponses() {
             if (!messagesQueue.isEmpty()) {
-                Response[] responses = (Response[]) messagesQueue.toArray(new Response[0]);
+                Response[] responses = messagesQueue.toArray(new Response[messagesQueue.size()]);
                 messagesQueue.clear();
                 for (Response response : responses) {
                     processResponse(response);
@@ -170,8 +174,6 @@ public class Terminal implements Module {
         private void processResponse(Response response) {
             try {
                 if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
-                    StringBuilder sb = new StringBuilder();
-
                     if (response.getTaskUuid() != null
                             && response.getTaskUuid().compareTo(task.getUuid()) == 0) {
 
@@ -180,14 +182,16 @@ public class Terminal implements Module {
                             commandManagerInterface.saveTask(task);
                         }
 
-                        sb.append("\n");
                         Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
                                 response.getRequestSequenceNumber());
-                        sb.append(CommandJson.getJson(new Command(result)));
+                        String res = CommandJson.getJson(new Command(result));
+                        if (res != null) {
+                            textAreaOutput.setValue(res.replace("\\n", "\n"));
+                        } else {
+                            res = "Error parsing response: " + response;
+                        }
+                        textAreaOutput.setCursorPosition(res.length() - 1);
                     }
-                    String str = sb.toString().replace("\\n", "\n");
-                    textAreaOutput.setValue(str);
-                    textAreaOutput.setCursorPosition(str.length() - 1);
                 }
             } catch (Property.ReadOnlyException ex) {
                 LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
@@ -207,13 +211,13 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
+                    List<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
                         sb.append(agent).append("\n");
 
-                        Set<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
+                        List<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
                         for (Agent lxcAgent : childAgents) {
                             sb.append("\t").append(lxcAgent).append("\n");
                         }
@@ -230,7 +234,7 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = getAgentManager().getRegisteredLxcAgents();
+                    List<Agent> agents = getAgentManager().getRegisteredLxcAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
@@ -415,7 +419,7 @@ public class Terminal implements Module {
                     clusterData.setDataDir("Data dir");
                     clusterData.setSavedCacheDir("Saved Cache Dir");
 
-                    Set<Agent> agents = AppData.getSelectedAgentList();
+                    List<Agent> agents = AppData.getSelectedAgentList();
                     List<UUID> listUuid = new ArrayList<UUID>();
                     for (Agent agent : agents) {
                         listUuid.add(agent.getUuid());
@@ -462,10 +466,12 @@ public class Terminal implements Module {
     }
 
     public void unsetModuleService(ModuleService service) {
+        service.unregisterModule(this);
+        component.executor.shutdown();
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
-            service.unregisterModule(this);
         }
+        System.out.println("Terminal: Unregistering with ModuleService");
     }
 
     public static CommandManagerInterface getCommandManager() {

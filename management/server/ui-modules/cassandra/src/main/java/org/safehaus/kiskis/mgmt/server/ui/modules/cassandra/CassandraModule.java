@@ -116,7 +116,7 @@ public class CassandraModule implements Module {
         //messages queue
 
         @Override
-        public void outputCommand(Response response) {
+        public void onCommand(Response response) {
             //messages queue
             if (response != null && response.getSource().equals(MODULE_NAME)) {
                 messagesQueue.add(response);

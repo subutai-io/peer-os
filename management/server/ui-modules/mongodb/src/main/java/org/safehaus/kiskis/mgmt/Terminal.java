@@ -11,6 +11,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
+import java.util.List;
 import java.util.Set;
 
 public class Terminal implements Module {
@@ -71,7 +72,7 @@ public class Terminal implements Module {
 
         @Override
         public void buttonClick(Button.ClickEvent event) {
-            Set<Agent> agents = AppData.getSelectedAgentList();
+            List<Agent> agents = AppData.getSelectedAgentList();
             if (agents != null && agents.size() > 0) {
                 for (Agent agent : agents) {
                     Request r = CommandJson.getRequest(textAreaCommand.getValue().toString());
@@ -91,7 +92,7 @@ public class Terminal implements Module {
         }
 
         @Override
-        public synchronized void outputCommand(Response response) {
+        public synchronized void onCommand(Response response) {
             System.out.println("");
             System.out.println(response);
             System.out.println("");

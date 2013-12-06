@@ -5,15 +5,30 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bahadyr
  */
 public class Step1 extends Panel {
 
+    private HadoopWizard parent;
+    private List<Agent> lxcAgent;
+
     public Step1(final HadoopWizard hadoopWizard) {
+        this.parent = hadoopWizard;
+
         setCaption("Welcome to Hadoop Cluster Installation");
         setSizeFull();
 
@@ -40,14 +55,25 @@ public class Step1 extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayout.setSpacing(true);
 
-        TextField textFieldClusterName = new TextField("Enter your cluster name");
+        final TextField textFieldClusterName = new TextField("Enter your cluster name");
         textFieldClusterName.setInputPrompt("Cluster name");
+        textFieldClusterName.setRequired(true);
+        textFieldClusterName.setRequiredError("Must have a name");
         verticalLayoutForm.addComponent(textFieldClusterName);
 
         Label labelNameNode = new Label("Choose the host that will run Name Node:");
         verticalLayoutForm.addComponent(labelNameNode);
 
-        ComboBox comboBoxNameNode = new ComboBox("Name Node");
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, parent.getLxcList());
+        ComboBox comboBoxNameNode = new ComboBox("Name Node", agents);
+        comboBoxNameNode.setMultiSelect(false);
+        comboBoxNameNode.setItemCaptionPropertyId("hostname");
+        comboBoxNameNode.addListener(new Property.ValueChangeListener(){
+            @Override
+            public void valueChange(Property.ValueChangeEvent event){
+
+            }
+        });
         // add items
         verticalLayoutForm.addComponent(comboBoxNameNode);
 
@@ -80,7 +106,10 @@ public class Step1 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                createTask();
+                parent.setClusterName(textFieldClusterName.getValue().toString());
                 hadoopWizard.showNext();
+
             }
         });
 
@@ -90,4 +119,11 @@ public class Step1 extends Panel {
         addComponent(verticalLayout);
     }
 
+    private void createTask() {
+        Task clusterTask = new Task();
+        clusterTask.setTaskStatus(TaskStatus.NEW);
+        clusterTask.setDescription("Setup Hadoop cluster");
+
+        parent.setTask(clusterTask);
+    }
 }

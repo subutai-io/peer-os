@@ -6,6 +6,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -36,7 +37,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     @Override
-    public void getCommand(Response response) {
+    public void onResponse(Response response) {
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
                 updateAgent(response, true);
@@ -111,7 +112,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private void notifyModules() {
         for (AgentListener ai : listeners) {
             if (ai != null) {
-                ai.agentRegistered();
+                ai.onAgent();
             } else {
                 listeners.remove(ai);
             }
@@ -152,10 +153,10 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void destroy() {
         try {
+            executorService.shutdownNow();
             if (commandTransportInterface != null) {
                 commandTransportInterface.removeListener(this);
             }
-            executorService.shutdownNow();
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
@@ -191,20 +192,20 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     @Override
-    public Set<Agent> getRegisteredAgents() {
+    public List<Agent> getRegisteredAgents() {
         return persistenceAgent.getRegisteredAgents(agentFreshnessMin);
     }
 
     @Override
-    public Set<Agent> getAgentsToHeartbeat() {
+    public List<Agent> getAgentsToHeartbeat() {
         return persistenceAgent.getAgentsByHeartbeat(heartbeatFromMin, heartbeatToMin);
     }
 
-    public Set<Agent> getRegisteredLxcAgents() {
+    public List<Agent> getRegisteredLxcAgents() {
         return persistenceAgent.getRegisteredLxcAgents(agentFreshnessMin);
     }
 
-    public Set<Agent> getRegisteredPhysicalAgents() {
+    public List<Agent> getRegisteredPhysicalAgents() {
         return persistenceAgent.getRegisteredPhysicalAgents(agentFreshnessMin);
     }
 
@@ -215,11 +216,11 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
      * @param physicalAgent - physical agent
      * @return child lxc agents of a physical agent
      */
-    public Set<Agent> getChildLxcAgents(Agent physicalAgent) {
+    public List<Agent> getChildLxcAgents(Agent physicalAgent) {
         return persistenceAgent.getRegisteredChildLxcAgents(physicalAgent, agentFreshnessMin);
     }
 
-    public Set<Agent> getUnknownChildLxcAgents() {
+    public List<Agent> getUnknownChildLxcAgents() {
         return persistenceAgent.getUnknownChildLxcAgents(agentFreshnessMin);
     }
 }

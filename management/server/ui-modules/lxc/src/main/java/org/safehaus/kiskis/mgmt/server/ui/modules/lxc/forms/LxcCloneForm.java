@@ -71,10 +71,9 @@ public class LxcCloneForm extends VerticalLayout implements
         hLayout.setComponentAlignment(buttonClone, Alignment.BOTTOM_CENTER);
         panel.addComponent(hLayout);
 
-        // let's adjust the panels default layout (a VerticalLayout)
         VerticalLayout layout = (VerticalLayout) panel.getContent();
-        layout.setMargin(true); // we want a margin
-        layout.setSpacing(true); // and spacing between components
+        layout.setMargin(true);
+        layout.setSpacing(true);
 
         outputPanel = new Panel("Clone command output");
 
@@ -84,7 +83,7 @@ public class LxcCloneForm extends VerticalLayout implements
 
     @Override
     public void buttonClick(Button.ClickEvent clickEvent) {
-        Set<Agent> agents = AppData.getSelectedAgentList();
+        List<Agent> agents = AppData.getSelectedAgentList();
         if (agents != null && agents.size() > 0) {
             physicalAgents = new HashSet<Agent>();
             for (Agent agent : agents) {
@@ -98,6 +97,7 @@ public class LxcCloneForm extends VerticalLayout implements
             } else if (Strings.isNullOrEmpty(textFieldLxcName.getValue().toString())) {
                 getWindow().showNotification("Enter lxc hostname");
             } else {
+                outputPanel.removeAllComponents();
                 createTask();
             }
         }
@@ -141,54 +141,34 @@ public class LxcCloneForm extends VerticalLayout implements
 
     public void setTaskStatus() {
         if (getCommandManager() != null) {
-            boolean isSuccess = true;
-            List<Request> requests = getCommandManager().getCommands(cloneTask.getUuid());
+            List<ParseResult> result = getCommandManager().parseTask(cloneTask, true);
+            for (ParseResult pr : result) {
+                if (pr.getResponse().getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
+                    if (pr.getResponse().getExitCode() == 0) {
+                        Label labelOk = new Label(pr.getResponse().getStdOut());
+                        labelOk.setIcon(new ThemeResource("icons/16/ok.png"));
+                        outputPanel.addComponent(labelOk);
 
-            for (Request request : requests) {
-                Response response = getCommandManager().getResponse(
-                        cloneTask.getUuid(),
-                        request.getRequestSequenceNumber());
-                if (response == null) {
-                    return;
-                } else {
-                    if (response.getType().equals(ResponseType.EXECUTE_TIMEOUTED)
-                            && response.getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
-                        isSuccess = false;
-
-                        Label labelError = new Label(response.getStdErr());
+                        buttonClone.setEnabled(true);
+                    } else {
+                        Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
                         labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
                         outputPanel.addComponent(labelError);
 
                         buttonClone.setEnabled(true);
-                    } else if (response.getType().equals(ResponseType.EXECUTE_RESPONSE_DONE))  {
-                        if(response.getExitCode() == 0){
-                            Label labelOk = new Label(response.getStdOut());
-                            labelOk.setIcon(new ThemeResource("icons/16/ok.png"));
-                            outputPanel.addComponent(labelOk);
-
-                            buttonClone.setEnabled(true);
-                        } else {
-                            Label labelError = new Label(response.getStdOut());
-                            labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
-                            outputPanel.addComponent(labelError);
-
-                            buttonClone.setEnabled(true);
-                        }
                     }
+                } else if (pr.getResponse().getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
+                    Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
+                    labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
+                    outputPanel.addComponent(labelError);
+
+                    buttonClone.setEnabled(true);
                 }
             }
-
-            if (isSuccess) {
-                cloneTask.setTaskStatus(TaskStatus.SUCCESS);
-            } else {
-                cloneTask.setTaskStatus(TaskStatus.FAIL);
-            }
-            getCommandManager().saveTask(cloneTask);
         }
     }
 
     public CommandManagerInterface getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(LxcModule.class).getBundleContext();
         if (ctx != null) {
             ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());

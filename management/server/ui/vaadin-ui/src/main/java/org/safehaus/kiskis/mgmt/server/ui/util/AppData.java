@@ -9,10 +9,7 @@ import com.vaadin.service.ApplicationContext.TransactionListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Holds data for one user session.
@@ -26,11 +23,11 @@ public class AppData
     private static final ThreadLocal<AppData> instance
             = new ThreadLocal<AppData>();
     //
-    private Set<Agent> selectedAgentList;
+    private List<Agent> selectedAgentList;
 
     public AppData(Application app) {
         this.app = app;
-        selectedAgentList = new HashSet<Agent>();
+        selectedAgentList = new ArrayList<Agent>();
 
         // It's usable from now on in the current request
         instance.set(AppData.this);
@@ -74,11 +71,11 @@ public class AppData
         return instance.get().app;
     }
 
-    public static Set<Agent> getSelectedAgentList() {
+    public static List<Agent> getSelectedAgentList() {
         return instance.get().selectedAgentList;
     }
 
-    public static void setSelectedAgentList(Set<Agent> agentList) {
+    public static void setSelectedAgentList(List<Agent> agentList) {
         instance.get().selectedAgentList = agentList;
     }
 }
