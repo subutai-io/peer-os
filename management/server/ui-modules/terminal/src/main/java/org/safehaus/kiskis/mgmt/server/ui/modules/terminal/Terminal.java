@@ -149,7 +149,9 @@ public class Terminal implements Module {
         @Override
         public void outputCommand(Response response) {
             //messages queue
-            messagesQueue.add(response);
+            if (response != null && response.getSource().equals(MODULE_NAME)) {
+                messagesQueue.add(response);
+            }
             //messages queue
         }
 
