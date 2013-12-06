@@ -29,7 +29,7 @@ public final class HadoopWizard extends Window {
     private Agent nameNode;
     private Agent jobTracker;
     private Agent sNameNode;
-
+    private int replicationFactor;
 
     Step1 step1;
     Step2 step2;
@@ -178,6 +178,14 @@ public final class HadoopWizard extends Window {
 
     public void setsNameNode(Agent sNameNode) {
         this.sNameNode = sNameNode;
+    }
+
+    public int getReplicationFactor() {
+        return replicationFactor;
+    }
+
+    public void setReplicationFactor(int replicationFactor) {
+        this.replicationFactor = replicationFactor;
     }
 
     public CommandManagerInterface getCommandManager() {

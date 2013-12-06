@@ -107,7 +107,15 @@ public class Step1 extends Panel {
         verticalLayoutForm.addComponent(labelReplicationFactor);
 
         ComboBox comboBoxReplicationFactor = new ComboBox("Dfs Replication Factor");
-        // add items
+        for(int i=1; i<=5; i++){
+            comboBoxReplicationFactor.addItem(i);
+        }
+        comboBoxReplicationFactor.addListener(new Property.ValueChangeListener(){
+            @Override
+            public void valueChange(Property.ValueChangeEvent event){
+                parent.setReplicationFactor((Integer) event.getProperty().getValue());
+            }
+        });
         verticalLayoutForm.addComponent(comboBoxReplicationFactor);
 
         grid.addComponent(verticalLayoutForm, 2, 0, 5, 14);

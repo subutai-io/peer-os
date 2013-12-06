@@ -5,8 +5,10 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -30,6 +32,7 @@ public class Step2 extends Panel {
 
     public Step2(final HadoopWizard hadoopWizard) {
         parent = hadoopWizard;
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, parent.getLxcList());
 
         setCaption("Welcome to Hadoop Cluster Installation");
         setSizeFull();
@@ -61,10 +64,8 @@ public class Step2 extends Panel {
         label.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(label);
 
-        TwinColSelect twinColSelectDataNodes = new TwinColSelect();
-        for (String host : hosts) {
-            twinColSelectDataNodes.addItem(host);
-        }
+
+        TwinColSelect twinColSelectDataNodes = new TwinColSelect("Data Nodes", agents);
         twinColSelectDataNodes.setRows(10);
         twinColSelectDataNodes.setNullSelectionAllowed(true);
         twinColSelectDataNodes.setMultiSelect(true);
