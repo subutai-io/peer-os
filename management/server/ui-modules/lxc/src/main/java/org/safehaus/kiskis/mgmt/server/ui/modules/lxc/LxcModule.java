@@ -76,7 +76,7 @@ public class LxcModule implements Module {
                     while (!Thread.interrupted()) {
                         try {
                             processAllResponses();
-                            Thread.sleep(100);
+                            Thread.sleep(500);
                         } catch (Exception ex) {
                             LOG.log(Level.SEVERE, "Error in queue executor", ex);
                         }
