@@ -154,6 +154,8 @@ public final class CassandraWizard extends Window {
     }
 
     public void setOutput(Response response) {
+        System.out.println("RESPONE: " + response.toString());
+        System.out.println("TASK:" + task.toString());
         if (task != null && response.getTaskUuid().toString().equals(task.getUuid().toString())) {
             StringBuilder output = new StringBuilder();
             output.append(textAreaTerminal.getValue());
@@ -163,7 +165,6 @@ public final class CassandraWizard extends Window {
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
                 output.append("OK ").append(response.getStdOut().trim());
             }
-            System.out.println("RESPONE: " + response.toString());
 
             switch (response.getType()) {
                 case EXECUTE_RESPONSE_DONE: {
