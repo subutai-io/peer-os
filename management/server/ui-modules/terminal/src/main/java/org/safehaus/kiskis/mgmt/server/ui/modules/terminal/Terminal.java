@@ -30,12 +30,7 @@ public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
     private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
-    private static ModuleComponent component;
-    //messages queue
-    private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-    private static final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    //messages queue
+    private ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
@@ -50,6 +45,11 @@ public class Terminal implements Module {
         private final TextArea textAreaOutput;
         private Set<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
+        //messages queue
+        private final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
+        private final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
+        private final ExecutorService executor = Executors.newSingleThreadExecutor();
+        //messages queue        
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
             this.commandManagerInterface = commandManagerInterface;
@@ -129,6 +129,13 @@ public class Terminal implements Module {
             verticalLayout.addComponent(textAreaOutput);
 
             setCompositionRoot(verticalLayout);
+            addListener(new ComponentDetachListener() {
+                @Override
+                public void componentDetachedFromContainer(ComponentDetachEvent event) {
+                    System.out.println("Terminal is detached");
+                    executor.shutdown();
+                }
+            });
 
             //messages queue
             executor.execute(new Runnable() {
@@ -139,6 +146,7 @@ public class Terminal implements Module {
                             processAllResponses();
                             Thread.sleep(500);
                         } catch (Exception ex) {
+                            System.out.println("Error in Terminal Queue Processor " + ex);
                         }
                     }
                 }
@@ -147,11 +155,11 @@ public class Terminal implements Module {
         }
 
         @Override
-        public void outputCommand(Response response) {
+        public void onCommand(Response response) {
             //messages queue
-            if (response != null && response.getSource().equals(MODULE_NAME)) {
-                messagesQueue.add(response);
-            }
+//            if (response != null && response.getSource().equals(MODULE_NAME)) {
+            messagesQueue.add(response);
+//            }
             //messages queue
         }
 
@@ -170,8 +178,6 @@ public class Terminal implements Module {
         private void processResponse(Response response) {
             try {
                 if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
-                    StringBuilder sb = new StringBuilder();
-
                     if (response.getTaskUuid() != null
                             && response.getTaskUuid().compareTo(task.getUuid()) == 0) {
 
@@ -180,14 +186,16 @@ public class Terminal implements Module {
                             commandManagerInterface.saveTask(task);
                         }
 
-                        sb.append("\n");
                         Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
                                 response.getRequestSequenceNumber());
-                        sb.append(CommandJson.getJson(new Command(result)));
+                        String res = CommandJson.getJson(new Command(result));
+                        if (res != null) {
+                            textAreaOutput.setValue(res.replace("\\n", "\n"));
+                        } else {
+                            res = "Error parsing response: " + response;
+                        }
+                        textAreaOutput.setCursorPosition(res.length() - 1);
                     }
-                    String result = sb.toString().replace("\\n", "\n");
-                    textAreaOutput.setValue(result);
-                    textAreaOutput.setCursorPosition(result.length() - 1);
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
@@ -450,8 +458,10 @@ public class Terminal implements Module {
     public void unsetModuleService(ModuleService service) {
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
-            service.unregisterModule(this);
         }
+        service.unregisterModule(this);
+        component.executor.shutdown();
+        System.out.println("Terminal: Unregistering with ModuleService");
     }
 
     public static CommandManagerInterface getCommandManager() {

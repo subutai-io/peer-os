@@ -5,5 +5,5 @@ package org.safehaus.kiskis.mgmt.shared.protocol.api.ui;
  */
 public interface AgentListener {
 
-    public void agentRegistered();
+    public void onAgent();
 }

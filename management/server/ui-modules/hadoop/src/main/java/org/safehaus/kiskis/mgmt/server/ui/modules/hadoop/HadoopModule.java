@@ -47,7 +47,7 @@ public class HadoopModule implements Module {
         }
 
         @Override
-        public synchronized void outputCommand(Response response) {
+        public synchronized void onCommand(Response response) {
             try {
                 if(response != null
                         && response.getSource().equals(MODULE_NAME)

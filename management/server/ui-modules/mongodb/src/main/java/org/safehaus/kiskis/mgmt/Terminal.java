@@ -91,7 +91,7 @@ public class Terminal implements Module {
         }
 
         @Override
-        public synchronized void outputCommand(Response response) {
+        public synchronized void onCommand(Response response) {
             System.out.println("");
             System.out.println(response);
             System.out.println("");
