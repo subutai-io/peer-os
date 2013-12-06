@@ -150,6 +150,7 @@ public class HadoopModule implements Module {
             getCommandManager().removeListener(component);
         }
         service.unregisterModule(this);
+        component.executor.shutdown();
     }
 
     public static CommandManagerInterface getCommandManager() {

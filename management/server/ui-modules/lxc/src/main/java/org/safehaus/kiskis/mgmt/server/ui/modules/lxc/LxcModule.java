@@ -8,6 +8,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms.LxcCloneForm;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms.LxcManageForm;
@@ -150,10 +151,26 @@ public class LxcModule implements Module {
             this.service.unregisterModule(this);
 
         }
+        if (getCommandManager() != null) {
+            getCommandManager().removeListener(component);
+        }
         component.executor.shutdown();
     }
 
     public void setContext(BundleContext context) {
         this.context = context;
+    }
+
+    public static CommandManagerInterface getCommandManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(LxcModule.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 }

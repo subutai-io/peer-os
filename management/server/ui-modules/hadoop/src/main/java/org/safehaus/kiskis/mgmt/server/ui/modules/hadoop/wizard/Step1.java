@@ -24,7 +24,6 @@ import java.util.List;
 public class Step1 extends Panel {
 
     private HadoopWizard parent;
-    private List<Agent> lxcAgent;
 
     public Step1(final HadoopWizard hadoopWizard) {
         this.parent = hadoopWizard;
@@ -71,24 +70,37 @@ public class Step1 extends Panel {
         comboBoxNameNode.addListener(new Property.ValueChangeListener(){
             @Override
             public void valueChange(Property.ValueChangeEvent event){
-
+                parent.setNameNode((Agent) event.getProperty().getValue());
             }
         });
-        // add items
         verticalLayoutForm.addComponent(comboBoxNameNode);
 
         Label labelJobTracker = new Label("Choose the host that will run Job Tracker:");
         verticalLayoutForm.addComponent(labelJobTracker);
 
-        ComboBox comboBoxJobTracker = new ComboBox("Job Tracker");
-        // add items
+        ComboBox comboBoxJobTracker = new ComboBox("Job Tracker", agents);
+        comboBoxJobTracker.setMultiSelect(false);
+        comboBoxJobTracker.setItemCaptionPropertyId("hostname");
+        comboBoxJobTracker.addListener(new Property.ValueChangeListener(){
+            @Override
+            public void valueChange(Property.ValueChangeEvent event){
+                parent.setJobTracker((Agent) event.getProperty().getValue());
+            }
+        });
         verticalLayoutForm.addComponent(comboBoxJobTracker);
 
         Label labelSecondaryNameNode = new Label("Choose the host that will run Secondary Name Node:");
         verticalLayoutForm.addComponent(labelSecondaryNameNode);
 
-        ComboBox comboBoxSecondaryNameNode = new ComboBox("Secondary Name Node");
-        // add items
+        ComboBox comboBoxSecondaryNameNode = new ComboBox("Secondary Name Node", agents);
+        comboBoxSecondaryNameNode.setMultiSelect(false);
+        comboBoxSecondaryNameNode.setItemCaptionPropertyId("hostname");
+        comboBoxSecondaryNameNode.addListener(new Property.ValueChangeListener(){
+            @Override
+            public void valueChange(Property.ValueChangeEvent event){
+                parent.setsNameNode((Agent) event.getProperty().getValue());
+            }
+        });
         verticalLayoutForm.addComponent(comboBoxSecondaryNameNode);
 
         Label labelReplicationFactor = new Label("Specify the replication factor:");
