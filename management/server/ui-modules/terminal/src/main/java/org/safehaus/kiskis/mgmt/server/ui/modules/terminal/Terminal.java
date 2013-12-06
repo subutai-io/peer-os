@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 import com.google.common.base.Strings;
 import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Queues;
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -186,7 +187,9 @@ public class Terminal implements Module {
                     textAreaOutput.setValue(str);
                     textAreaOutput.setCursorPosition(str.length() - 1);
                 }
-            } catch (Exception ex) {
+            } catch (Property.ReadOnlyException ex) {
+                LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
+            } catch (Property.ConversionException ex) {
                 LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
             }
         }
@@ -306,7 +309,7 @@ public class Terminal implements Module {
             });
             return button;
         }
-        
+
         private Button genClearButton() {
             Button button = new Button("Clear");
             button.setDescription("Clears the output text area");
