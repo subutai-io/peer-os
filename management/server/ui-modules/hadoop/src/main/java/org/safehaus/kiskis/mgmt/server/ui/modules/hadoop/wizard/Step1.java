@@ -71,7 +71,7 @@ public class Step1 extends Panel {
         comboBoxNameNode.addListener(new Property.ValueChangeListener(){
             @Override
             public void valueChange(Property.ValueChangeEvent event){
-                System.out.println(event.getProperty());
+
             }
         });
         // add items

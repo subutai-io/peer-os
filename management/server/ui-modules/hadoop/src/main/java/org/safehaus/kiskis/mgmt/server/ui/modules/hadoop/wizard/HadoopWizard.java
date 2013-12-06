@@ -160,32 +160,8 @@ public final class HadoopWizard extends Window {
         this.clusterName = clusterName;
     }
 
-    public IndexedContainer getContainer() {
-        return container;
-    }
-
-    public void setContainer() {
-        container = new IndexedContainer();
-
-        // Create the container properties
-        container.addContainerProperty("id", UUID.class, "");
-        container.addContainerProperty("value", Agent.class, "");
-
-        for(Agent lxc : lxcList) {
-            Object itemId = container.addItem();
-            Item item = container.getItem(itemId);
-
-            item.getItemProperty("id").setValue(lxc.getUuid());
-            item.getItemProperty("value").setValue(lxc);
-        }
-    }
-
     public List<Agent> getLxcList() {
         return lxcList;
-    }
-
-    public void setLxcList(List<Agent> lxcList) {
-        this.lxcList = lxcList;
     }
 
     public CommandManagerInterface getCommandManager() {
