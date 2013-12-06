@@ -64,7 +64,7 @@ string toString(int intcont)
  *  		   connectionOptions: ReconnectDelay and Reconnect feature settings.
  *  		   loglevel: Debugging Loglevel. (0-8)
  */
-int getSettings(string & url, string & connectionOptions, string & loglevel)
+int getSettings(string & url, string & connectionOptions, string & loglevel, string & clientpasswd)
 {
 	pugi::xml_document doc;
 
@@ -75,7 +75,7 @@ int getSettings(string & url, string & connectionOptions, string & loglevel)
 	}
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
-
+	clientpasswd = doc.child("Settings").child_value("clientpasswd") ;		//reading cleintpassword
 	url = "failover:ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
 	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
@@ -219,6 +219,7 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 int main(int argc,char *argv[],char *envp[])
 {
 	string url,connectionOptions,loglevel;
+	string clientpasswd;
 	string Uuid,macaddress,hostname;
 	int isLxc = -1;
 	vector<string> ipadress;
@@ -242,7 +243,7 @@ int main(int argc,char *argv[],char *envp[])
 		cout << "/var/log/ksks-agent/ folder does not exist.. KiskisAgent is going to be closed.."<<endl;
 		FILE* dumplog = fopen("/etc/ksks-agent_dump.log","a+");
 		string log = "<DEBUG> /var/log/ksks-agent/ folder does not exist.. KiskisAgent is going to be closed.. \n";
-		fprintf(dumplog,log.c_str());
+		fputs(log.c_str(),dumplog);
 		fflush(dumplog);
 		close(STDIN_FILENO);
 		close(STDOUT_FILENO);
@@ -252,13 +253,14 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.setLogLevel(7);
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent is starting.."));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is reading.."));
-	if(!getSettings(url,connectionOptions,loglevel))
+	if(!getSettings(url,connectionOptions,loglevel,clientpasswd))
 	{
 
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","URL:",url));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","ConnectionOptions:",connectionOptions));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","LogLevel:",loglevel));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is read successfully.."));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","clientpasswd:",clientpasswd));
 		stringstream(loglevel) >> level;
 		logMain.setLogLevel(level);
 	}
@@ -318,7 +320,7 @@ int main(int argc,char *argv[],char *envp[])
 
 	activemq::library::ActiveMQCPP::initializeLibrary();
 	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/ksks-agent/config/client_ks.pem");
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",	"client");
+	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",clientpasswd.c_str());
 	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/ksks-agent/config/client_ts.pem" );
 
 	clientaddress = Uuid;
