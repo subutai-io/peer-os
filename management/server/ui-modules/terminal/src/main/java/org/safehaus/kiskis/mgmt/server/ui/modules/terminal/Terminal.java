@@ -3,7 +3,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 import com.google.common.base.Strings;
 import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Queues;
-import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -183,9 +182,9 @@ public class Terminal implements Module {
                                 response.getRequestSequenceNumber());
                         sb.append(CommandJson.getJson(new Command(result)));
                     }
-
-                    textAreaOutput.setValue(sb);
-                    textAreaOutput.setCursorPosition(sb.length() - 1);
+                    String str = sb.toString().replace("\\n", "\n");
+                    textAreaOutput.setValue(str);
+                    textAreaOutput.setCursorPosition(str.length() - 1);
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
