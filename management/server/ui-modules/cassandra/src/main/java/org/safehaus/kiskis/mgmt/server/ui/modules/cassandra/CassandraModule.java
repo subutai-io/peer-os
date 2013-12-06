@@ -1,9 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
+import com.google.common.collect.EvictingQueue;
+import com.google.common.collect.Queues;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -14,6 +19,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 public class CassandraModule implements Module {
 
@@ -21,6 +27,11 @@ public class CassandraModule implements Module {
     private BundleContext context;
 
     private static ModuleComponent component;
+    //messages queue
+    private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
+    private static final Queue messagesQueue = Queues.synchronizedQueue(queue);
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    //messages queue
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
@@ -63,10 +74,35 @@ public class CassandraModule implements Module {
             verticalLayout.addComponent(cassandraTable);
 
             setCompositionRoot(verticalLayout);
+
+            //messages queue
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (!Thread.interrupted()) {
+                        try {
+                            processAllResponses();
+                            Thread.sleep(100);
+                        } catch (Exception ex) {
+                        }
+                    }
+                }
+            });
+            //messages queue
         }
 
-        @Override
-        public synchronized void outputCommand(Response response) {
+        //messages queue
+        private void processAllResponses() {
+            if (!messagesQueue.isEmpty()) {
+                Response[] responses = (Response[]) messagesQueue.toArray(new Response[0]);
+                messagesQueue.clear();
+                for (Response response : responses) {
+                    processResponse(response);
+                }
+            }
+        }
+
+        private void processResponse(Response response) {
             try {
                 if (response != null && response.getSource().equals(MODULE_NAME)) {
                     if (subwindow != null && subwindow.isVisible()) {
@@ -77,6 +113,14 @@ public class CassandraModule implements Module {
                 System.out.println("outputCommand event Exception");
                 ex.printStackTrace();
             }
+        }
+        //messages queue
+
+        @Override
+        public void outputCommand(Response response) {
+            //messages queue
+            messagesQueue.add(response);
+            //messages queue
 
         }
 
