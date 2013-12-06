@@ -50,6 +50,7 @@ public final class CassandraWizard extends Window {
         progressBar = new ProgressIndicator();
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(true);
+        progressBar.setPollingInterval(30000);
         progressBar.setValue(0f);
         progressBar.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         gridLayout.addComponent(progressBar, 0, 0);
