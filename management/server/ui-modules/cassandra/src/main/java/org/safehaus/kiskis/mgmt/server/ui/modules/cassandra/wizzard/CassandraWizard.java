@@ -27,6 +27,8 @@ public final class CassandraWizard extends Window {
     Step1 step1;
     Step2 step2;
     Step3 step3;
+    Step21 step21;
+    Step31 step31;
     Step41 step41;
     Step42 step42;
     Step43 step43;
@@ -113,17 +115,35 @@ public final class CassandraWizard extends Window {
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                step21 = new Step21(this);
+                verticalLayout.addComponent(step21);
+                break;
+            }
+            case 5: {
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                step31 = new Step31(this);
+                verticalLayout.addComponent(step31);
+                break;
+            }
+            case 6: {
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                step3 = new Step3(this);
+                verticalLayout.addComponent(step3);
+                break;
+            }
+            case 7: {
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 step41 = new Step41(this);
                 verticalLayout.addComponent(step41);
                 break;
             }
-            case 5: {
+            case 8: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 step42 = new Step42(this);
                 verticalLayout.addComponent(step42);
                 break;
             }
-            case 6: {
+            case 9: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 step43 = new Step43(this);
                 verticalLayout.addComponent(step43);
@@ -154,8 +174,6 @@ public final class CassandraWizard extends Window {
     }
 
     public void setOutput(Response response) {
-        System.out.println("RESPONE: " + response.toString());
-        System.out.println("TASK:" + task.toString());
         if (task != null && response.getTaskUuid().toString().equals(task.getUuid().toString())) {
             StringBuilder output = new StringBuilder();
             output.append(textAreaTerminal.getValue());
@@ -183,9 +201,19 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 5: {
+                            step31.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 6: {
+                            break;
+                        }
+                        case 7: {
+                            break;
+                        }
+                        case 8: {
+                            break;
+                        }
+                        case 9: {
                             break;
                         }
 

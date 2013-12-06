@@ -83,7 +83,7 @@ public class CassandraModule implements Module {
                         try {
                             processAllResponses();
                             Thread.sleep(100);
-                        } catch (Exception ex) {
+                        } catch (InterruptedException ex) {
                         }
                     }
                 }

@@ -21,19 +21,19 @@ import java.util.UUID;
 /**
  * @author bahadyr
  */
-public class Step2 extends Panel {
+public class Step21 extends Panel {
 
     //    private static final List<String> hosts = Arrays.asList(new String[]{
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
     List<Agent> hosts;
     CassandraWizard parent;
-    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
-//    String listenAddressCommand = "sed -i 's/listen_address: localhost/listen_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
-//    String rpcAddressCommand = "sed -i 's/rpc_address: localhost/rpc_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
+//    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
+    String listenAddressCommand = "sed -i 's/listen_address: localhost/listen_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
+    String rpcAddressCommand = "sed -i 's/rpc_address: localhost/rpc_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
 
-    public Step2(final CassandraWizard cassandraWizard) {
+    public Step21(final CassandraWizard cassandraWizard) {
         parent = cassandraWizard;
 
         setCaption("List nodes");
@@ -64,7 +64,7 @@ public class Step2 extends Panel {
         label.setContentMode(Label.CONTENT_XHTML);
 
         grid.addComponent(label, 2, 0, 5, 0);
-        grid.setComponentAlignment(label, Alignment.TOP_CENTER);
+        grid.setComponentAlignment(label, Alignment.TOP_CENTER);    
 
         Label label1 = new Label("<strong>Target Hosts</strong><br>"
                 + "<br>");
@@ -101,14 +101,14 @@ public class Step2 extends Panel {
 //                    args.add("--assume-yes");
 //                    args.add("install");
 //                    args.add("ksks-cassandra");
-                    Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
+//                    Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
+//                    cassandraWizard.runCommand(command);
+                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
+                    Command command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
-//                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
-//                    command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
-//                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
-//                    command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
+                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
+                    command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
+                    cassandraWizard.runCommand(command);
                 }
                 cassandraWizard.showNext();
             }
