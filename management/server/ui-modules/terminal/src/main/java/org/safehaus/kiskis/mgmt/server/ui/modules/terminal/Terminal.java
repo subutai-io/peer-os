@@ -33,7 +33,7 @@ public class Terminal implements Module {
     private static ModuleComponent component;
     //messages queue
     private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-    private static final Queue messagesQueue = Queues.synchronizedQueue(queue);
+    private static final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     //messages queue
 
