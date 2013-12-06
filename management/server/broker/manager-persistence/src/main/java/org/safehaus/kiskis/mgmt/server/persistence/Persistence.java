@@ -320,7 +320,7 @@ public class Persistence implements PersistenceInterface {
             cluster.shutdown();
         } catch (Exception e) {
         }
-        System.out.println(this.getClass().getName() + " stopped");
+        System.out.println("Persistence stopped");
     }
 
     /**
