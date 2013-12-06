@@ -111,7 +111,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private void notifyModules() {
         for (AgentListener ai : listeners) {
             if (ai != null) {
-                ai.agentRegistered(getRegisteredAgents());
+                ai.agentRegistered();
             } else {
                 listeners.remove(ai);
             }

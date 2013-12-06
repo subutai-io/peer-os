@@ -15,23 +15,26 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 11/8/13
- * Time: 7:24 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
  */
 @SuppressWarnings("serial")
-public class MgmtAgentManager extends VerticalLayout implements
+public final class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentListener {
 
     private AgentManagerInterface agentManagerInterface;
     private Set<Agent> registeredAgents;
     private Tree tree;
     private HierarchicalContainer container;
-    private int id;
+    private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
+    private volatile boolean refresh = true;
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
         this.agentManagerInterface = agentManagerService;
@@ -45,13 +48,29 @@ public class MgmtAgentManager extends VerticalLayout implements
         addComponent(tree);
         addComponent(getRefreshButton());
 
-        id = ThreadLocalRandom.current().nextInt(1, 1000000);
         agentManagerService.addListener(this);
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (!Thread.interrupted()) {
+                    try {
+                        if (refresh) {
+                            refresh = false;
+                            refreshAgents();
+                        }
+                        Thread.sleep(500);
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        });
     }
 
     /*
      * Shows a notification when a selection is made.
      */
+    @Override
     public void valueChange(Property.ValueChangeEvent event) {
         if (event.getProperty().getValue() instanceof Set) {
             Tree t = (Tree) event.getProperty();
@@ -74,7 +93,6 @@ public class MgmtAgentManager extends VerticalLayout implements
         Button button = new Button("Refresh agents");
         button.setDescription("Gets LXC agents from Cassandra");
         button.addListener(new Button.ClickListener() {
-
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
@@ -88,22 +106,11 @@ public class MgmtAgentManager extends VerticalLayout implements
     }
 
     @Override
-    public void agentRegistered(Set<Agent> agents) {
-        try {
-            System.out.println("\nagents size: " + agents.size());
-            refreshAgents();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    @Override
-    public int getId() {
-        return this.id;
+    public void agentRegistered() {
+        refresh = true;
     }
 
     public HierarchicalContainer getNodeContainer() {
-        Item item = null;
 
         registeredAgents = new HashSet<Agent>();
         container = new HierarchicalContainer();
@@ -118,56 +125,72 @@ public class MgmtAgentManager extends VerticalLayout implements
     }
 
     private void refreshAgents() {
-        Set<Agent> setToRemove = new HashSet<Agent>();
-        Set<Agent> setToAdd = new HashSet<Agent>();
+        try {
+            //grab all agents
+            Set<Agent> allFreshAgents = agentManagerInterface.getRegisteredAgents();
 
-        // clear all agents
-        setToRemove.clear();
-        setToRemove.addAll(registeredAgents);
-        setToRemove.removeAll(agentManagerInterface.getRegisteredAgents());
-        refreshNodeContainer(setToRemove, true, null);
+            // clear all agents
+            Set<Agent> setToRemove = new HashSet<Agent>();
+            setToRemove.addAll(registeredAgents);
+            setToRemove.removeAll(allFreshAgents);
+            refreshNodeContainer(setToRemove, true, null);
 
-        // add physical agents
-        setToAdd.clear();
-        setToAdd.addAll(agentManagerInterface.getRegisteredPhysicalAgents());
-        refreshNodeContainer(setToAdd, false, null);
+            //grab parents
+            Set<Agent> parents = new HashSet<Agent>();
+            for (Agent agent : allFreshAgents) {
+                if (!agent.isIsLXC()) {
+                    parents.add(agent);
+                }
+            }
+//        setToAdd.add(null);
+            refreshNodeContainer(parents, false, null);
 
-        for (Agent agent : setToAdd) {
-            // add lxc agents
-            Set<Agent> setToAddChild = new HashSet<Agent>();
-            setToAddChild.clear();
-            setToAddChild.addAll(agentManagerInterface.getChildLxcAgents(agent));
-            refreshNodeContainer(setToAddChild, false, agent);
+            //grab children
+            for (Agent parent : parents) {
+                Set<Agent> children = new HashSet<Agent>();
+                for (Agent possibleChild : allFreshAgents) {
+                    if (possibleChild.isIsLXC() && possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                        children.add(possibleChild);
+                    }
+                }
+                refreshNodeContainer(children, false, parent);
+            }
+
+            registeredAgents.clear();
+            registeredAgents.addAll(allFreshAgents);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
         }
-
-        registeredAgents.clear();
-        registeredAgents.addAll(agentManagerInterface.getRegisteredAgents());
     }
 
     public void refreshNodeContainer(Set<Agent> agents, boolean delete, Agent parent) {
-        if (delete) {
-            for (Agent agent : agents) {
-                container.removeItemRecursively(agent.getHostname());
-            }
-        } else {
-            for (Agent agent : agents) {
-                if(container.getItem(agent.getHostname()) == null){
-                    if (agent.getUuid() != null && agent.getHostname() != null) {
-                        Item item = container.addItem(agent.getHostname());
-                        if (item != null) {
-                            item.getItemProperty("name").setValue(agent.getUuid());
-                            item.getItemProperty("value").setValue(agent);
-                            if (!agent.isIsLXC()) {
-                                container.setChildrenAllowed(agent.getUuid(), true);
-                            } else {
-                                item.getItemProperty("icon").setValue(new ThemeResource("icons/16/folder.png"));
-                                container.setParent(agent.getHostname(), parent.getHostname());
-                                container.setChildrenAllowed(agent.getHostname(), false);
+        try {
+            if (delete) {
+                for (Agent agent : agents) {
+                    container.removeItemRecursively(agent.getHostname());
+                }
+            } else {
+                for (Agent agent : agents) {
+                    if (container.getItem(agent.getHostname()) == null) {
+                        if (agent.getUuid() != null && agent.getHostname() != null) {
+                            Item item = container.addItem(agent.getHostname());
+                            if (item != null) {
+                                item.getItemProperty("name").setValue(agent.getUuid());
+                                item.getItemProperty("value").setValue(agent);
+                                if (!agent.isIsLXC()) {
+                                    container.setChildrenAllowed(agent.getHostname(), true);
+                                } else {
+                                    item.getItemProperty("icon").setValue(new ThemeResource("icons/16/folder.png"));
+                                    container.setParent(agent.getHostname(), parent.getHostname());
+                                    container.setChildrenAllowed(agent.getHostname(), false);
+                                }
                             }
                         }
                     }
                 }
             }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in refreshNodeContainer", ex);
         }
     }
 }
