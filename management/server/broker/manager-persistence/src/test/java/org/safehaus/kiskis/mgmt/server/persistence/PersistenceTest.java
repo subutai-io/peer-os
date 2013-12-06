@@ -55,7 +55,7 @@ public class PersistenceTest {
 
 //    @Test
     public void testGetRegisteredAgents() {
-        Set<Agent> agents = instance.getRegisteredAgents(300);
+        List<Agent> agents = instance.getRegisteredAgents(300);
         for (Agent agent : agents) {
             System.out.println(agent);
         }
@@ -63,7 +63,7 @@ public class PersistenceTest {
 
     @Test
     public void testGetLxcAgents() {
-        Set<Agent> agents = instance.getRegisteredLxcAgents(300);
+        List<Agent> agents = instance.getRegisteredLxcAgents(300);
         for (Agent agent : agents) {
             System.out.println(agent);
         }
@@ -71,9 +71,9 @@ public class PersistenceTest {
 
 //    @Test
     public void testGetChildLxcAgents() {
-        Set<Agent> phyAgents = instance.getRegisteredPhysicalAgents(300);
+        List<Agent> phyAgents = instance.getRegisteredPhysicalAgents(300);
         for (Agent phyAgent : phyAgents) {
-            Set<Agent> agents = instance.getRegisteredChildLxcAgents(phyAgent, 300);
+            List<Agent> agents = instance.getRegisteredChildLxcAgents(phyAgent, 300);
             System.out.println("Parent: " + phyAgent);
             for (Agent agent : agents) {
                 System.out.println("Child: " + agent);
@@ -83,7 +83,7 @@ public class PersistenceTest {
 
 //    @Test
     public void testGetPhysicalAgents() {
-        Set<Agent> agents = instance.getRegisteredPhysicalAgents(300);
+        List<Agent> agents = instance.getRegisteredPhysicalAgents(300);
         for (Agent agent : agents) {
             System.out.println(agent);
         }

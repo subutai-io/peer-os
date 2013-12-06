@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -52,8 +53,8 @@ public class AgentManagerTest {
     public void testGetRegisteredAgents() {
         System.out.println("getRegisteredAgents");
         AgentManager instance = new AgentManager();
-        Set<Agent> expResult = null;
-        Set<Agent> result = instance.getRegisteredAgents();
+        List<Agent> expResult = null;
+        List<Agent> result = instance.getRegisteredAgents();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
