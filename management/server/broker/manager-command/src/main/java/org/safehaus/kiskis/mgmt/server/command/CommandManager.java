@@ -37,7 +37,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     @Override
-    public void getCommand(Response response) {
+    public void onResponse(Response response) {
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
@@ -61,8 +61,8 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             System.out.println("Module count: " + listeners.size());
             for (CommandListener ai : listeners) {
                 if (ai != null && ai.getName() != null) {
-                    if (response.getSource() != null && ai.getName().equals(response.getSource())) {
-                        ai.outputCommand(response);
+                    if (response != null && response.getSource() != null && ai.getName().equals(response.getSource())) {
+                        ai.onCommand(response);
                     }
                 } else {
                     listeners.remove(ai);

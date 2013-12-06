@@ -14,6 +14,6 @@ public interface BrokerListener {
      * @param response
      * @return
      */
-    public void getCommand(Response response);
+    public void onResponse(Response response);
 
 }

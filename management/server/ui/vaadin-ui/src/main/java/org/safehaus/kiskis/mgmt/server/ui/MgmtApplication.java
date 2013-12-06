@@ -18,6 +18,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private ModuleService moduleService;
     private AgentManagerInterface agentManagerService;
     private Window window;
+    private MgmtAgentManager mgmtAgentManager;
 
     public MgmtApplication(String title, ModuleService moduleService, AgentManagerInterface agentManagerService) {
         this.moduleService = moduleService;
@@ -49,7 +50,8 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             layout.setExpandRatio(horizontalSplit, 1);
             horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
 
-            horizontalSplit.setFirstComponent(new MgmtAgentManager(agentManagerService));
+            mgmtAgentManager = new MgmtAgentManager(agentManagerService);
+            horizontalSplit.setFirstComponent(mgmtAgentManager);
 
             tabs = new TabSheet();
             tabs.setSizeFull();
@@ -79,7 +81,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             //
             final ProgressIndicator indicator =
                     new ProgressIndicator(new Float(0.0));
-//            indicator.setVisible(false);
             indicator.setPollingInterval(3000);
             indicator.setWidth("1px");
             indicator.setHeight("1px");
@@ -87,23 +88,14 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             //            
         } catch (Exception ex) {
         } finally {
-//            setRefreshUIRate(5000);
         }
     }
 
-//    private void setRefreshUIRate(int ms) {
-//        try {
-//            getMainWindow().executeJavaScript(
-//                    "function refreshUI(){try{javascript:vaadin.forceSync();}catch(e){}finally{setTimeout(refreshUI,"
-//                    + ms + ");}}; setTimeout(refreshUI," + ms + ");");
-//        } catch (Exception e) {
-//        }
-//    }
     @Override
     public void close() {
-        System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
+        mgmtAgentManager.executor.shutdown();
         super.close();
-//        setRefreshUIRate(5000);
+        System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
     }
 
     @Override

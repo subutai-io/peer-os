@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.lxc;
 
-
 import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Queues;
 import com.vaadin.ui.Component;
@@ -32,17 +31,19 @@ public class LxcModule implements Module {
     private ModuleService service;
     private BundleContext context;
     public static final String MODULE_NAME = "LXC";
-    //messages queue
-    private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-    private static final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    //messages queue
+    private ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements CommandListener {
+
         private BundleContext context;
         private TabSheet commandsSheet;
         private LxcCloneForm cloneForm;
         private LxcManageForm manageForm;
+        //messages queue
+        private final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
+        private final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
+        private final ExecutorService executor = Executors.newSingleThreadExecutor();
+        //messages queue        
 
         public ModuleComponent(BundleContext context) {
             this.context = context;
@@ -70,6 +71,14 @@ public class LxcModule implements Module {
                 LOG.log(Level.SEVERE, "Error in addListener", ex);
             }
 
+            addListener(new ComponentDetachListener() {
+                @Override
+                public void componentDetachedFromContainer(ComponentDetachEvent event) {
+                    System.out.println("Lxc is detached");
+                    executor.shutdown();
+                }
+            });
+
             //messages queue
             executor.execute(new Runnable() {
                 @Override
@@ -88,11 +97,11 @@ public class LxcModule implements Module {
         }
 
         @Override
-        public void outputCommand(Response response) {
+        public void onCommand(Response response) {
             //messages queue
-            if (response != null && response.getSource().equals(MODULE_NAME)) {
-                messagesQueue.add(response);
-            }
+//            if (response != null && response.getSource().equals(MODULE_NAME)) {
+            messagesQueue.add(response);
+//            }
             //messages queue
         }
 
@@ -128,7 +137,8 @@ public class LxcModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(context);
+        component = new ModuleComponent(context);
+        return component;
     }
 
     public void setModuleService(ModuleService service) {
@@ -143,6 +153,7 @@ public class LxcModule implements Module {
         if (service != null) {
             this.service.unregisterModule(this);
         }
+        component.executor.shutdown();
     }
 
     public void setContext(BundleContext context) {

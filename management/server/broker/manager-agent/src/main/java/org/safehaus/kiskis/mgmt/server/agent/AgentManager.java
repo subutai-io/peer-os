@@ -37,7 +37,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     @Override
-    public void getCommand(Response response) {
+    public void onResponse(Response response) {
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
                 updateAgent(response, true);
@@ -112,7 +112,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private void notifyModules() {
         for (AgentListener ai : listeners) {
             if (ai != null) {
-                ai.agentRegistered();
+                ai.onAgent();
             } else {
                 listeners.remove(ai);
             }

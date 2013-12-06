@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  */
 public interface CommandListener {
 
-    public void outputCommand(Response response);
+    public void onCommand(Response response);
 
     public String getName();
 }

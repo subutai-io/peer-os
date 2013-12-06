@@ -36,7 +36,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
     private volatile boolean refresh = true;
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    protected final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
         this.agentManagerInterface = agentManagerService;
@@ -63,7 +63,8 @@ public final class MgmtAgentManager extends VerticalLayout implements
                             refreshAgents();
                         }
                         Thread.sleep(500);
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
+                        System.out.println("Error in MgmtAgentManager Queue Processor " + ex);
                     }
                 }
             }
@@ -109,7 +110,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
     }
 
     @Override
-    public void agentRegistered() {
+    public void onAgent() {
         refresh = true;
     }
 

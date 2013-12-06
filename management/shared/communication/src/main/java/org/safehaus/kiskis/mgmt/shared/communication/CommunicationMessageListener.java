@@ -48,7 +48,7 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             for (BrokerListener ai : listeners) {
                 if (ai != null) {
-                    ai.getCommand(response);
+                    ai.onResponse(response);
                 } else {
                     listeners.remove(ai);
                 }
