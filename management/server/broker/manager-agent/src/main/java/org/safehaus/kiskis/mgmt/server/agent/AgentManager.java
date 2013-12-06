@@ -152,10 +152,10 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void destroy() {
         try {
+            executorService.shutdownNow();
             if (commandTransportInterface != null) {
                 commandTransportInterface.removeListener(this);
             }
-            executorService.shutdownNow();
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
