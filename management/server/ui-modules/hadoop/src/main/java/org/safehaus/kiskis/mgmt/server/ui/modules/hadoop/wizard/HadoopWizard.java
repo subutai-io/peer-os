@@ -180,6 +180,14 @@ public final class HadoopWizard extends Window {
         }
     }
 
+    public List<Agent> getLxcList() {
+        return lxcList;
+    }
+
+    public void setLxcList(List<Agent> lxcList) {
+        this.lxcList = lxcList;
+    }
+
     public CommandManagerInterface getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();

@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
@@ -63,10 +64,10 @@ public class Step1 extends Panel {
         Label labelNameNode = new Label("Choose the host that will run Name Node:");
         verticalLayoutForm.addComponent(labelNameNode);
 
-        ComboBox comboBoxNameNode = new ComboBox("Name Node");
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, parent.getLxcList());
+        ComboBox comboBoxNameNode = new ComboBox("Name Node", agents);
         comboBoxNameNode.setMultiSelect(false);
-        comboBoxNameNode.setContainerDataSource(parent.getContainer());
-        comboBoxNameNode.setItemCaptionPropertyId("id");
+        comboBoxNameNode.setItemCaptionPropertyId("hostname");
         comboBoxNameNode.addListener(new Property.ValueChangeListener(){
             @Override
             public void valueChange(Property.ValueChangeEvent event){
