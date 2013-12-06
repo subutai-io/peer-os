@@ -48,7 +48,7 @@ public class Terminal implements Module {
         private final TextField textFieldTimeout;
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
-        private Set<Agent> agents;
+        private List<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
@@ -206,13 +206,13 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
+                    List<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
                         sb.append(agent).append("\n");
 
-                        Set<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
+                        List<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
                         for (Agent lxcAgent : childAgents) {
                             sb.append("\t").append(lxcAgent).append("\n");
                         }
@@ -229,7 +229,7 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = getAgentManager().getRegisteredLxcAgents();
+                    List<Agent> agents = getAgentManager().getRegisteredLxcAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
@@ -425,7 +425,7 @@ public class Terminal implements Module {
                     clusterData.setDataDir("Data dir");
                     clusterData.setSavedCacheDir("Saved Cache Dir");
 
-                    Set<Agent> agents = AppData.getSelectedAgentList();
+                    List<Agent> agents = AppData.getSelectedAgentList();
                     List<UUID> listUuid = new ArrayList<UUID>();
                     for (Agent agent : agents) {
                         listUuid.add(agent.getUuid());

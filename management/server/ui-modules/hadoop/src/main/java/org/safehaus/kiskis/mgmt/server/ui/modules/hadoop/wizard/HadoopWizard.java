@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 public final class HadoopWizard extends Window {
@@ -17,6 +18,7 @@ public final class HadoopWizard extends Window {
 
     private final VerticalLayout verticalLayout;
     private Task task;
+    private String clusterName;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
@@ -41,6 +43,7 @@ public final class HadoopWizard extends Window {
         progressBar = new ProgressIndicator();
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(true);
+        progressBar.setPollingInterval(30000);
         progressBar.setValue(0f);
         progressBar.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         gridLayout.addComponent(progressBar, 0, 0);
@@ -68,6 +71,10 @@ public final class HadoopWizard extends Window {
 
     public void runCommand(Command command) {
         commandManagerInterface.executeCommand(command);
+    }
+
+    public void setStep(int step) {
+        this.step = step;
     }
 
     public void showNext() {
@@ -135,6 +142,14 @@ public final class HadoopWizard extends Window {
                 textAreaTerminal.setCursorPosition(output.length() - 1);
             }
         }
+    }
+
+    public String getClusterName() {
+        return clusterName;
+    }
+
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
     }
 
     public CommandManagerInterface getCommandManager() {

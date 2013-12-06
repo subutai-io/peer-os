@@ -64,8 +64,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getAgentsByHeartbeat(long from, long to) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getAgentsByHeartbeat(long from, long to) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = false and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -108,16 +108,16 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getRegisteredAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         list.addAll(getRegisteredPhysicalAgents(freshness));
         list.addAll(getRegisteredLxcAgents(freshness));
         return list;
     }
 
     @Override
-    public Set<Agent> getRegisteredLxcAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredLxcAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = true and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -143,8 +143,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getRegisteredPhysicalAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredPhysicalAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = false and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -170,8 +170,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = true and parenthostname = ? and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -197,8 +197,8 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Set<Agent> getUnknownChildLxcAgents(long freshness) {
-        Set<Agent> list = new HashSet<Agent>();
+    public List<Agent> getUnknownChildLxcAgents(long freshness) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
             String cql = "select * from agents where islxc = true and parenthostname = ? and lastheartbeat >= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
@@ -589,7 +589,7 @@ public class Persistence implements PersistenceInterface {
                     + "values (?,?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(cluster.getUid(),
+            session.execute(boundStatement.bind(cluster.getUid(),
                     cluster.getClusterName(), cluster.getNameNode(),
                     cluster.getSecondaryNameNode(), cluster.getJobTracker(),
                     cluster.getReplicationFactor(), cluster.getDataNodes(),

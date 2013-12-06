@@ -51,7 +51,7 @@ public class LxcManageForm extends VerticalLayout {
         buttonRefresh.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Set<Agent> agents = AppData.getSelectedAgentList();
+                List<Agent> agents = AppData.getSelectedAgentList();
                 if (agents != null && agents.size() > 0) {
                     Set<Agent> physicalAgents = new HashSet<Agent>();
                     for (Agent agent : agents) {

@@ -33,21 +33,21 @@ public interface PersistenceInterface {
 
     boolean saveResponse(Response response);
 
-    Set<Agent> getRegisteredAgents(long freshness);
+    List<Agent> getRegisteredAgents(long freshness);
 
-    Set<Agent> getRegisteredLxcAgents(long freshness);
+    List<Agent> getRegisteredLxcAgents(long freshness);
 
-    Set<Agent> getUnknownChildLxcAgents(long freshness);
+    List<Agent> getUnknownChildLxcAgents(long freshness);
 
-    Set<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness);
+    List<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness);
 
-    Set<Agent> getRegisteredPhysicalAgents(long freshness);
+    List<Agent> getRegisteredPhysicalAgents(long freshness);
 
     Agent getRegisteredLxcAgentByHostname(String hostname, long freshness);
 
     Agent getRegisteredPhysicalAgentByHostname(String hostname, long freshness);
 
-    Set<Agent> getAgentsByHeartbeat(long from, long to);
+    List<Agent> getAgentsByHeartbeat(long from, long to);
 
     Agent getAgent(UUID uuid);
 

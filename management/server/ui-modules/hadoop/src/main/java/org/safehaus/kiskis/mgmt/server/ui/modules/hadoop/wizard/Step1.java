@@ -5,15 +5,31 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bahadyr
  */
 public class Step1 extends Panel {
 
+    private HadoopWizard parent;
+    private List<Agent> lxcAgent;
+
     public Step1(final HadoopWizard hadoopWizard) {
+        this.parent = hadoopWizard;
+
+        lxcAgent = getLxcAgents();
+
         setCaption("Welcome to Hadoop Cluster Installation");
         setSizeFull();
 
@@ -40,14 +56,28 @@ public class Step1 extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayout.setSpacing(true);
 
-        TextField textFieldClusterName = new TextField("Enter your cluster name");
+        final TextField textFieldClusterName = new TextField("Enter your cluster name");
         textFieldClusterName.setInputPrompt("Cluster name");
+        textFieldClusterName.setRequired(true);
+        textFieldClusterName.setRequiredError("Must have a name");
         verticalLayoutForm.addComponent(textFieldClusterName);
 
         Label labelNameNode = new Label("Choose the host that will run Name Node:");
         verticalLayoutForm.addComponent(labelNameNode);
 
         ComboBox comboBoxNameNode = new ComboBox("Name Node");
+        comboBoxNameNode.setMultiSelect(false);
+        for(Agent agent : lxcAgent){
+            Item item = (Item) comboBoxNameNode.addItem(agent.getHostname());
+            Property property = item.getItemProperty("value");
+            property.setValue(agent);
+        }
+        comboBoxNameNode.addListener(new Property.ValueChangeListener(){
+            @Override
+            public void valueChange(Property.ValueChangeEvent event){
+                System.out.println(event.getProperty());
+            }
+        });
         // add items
         verticalLayoutForm.addComponent(comboBoxNameNode);
 
@@ -80,7 +110,10 @@ public class Step1 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                createTask();
+                parent.setClusterName(textFieldClusterName.getValue().toString());
                 hadoopWizard.showNext();
+
             }
         });
 
@@ -88,6 +121,35 @@ public class Step1 extends Panel {
         verticalLayout.addComponent(next);
 
         addComponent(verticalLayout);
+    }
+
+    private void createTask() {
+        Task clusterTask = new Task();
+        clusterTask.setTaskStatus(TaskStatus.NEW);
+        clusterTask.setDescription("Setup Hadoop cluster");
+
+        parent.setTask(clusterTask);
+    }
+
+    private List<Agent> getLxcAgents() {
+        if (AppData.getSelectedAgentList() != null) {
+            List<Agent> list =  new ArrayList<Agent>();
+            for(Agent agent : AppData.getSelectedAgentList()) {
+                if(agent.isIsLXC()){
+                    list.add(agent);
+                }
+            }
+
+            if(list.size() == 0){
+                getWindow().showNotification("Select lxc agents at first");
+                parent.setStep(-1);
+                parent.showNext();
+            } else {
+                return list;
+            }
+        }
+
+        return null;
     }
 
 }
