@@ -33,7 +33,7 @@ public final class CassandraWizard extends Window {
     int step = 1;
 
     /**
-     * 
+     *
      */
     public CassandraWizard() {
         setModal(true);
@@ -50,6 +50,7 @@ public final class CassandraWizard extends Window {
         progressBar = new ProgressIndicator();
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(true);
+        progressBar.setPollingInterval(30000);
         progressBar.setValue(0f);
         progressBar.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         gridLayout.addComponent(progressBar, 0, 0);
@@ -162,6 +163,8 @@ public final class CassandraWizard extends Window {
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
                 output.append("OK ").append(response.getStdOut().trim());
             }
+            System.out.println("RESPONE: " + response.toString());
+
             switch (response.getType()) {
                 case EXECUTE_RESPONSE_DONE: {
                     switch (step) {
@@ -203,8 +206,7 @@ public final class CassandraWizard extends Window {
                 return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
             }
         }
-        
-        
+
         return null;
     }
 }
