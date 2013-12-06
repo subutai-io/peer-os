@@ -140,7 +140,7 @@ public class LxcCloneForm extends VerticalLayout implements
     }
 
     public void setTaskStatus() {
-        if (getCommandManager() != null) {
+        if (getCommandManager() != null && cloneTask.getTaskStatus().compareTo(TaskStatus.NEW) == 0) {
             boolean isSuccess = true;
             List<Request> requests = getCommandManager().getCommands(cloneTask.getUuid());
             Integer responseCount = getCommandManager().getResponseCount(cloneTask.getUuid());
