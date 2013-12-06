@@ -237,7 +237,18 @@ int main(int argc,char *argv[],char *envp[])
 		return 300;
 	}
 	KALogger logMain;
-	logMain.openLogFileWithName("KiskisAgentMain.log");
+	if(!logMain.openLogFileWithName("KiskisAgentMain.log"))
+	{
+		cout << "/var/log/ksks-agent/ folder does not exist.. KiskisAgent is going to be closed.."<<endl;
+		FILE* dumplog = fopen("/etc/ksks-agent_dump.log","a+");
+		string log = "<DEBUG> /var/log/ksks-agent/ folder does not exist.. KiskisAgent is going to be closed.. \n";
+		fprintf(dumplog,log.c_str());
+		fflush(dumplog);
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
+		return 200;
+	}
 	logMain.setLogLevel(7);
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent is starting.."));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is reading.."));
