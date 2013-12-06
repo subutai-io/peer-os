@@ -40,34 +40,41 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     @Override
     public void getCommand(Response response) {
-        switch (response.getType()) {
-            case EXECUTE_TIMEOUTED:
-            case EXECUTE_RESPONSE: {
-                persistenceCommand.saveResponse(response);
-                notifyListeners(response);
-                break;
+        try {
+            switch (response.getType()) {
+                case EXECUTE_TIMEOUTED: {
+                    System.out.println(response.getType());
+                }
+                case EXECUTE_RESPONSE: {
+                    persistenceCommand.saveResponse(response);
+                    notifyListeners(response);
+                    break;
+                }
+                case EXECUTE_RESPONSE_DONE: {
+                    persistenceCommand.saveResponse(response);
+                    notifyListeners(response);
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
-            case EXECUTE_RESPONSE_DONE: {
-                persistenceCommand.saveResponse(response);
-                notifyListeners(response);
-                break;
-            }
-            default: {
-                break;
-            }
+        } catch (Exception e) {
+            System.out.println("EXCEPTION: " + e.getMessage());
         }
     }
 
     private void notifyListeners(Response response) {
         try {
             System.out.println("Module count: " + listeners.size());
-            for (CommandListener ai : listeners) {
-                if (ai != null && ai.getName() != null) {
-                    if (response.getSource() != null && ai.getName().equals(response.getSource())) {
-                        ai.outputCommand(response);
+            for (CommandListener commandListener : listeners) {
+                if (commandListener != null && commandListener.getName() != null) {
+                    System.out.println(commandListener.getName());
+                    if (response.getSource() != null && commandListener.getName().equals(response.getSource())) {
+                        commandListener.outputCommand(response);
                     }
                 } else {
-                    listeners.remove(ai);
+                    listeners.remove(commandListener);
                 }
             }
         } catch (Exception ex) {
