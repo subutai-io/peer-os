@@ -1,6 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.EvictingQueue;
+import com.google.common.collect.Queues;
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -14,16 +17,26 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
-    private BundleContext context;
+    private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
     private static ModuleComponent component;
+    //messages queue
+    private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
+    private static final Queue messagesQueue = Queues.synchronizedQueue(queue);
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    //messages queue
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
@@ -115,10 +128,43 @@ public class Terminal implements Module {
             verticalLayout.addComponent(textAreaOutput);
 
             setCompositionRoot(verticalLayout);
+
+            //messages queue
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (!Thread.interrupted()) {
+                        try {
+                            processAllResponses();
+                            Thread.sleep(100);
+                        } catch (Exception ex) {
+                        }
+                    }
+                }
+            });
+            //messages queue
         }
 
         @Override
-        public synchronized void outputCommand(Response response) {
+        public void outputCommand(Response response) {
+            //messages queue
+            messagesQueue.add(response);
+            //messages queue
+        }
+
+        //messages queue
+        private void processAllResponses() {
+            if (!messagesQueue.isEmpty()) {
+                Response[] responses = (Response[]) messagesQueue.toArray(new Response[0]);
+                messagesQueue.clear();
+                for (Response response : responses) {
+                    processResponse(response);
+                }
+            }
+        }
+        //messages queue
+
+        private void processResponse(Response response) {
             try {
                 if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
                     StringBuilder sb = new StringBuilder();
@@ -141,9 +187,8 @@ public class Terminal implements Module {
                     textAreaOutput.setCursorPosition(sb.length() - 1);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
             }
-
         }
 
         @Override
@@ -219,7 +264,7 @@ public class Terminal implements Module {
 
                                         Command command = new Command(r);
                                         commandManagerInterface.executeCommand(command);
-                                    }else{
+                                    } else {
                                         textAreaOutput.setValue("ERROR IN COMMAND JSON");
                                     }
                                 } else {
@@ -255,8 +300,7 @@ public class Terminal implements Module {
                         }
                     } catch (Exception ex) {
                         getWindow().showNotification(ex.toString());
-                        System.out.println("buttonClick event Exception");
-                        ex.printStackTrace();
+                        LOG.log(Level.SEVERE, "Error in buttonClick", ex);
                     }
                 }
             });
@@ -393,10 +437,6 @@ public class Terminal implements Module {
             getCommandManager().removeListener(component);
             service.unregisterModule(this);
         }
-    }
-
-    public void setContext(BundleContext context) {
-        this.context = context;
     }
 
     public static CommandManagerInterface getCommandManager() {
