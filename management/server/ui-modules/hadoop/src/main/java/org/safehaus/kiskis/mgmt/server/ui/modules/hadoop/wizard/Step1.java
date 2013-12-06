@@ -68,9 +68,7 @@ public class Step1 extends Panel {
         ComboBox comboBoxNameNode = new ComboBox("Name Node");
         comboBoxNameNode.setMultiSelect(false);
         for(Agent agent : lxcAgent){
-            Item item = (Item) comboBoxNameNode.addItem(agent.getHostname());
-            Property property = item.getItemProperty("value");
-            property.setValue(agent);
+            comboBoxNameNode.addItem(agent.getUuid());
         }
         comboBoxNameNode.addListener(new Property.ValueChangeListener(){
             @Override

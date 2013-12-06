@@ -8,7 +8,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -484,9 +487,13 @@ public class Persistence implements PersistenceInterface {
                 request.setRequestSequenceNumber(row.getInt("reqseqnum"));
                 request.setRunAs(row.getString("runsas"));
                 request.setSource(row.getString("source"));
-                request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                if (row.getString("outputredirectionstderr") != null) {
+                    request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                }
                 request.setStdErrPath(row.getString("erroutpath"));
-                request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
+                if (row.getString("outputredirectionstdout") != null) {
+                    request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
+                }
                 request.setStdOutPath(row.getString("stdoutpath"));
                 request.setTaskUuid(row.getUUID("taskuuid"));
                 request.setTimeout(row.getInt("timeout"));
