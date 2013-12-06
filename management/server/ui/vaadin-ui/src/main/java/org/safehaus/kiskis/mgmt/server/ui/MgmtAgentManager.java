@@ -39,7 +39,8 @@ public final class MgmtAgentManager extends VerticalLayout implements
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
-        setSpacing(true);
+        //setSpacing(true);
+        setMargin(true);
 
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setMultiSelect(true);

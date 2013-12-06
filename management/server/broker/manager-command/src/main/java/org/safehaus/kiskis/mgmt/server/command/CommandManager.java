@@ -201,18 +201,18 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                 }
             }
 
-            Integer exitCode = 1;
+            Integer exitCode = 0;
             for(Request request : requestList){
                 Response response = getResponse(task.getUuid(), request.getRequestSequenceNumber());
 
                 if(response != null){
                     result.add(new ParseResult(request, response));
-                    exitCode &= response.getExitCode();
+                    exitCode += response.getExitCode();
                 }
             }
 
             if(isResponseDone){
-                if(exitCode == 1){
+                if(exitCode == 0){
                     task.setTaskStatus(TaskStatus.SUCCESS);
                 } else {
                     task.setTaskStatus(TaskStatus.FAIL);
