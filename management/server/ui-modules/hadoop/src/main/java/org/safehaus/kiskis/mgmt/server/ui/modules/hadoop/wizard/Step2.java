@@ -73,7 +73,7 @@ public class Step2 extends Panel {
         twinColSelectDataNodes.setImmediate(true);
         twinColSelectDataNodes.setLeftColumnCaption("Available Nodes");
         twinColSelectDataNodes.setRightColumnCaption("Data Nodes");
-        twinColSelectDataNodes.setWidth("350px");
+        twinColSelectDataNodes.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         verticalLayoutForm.addComponent(twinColSelectDataNodes);
 
         Label labelTaskTrackerCaption = new Label("<strong>Enter a list of hosts that will run as Task tracker.<br>" +
@@ -82,13 +82,14 @@ public class Step2 extends Panel {
         verticalLayoutForm.addComponent(labelTaskTrackerCaption);
 
         TwinColSelect twinColSelectTaskTrackers = new TwinColSelect("", agents);
+        twinColSelectTaskTrackers.setItemCaptionPropertyId("hostname");
         twinColSelectTaskTrackers.setRows(10);
         twinColSelectTaskTrackers.setNullSelectionAllowed(true);
         twinColSelectTaskTrackers.setMultiSelect(true);
         twinColSelectTaskTrackers.setImmediate(true);
         twinColSelectTaskTrackers.setLeftColumnCaption("Available Nodes");
         twinColSelectTaskTrackers.setRightColumnCaption("Task Trackers");
-        twinColSelectTaskTrackers.setWidth("350px");
+        twinColSelectTaskTrackers.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         verticalLayoutForm.addComponent(twinColSelectTaskTrackers);
 
         grid.addComponent(verticalLayoutForm, 1, 0, 5, 9);
