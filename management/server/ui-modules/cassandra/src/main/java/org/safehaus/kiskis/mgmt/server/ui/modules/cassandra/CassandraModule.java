@@ -111,7 +111,6 @@ public class CassandraModule implements Module {
                 }
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
-                ex.printStackTrace();
             }
         }
         //messages queue
@@ -119,9 +118,10 @@ public class CassandraModule implements Module {
         @Override
         public void outputCommand(Response response) {
             //messages queue
-            messagesQueue.add(response);
-            //messages queue
-
+            if (response != null && response.getSource().equals(MODULE_NAME)) //messages queue
+            {
+                messagesQueue.add(response);
+            }
         }
 
         @Override
