@@ -456,11 +456,11 @@ public class Terminal implements Module {
     }
 
     public void unsetModuleService(ModuleService service) {
+        service.unregisterModule(this);
+        component.executor.shutdown();
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
         }
-        service.unregisterModule(this);
-        component.executor.shutdown();
         System.out.println("Terminal: Unregistering with ModuleService");
     }
 
