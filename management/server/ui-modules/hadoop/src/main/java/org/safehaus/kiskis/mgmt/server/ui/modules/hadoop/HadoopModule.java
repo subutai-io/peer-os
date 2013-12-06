@@ -10,9 +10,14 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HadoopModule implements Module {
 
@@ -36,8 +41,10 @@ public class HadoopModule implements Module {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    subwindow = new HadoopWizard();
-                    getApplication().getMainWindow().addWindow(subwindow);
+                    if(getLxcAgents().size() > 0){
+                        subwindow = new HadoopWizard(getLxcAgents());
+                        getApplication().getMainWindow().addWindow(subwindow);
+                    }
                 }
             });
             verticalLayout.addComponent(buttonInstallWizard);
@@ -47,7 +54,7 @@ public class HadoopModule implements Module {
         }
 
         @Override
-        public synchronized void outputCommand(Response response) {
+        public void outputCommand(Response response) {
             try {
                 if(response != null
                         && response.getSource().equals(MODULE_NAME)
@@ -65,6 +72,19 @@ public class HadoopModule implements Module {
         @Override
         public String getName() {
             return HadoopModule.MODULE_NAME;
+        }
+
+        private List<Agent> getLxcAgents() {
+            List<Agent> list =  new ArrayList<Agent>();
+            if (AppData.getSelectedAgentList() != null) {
+                for(Agent agent : AppData.getSelectedAgentList()) {
+                    if(agent.isIsLXC()){
+                        list.add(agent);
+                    }
+                }
+            }
+
+            return list;
         }
     }
 

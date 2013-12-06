@@ -28,8 +28,6 @@ public class Step1 extends Panel {
     public Step1(final HadoopWizard hadoopWizard) {
         this.parent = hadoopWizard;
 
-        lxcAgent = getLxcAgents();
-
         setCaption("Welcome to Hadoop Cluster Installation");
         setSizeFull();
 
@@ -67,9 +65,7 @@ public class Step1 extends Panel {
 
         ComboBox comboBoxNameNode = new ComboBox("Name Node");
         comboBoxNameNode.setMultiSelect(false);
-        for(Agent agent : lxcAgent){
-            comboBoxNameNode.addItem(agent.getUuid());
-        }
+        comboBoxNameNode.setContainerDataSource(parent.getContainer());
         comboBoxNameNode.addListener(new Property.ValueChangeListener(){
             @Override
             public void valueChange(Property.ValueChangeEvent event){
@@ -128,26 +124,4 @@ public class Step1 extends Panel {
 
         parent.setTask(clusterTask);
     }
-
-    private List<Agent> getLxcAgents() {
-        if (AppData.getSelectedAgentList() != null) {
-            List<Agent> list =  new ArrayList<Agent>();
-            for(Agent agent : AppData.getSelectedAgentList()) {
-                if(agent.isIsLXC()){
-                    list.add(agent);
-                }
-            }
-
-            if(list.size() == 0){
-                getWindow().showNotification("Select lxc agents at first");
-                parent.setStep(-1);
-                parent.showNext();
-            } else {
-                return list;
-            }
-        }
-
-        return null;
-    }
-
 }

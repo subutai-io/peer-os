@@ -1,16 +1,25 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.google.common.base.Strings;
+import com.vaadin.data.Item;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public final class HadoopWizard extends Window {
 
@@ -19,6 +28,8 @@ public final class HadoopWizard extends Window {
     private final VerticalLayout verticalLayout;
     private Task task;
     private String clusterName;
+    private List<Agent> lxcList;
+    private IndexedContainer container;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
@@ -28,9 +39,10 @@ public final class HadoopWizard extends Window {
     Step2 step2;
     int step = 1;
 
-    public HadoopWizard() {
+    public HadoopWizard(List<Agent> lxcList) {
         setModal(true);
 
+        this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
         setCaption("HadoopModule Wizard");
 
@@ -71,10 +83,6 @@ public final class HadoopWizard extends Window {
 
     public void runCommand(Command command) {
         commandManagerInterface.executeCommand(command);
-    }
-
-    public void setStep(int step) {
-        this.step = step;
     }
 
     public void showNext() {
@@ -150,6 +158,26 @@ public final class HadoopWizard extends Window {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    public IndexedContainer getContainer() {
+        return container;
+    }
+
+    public void setContainer() {
+        container = new IndexedContainer();
+
+        // Create the container properties
+        container.addContainerProperty("id", UUID.class, "");
+        container.addContainerProperty("value", Agent.class, "");
+
+        for(Agent lxc : lxcList) {
+            Object itemId = container.addItem();
+            Item item = container.getItem(itemId);
+
+            item.getItemProperty("id").setValue(lxc.getUuid());
+            item.getItemProperty("value").setValue(lxc);
+        }
     }
 
     public CommandManagerInterface getCommandManager() {
