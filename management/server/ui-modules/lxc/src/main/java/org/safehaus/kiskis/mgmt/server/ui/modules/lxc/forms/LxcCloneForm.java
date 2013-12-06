@@ -71,10 +71,9 @@ public class LxcCloneForm extends VerticalLayout implements
         hLayout.setComponentAlignment(buttonClone, Alignment.BOTTOM_CENTER);
         panel.addComponent(hLayout);
 
-        // let's adjust the panels default layout (a VerticalLayout)
         VerticalLayout layout = (VerticalLayout) panel.getContent();
-        layout.setMargin(true); // we want a margin
-        layout.setSpacing(true); // and spacing between components
+        layout.setMargin(true);
+        layout.setSpacing(true);
 
         outputPanel = new Panel("Clone command output");
 
@@ -191,7 +190,6 @@ public class LxcCloneForm extends VerticalLayout implements
     }
 
     public CommandManagerInterface getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(LxcModule.class).getBundleContext();
         if (ctx != null) {
             ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());

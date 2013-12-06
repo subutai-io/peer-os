@@ -303,7 +303,6 @@ public class LxcTable extends Table {
                             buttonStop.setEnabled(true);
                             buttonStart.setEnabled(false);
                         }
-                        System.out.println(lxc + " " + out);
                     }
                 }
             }
