@@ -34,7 +34,7 @@ public class Terminal implements Module {
     private static ModuleComponent component;
     //messages queue
     private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-    private static final Queue messagesQueue = Queues.synchronizedQueue(queue);
+    private static final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     //messages queue
 
@@ -98,7 +98,7 @@ public class Terminal implements Module {
 
             HorizontalLayout hLayout = new HorizontalLayout();
             Button buttonSend = genSendButton();
-            Button buttonClear = genClearButton();
+            Button buttonClear = getClearButton();
             Button getRequests = genGetRequestButton();
             Button getResponses = genGetResponsesButton();
             Button getTasks = getGetTasksButton();
@@ -149,7 +149,9 @@ public class Terminal implements Module {
         @Override
         public void outputCommand(Response response) {
             //messages queue
-            messagesQueue.add(response);
+            if (response != null && response.getSource().equals(MODULE_NAME)) {
+                messagesQueue.add(response);
+            }
             //messages queue
         }
 
@@ -422,6 +424,18 @@ public class Terminal implements Module {
                     clusterData.setSeeds(listUuid);
                     commandManagerInterface.saveCassandraClusterData(clusterData);
                     textAreaOutput.setValue(clusterData);
+                }
+            });
+            return button;
+        }
+
+        private Button getClearButton() {
+            Button button = new Button("Clear");
+            button.setDescription("Clear output area");
+            button.addListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    textAreaOutput.setValue("");
                 }
             });
             return button;
