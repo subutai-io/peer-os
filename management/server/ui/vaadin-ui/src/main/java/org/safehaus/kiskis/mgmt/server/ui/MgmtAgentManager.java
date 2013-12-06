@@ -45,8 +45,8 @@ public final class MgmtAgentManager extends VerticalLayout implements
         tree.setMultiSelect(true);
         tree.setImmediate(true);
         tree.addListener(this);
-        addComponent(tree);
         addComponent(getRefreshButton());
+        addComponent(tree);
 
         agentManagerService.addListener(this);
 

@@ -141,7 +141,7 @@ public class LxcCloneForm extends VerticalLayout implements
 
     public void setTaskStatus() {
         if (getCommandManager() != null && cloneTask.getTaskStatus().compareTo(TaskStatus.NEW) == 0) {
-            boolean isSuccess = true;
+            /*boolean isSuccess = true;
             List<Request> requests = getCommandManager().getCommands(cloneTask.getUuid());
             Integer responseCount = getCommandManager().getResponseCount(cloneTask.getUuid());
 
@@ -186,6 +186,31 @@ public class LxcCloneForm extends VerticalLayout implements
                     cloneTask.setTaskStatus(TaskStatus.FAIL);
                 }
                 getCommandManager().saveTask(cloneTask);
+            }*/
+
+            List<ParseResult> result = getCommandManager().parseTask(cloneTask, true);
+            for (ParseResult pr : result) {
+                if (pr.getResponse().getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
+                    if (pr.getResponse().getExitCode() == 0) {
+                        Label labelOk = new Label(pr.getResponse().getStdOut());
+                        labelOk.setIcon(new ThemeResource("icons/16/ok.png"));
+                        outputPanel.addComponent(labelOk);
+
+                        buttonClone.setEnabled(true);
+                    } else {
+                        Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
+                        labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
+                        outputPanel.addComponent(labelError);
+
+                        buttonClone.setEnabled(true);
+                    }
+                } else if (pr.getResponse().getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
+                    Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
+                    labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
+                    outputPanel.addComponent(labelError);
+
+                    buttonClone.setEnabled(true);
+                }
             }
         }
     }
