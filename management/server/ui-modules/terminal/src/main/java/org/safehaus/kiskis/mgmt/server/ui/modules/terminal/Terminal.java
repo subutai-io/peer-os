@@ -3,7 +3,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 import com.google.common.base.Strings;
 import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Queues;
-import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -98,6 +97,7 @@ public class Terminal implements Module {
 
             HorizontalLayout hLayout = new HorizontalLayout();
             Button buttonSend = genSendButton();
+            Button buttonClear = getClearButton();
             Button getRequests = genGetRequestButton();
             Button getResponses = genGetResponsesButton();
             Button getTasks = getGetTasksButton();
@@ -107,6 +107,7 @@ public class Terminal implements Module {
             Button buttonCreateCluster = getClusterButton();
 
             hLayout.addComponent(buttonSend);
+            hLayout.addComponent(buttonClear);
             hLayout.addComponent(getRequests);
             hLayout.addComponent(getResponses);
             hLayout.addComponent(getTasks);
@@ -182,9 +183,9 @@ public class Terminal implements Module {
                                 response.getRequestSequenceNumber());
                         sb.append(CommandJson.getJson(new Command(result)));
                     }
-
-                    textAreaOutput.setValue(sb);
-                    textAreaOutput.setCursorPosition(sb.length() - 1);
+                    String result = sb.toString().replace("\\n", "\n");
+                    textAreaOutput.setValue(result);
+                    textAreaOutput.setCursorPosition(result.length() - 1);
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
@@ -407,6 +408,18 @@ public class Terminal implements Module {
                     clusterData.setSeeds(listUuid);
                     commandManagerInterface.saveCassandraClusterData(clusterData);
                     textAreaOutput.setValue(clusterData);
+                }
+            });
+            return button;
+        }
+
+        private Button getClearButton() {
+            Button button = new Button("Clear");
+            button.setDescription("Clear output area");
+            button.addListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    textAreaOutput.setValue("");
                 }
             });
             return button;
