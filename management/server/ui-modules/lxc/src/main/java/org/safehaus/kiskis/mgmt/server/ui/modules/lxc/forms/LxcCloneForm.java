@@ -140,54 +140,7 @@ public class LxcCloneForm extends VerticalLayout implements
     }
 
     public void setTaskStatus() {
-        if (getCommandManager() != null && cloneTask.getTaskStatus().compareTo(TaskStatus.NEW) == 0) {
-            /*boolean isSuccess = true;
-            List<Request> requests = getCommandManager().getCommands(cloneTask.getUuid());
-            Integer responseCount = getCommandManager().getResponseCount(cloneTask.getUuid());
-
-            if (requests.size() == responseCount) {
-                for (Request request : requests) {
-                    Response response = getCommandManager().getResponse(
-                            cloneTask.getUuid(),
-                            request.getRequestSequenceNumber());
-                    if (response == null) {
-                        return;
-                    } else {
-                        if (response.getType().equals(ResponseType.EXECUTE_TIMEOUTED)
-                                && response.getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
-                            isSuccess = false;
-
-                            Label labelError = new Label(response.getStdErr());
-                            labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
-                            outputPanel.addComponent(labelError);
-
-                            buttonClone.setEnabled(true);
-                        } else if (response.getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
-                            if (response.getExitCode() == 0) {
-                                Label labelOk = new Label(response.getStdOut());
-                                labelOk.setIcon(new ThemeResource("icons/16/ok.png"));
-                                outputPanel.addComponent(labelOk);
-
-                                buttonClone.setEnabled(true);
-                            } else {
-                                Label labelError = new Label(response.getStdOut());
-                                labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
-                                outputPanel.addComponent(labelError);
-
-                                buttonClone.setEnabled(true);
-                            }
-                        }
-                    }
-                }
-
-                if (isSuccess) {
-                    cloneTask.setTaskStatus(TaskStatus.SUCCESS);
-                } else {
-                    cloneTask.setTaskStatus(TaskStatus.FAIL);
-                }
-                getCommandManager().saveTask(cloneTask);
-            }*/
-
+        if (getCommandManager() != null) {
             List<ParseResult> result = getCommandManager().parseTask(cloneTask, true);
             for (ParseResult pr : result) {
                 if (pr.getResponse().getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {

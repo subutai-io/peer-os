@@ -170,10 +170,10 @@ public class Terminal implements Module {
         private void processResponse(Response response) {
             try {
                 if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
-                    StringBuilder sb = new StringBuilder();
-
                     if (response.getTaskUuid() != null
                             && response.getTaskUuid().compareTo(task.getUuid()) == 0) {
+
+                        StringBuilder sb = new StringBuilder();
 
                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                             task.setTaskStatus(TaskStatus.SUCCESS);
@@ -184,10 +184,11 @@ public class Terminal implements Module {
                         Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
                                 response.getRequestSequenceNumber());
                         sb.append(CommandJson.getJson(new Command(result)));
+
+                        String resultStr = sb.toString().replace("\\n", "\n");
+                        textAreaOutput.setValue(result);
+                        textAreaOutput.setCursorPosition(resultStr.length() - 1);
                     }
-                    String result = sb.toString().replace("\\n", "\n");
-                    textAreaOutput.setValue(result);
-                    textAreaOutput.setCursorPosition(result.length() - 1);
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);

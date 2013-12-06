@@ -7,18 +7,14 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Window;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -129,9 +125,6 @@ public class LxcTable extends Table {
     private Task startTask;
     private Task stopTask;
 
-    public static final int REQUEST = 0, RESPONSE = 1, OUTPUT_SIZE = 2;
-    private List<ParseResult> output;
-
     public LxcTable() {
         this.setCaption(" LXC containers");
         this.setContainerDataSource(getContainer(new String[]{}));
@@ -233,8 +226,9 @@ public class LxcTable extends Table {
     }
 
     public void outputResponse(Response response) {
+        List<ParseResult> output;
         if (listTask != null && response.getTaskUuid().compareTo(listTask.getUuid()) == 0) {
-            output = parseResponse(listTask);
+            output = getCommandManager().parseTask(listTask, true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     refreshDataSource(pr);
@@ -242,14 +236,14 @@ public class LxcTable extends Table {
             }
 
         } else if (infoTask != null && response.getTaskUuid().compareTo(infoTask.getUuid()) == 0) {
-            output = parseResponse(infoTask);
+            output = getCommandManager().parseTask(infoTask, true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
                 }
             }
         } else if (destroyTask != null && response.getTaskUuid().compareTo(destroyTask.getUuid()) == 0) {
-            output = parseResponse(destroyTask);
+            output = getCommandManager().parseTask(destroyTask, true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -258,7 +252,7 @@ public class LxcTable extends Table {
             listTask = createTask("List lxc container");
             createRequest(LIST_LXC, listTask, null);
         } else if (startTask != null && response.getTaskUuid().compareTo(startTask.getUuid()) == 0) {
-            output = parseResponse(startTask);
+            output = getCommandManager().parseTask(startTask, true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -267,7 +261,7 @@ public class LxcTable extends Table {
             listTask = createTask("List lxc container");
             createRequest(LIST_LXC, listTask, null);
         } else if (stopTask != null && response.getTaskUuid().compareTo(stopTask.getUuid()) == 0) {
-            output = parseResponse(stopTask);
+            output = getCommandManager().parseTask(stopTask, true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -308,65 +302,6 @@ public class LxcTable extends Table {
             }
         }
     }
-
-    private List<ParseResult> parseResponse(Task task) {
-        List<ParseResult> result = new ArrayList<ParseResult>();
-        if (getCommandManager() != null) {
-            boolean isSuccess = true;
-            List<Request> requests = getCommandManager().getCommands(task.getUuid());
-            Integer responseCount = getCommandManager().getResponseCount(task.getUuid());
-
-            if (requests.size() == responseCount) {
-                for (Request request : requests) {
-                    Response response = getCommandManager().getResponse(
-                            task.getUuid(),
-                            request.getRequestSequenceNumber());
-
-                    if (response == null) {
-                        return null;
-                    } else {
-                        if (response.getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
-                            isSuccess = false;
-
-                            getWindow().showNotification(
-                                    "Error",
-                                    response.getStdErr(),
-                                    Window.Notification.TYPE_ERROR_MESSAGE);
-                        } else {
-                            if (response.getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
-                                if (response.getExitCode() == 0) {
-                                    ParseResult pr = new ParseResult(request, response);
-                                    result.add(pr);
-
-                                    if (!Strings.isNullOrEmpty(response.getStdErr().trim())) {
-                                        getWindow().showNotification(
-                                                "Warning",
-                                                response.getStdErr(),
-                                                Window.Notification.TYPE_TRAY_NOTIFICATION);
-                                    }
-                                } else {
-                                    getWindow().showNotification(
-                                            "Error",
-                                            response.getStdErr(),
-                                            Window.Notification.TYPE_ERROR_MESSAGE);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (isSuccess) {
-                    task.setTaskStatus(TaskStatus.SUCCESS);
-                } else {
-                    task.setTaskStatus(TaskStatus.FAIL);
-                }
-                getCommandManager().saveTask(task);
-            }
-        }
-
-        return result;
-    }
-
 
     private void refreshDataSource(ParseResult parseResult) {
         String[] lxcs = parseResult.getResponse().getStdOut().split("\\n");
