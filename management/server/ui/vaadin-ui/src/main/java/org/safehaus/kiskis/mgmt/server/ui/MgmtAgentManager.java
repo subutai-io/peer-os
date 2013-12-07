@@ -79,7 +79,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
                 container.removeAllItems();
                 registeredAgents.clear();
                 refreshAgents(agentManagerInterface.getRegisteredAgents());
-                AppData.setSelectedAgentList(registeredAgents);
+                AppData.setSelectedAgentList(new ArrayList<Agent>());
             }
         });
         return button;
