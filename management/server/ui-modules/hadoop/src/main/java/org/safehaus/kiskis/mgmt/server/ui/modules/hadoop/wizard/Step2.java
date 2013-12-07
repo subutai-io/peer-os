@@ -70,6 +70,7 @@ public class Step2 extends Panel {
         twinColSelectDataNodes.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
+                System.out.println(event.getProperty().getValue().getClass().getName());
                 System.out.println(event.getProperty().getValue());
             }
         });
