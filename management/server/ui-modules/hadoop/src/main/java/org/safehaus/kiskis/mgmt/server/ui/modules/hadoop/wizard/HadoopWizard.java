@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -7,6 +8,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -18,18 +20,14 @@ public final class HadoopWizard extends Window {
     private final CommandManagerInterface commandManagerInterface;
 
     private final VerticalLayout verticalLayout;
+    private Task task;
+    private String clusterName;
     private List<Agent> lxcList;
+    private IndexedContainer container;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 2;
-
-    private Task task;
-    private String clusterName;
-    private Agent nameNode;
-    private Agent jobTracker;
-    private Agent sNameNode;
-    private int replicationFactor;
 
     Step1 step1;
     Step2 step2;
@@ -77,6 +75,10 @@ public final class HadoopWizard extends Window {
         setContent(gridLayout);
     }
 
+    public void runCommand(Command command) {
+        commandManagerInterface.executeCommand(command);
+    }
+
     public void showNext() {
         step++;
         putForm();
@@ -118,8 +120,8 @@ public final class HadoopWizard extends Window {
     }
 
     public void setOutput(Response response) {
-        if (task != null) {
-            if (response.getTaskUuid().compareTo(task.getUuid()) == 0) {
+        if(task != null){
+            if (response.getTaskUuid().equals(task.getUuid().toString())) {
                 StringBuilder output = new StringBuilder();
                 output.append(textAreaTerminal.getValue());
                 if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
@@ -154,38 +156,6 @@ public final class HadoopWizard extends Window {
 
     public List<Agent> getLxcList() {
         return lxcList;
-    }
-
-    public Agent getNameNode() {
-        return nameNode;
-    }
-
-    public void setNameNode(Agent nameNode) {
-        this.nameNode = nameNode;
-    }
-
-    public Agent getJobTracker() {
-        return jobTracker;
-    }
-
-    public void setJobTracker(Agent jobTracker) {
-        this.jobTracker = jobTracker;
-    }
-
-    public Agent getsNameNode() {
-        return sNameNode;
-    }
-
-    public void setsNameNode(Agent sNameNode) {
-        this.sNameNode = sNameNode;
-    }
-
-    public int getReplicationFactor() {
-        return replicationFactor;
-    }
-
-    public void setReplicationFactor(int replicationFactor) {
-        this.replicationFactor = replicationFactor;
     }
 
     public CommandManagerInterface getCommandManager() {

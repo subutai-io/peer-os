@@ -33,7 +33,7 @@ public class AgentHeartBeat implements Runnable {
     }
 
     public void run() {
-        while (true) {
+        while (!Thread.interrupted()) {
             try {
                 //send hearbeats
                 if (commandSender != null) {

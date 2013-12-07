@@ -1,8 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.EvictingQueue;
-import com.google.common.collect.Queues;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -19,12 +17,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 public class Terminal implements Module {
 
@@ -45,11 +40,6 @@ public class Terminal implements Module {
         private final TextArea textAreaOutput;
         private List<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
-        //messages queue
-        private final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-        private final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
-        private final ExecutorService executor = Executors.newSingleThreadExecutor();
-        //messages queue        
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
             this.commandManagerInterface = commandManagerInterface;
@@ -129,47 +119,13 @@ public class Terminal implements Module {
             verticalLayout.addComponent(textAreaOutput);
 
             setCompositionRoot(verticalLayout);
-            addListener(new ComponentDetachListener() {
-                @Override
-                public void componentDetachedFromContainer(ComponentDetachEvent event) {
-                    System.out.println("Terminal is detached");
-                    executor.shutdown();
-                }
-            });
 
-            //messages queue
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    while (!Thread.interrupted()) {
-                        try {
-                            processAllResponses();
-                            Thread.sleep(500);
-                        } catch (Exception ex) {
-                            System.out.println("Error in Terminal Queue Processor " + ex);
-                        }
-                    }
-                }
-            });
-            //messages queue
         }
 
         @Override
         public void onCommand(Response response) {
-            messagesQueue.add(response);
+            processResponse(response);
         }
-
-        //messages queue
-        private void processAllResponses() {
-            if (!messagesQueue.isEmpty()) {
-                Response[] responses = messagesQueue.toArray(new Response[messagesQueue.size()]);
-                messagesQueue.clear();
-                for (Response response : responses) {
-                    processResponse(response);
-                }
-            }
-        }
-        //messages queue
 
         private void processResponse(Response response) {
             try {
@@ -453,7 +409,6 @@ public class Terminal implements Module {
 
     public void unsetModuleService(ModuleService service) {
         service.unregisterModule(this);
-        component.executor.shutdown();
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
         }

@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -26,12 +26,13 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     private PersistenceInterface persistenceAgent;
     private CommandManagerInterface commandManager;
     private CommandTransportInterface commandTransportInterface;
-    private final ConcurrentLinkedQueue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
-    private ExecutorService executorService;
+    private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
+    private ExecutorService exec;
     private int heartbeatTimeoutSec;
     private int heartbeatFromMin;
     private int heartbeatToMin;
     private int agentFreshnessMin;
+    private AgentNotifier agentNotifier;
 
     public AgentManager() {
     }
@@ -58,67 +59,70 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     }
 
     private void updateAgent(Response response, boolean register) {
-        Agent agent = new Agent();
-        agent.setUuid(response.getUuid());
-        agent.setHostname(response.getHostname());
-        agent.setMacAddress(response.getMacAddress());
-        if (response.isIsLxc() == null) {
-            agent.setIsLXC(false);
-        } else {
-            agent.setIsLXC(response.isIsLxc());
-        }
-        agent.setListIP(response.getIps());
-        if (agent.isIsLXC()) {
-            if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
-                agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
+        try {
+            Agent agent = new Agent();
+            agent.setUuid(response.getUuid());
+            agent.setHostname(response.getHostname());
+            agent.setMacAddress(response.getMacAddress());
+            if (response.isIsLxc() == null) {
+                agent.setIsLXC(false);
             } else {
-                agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
+                agent.setIsLXC(response.isIsLxc());
             }
-        }
+            agent.setListIP(response.getIps());
+            if (agent.isIsLXC()) {
+                if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
+                    agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
+                } else {
+                    agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
+                }
+            }
 
-        if (persistenceAgent.saveAgent(agent)) {
-            if (register) {
-                Task task = new Task();
-                task.setDescription("Agent registration");
-                task.setTaskStatus(TaskStatus.NEW);
-                task.setReqSeqNumber(0);
-                commandManager.saveTask(task);
-                response.setTaskUuid(task.getUuid());
-                response.setRequestSequenceNumber(task.getReqSeqNumber());
-                persistenceAgent.saveResponse(response);
-                //
-                Request request = new Request();
-                request.setTaskUuid(task.getUuid());
-                request.setRequestSequenceNumber(task.getReqSeqNumber());
-                request.setType(RequestType.REGISTRATION_REQUEST_DONE);
-                request.setUuid(agent.getUuid());
-                request.setSource(response.getSource());
-                request.setStdErr(OutputRedirection.NO);
-                request.setStdOut(OutputRedirection.NO);
-                Command command = new Command(request);
-                commandManager.executeCommand(command);
-                //
-                task.setTaskStatus(TaskStatus.SUCCESS);
-                persistenceAgent.saveTask(task);
-                //
+            if (persistenceAgent.saveAgent(agent)) {
+                if (register) {
+                    Task task = new Task();
+                    task.setDescription("Agent registration");
+                    task.setTaskStatus(TaskStatus.NEW);
+                    task.setReqSeqNumber(0);
+                    commandManager.saveTask(task);
+                    response.setTaskUuid(task.getUuid());
+                    response.setRequestSequenceNumber(task.getReqSeqNumber());
+                    persistenceAgent.saveResponse(response);
+                    //
+                    Request request = new Request();
+                    request.setTaskUuid(task.getUuid());
+                    request.setRequestSequenceNumber(task.getReqSeqNumber());
+                    request.setType(RequestType.REGISTRATION_REQUEST_DONE);
+                    request.setUuid(agent.getUuid());
+                    request.setSource(response.getSource());
+                    request.setStdErr(OutputRedirection.NO);
+                    request.setStdOut(OutputRedirection.NO);
+                    Command command = new Command(request);
+                    commandManager.executeCommand(command);
+                    //
+                    task.setTaskStatus(TaskStatus.SUCCESS);
+                    persistenceAgent.saveTask(task);
+                    //
+                }
+                agentNotifier.refresh = true;
+                System.out.println(agent + String.format("\nAgent is %s", register ? "registered" : "updated"));
+            } else {
+                System.out.println(agent + String.format("\nError %s agent", register ? "registering" : "updating"));
             }
-            notifyModules();
-            System.out.println(agent + String.format("\nAgent is %s", register ? "registered" : "updated"));
-        } else {
-            System.out.println(agent + String.format("\nError %s agent", register ? "registering" : "updating"));
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in updatAgent", ex);
         }
     }
 
-    private void notifyModules() {
-        for (AgentListener ai : listeners) {
-            if (ai != null) {
-                ai.onAgent();
-            } else {
-                listeners.remove(ai);
-            }
-        }
-    }
-
+//    private void notifyModules() {
+//        for (AgentListener ai : listeners) {
+//            if (ai != null) {
+//                ai.onAgent();
+//            } else {
+//                listeners.remove(ai);
+//            }
+//        }
+//    }
     @Override
     public void addListener(AgentListener listener) {
         try {
@@ -140,9 +144,11 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
     public void init() {
         try {
             if (commandTransportInterface != null) {
+                exec = Executors.newFixedThreadPool(2);
+                exec.execute(new AgentHeartBeat(this, commandTransportInterface, heartbeatTimeoutSec));
+                agentNotifier = new AgentNotifier(this, listeners);
+                exec.execute(agentNotifier);
                 commandTransportInterface.addListener(this);
-                executorService = Executors.newSingleThreadExecutor();
-                executorService.execute(new AgentHeartBeat(this, commandTransportInterface, heartbeatTimeoutSec));
             } else {
                 throw new Exception("Missing communication service");
             }
@@ -153,7 +159,7 @@ public class AgentManager implements AgentManagerInterface, BrokerListener {
 
     public void destroy() {
         try {
-            executorService.shutdownNow();
+            exec.shutdownNow();
             if (commandTransportInterface != null) {
                 commandTransportInterface.removeListener(this);
             }
