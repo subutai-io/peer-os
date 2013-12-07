@@ -78,8 +78,8 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 container.removeAllItems();
                 registeredAgents.clear();
+                AppData.getSelectedAgentList().clear();
                 refreshAgents(agentManagerInterface.getRegisteredAgents());
-                AppData.setSelectedAgentList(new ArrayList<Agent>());
             }
         });
         return button;
@@ -130,6 +130,9 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 registeredAgents.clear();
                 registeredAgents.addAll(allFreshAgents);
+                if (!AppData.getSelectedAgentList().isEmpty()) {
+                    AppData.getSelectedAgentList().retainAll(allFreshAgents);
+                }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
             }
