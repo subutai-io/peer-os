@@ -22,13 +22,7 @@ import java.util.UUID;
  * @author bahadyr
  */
 public class Step2 extends Panel {
-
-    private static final List<String> hosts = Arrays.asList(new String[]{
-            "hadoop-node1", "hadoop-node2", "hadoop-node3", "hadoop-node4", "hadoop-node5"});
-    //List<String> hosts;
     HadoopWizard parent;
-    String installationCommand = "apt-get --force-yes --assume-yes install ksks-zookeeper";
-    String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-zookeeper";
 
     public Step2(final HadoopWizard hadoopWizard) {
         parent = hadoopWizard;
