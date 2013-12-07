@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -17,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -132,10 +134,10 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             String stdOut = "", stdErr = "";
             for (Response r : list) {
                 response = r;
-                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null")) {
+                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdOut())) {
                     stdOut += "\n" + r.getStdOut();
                 }
-                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null")) {
+                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdErr())) {
                     stdErr += "\n" + r.getStdErr();
                 }
             }
@@ -145,7 +147,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                 response.setStdErr(stdErr);
             }
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getCommands", ex);
+            LOG.log(Level.SEVERE, "Error in getResponse", ex);
         }
         return response;
     }
@@ -188,17 +190,21 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                 }
             }
 
+
             Integer exitCode = 0;
             for (Request request : requestList) {
                 Response response = getResponse(task.getUuid(), request.getRequestSequenceNumber());
-
                 if (response != null) {
                     result.add(new ParseResult(request, response));
-                    exitCode += response.getExitCode();
+                    if (response.getType().compareTo(ResponseType.EXECUTE_RESPONSE_DONE) == 0) {
+                        exitCode += response.getExitCode();
+                    } else if (response.getType().compareTo(ResponseType.EXECUTE_TIMEOUTED) == 0) {
+                        exitCode = 1;
+                    }
                 }
             }
 
-            if (isResponseDone) {
+            if (isResponseDone || requestList.size() == responseCount) {
                 if (exitCode == 0) {
                     task.setTaskStatus(TaskStatus.SUCCESS);
                 } else {

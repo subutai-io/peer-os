@@ -372,7 +372,8 @@ public class Persistence implements PersistenceInterface {
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(response.getUuid(), response.getTaskUuid(),
                     response.getResponseSequenceNumber() == null ? -1 : response.getResponseSequenceNumber(),
-                    response.getExitCode(), response.getStdErr(), response.getHostname(), response.getIps(),
+                    response.getExitCode() == null ? -1 : response.getExitCode(), response.getStdErr(),
+                    response.getHostname(), response.getIps(),
                     response.getMacAddress(), response.getPid(),
                     response.getRequestSequenceNumber() == null ? -1 : response.getRequestSequenceNumber(),
                     response.getType().toString(),
