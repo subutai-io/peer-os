@@ -23,11 +23,13 @@ public final class HadoopWizard extends Window {
     private Task task;
     private String clusterName;
     private List<Agent> lxcList;
-    private IndexedContainer container;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 2;
+
+    private Agent nameNode, jobTracker, sNameNode;
+    private Integer replicationFactor;
 
     Step1 step1;
     Step2 step2;
@@ -121,7 +123,7 @@ public final class HadoopWizard extends Window {
 
     public void setOutput(Response response) {
         if(task != null){
-            if (response.getTaskUuid().equals(task.getUuid().toString())) {
+            if (response.getTaskUuid().compareTo(task.getUuid()) == 0) {
                 StringBuilder output = new StringBuilder();
                 output.append(textAreaTerminal.getValue());
                 if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
@@ -156,6 +158,38 @@ public final class HadoopWizard extends Window {
 
     public List<Agent> getLxcList() {
         return lxcList;
+    }
+
+    public Agent getNameNode() {
+        return nameNode;
+    }
+
+    public void setNameNode(Agent nameNode) {
+        this.nameNode = nameNode;
+    }
+
+    public Agent getJobTracker() {
+        return jobTracker;
+    }
+
+    public void setJobTracker(Agent jobTracker) {
+        this.jobTracker = jobTracker;
+    }
+
+    public Agent getsNameNode() {
+        return sNameNode;
+    }
+
+    public void setsNameNode(Agent sNameNode) {
+        this.sNameNode = sNameNode;
+    }
+
+    public Integer getReplicationFactor() {
+        return replicationFactor;
+    }
+
+    public void setReplicationFactor(Integer replicationFactor) {
+        this.replicationFactor = replicationFactor;
     }
 
     public CommandManagerInterface getCommandManager() {

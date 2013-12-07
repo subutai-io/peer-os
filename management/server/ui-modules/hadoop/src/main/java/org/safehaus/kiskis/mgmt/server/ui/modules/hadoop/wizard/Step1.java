@@ -63,6 +63,7 @@ public class Step1 extends Panel {
         BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, parent.getLxcList());
         ComboBox comboBoxNameNode = new ComboBox("Name Node", agents);
         comboBoxNameNode.setMultiSelect(false);
+        comboBoxNameNode.setImmediate(true);
         comboBoxNameNode.setItemCaptionPropertyId("hostname");
         comboBoxNameNode.addListener(new Property.ValueChangeListener(){
             @Override
@@ -77,6 +78,7 @@ public class Step1 extends Panel {
 
         ComboBox comboBoxJobTracker = new ComboBox("Job Tracker", agents);
         comboBoxJobTracker.setMultiSelect(false);
+        comboBoxJobTracker.setImmediate(true);
         comboBoxJobTracker.setItemCaptionPropertyId("hostname");
         comboBoxJobTracker.addListener(new Property.ValueChangeListener(){
             @Override
@@ -91,6 +93,7 @@ public class Step1 extends Panel {
 
         ComboBox comboBoxSecondaryNameNode = new ComboBox("Secondary Name Node", agents);
         comboBoxSecondaryNameNode.setMultiSelect(false);
+        comboBoxSecondaryNameNode.setImmediate(true);
         comboBoxSecondaryNameNode.setItemCaptionPropertyId("hostname");
         comboBoxSecondaryNameNode.addListener(new Property.ValueChangeListener(){
             @Override
@@ -107,6 +110,7 @@ public class Step1 extends Panel {
         for(int i=1; i<=5; i++){
             comboBoxReplicationFactor.addItem(i);
         }
+        comboBoxReplicationFactor.setImmediate(true);
         comboBoxReplicationFactor.addListener(new Property.ValueChangeListener(){
             @Override
             public void valueChange(Property.ValueChangeEvent event){

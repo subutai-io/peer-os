@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
@@ -14,8 +15,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -68,6 +67,12 @@ public class Step2 extends Panel {
         twinColSelectDataNodes.setLeftColumnCaption("Available Nodes");
         twinColSelectDataNodes.setRightColumnCaption("Data Nodes");
         twinColSelectDataNodes.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        twinColSelectDataNodes.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                System.out.println(event.getProperty().getValue());
+            }
+        });
         verticalLayoutForm.addComponent(twinColSelectDataNodes);
 
         Label labelTaskTrackerCaption = new Label("<strong>Enter a list of hosts that will run as Task tracker.<br>" +
