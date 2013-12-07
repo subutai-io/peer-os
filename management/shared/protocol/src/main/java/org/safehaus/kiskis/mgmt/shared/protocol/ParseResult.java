@@ -1,8 +1,5 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-
 /**
  * Created with IntelliJ IDEA.
  * User: daralbaev

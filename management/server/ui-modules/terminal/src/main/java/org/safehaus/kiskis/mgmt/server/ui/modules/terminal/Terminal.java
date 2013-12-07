@@ -245,8 +245,8 @@ public class Terminal implements Module {
                                     r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
                                     r.setWorkingDirectory(textFieldWorkingDirectory.getValue().toString());
                                     r.setProgram(textFieldProgram.getValue().toString());
-                                    r.setStdOut(OutputRedirection.CAPTURE_AND_RETURN);
-                                    r.setStdErr(OutputRedirection.CAPTURE);
+                                    r.setStdOut(OutputRedirection.RETURN);
+                                    r.setStdErr(OutputRedirection.RETURN);
                                     r.setRunAs(textFieldRunAs.getValue().toString());
 
                                     String[] args = textFieldArgs.getValue().toString().split(" ");

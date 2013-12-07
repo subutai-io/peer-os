@@ -56,7 +56,9 @@ public class HadoopModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            subwindow.setOutput(response);
+            if (subwindow != null && subwindow.isVisible()) {
+                subwindow.setOutput(response);
+            }
         }
 
         @Override
