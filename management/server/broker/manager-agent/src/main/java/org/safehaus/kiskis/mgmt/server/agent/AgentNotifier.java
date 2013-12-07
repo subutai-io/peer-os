@@ -4,6 +4,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.agent;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -34,8 +35,13 @@ public class AgentNotifier implements Runnable {
                 if (refresh) {
                     refresh = false;
                     List<Agent> allFreshAgents = agentManager.getRegisteredAgents();
-                    for (AgentListener listener : listeners) {
-                        listener.onAgent(allFreshAgents);
+                    for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
+                        AgentListener listener = it.next();
+                        if (listener != null) {
+                            listener.onAgent(allFreshAgents);
+                        } else {
+                            it.remove();
+                        }
                     }
                 }
                 Thread.sleep(500);
