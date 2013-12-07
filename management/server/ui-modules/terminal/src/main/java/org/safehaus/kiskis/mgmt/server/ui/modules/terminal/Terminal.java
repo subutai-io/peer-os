@@ -124,34 +124,30 @@ public class Terminal implements Module {
 
         @Override
         public void onCommand(Response response) {
-            processResponse(response);
-        }
-
-        private void processResponse(Response response) {
-            try {
-                if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
-                    if (response.getTaskUuid() != null
-                            && response.getTaskUuid().compareTo(task.getUuid()) == 0) {
-
-                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                            task.setTaskStatus(TaskStatus.SUCCESS);
-                            commandManagerInterface.saveTask(task);
-                        }
-
-                        Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
-                                response.getRequestSequenceNumber());
-                        String res = CommandJson.getJson(new Command(result));
+//            processResponse(response);
+            if (task != null && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
+                List<ParseResult> result = commandManagerInterface.parseTask(task, false);
+                StringBuilder sb = new StringBuilder();
+                for (ParseResult parseResult : result) {
+                    if (parseResult.getResponse() != null) {
+                        String res = CommandJson.getJson(new Command(parseResult.getResponse()));
                         if (res != null) {
-                            textAreaOutput.setValue(res.replace("\\n", "\n"));
+                            sb.append(res).append("\n\n");
                         } else {
-                            res = "Error parsing response: " + response;
+                            sb.append("Error parsing response: ").append(parseResult.getResponse()).append("\n\n");
                         }
-                        textAreaOutput.setCursorPosition(res.length() - 1);
+                        if (parseResult.getResponse().getType().compareTo(ResponseType.EXECUTE_RESPONSE_DONE) == 0) {
+                            sb.append("Exit Code: ").append(parseResult.getResponse().getExitCode()).append("\n\n");
+                        } else if (parseResult.getResponse().getType().compareTo(ResponseType.EXECUTE_TIMEOUTED) == 0) {
+                            sb.append("EXECUTE TIMEOUTED").append("\n\n");
+                        }
                     }
                 }
-            } catch (Exception ex) {
-                LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
+                String res = sb.toString().replace("\\n", "\n");
+                textAreaOutput.setValue(res);
+                textAreaOutput.setCursorPosition(res.length() - 1);
             }
+
         }
 
         @Override
