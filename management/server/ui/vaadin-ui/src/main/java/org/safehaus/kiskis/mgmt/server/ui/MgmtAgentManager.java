@@ -24,6 +24,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
  */
 @SuppressWarnings("serial")
+
 public final class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentListener {
 
@@ -34,6 +35,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
+        
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
         //setSpacing(true);
@@ -78,7 +80,9 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 container.removeAllItems();
                 registeredAgents.clear();
-                AppData.getSelectedAgentList().clear();
+                if (AppData.getSelectedAgentList() != null) {
+                    AppData.getSelectedAgentList().clear();
+                }
                 refreshAgents(agentManagerInterface.getRegisteredAgents());
             }
         });
@@ -95,7 +99,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
         container = new HierarchicalContainer();
         container.addContainerProperty("value", Agent.class, null);
         container.addContainerProperty("icon", ThemeResource.class,
-                new ThemeResource("icons/16/document.png"));
+                new ThemeResource("icons/16/folder.png"));
         refreshAgents(agentManagerInterface.getRegisteredAgents());
         return container;
     }
@@ -130,7 +134,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 registeredAgents.clear();
                 registeredAgents.addAll(allFreshAgents);
-                if (!AppData.getSelectedAgentList().isEmpty()) {
+                if (AppData.getSelectedAgentList() != null && !AppData.getSelectedAgentList().isEmpty()) {
                     AppData.getSelectedAgentList().retainAll(allFreshAgents);
                 }
             } catch (Exception ex) {
@@ -155,7 +159,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
                                 if (!agent.isIsLXC()) {
                                     container.setChildrenAllowed(agent.getHostname(), true);
                                 } else {
-                                    item.getItemProperty("icon").setValue(new ThemeResource("icons/16/folder.png"));
+                                    item.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
                                     container.setParent(agent.getHostname(), parent.getHostname());
                                     container.setChildrenAllowed(agent.getHostname(), false);
                                 }
