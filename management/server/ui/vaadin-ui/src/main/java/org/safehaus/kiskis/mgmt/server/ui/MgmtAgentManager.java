@@ -93,7 +93,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
     public HierarchicalContainer getNodeContainer() {
         registeredAgents = new ArrayList<Agent>();
         container = new HierarchicalContainer();
-        container.addContainerProperty("name", String.class, null);
         container.addContainerProperty("value", Agent.class, null);
         container.addContainerProperty("icon", ThemeResource.class,
                 new ThemeResource("icons/16/document.png"));
@@ -149,7 +148,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
                         if (agent.getUuid() != null && agent.getHostname() != null) {
                             Item item = container.addItem(agent.getHostname());
                             if (item != null) {
-                                item.getItemProperty("name").setValue(agent.getUuid());
                                 item.getItemProperty("value").setValue(agent);
                                 if (!agent.isIsLXC()) {
                                     container.setChildrenAllowed(agent.getHostname(), true);

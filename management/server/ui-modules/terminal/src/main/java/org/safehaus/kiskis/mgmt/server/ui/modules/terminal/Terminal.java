@@ -205,6 +205,10 @@ public class Terminal implements Module {
                     try {
                         agents = AppData.getSelectedAgentList();
                         if (agents != null && agents.size() > 0) {
+                            task = new Task();
+                            task.setDescription("JSON executing");
+                            task.setTaskStatus(TaskStatus.NEW);
+                            commandManagerInterface.saveTask(task);
                             for (Agent agent : agents) {
                                 if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
                                     String json = textAreaCommand.getValue().toString().trim();
@@ -212,14 +216,11 @@ public class Terminal implements Module {
                                     Request r = CommandJson.getRequest(json);
 
                                     if (r != null) {
-                                        task = new Task();
-                                        task.setDescription("JSON executing");
-                                        task.setTaskStatus(TaskStatus.NEW);
-                                        commandManagerInterface.saveTask(task);
 
                                         r.setUuid(agent.getUuid());
                                         r.setSource(Terminal.MODULE_NAME);
                                         r.setTaskUuid(task.getUuid());
+                                        r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
 
                                         Command command = new Command(r);
                                         commandManagerInterface.executeCommand(command);
@@ -227,10 +228,10 @@ public class Terminal implements Module {
                                         textAreaOutput.setValue("ERROR IN COMMAND JSON");
                                     }
                                 } else {
-                                    task = new Task();
-                                    task.setDescription("JSON executing");
-                                    task.setTaskStatus(TaskStatus.NEW);
-                                    commandManagerInterface.saveTask(task);
+//                                    task = new Task();
+//                                    task.setDescription("JSON executing");
+//                                    task.setTaskStatus(TaskStatus.NEW);
+//                                    commandManagerInterface.saveTask(task);
 
                                     Request r = new Request();
 
