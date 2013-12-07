@@ -103,6 +103,7 @@ public final class HadoopWizard extends Window {
             case 3: {
                 this.setClosable(false);
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                step3 = new Step3(this);
                 verticalLayout.addComponent(step3);
                 break;
             }
