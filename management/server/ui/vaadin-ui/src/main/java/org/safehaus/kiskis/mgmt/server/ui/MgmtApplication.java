@@ -18,7 +18,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private ModuleService moduleService;
     private AgentManagerInterface agentManagerService;
     private Window window;
-    private MgmtAgentManager mgmtAgentManager;
 
     public MgmtApplication(String title, ModuleService moduleService, AgentManagerInterface agentManagerService) {
         this.moduleService = moduleService;
@@ -50,8 +49,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             layout.setExpandRatio(horizontalSplit, 1);
             horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
 
-            mgmtAgentManager = new MgmtAgentManager(agentManagerService);
-            horizontalSplit.setFirstComponent(mgmtAgentManager);
+            horizontalSplit.setFirstComponent(new MgmtAgentManager(agentManagerService));
 
             tabs = new TabSheet();
             tabs.setSizeFull();
@@ -93,7 +91,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void close() {
-        mgmtAgentManager.executor.shutdown();
         super.close();
         System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
     }
