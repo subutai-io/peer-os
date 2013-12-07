@@ -1,16 +1,16 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
-import com.vaadin.data.util.IndexedContainer;
+import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util.HadoopInstallation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 import java.util.List;
@@ -20,23 +20,21 @@ public final class HadoopWizard extends Window {
     private final CommandManagerInterface commandManagerInterface;
 
     private final VerticalLayout verticalLayout;
-    private Task task;
-    private String clusterName;
+    HadoopInstallation hadoopInstallation;
     private List<Agent> lxcList;
 
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
-    private static final int MAX_STEPS = 2;
-
-    private Agent nameNode, jobTracker, sNameNode;
-    private Integer replicationFactor;
+    private static final int MAX_STEPS = 3;
 
     Step1 step1;
     Step2 step2;
+    Step3 step3;
     int step = 1;
 
     public HadoopWizard(List<Agent> lxcList) {
         setModal(true);
+        hadoopInstallation = new HadoopInstallation(getCommandManager());
 
         this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
@@ -77,10 +75,6 @@ public final class HadoopWizard extends Window {
         setContent(gridLayout);
     }
 
-    public void runCommand(Command command) {
-        commandManagerInterface.executeCommand(command);
-    }
-
     public void showNext() {
         step++;
         putForm();
@@ -106,6 +100,12 @@ public final class HadoopWizard extends Window {
                 verticalLayout.addComponent(step2);
                 break;
             }
+            case 3: {
+                this.setClosable(false);
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                verticalLayout.addComponent(step3);
+                break;
+            }
             default: {
                 this.close();
                 break;
@@ -113,33 +113,20 @@ public final class HadoopWizard extends Window {
         }
     }
 
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
     public void setOutput(Response response) {
-        if(task != null){
-            if (response.getTaskUuid().compareTo(task.getUuid()) == 0) {
-                StringBuilder output = new StringBuilder();
-                output.append(textAreaTerminal.getValue());
-                if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
-                    output.append("ERROR ").append(response.getStdErr().trim());
-                }
-                if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                    output.append("OK ").append(response.getStdOut().trim());
-                }
-                switch (step) {
-                    case 1: {
-                        break;
-                    }
-                    case 2: {
-                        break;
-                    }
+        if (hadoopInstallation.getHadoopTask() != null) {
+            if (response.getTaskUuid().compareTo(hadoopInstallation.getHadoopTask().getUuid()) == 0) {
 
+                List<ParseResult> result = getCommandManager().parseTask(hadoopInstallation.getHadoopTask(), true);
+                StringBuilder output = new StringBuilder();
+
+                for(ParseResult pr : result){
+                    if (!Strings.isNullOrEmpty(pr.getResponse().getStdErr())) {
+                        output.append("ERROR ").append(pr.getResponse().getStdErr().trim());
+                    }
+                    if (Strings.isNullOrEmpty(pr.getResponse().getStdOut())) {
+                        output.append("OK ").append(pr.getResponse().getStdOut().trim());
+                    }
                 }
 
                 textAreaTerminal.setValue(output);
@@ -148,48 +135,12 @@ public final class HadoopWizard extends Window {
         }
     }
 
-    public String getClusterName() {
-        return clusterName;
-    }
-
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    public HadoopInstallation getHadoopInstallation() {
+        return hadoopInstallation;
     }
 
     public List<Agent> getLxcList() {
         return lxcList;
-    }
-
-    public Agent getNameNode() {
-        return nameNode;
-    }
-
-    public void setNameNode(Agent nameNode) {
-        this.nameNode = nameNode;
-    }
-
-    public Agent getJobTracker() {
-        return jobTracker;
-    }
-
-    public void setJobTracker(Agent jobTracker) {
-        this.jobTracker = jobTracker;
-    }
-
-    public Agent getsNameNode() {
-        return sNameNode;
-    }
-
-    public void setsNameNode(Agent sNameNode) {
-        this.sNameNode = sNameNode;
-    }
-
-    public Integer getReplicationFactor() {
-        return replicationFactor;
-    }
-
-    public void setReplicationFactor(Integer replicationFactor) {
-        this.replicationFactor = replicationFactor;
     }
 
     public CommandManagerInterface getCommandManager() {

@@ -15,6 +15,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -42,7 +45,8 @@ public class Step2 extends Panel {
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
                 + " 1) Master Configurations<br>"
-                + " 2) <font color=\"#f14c1a\"><strong>Slave Configurations</strong></font><br>");
+                + " 2) <font color=\"#f14c1a\"><strong>Slave Configurations</strong></font><br>"
+                + " 3) Installation<br>");
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
         grid.addComponent(menu, 0, 0, 0, 5);
@@ -70,8 +74,9 @@ public class Step2 extends Panel {
         twinColSelectDataNodes.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                System.out.println(event.getProperty().getValue().getClass().getName());
-                System.out.println(event.getProperty().getValue());
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                List<Agent> dataNodes = new ArrayList<Agent>(agentList);
+                parent.getHadoopInstallation().setDataNodes(dataNodes);
             }
         });
         verticalLayoutForm.addComponent(twinColSelectDataNodes);
@@ -90,6 +95,14 @@ public class Step2 extends Panel {
         twinColSelectTaskTrackers.setLeftColumnCaption("Available Nodes");
         twinColSelectTaskTrackers.setRightColumnCaption("Task Trackers");
         twinColSelectTaskTrackers.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        twinColSelectTaskTrackers.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                List<Agent> taskTrackers = new ArrayList<Agent>(agentList);
+                parent.getHadoopInstallation().setTaskTrackers(taskTrackers);
+            }
+        });
         verticalLayoutForm.addComponent(twinColSelectTaskTrackers);
 
         grid.addComponent(verticalLayoutForm, 1, 0, 5, 9);
@@ -103,7 +116,7 @@ public class Step2 extends Panel {
                 parent.showNext();
             }
         });
-        Button back = new Button("Finish");
+        Button back = new Button("Back");
         back.addListener(new Button.ClickListener() {
 
             @Override
@@ -120,25 +133,6 @@ public class Step2 extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
-    }
-
-    private Command buildCommand(UUID uuid, String program, Integer reqSeqNumber, UUID taskUuid) {
-
-        Request request = new Request();
-        request.setSource("HadoopModule Wizard");
-        request.setProgram(program);
-        request.setUuid(uuid);
-        request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid(taskUuid);
-        request.setWorkingDirectory("/");
-        request.setStdOut(OutputRedirection.RETURN);
-        request.setStdErr(OutputRedirection.RETURN);
-        request.setRunAs("root");
-        request.setTimeout(0);
-        request.setRequestSequenceNumber(reqSeqNumber);
-        Command command = new Command(request);
-
-        return command;
     }
 
 }
