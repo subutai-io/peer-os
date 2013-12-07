@@ -72,10 +72,12 @@ public class HadoopInstallation {
         json = json.replaceAll(":uuid", agent.getUuid().toString());
         json = json.replaceAll(":requestSequenceNumber", task.getIncrementedReqSeqNumber().toString());
 
-        Request request = CommandJson.getRequest(json);
+        /*Request request = CommandJson.getRequest(json);
         if (commandManager != null) {
             commandManager.executeCommand(new Command(request));
-        }
+        }*/
+
+        System.out.println(json);
     }
 
     public Task getHadoopTask() {
