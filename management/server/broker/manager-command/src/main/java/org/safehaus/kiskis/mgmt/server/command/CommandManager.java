@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +27,8 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
     private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
+    private ExecutorService exec;
+    private CommandNotifier commandNotifier;
 
     @Override
     public void executeCommand(Command command) {
@@ -43,34 +47,17 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
                 persistenceCommand.saveResponse(response);
-                notifyListeners(response);
+                commandNotifier.messagesQueue.add(response);
                 break;
             }
             case EXECUTE_RESPONSE_DONE: {
                 persistenceCommand.saveResponse(response);
-                notifyListeners(response);
+                commandNotifier.messagesQueue.add(response);
                 break;
             }
             default: {
                 break;
             }
-        }
-    }
-
-    private void notifyListeners(Response response) {
-        try {
-            System.out.println("Module count: " + listeners.size());
-            for (CommandListener ai : listeners) {
-                if (ai != null && ai.getName() != null) {
-                    if (response != null && response.getSource() != null && ai.getName().equals(response.getSource())) {
-                        ai.onCommand(response);
-                    }
-                } else {
-                    listeners.remove(ai);
-                }
-            }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in notifyListeners", ex);
         }
     }
 
@@ -97,6 +84,9 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     public void init() {
         try {
             if (communicationService != null) {
+                exec = Executors.newSingleThreadExecutor();
+                commandNotifier = new CommandNotifier(listeners);
+                exec.execute(commandNotifier);
                 communicationService.addListener(this);
             } else {
                 throw new Exception("Missing communication service");
@@ -108,6 +98,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public void destroy() {
         try {
+            exec.shutdown();
             if (communicationService != null) {
                 communicationService.removeListener(this);
             }
@@ -125,12 +116,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     public List<Request> getCommands(UUID taskuuid) {
-        try {
-            return persistenceCommand.getRequests(taskuuid);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getCommands", ex);
-        }
-        return null;
+        return persistenceCommand.getRequests(taskuuid);
     }
 
     @Override

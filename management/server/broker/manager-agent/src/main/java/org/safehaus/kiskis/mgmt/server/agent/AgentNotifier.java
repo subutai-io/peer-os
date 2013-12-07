@@ -20,9 +20,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 public class AgentNotifier implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(AgentNotifier.class.getName());
-    private AgentManagerInterface agentManager;
+    private final AgentManagerInterface agentManager;
     protected volatile boolean refresh = true;
-    private Queue<AgentListener> listeners;
+    private final Queue<AgentListener> listeners;
 
     public AgentNotifier(AgentManagerInterface agentManager, Queue<AgentListener> listeners) {
         this.agentManager = agentManager;
