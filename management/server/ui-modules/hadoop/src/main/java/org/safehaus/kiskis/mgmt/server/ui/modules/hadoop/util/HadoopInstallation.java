@@ -59,10 +59,11 @@ public class HadoopInstallation {
     }
 
     public void createInstallationRequest() {
-        /*for(Agent agent : allNodes){
-            createRequest(HadoopCommands.INSTALL_HADOOP, hadoopTask, agent);
-        }*/
-        System.out.println(allNodes);
+        for(Agent agent : allNodes){
+            if(agent != null){
+                createRequest(HadoopCommands.INSTALL_HADOOP, hadoopTask, agent);
+            }
+        }
     }
 
     private void createRequest(final String command, Task task, Agent agent) {
