@@ -31,6 +31,7 @@ public class HadoopModule implements Module {
 
         private final Button buttonInstallWizard;
         private HadoopWizard subwindow;
+
         public ModuleComponent() {
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -63,19 +64,6 @@ public class HadoopModule implements Module {
         @Override
         public String getName() {
             return HadoopModule.MODULE_NAME;
-        }
-
-        private List<Agent> getLxcAgents() {
-            List<Agent> list = new ArrayList<Agent>();
-            if (AppData.getSelectedAgentList() != null) {
-                for (Agent agent : AppData.getSelectedAgentList()) {
-                    if (agent.isIsLXC()) {
-                        list.add(agent);
-                    }
-                }
-            }
-
-            return list;
         }
 
         private List<Agent> getLxcAgents() {
