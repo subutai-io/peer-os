@@ -20,8 +20,7 @@ public class AppData
     private ResourceBundle bundle;
     private Locale locale;   // Current locale
     private final Application app; // For distinguishing between apps
-    private static final ThreadLocal<AppData> instance
-            = new ThreadLocal<AppData>();
+    private static final ThreadLocal<AppData> instance = new ThreadLocal<AppData>();
     //
     private List<Agent> selectedAgentList;
 
@@ -55,8 +54,7 @@ public class AppData
     public static void initLocale(Locale locale,
             String bundleName) {
         instance.get().locale = locale;
-        instance.get().bundle
-                = ResourceBundle.getBundle(bundleName, locale);
+        instance.get().bundle = ResourceBundle.getBundle(bundleName, locale);
     }
 
     public static Locale getLocale() {
@@ -72,10 +70,15 @@ public class AppData
     }
 
     public static List<Agent> getSelectedAgentList() {
-        return instance.get().selectedAgentList;
+        if (instance.get() != null) {
+            return instance.get().selectedAgentList;
+        }
+        return null;
     }
 
     public static void setSelectedAgentList(List<Agent> agentList) {
-        instance.get().selectedAgentList = agentList;
+        if (instance.get() != null) {
+            instance.get().selectedAgentList = agentList;
+        }
     }
 }

@@ -92,7 +92,7 @@ public class LxcCloneForm extends VerticalLayout implements
                 }
             }
 
-            if (physicalAgents.size() == 0) {
+            if (physicalAgents.isEmpty()) {
                 getWindow().showNotification("Select at least one physical agent");
             } else if (Strings.isNullOrEmpty(textFieldLxcName.getValue().toString())) {
                 getWindow().showNotification("Enter lxc hostname");

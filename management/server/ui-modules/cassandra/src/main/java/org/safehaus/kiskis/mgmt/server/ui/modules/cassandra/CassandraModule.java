@@ -27,11 +27,6 @@ public class CassandraModule implements Module {
     private BundleContext context;
 
     private static ModuleComponent component;
-    //messages queue
-    private static final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-    private static final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    //messages queue
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
@@ -75,34 +70,10 @@ public class CassandraModule implements Module {
 
             setCompositionRoot(verticalLayout);
 
-            //messages queue
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    while (!Thread.interrupted()) {
-                        try {
-                            processAllResponses();
-                            Thread.sleep(100);
-                        } catch (InterruptedException ex) {
-                        }
-                    }
-                }
-            });
-            //messages queue
         }
 
-        //messages queue
-        private void processAllResponses() {
-            if (!messagesQueue.isEmpty()) {
-                Response[] responses = (Response[]) messagesQueue.toArray(new Response[0]);
-                messagesQueue.clear();
-                for (Response response : responses) {
-                    processResponse(response);
-                }
-            }
-        }
-
-        private void processResponse(Response response) {
+        @Override
+        public synchronized void onCommand(Response response) {
             try {
                 if (response != null && response.getSource().equals(MODULE_NAME)) {
                     if (subwindow != null && subwindow.isVisible()) {
@@ -111,15 +82,6 @@ public class CassandraModule implements Module {
                 }
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception");
-            }
-        }
-        //messages queue
-
-        @Override
-        public void onCommand(Response response) {
-            //messages queue
-            if (response != null && response.getSource().equals(MODULE_NAME)) {
-                messagesQueue.add(response);
             }
         }
 

@@ -1,9 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.EvictingQueue;
-import com.google.common.collect.Queues;
-import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -20,12 +17,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 public class Terminal implements Module {
 
@@ -46,11 +40,6 @@ public class Terminal implements Module {
         private final TextArea textAreaOutput;
         private List<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
-        //messages queue
-        private final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_MODULE_MESSAGE_QUEUE_LENGTH);
-        private final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
-        private final ExecutorService executor = Executors.newSingleThreadExecutor();
-        //messages queue        
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
             this.commandManagerInterface = commandManagerInterface;
@@ -129,75 +118,34 @@ public class Terminal implements Module {
             verticalLayout.addComponent(textAreaOutput);
 
             setCompositionRoot(verticalLayout);
-            addListener(new ComponentDetachListener() {
-                @Override
-                public void componentDetachedFromContainer(ComponentDetachEvent event) {
-                    System.out.println("Terminal is detached");
-                    executor.shutdown();
-                }
-            });
 
-            //messages queue
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    while (!Thread.interrupted()) {
-                        try {
-                            processAllResponses();
-                            Thread.sleep(500);
-                        } catch (Exception ex) {
-                            System.out.println("Error in Terminal Queue Processor " + ex);
-                        }
-                    }
-                }
-            });
-            //messages queue
         }
 
         @Override
         public void onCommand(Response response) {
-            messagesQueue.add(response);
-        }
-
-        //messages queue
-        private void processAllResponses() {
-            if (!messagesQueue.isEmpty()) {
-                Response[] responses = messagesQueue.toArray(new Response[messagesQueue.size()]);
-                messagesQueue.clear();
-                for (Response response : responses) {
-                    processResponse(response);
-                }
-            }
-        }
-        //messages queue
-
-        private void processResponse(Response response) {
-            try {
-                if (task != null && response != null && response.getSource().equals(MODULE_NAME)) {
-                    if (response.getTaskUuid() != null
-                            && response.getTaskUuid().compareTo(task.getUuid()) == 0) {
-
-                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                            task.setTaskStatus(TaskStatus.SUCCESS);
-                            commandManagerInterface.saveTask(task);
-                        }
-
-                        Response result = commandManagerInterface.getResponse(response.getTaskUuid(),
-                                response.getRequestSequenceNumber());
-                        String res = CommandJson.getJson(new Command(result));
+            if (task != null && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
+                List<ParseResult> result = commandManagerInterface.parseTask(task, false);
+                StringBuilder sb = new StringBuilder();
+                for (ParseResult parseResult : result) {
+                    if (parseResult.getResponse() != null) {
+                        String res = CommandJson.getJson(new Command(parseResult.getResponse()));
                         if (res != null) {
-                            textAreaOutput.setValue(res.replace("\\n", "\n"));
+                            sb.append(res).append("\n\n");
                         } else {
-                            res = "Error parsing response: " + response;
+                            sb.append("Error parsing response: ").append(parseResult.getResponse()).append("\n\n");
                         }
-                        textAreaOutput.setCursorPosition(res.length() - 1);
+                        if (parseResult.getResponse().getType().compareTo(ResponseType.EXECUTE_RESPONSE_DONE) == 0) {
+                            sb.append("Exit Code: ").append(parseResult.getResponse().getExitCode()).append("\n\n");
+                        } else if (parseResult.getResponse().getType().compareTo(ResponseType.EXECUTE_TIMEOUTED) == 0) {
+                            sb.append("EXECUTE TIMEOUTED").append("\n\n");
+                        }
                     }
                 }
-            } catch (Property.ReadOnlyException ex) {
-                LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
-            } catch (Property.ConversionException ex) {
-                LOG.log(Level.SEVERE, "Error in processResponse [" + response + "]", ex);
+                String res = sb.toString().replace("\\n", "\n");
+                textAreaOutput.setValue(res);
+                textAreaOutput.setCursorPosition(res.length() - 1);
             }
+
         }
 
         @Override
@@ -255,6 +203,10 @@ public class Terminal implements Module {
                     try {
                         agents = AppData.getSelectedAgentList();
                         if (agents != null && agents.size() > 0) {
+                            task = new Task();
+                            task.setDescription("JSON executing");
+                            task.setTaskStatus(TaskStatus.NEW);
+                            commandManagerInterface.saveTask(task);
                             for (Agent agent : agents) {
                                 if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
                                     String json = textAreaCommand.getValue().toString().trim();
@@ -262,14 +214,11 @@ public class Terminal implements Module {
                                     Request r = CommandJson.getRequest(json);
 
                                     if (r != null) {
-                                        task = new Task();
-                                        task.setDescription("JSON executing");
-                                        task.setTaskStatus(TaskStatus.NEW);
-                                        commandManagerInterface.saveTask(task);
 
                                         r.setUuid(agent.getUuid());
                                         r.setSource(Terminal.MODULE_NAME);
                                         r.setTaskUuid(task.getUuid());
+                                        r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
 
                                         Command command = new Command(r);
                                         commandManagerInterface.executeCommand(command);
@@ -277,10 +226,10 @@ public class Terminal implements Module {
                                         textAreaOutput.setValue("ERROR IN COMMAND JSON");
                                     }
                                 } else {
-                                    task = new Task();
-                                    task.setDescription("JSON executing");
-                                    task.setTaskStatus(TaskStatus.NEW);
-                                    commandManagerInterface.saveTask(task);
+//                                    task = new Task();
+//                                    task.setDescription("JSON executing");
+//                                    task.setTaskStatus(TaskStatus.NEW);
+//                                    commandManagerInterface.saveTask(task);
 
                                     Request r = new Request();
 
@@ -291,8 +240,8 @@ public class Terminal implements Module {
                                     r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
                                     r.setWorkingDirectory(textFieldWorkingDirectory.getValue().toString());
                                     r.setProgram(textFieldProgram.getValue().toString());
-                                    r.setStdOut(OutputRedirection.CAPTURE_AND_RETURN);
-                                    r.setStdErr(OutputRedirection.CAPTURE);
+                                    r.setStdOut(OutputRedirection.RETURN);
+                                    r.setStdErr(OutputRedirection.RETURN);
                                     r.setRunAs(textFieldRunAs.getValue().toString());
 
                                     String[] args = textFieldArgs.getValue().toString().split(" ");
@@ -467,7 +416,7 @@ public class Terminal implements Module {
 
     public void unsetModuleService(ModuleService service) {
         service.unregisterModule(this);
-        component.executor.shutdown();
+
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
         }

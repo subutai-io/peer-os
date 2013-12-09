@@ -14,11 +14,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -27,6 +24,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
  */
 @SuppressWarnings("serial")
+
 public final class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentListener {
 
@@ -35,40 +33,20 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
-    private volatile boolean refresh = true;
-    protected final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
+        
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
         //setSpacing(true);
         setMargin(true);
-
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setMultiSelect(true);
         tree.setImmediate(true);
         tree.addListener(this);
         addComponent(getRefreshButton());
         addComponent(tree);
-
         agentManagerService.addListener(this);
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (!Thread.interrupted()) {
-                    try {
-                        if (refresh) {
-                            refresh = false;
-                            refreshAgents();
-                        }
-                        Thread.sleep(500);
-                    } catch (Exception ex) {
-                        System.out.println("Error in MgmtAgentManager Queue Processor " + ex);
-                    }
-                }
-            }
-        });
     }
 
     /*
@@ -102,68 +80,66 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 container.removeAllItems();
                 registeredAgents.clear();
-                refreshAgents();
-                AppData.setSelectedAgentList(registeredAgents);
+                if (AppData.getSelectedAgentList() != null) {
+                    AppData.getSelectedAgentList().clear();
+                }
+                refreshAgents(agentManagerInterface.getRegisteredAgents());
             }
         });
         return button;
     }
 
     @Override
-    public void onAgent() {
-        refresh = true;
+    public void onAgent(List<Agent> freshAgents) {
+        refreshAgents(freshAgents);
     }
 
     public HierarchicalContainer getNodeContainer() {
-
         registeredAgents = new ArrayList<Agent>();
         container = new HierarchicalContainer();
-        container.addContainerProperty("name", String.class, null);
         container.addContainerProperty("value", Agent.class, null);
         container.addContainerProperty("icon", ThemeResource.class,
-                new ThemeResource("icons/16/document.png"));
-
-        refreshAgents();
-
+                new ThemeResource("icons/16/folder.png"));
+        refreshAgents(agentManagerInterface.getRegisteredAgents());
         return container;
     }
 
-    private void refreshAgents() {
-        try {
-            //grab all agents
-            List<Agent> allFreshAgents = agentManagerInterface.getRegisteredAgents();
+    private void refreshAgents(List<Agent> allFreshAgents) {
+        if (allFreshAgents != null) {
+            try {
+                // clear all agents
+                List<Agent> setToRemove = new ArrayList<Agent>();
+                setToRemove.addAll(registeredAgents);
+                setToRemove.removeAll(allFreshAgents);
+                refreshNodeContainer(setToRemove, true, null);
 
-            // clear all agents
-            List<Agent> setToRemove = new ArrayList<Agent>();
-            setToRemove.addAll(registeredAgents);
-            setToRemove.removeAll(allFreshAgents);
-            refreshNodeContainer(setToRemove, true, null);
-
-            //grab parents
-            List<Agent> parents = new ArrayList<Agent>();
-            for (Agent agent : allFreshAgents) {
-                if (!agent.isIsLXC()) {
-                    parents.add(agent);
-                }
-            }
-//        setToAdd.add(null);
-            refreshNodeContainer(parents, false, null);
-
-            //grab children
-            for (Agent parent : parents) {
-                List<Agent> children = new ArrayList<Agent>();
-                for (Agent possibleChild : allFreshAgents) {
-                    if (possibleChild.isIsLXC() && possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                        children.add(possibleChild);
+                //grab parents
+                List<Agent> parents = new ArrayList<Agent>();
+                for (Agent agent : allFreshAgents) {
+                    if (!agent.isIsLXC()) {
+                        parents.add(agent);
                     }
                 }
-                refreshNodeContainer(children, false, parent);
-            }
+                refreshNodeContainer(parents, false, null);
+                //grab children
+                for (Agent parent : parents) {
+                    List<Agent> children = new ArrayList<Agent>();
+                    for (Agent possibleChild : allFreshAgents) {
+                        if (possibleChild.isIsLXC() && possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                            children.add(possibleChild);
+                        }
+                    }
+                    refreshNodeContainer(children, false, parent);
+                }
 
-            registeredAgents.clear();
-            registeredAgents.addAll(allFreshAgents);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
+                registeredAgents.clear();
+                registeredAgents.addAll(allFreshAgents);
+                if (AppData.getSelectedAgentList() != null && !AppData.getSelectedAgentList().isEmpty()) {
+                    AppData.getSelectedAgentList().retainAll(allFreshAgents);
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
+            }
         }
     }
 
@@ -179,12 +155,11 @@ public final class MgmtAgentManager extends VerticalLayout implements
                         if (agent.getUuid() != null && agent.getHostname() != null) {
                             Item item = container.addItem(agent.getHostname());
                             if (item != null) {
-                                item.getItemProperty("name").setValue(agent.getUuid());
                                 item.getItemProperty("value").setValue(agent);
                                 if (!agent.isIsLXC()) {
                                     container.setChildrenAllowed(agent.getHostname(), true);
                                 } else {
-                                    item.getItemProperty("icon").setValue(new ThemeResource("icons/16/folder.png"));
+                                    item.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
                                     container.setParent(agent.getHostname(), parent.getHostname());
                                     container.setChildrenAllowed(agent.getHostname(), false);
                                 }

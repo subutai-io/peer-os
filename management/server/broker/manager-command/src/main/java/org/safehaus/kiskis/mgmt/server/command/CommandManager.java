@@ -1,22 +1,24 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import com.google.common.base.Strings;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -26,7 +28,9 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-    private final ConcurrentLinkedQueue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
+    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
+    private ExecutorService exec;
+    private CommandNotifier commandNotifier;
 
     @Override
     public void executeCommand(Command command) {
@@ -39,46 +43,23 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         }
     }
 
-    public void getCommand(Response response) {
-        try {
-            switch (response.getType()) {
-                case EXECUTE_TIMEOUTED: {
-                    System.out.println(response.getType());
-                }
-                case EXECUTE_RESPONSE: {
-                    persistenceCommand.saveResponse(response);
-                    notifyListeners(response);
-                    break;
-                }
-                case EXECUTE_RESPONSE_DONE: {
-                    persistenceCommand.saveResponse(response);
-                    notifyListeners(response);
-                    break;
-                }
-                default: {
-                    break;
-                }
+    @Override
+    public void onResponse(Response response) {
+        switch (response.getType()) {
+            case EXECUTE_TIMEOUTED:
+            case EXECUTE_RESPONSE: {
+                persistenceCommand.saveResponse(response);
+                commandNotifier.messagesQueue.add(response);
+                break;
             }
-        } catch (Exception e) {
-            System.out.println("EXCEPTION: " + e.getMessage());
-        }
-    }
-
-    private void notifyListeners(Response response) {
-        try {
-            System.out.println("Module count: " + listeners.size());
-            for (CommandListener commandListener : listeners) {
-                if (commandListener != null && commandListener.getName() != null) {
-                    System.out.println(commandListener.getName());
-                    if (response.getSource() != null && commandListener.getName().equals(response.getSource())) {
-                        commandListener.onCommand(response);
-                    }
-                } else {
-                    listeners.remove(commandListener);
-                }
+            case EXECUTE_RESPONSE_DONE: {
+                persistenceCommand.saveResponse(response);
+                commandNotifier.messagesQueue.add(response);
+                break;
             }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in notifyListeners", ex);
+            default: {
+                break;
+            }
         }
     }
 
@@ -105,6 +86,9 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     public void init() {
         try {
             if (communicationService != null) {
+                exec = Executors.newSingleThreadExecutor();
+                commandNotifier = new CommandNotifier(listeners);
+                exec.execute(commandNotifier);
                 communicationService.addListener(this);
             } else {
                 throw new Exception("Missing communication service");
@@ -116,6 +100,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
 
     public void destroy() {
         try {
+            exec.shutdown();
             if (communicationService != null) {
                 communicationService.removeListener(this);
             }
@@ -133,12 +118,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
     }
 
     public List<Request> getCommands(UUID taskuuid) {
-        try {
-            return persistenceCommand.getRequests(taskuuid);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getCommands", ex);
-        }
-        return null;
+        return persistenceCommand.getRequests(taskuuid);
     }
 
     @Override
@@ -154,10 +134,10 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
             String stdOut = "", stdErr = "";
             for (Response r : list) {
                 response = r;
-                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null")) {
+                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdOut())) {
                     stdOut += "\n" + r.getStdOut();
                 }
-                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null")) {
+                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdErr())) {
                     stdErr += "\n" + r.getStdErr();
                 }
             }
@@ -167,7 +147,7 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
                 response.setStdErr(stdErr);
             }
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getCommands", ex);
+            LOG.log(Level.SEVERE, "Error in getResponse", ex);
         }
         return response;
     }
@@ -196,11 +176,44 @@ public class CommandManager implements CommandManagerInterface, BrokerListener {
         return persistenceCommand.getCassandraClusterInfo();
     }
 
+    @Override
     public List<ParseResult> parseTask(Task task, boolean isResponseDone) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+        List<ParseResult> result = new ArrayList<ParseResult>();
 
-    public void onResponse(Response response) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (persistenceCommand != null) {
+            List<Request> requestList = persistenceCommand.getRequests(task.getUuid());
+            Integer responseCount = persistenceCommand.getResponsesCount(task.getUuid());
+
+            if (isResponseDone) {
+                if (requestList.size() != responseCount) {
+                    return result;
+                }
+            }
+
+
+            Integer exitCode = 0;
+            for (Request request : requestList) {
+                Response response = getResponse(task.getUuid(), request.getRequestSequenceNumber());
+                if (response != null) {
+                    result.add(new ParseResult(request, response));
+                    if (response.getType().compareTo(ResponseType.EXECUTE_RESPONSE_DONE) == 0) {
+                        exitCode += response.getExitCode();
+                    } else if (response.getType().compareTo(ResponseType.EXECUTE_TIMEOUTED) == 0) {
+                        exitCode = 1;
+                    }
+                }
+            }
+
+            if (isResponseDone || requestList.size() == responseCount) {
+                if (exitCode == 0) {
+                    task.setTaskStatus(TaskStatus.SUCCESS);
+                } else {
+                    task.setTaskStatus(TaskStatus.FAIL);
+                }
+                persistenceCommand.saveTask(task);
+            }
+        }
+
+        return result;
     }
 }

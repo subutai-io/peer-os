@@ -93,7 +93,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void close() {
-        mgmtAgentManager.executor.shutdown();
         super.close();
         System.out.println("Kiskis Management Vaadin UI: Application closing, removing module service listener");
     }
