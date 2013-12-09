@@ -78,6 +78,19 @@ public class HadoopModule implements Module {
             return list;
         }
 
+        private List<Agent> getLxcAgents() {
+            List<Agent> list = new ArrayList<Agent>();
+            if (AppData.getSelectedAgentList() != null) {
+                for (Agent agent : AppData.getSelectedAgentList()) {
+                    if (agent.isIsLXC()) {
+                        list.add(agent);
+                    }
+                }
+            }
+
+            return list;
+        }
+
     }
 
     @Override
