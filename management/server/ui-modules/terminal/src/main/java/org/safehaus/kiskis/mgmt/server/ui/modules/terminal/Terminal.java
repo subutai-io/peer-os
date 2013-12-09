@@ -124,7 +124,6 @@ public class Terminal implements Module {
 
         @Override
         public void onCommand(Response response) {
-//            processResponse(response);
             if (task != null && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
                 List<ParseResult> result = commandManagerInterface.parseTask(task, false);
                 StringBuilder sb = new StringBuilder();

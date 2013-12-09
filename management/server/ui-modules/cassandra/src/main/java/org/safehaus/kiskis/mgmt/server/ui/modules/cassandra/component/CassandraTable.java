@@ -40,6 +40,7 @@ public class CassandraTable extends Table {
         this.setSelectable(true);
         this.setImmediate(true);
         this.addListener(new Table.ValueChangeListener() {
+            @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String caption = container.getItem(event.getProperty().getValue())
                         .getItemProperty(CassandraClusterInfo.NAME_LABEL).getValue().toString();

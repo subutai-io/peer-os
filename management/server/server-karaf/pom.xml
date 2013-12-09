@@ -116,7 +116,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -138,6 +138,11 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.13</version>
         </dependency>
+<!--        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.1.0-M4</version>
+        </dependency>        -->
     </dependencies>
     <build>
         <resources>
@@ -248,7 +253,7 @@
                                 <artifactItem>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava</artifactId>
-                                    <version>15.0</version>
+                                    <version>${guava.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>io.netty</groupId>
@@ -372,6 +377,11 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Apt Repo Exposer-->
+<!--                                <artifactItem>
+                                    <groupId>org.xerial.snappy</groupId>
+                                    <artifactId>snappy-java</artifactId>
+                                    <version>1.1.0-M4</version>
+                                </artifactItem>                                -->
                             </artifactItems>
                         </configuration>
                     </execution>

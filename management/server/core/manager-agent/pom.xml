@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-shared-parent</artifactId>
+        <artifactId>mgmt-server-core-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mgmt-shared-protocol</artifactId>
-    <name>Kiskis Management Shared Protocol</name>
-    <description>Shared Protocol Bundle</description>
+
+    <artifactId>mgmt-server-agent</artifactId>
+    <name>Kiskis Management Server Agent</name>
+    <description>Kiskis Management Server Agent</description>
 
     <packaging>bundle</packaging>
-
-    <repositories>
-        <repository>
-            <id>eaio.com</id>
-            <url>http://eaio.com/maven2</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -27,14 +22,20 @@
             <version>${osgi.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.eaio.uuid</groupId>
-            <artifactId>uuid</artifactId>
-            <version>3.2</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 
@@ -49,10 +50,11 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.shared.protocol</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.server.agent</Bundle-SymbolicName>
                         <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true
+                            {local-packages};{local-packages}.impl;version=${project.version};-noimport:=true
                         </Export-Package>
+                        <Import-Package>*</Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

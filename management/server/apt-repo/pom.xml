@@ -60,10 +60,5 @@
             <artifactId>jetty-server</artifactId>
             <version>7.6.8.v20121106</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>

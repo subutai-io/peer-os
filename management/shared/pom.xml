@@ -15,7 +15,6 @@
 
     <modules>
         <module>protocol</module>
-        <module>communication</module>
     </modules>
 
     <description>Parent project for the Kiskis Management Shared Artifacts</description>
