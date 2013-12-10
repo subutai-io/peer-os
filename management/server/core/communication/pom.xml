@@ -7,7 +7,7 @@
         <artifactId>mgmt-server-core-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mgmt-shared-communication</artifactId>
+    <artifactId>mgmt-server-communication</artifactId>
     <name>Kiskis Management Server Communication</name>
     <description>Shared Communication Bundle</description>
 
@@ -58,7 +58,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.shared.communication</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.server.communication</Bundle-SymbolicName>
                         <Export-Package>
                             org.apache.activemq.pool;{local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

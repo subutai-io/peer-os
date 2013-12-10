@@ -26,7 +26,7 @@
     </cm:property-placeholder>
 
     <bean id="communicationService"
-          class="org.safehaus.kiskis.mgmt.shared.communication.CommandTransport"
+          class="org.safehaus.kiskis.mgmt.server.communication.CommandTransport"
           init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="amqPort" value="${amqPort}"/>
         <property name="amqBindAddress" value="${amqBindAddress}"/>
