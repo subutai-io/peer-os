@@ -20,7 +20,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:11 PM
  */
-public class AgentManager implements AgentManagerInterface, BrokerListener {
+public class AgentManager implements AgentManagerInterface, ResponseListener {
 
     private static final Logger LOG = Logger.getLogger(AgentManager.class.getName());
     private PersistenceInterface persistenceAgent;

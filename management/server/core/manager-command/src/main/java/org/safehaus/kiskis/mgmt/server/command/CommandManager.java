@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.server.command;
 
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
@@ -23,7 +23,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
  */
-public class CommandManager implements CommandManagerInterface, BrokerListener {
+public class CommandManager implements CommandManagerInterface, ResponseListener {
 
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;

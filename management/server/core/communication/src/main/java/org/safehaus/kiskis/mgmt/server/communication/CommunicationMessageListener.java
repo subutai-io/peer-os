@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.server.communication;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 import javax.jms.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
-    private final ConcurrentLinkedQueue<BrokerListener> listeners = new ConcurrentLinkedQueue<BrokerListener>();
+    private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<ResponseListener>();
 
     public CommunicationMessageListener() {
     }
@@ -46,7 +46,7 @@ public class CommunicationMessageListener implements MessageListener {
 
     private void notifyListeners(Response response) {
         try {
-            for (BrokerListener ai : listeners) {
+            for (ResponseListener ai : listeners) {
                 if (ai != null) {
                     ai.onResponse(response);
                 } else {
@@ -58,7 +58,7 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
-    public void addListener(BrokerListener listener) {
+    public void addListener(ResponseListener listener) {
         try {
             listeners.add(listener);
         } catch (Exception ex) {
@@ -66,7 +66,7 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
-    public void removeListener(BrokerListener listener) {
+    public void removeListener(ResponseListener listener) {
         try {
             listeners.remove(listener);
         } catch (Exception ex) {

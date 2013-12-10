@@ -10,7 +10,7 @@ public interface CommandTransportInterface {
 
     public void sendCommand(Command command);
 
-    public void addListener(BrokerListener listener);
+    public void addListener(ResponseListener listener);
 
-    public void removeListener(BrokerListener listener);
+    public void removeListener(ResponseListener listener);
 }

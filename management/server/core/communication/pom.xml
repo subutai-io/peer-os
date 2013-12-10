@@ -9,7 +9,7 @@
     </parent>
     <artifactId>mgmt-server-communication</artifactId>
     <name>Kiskis Management Server Communication</name>
-    <description>Shared Communication Bundle</description>
+    <description>Server Communication Bundle</description>
 
     <packaging>bundle</packaging>
 

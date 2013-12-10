@@ -8,7 +8,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.BrokerListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 
 import javax.jms.*;
@@ -244,7 +244,7 @@ public class CommandTransport implements CommandTransportInterface {
     }
 
     @Override
-    public void addListener(BrokerListener listener) {
+    public void addListener(ResponseListener listener) {
         try {
             communicationMessageListener.addListener(listener);
         } catch (Exception ex) {
@@ -253,7 +253,7 @@ public class CommandTransport implements CommandTransportInterface {
     }
 
     @Override
-    public void removeListener(BrokerListener listener) {
+    public void removeListener(ResponseListener listener) {
         try {
             communicationMessageListener.removeListener(listener);
         } catch (Exception ex) {
