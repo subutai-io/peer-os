@@ -278,7 +278,7 @@
 
                                 <!--UI Dependencies-->
 
-                                <!--Broker Dependencies-->
+                                <!--Core Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-server-agent</artifactId>
@@ -294,17 +294,17 @@
                                     <artifactId>mgmt-server-persistence</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--Broker Dependencies-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-communication</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!--Core Dependencies-->
 
                                 <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-shared-communication</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Shared Dependencies-->
