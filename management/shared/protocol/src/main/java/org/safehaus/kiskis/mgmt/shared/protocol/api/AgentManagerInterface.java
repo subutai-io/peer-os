@@ -4,7 +4,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**

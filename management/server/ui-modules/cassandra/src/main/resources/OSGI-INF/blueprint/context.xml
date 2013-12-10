@@ -5,7 +5,6 @@
         <reference-listener
                 bind-method="setModuleService" unbind-method="unsetModuleService">
             <bean class="org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule">
-                <property name="context" ref="blueprintBundleContext"/>
             </bean>
         </reference-listener>
     </reference-list>

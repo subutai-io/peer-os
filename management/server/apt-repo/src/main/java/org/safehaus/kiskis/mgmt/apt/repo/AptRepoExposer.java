@@ -9,7 +9,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
