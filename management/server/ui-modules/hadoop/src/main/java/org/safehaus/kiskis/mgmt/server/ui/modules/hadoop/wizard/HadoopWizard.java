@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
-import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -9,7 +8,6 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util.HadoopInstallation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
@@ -23,7 +21,6 @@ public final class HadoopWizard extends Window {
     HadoopInstallation hadoopInstallation;
     private List<Agent> lxcList;
 
-    private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 3;
 
@@ -59,16 +56,8 @@ public final class HadoopWizard extends Window {
         verticalLayout.setSpacing(true);
         verticalLayout.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        gridLayout.addComponent(verticalLayout, 0, 1, 0, 13);
+        gridLayout.addComponent(verticalLayout, 0, 1, 0, 14);
         gridLayout.setComponentAlignment(verticalLayout, Alignment.MIDDLE_CENTER);
-
-        textAreaTerminal = new TextArea();
-        textAreaTerminal.setRows(5);
-        textAreaTerminal.setColumns(65);
-        textAreaTerminal.setImmediate(true);
-        textAreaTerminal.setWordwrap(true);
-        gridLayout.addComponent(textAreaTerminal, 0, 14);
-        gridLayout.setComponentAlignment(textAreaTerminal, Alignment.MIDDLE_CENTER);
 
         putForm();
 
@@ -115,25 +104,7 @@ public final class HadoopWizard extends Window {
     }
 
     public void setOutput(Response response) {
-        if (hadoopInstallation.getHadoopTask() != null) {
-            if (response.getTaskUuid().compareTo(hadoopInstallation.getHadoopTask().getUuid()) == 0) {
-
-                List<ParseResult> result = getCommandManager().parseTask(hadoopInstallation.getHadoopTask(), true);
-                StringBuilder output = new StringBuilder();
-
-                for(ParseResult pr : result){
-                    if (!Strings.isNullOrEmpty(pr.getResponse().getStdErr())) {
-                        output.append("ERROR ").append(pr.getResponse().getStdErr().trim());
-                    }
-                    if (Strings.isNullOrEmpty(pr.getResponse().getStdOut())) {
-                        output.append("OK ").append(pr.getResponse().getStdOut().trim());
-                    }
-                }
-
-                textAreaTerminal.setValue(output);
-                textAreaTerminal.setCursorPosition(output.length() - 1);
-            }
-        }
+        hadoopInstallation.onCommand(response, step3);
     }
 
     public HadoopInstallation getHadoopInstallation() {

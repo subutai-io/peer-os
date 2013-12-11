@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -17,7 +18,8 @@ import java.util.Set;
  * Time: 5:55 PM
  */
 public class HadoopInstallation {
-    private Task hadoopTask;
+    private Task hadoopInstallationTask;
+
 
     private String clusterName;
     private Agent nameNode, jobTracker, sNameNode;
@@ -31,42 +33,59 @@ public class HadoopInstallation {
         this.commandManager = commandManagerInterface;
     }
 
-    public void createTask() {
+    public void installHadoop(){
+        hadoopInstallationTask = createTask("Setup Hadoop package");
+        createInstallationRequest();
+    }
+
+    private Task createTask(String description) {
         Task clusterTask = new Task();
         clusterTask.setTaskStatus(TaskStatus.NEW);
-        clusterTask.setDescription("Setup Hadoop cluster");
+        clusterTask.setDescription(description);
 
-        setHadoopTask(clusterTask);
-        commandManager.saveTask(hadoopTask);
+        setHadoopInstallationTask(clusterTask);
+        commandManager.saveTask(hadoopInstallationTask);
 
         removeDuplicateAgents();
+
+        return clusterTask;
     }
 
     private void removeDuplicateAgents() {
         Set<Agent> allAgents = new HashSet<Agent>();
-        allAgents.addAll(dataNodes);
-        allAgents.addAll(taskTrackers);
+        if(dataNodes != null){
+            allAgents.addAll(dataNodes);
+        }
+        if(taskTrackers != null){
+            allAgents.addAll(taskTrackers);
+        }
 
         this.allSlaveNodes = new ArrayList<Agent>();
         this.allSlaveNodes.addAll(allAgents);
 
-        allAgents.add(nameNode);
-        allAgents.add(jobTracker);
-        allAgents.add(sNameNode);
+        if(nameNode != null){
+            allAgents.add(nameNode);
+        }
+        if(jobTracker != null){
+            allAgents.add(jobTracker);
+        }
+        if(sNameNode != null){
+            allAgents.add(sNameNode);
+        }
 
         this.allNodes = new ArrayList<Agent>();
         this.allNodes.addAll(allAgents);
     }
 
-    public void createInstallationRequest() {
+    private void createInstallationRequest() {
         for(Agent agent : allNodes){
             if(agent != null){
-                createRequest(HadoopCommands.INSTALL_HADOOP, hadoopTask, agent);
+                createRequest(HadoopCommands.INSTALL_HADOOP, hadoopInstallationTask, agent);
             }
         }
     }
 
-    private void createRequest(final String command, Task task, Agent agent) {
+    private Request createRequest(final String command, Task task, Agent agent) {
         String json = command;
         json = json.replaceAll(":taskUuid", task.getUuid().toString());
         json = json.replaceAll(":source", HadoopModule.MODULE_NAME);
@@ -78,10 +97,19 @@ public class HadoopInstallation {
         if (commandManager != null) {
             commandManager.executeCommand(new Command(request));
         }
+
+        return request;
     }
 
-    public Task getHadoopTask() {
-        return hadoopTask;
+    public void onCommand(Response response, Step3 panel){
+        List<ParseResult> resultList = commandManager.parseTask(hadoopInstallationTask, true);
+        for(ParseResult pr : resultList){
+           panel.addOutput(hadoopInstallationTask, pr.getResponse());
+        }
+    }
+
+    public Task getHadoopInstallationTask() {
+        return hadoopInstallationTask;
     }
 
     public String getClusterName() {
@@ -92,8 +120,8 @@ public class HadoopInstallation {
         this.clusterName = clusterName;
     }
 
-    public void setHadoopTask(Task hadoopTask) {
-        this.hadoopTask = hadoopTask;
+    public void setHadoopInstallationTask(Task hadoopInstallationTask) {
+        this.hadoopInstallationTask = hadoopInstallationTask;
     }
 
     public Agent getNameNode() {

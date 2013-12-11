@@ -5,20 +5,18 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
+import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * @author bahadyr
  */
 public class Step3 extends Panel {
+    private TextArea terminal;
     HadoopWizard parent;
     Button next;
 
@@ -51,6 +49,13 @@ public class Step3 extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
+        terminal = new TextArea();
+        terminal.setRows(20);
+        terminal.setColumns(40);
+        terminal.setImmediate(true);
+        terminal.setWordwrap(false);
+        verticalLayoutForm.addComponent(terminal);
+
         grid.addComponent(verticalLayoutForm, 1, 0, 5, 9);
         grid.setComponentAlignment(verticalLayoutForm, Alignment.MIDDLE_CENTER);
 
@@ -72,8 +77,29 @@ public class Step3 extends Panel {
 
         addComponent(verticalLayout);
 
-        parent.getHadoopInstallation().createTask();
-        parent.getHadoopInstallation().createInstallationRequest();
+        parent.getHadoopInstallation().installHadoop();
     }
 
+    public void addOutput(Task task, Response response) {
+        System.out.println(response);
+        if (task.getTaskStatus().equals(TaskStatus.SUCCESS)) {
+            if(!Strings.isNullOrEmpty(response.getStdOut()) && !response.getStdOut().equals("null")) {
+                StringBuffer str = new StringBuffer();
+                str.append(terminal.getValue());
+                str.append("\n");
+                str.append(response.getStdOut());
+                terminal.setValue(str);
+            }
+        } else {
+            if(!Strings.isNullOrEmpty(response.getStdErr()) && !response.getStdErr().equals("null")){
+                StringBuffer str = new StringBuffer();
+                str.append(terminal.getValue());
+                str.append("\n");
+                str.append(response.getStdErr());
+                terminal.setValue(str);
+            }
+        }
+
+
+    }
 }
