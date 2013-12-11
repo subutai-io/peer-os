@@ -192,7 +192,7 @@ public class CommandTransport implements CommandTransportInterface {
             //***policy
             broker.setPersistent(true);
             broker.setUseJmx(false);
-            broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort+"?needClientAuth=true");
+            broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true");
             broker.start();
             broker.waitUntilStarted();
             //executor service setup
