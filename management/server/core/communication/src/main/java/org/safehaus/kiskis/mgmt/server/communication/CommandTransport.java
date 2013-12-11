@@ -198,7 +198,9 @@ public class CommandTransport implements CommandTransportInterface {
             //executor service setup
             exec = Executors.newFixedThreadPool(amqExecutorPoolSize);
             //pooled connection factory setup
-            pooledConnectionFactory = new PooledConnectionFactory(new ActiveMQConnectionFactory("vm://localhost"));
+            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory("vm://localhost?create=false");
+            amqFactory.setCheckForDuplicates(true);
+            pooledConnectionFactory = new PooledConnectionFactory(amqFactory);
             pooledConnectionFactory.setMaxConnections(amqMaxConnections);
             pooledConnectionFactory.start();
 //            connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
