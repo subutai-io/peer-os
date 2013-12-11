@@ -162,6 +162,7 @@
         </resources>
         <plugins>
             <plugin>
+                <version>2.6</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
