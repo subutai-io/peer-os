@@ -50,6 +50,7 @@
     <build>
         <plugins>
             <plugin>
+                <version>2.4.0</version>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <inherited>true</inherited>
