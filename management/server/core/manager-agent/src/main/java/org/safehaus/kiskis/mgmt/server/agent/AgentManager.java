@@ -60,6 +60,9 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
 
     private void updateAgent(Response response, boolean register) {
         try {
+            if (response.getUuid() == null) {
+                throw new Exception("Error " + (register ? "registering" : "updating") + " agent: UUID is null " + response);
+            }
             Agent agent = new Agent();
             agent.setUuid(response.getUuid());
             agent.setHostname(response.getHostname());
@@ -70,6 +73,9 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
                 agent.setIsLXC(response.isIsLxc());
             }
             agent.setListIP(response.getIps());
+            if (agent.getHostname() == null || agent.getHostname().trim().isEmpty()) {
+                agent.setHostname(agent.getUuid().toString());
+            }
             if (agent.isIsLXC()) {
                 if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
                     agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
