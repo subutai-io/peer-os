@@ -13,9 +13,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 
 import javax.jms.*;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
+import org.apache.activemq.broker.region.policy.DeadLetterStrategy;
 import org.apache.activemq.broker.region.policy.OldestMessageWithLowestPriorityEvictionStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
+import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
 //check branch
 
@@ -178,14 +180,24 @@ public class CommandTransport implements CommandTransportInterface {
             //***policy
             PolicyMap policy = new PolicyMap();
             PolicyEntry pentry = new PolicyEntry();
+            //period to expire messages
             pentry.setExpireMessagesPeriod(amqExpireMessagesPeriodSec * 1000);
+            //oldest messages are discarded but if their priority is less then newer messages'priority
+            //otherwise newer messages are discarded
             OldestMessageWithLowestPriorityEvictionStrategy eviction = new OldestMessageWithLowestPriorityEvictionStrategy();
             eviction.setEvictExpiredMessagesHighWatermark(amqExpiredMessagesHighWatermark);
             pentry.setMessageEvictionStrategy(eviction);
+            //maximum number above client's prefetch limit to hold in memory before sending
+            //beyond this limit older unsent messages are discarded
             ConstantPendingMessageLimitStrategy limit = new ConstantPendingMessageLimitStrategy();
             limit.setLimit(amqConstantPendingMessageLimit);
             pentry.setPendingMessageLimitStrategy(limit);
+            //drop expired messages instead of sending to DLQ
+            DeadLetterStrategy deadLetterStrategy = new SharedDeadLetterStrategy();
+            deadLetterStrategy.setProcessExpired(false);
+            pentry.setDeadLetterStrategy(deadLetterStrategy);
             policy.setDefaultEntry(pentry);
+            //drop queues which clients are offline for this amount of time
             broker.setOfflineDurableSubscriberTimeout(amqOfflineDurableSubscriberTimeoutSec * 1000);
             broker.setOfflineDurableSubscriberTaskSchedule(amqOfflineDurableSubscriberTaskScheduleSec * 1000);
             broker.setDestinationPolicy(policy);
