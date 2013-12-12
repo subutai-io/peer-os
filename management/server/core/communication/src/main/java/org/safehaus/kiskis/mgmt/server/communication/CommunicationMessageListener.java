@@ -8,6 +8,7 @@ import javax.jms.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 12:13 AM
@@ -31,7 +32,7 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             String jsonCmd = txtMsg.getText();
             Response response = CommandJson.getResponse(jsonCmd);
-            System.out.println("Received " + response);
+            System.out.println("Received " + CommandJson.getJson(new Command(response)));
             long ts = System.currentTimeMillis();
             if (response != null) {
                 notifyListeners(response);

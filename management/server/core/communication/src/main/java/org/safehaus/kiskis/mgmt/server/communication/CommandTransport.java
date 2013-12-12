@@ -10,11 +10,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
-
 import javax.jms.*;
-import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
+import org.apache.activemq.broker.region.policy.AbortSlowAckConsumerStrategy;
 import org.apache.activemq.broker.region.policy.DeadLetterStrategy;
-import org.apache.activemq.broker.region.policy.OldestMessageWithLowestPriorityEvictionStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
@@ -26,7 +24,6 @@ public class CommandTransport implements CommandTransportInterface {
     private static final Logger LOG = Logger.getLogger(CommandTransport.class.getName());
     private BrokerService broker;
     private PooledConnectionFactory pooledConnectionFactory;
-//    private ActiveMQConnectionFactory connectionFactory;
     private CommunicationMessageListener communicationMessageListener;
     private ExecutorService exec;
     private String amqBindAddress;
@@ -36,24 +33,14 @@ public class CommandTransport implements CommandTransportInterface {
     private String amqBrokerCertificatePwd;
     private String amqBrokerTrustStorePwd;
     private int amqPort;
-    private int amqExpiredMessagesHighWatermark;
-    private int amqConstantPendingMessageLimit;
-    private int amqExpireMessagesPeriodSec;
-    private int amqOfflineDurableSubscriberTimeoutSec;
-    private int amqOfflineDurableSubscriberTaskScheduleSec;
-    private int amqMaxConnections;
-    private int amqExecutorPoolSize;
+    private int amqMaxMessageToAgentTtlSec;
+    private int amqMaxOfflineAgentQueueTtlSec;
+    private int amqMaxSlowAgentConnectionTtlSec;
+    private int amqMaxPooledConnections;
+    private int amqMaxSenderPoolSize;
 
     public void setAmqPort(int amqPort) {
         this.amqPort = amqPort;
-    }
-
-    public void setAmqMaxConnections(int amqMaxConnections) {
-        this.amqMaxConnections = amqMaxConnections;
-    }
-
-    public void setAmqExecutorPoolSize(int amqExecutorPoolSize) {
-        this.amqExecutorPoolSize = amqExecutorPoolSize;
     }
 
     public void setAmqBindAddress(String amqBindAddress) {
@@ -80,24 +67,24 @@ public class CommandTransport implements CommandTransportInterface {
         this.amqBrokerTrustStorePwd = amqBrokerTrustStorePwd;
     }
 
-    public void setAmqExpiredMessagesHighWatermark(int amqExpiredMessagesHighWatermark) {
-        this.amqExpiredMessagesHighWatermark = amqExpiredMessagesHighWatermark;
+    public void setAmqMaxMessageToAgentTtlSec(int amqMaxMessageToAgentTtlSec) {
+        this.amqMaxMessageToAgentTtlSec = amqMaxMessageToAgentTtlSec;
     }
 
-    public void setAmqConstantPendingMessageLimit(int amqConstantPendingMessageLimit) {
-        this.amqConstantPendingMessageLimit = amqConstantPendingMessageLimit;
+    public void setAmqMaxOfflineAgentQueueTtlSec(int amqMaxOfflineAgentQueueTtlSec) {
+        this.amqMaxOfflineAgentQueueTtlSec = amqMaxOfflineAgentQueueTtlSec;
     }
 
-    public void setAmqExpireMessagesPeriodSec(int amqExpireMessagesPeriodSec) {
-        this.amqExpireMessagesPeriodSec = amqExpireMessagesPeriodSec;
+    public void setAmqMaxSlowAgentConnectionTtlSec(int amqMaxSlowAgentConnectionTtlSec) {
+        this.amqMaxSlowAgentConnectionTtlSec = amqMaxSlowAgentConnectionTtlSec;
     }
 
-    public void setAmqOfflineDurableSubscriberTimeoutSec(int amqOfflineDurableSubscriberTimeoutSec) {
-        this.amqOfflineDurableSubscriberTimeoutSec = amqOfflineDurableSubscriberTimeoutSec;
+    public void setAmqMaxPooledConnections(int amqMaxPooledConnections) {
+        this.amqMaxPooledConnections = amqMaxPooledConnections;
     }
 
-    public void setAmqOfflineDurableSubscriberTaskScheduleSec(int amqOfflineDurableSubscriberTaskScheduleSec) {
-        this.amqOfflineDurableSubscriberTaskScheduleSec = amqOfflineDurableSubscriberTaskScheduleSec;
+    public void setAmqMaxSenderPoolSize(int amqMaxSenderPoolSize) {
+        this.amqMaxSenderPoolSize = amqMaxSenderPoolSize;
     }
 
     @Override
@@ -119,12 +106,12 @@ public class CommandTransport implements CommandTransportInterface {
             MessageProducer producer = null;
             try {
                 connection = pooledConnectionFactory.createConnection();
-//                connection = connectionFactory.createConnection();
                 connection.start();
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 Destination destination = session.createQueue(command.getCommand().getUuid().toString());
                 producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+                producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);
                 String json = CommandJson.getJson(command);
                 System.out.println("Sending: " + json);
                 TextMessage message = session.createTextMessage(json);
@@ -180,26 +167,17 @@ public class CommandTransport implements CommandTransportInterface {
             //***policy
             PolicyMap policy = new PolicyMap();
             PolicyEntry pentry = new PolicyEntry();
-            //period to expire messages
-            pentry.setExpireMessagesPeriod(amqExpireMessagesPeriodSec * 1000);
-            //oldest messages are discarded but if their priority is less then newer messages'priority
-            //otherwise newer messages are discarded
-            OldestMessageWithLowestPriorityEvictionStrategy eviction = new OldestMessageWithLowestPriorityEvictionStrategy();
-            eviction.setEvictExpiredMessagesHighWatermark(amqExpiredMessagesHighWatermark);
-            pentry.setMessageEvictionStrategy(eviction);
-            //maximum number above client's prefetch limit to hold in memory before sending
-            //beyond this limit older unsent messages are discarded
-            ConstantPendingMessageLimitStrategy limit = new ConstantPendingMessageLimitStrategy();
-            limit.setLimit(amqConstantPendingMessageLimit);
-            pentry.setPendingMessageLimitStrategy(limit);
+            //abort consumers not acking message within this period of time
+            AbortSlowAckConsumerStrategy slowConsumerStrategy = new AbortSlowAckConsumerStrategy();
+            slowConsumerStrategy.setMaxTimeSinceLastAck(amqMaxSlowAgentConnectionTtlSec * 1000);
+            pentry.setSlowConsumerStrategy(slowConsumerStrategy);
             //drop expired messages instead of sending to DLQ
             DeadLetterStrategy deadLetterStrategy = new SharedDeadLetterStrategy();
             deadLetterStrategy.setProcessExpired(false);
             pentry.setDeadLetterStrategy(deadLetterStrategy);
             policy.setDefaultEntry(pentry);
-            //drop queues which clients are offline for this amount of time
-            broker.setOfflineDurableSubscriberTimeout(amqOfflineDurableSubscriberTimeoutSec * 1000);
-            broker.setOfflineDurableSubscriberTaskSchedule(amqOfflineDurableSubscriberTaskScheduleSec * 1000);
+            //drop queues whose clients are offline for this amount of time
+            broker.setOfflineDurableSubscriberTimeout(amqMaxOfflineAgentQueueTtlSec * 1000);
             broker.setDestinationPolicy(policy);
             //***policy
             broker.setPersistent(true);
@@ -208,14 +186,13 @@ public class CommandTransport implements CommandTransportInterface {
             broker.start();
             broker.waitUntilStarted();
             //executor service setup
-            exec = Executors.newFixedThreadPool(amqExecutorPoolSize);
+            exec = Executors.newFixedThreadPool(amqMaxSenderPoolSize);
             //pooled connection factory setup
             ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory("vm://localhost?create=false");
             amqFactory.setCheckForDuplicates(true);
             pooledConnectionFactory = new PooledConnectionFactory(amqFactory);
-            pooledConnectionFactory.setMaxConnections(amqMaxConnections);
+            pooledConnectionFactory.setMaxConnections(amqMaxPooledConnections);
             pooledConnectionFactory.start();
-//            connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
             setupListener();
             System.out.println("ActiveMQ started...");
         } catch (Exception ex) {
@@ -227,13 +204,22 @@ public class CommandTransport implements CommandTransportInterface {
     public void destroy() {
         try {
             if (pooledConnectionFactory != null) {
-                pooledConnectionFactory.stop();
+                try {
+                    pooledConnectionFactory.stop();
+                } catch (Exception e) {
+                }
             }
             if (broker != null) {
-                broker.stop();
+                try {
+                    broker.stop();
+                } catch (Exception e) {
+                }
             }
             if (communicationMessageListener != null) {
-                communicationMessageListener.destroy();
+                try {
+                    communicationMessageListener.destroy();
+                } catch (Exception e) {
+                }
             }
             System.out.println("ActiveMQ stopped...");
         } catch (Exception ex) {
@@ -244,7 +230,6 @@ public class CommandTransport implements CommandTransportInterface {
     private void setupListener() {
         try {
             Connection connection = pooledConnectionFactory.createConnection();
-//            Connection connection = connectionFactory.createConnection();
             //don not close this connection to not return it to the pool so no consumers are closed
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
