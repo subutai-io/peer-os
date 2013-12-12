@@ -385,7 +385,9 @@ int main(int argc,char *argv[],char *envp[])
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command RequestSequenceNumber:",toString(command.getRequestSequenceNumber())));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command workingDirectory:",command.getWorkingDirectory()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command StdOut:",command.getStandardOutput()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command stdOutPath:",command.getStandardOutputPath()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command StdErr:",command.getStandardError()));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command stdErrPath:",command.getStandardErrPath()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command Program:",command.getProgram()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command runAs:",command.getRunAs()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command timeout:",toString(command.getTimeout())));

@@ -1,9 +1,28 @@
+/**   @copyright 2013 Safehaus.org
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include "KAThread.h"
 /**
  *  \details   Default constructor of the KAThread class.
  */
 KAThread::KAThread()
 {
+	setCWDERR(false);
+	setUIDERR(false);
+	setResponsecount(1);
+	setACTFLAG(false);
+	setEXITSTATUS(0);
 	// TODO Auto-generated constructor stub
 }
 /**
@@ -87,476 +106,582 @@ string KAThread::createExecString(KACommand *command)
  *  \details   This method check lastly buffer results and sends the buffers to the ActiveMQ broker.
  *  		   This method is only called when the timeout occured or process is done.
  */
-void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command,string* outBuff,
-		string* errBuff,numbers* block,KALogger* logger)
+void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command)
 {
-	logger->writeLog(6,logger->setLogData("<KAThread::lastCheckAndSend> " "The method starts..."));
-	logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend> " "Execution command has been created","outbuff:",*outBuff));
-	logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend> " "Execution command has been created","errbuff:",*errBuff));
-	unsigned int outBuffsize = outBuff->size();					//real output buffer size
-	unsigned int errBuffsize = errBuff->size();					//real error buffer size
-	KAResponsePack response;
+	this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::lastCheckAndSend> " "The method starts..."));
+	unsigned int outBuffsize = this->getoutBuff().size();					//real output buffer size
+	unsigned int errBuffsize = this->geterrBuff().size();					//real error buffer size
+
 	if(outBuffsize !=0 || errBuffsize!=0)
 	{
 		if(outBuffsize !=0 && errBuffsize!=0)
 		{
-			if(command->getStandardOutput()!="CAPTURE" && command->getStandardError()!="CAPTURE")
+			if((command->getStandardOutput() =="CAPTURE_AND_RETURN" || command->getStandardOutput() == "RETURN")
+					&& (command->getStandardError() == "CAPTURE_AND_RETURN" || command->getStandardError() == "RETURN"))
 			{
 				/*
 				 * send main buffers without blocking output and error
 				 */
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend1> " "Message was created for send to the shared memory","Message:",message));
+				string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+						this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+				this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::lastCheckAndSend1> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend1> " "Message was created and sent to the shared memory"));
-				outBuff->clear();
-				errBuff->clear();
+				this->getResponsecount() = this->getResponsecount() + 1;
+				this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::lastCheckAndSend1> " "Message was created and sent to the shared memory"));
+				this->getoutBuff().clear();
+				this->geterrBuff().clear();
 			}
-			else if(command->getStandardOutput()!="CAPTURE")
+			else if((command->getStandardOutput() =="CAPTURE_AND_RETURN" || command->getStandardOutput() == "RETURN"))
 			{
 				/*
 				 * send main buffers with block error buff
 				 */
-				errBuff->clear();
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend2> " "Message was created for send to the shared memory","Message:",message));
+				this->geterrBuff().clear();
+				string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+						this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+				this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::lastCheckAndSend2> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::lastCheckAndSend2> " "Message was created and sent to the shared memory"));
-				outBuff->clear();
+				this->getResponsecount() = this->getResponsecount() + 1;
+				this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::lastCheckAndSend2> " "Message was created and sent to the shared memory"));
+				this->getoutBuff().clear();
 			}
-			else if(command->getStandardError()!="CAPTURE")
+			else if((command->getStandardError() == "CAPTURE_AND_RETURN" || command->getStandardError() == "RETURN"))
 			{
-				outBuff->clear();
 				/*
 				 * send main buffers with blocking error buff
 				 */
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend3> " "Message was created for send to the shared memory","Message:",message));
+				this->getoutBuff().clear();
+				string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+						this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+				this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::lastCheckAndSend3> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::lastCheckAndSend3> " "Message was created and sent to the shared memory"));
-				errBuff->clear();
+				this->getResponsecount() = this->getResponsecount() + 1;
+				this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::lastCheckAndSend3> " "Message was created and sent to the shared memory"));
+				this->geterrBuff().clear();
 			}
 			else
 			{
-				outBuff->clear();
-				errBuff->clear();
+				this->getoutBuff().clear();
+				this->geterrBuff().clear();
 			}
 		}
 		else if(outBuffsize !=0)
 		{
-			if(command->getStandardOutput()!="CAPTURE")
+			if(command->getStandardOutput() =="CAPTURE_AND_RETURN" || command->getStandardOutput() == "RETURN")
 			{
 				/*
 				 * send main buffers without block output. (errbuff size is zero)
 				 */
-				errBuff->clear();
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend4> " "Message was created for send to the shared memory","Message:",message));
+				this->geterrBuff().clear();
+				string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+						this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+				this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::lastCheckAndSend4> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::lastCheckAndSend4> " "Message was created and sent to the shared memory"));
-				outBuff->clear();
+				this->getResponsecount() = this->getResponsecount() + 1;
+				this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::lastCheckAndSend4> " "Message was created and sent to the shared memory"));
+				this->getoutBuff().clear();
 			}
 			else
 			{
-				outBuff->clear();
-				errBuff->clear();
+				this->getoutBuff().clear();
+				this->geterrBuff().clear();
 			}
 		}
 		else if(errBuffsize !=0)
 		{
-			if(command->getStandardError()!="CAPTURE")
+			if(command->getStandardError() == "CAPTURE_AND_RETURN" || command->getStandardError() == "RETURN")
 			{
 				/*
 				 * send main buffers without block output. (errbuff size is zero)
 				 */
-				outBuff->clear();
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::lastCheckAndSend5> " "Message was created for send to the shared memory","Message:",message));
+				this->getoutBuff().clear();
+				string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+						this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+				this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::lastCheckAndSend5> " "Message was created for send to the shared memory","Message:",message));
 				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::lastCheckAndSend5> " "Message was created and sent to the shared memory"));
-				errBuff->clear();
+				this->getResponsecount() = this->getResponsecount() + 1;
+				this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::lastCheckAndSend5> " "Message was created and sent to the shared memory"));
+				this->geterrBuff().clear();
 			}
 			else
 			{
-				outBuff->clear();
-				errBuff->clear();
+				this->getoutBuff().clear();
+				this->geterrBuff().clear();
 			}
 		}
 	}
 }
 /**
  *  \details   This method check buffer results and sends the buffers to the ActiveMQ broker.
- *  		   This method calls when any buffer result overflow 1000 bytes.
+ *  		   This method calls when any buffer result overflow MaxBuffSize=1000 bytes.
  */
-void KAThread::checkAndSend(message_queue* messageQueue,KAStreamReader* Stream,string* outBuff,string* errBuff,
-		KACommand* command,numbers* block,KALogger* logger)
+void KAThread::checkAndSend(message_queue* messageQueue,KACommand* command)
 {
-	logger->writeLog(6,logger->setLogData("<KAThread::checkAndSend> Method starts..."));
-	logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend> ","outbuff:",*outBuff));
-	KAResponsePack response;
-	if(Stream->getIdentity()=="output")
+	this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndSend> Method starts..."));
+
+	//if output is RETURN or CAPT_AND_RET
+	if( this->getOutputStream().getMode()=="RETURN" || this->getOutputStream().getMode()=="CAPTURE_AND_RETURN" )
 	{
-		if( Stream->getMode()=="RETURN" || Stream->getMode()=="CAPTURE_AND_RETURN" )	//send to ActiveMQ
+		if(command->getStandardError() == "CAPTURE" || command->getStandardError() == "NO" )
 		{
-			if(command->getStandardError() == "CAPTURE")
-			{
-				/*
-				 * send main buffers with blocking error
-				 */
-				errBuff->clear();
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend1> " "Message was created for sending to the shared memory","Message:",message));
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::checkAndSend1> " "Message was created and sent to the shared memory"));
-			}
-			else	//stderr is not in capture mode so it will not be blocked
-			{
-				/*
-				 * send main buffers without block error
-				 */
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::checkAndSend2> " "Message was created and sent to the shared memory"));
-			}
+			/*
+			 * send main buffers with blocking error
+			 */
+			this->geterrBuff().clear();
+
+			string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+					this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndSend1> " "Message was created for sending to the shared memory","Message:",message));
+			while(!messageQueue->try_send(message.data(), message.size(), 0));
+			this->getResponsecount()=this->getResponsecount()+1;
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndSend1> " "Message was created and sent to the shared memory"));
+		}
+		else	//stderr is not in capture mode so it will not be blocked
+		{
+			/*
+			 * send main buffers without blocking
+			 */
+			string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+					this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
+			while(!messageQueue->try_send(message.data(), message.size(), 0));
+			this->getResponsecount()=this->getResponsecount()+1;
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndSend2> " "Message was created and sent to the shared memory"));
 		}
 	}
-	else if(Stream->getIdentity()=="error")
+	else	//out capture or No so it should be blocked
 	{
-		if( Stream->getMode()=="RETURN" || Stream->getMode()=="CAPTURE_AND_RETURN" )	//send to ActiveMQ
+		if(command->getStandardError() == "CAPTURE" || command->getStandardError() == "NO" )
 		{
-			if(command->getStandardOutput() == "CAPTURE")
-			{
-				/*
-				 * send main buffers with blocking output
-				 */
-				outBuff->clear();
-
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend3> " "Message was created for sending to the shared memory","Message:",message));
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::checkAndSend3> " "Message was created and sent to the shared memory"));
-			}
-			else	//stdout is not in capture mode so it will not be blocked
-			{
-				/*
-				 * send main buffers without block output
-				 */
-				string message = response.createResponseMessage(command->getUuid(),*block->processpid,
-						command->getRequestSequenceNumber(),*block->responsecount,*errBuff,*outBuff);
-				logger->writeLog(7,logger->setLogData("<KAThread::checkAndSend4> " "Message was created for sending to the shared memory","Message:",message));
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				*block->responsecount=*block->responsecount+1;
-				logger->writeLog(6,logger->setLogData("<KAThread::checkAndSend5> " "Message was created and sent to the shared memory"));
-			}
+			/*
+			 * send main buffers with blocking error and output
+			 */
+			//Nothing will be send..
 		}
+		else	//stderr is not in capture mode so it will not be blocked
+		{
+			/*
+			 * send main buffers without block output
+			 */
+			this->getoutBuff().clear();
+
+			string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+					this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
+			while(!messageQueue->try_send(message.data(), message.size(), 0));
+			this->getResponsecount()=this->getResponsecount()+1;
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndSend2> " "Message was created and sent to the shared memory"));
+		}
+
 	}
 }
 /**
  *  \details   This method is mainly writes the buffers to the files if the modes are capture.
  *  		   This method calls when any response comes to the error or output buffer.
  */
-void KAThread::checkAndWrite(message_queue *messageQueue,KAStreamReader* Stream,string* outBuff,string* errBuff,
-		KACommand* command,numbers* block,KALogger* logger)
+void KAThread::checkAndWrite(message_queue *messageQueue,KACommand* command)
 {
-	logger->writeLog(6,logger->setLogData("<KAThread::checkAndWrite> Method starts... "));
-	logger->writeLog(7,logger->setLogData("<KAThread::checkAndWrite> ","outBuff:",*outBuff));
+	unsigned int MaxBuffSize = 1000; //max Packet size is setting with 1000 chars.
+	this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndWrite> Method starts... "));
 	/*
 	 * Appending output and error buffer results to real buffers
 	 */
-	if(Stream->getIdentity()=="output")
+	this->getoutBuff().append(this->getOutputStream().getBuffer());	//appending buffers.
+	if(this->getOutputStream().getMode() == "CAPTURE" || this->getOutputStream().getMode() == "CAPTURE_AND_RETURN")
 	{
-		outBuff->append(Stream->getBuffer());
-		if(Stream->getMode()!="RETURN")		//if the mode is different from RETURN it should have to be written to the file..
+		this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> Starting Capturing Output.."));
+		if( this->getOutputStream().openFile() )
 		{
-			if(Stream->openFile())
-			{
-				Stream->appendFile(Stream->getBuffer());
-				Stream->closeFile();
-			}
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> CAPTURE Output: ",this->getOutputStream().getBuffer()));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> CAPTURE Output is written to file... "));
+			this->getOutputStream().appendFile(this->getOutputStream().getBuffer());
+			this->getOutputStream().closeFile();
 		}
 	}
-	else if(Stream->getIdentity()=="error")
+	this->getOutputStream().clearBuffer();	//clear stream buffer
+	this->geterrBuff().append(this->getErrorStream().getBuffer());  //appending buffers.
+	if(this->getErrorStream().getMode() == "CAPTURE" || this->getErrorStream().getMode() == "CAPTURE_AND_RETURN")
 	{
-		errBuff->append(Stream->getBuffer());
-		if(Stream->getMode()!="RETURN")		//if the mode is different from RETURN it should have to be written to the file..
+		this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> Starting Capturing Error.."));
+		if( this->getErrorStream().openFile() )
 		{
-			if(Stream->openFile())
-			{
-				Stream->appendFile(Stream->getBuffer());
-				Stream->closeFile();
-			}
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> CAPTURE Error: ",this->getErrorStream().getBuffer()));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> CAPTURE Error is written to file... "));
+			this->getErrorStream().appendFile(this->getErrorStream().getBuffer());
+			this->getErrorStream().closeFile();
 		}
 	}
-	unsigned int outBuffsize = outBuff->size();					//real output buffer size
-	logger->writeLog(7,logger->setLogData("<KAThread::checkAndWrite2> ","OutBuffSize:",toString(outBuffsize)));
-	unsigned int errBuffsize = errBuff->size();					//real error buffer size
-	logger->writeLog(7,logger->setLogData("<KAThread::checkAndWrite3> ","errBuffSize:",toString(errBuffsize)));
-	if( outBuffsize >= 1000 || errBuffsize >= 1000 )
+	this->getErrorStream().clearBuffer();	//clear stream buffer
+
+	unsigned int outBuffsize = this->getoutBuff().size();					//real output buffer size
+	this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite2> ","OutBuffSize:",toString(outBuffsize)));
+	unsigned int errBuffsize = this->geterrBuff().size();					//real error buffer size
+	this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite3> ","errBuffSize:",toString(errBuffsize)));
+
+	if(errBuffsize > 0 )	//if there is an error in the pipe, it will be set.
+		this->setEXITSTATUS(1);
+
+	if( outBuffsize >= MaxBuffSize || errBuffsize >= MaxBuffSize )
 	{
-		if( outBuff->size() >= 1000 && errBuff->size() >= 1000 )		//Both buffer is big enough than standard size ?
+		if( outBuffsize >= MaxBuffSize && errBuffsize >= MaxBuffSize )		//Both buffer is big enough than standard size ?
 		{
-			string divisionOut = outBuff->substr(1000,(outBuffsize-1000));	//cut the excess string from buffer
-			*outBuff = outBuff->substr(0,1000);
+			string divisionOut = this->getoutBuff().substr(MaxBuffSize,(outBuffsize-MaxBuffSize));	//cut the excess string from output buffer
+			this->getoutBuff() = this->getoutBuff().substr(0,MaxBuffSize);
 
-			string divisionErr= errBuff->substr(1000,(errBuffsize-1000));	//cut the excess string from buffer
-			*errBuff = errBuff->substr(0,1000);
-			logger->writeLog(6,logger->setLogData("<KAThread::checkAndWrite> checkAndSend method is calling..."));
-			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block,logger);
-			logger->writeLog(6,logger->setLogData("<KAThread::checkAndWrite> checkAndSend method finished"));
+			string divisionErr = this->geterrBuff().substr(MaxBuffSize,(errBuffsize-MaxBuffSize));	//cut the excess string from buffer
+			this->geterrBuff() = this->geterrBuff().substr(0,MaxBuffSize);
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndWrite> checkAndSend method is calling..."));
 
-			outBuff->clear();
-			errBuff->clear();
-			*outBuff=divisionOut;
-			*errBuff=divisionErr;
+			checkAndSend(messageQueue,command);
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndWrite> checkAndSend method finished"));
+
+			this->getoutBuff().clear();
+			this->geterrBuff().clear();
+			this->setoutBuff(divisionOut);
+			this->seterrBuff(divisionErr);
 		}
-		else if( outBuffsize >= 1000 )
+		else if( outBuffsize >= MaxBuffSize )
 		{
-			string divisionOut = outBuff->substr(1000,(outBuffsize-1000));	//cut the excess string from buffer
-			*outBuff = outBuff->substr(0,1000);
-			logger->writeLog(7,logger->setLogData("<KAThread::checkAndWrite> ","Excess_DataSize:",toString(divisionOut.size())));
-			logger->writeLog(7,logger->setLogData("<KAThread::checkAndWrite> ","CuttedDataSize:",toString(outBuffsize)));
-			logger->writeLog(7,logger->setLogData("<KAThread::checkAndWrite> ","Excess_Data:",divisionOut));
-			logger->writeLog(7,logger->setLogData("<KAThread::checkAndWrite> ","CuttedData:",*outBuff));
-			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block,logger);
+			string divisionOut = this->getoutBuff().substr(MaxBuffSize,(outBuffsize-MaxBuffSize));	//cut the excess string from buffer
+			this->getoutBuff() = this->getoutBuff().substr(0,MaxBuffSize);
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> ","Excess_DataSize:",toString(divisionOut.size())));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> ","CuttedDataSize:",toString(outBuffsize)));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> ","Excess_Data:",divisionOut));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkAndWrite> ","CuttedData:",this->getoutBuff()));
 
-			outBuff->clear();
-			errBuff->clear();
-			*outBuff=divisionOut;
+			checkAndSend(messageQueue,command);
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndWrite> checkAndSend method finished"));
+
+			this->getoutBuff().clear();
+			this->geterrBuff().clear();
+			this->setoutBuff(divisionOut);
 		}
-		else if( errBuffsize >= 1000 )
+		else if( errBuffsize >= MaxBuffSize )
 		{
-			string divisionErr = errBuff->substr(1000,(errBuffsize-1000));	//cut the excess string from buffer
-			*errBuff = errBuff->substr(0,1000);
-			logger->writeLog(6,logger->setLogData("<KAThread::checkAndWrite> checkAndSend method is calling..."));
-			checkAndSend(messageQueue,Stream,outBuff,errBuff,command,block,logger);
-			logger->writeLog(6,logger->setLogData("<KAThread::checkAndWrite> checkAndSend method finished..."));
-			outBuff->clear();
-			errBuff->clear();
-			*errBuff=divisionErr;
+			string divisionErr = this->geterrBuff().substr(MaxBuffSize,(errBuffsize-MaxBuffSize));	//cut the excess string from buffer
+			this->geterrBuff() = this->geterrBuff().substr(0,MaxBuffSize);
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndWrite> checkAndSend method is calling..."));
+
+			checkAndSend(messageQueue,command);
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::checkAndWrite> checkAndSend method finished..."));
+
+			this->getoutBuff().clear();
+			this->geterrBuff().clear();
+			this->seterrBuff(divisionErr);
 		}
 	}
 }
 /**
- *  \details   This method is one of the most important method of the KAThread class.
- *  		   It captures intermediate response from pipeline.
+ *  \details   This method checks the execution timeout value.
+ *  		   if execution timeout is occured it returns true. Otherwise it returns false.
  */
-void KAThread::capture(message_queue *messageQueue,KACommand* command,KAStreamReader* Stream,
-		mutex* mymutex,string* outBuff,string* errBuff,numbers* block,KALogger* logger)
+bool KAThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* exectimeout,unsigned int* count)
 {
-	Stream->setTimeout(command->getTimeout());
-	Stream->prepareFileDec();
-	logger->writeLog(6,logger->setLogData("<KAThread::capture> " "Capturing Started!!"));
-	while(true)
+	if (*exectimeout != 0)
 	{
-		logger->writeLog(7,logger->setLogData("<KAThread::capture> " "Selection:",toString(Stream->getSelectResult()),"Identity:",Stream->getIdentity()));
-		Stream->clearBuffer();
-		Stream->startSelection();
+		boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
+		unsigned int currentsec  =  current.time_of_day().seconds();
 
-		if (Stream->getSelectResult()==0)
+		if((currentsec > *startsec) && *overflag==false)
 		{
-			/*
-			 * Timeout occured!!
-			 */
-			logger->writeLog(6,logger->setLogData("<KAThread::capture> " "Timeout has been occured","Identity:",Stream->getIdentity()));
-			break;
-		}
-		else if (Stream->getSelectResult()==-1)
-		{
-			logger->writeLog(3,logger->setLogData("<KAThread::capture> " "Error opening pipe.."));
-			break;
-		}
-		else
-		{
-			if (Stream->getSelectResult() != 0)
+			if(currentsec != 59)
 			{
-				Stream->clearBuffer();
-				Stream->startReading();
-			}
-			if (Stream->getReadResult() > 0)
-			{
-				*(block->flag)=true;
-
-				mymutex->lock();
-				checkAndWrite(messageQueue,Stream,outBuff,errBuff,command,block,logger);
-				mymutex->unlock();
-				logger->writeLog(6,logger->setLogData("<KAThread::capture> " "Result:",toString(Stream->getReadResult()),"Identity:",Stream->getIdentity()));
-				logger->writeLog(6,logger->setLogData("<KAThread::capture> " "Buffer:",Stream->getBuffer(),"Identity:",Stream->getIdentity()));
+				*count = *count + (currentsec - *startsec);
+				*startsec = currentsec;
 			}
 			else
 			{
-				/*
-				 * End of file.
-				 */
-				logger->writeLog(6,logger->setLogData("<KAThread::capture> " "Result:",toString(Stream->getReadResult()),"Identity:",Stream->getIdentity()));
-				logger->writeLog(7,logger->setLogData("<KAThread::capture> " "Breaking!!","Identity:",Stream->getIdentity()));
-				break;
+				*count = *count + (currentsec - *startsec);
+				*overflag = true;
+				*startsec = 0;
 			}
 		}
+		if(currentsec == 59)
+		{
+			*overflag = true;
+			*startsec = 0;
+		}
+		else
+		{
+			*overflag = false;
+		}
+		if(*count >= *exectimeout) //timeout
+		{
+			this->getLogger().writeLog(4,this->getLogger().setLogData("<KAThread::checkTimeout> " "Timeout Occured!!"));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkTimeout> " "count:",toString(*count)));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
+			return true;	//timeout occured now
+		}
+		else
+		{
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkTimeout> " "count:",toString(*count)));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
+			return false; //no timeout occured
+		}
 	}
-	logger->writeLog(6,logger->setLogData("<KAThread::capture> ""Thread is closing!!","Identity:",Stream->getIdentity()));
+	return false;	//no timeout occured
 }
 /**
  *  \details   This method is creating the capturing threads and timeout thread.
  *  		   It also gets the process id of the execution.
  *  		   It manages the lifecycle of the threads and handles capturing and sending execution responses using these threads.
  */
-int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,
-		KAStreamReader* errorStream,KAStreamReader* outputStream,int newpid)
+int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int newpid)
 {
 	/*
 	 *	Getting system pid of child process
 	 *	For example, after this block, processpid should be pid of running command (e.g. tail)
 	 */
 	int status;
-	string processpid=toString(newpid);
+	this->setPpid(newpid);
 	pid_t result = waitpid(newpid, &status, WNOHANG);
-	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
-	while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
-		processpid="pgrep -P "+toString(newpid);
-		processpid = this->getProcessPid(processpid.c_str());
-		processpid="pgrep -P "+processpid;
-		processpid = this->getProcessPid(processpid.c_str());
-		if(atoi(processpid.c_str()))
+	this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
+	while ((result = waitpid(newpid, &status, WNOHANG)) == 0)
+	{
+		string cmd;
+		cmd = "pgrep -P "+toString(newpid);
+		cmd = this->getProcessPid(cmd.c_str());
+
+		cmd = "pgrep -P "+ cmd;
+		cmd = this->getProcessPid(cmd.c_str());
+
+		this->setPpid(atoi(cmd.c_str()));
+		if(this->getPpid())
 		{
 			break;
 		}
-		processpid=toString(newpid);
+		this->setPpid(newpid);
 	}
-	if(result >0)
+	if(result > 0)
 	{
-		processpid=toString(newpid);
-		//return 1;
+		this->setPpid(newpid);
 	}
-	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Find pid finished","current pid:",processpid));
-
+	this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Find pid finished","current pid:",toString(processpid)));
 	/*
 	 * if the execution is done process pid could not be read and should be skipped now..
 	 */
+	if(!checkCWD(command))
+	{
+		this->setCWDERR(true);
+		string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
+				"Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+		while(!messageQueue->try_send(message.data(), message.size(), 0));
+		this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+		//problem about absolute path
+	}
+	if(!checkUID(command))
+	{
+		this->setUIDERR(true);
+		string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
+				"User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+		while(!messageQueue->try_send(message.data(), message.size(), 0));
+		this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "USer id not found on system..","RunAs:",command->getRunAs()));
+		//problem about UID
+	}
 
-	int responsecount=1;
-	bool flag=false;			//flag for acrivity check for stderr and stdout
-	boost::mutex mymutex;
-	numbers block;
-	block.flag=&flag;
-	block.processpid=&processpid;
-	block.responsecount=&responsecount;
-	block.logger=&logger;
-	string outBuff, errBuff;	//general buffers for error and output
 	/*
-	 * timeoutthread is used for send I'm alive message in periodically if there is no activity on stderr and stdout.
+	 * Starting Execution Timeout
 	 */
-	if(command->getTimeout()==0)
-	{
-		boost::thread timeoutthread(taskTimeout,messageQueue,command,&processpid,&outBuff,&errBuff,&block,&(this->getLogger()));
-		logger.writeLog(5,logger.setLogData("<KAThread::optionReadSend> " "taskTimeout thread was started"));
-	}
-	if(command->getStandardOutput()!="NO" && command->getStandardError()!="NO" )
-	{
-		/*
-		 * StandardOutput and StandardError will not be ignored
-		 */
-		boost::thread outthread(capture,messageQueue,command,outputStream,&mymutex,&outBuff,&errBuff,&block,&(this->getLogger()));
-		logger.writeLog(5,logger.setLogData("<KAThread::optionReadSend> " "Output Capture thread was started"));
-		boost::thread errorthread(capture,messageQueue,command,errorStream,&mymutex,&outBuff,&errBuff,&block,&(this->getLogger()));
-		logger.writeLog(5,logger.setLogData("<KAThread::optionReadSend> " "Error Capture thread was started"));
+	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
+	unsigned int exectimeout = command->getTimeout();
+	unsigned int startsec  =  start.time_of_day().seconds();
+	bool overflag = false;
+	unsigned int count = 0;
 
-		outthread.join();
-		errorthread.join();
-	}
-	else if(command->getStandardOutput()!="NO")
+	/*
+	 * Starting Hertbeat Timeout
+	 */
+	boost::posix_time::ptime startheart = boost::posix_time::second_clock::local_time();
+	unsigned int startheartsec  =  startheart.time_of_day().seconds();
+	unsigned int exectimeoutheat = 30;
+	bool overflagheat = false;
+	unsigned int countheat = 0;
+
+	bool EXECTIMEOUT = false;
+	/*
+	 * Starting Pipeline Read operation
+	 */
+	while(true)
 	{
-		/*
-		 * StandardOutput will be ignored
-		 */
-		boost::thread outthread(capture,messageQueue,command,outputStream,&mymutex,&outBuff,&errBuff,&block,&(this->getLogger()));
-		logger.writeLog(5,logger.setLogData("<KAThread::optionReadSend> " "Output Capture thread was started"));
-		outthread.join();
-		errorStream->setReadResult(0);
-		errorStream->setSelectResult(0);
-	}
-	else if(command->getStandardError()!="NO")
-	{
-		/*
-		 * StandardError will be ignored
-		 */
-		boost::thread errorthread(capture,messageQueue,command,errorStream,&mymutex,&outBuff,&errBuff,&block,&(this->getLogger()));
-		logger.writeLog(5,logger.setLogData("<KAThread::optionReadSend> " "Error Capture thread was started"));
-		errorthread.join();
-		outputStream->setReadResult(0);
-		outputStream->setSelectResult(0);
-	}
-	if( errorStream->getReadResult() == 0 && outputStream->getReadResult() == 0 )
-	{
-		/*
-		 * Execute Done Response is sending..
-		 */
-		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block,&(this->getLogger()));
-		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "LastCheckSend function has finished at ReadResult"));
-		string message = response.createExitMessage(command->getUuid(),processpid,
-				command->getRequestSequenceNumber(),responsecount);
-		while(!messageQueue->try_send(message.data(), message.size(), 0));
-		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
-	}
-	if(command->getStandardOutput()=="NO" && command->getStandardError()=="NO" )
-	{
-		sleep(command->getTimeout());
-		if(command->getTimeout()==0)
+		this->getOutputStream().setTimeout(50000); //50 milisec for pipe timeout
+		this->getErrorStream().setTimeout(50000); //50 milisec for pipe timeout
+		this->getOutputStream().prepareFileDec();
+		this->getErrorStream().prepareFileDec();
+
+		this->getOutputStream().startSelection();	//Selecting Output first
+		this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Output Selection:",toString(this->getOutputStream().getSelectResult())));
+
+		this->getErrorStream().startSelection();	//Selecting Error Second
+		this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Error Selection:",toString(this->getErrorStream().getSelectResult())));
+
+		if(this->checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking general Execution Timeout.
 		{
-			pause();
+			//Execution timeout occured!!
+			EXECTIMEOUT = true;
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "EXECUTION TIMEOUT OCCURED!!"));
+			break;
 		}
-		string message = response.createTimeoutMessage(command->getUuid(),processpid,
-				command->getRequestSequenceNumber(),responsecount,"","");
-		while(!messageQueue->try_send(message.data(), message.size(), 0));
-		logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
-		if(atoi(processpid.c_str()))
+		if(this->getACTFLAG() == true) //Reset Heartbeat Timeout.
 		{
-			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process will be killed.","pid:",processpid));
-			kill(atoi(processpid.c_str()),SIGKILL); //killing the process after timeout
+			setACTFLAG(false);
+			startheart = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Timeout values
+			startheartsec  =  startheart.time_of_day().seconds();
+			overflagheat = false;
+			exectimeoutheat = 30;
+			countheat = 0;
+		}
+		else	//check the Heartbeat Timeout
+		{
+			if(this->checkExecutionTimeout(&startheartsec,&overflagheat,&exectimeoutheat,&countheat))
+			{
+				//send HeartBeat Message..
+				if(this->getoutBuff().empty() && this->geterrBuff().empty())
+				{
+					/*
+					 * sending I'm alive message with no output and errror buffers
+					 */
+					this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "(HEARTBEAT TIMEOUT)Sending I'm alive Message!!"));
+					string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+							this->getResponsecount(),"","",command->getSource(),command->getTaskUuid());
+					this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Sending I'm alive Message!!","Message:",message));
+					while(!messageQueue->try_send(message.data(), message.size(), 0));
+					this->getResponsecount() = this->getResponsecount()+1;
+				}
+				else //there is some data on the buffer..
+				{
+					if((command->getStandardOutput() == "CAPTURE" ||  command->getStandardOutput() == "NO")
+							&& (command->getStandardError() == "CAPTURE" || command->getStandardError() == "NO"))
+					{
+						this->geterrBuff().clear();
+						this->getoutBuff().clear();
+					}
+					else if(command->getStandardOutput() == "CAPTURE" ||  command->getStandardOutput() == "NO")
+					{
+						this->getoutBuff().clear();
+					}
+					else if(command->getStandardError() == "CAPTURE" || command->getStandardError() == "NO")
+					{
+						this->geterrBuff().clear();
+					}
+					/*
+					 * sending I'm alive message
+					 */
+					string message =  this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+							this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+					while(!messageQueue->try_send(message.data(), message.size(), 0));
+					this->geterrBuff().clear();
+					this->getoutBuff().clear();
+					this->getResponsecount() = this->getResponsecount()+1;
+					this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "(HEARTBEAT TIMEOUT)Sending I'm alive Message!!"));
+					this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Sending I'm alive Message!!","Message:",message));
+				}
+				startheart = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Timeout values
+				startheartsec  =  startheart.time_of_day().seconds();
+				overflagheat = false;
+				exectimeoutheat = 30;
+				countheat = 0;
+			}
+		}
+		if(this->getOutputStream().getSelectResult() == -1 || this->getErrorStream().getSelectResult() == -1 )
+		{
+			cout << "ERROR selecting pipelines" << endl;
+			return -1;
+			//ERROR selecting
+		}
+
+		if (this->getOutputStream().getSelectResult() == 0 )
+		{
+			//dummy timeout
+			//TIMEOUT for 50ms with no data
+		}
+		else if (this->getOutputStream().getSelectResult() > 0 )
+		{
+			this->getOutputStream().clearBuffer();
+			this->getOutputStream().startReading();
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Output Read Result:",toString(this->getOutputStream().getReadResult())));
+		}
+
+		if (this->getErrorStream().getSelectResult() == 0 )
+		{
+			//dummy timeout
+			//TIMEOUT for 50ms with no data
+		}
+		else if (this->getErrorStream().getSelectResult() > 0)
+		{
+			this->getErrorStream().clearBuffer();
+			this->getErrorStream().startReading();
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Error Read Result:",toString(this->getErrorStream().getReadResult())));
+		}
+
+		if(this->getOutputStream().getSelectResult() > 0 || this->getErrorStream().getSelectResult() > 0 )
+		{
+			this->setACTFLAG(true);	//there is an activity on pipes so ACT flag should be set to true to reset heartbeat timeout.
+		}
+		if (this->getOutputStream().getReadResult() > 0 || this->getErrorStream().getReadResult() > 0)
+		{
+			//getting buffers
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Output Read Result:",toString(this->getOutputStream().getReadResult())));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Output Buffer:",this->getOutputStream().getBuffer()));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Error  Read Result:",toString(this->getErrorStream().getReadResult())));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Error Buffer:",this->getErrorStream().getBuffer()));
+
+			this->checkAndWrite(messageQueue,command);
 		}
 		else
 		{
-			logger.writeLog(3,logger.setLogData("<KAThread::optionReadSend> " "Process pid is not valid.","pid:",processpid));
+			/*
+			 * End of Reading pipes.
+			 */
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Output Read Result:",toString(this->getOutputStream().getReadResult())));
+			this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Error  Read Result:",toString(this->getErrorStream().getReadResult())));
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Breaking!!"));
+			break;
 		}
 	}
-	if( errorStream->getSelectResult() == 0 && outputStream->getSelectResult() == 0 )
+
+	//Check Execution is done by Timeout or another Reason(Normally finished)
+	if(EXECTIMEOUT == true)
 	{
 		/*
 		 * Timeout Response is sending..
 		 */
-		lastCheckAndSend(messageQueue,command,&outBuff,&errBuff,&block,&(this->getLogger()));
-		logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "LastCheckSend function has finished at SelectResult"));
-		string message = response.createTimeoutMessage(command->getUuid(),processpid,
-				command->getRequestSequenceNumber(),responsecount,"","");
+		this->lastCheckAndSend(messageQueue,command);
+		this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Timeout Done message is sending.."));
+		string message = this->getResponse().createTimeoutMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+				this->getResponsecount(),"","",command->getSource(),command->getTaskUuid());
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
-		logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
-		if(atoi(processpid.c_str()))
+		this->getLogger().writeLog(7,this->getLogger().setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
+		if(this->getPpid())
 		{
-			logger.writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "Process will be killed.","pid:",processpid));
-			kill(atoi(processpid.c_str()),SIGKILL); //killing the process after timeout
+			this->getLogger().writeLog(7,logger.setLogData("<KAThread::optionReadSend> " "Process will be killed.","pid:",toString(this->getPpid())));
+			kill(this->getPpid(),SIGKILL); //killing the process after timeout
 		}
 		else
 		{
-			logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Process pid is not valid.","pid:",processpid));
+			this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Process pid is not valid.","pid:",toString(this->getPpid())));
 		}
 	}
-	logger.writeLog(6,logger.setLogData("<KAThread::optionReadSend> " "Capturing is Done!!"));
+
+	if( this->getErrorStream().getReadResult() == 0 && this->getOutputStream().getReadResult() == 0 )
+	{
+		/*
+		 * Execute Done Response is sending..
+		 */
+
+		int exitcode = 0;
+		if(this->getEXITSTATUS() || this->getCWDERR() == true || this->getUIDERR() == true)
+			exitcode = 1;
+
+		this->lastCheckAndSend(messageQueue,command);
+
+		this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Done message is sending.."));
+		string message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+				this->getResponsecount(),command->getSource(),command->getTaskUuid(),exitcode);
+		while(!messageQueue->try_send(message.data(), message.size(), 0));
+		this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
+	}
+
+	this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Capturing is Done!!"));
 	return true;
 }
 /**
@@ -578,9 +703,15 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 		string pidparnumstr = toString(getpid());		//geting pid number of the process
 		string processpid="";	//processpid for execution
 		logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "New Main Fork is Starting!!",toString(getpid())));
-		KAStreamReader outputStream(command->getStandardOutput(),command->getStandardOutputPath(),"output");
-		KAStreamReader errorStream(command->getStandardError(),command->getStandardErrPath(),"error");
-		if(outputStream.openPipe()==false || errorStream.openPipe()==false)
+		this->getOutputStream().setMode(command->getStandardOutput());
+		this->getOutputStream().setPath(command->getStandardOutputPath());
+		this->getOutputStream().setIdentity("output");
+
+		this->getErrorStream().setMode(command->getStandardError());
+		this->getErrorStream().setPath(command->getStandardErrPath());
+		this->getErrorStream().setIdentity("error");
+
+		if(this->getOutputStream().openPipe() == false || this->getErrorStream().openPipe() == false)
 		{
 			/* an error occurred pipe of pipeerror or output */
 			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Error opening pipes!!"));
@@ -590,17 +721,15 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 		{	// Child execute the command
 			string pidchldnumstr = toString(getpid());
 			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "New Child Process is starting for pipes","Parentpid",pidparnumstr,"pid",pidchldnumstr));
-			outputStream.PreparePipe();
-			errorStream.PreparePipe();
+
+			this->getOutputStream().PreparePipe();
+			this->getErrorStream().PreparePipe();
+
+			this->getErrorStream().closePipe(0);
+			this->getOutputStream().closePipe(0);
 
 			if(!checkCWD(command))
 			{
-				string message = response.createResponseMessage(command->getUuid(),toString(getpid()),
-						command->getRequestSequenceNumber(),1,"Working Directory Does Not Exist on System","");
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				message = response.createExitMessage(command->getUuid(),processpid,
-						command->getRequestSequenceNumber(),2);
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
 				kill(getpid(),SIGKILL);		//killing child
 				exit(1);
@@ -608,12 +737,6 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			}
 			if(!checkUID(command))
 			{
-				string message = response.createResponseMessage(command->getUuid(),toString(getpid()),
-						command->getRequestSequenceNumber(),1,"User Does Not Exist on System","");
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
-				message = response.createExitMessage(command->getUuid(),processpid,
-						command->getRequestSequenceNumber(),2);
-				while(!messageQueue->try_send(message.data(), message.size(), 0));
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
 				kill(getpid(),SIGKILL);		//killing child
 				exit(1);
@@ -634,13 +757,13 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			//Parent read the result and send back
 			try
 			{
-				errorStream.closePipe(1);
-				outputStream.closePipe(1);
+				this->getErrorStream().closePipe(1);
+				this->getOutputStream().closePipe(1);
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend is starting!!","pid",toString(getpid())));
-				optionReadSend(messageQueue,command,&errorStream,&outputStream,newpid);
+				optionReadSend(messageQueue,command,newpid);
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend has finished!!","pid",toString(getpid())));
-				errorStream.closePipe(0);
-				outputStream.closePipe(0);
+				this->getErrorStream().closePipe(0);
+				this->getOutputStream().closePipe(0);
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "New Main Thread is Stopping!!","pid",toString(getpid())));
 				logger.closeLogFile();
 				kill(getpid(),SIGKILL);		//killing child
@@ -687,79 +810,146 @@ KAUserID& KAThread::getUserID()
 	return this->uid;
 }
 /**
- *  \details   This method checks the flag result that indicates activity on the error and output streams.
- *  		   If there is no activity during 60 seconds(default timeout) this thread sends a I'm alive message to the ActiveMQ Broker.
+ *  \details   getting "response" KAResponsepack private variable of KAThread instance.
  */
-void KAThread::taskTimeout(message_queue *messageQueue,KACommand* command,
-		string* pid,string* outBuff,string* errBuff,numbers* block,KALogger* logger)
+KAResponsePack& KAThread::getResponse()
 {
-	logger->writeLog(6,logger->setLogData("<KAThread::taskTimeout> " "taskTİmeOut is starting!!","pid",toString(getpid())));
-	try
-	{
-		KAResponsePack myresponse;
-		unsigned int counter = 0;
-		while (true)
-		{
-			sleep(1);
-			logger->writeLog(6,logger->setLogData("<KAThread::taskTimeout> " "Flag","pid",toString(getpid())));
-			if ((int)*block->flag)	//if any activity on the process flag is changed to true, if not is changed to false and send message
-			{
-				//do nothing
-				*block->flag=false;
-				counter=0;
-			}
-			else
-			{
-				counter++;
-			}
-			if(counter==60)
-			{
-				if(outBuff->empty() && errBuff->empty())
-				{
-					/*
-					 * sending I'm alive message
-					 */
-					string message = myresponse.createResponseMessage(command->getUuid(),*pid,
-							command->getRequestSequenceNumber(),-1,"","");
-					while(!messageQueue->try_send(message.data(), message.size(), 0));
-					*block->responsecount=*block->responsecount+1;
-					logger->writeLog(6,logger->setLogData("<KAThread::taskTimeout> " "taskTİmeOut sends message!!","pid",toString(getpid()),"Message:",message));
-					counter=0;
-				}
-				else
-				{
-					if(command->getStandardOutput()=="CAPTURE"&&command->getStandardError()=="CAPTURE")
-					{
-						errBuff->clear();
-						outBuff->clear();
-					}
-					else if(command->getStandardOutput()=="CAPTURE")
-					{
-						outBuff->clear();
-					}
-					else if(command->getStandardError()=="CAPTURE")
-					{
-						errBuff->clear();
-					}
-					/*
-					 * sending I'm alive message
-					 */
-					string message = myresponse.createResponseMessage(command->getUuid(),*pid,
-							command->getRequestSequenceNumber(),-1,*errBuff,*outBuff);
-					while(!messageQueue->try_send(message.data(), message.size(), 0));
-					outBuff->clear();
-					errBuff->clear();
-					*block->responsecount=*block->responsecount+1;
-					logger->writeLog(6,logger->setLogData("<KAThread::taskTimeout> " "taskTİmeOut sends message!!","pid",toString(getpid()),"Message:",message));
-					counter=0;
-				}
-			}
-		}
-	}
-	catch(const std::exception& error)
-	{
-		logger->writeLog(3,logger->setLogData("<KAThread::taskTimeout> " "Problem is occured:",error.what()));
-	}
+	return this->response;
+}
+/**
+ *  \details   getting "errorStream" KAStreamReader private variable of KAThread instance.
+ */
+KAStreamReader& KAThread::getErrorStream()
+{
+	return this->errorStream;
+}
+/**
+ *  \details   getting "outputStream" KAStreamReader private variable of KAThread instance.
+ */
+KAStreamReader& KAThread::getOutputStream()
+{
+	return this->outputStream;
+}
+/**
+ *  \details   getting "CWDERR" private variable of KAThread instance.
+ *  		   it shows the current working directory existence. false:CWD does not exist. true:it exist.
+ */
+bool& KAThread::getCWDERR()
+{
+	return this->CWDERR;
+}
+/**
+ *  \details   setting "CWDERR" private variable of KAThread instance.
+ */
+void KAThread::setCWDERR(bool cwderr)
+{
+	this->CWDERR=cwderr;
+}
+/**
+ *  \details   getting "UIDERR" private variable of KAThread instance.
+ *  		   it shows the current user existence. false:UID does not exist. true:it exist.
+ */
+bool& KAThread::getUIDERR()
+{
+	return this->UIDERR;
+}
+/**
+ *  \details   setting "UIDERR" private variable of KAThread instance.
+ */
+void KAThread::setUIDERR(bool uiderr)
+{
+	this->UIDERR=uiderr;
+}
+/**
+ *  \details   getting "EXITSTATUS" private variable of KAThread instance.
+ */
+int& KAThread::getEXITSTATUS()
+{
+	return this->EXITSTATUS;
+}
+/**
+ *  \details   setting "EXITSTATUS" private variable of KAThread instance.
+ *  		   it shows the error state of the execution if it is bigger than "0" there is some error message in the execution if it is "0" false.
+ *  		   it means successfull execution is done.
+ */
+void KAThread::setEXITSTATUS(int exitstatus)
+{
+	this->EXITSTATUS = exitstatus;
+}
+/**
+ *  \details   getting "ACTFLAG" private variable of KAThread instance.
+ *  		   it shows the activity on the process within default 30 seconds. false:No activity. true:There is at least one activity.
+ */
+bool& KAThread::getACTFLAG()
+{
+	return this->ACTFLAG;
+}
+/**
+ *  \details   setting "ACTFLAG" private variable of KAThread instance.
+ */
+void KAThread::setACTFLAG(bool actflag)
+{
+	this->ACTFLAG=actflag;
+}
+/**
+ *  \details   getting "responsecount" private variable of KAThread instance.
+ *  		   it indicates the number of sending resposne.
+ */
+int& KAThread::getResponsecount()
+{
+	return this->responsecount;
+}
+/**
+ *  \details   setting "responsecount" private variable of KAThread instance.
+ */
+void KAThread::setResponsecount(int rspcount)
+{
+	this->responsecount=rspcount;
+}
+/**
+ *  \details   getting "processpid" private variable of KAThread instance.
+ *  		   it indicates the process id of the execution.
+ */
+int& KAThread::getPpid()
+{
+	return this->processpid;
+}
+/**
+ *  \details   setting "processpid" private variable of KAThread instance.
+ */
+void KAThread::setPpid(int Ppid)
+{
+	this->processpid=Ppid;
+}
+/**
+ *  \details   getting "outBuff" private variable of KAThread instance.
+ *  		   it stores output value to be send.
+ */
+string& KAThread::getoutBuff()
+{
+	return this->outBuff;
+}
+/**
+ *  \details   setting "outBuff" private variable of KAThread instance.
+ */
+void KAThread::setoutBuff(string outbuff)
+{
+	this->outBuff = outbuff;
+}
+/**
+ *  \details   getting "errBuff" private variable of KAThread instance.
+ *  		   it stores error value to be send.
+ */
+string& KAThread::geterrBuff()
+{
+	return this->errBuff;
+}
+/**
+ *  \details   setting "errBuff" private variable of KAThread instance.
+ */
+void KAThread::seterrBuff(string errbuff)
+{
+	this->errBuff = errbuff;
 }
 /**
  *  \details   This method executes the given command and returns its answer.
@@ -779,7 +969,7 @@ string KAThread::getProcessPid(const char* cmd)
 		if(fgets(buffer, 128, pipe) != NULL)
 		{
 			buffer[strlen(buffer)-1]='\0';
-			result += buffer;
+			result = buffer;
 		}
 	}
 	pclose(pipe);
@@ -794,3 +984,121 @@ string KAThread::toString(int intcont)
 	dummy << intcont;
 	return dummy.str();
 }
+
+
+
+/*
+ void ThreadOperation::optionReadSend(DaemonCommand command,DaemonConnection* connection,int *pipeoutput,int *pipeerror,int newpid)
+{
+
+	while(true)
+	{
+		timeout.tv_sec=10;
+		timeout.tv_usec=0;
+		timeerr.tv_sec=0;
+		timeerr.tv_usec=50000;
+		rvout = select(pipeoutput[0]+1,&setout,NULL,NULL,&timeout);
+		rverr = select(pipeerror[0]+1,&seterror,NULL,NULL,&timeerr);
+		syslog(LOG_INFO,"<LOG_INFO>::<ThreadOperation::threadFunction> " "rvout:%d rverr:%d",rvout,rverr);
+
+		if(rvout==0 && rverr==0)
+		{
+			cout << "Timeout";
+			syslog(LOG_INFO,"<LOG_INFO>::<ThreadOperation::threadFunction> " "TIMEOUT");
+			memset(bufferout,0,100);
+			if(rvout!=0)
+				resultout= read(pipeoutput[0], bufferout, sizeof(bufferout));
+			memset(buffererror,0,100);
+			if(rverr!=0)
+				resulterr= read(pipeerror[0] , buffererror, sizeof(buffererror));
+			if(command.getStandardOutput()=="CAPTURE"||command.getStandardOutput()=="CAPTURE_AND_RETURN")
+			{
+				fputs(bufferout,file);	//write buuferout to the file
+			}
+			if(command.getStandardError()=="CAPTURE"||command.getStandardError()=="CAPTURE_AND_RETURN")
+			{
+				fputs(buffererror,file1);
+			}
+			if(command.getStandardOutput()!="NO"||command.getStandardError()!="NO")
+			{
+				TextMessage* message = newsession->createTextMessage(response.createTimeoutMessage(command.getUuid(),toString(pid),
+						command.getRequestSequenceNumber(),responsencount,(string)buffererror,(string)bufferout));
+				sender->send(message);
+				if(command.getStandardOutput()=="CAPTURE"||command.getStandardOutput()=="CAPTURE_AND_RETURN")
+				{
+					fclose(file);
+				}
+				if(command.getStandardError()=="CAPTURE"||command.getStandardError()=="CAPTURE_AND_RETURN")
+				{
+					fclose(file1);
+				}
+				responsencount++;
+			}
+			if(pid>0)
+			{
+				kill(pid,SIGKILL);
+			}
+			break;
+		}
+		else if(rvout==-1 || rverr == -1)
+		{
+			cout << "Error";
+			break;
+		}
+		else
+		{
+			memset(bufferout,0,100);
+			if(rvout!=0)
+			{
+				resultout= read(pipeoutput[0], bufferout, sizeof(bufferout));
+			}
+			memset(buffererror,0,100);
+			if(rverr!=0)
+			{
+				resulterr= read(pipeerror[0] , buffererror, sizeof(buffererror));
+			}
+			if(resulterr > 0 || resultout > 0)
+			{
+				if(command.getStandardOutput()=="CAPTURE"||command.getStandardOutput()=="CAPTURE_AND_RETURN")
+				{
+					fputs(bufferout,file);	//write buuferout to the file
+				}
+				if(command.getStandardError()=="CAPTURE"||command.getStandardError()=="CAPTURE_AND_RETURN")
+				{
+					fputs(buffererror,file1);
+				}
+				if(command.getStandardOutput()=="CAPTURE"||command.getStandardOutput()=="NO")
+				{
+					memset(bufferout,0,100);
+				}
+				if(command.getStandardError()=="CAPTURE"||command.getStandardError()=="NO")
+				{
+					memset(buffererror,0,100);
+				}
+				if(bufferout[0]!=0 || buffererror[0]!=0)
+				{
+					TextMessage* message = newsession->createTextMessage(response.createResponseMessage(command.getUuid(),toString(pid),
+							command.getRequestSequenceNumber(),responsencount,(string)buffererror,(string)bufferout));
+					sender->send(message);
+					responsencount++;
+				}
+			}
+			else
+			{
+				TextMessage* message = newsession->createTextMessage(response.createExitMessage(command.getUuid(),toString(pid),
+						command.getRequestSequenceNumber(),responsencount));
+				sender->send(message);
+				if(command.getStandardOutput()=="CAPTURE"||command.getStandardOutput()=="CAPTURE_AND_RETURN")
+				{
+					fclose(file);
+				}
+				if(command.getStandardError()=="CAPTURE"||command.getStandardError()=="CAPTURE_AND_RETURN")
+				{
+					fclose(file1);
+				}
+				break;
+			}
+		}
+	}
+}
+ */
