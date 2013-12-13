@@ -5,31 +5,30 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * @author bahadyr
  */
 public class Step2 extends Panel {
-
-    private static final List<String> hosts = Arrays.asList(new String[]{
-            "hadoop-node1", "hadoop-node2", "hadoop-node3", "hadoop-node4", "hadoop-node5"});
-    //List<String> hosts;
     HadoopWizard parent;
-    String installationCommand = "apt-get --force-yes --assume-yes install ksks-zookeeper";
-    String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-zookeeper";
 
     public Step2(final HadoopWizard hadoopWizard) {
         parent = hadoopWizard;
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, parent.getLxcList());
 
         setCaption("Welcome to Hadoop Cluster Installation");
         setSizeFull();
@@ -46,7 +45,8 @@ public class Step2 extends Panel {
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
                 + " 1) Master Configurations<br>"
-                + " 2) <font color=\"#f14c1a\"><strong>Slave Configurations</strong></font><br>");
+                + " 2) <font color=\"#f14c1a\"><strong>Slave Configurations</strong></font><br>"
+                + " 3) Installation<br>");
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
         grid.addComponent(menu, 0, 0, 0, 5);
@@ -61,17 +61,24 @@ public class Step2 extends Panel {
         label.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(label);
 
-        TwinColSelect twinColSelectDataNodes = new TwinColSelect();
-        for (String host : hosts) {
-            twinColSelectDataNodes.addItem(host);
-        }
+
+        TwinColSelect twinColSelectDataNodes = new TwinColSelect("", agents);
+        twinColSelectDataNodes.setItemCaptionPropertyId("hostname");
         twinColSelectDataNodes.setRows(10);
         twinColSelectDataNodes.setNullSelectionAllowed(true);
         twinColSelectDataNodes.setMultiSelect(true);
         twinColSelectDataNodes.setImmediate(true);
         twinColSelectDataNodes.setLeftColumnCaption("Available Nodes");
         twinColSelectDataNodes.setRightColumnCaption("Data Nodes");
-        twinColSelectDataNodes.setWidth("350px");
+        twinColSelectDataNodes.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        twinColSelectDataNodes.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                List<Agent> dataNodes = new ArrayList<Agent>(agentList);
+                parent.getHadoopInstallation().setDataNodes(dataNodes);
+            }
+        });
         verticalLayoutForm.addComponent(twinColSelectDataNodes);
 
         Label labelTaskTrackerCaption = new Label("<strong>Enter a list of hosts that will run as Task tracker.<br>" +
@@ -79,17 +86,23 @@ public class Step2 extends Panel {
         labelTaskTrackerCaption.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(labelTaskTrackerCaption);
 
-        TwinColSelect twinColSelectTaskTrackers = new TwinColSelect();
-        for (String host : hosts) {
-            twinColSelectTaskTrackers.addItem(host);
-        }
+        TwinColSelect twinColSelectTaskTrackers = new TwinColSelect("", agents);
+        twinColSelectTaskTrackers.setItemCaptionPropertyId("hostname");
         twinColSelectTaskTrackers.setRows(10);
         twinColSelectTaskTrackers.setNullSelectionAllowed(true);
         twinColSelectTaskTrackers.setMultiSelect(true);
         twinColSelectTaskTrackers.setImmediate(true);
         twinColSelectTaskTrackers.setLeftColumnCaption("Available Nodes");
         twinColSelectTaskTrackers.setRightColumnCaption("Task Trackers");
-        twinColSelectTaskTrackers.setWidth("350px");
+        twinColSelectTaskTrackers.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        twinColSelectTaskTrackers.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                List<Agent> taskTrackers = new ArrayList<Agent>(agentList);
+                parent.getHadoopInstallation().setTaskTrackers(taskTrackers);
+            }
+        });
         verticalLayoutForm.addComponent(twinColSelectTaskTrackers);
 
         grid.addComponent(verticalLayoutForm, 1, 0, 5, 9);
@@ -103,7 +116,7 @@ public class Step2 extends Panel {
                 parent.showNext();
             }
         });
-        Button back = new Button("Finish");
+        Button back = new Button("Back");
         back.addListener(new Button.ClickListener() {
 
             @Override
@@ -120,25 +133,6 @@ public class Step2 extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
-    }
-
-    private Command buildCommand(UUID uuid, String program, Integer reqSeqNumber, UUID taskUuid) {
-
-        Request request = new Request();
-        request.setSource("HadoopModule Wizard");
-        request.setProgram(program);
-        request.setUuid(uuid);
-        request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid(taskUuid);
-        request.setWorkingDirectory("/");
-        request.setStdOut(OutputRedirection.RETURN);
-        request.setStdErr(OutputRedirection.RETURN);
-        request.setRunAs("root");
-        request.setTimeout(0);
-        request.setRequestSequenceNumber(reqSeqNumber);
-        Command command = new Command(request);
-
-        return command;
     }
 
 }

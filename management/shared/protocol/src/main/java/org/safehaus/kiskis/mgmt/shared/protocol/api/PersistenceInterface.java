@@ -4,24 +4,17 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
+
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-
 /**
- *
  * @author dilshat
  */
 public interface PersistenceInterface {
 
-//    //Commands section
+    //    //Commands section
     boolean saveCommand(Command command);
 
     List<Request> getRequests(UUID taskuuid);
@@ -55,6 +48,8 @@ public interface PersistenceInterface {
     String saveTask(Task task);
 
     List<Task> getTasks();
+
+    Task getTask(UUID uuid);
 
     public boolean truncateTables();
 
