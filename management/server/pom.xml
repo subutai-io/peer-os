@@ -30,7 +30,7 @@
 
     <modules>
         <module>apt-repo</module>
-        <module>broker</module>
+        <module>core</module>
         <module>ui</module>
         <module>ui-modules</module>
         <module>server-karaf</module>

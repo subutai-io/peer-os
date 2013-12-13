@@ -35,7 +35,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
-        
+
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
         //setSpacing(true);
@@ -60,7 +60,9 @@ public final class MgmtAgentManager extends VerticalLayout implements
             List<Agent> selectedList = new ArrayList<Agent>();
 
             for (Object o : (Set<Object>) t.getValue()) {
-                selectedList.add((Agent) tree.getItem(o).getItemProperty("value").getValue());
+                if (tree.getItem(o).getItemProperty("value").getValue() != null) {
+                    selectedList.add((Agent) tree.getItem(o).getItemProperty("value").getValue());
+                }
             }
 
             AppData.setSelectedAgentList(selectedList);
@@ -121,15 +123,56 @@ public final class MgmtAgentManager extends VerticalLayout implements
                     }
                 }
                 refreshNodeContainer(parents, false, null);
+
                 //grab children
+                List<Agent> childAgents = new ArrayList<Agent>();
                 for (Agent parent : parents) {
                     List<Agent> children = new ArrayList<Agent>();
                     for (Agent possibleChild : allFreshAgents) {
-                        if (possibleChild.isIsLXC() && possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                            children.add(possibleChild);
+                        if (possibleChild.isIsLXC()) {
+                            if (possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                                children.add(possibleChild);
+                            }
+
+                            childAgents.add(possibleChild);
                         }
                     }
                     refreshNodeContainer(children, false, parent);
+                }
+
+                //process orphan agents
+                List<Agent> orphanAgents = new ArrayList<Agent>();
+                for (Agent possibleOrphan : childAgents) {
+                    if (possibleOrphan.getParentHostName() == null
+                            || Common.UNKNOWN_LXC_PARENT_NAME.equalsIgnoreCase(possibleOrphan.getParentHostName())) {
+//                        possibleOrphan.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
+                        orphanAgents.add(possibleOrphan);
+                    } else {
+                        boolean parentFound = false;
+                        for (Agent parent : parents) {
+                            if (possibleOrphan.getParentHostName().equals(parent.getHostname())) {
+                                parentFound = true;
+                                break;
+                            }
+                        }
+                        if (!parentFound) {
+//                            possibleOrphan.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
+                            orphanAgents.add(possibleOrphan);
+                        }
+                    }
+                }
+                container.removeItemRecursively(Common.UNKNOWN_LXC_PARENT_NAME);
+                if (!orphanAgents.isEmpty()) {
+                    container.addItem(Common.UNKNOWN_LXC_PARENT_NAME);
+                    container.setChildrenAllowed(Common.UNKNOWN_LXC_PARENT_NAME, true);
+                    for (Agent orphanAgent : orphanAgents) {
+                        Item item = container.addItem(orphanAgent.getHostname());
+                        if (item != null) {
+                            item.getItemProperty("value").setValue(orphanAgent);
+                            container.setParent(orphanAgent.getHostname(), Common.UNKNOWN_LXC_PARENT_NAME);
+                            container.setChildrenAllowed(orphanAgent.getHostname(), false);
+                        }
+                    }
                 }
 
                 registeredAgents.clear();

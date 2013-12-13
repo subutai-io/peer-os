@@ -116,7 +116,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -138,6 +138,11 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.13</version>
         </dependency>
+<!--        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.1.0-M4</version>
+        </dependency>        -->
     </dependencies>
     <build>
         <resources>
@@ -157,6 +162,7 @@
         </resources>
         <plugins>
             <plugin>
+                <version>2.6</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -248,7 +254,7 @@
                                 <artifactItem>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava</artifactId>
-                                    <version>15.0</version>
+                                    <version>${guava.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>io.netty</groupId>
@@ -273,7 +279,7 @@
 
                                 <!--UI Dependencies-->
 
-                                <!--Broker Dependencies-->
+                                <!--Core Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-server-agent</artifactId>
@@ -289,17 +295,17 @@
                                     <artifactId>mgmt-server-persistence</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--Broker Dependencies-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-server-communication</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!--Core Dependencies-->
 
                                 <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-shared-communication</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Shared Dependencies-->
@@ -372,6 +378,11 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Apt Repo Exposer-->
+<!--                                <artifactItem>
+                                    <groupId>org.xerial.snappy</groupId>
+                                    <artifactId>snappy-java</artifactId>
+                                    <version>1.1.0-M4</version>
+                                </artifactItem>                                -->
                             </artifactItems>
                         </configuration>
                     </execution>

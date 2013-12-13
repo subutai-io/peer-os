@@ -18,8 +18,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 public class CassandraModule implements Module {
 
     public static final String MODULE_NAME = "CassandraModule";
-    private BundleContext context;
-
     private static ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
@@ -41,7 +39,6 @@ public class CassandraModule implements Module {
 
             buttonInstallWizard = new Button("CassandraModule Installation Wizard");
             buttonInstallWizard.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     subwindow = new CassandraWizard();
@@ -52,7 +49,6 @@ public class CassandraModule implements Module {
 
             getClusters = new Button("Get Cassandra clusters");
             getClusters.addListener(new Button.ClickListener() {
-
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     cassandraTable.refreshDatasource();
@@ -75,7 +71,7 @@ public class CassandraModule implements Module {
                     }
                 }
             } catch (Exception ex) {
-                System.out.println("outputCommand event Exception");
+                System.out.println("outputCommand event Exception\n" + ex);
             }
         }
 
@@ -109,10 +105,6 @@ public class CassandraModule implements Module {
             getCommandManager().removeListener(component);
             service.unregisterModule(this);
         }
-    }
-
-    public void setContext(BundleContext context) {
-        this.context = context;
     }
 
     public static CommandManagerInterface getCommandManager() {
