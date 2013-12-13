@@ -18,7 +18,7 @@ public class Step3 extends Panel {
     Button next;
 
     public Step3(final CassandraWizard cassandraWizard) {
-        setCaption("Installation");
+        setCaption("Installation Step3");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

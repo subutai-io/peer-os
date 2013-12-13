@@ -1,14 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
-import com.google.common.collect.EvictingQueue;
-import com.google.common.collect.Queues;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -19,7 +14,6 @@ import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 public class CassandraModule implements Module {
 

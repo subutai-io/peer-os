@@ -27,11 +27,11 @@ public final class CassandraWizard extends Window {
     Step1 step1;
     Step2 step2;
     Step3 step3;
-    Step21 step21;
-    Step31 step31;
-    Step41 step41;
-    Step42 step42;
-    Step43 step43;
+    Step4 step4;
+    Step5 step5;
+    Step6 step6;
+    Step7 step7;
+    Step8 step8;
     int step = 1;
 
     /**
@@ -115,39 +115,33 @@ public final class CassandraWizard extends Window {
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step21 = new Step21(this);
-                verticalLayout.addComponent(step21);
+                step4 = new Step4(this);
+                verticalLayout.addComponent(step4);
                 break;
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step31 = new Step31(this);
-                verticalLayout.addComponent(step31);
+                step5 = new Step5(this);
+                verticalLayout.addComponent(step5);
                 break;
             }
             case 6: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step3 = new Step3(this);
-                verticalLayout.addComponent(step3);
+                step6 = new Step6(this);
+                verticalLayout.addComponent(step6);
                 break;
             }
             case 7: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step41 = new Step41(this);
-                verticalLayout.addComponent(step41);
+                step7 = new Step7(this);
+                verticalLayout.addComponent(step7);
                 break;
             }
             case 8: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step42 = new Step42(this);
-                verticalLayout.addComponent(step42);
-                break;
-            }
-            case 9: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step43 = new Step43(this);
-                verticalLayout.addComponent(step43);
-                commandManagerInterface.saveCassandraClusterData(cluster);
+                step8 = new Step8(this);
+                verticalLayout.addComponent(step8);
+//                commandManagerInterface.saveCassandraClusterData(cluster);
                 break;
             }
             default: {
@@ -201,7 +195,7 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 5: {
-                            step31.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
+                            step5.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 6: {
@@ -213,10 +207,6 @@ public final class CassandraWizard extends Window {
                         case 8: {
                             break;
                         }
-                        case 9: {
-                            break;
-                        }
-
                     }
                 }
             }

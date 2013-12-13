@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
@@ -15,13 +16,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * @author bahadyr
  */
-public class Step21 extends Panel {
+public class Step4 extends Panel {
 
     //    private static final List<String> hosts = Arrays.asList(new String[]{
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
@@ -33,10 +35,10 @@ public class Step21 extends Panel {
 
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
 
-    public Step21(final CassandraWizard cassandraWizard) {
+    public Step4(final CassandraWizard cassandraWizard) {
         parent = cassandraWizard;
 
-        setCaption("List nodes");
+        setCaption("List nodes Step21");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -64,7 +66,7 @@ public class Step21 extends Panel {
         label.setContentMode(Label.CONTENT_XHTML);
 
         grid.addComponent(label, 2, 0, 5, 0);
-        grid.setComponentAlignment(label, Alignment.TOP_CENTER);    
+        grid.setComponentAlignment(label, Alignment.TOP_CENTER);
 
         Label label1 = new Label("<strong>Target Hosts</strong><br>"
                 + "<br>");
@@ -74,16 +76,24 @@ public class Step21 extends Panel {
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
         // 'Shorthand' constructor - also supports data binding using Containers
-        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
-        List<UUID> agentUuids = new ArrayList<UUID>();
-        for (Agent agent : hosts) {
-            agentUuids.add(agent.getUuid());
-        }
-        cassandraWizard.getCluster().setNodes(agentUuids);
-        ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agentUuids);
+//        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
+//        List<UUID> agentUuids = new ArrayList<UUID>();
+//        for (Agent agent : hosts) {
+//            agentUuids.add(agent.getUuid());
+//        }
+//        cassandraWizard.getCluster().setNodes(agentUuids);
+        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", hosts);
 
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
+        hostSelect.setMultiSelect(true);
+        hostSelect.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                getWindow().showNotification("hosts selected");
+                cassandraWizard.step6.hosts = hosts;
+            }
+        });
 
         grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
@@ -93,7 +103,8 @@ public class Step21 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Agent agent : hosts) {
+                for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
+                    Agent agent = (Agent) i.next();
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();

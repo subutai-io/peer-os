@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
@@ -15,6 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +38,7 @@ public class Step2 extends Panel {
     public Step2(final CassandraWizard cassandraWizard) {
         parent = cassandraWizard;
 
-        setCaption("List nodes");
+        setCaption("List nodes Step2");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -75,15 +77,24 @@ public class Step2 extends Panel {
 
         // 'Shorthand' constructor - also supports data binding using Containers
         hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
-        List<UUID> agentUuids = new ArrayList<UUID>();
-        for (Agent agent : hosts) {
-            agentUuids.add(agent.getUuid());
-        }
-        cassandraWizard.getCluster().setNodes(agentUuids);
-        ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agentUuids);
+//        List<UUID> agentUuids = new ArrayList<UUID>();
+//        for (Agent agent : hosts) {
+//            agentUuids.add(agent.getUuid());
+//        }
+//        cassandraWizard.getCluster().setNodes(hosts);
+        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", hosts);
 
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
+        hostSelect.setMultiSelect(true);
+        hostSelect.addListener(new Property.ValueChangeListener() {
+
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                getWindow().showNotification("hosts selected");
+                cassandraWizard.step4.hosts = hosts;
+            }
+        });
 
         grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
@@ -93,7 +104,8 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Agent agent : hosts) {
+                for(Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
+                    Agent agent = (Agent) i.next();
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
@@ -103,13 +115,16 @@ public class Step2 extends Panel {
 //                    args.add("ksks-cassandra");
                     Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
-//                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
-//                    command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
-//                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
-//                    command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
+                    
                 }
+//                for (Agent agent : hosts) {
+////                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
+////                    command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
+////                    cassandraWizard.runCommand(command);
+////                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
+////                    command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
+////                    cassandraWizard.runCommand(command);
+//                }
                 cassandraWizard.showNext();
             }
         });

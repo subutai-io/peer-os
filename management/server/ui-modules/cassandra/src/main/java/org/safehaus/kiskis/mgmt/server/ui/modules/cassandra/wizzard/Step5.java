@@ -11,14 +11,14 @@ import com.vaadin.ui.*;
 /**
  * @author bahadyr
  */
-public class Step31 extends Panel {
+public class Step5 extends Panel {
 
     GridLayout grid;
     VerticalLayout verticalLayoutForm;
     Button next;
 
-    public Step31(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration");
+    public Step5(final CassandraWizard cassandraWizard) {
+        setCaption("Configuration Step31");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

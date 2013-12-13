@@ -17,7 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public class Step1 extends Panel {
 
     public Step1(final CassandraWizard cassandraWizard) {
-        setCaption("Welcome");
+        setCaption("Welcome Step1");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

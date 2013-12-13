@@ -11,13 +11,13 @@ import com.vaadin.ui.*;
 /**
  * @author bahadyr
  */
-public class Step42 extends Panel {
+public class Step7 extends Panel {
 
     private static final String[] cities = new String[]{"cassandra-node1", "cassandra-node2", "cassandra-node3",
             "cassandra-node4", "cassandra-node5"};
 
-    public Step42(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration");
+    public Step7(final CassandraWizard cassandraWizard) {
+        setCaption("Configuration Step42");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
