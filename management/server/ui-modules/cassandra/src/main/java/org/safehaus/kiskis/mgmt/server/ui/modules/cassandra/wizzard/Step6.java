@@ -6,13 +6,13 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
@@ -25,7 +25,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class Step6 extends Panel {
 
-    List<Agent> hosts;
     String changeNameCommand = "sed -i \"$(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)\"'s/Test Cluster/'\"%name\"'/' /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     public Step6(final CassandraWizard cassandraWizard) {
@@ -64,7 +63,8 @@ public class Step6 extends Panel {
 //        for (Agent agent : hosts) {
 //            agentUuids.add(agent.getUuid());
 //        }
-        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", hosts);
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
 
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'

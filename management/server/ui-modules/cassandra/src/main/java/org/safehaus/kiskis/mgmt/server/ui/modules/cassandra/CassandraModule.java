@@ -4,6 +4,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
+import java.util.ArrayList;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -11,6 +13,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.component.CassandraT
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
+import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
@@ -41,8 +45,23 @@ public class CassandraModule implements Module {
             buttonInstallWizard.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    subwindow = new CassandraWizard();
-                    getApplication().getMainWindow().addWindow(subwindow);
+                    if (getLxcAgents().size() > 0) {
+                        subwindow = new CassandraWizard(getLxcAgents());
+                        getApplication().getMainWindow().addWindow(subwindow);
+                    }
+                }
+
+                private List<Agent> getLxcAgents() {
+                    List<Agent> list = new ArrayList<Agent>();
+                    if (AppData.getSelectedAgentList() != null) {
+                        for (Agent agent : AppData.getSelectedAgentList()) {
+                            if (agent.isIsLXC()) {
+                                list.add(agent);
+                            }
+                        }
+                    }
+
+                    return list;
                 }
             });
             verticalLayout.addComponent(buttonInstallWizard);

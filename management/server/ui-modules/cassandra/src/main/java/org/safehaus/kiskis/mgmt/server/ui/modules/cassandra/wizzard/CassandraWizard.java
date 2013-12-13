@@ -2,10 +2,12 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -19,7 +21,7 @@ public final class CassandraWizard extends Window {
     private final VerticalLayout verticalLayout;
     private Task task;
     CassandraClusterInfo cluster;
-
+    private final List<Agent> lxcList;
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 5;
@@ -36,10 +38,11 @@ public final class CassandraWizard extends Window {
 
     /**
      *
+     * @param lxcList
      */
-    public CassandraWizard() {
+    public CassandraWizard(List<Agent> lxcList) {
         setModal(true);
-
+        this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
         setCaption("Cassandra Wizard");
 
@@ -227,5 +230,9 @@ public final class CassandraWizard extends Window {
         }
 
         return null;
+    }
+
+    public List<Agent> getLxcList() {
+        return lxcList;
     }
 }

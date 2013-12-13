@@ -6,9 +6,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
@@ -28,7 +28,7 @@ public class Step2 extends Panel {
     //    private static final List<String> hosts = Arrays.asList(new String[]{
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
     List<Agent> hosts;
-    CassandraWizard parent;
+    CassandraWizard cassandraWizard;
     String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
 //    String listenAddressCommand = "sed -i 's/listen_address: localhost/listen_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
 //    String rpcAddressCommand = "sed -i 's/rpc_address: localhost/rpc_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
@@ -36,7 +36,7 @@ public class Step2 extends Panel {
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
 
     public Step2(final CassandraWizard cassandraWizard) {
-        parent = cassandraWizard;
+        this.cassandraWizard = cassandraWizard;
 
         setCaption("List nodes Step2");
         setSizeFull();
@@ -75,14 +75,9 @@ public class Step2 extends Panel {
         grid.addComponent(label1, 2, 1, 5, 1);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
-        // 'Shorthand' constructor - also supports data binding using Containers
-        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
-//        List<UUID> agentUuids = new ArrayList<UUID>();
-//        for (Agent agent : hosts) {
-//            agentUuids.add(agent.getUuid());
-//        }
-//        cassandraWizard.getCluster().setNodes(hosts);
-        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", hosts);
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, this.cassandraWizard.getLxcList());
+
+        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
 
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
@@ -92,7 +87,6 @@ public class Step2 extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 getWindow().showNotification("hosts selected");
-                cassandraWizard.step4.hosts = hosts;
             }
         });
 
@@ -104,7 +98,7 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for(Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
+                for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
                     Agent agent = (Agent) i.next();
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
@@ -114,17 +108,9 @@ public class Step2 extends Panel {
 //                    args.add("install");
 //                    args.add("ksks-cassandra");
                     Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
-                    cassandraWizard.runCommand(command);
-                    
+//                    cassandraWizard.runCommand(command);
+
                 }
-//                for (Agent agent : hosts) {
-////                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
-////                    command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
-////                    cassandraWizard.runCommand(command);
-////                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
-////                    command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
-////                    cassandraWizard.runCommand(command);
-//                }
                 cassandraWizard.showNext();
             }
         });
@@ -133,7 +119,8 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Agent agent : hosts) {
+                for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
+                    Agent agent = (Agent) i.next();
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
@@ -142,7 +129,7 @@ public class Step2 extends Panel {
 //                    args.add("purge");
 //                    args.add("ksks-cassandra");
                     Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
-                    cassandraWizard.runCommand(command);
+//                    cassandraWizard.runCommand(command);
                 }
             }
         });
