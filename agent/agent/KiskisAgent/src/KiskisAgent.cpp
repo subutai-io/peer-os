@@ -48,7 +48,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
-#include <time.h>
+
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */
@@ -212,6 +212,51 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 	}
 }
 /**
+ *  \details   This method checks the Default HeartBeat execution timeout value.
+ *  		   if execution timeout is occured it returns true. Otherwise it returns false.
+ */
+bool checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* exectimeout,unsigned int* count)
+{
+	if (*exectimeout != 0)
+	{
+		boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
+		unsigned int currentsec  =  current.time_of_day().seconds();
+
+		if((currentsec > *startsec) && *overflag==false)
+		{
+			if(currentsec != 59)
+			{
+				*count = *count + (currentsec - *startsec);
+				*startsec = currentsec;
+			}
+			else
+			{
+				*count = *count + (currentsec - *startsec);
+				*overflag = true;
+				*startsec = 0;
+			}
+		}
+		if(currentsec == 59)
+		{
+			*overflag = true;
+			*startsec = 0;
+		}
+		else
+		{
+			*overflag = false;
+		}
+		if(*count >= *exectimeout) //timeout
+		{
+			return true;	//timeout occured now
+		}
+		else
+		{
+			return false; //no timeout occured
+		}
+	}
+	return false;	//no timeout occured
+}
+/**
  *  \details   This function is the main thread of KiskisAgent.
  *  		   It sends and receives messages from ActiveMQ broker.
  *  		   It is also responsible from creation new process.
@@ -364,13 +409,36 @@ int main(int argc,char *argv[],char *envp[])
 	boost::thread thread1(threadSend,&messageQueue,&connection,&logMain);
 	/* Change the file mode mask */
 	umask(0);
-	//	For responses the type parameter might have the following values: EXECUTE_RESPONSE, EXECUTE_RESPONSE_DONE, REGISTRATION_REQUEST, HEARTBEAT_RESPONSE, TERMINATE_REQUEST_DONE
-	//	For commands the type parameter might have the following values: EXECUTE_REQUEST, REGISTRATION_REQUEST_DONE, HEARTBEAT_REQUEST, TERMINATE_REQUEST
+
+	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
+	unsigned int exectimeout = 60; //60 seconds for HeartBeat Default Timeout
+	unsigned int startsec  =  start.time_of_day().seconds();
+	bool overflag = false;
+	unsigned int count = 0;
 
 	while(true)
 	{
 		try
 		{
+			if(checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking HeartBeat Default Timeout
+			{
+				//timeout occured!!
+				response.clear();
+				response.setIps(ipadress);
+				response.setIsLxc(isLxc);
+				response.setHostname(hostname);
+				response.setMacAddress(macaddress);
+				string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,isLxc,command.getSource(),command.getTaskUuid());
+				connection.sendMessage(resp);
+
+				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
+				start = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Default Timeout values
+				startsec  =  start.time_of_day().seconds();
+				overflag = false;
+				exectimeout = 60;
+				count = 0;
+			}
+			usleep(20000);//20 ms delay for the main loop
 			command.clear();
 			if(connection.fetchMessage(input)) 	//check and wait if new message comes?
 			{
