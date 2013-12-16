@@ -16,6 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 
 /**
  * @author bahadyr
@@ -119,22 +120,37 @@ public class Step2 extends Panel {
 
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
 
-        Request request = new Request();
-        request.setSource("CassandraModule");
-        request.setProgram(program);
-        request.setUuid(uuid);
-        request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid(taskUuid);
-        request.setWorkingDirectory("/");
-        request.setStdOut(OutputRedirection.RETURN);
-        request.setStdErr(OutputRedirection.RETURN);
-        request.setRunAs("root");
-        request.setTimeout(0);
-        request.setArgs(args);
-        request.setRequestSequenceNumber(reqSeqNumber);
-        Command command = new Command(request);
+//        Request request = new Request();
+//        request.setSource("CassandraModule");
+//        request.setProgram(program);
+//        request.setUuid(uuid);
+//        request.setType(RequestType.EXECUTE_REQUEST);
+//        request.setTaskUuid(taskUuid);
+//        request.setWorkingDirectory("/");
+//        request.setStdOut(OutputRedirection.RETURN);
+//        request.setStdErr(OutputRedirection.RETURN);
+//        request.setRunAs("root");
+//        request.setTimeout(0);
+//        request.setArgs(args);
+//        request.setRequestSequenceNumber(reqSeqNumber);
+//        Command command = new Command(request);
+//        return command;
+        return (Command) CommandFactory.createRequest(
+                RequestType.EXECUTE_REQUEST,
+                uuid,
+                "CassandraModule",
+                taskUuid,
+                reqSeqNumber,
+                "/",
+                program,
+                OutputRedirection.RETURN,
+                OutputRedirection.RETURN,
+                null,
+                null,
+                "root",
+                args,
+                null);
 
-        return command;
     }
 
 }

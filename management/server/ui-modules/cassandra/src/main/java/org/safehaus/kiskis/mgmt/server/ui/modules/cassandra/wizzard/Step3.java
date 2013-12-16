@@ -22,8 +22,8 @@ import java.util.UUID;
  */
 public class Step3 extends Panel {
 
-    String listenAddressCommand = "sed -i 's/listen_address: localhost/listen_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
-    String rpcAddressCommand = "sed -i 's/rpc_address: localhost/rpc_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
+    String listenAddressCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/listen_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!listen_address: %ip!'";
+    String rpcAddressCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/rpc_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!rpc_address: %ip!'";
 
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
 

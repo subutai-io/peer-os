@@ -25,7 +25,7 @@ import java.util.UUID;
  */
 public class Step4 extends Panel {
 
-    String seedsCommand = "sed -i \"s/- seeds: \\\"localhost\\\"/- seeds: \\\"%ip\\\"/g\" /opt/cassandra-2.0.0/conf/cassandra.yaml";
+    String seedsCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/- seeds:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!             - seeds: \"%ips\"!'";
 
     public Step4(final CassandraWizard cassandraWizard) {
         setCaption("Configure seed");
@@ -88,10 +88,13 @@ public class Step4 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 StringBuilder sb = new StringBuilder();
+                List<UUID> seeds = new ArrayList<UUID>();
                 for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
                     Agent agent = (Agent) i.next();
                     sb.append(agent.getHostname()).append(",");
+                    seeds.add(agent.getUuid());
                 }
+                cassandraWizard.getCluster().setSeeds(seeds);
                 for (Agent agent : cassandraWizard.getLxcList()) {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
@@ -102,8 +105,8 @@ public class Step4 extends Panel {
 //                    args.add("ksks-cassandra");
 //                    Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
 //                    cassandraWizard.runCommand(command);
-                    String seeds = sb.toString();
-                    seedsCommand = seedsCommand.replace("%ip", seeds.substring(0, seeds.length() - 1));
+                    String seedsStr = sb.toString();
+                    seedsCommand = seedsCommand.replace("%ips", seedsStr.substring(0, seedsStr.length() - 1));
                     Command command = buildCommand(agent.getUuid(), seedsCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
                 }

@@ -22,7 +22,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class Step5 extends Panel {
 
-    String changeNameCommand = "sed -i \"$(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)\"'s/Test Cluster/'\"%name\"'/' /opt/cassandra-2.0.0/conf/cassandra.yaml";
+    String changeNameCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!cluster_name: \"%newName\"!'";
 
     public Step5(final CassandraWizard cassandraWizard) {
         setCaption("Rename cluster");
@@ -65,7 +65,7 @@ public class Step5 extends Panel {
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                         UUID taskUuid = cassandraWizard.getTask().getUuid();
                         List<String> args = new ArrayList<String>();
-                        changeNameCommand = changeNameCommand.replace("%name", clusterName.getValue().toString());
+                        changeNameCommand = changeNameCommand.replace("%newName", clusterName.getValue().toString());
                         Command command = buildCommand(agent.getUuid(), changeNameCommand, reqSeqNumber, taskUuid, args);
                         cassandraWizard.runCommand(command);
                         cassandraWizard.getCluster().setName(clusterName.getValue().toString());

@@ -22,10 +22,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class Step6 extends FormLayout {
 
-    String dataDirCommand = "sed -i \"s/- \\/var\\/lib\\/cassandra\\/data/- %dataDirg\" /opt/cassandra-2.0.0/conf/cassandra.yaml";
-    String commitDirCommand = "sed -i \"s/commitlog_directory: \\/var\\/lib\\/cassandra\\/commitlog/commitlog_directory: %commitDirg\" /opt/cassandra-2.0.0/conf/cassandra.yaml";
+    String dataDirCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/data_file_directories:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml) + 1`'s!.*!     - %dir!'";
+    String commitDirCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/commitlog_directory:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!commitlog_directory:%dir!'";
 
-    String cacheDirCommand = "sed -i \"s/saved_caches_directory: \\/var\\/lib\\/cassandra\\/saved_caches/saved_caches_directory: %cacheDir/g\" /opt/cassandra-2.0.0/conf/cassandra.yaml";
+    String cacheDirCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/saved_caches_directory:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!saved_caches_directory:%dir!'";
 
     public Step6(final CassandraWizard cassandraWizard) {
         setCaption("Change directories");
@@ -78,12 +78,14 @@ public class Step6 extends FormLayout {
                 String dataDir = textFieldDataDir.getValue().toString();
                 String commitDir = textFieldCommitLogDir.getValue().toString();
                 String cacheDir = textFieldSavedCachesDir.getValue().toString();
+                List<UUID> nodes = new ArrayList<UUID>();
                 if (dataDir.length() > 0 && commitDir.length() > 0 && cacheDir.length() > 0) {
                     cassandraWizard.getCluster().setDataDir(dataDir);
                     cassandraWizard.getCluster().setCommitLogDir(commitDir);
                     cassandraWizard.getCluster().setSavedCacheDir(cacheDir);
-                    for (Agent agent : cassandraWizard.getLxcList()) {
 
+                    for (Agent agent : cassandraWizard.getLxcList()) {
+                        nodes.add(agent.getUuid());
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                         UUID taskUuid = cassandraWizard.getTask().getUuid();
                         List<String> args = new ArrayList<String>();
@@ -91,16 +93,16 @@ public class Step6 extends FormLayout {
 //                    args.add("--assume-yes");
 //                    args.add("install");
 //                    args.add("ksks-cassandra");
-                        dataDirCommand = dataDirCommand.replace("%dataDir", dataDir);
+                        dataDirCommand = dataDirCommand.replace("%dir", dataDir);
                         Command command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
                         cassandraWizard.runCommand(command);
 
-                        commitDirCommand = commitDirCommand.replace("%commitDir", commitDir);
+                        commitDirCommand = commitDirCommand.replace("%dir", commitDir);
                         command = buildCommand(agent.getUuid(), commitDirCommand, reqSeqNumber, taskUuid, args);
                         cassandraWizard.runCommand(command);
 
-                        cacheDirCommand = cacheDirCommand.replace("%cacheDir", cacheDir);
-                        command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
+                        cacheDirCommand = cacheDirCommand.replace("%dir", cacheDir);
+                        command = buildCommand(agent.getUuid(), cacheDirCommand, reqSeqNumber, taskUuid, args);
                         cassandraWizard.runCommand(command);
 
                     }
@@ -110,6 +112,7 @@ public class Step6 extends FormLayout {
                             Window.Notification.TYPE_TRAY_NOTIFICATION);
                 }
 
+                cassandraWizard.getCluster().setNodes(nodes);
                 cassandraWizard.showNext();
             }
         });
