@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -127,7 +128,7 @@ public class LxcTable extends Table {
 
     public LxcTable() {
         this.setCaption(" LXC containers");
-        this.setContainerDataSource(getContainer(new String[]{}));
+        this.setContainerDataSource(getContainer(new ArrayList<String>(), new ArrayList<String>()));
 
         this.setWidth("100%");
         this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
@@ -137,7 +138,7 @@ public class LxcTable extends Table {
         this.setImmediate(true);
     }
 
-    private IndexedContainer getContainer(String[] lxcs) {
+    private IndexedContainer getContainer(List<String> lxcR, List<String> lxcS) {
         container = new IndexedContainer();
 
         // Create the container properties
@@ -146,16 +147,26 @@ public class LxcTable extends Table {
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
 
-        if (lxcs.length > 0) {
-            infoTask = createTask("Info lxc container");
-            for (String lxc : lxcs) {
+        if(lxcS.size() > 0){
+            for (String lxc : lxcS) {
                 if (!Strings.isNullOrEmpty(lxc.trim())
                         && !lxc.trim().equals("base-container")
                         && !lxc.trim().equals("RUNNING")
                         && !lxc.trim().equals("FROZEN")
                         && !lxc.trim().equals("STOPPED")) {
-                    addOrderToContainer(container, lxc.trim());
-                    createRequest(INFO_LXC, infoTask, lxc.trim());
+                    addOrderToContainer(container, lxc.trim(), false);
+                }
+            }
+        }
+
+        if(lxcR.size() > 0){
+            for (String lxc : lxcR) {
+                if (!Strings.isNullOrEmpty(lxc.trim())
+                        && !lxc.trim().equals("base-container")
+                        && !lxc.trim().equals("RUNNING")
+                        && !lxc.trim().equals("FROZEN")
+                        && !lxc.trim().equals("STOPPED")) {
+                    addOrderToContainer(container, lxc.trim(), true);
                 }
             }
         }
@@ -163,14 +174,14 @@ public class LxcTable extends Table {
         return container;
     }
 
-    private void addOrderToContainer(Container container, final String lxc) {
+    private void addOrderToContainer(Container container, final String lxc, final boolean isStarted) {
         Object itemId = container.addItem();
         Item item = container.getItem(itemId);
 
         item.getItemProperty("name").setValue(lxc);
 
         Button buttonStart = new Button("Start");
-        buttonStart.setEnabled(false);
+        buttonStart.setEnabled(!isStarted);
         buttonStart.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -181,7 +192,7 @@ public class LxcTable extends Table {
         item.getItemProperty("Start").setValue(buttonStart);
 
         Button buttonStop = new Button("Stop");
-        buttonStop.setEnabled(false);
+        buttonStop.setEnabled(isStarted);
         buttonStop.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -307,9 +318,30 @@ public class LxcTable extends Table {
     }
 
     private void refreshDataSource(ParseResult parseResult) {
-        String[] lxcs = parseResult.getResponse().getStdOut().split("\\n");
         this.setCaption(agent.getHostname() + " LXC containers");
-        this.setContainerDataSource(getContainer(lxcs));
+
+        String[] lxcs = parseResult.getResponse().getStdOut().split("\\n");
+        ArrayList<String> startedLXC = new ArrayList<String>();
+        ArrayList<String> stoppedLXC = new ArrayList<String>();
+        ArrayList<String> frozenLXC = new ArrayList<String>();
+
+        ArrayList<String> temp = null;
+        for(String s : lxcs){
+            if(s.trim().contains("RUNNING")){
+                temp = startedLXC;
+            } else if(s.trim().contains("STOPPED")){
+                temp = stoppedLXC;
+            }  else if(s.trim().contains("FROZEN")){
+                temp = frozenLXC;
+            } else {
+                if (!Strings.isNullOrEmpty(s.trim()) && temp != null && !s.trim().equals("base-container")) {
+                    temp.add(s.trim());
+                }
+            }
+
+        }
+
+        this.setContainerDataSource(getContainer(startedLXC, stoppedLXC));
     }
 
     public void setAgent(Agent agent) {

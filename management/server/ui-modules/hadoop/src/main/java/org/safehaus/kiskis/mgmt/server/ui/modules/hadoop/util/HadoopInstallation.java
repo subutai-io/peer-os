@@ -34,6 +34,8 @@ public class HadoopInstallation {
     }
 
     public void installHadoop() {
+        removeDuplicateAgents();
+
         hadoopInstallationTask = createTask("Setup Hadoop cluster");
         createInstallationRequest();
 
@@ -54,8 +56,6 @@ public class HadoopInstallation {
 
         setHadoopInstallationTask(clusterTask);
         commandManager.saveTask(hadoopInstallationTask);
-
-        removeDuplicateAgents();
 
         return clusterTask;
     }

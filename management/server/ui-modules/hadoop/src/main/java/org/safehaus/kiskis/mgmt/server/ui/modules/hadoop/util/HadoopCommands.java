@@ -53,7 +53,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -72,7 +72,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -91,7 +91,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -110,7 +110,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -129,7 +129,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -148,7 +148,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -218,7 +218,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
