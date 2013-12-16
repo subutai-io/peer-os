@@ -39,7 +39,7 @@ public class HadoopCommands {
              "\t    \"stdErr\": \"RETURN\",\n" +
              "\t    \"runAs\": \"root\",\n" +
              "\t    \"args\": [\n" +
-             "\t      \"hdfs://:namenode:8020\",\":jobtracker:9000\",\":replicationfactor\"\n" +
+             "\t      \":namenode:8020\",\":jobtracker:9000\",\":replicationfactor\"\n" +
              "\t    ],\n" +
              "\t    \"timeout\": 180\n" +
              "\t  }\n" +
