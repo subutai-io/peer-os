@@ -13,6 +13,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public final class CassandraWizard extends Window {
 
@@ -134,6 +135,8 @@ public final class CassandraWizard extends Window {
             }
             case 7: {
                 commandManagerInterface.saveCassandraClusterData(cluster);
+                task.setTaskStatus(TaskStatus.SUCCESS);
+                commandManagerInterface.saveTask(task);
             }
             default: {
                 this.close();
