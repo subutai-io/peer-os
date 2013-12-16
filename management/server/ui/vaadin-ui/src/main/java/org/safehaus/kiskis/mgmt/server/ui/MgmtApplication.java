@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -15,8 +16,8 @@ import java.util.Iterator;
 public class MgmtApplication extends Application implements ModuleServiceListener {
 
     private ModuleServiceListener app;
-    private ModuleService moduleService;
-    private AgentManagerInterface agentManagerService;
+    private final ModuleService moduleService;
+    private final AgentManagerInterface agentManagerService;
     private Window window;
     private MgmtAgentManager mgmtAgentManager;
 
@@ -25,7 +26,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         this.agentManagerService = agentManagerService;
         this.title = title;
     }
-    private String title;
+    private final String title;
     private TabSheet tabs;
 
     @Override
@@ -48,10 +49,12 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             layout.addComponent(horizontalSplit);
 
             layout.setExpandRatio(horizontalSplit, 1);
-            horizontalSplit.setSplitPosition(200, SplitPanel.UNITS_PIXELS);
+            horizontalSplit.setSplitPosition(200, Sizeable.UNITS_PIXELS);
 
-            mgmtAgentManager = new MgmtAgentManager(agentManagerService);
-            horizontalSplit.setFirstComponent(mgmtAgentManager);
+            Panel panel = new Panel();
+            panel.addComponent(new MgmtAgentManager(agentManagerService));
+            panel.setSizeFull();
+            horizontalSplit.setFirstComponent(panel);
 
             tabs = new TabSheet();
             tabs.setSizeFull();
@@ -79,8 +82,8 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 }
             });
             //
-            final ProgressIndicator indicator =
-                    new ProgressIndicator(new Float(0.0));
+            final ProgressIndicator indicator
+                    = new ProgressIndicator(new Float(0.0));
             indicator.setPollingInterval(3000);
             indicator.setWidth("1px");
             indicator.setHeight("1px");
