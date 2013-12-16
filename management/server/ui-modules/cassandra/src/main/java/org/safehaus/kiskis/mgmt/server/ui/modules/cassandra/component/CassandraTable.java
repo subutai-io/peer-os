@@ -8,12 +8,16 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
+import static java.lang.Compiler.command;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import sun.management.resources.agent;
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,8 +67,36 @@ public class CassandraTable extends Table {
         container.addContainerProperty(CassandraClusterInfo.DATADIR_LABEL, String.class, "");
         container.addContainerProperty(CassandraClusterInfo.COMMITLOGDIR_LABEL, String.class, "");
         container.addContainerProperty(CassandraClusterInfo.SAVEDCACHEDIR_LOG, String.class, "");
+//        Button startButton  = new Button("Start");
+//        startButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+////                Task task = new Task();
+////                task.setDescription("Starting cluster");
+////                task.setTaskStatus(TaskStatus.NEW);
+//                getWindow().showNotification("Start cassandra");
+////               Command command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
+////                    cassandraWizard.runCommand(command);
+//            }
+//        });
+//        Button stopButton  = new Button("Start");
+//        stopButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+////                Task task = new Task();
+////                task.setDescription("Starting cluster");
+////                task.setTaskStatus(TaskStatus.NEW);
+//                getWindow().showNotification("Stop cassandra");
+////               Command command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
+////                    cassandraWizard.runCommand(command);
+//            }
+//        });
+        
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
+        container.addContainerProperty("Destroy", Button.class, "");
         container.addContainerProperty(CassandraClusterInfo.NODES_LABEL, List.class, 0);
         container.addContainerProperty(CassandraClusterInfo.SEEDS_LABEL, List.class, 0);
 
@@ -85,8 +117,48 @@ public class CassandraTable extends Table {
         item.getItemProperty(CassandraClusterInfo.DATADIR_LABEL).setValue(cd.getDataDir());
         item.getItemProperty(CassandraClusterInfo.COMMITLOGDIR_LABEL).setValue(cd.getCommitLogDir());
         item.getItemProperty(CassandraClusterInfo.SAVEDCACHEDIR_LOG).setValue(cd.getSavedCacheDir());
-        item.getItemProperty("Start").setValue(new Button("Start"));
-        item.getItemProperty("Stop").setValue(new Button("Stop"));
+         Button startButton  = new Button("Start");
+        startButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+//                Task task = new Task();
+//                task.setDescription("Starting cluster");
+//                task.setTaskStatus(TaskStatus.NEW);
+                getWindow().showNotification("Start cassandra cluster");
+//               Command command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
+//                    cassandraWizard.runCommand(command);
+            }
+        });
+        Button stopButton  = new Button("Start");
+        stopButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+//                Task task = new Task();
+//                task.setDescription("Starting cluster");
+//                task.setTaskStatus(TaskStatus.NEW);
+                getWindow().showNotification("Stop cassandra cluster");
+//               Command command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
+//                    cassandraWizard.runCommand(command);
+            }
+        });
+        Button destroyButton  = new Button("Destroy");
+        stopButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+//                Task task = new Task();
+//                task.setDescription("Starting cluster");
+//                task.setTaskStatus(TaskStatus.NEW);
+                getWindow().showNotification("Destroy cassandra cluster");
+//               Command command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
+//                    cassandraWizard.runCommand(command);
+            }
+        });
+        item.getItemProperty("Start").setValue(startButton);
+        item.getItemProperty("Stop").setValue(stopButton);
+        item.getItemProperty("Destroy").setValue(destroyButton);
         item.getItemProperty(CassandraClusterInfo.NODES_LABEL).setValue(cd.getNodes());
         item.getItemProperty(CassandraClusterInfo.SEEDS_LABEL).setValue(cd.getSeeds());
     }

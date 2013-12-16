@@ -23,12 +23,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  *
  * @author bahadyr
  */
-public class Step6 extends Panel {
+public class Step5 extends Panel {
 
     String changeNameCommand = "sed -i \"$(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)\"'s/Test Cluster/'\"%name\"'/' /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
-    public Step6(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration Step6");
+    public Step5(final CassandraWizard cassandraWizard) {
+        setCaption("Rename cluster");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -63,29 +63,26 @@ public class Step6 extends Panel {
 //        for (Agent agent : hosts) {
 //            agentUuids.add(agent.getUuid());
 //        }
-        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
-        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
-
-        hostSelect.setRows(6); // perfect length in out case
-        hostSelect.setItemCaptionPropertyId("hostname");
-        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
-        hostSelect.setMultiSelect(true);
-        hostSelect.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                getWindow().showNotification("hosts selected");
-            }
-        });
-
-        grid.addComponent(hostSelect, 2, 2, 5, 9);
-
-        Button next = new Button("Next");
+//        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+//        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
+//        hostSelect.setRows(6); // perfect length in out case
+//        hostSelect.setItemCaptionPropertyId("hostname");
+//        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
+//        hostSelect.setMultiSelect(true);
+//        hostSelect.addListener(new Property.ValueChangeListener() {
+//            @Override
+//            public void valueChange(Property.ValueChangeEvent event) {
+//                getWindow().showNotification("hosts selected");
+//            }
+//        });
+//
+//        grid.addComponent(hostSelect, 2, 2, 5, 9);
+        Button next = new Button("Rename cluster");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
-                    Agent agent = (Agent) i.next();
+                for (Agent agent : cassandraWizard.getLxcList()) {
 
                     if (clusterName.getValue().toString().length() > 0) {
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
@@ -95,13 +92,13 @@ public class Step6 extends Panel {
                         Command command = buildCommand(agent.getUuid(), changeNameCommand, reqSeqNumber, taskUuid, args);
                         cassandraWizard.runCommand(command);
                         cassandraWizard.getCluster().setName(clusterName.getValue().toString());
-                        cassandraWizard.showNext();
                     } else {
                         getWindow().showNotification(
                                 "Please provide cluster name.",
                                 Window.Notification.TYPE_TRAY_NOTIFICATION);
                     }
                 }
+                cassandraWizard.showNext();
             }
         });
         Button back = new Button("Back");

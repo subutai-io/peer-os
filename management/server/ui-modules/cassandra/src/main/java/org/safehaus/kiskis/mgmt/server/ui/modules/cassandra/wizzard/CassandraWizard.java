@@ -32,8 +32,6 @@ public final class CassandraWizard extends Window {
     Step4 step4;
     Step5 step5;
     Step6 step6;
-    Step7 step7;
-    Step8 step8;
     int step = 1;
 
     /**
@@ -135,20 +133,11 @@ public final class CassandraWizard extends Window {
                 break;
             }
             case 7: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step7 = new Step7(this);
-                verticalLayout.addComponent(step7);
-                break;
-            }
-            case 8: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step8 = new Step8(this);
-                verticalLayout.addComponent(step8);
-//                commandManagerInterface.saveCassandraClusterData(cluster);
-                break;
+                commandManagerInterface.saveCassandraClusterData(cluster);
             }
             default: {
                 this.close();
+                removeWindow(this);
                 break;
             }
         }
@@ -191,23 +180,17 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 3: {
-                            step3.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
+//                            step3.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 4: {
                             break;
                         }
                         case 5: {
-                            step5.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
+//                            step5.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 6: {
-                            break;
-                        }
-                        case 7: {
-                            break;
-                        }
-                        case 8: {
                             break;
                         }
                     }

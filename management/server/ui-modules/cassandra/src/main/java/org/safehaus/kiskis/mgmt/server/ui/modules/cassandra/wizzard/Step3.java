@@ -5,8 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -16,28 +14,27 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * @author bahadyr
  */
-public class Step4 extends Panel {
+public class Step3 extends Panel {
 
     //    private static final List<String> hosts = Arrays.asList(new String[]{
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
-    CassandraWizard parent;
+//    CassandraWizard parent;
 //    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
     String listenAddressCommand = "sed -i 's/listen_address: localhost/listen_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
     String rpcAddressCommand = "sed -i 's/rpc_address: localhost/rpc_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
 
-    public Step4(final CassandraWizard cassandraWizard) {
-        parent = cassandraWizard;
+    public Step3(final CassandraWizard cassandraWizard) {
+//        parent = cassandraWizard;
 
-        setCaption("List nodes Step4");
+        setCaption("Configure listen address/prc address");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -81,30 +78,28 @@ public class Step4 extends Panel {
 //            agentUuids.add(agent.getUuid());
 //        }
 //        cassandraWizard.getCluster().setNodes(agentUuids);
-        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
-        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
-
-        hostSelect.setRows(6); // perfect length in out case
-        hostSelect.setItemCaptionPropertyId("hostname");
-        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
-        hostSelect.setMultiSelect(true);
-        hostSelect.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                getWindow().showNotification("hosts selected");
-            }
-        });
-
-        grid.addComponent(hostSelect, 2, 2, 5, 9);
+//        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+//        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
+//
+//        hostSelect.setRows(6); // perfect length in out case
+//        hostSelect.setItemCaptionPropertyId("hostname");
+//        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
+//        hostSelect.setMultiSelect(true);
+//        hostSelect.addListener(new Property.ValueChangeListener() {
+//            @Override
+//            public void valueChange(Property.ValueChangeEvent event) {
+//                getWindow().showNotification("hosts selected");
+//            }
+//        });
+//        grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
-        Button next = new Button("Install");
+        Button next = new Button("Configure listen and rpc addresses");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
-                    Agent agent = (Agent) i.next();
+                for (Agent agent : cassandraWizard.getLxcList()) {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
@@ -116,10 +111,10 @@ public class Step4 extends Panel {
 //                    cassandraWizard.runCommand(command);
                     listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
                     Command command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
+                    cassandraWizard.runCommand(command);
                     rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
                     command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
+                    cassandraWizard.runCommand(command);
                 }
                 cassandraWizard.showNext();
             }
@@ -129,18 +124,7 @@ public class Step4 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
-                    Agent agent = (Agent) i.next();
-                    int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
-                    UUID taskUuid = cassandraWizard.getTask().getUuid();
-                    List<String> args = new ArrayList<String>();
-//                    args.add("--force-yes");
-//                    args.add("--assume-yes");
-//                    args.add("purge");
-//                    args.add("ksks-cassandra");
-                    Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
-                }
+                cassandraWizard.showBack();
             }
         });
 

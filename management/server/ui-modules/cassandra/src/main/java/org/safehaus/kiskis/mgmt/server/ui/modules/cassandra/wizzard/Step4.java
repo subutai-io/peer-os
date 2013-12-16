@@ -5,20 +5,33 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author bahadyr
  */
-public class Step5 extends Panel {
+public class Step4 extends Panel {
 
-    GridLayout grid;
-    VerticalLayout verticalLayoutForm;
-    Button next;
+//    CassandraWizard parent;
+    String seedsCommand = "sed -i \"s/- seeds: \\\"localhost\\\"/- seeds: \\\"%ip\\\"/g\" /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
-    public Step5(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration Step5");
+    public Step4(final CassandraWizard cassandraWizard) {
+//        parent = cassandraWizard;
+
+        setCaption("Configure seed");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -26,44 +39,84 @@ public class Step5 extends Panel {
         verticalLayout.setHeight(600, Sizeable.UNITS_PIXELS);
         verticalLayout.setMargin(true);
 
-        grid = new GridLayout(6, 10);
+        GridLayout grid = new GridLayout(6, 10);
         grid.setSpacing(true);
         grid.setSizeFull();
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
                 + " 1) Welcome<br>"
-                + " 2) List nodes<br>"
-                + " 3) <font color=\"#f14c1a\"><strong>Installation</strong></font><br>"
-                + " 4) Configuration");
+                + " 2) <font color=\"#f14c1a\"><strong>List nodes</strong></font><br>"
+                + " 3) Installation<br>"
+                + " 4) Configuration<br>");
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
 
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        verticalLayoutForm = new VerticalLayout();
-        verticalLayoutForm.setSizeFull();
-        verticalLayout.setSpacing(true);
-
         Label label = new Label("Please enter the list of hosts to be included in the cluster");
         label.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(label);
 
-        Label label1 = new Label("<strong>Status of nodes</strong><br>"
+        grid.addComponent(label, 2, 0, 5, 0);
+        grid.setComponentAlignment(label, Alignment.TOP_CENTER);
+
+        Label label1 = new Label("<strong>Target Hosts</strong><br>"
                 + "<br>");
         label1.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(label1);
 
-        grid.addComponent(verticalLayoutForm, 2, 0, 5, 9);
-        grid.setComponentAlignment(verticalLayoutForm, Alignment.MIDDLE_CENTER);
+        grid.addComponent(label1, 2, 1, 5, 1);
+        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
-        next = new Button("Next");
-        next.setEnabled(true);
+        // 'Shorthand' constructor - also supports data binding using Containers
+//        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
+//        List<UUID> agentUuids = new ArrayList<UUID>();
+//        for (Agent agent : hosts) {
+//            agentUuids.add(agent.getUuid());
+//        }
+//        cassandraWizard.getCluster().setNodes(agentUuids);
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
+
+        hostSelect.setRows(6); // perfect length in out case
+        hostSelect.setItemCaptionPropertyId("hostname");
+        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
+        hostSelect.setMultiSelect(true);
+        hostSelect.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                getWindow().showNotification("hosts selected");
+            }
+        });
+
+        grid.addComponent(hostSelect, 2, 2, 5, 9);
+        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
+
+        Button next = new Button("Configure seeds");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                StringBuilder sb = new StringBuilder();
+                for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
+                    Agent agent = (Agent) i.next();
+                    sb.append(agent.getHostname()).append(",");
+                }
+                for (Agent agent : cassandraWizard.getLxcList()) {
+                    int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
+                    UUID taskUuid = cassandraWizard.getTask().getUuid();
+                    List<String> args = new ArrayList<String>();
+//                    args.add("--force-yes");
+//                    args.add("--assume-yes");
+//                    args.add("install");
+//                    args.add("ksks-cassandra");
+//                    Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
+//                    cassandraWizard.runCommand(command);
+                    String seeds = sb.toString();
+                    seedsCommand = seedsCommand.replace("%ip", seeds.substring(0, seeds.length() - 1));
+                    Command command = buildCommand(agent.getUuid(), seedsCommand, reqSeqNumber, taskUuid, args);
+                    cassandraWizard.runCommand(command);
+                }
                 cassandraWizard.showNext();
             }
         });
@@ -86,10 +139,24 @@ public class Step5 extends Panel {
         addComponent(verticalLayout);
     }
 
-    void updateUI(String msg) {
-        Label label1 = new Label("<strong>" + msg + "</strong><br>");
-        label1.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(label1);
+    private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
+
+        Request request = new Request();
+        request.setSource("CassandraModule");
+        request.setProgram(program);
+        request.setUuid(uuid);
+        request.setType(RequestType.EXECUTE_REQUEST);
+        request.setTaskUuid(taskUuid);
+        request.setWorkingDirectory("/");
+        request.setStdOut(OutputRedirection.RETURN);
+        request.setStdErr(OutputRedirection.RETURN);
+        request.setRunAs("root");
+        request.setTimeout(0);
+        request.setArgs(args);
+        request.setRequestSequenceNumber(reqSeqNumber);
+        Command command = new Command(request);
+
+        return command;
     }
 
 }
