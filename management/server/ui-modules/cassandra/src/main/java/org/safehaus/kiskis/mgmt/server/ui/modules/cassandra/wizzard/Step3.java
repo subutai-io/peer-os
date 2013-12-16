@@ -22,18 +22,12 @@ import java.util.UUID;
  */
 public class Step3 extends Panel {
 
-    //    private static final List<String> hosts = Arrays.asList(new String[]{
-//            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
-//    CassandraWizard parent;
-//    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
     String listenAddressCommand = "sed -i 's/listen_address: localhost/listen_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
     String rpcAddressCommand = "sed -i 's/rpc_address: localhost/rpc_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
 
     public Step3(final CassandraWizard cassandraWizard) {
-//        parent = cassandraWizard;
-
         setCaption("Configure listen address/prc address");
         setSizeFull();
 
@@ -71,27 +65,6 @@ public class Step3 extends Panel {
         grid.addComponent(label1, 2, 1, 5, 1);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
-        // 'Shorthand' constructor - also supports data binding using Containers
-//        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
-//        List<UUID> agentUuids = new ArrayList<UUID>();
-//        for (Agent agent : hosts) {
-//            agentUuids.add(agent.getUuid());
-//        }
-//        cassandraWizard.getCluster().setNodes(agentUuids);
-//        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
-//        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
-//
-//        hostSelect.setRows(6); // perfect length in out case
-//        hostSelect.setItemCaptionPropertyId("hostname");
-//        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
-//        hostSelect.setMultiSelect(true);
-//        hostSelect.addListener(new Property.ValueChangeListener() {
-//            @Override
-//            public void valueChange(Property.ValueChangeEvent event) {
-//                getWindow().showNotification("hosts selected");
-//            }
-//        });
-//        grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
         Button next = new Button("Configure listen and rpc addresses");

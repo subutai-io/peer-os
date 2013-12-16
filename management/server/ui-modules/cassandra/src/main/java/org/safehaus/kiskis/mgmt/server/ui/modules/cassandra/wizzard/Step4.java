@@ -25,12 +25,9 @@ import java.util.UUID;
  */
 public class Step4 extends Panel {
 
-//    CassandraWizard parent;
     String seedsCommand = "sed -i \"s/- seeds: \\\"localhost\\\"/- seeds: \\\"%ip\\\"/g\" /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     public Step4(final CassandraWizard cassandraWizard) {
-//        parent = cassandraWizard;
-
         setCaption("Configure seed");
         setSizeFull();
 
@@ -68,13 +65,6 @@ public class Step4 extends Panel {
         grid.addComponent(label1, 2, 1, 5, 1);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
-        // 'Shorthand' constructor - also supports data binding using Containers
-//        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
-//        List<UUID> agentUuids = new ArrayList<UUID>();
-//        for (Agent agent : hosts) {
-//            agentUuids.add(agent.getUuid());
-//        }
-//        cassandraWizard.getCluster().setNodes(agentUuids);
         BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
         final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
 

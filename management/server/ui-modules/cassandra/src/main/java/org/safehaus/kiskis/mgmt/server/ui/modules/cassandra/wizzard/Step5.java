@@ -5,12 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -57,26 +54,6 @@ public class Step5 extends Panel {
         grid.addComponent(clusterName, 2, 0, 5, 1);
         grid.setComponentAlignment(clusterName, Alignment.MIDDLE_CENTER);
 
-        // 'Shorthand' constructor - also supports data binding using Containers
-//        hosts = new ArrayList<Agent>(AppData.getSelectedAgentList());
-//        List<UUID> agentUuids = new ArrayList<UUID>();
-//        for (Agent agent : hosts) {
-//            agentUuids.add(agent.getUuid());
-//        }
-//        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
-//        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
-//        hostSelect.setRows(6); // perfect length in out case
-//        hostSelect.setItemCaptionPropertyId("hostname");
-//        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
-//        hostSelect.setMultiSelect(true);
-//        hostSelect.addListener(new Property.ValueChangeListener() {
-//            @Override
-//            public void valueChange(Property.ValueChangeEvent event) {
-//                getWindow().showNotification("hosts selected");
-//            }
-//        });
-//
-//        grid.addComponent(hostSelect, 2, 2, 5, 9);
         Button next = new Button("Rename cluster");
         next.addListener(new Button.ClickListener() {
 

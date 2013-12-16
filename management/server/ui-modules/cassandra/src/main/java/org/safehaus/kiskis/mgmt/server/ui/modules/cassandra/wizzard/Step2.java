@@ -5,8 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -16,7 +14,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,24 +66,7 @@ public class Step2 extends Panel {
 
         grid.addComponent(label1, 2, 1, 5, 1);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
-//
-//        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
-//
-//        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
-//        hostSelect.setItemCaptionPropertyId("hostname");
-//        hostSelect.setRows(6); // perfect length in out case
-//        hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
-//        hostSelect.setMultiSelect(true);
-//        hostSelect.addListener(new Property.ValueChangeListener() {
-//
-//            @Override
-//            public void valueChange(Property.ValueChangeEvent event) {
-//                getWindow().showNotification("hosts selected");
-//            }
-//        });
 
-//        grid.addComponent(hostSelect, 2, 2, 5, 9);
-//        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
         Button next = new Button("Install");
         next.addListener(new Button.ClickListener() {
 
