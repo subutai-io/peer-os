@@ -15,13 +15,11 @@
             <cm:property name="amqBrokerTrustStoreName" value="broker.ts"/>
             <cm:property name="amqBrokerCertificatePwd" value="broker"/>
             <cm:property name="amqBrokerTrustStorePwd" value="broker"/>
-            <cm:property name="amqExpiredMessagesHighWatermark" value="1000"/>
-            <cm:property name="amqConstantPendingMessageLimit" value="100"/>
-            <cm:property name="amqExpireMessagesPeriodSec" value="300"/>
-            <cm:property name="amqOfflineDurableSubscriberTimeoutSec" value="600"/>
-            <cm:property name="amqOfflineDurableSubscriberTaskScheduleSec" value="600"/>
-            <cm:property name="amqMaxConnections" value="10"/>
-            <cm:property name="amqExecutorPoolSize" value="9"/>
+            <cm:property name="amqMaxMessageToAgentTtlSec" value="60"/>
+            <cm:property name="amqMaxOfflineAgentQueueTtlSec" value="300"/>
+            <cm:property name="amqMaxSlowAgentConnectionTtlSec" value="30"/>
+            <cm:property name="amqMaxPooledConnections" value="11"/>
+            <cm:property name="amqMaxSenderPoolSize" value="20"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -35,13 +33,11 @@
         <property name="amqBrokerTrustStoreName" value="${amqBrokerTrustStoreName}"/>
         <property name="amqBrokerCertificatePwd" value="${amqBrokerCertificatePwd}"/>
         <property name="amqBrokerTrustStorePwd" value="${amqBrokerTrustStorePwd}"/>
-        <property name="amqExpiredMessagesHighWatermark" value="${amqExpiredMessagesHighWatermark}"/>
-        <property name="amqConstantPendingMessageLimit" value="${amqConstantPendingMessageLimit}"/>
-        <property name="amqExpireMessagesPeriodSec" value="${amqExpireMessagesPeriodSec}"/>
-        <property name="amqOfflineDurableSubscriberTimeoutSec" value="${amqOfflineDurableSubscriberTimeoutSec}"/>
-        <property name="amqOfflineDurableSubscriberTaskScheduleSec" value="${amqOfflineDurableSubscriberTaskScheduleSec}"/>
-        <property name="amqMaxConnections" value="${amqMaxConnections}"/>
-        <property name="amqExecutorPoolSize" value="${amqExecutorPoolSize}"/>
+        <property name="amqMaxMessageToAgentTtlSec" value="${amqMaxMessageToAgentTtlSec}"/>
+        <property name="amqMaxOfflineAgentQueueTtlSec" value="${amqMaxOfflineAgentQueueTtlSec}"/>
+        <property name="amqMaxSlowAgentConnectionTtlSec" value="${amqMaxSlowAgentConnectionTtlSec}"/>
+        <property name="amqMaxPooledConnections" value="${amqMaxPooledConnections}"/>
+        <property name="amqMaxSenderPoolSize" value="${amqMaxSenderPoolSize}"/>
     </bean>
 
     <service ref="communicationService"

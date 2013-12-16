@@ -14,16 +14,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-/**s
+/**
+ * s
  *
  * @author dilshat
  */
 public class AgentHeartBeat implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(AgentHeartBeat.class.getName());
-    private AgentManagerInterface agentManager;
-    private CommandTransportInterface commandSender;
-    private int timeoutSec;
+    private final AgentManagerInterface agentManager;
+    private final CommandTransportInterface commandSender;
+    private final int timeoutSec;
 
     public AgentHeartBeat(AgentManagerInterface agentManager, CommandTransportInterface commandSender, int timeoutSec) {
         this.commandSender = commandSender;

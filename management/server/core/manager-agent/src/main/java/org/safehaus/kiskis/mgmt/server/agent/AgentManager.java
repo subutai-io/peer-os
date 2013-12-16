@@ -60,6 +60,9 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
 
     private void updateAgent(Response response, boolean register) {
         try {
+            if (response.getUuid() == null) {
+                throw new Exception("Error " + (register ? "registering" : "updating") + " agent: UUID is null " + response);
+            }
             Agent agent = new Agent();
             agent.setUuid(response.getUuid());
             agent.setHostname(response.getHostname());
@@ -70,6 +73,9 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
                 agent.setIsLXC(response.isIsLxc());
             }
             agent.setListIP(response.getIps());
+            if (agent.getHostname() == null || agent.getHostname().trim().isEmpty()) {
+                agent.setHostname(agent.getUuid().toString());
+            }
             if (agent.isIsLXC()) {
                 if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
                     agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
@@ -105,24 +111,15 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
                     //
                 }
                 agentNotifier.refresh = true;
-                System.out.println(agent + String.format("\nAgent is %s", register ? "registered" : "updated"));
+                System.out.println(String.format("Agent %s is %s", agent.getHostname(), register ? "registered" : "updated"));
             } else {
-                System.out.println(agent + String.format("\nError %s agent", register ? "registering" : "updating"));
+                System.out.println(String.format("\nError %s agent %s", register ? "registering" : "updating", agent.getHostname()));
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in updatAgent", ex);
         }
     }
 
-//    private void notifyModules() {
-//        for (AgentListener ai : listeners) {
-//            if (ai != null) {
-//                ai.onAgent();
-//            } else {
-//                listeners.remove(ai);
-//            }
-//        }
-//    }
     @Override
     public void addListener(AgentListener listener) {
         try {
