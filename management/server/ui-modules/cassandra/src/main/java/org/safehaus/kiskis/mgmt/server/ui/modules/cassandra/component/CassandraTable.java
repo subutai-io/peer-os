@@ -40,8 +40,9 @@ public class CassandraTable extends Table {
         this.addListener(new Table.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                String caption = container.getItem(event.getProperty().getValue())
-                        .getItemProperty(CassandraClusterInfo.NAME_LABEL).getValue().toString();
+//                String caption = container.getItem(event.getProperty().getValue())
+//                        .getItemProperty(CassandraClusterInfo.NAME_LABEL).getValue().toString();
+                String caption = "some caption";
                 List<UUID> list = (List<UUID>) container.getItem(event.getProperty().getValue())
                         .getItemProperty(CassandraClusterInfo.NODES_LABEL).getValue();
 

@@ -17,15 +17,17 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
  */
-public class NodesWindow extends Window {
+public class NodesWindow extends Window implements CommandListener{
 
     private final Table table;
     private IndexedContainer container;
@@ -71,6 +73,7 @@ public class NodesWindow extends Window {
 
         return container;
     }
+    
 
     private void addOrderToContainer(Container container, final Agent agent) {
         Object itemId = container.addItem();
@@ -104,22 +107,24 @@ public class NodesWindow extends Window {
                         null,
                         null);
                 commandManager.executeCommand(command);
+                task.setTaskStatus(TaskStatus.SUCCESS);
+                commandManager.saveTask(task);
             }
         });
-        Button stopButton = new Button("Start");
+        Button stopButton = new Button("Stop");
         stopButton.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Task task = new Task();
-                task.setDescription("Starting node");
+                task.setDescription("Stopping node");
                 task.setTaskStatus(TaskStatus.NEW);
                 int reqSeqNumber = task.getIncrementedReqSeqNumber();
 
                 Command command = (Command) CommandFactory.createRequest(
                         RequestType.EXECUTE_REQUEST,
                         agent.getUuid(),
-                        "CassandraNodeStart",
+                        "CassandraNodeStop",
                         task.getUuid(),
                         reqSeqNumber,
                         "/",
@@ -133,6 +138,8 @@ public class NodesWindow extends Window {
                         null);
                 commandManager.executeCommand(command);
                 getWindow().showNotification("Stop cassandra cluster");
+                task.setTaskStatus(TaskStatus.SUCCESS);
+                commandManager.saveTask(task);
             }
         });
 //        Button destroyButton = new Button("Destroy");
@@ -160,5 +167,10 @@ public class NodesWindow extends Window {
         }
 
         return null;
+    }
+
+    @Override
+    public void onCommand(Response response) {
+        System.out.println("RESPONSE " + response.getStdOut() + " EXIT CODE " + response.getExitCode());
     }
 }
