@@ -15,7 +15,7 @@ import com.vaadin.ui.*;
 public class Step8 extends FormLayout {
 
     public Step8(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration Step43");
+        setCaption("Configuration Step8");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

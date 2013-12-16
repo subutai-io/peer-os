@@ -17,7 +17,7 @@ public class Step7 extends Panel {
             "cassandra-node4", "cassandra-node5"};
 
     public Step7(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration Step42");
+        setCaption("Configuration Step7");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

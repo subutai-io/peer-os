@@ -27,7 +27,7 @@ public class Step2 extends Panel {
 
     //    private static final List<String> hosts = Arrays.asList(new String[]{
 //            "cassandra-node1", "cassandra-node2", "cassandra-node3", "cassandra-node4", "cassandra-node5"});
-    List<Agent> hosts;
+//    List<Agent> hosts;
     CassandraWizard cassandraWizard;
     String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
 //    String listenAddressCommand = "sed -i 's/listen_address: localhost/listen_address: %ip/g' /opt/cassandra-2.0.0/conf/cassandra.yaml";
@@ -78,7 +78,7 @@ public class Step2 extends Panel {
         BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, this.cassandraWizard.getLxcList());
 
         final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
-
+        hostSelect.setItemCaptionPropertyId("hostname");
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
         hostSelect.setMultiSelect(true);

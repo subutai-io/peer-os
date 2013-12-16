@@ -28,7 +28,7 @@ public class Step6 extends Panel {
     String changeNameCommand = "sed -i \"$(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)\"'s/Test Cluster/'\"%name\"'/' /opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     public Step6(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration Step41");
+        setCaption("Configuration Step6");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -67,6 +67,7 @@ public class Step6 extends Panel {
         final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
 
         hostSelect.setRows(6); // perfect length in out case
+        hostSelect.setItemCaptionPropertyId("hostname");
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
         hostSelect.setMultiSelect(true);
         hostSelect.addListener(new Property.ValueChangeListener() {

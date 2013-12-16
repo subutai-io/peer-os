@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -36,7 +37,7 @@ public class Step4 extends Panel {
     public Step4(final CassandraWizard cassandraWizard) {
         parent = cassandraWizard;
 
-        setCaption("List nodes Step21");
+        setCaption("List nodes Step4");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -80,9 +81,11 @@ public class Step4 extends Panel {
 //            agentUuids.add(agent.getUuid());
 //        }
 //        cassandraWizard.getCluster().setNodes(agentUuids);
-        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", cassandraWizard.getLxcList());
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
 
         hostSelect.setRows(6); // perfect length in out case
+        hostSelect.setItemCaptionPropertyId("hostname");
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
         hostSelect.setMultiSelect(true);
         hostSelect.addListener(new Property.ValueChangeListener() {

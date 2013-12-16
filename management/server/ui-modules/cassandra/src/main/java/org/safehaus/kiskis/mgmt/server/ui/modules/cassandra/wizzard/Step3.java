@@ -59,7 +59,7 @@ public class Step3 extends Panel {
         grid.setComponentAlignment(verticalLayoutForm, Alignment.MIDDLE_CENTER);
 
         next = new Button("Next");
-        next.setEnabled(false);
+        next.setEnabled(true);
         next.addListener(new Button.ClickListener() {
 
             @Override
@@ -90,7 +90,7 @@ public class Step3 extends Panel {
         Label label1 = new Label("<strong>" + msg + "</strong><br>");
         label1.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(label1);
-        next.setEnabled(true);
+//        next.setEnabled(true);
     }
 
 }
