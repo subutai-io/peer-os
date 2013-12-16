@@ -176,6 +176,10 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
         return persistenceCommand.getCassandraClusterInfo();
     }
 
+    public Task getTask(UUID uuid) {
+        return persistenceCommand.getTask(uuid);
+    }
+
     @Override
     public List<ParseResult> parseTask(Task task, boolean isResponseDone) {
         List<ParseResult> result = new ArrayList<ParseResult>();

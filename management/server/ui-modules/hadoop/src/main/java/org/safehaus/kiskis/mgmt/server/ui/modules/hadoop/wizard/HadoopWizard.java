@@ -1,16 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util.HadoopInstallation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 import java.util.List;
@@ -20,21 +18,20 @@ public final class HadoopWizard extends Window {
     private final CommandManagerInterface commandManagerInterface;
 
     private final VerticalLayout verticalLayout;
-    private Task task;
-    private String clusterName;
+    HadoopInstallation hadoopInstallation;
     private List<Agent> lxcList;
-    private IndexedContainer container;
 
-    private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
-    private static final int MAX_STEPS = 2;
+    private static final int MAX_STEPS = 3;
 
     Step1 step1;
     Step2 step2;
+    Step3 step3;
     int step = 1;
 
     public HadoopWizard(List<Agent> lxcList) {
         setModal(true);
+        hadoopInstallation = new HadoopInstallation(getCommandManager());
 
         this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
@@ -59,24 +56,12 @@ public final class HadoopWizard extends Window {
         verticalLayout.setSpacing(true);
         verticalLayout.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        gridLayout.addComponent(verticalLayout, 0, 1, 0, 13);
+        gridLayout.addComponent(verticalLayout, 0, 1, 0, 14);
         gridLayout.setComponentAlignment(verticalLayout, Alignment.MIDDLE_CENTER);
-
-        textAreaTerminal = new TextArea();
-        textAreaTerminal.setRows(5);
-        textAreaTerminal.setColumns(65);
-        textAreaTerminal.setImmediate(true);
-        textAreaTerminal.setWordwrap(true);
-        gridLayout.addComponent(textAreaTerminal, 0, 14);
-        gridLayout.setComponentAlignment(textAreaTerminal, Alignment.MIDDLE_CENTER);
 
         putForm();
 
         setContent(gridLayout);
-    }
-
-    public void runCommand(Command command) {
-        commandManagerInterface.executeCommand(command);
     }
 
     public void showNext() {
@@ -104,6 +89,13 @@ public final class HadoopWizard extends Window {
                 verticalLayout.addComponent(step2);
                 break;
             }
+            case 3: {
+                this.setClosable(false);
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                step3 = new Step3(this);
+                verticalLayout.addComponent(step3);
+                break;
+            }
             default: {
                 this.close();
                 break;
@@ -111,47 +103,12 @@ public final class HadoopWizard extends Window {
         }
     }
 
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
     public void setOutput(Response response) {
-        if(task != null){
-            if (response.getTaskUuid().equals(task.getUuid().toString())) {
-                StringBuilder output = new StringBuilder();
-                output.append(textAreaTerminal.getValue());
-                if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
-                    output.append("ERROR ").append(response.getStdErr().trim());
-                }
-                if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                    output.append("OK ").append(response.getStdOut().trim());
-                }
-                switch (step) {
-                    case 1: {
-                        break;
-                    }
-                    case 2: {
-                        break;
-                    }
-
-                }
-
-                textAreaTerminal.setValue(output);
-                textAreaTerminal.setCursorPosition(output.length() - 1);
-            }
-        }
+        hadoopInstallation.onCommand(response, step3);
     }
 
-    public String getClusterName() {
-        return clusterName;
-    }
-
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    public HadoopInstallation getHadoopInstallation() {
+        return hadoopInstallation;
     }
 
     public List<Agent> getLxcList() {

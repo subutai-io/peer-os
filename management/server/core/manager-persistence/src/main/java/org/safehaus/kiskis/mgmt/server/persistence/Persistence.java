@@ -469,9 +469,9 @@ public class Persistence implements PersistenceInterface {
             String cql = "select * from requests";
             ResultSet rs;
             if (taskuuid == null) {
-                rs = session.execute("select * from requests");
+                rs = session.execute("select * from requests order by agentuuid, reqseqnum;");
             } else {
-                cql += " WHERE taskuuid = ?;";
+                cql += " WHERE taskuuid = ? order by agentuuid, reqseqnum;;";
                 PreparedStatement stmt = session.prepare(cql);
 
                 BoundStatement boundStatement = new BoundStatement(stmt);
@@ -527,6 +527,27 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
         }
         return list;
+    }
+
+    @Override
+    public Task getTask(UUID uuid) {
+        Task task = new Task();
+        try {
+            String cql = "select * from tasks where uuid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            for (Row row : rs) {
+                task.setUuid(row.getUUID("uuid"));
+                task.setDescription(row.getString("description"));
+                task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
+            }
+
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getTask", ex);
+        }
+        return task;
     }
 
     @Override

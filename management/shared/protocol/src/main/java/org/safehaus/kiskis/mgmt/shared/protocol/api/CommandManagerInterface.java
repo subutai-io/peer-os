@@ -32,6 +32,8 @@ public interface CommandManagerInterface {
 
     public List<Task> getTasks();
 
+    public Task getTask(UUID uuid);
+
     public boolean truncateTables();
 
     public boolean saveCassandraClusterData(CassandraClusterInfo cluster);

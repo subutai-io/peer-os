@@ -32,7 +32,7 @@ public class LxcTable extends Table {
             "\t    \"taskUuid\": \":task\",\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/lxc-ls\",\n" +
+            "\t    \"program\": \"/usr/bin/lxc-list\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -148,11 +148,14 @@ public class LxcTable extends Table {
 
         if (lxcs.length > 0) {
             infoTask = createTask("Info lxc container");
-            // Create some orders
             for (String lxc : lxcs) {
-                if (!Strings.isNullOrEmpty(lxc.trim()) && !lxc.trim().equals("base-container")) {
+                if (!Strings.isNullOrEmpty(lxc.trim())
+                        && !lxc.trim().equals("base-container")
+                        && !lxc.trim().equals("RUNNING")
+                        && !lxc.trim().equals("FROZEN")
+                        && !lxc.trim().equals("STOPPED")) {
                     addOrderToContainer(container, lxc.trim());
-                    createRequest(INFO_LXC, infoTask, lxc);
+                    createRequest(INFO_LXC, infoTask, lxc.trim());
                 }
             }
         }
