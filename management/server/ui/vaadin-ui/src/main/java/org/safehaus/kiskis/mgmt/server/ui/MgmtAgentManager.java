@@ -28,9 +28,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public final class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentListener {
 
-    private AgentManagerInterface agentManagerInterface;
+    private final AgentManagerInterface agentManagerInterface;
     private List<Agent> registeredAgents;
-    private Tree tree;
+    private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
 
@@ -42,7 +42,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setMultiSelect(true);
         tree.setImmediate(true);
-        tree.addListener(this);
+        tree.addListener(this) ;
         addComponent(getRefreshButton());
         addComponent(tree);
         agentManagerService.addListener(this);
@@ -73,7 +73,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
     }
 
     private Button getRefreshButton() {
-        Button button = new Button("Refresh agents");
+        Button button = new Button("Refresh");
         button.setDescription("Gets LXC agents from Cassandra");
         button.addListener(new Button.ClickListener() {
             @Override
