@@ -26,8 +26,8 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.0
- *  @date      Sep 27, 2013
+ *  @version   1.0.1
+ *  @date      Dec 17, 2013
  */
 
 /** \mainpage  Welcome to Project KiskisAgent
@@ -233,13 +233,13 @@ bool checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* e
 			{
 				*count = *count + (currentsec - *startsec);
 				*overflag = true;
-				*startsec = 0;
+				*startsec = 1;
 			}
 		}
 		if(currentsec == 59)
 		{
 			*overflag = true;
-			*startsec = 0;
+			*startsec = 1;
 		}
 		else
 		{
@@ -411,10 +411,10 @@ int main(int argc,char *argv[],char *envp[])
 	umask(0);
 
 	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
-	unsigned int exectimeout = 60; //60 seconds for HeartBeat Default Timeout
+	unsigned int exectimeout = 175; //180 seconds for HeartBeat Default Timeout
 	unsigned int startsec  =  start.time_of_day().seconds();
 	bool overflag = false;
-	unsigned int count = 0;
+	unsigned int count = 1;
 
 	while(true)
 	{
@@ -435,8 +435,8 @@ int main(int argc,char *argv[],char *envp[])
 				start = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Default Timeout values
 				startsec  =  start.time_of_day().seconds();
 				overflag = false;
-				exectimeout = 60;
-				count = 0;
+				exectimeout = 175;
+				count = 1;
 			}
 			usleep(20000);//20 ms delay for the main loop
 			command.clear();
