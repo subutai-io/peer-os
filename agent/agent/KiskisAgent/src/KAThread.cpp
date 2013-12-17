@@ -393,13 +393,13 @@ bool KAThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsig
 			{
 				*count = *count + (currentsec - *startsec);
 				*overflag = true;
-				*startsec = 0;
+				*startsec = 1;
 			}
 		}
 		if(currentsec == 59)
 		{
 			*overflag = true;
-			*startsec = 0;
+			*startsec = 1;
 		}
 		else
 		{
