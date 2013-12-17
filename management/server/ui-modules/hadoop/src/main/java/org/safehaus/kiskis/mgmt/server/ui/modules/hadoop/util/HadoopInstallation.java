@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util;
 
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -38,13 +39,10 @@ public class HadoopInstallation {
 
         hadoopInstallationTask = createTask("Setup Hadoop cluster");
         createInstallationRequest();
-
-        if (hadoopInstallationTask.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-            configureHadoop();
-        }
     }
 
     public void configureHadoop() {
+        System.out.println("Hadoop configuration");
         hadoopConfigureTask = createTask("Configure Hadoop cluster");
         createConfigureRequest();
     }
@@ -53,9 +51,7 @@ public class HadoopInstallation {
         Task clusterTask = new Task();
         clusterTask.setTaskStatus(TaskStatus.NEW);
         clusterTask.setDescription(description);
-
-        setHadoopInstallationTask(clusterTask);
-        commandManager.saveTask(hadoopInstallationTask);
+        commandManager.saveTask(clusterTask);
 
         return clusterTask;
     }
@@ -98,10 +94,41 @@ public class HadoopInstallation {
     }
 
     public void onCommand(Response response, Step3 panel) {
-        hadoopInstallationTask = commandManager.getTask(hadoopInstallationTask.getUuid());
-        List<ParseResult> resultList = commandManager.parseTask(hadoopInstallationTask, true);
-        for (ParseResult pr : resultList) {
-            panel.addOutput(hadoopInstallationTask, pr.getResponse());
+        if (response.getTaskUuid().compareTo(hadoopInstallationTask.getUuid()) == 0) {
+            List<ParseResult> resultList = commandManager.parseTask(hadoopInstallationTask, true);
+            hadoopInstallationTask = commandManager.getTask(hadoopInstallationTask.getUuid());
+
+            if (resultList.size() > 0 && hadoopInstallationTask.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                panel.addOutput(hadoopInstallationTask, " successfully finished.");
+                if (hadoopConfigureTask == null) {
+                    configureHadoop();
+                }
+            } else if (hadoopInstallationTask.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (ParseResult pr : resultList) {
+                    if (!Strings.isNullOrEmpty(pr.getResponse().getStdErr())) {
+                        stringBuilder.append("\n");
+                        stringBuilder.append(pr.getResponse().getStdErr());
+                    }
+                }
+                panel.addOutput(hadoopInstallationTask, " failed.\nDetails: " + stringBuilder);
+            }
+        } else if (response.getTaskUuid().compareTo(hadoopConfigureTask.getUuid()) == 0) {
+            List<ParseResult> resultList = commandManager.parseTask(hadoopConfigureTask, true);
+            hadoopConfigureTask = commandManager.getTask(hadoopConfigureTask.getUuid());
+
+            if (resultList.size() > 0 && hadoopConfigureTask.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                panel.addOutput(hadoopConfigureTask, " successfully finished.");
+            } else if (hadoopConfigureTask.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (ParseResult pr : resultList) {
+                    if (!Strings.isNullOrEmpty(pr.getResponse().getStdErr())) {
+                        stringBuilder.append("\n");
+                        stringBuilder.append(pr.getResponse().getStdErr());
+                    }
+                }
+                panel.addOutput(hadoopConfigureTask, " failed.\nDetails: " + stringBuilder);
+            }
         }
     }
 

@@ -8,7 +8,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -77,29 +76,30 @@ public class Step3 extends Panel {
 
         addComponent(verticalLayout);
 
+        parent.setClosable(true);
         parent.getHadoopInstallation().installHadoop();
     }
 
-    public void addOutput(Task task, Response response) {
+    public void addOutput(Task task, String stdResult) {
         if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-            if(!Strings.isNullOrEmpty(response.getStdOut()) && !response.getStdOut().equals("null")) {
+            if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
+                StringBuffer str = new StringBuffer();
+                str.append(terminal.getValue());
+                str.append("\n");
+                str.append(task.getUuid() + " ");
+                str.append(task.getDescription());
+                str.append(stdResult);
+                terminal.setValue(str);
+            }
+        } else {
+            if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
                 str.append(terminal.getValue());
                 str.append("\n");
                 str.append(task.getDescription());
-                str.append(" successfully finished.");
-                terminal.setValue(str);
-            }
-        } else {
-            if(!Strings.isNullOrEmpty(response.getStdErr()) && !response.getStdErr().equals("null")){
-                StringBuffer str = new StringBuffer();
-                str.append(terminal.getValue());
-                str.append("\n");
-                str.append(response.getStdErr());
+                str.append(stdResult);
                 terminal.setValue(str);
             }
         }
-
-
     }
 }

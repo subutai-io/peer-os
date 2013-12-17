@@ -113,7 +113,7 @@ public class CommandTransport implements CommandTransportInterface {
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);
                 String json = CommandJson.getJson(command);
-                System.out.println("Sending: " + json);
+                LOG.info("Sending: " + json);
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
             } catch (JMSException ex) {

@@ -469,9 +469,10 @@ public class Persistence implements PersistenceInterface {
             String cql = "select * from requests";
             ResultSet rs;
             if (taskuuid == null) {
-                rs = session.execute("select * from requests order by agentuuid, reqseqnum;");
+                cql += " order by agentuuid, reqseqnum;";
+                rs = session.execute(cql);
             } else {
-                cql += " WHERE taskuuid = ? order by agentuuid, reqseqnum;;";
+                cql += " WHERE taskuuid = ? order by agentuuid, reqseqnum;";
                 PreparedStatement stmt = session.prepare(cql);
 
                 BoundStatement boundStatement = new BoundStatement(stmt);

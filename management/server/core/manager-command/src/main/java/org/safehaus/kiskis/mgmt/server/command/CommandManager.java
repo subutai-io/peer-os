@@ -189,7 +189,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             Integer responseCount = persistenceCommand.getResponsesCount(task.getUuid());
 
             if (isResponseDone) {
-                if (requestList.size() != responseCount) {
+                if (requestList.size() != responseCount || task.getTaskStatus().compareTo(TaskStatus.NEW) != 0) {
                     return result;
                 }
             }
@@ -208,7 +208,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
                 }
             }
 
-            if (isResponseDone || requestList.size() == responseCount) {
+            if (requestList.size() == responseCount) {
                 if (exitCode == 0) {
                     task.setTaskStatus(TaskStatus.SUCCESS);
                 } else {
