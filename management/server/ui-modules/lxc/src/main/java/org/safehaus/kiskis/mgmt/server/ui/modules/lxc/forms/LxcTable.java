@@ -181,7 +181,7 @@ public class LxcTable extends Table {
         item.getItemProperty("name").setValue(lxc);
 
         Button buttonStart = new Button("Start");
-        buttonStart.setEnabled(isStarted);
+        buttonStart.setEnabled(!isStarted);
         buttonStart.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -192,7 +192,7 @@ public class LxcTable extends Table {
         item.getItemProperty("Start").setValue(buttonStart);
 
         Button buttonStop = new Button("Stop");
-        buttonStop.setEnabled(!isStarted);
+        buttonStop.setEnabled(isStarted);
         buttonStop.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
