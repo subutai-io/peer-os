@@ -7,28 +7,25 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 /**
+ *
  * @author bahadyr
  */
-public class Step3 extends Panel {
+public class Step5 extends Panel {
 
-    String listenAddressCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/listen_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!listen_address: %ip!'";
-    String rpcAddressCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/rpc_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!rpc_address: %ip!'";
+    String changeNameCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!cluster_name: \"%newName\"!'";
 
-    String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
-
-    public Step3(final CassandraWizard cassandraWizard) {
-        setCaption("Configure listen address/prc address");
+    public Step5(final CassandraWizard cassandraWizard) {
+        setCaption("Rename cluster");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -43,51 +40,40 @@ public class Step3 extends Panel {
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
                 + " 1) Welcome<br>"
-                + " 2) <font color=\"#f14c1a\"><strong>List nodes</strong></font><br>"
+                + " 2) List nodes<br>"
                 + " 3) Installation<br>"
-                + " 4) Configuration<br>");
+                + " 4) <font color=\"#f14c1a\"><strong>Configuration</strong></font><br>");
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
 
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        Label label = new Label("Please enter the list of hosts to be included in the cluster");
-        label.setContentMode(Label.CONTENT_XHTML);
+        final TextField clusterName = new TextField("Name your Cluster:");
 
-        grid.addComponent(label, 2, 0, 5, 0);
-        grid.setComponentAlignment(label, Alignment.TOP_CENTER);
+        grid.addComponent(clusterName, 2, 0, 5, 1);
+        grid.setComponentAlignment(clusterName, Alignment.MIDDLE_CENTER);
 
-        Label label1 = new Label("<strong>Target Hosts</strong><br>"
-                + "<br>");
-        label1.setContentMode(Label.CONTENT_XHTML);
-
-        grid.addComponent(label1, 2, 1, 5, 1);
-        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
-
-        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
-
-        Button next = new Button("Configure listen and rpc addresses");
+        Button next = new Button("Rename cluster");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 for (Agent agent : cassandraWizard.getLxcList()) {
-                    int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
-                    UUID taskUuid = cassandraWizard.getTask().getUuid();
-                    List<String> args = new ArrayList<String>();
-//                    args.add("--force-yes");
-//                    args.add("--assume-yes");
-//                    args.add("install");
-//                    args.add("ksks-cassandra");
-//                    Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
-//                    cassandraWizard.runCommand(command);
-                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
-                    Command command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
-                    cassandraWizard.runCommand(command);
-                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
-                    command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
-                    cassandraWizard.runCommand(command);
+
+                    if (clusterName.getValue().toString().length() > 0) {
+                        int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
+                        UUID taskUuid = cassandraWizard.getTask().getUuid();
+                        List<String> args = new ArrayList<String>();
+                        changeNameCommand = changeNameCommand.replace("%newName", clusterName.getValue().toString());
+                        Command command = buildCommand(agent.getUuid(), changeNameCommand, reqSeqNumber, taskUuid, args);
+                        cassandraWizard.runCommand(command);
+                        cassandraWizard.getCluster().setName(clusterName.getValue().toString());
+                    } else {
+                        getWindow().showNotification(
+                                "Please provide cluster name.",
+                                Window.Notification.TYPE_TRAY_NOTIFICATION);
+                    }
                 }
                 cassandraWizard.showNext();
             }

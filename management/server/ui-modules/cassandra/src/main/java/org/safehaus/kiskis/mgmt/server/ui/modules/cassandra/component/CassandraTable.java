@@ -16,17 +16,15 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 11/30/13
- * Time: 6:56 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
  */
 public class CassandraTable extends Table {
-    private CommandManagerInterface commandManager;
+
+    private final CommandManagerInterface commandManager;
     private IndexedContainer container;
     private final CassandraModule.ModuleComponent parent;
 
-    public CassandraTable(CommandManagerInterface commandManager, final CassandraModule.ModuleComponent window) {
+    public CassandraTable(final CommandManagerInterface commandManager, final CassandraModule.ModuleComponent window) {
         this.commandManager = commandManager;
         this.parent = window;
 
@@ -42,12 +40,13 @@ public class CassandraTable extends Table {
         this.addListener(new Table.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                String caption = container.getItem(event.getProperty().getValue())
-                        .getItemProperty(CassandraClusterInfo.NAME_LABEL).getValue().toString();
+//                String caption = container.getItem(event.getProperty().getValue())
+//                        .getItemProperty(CassandraClusterInfo.NAME_LABEL).getValue().toString();
+                String caption = "some caption";
                 List<UUID> list = (List<UUID>) container.getItem(event.getProperty().getValue())
                         .getItemProperty(CassandraClusterInfo.NODES_LABEL).getValue();
 
-                Window window = new NodesWindow(caption, list);
+                Window window = new NodesWindow(caption, list, commandManager);
                 window.setModal(true);
                 getApplication().getMainWindow().addWindow(window);
             }
@@ -65,6 +64,7 @@ public class CassandraTable extends Table {
         container.addContainerProperty(CassandraClusterInfo.SAVEDCACHEDIR_LOG, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
+        container.addContainerProperty("Destroy", Button.class, "");
         container.addContainerProperty(CassandraClusterInfo.NODES_LABEL, List.class, 0);
         container.addContainerProperty(CassandraClusterInfo.SEEDS_LABEL, List.class, 0);
 
@@ -85,8 +85,35 @@ public class CassandraTable extends Table {
         item.getItemProperty(CassandraClusterInfo.DATADIR_LABEL).setValue(cd.getDataDir());
         item.getItemProperty(CassandraClusterInfo.COMMITLOGDIR_LABEL).setValue(cd.getCommitLogDir());
         item.getItemProperty(CassandraClusterInfo.SAVEDCACHEDIR_LOG).setValue(cd.getSavedCacheDir());
-        item.getItemProperty("Start").setValue(new Button("Start"));
-        item.getItemProperty("Stop").setValue(new Button("Stop"));
+
+        Button startButton = new Button("Start");
+        startButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Start cassandra cluster");
+            }
+        });
+        Button stopButton = new Button("Start");
+        stopButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Stop cassandra cluster");
+            }
+        });
+        Button destroyButton = new Button("Destroy");
+        destroyButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Destroy cassandra cluster");
+            }
+        });
+
+        item.getItemProperty("Start").setValue(startButton);
+        item.getItemProperty("Stop").setValue(stopButton);
+        item.getItemProperty("Destroy").setValue(destroyButton);
         item.getItemProperty(CassandraClusterInfo.NODES_LABEL).setValue(cd.getNodes());
         item.getItemProperty(CassandraClusterInfo.SEEDS_LABEL).setValue(cd.getSeeds());
     }

@@ -2,15 +2,18 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public final class CassandraWizard extends Window {
 
@@ -19,7 +22,7 @@ public final class CassandraWizard extends Window {
     private final VerticalLayout verticalLayout;
     private Task task;
     CassandraClusterInfo cluster;
-
+    private final List<Agent> lxcList;
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 5;
@@ -27,17 +30,18 @@ public final class CassandraWizard extends Window {
     Step1 step1;
     Step2 step2;
     Step3 step3;
-    Step41 step41;
-    Step42 step42;
-    Step43 step43;
+    Step4 step4;
+    Step5 step5;
+    Step6 step6;
     int step = 1;
 
     /**
-     * 
+     *
+     * @param lxcList
      */
-    public CassandraWizard() {
+    public CassandraWizard(List<Agent> lxcList) {
         setModal(true);
-
+        this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
         setCaption("Cassandra Wizard");
 
@@ -50,6 +54,7 @@ public final class CassandraWizard extends Window {
         progressBar = new ProgressIndicator();
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(true);
+        progressBar.setPollingInterval(30000);
         progressBar.setValue(0f);
         progressBar.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         gridLayout.addComponent(progressBar, 0, 0);
@@ -112,25 +117,30 @@ public final class CassandraWizard extends Window {
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step41 = new Step41(this);
-                verticalLayout.addComponent(step41);
+                step4 = new Step4(this);
+                verticalLayout.addComponent(step4);
                 break;
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step42 = new Step42(this);
-                verticalLayout.addComponent(step42);
+                step5 = new Step5(this);
+                verticalLayout.addComponent(step5);
                 break;
             }
             case 6: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step43 = new Step43(this);
-                verticalLayout.addComponent(step43);
-                commandManagerInterface.saveCassandraClusterData(cluster);
+                step6 = new Step6(this);
+                verticalLayout.addComponent(step6);
                 break;
+            }
+            case 7: {
+                commandManagerInterface.saveCassandraClusterData(cluster);
+                task.setTaskStatus(TaskStatus.SUCCESS);
+                commandManagerInterface.saveTask(task);
             }
             default: {
                 this.close();
+                removeWindow(this);
                 break;
             }
         }
@@ -153,7 +163,7 @@ public final class CassandraWizard extends Window {
     }
 
     public void setOutput(Response response) {
-        if (response.getTaskUuid().toString().equals(task.getUuid().toString())) {
+        if (task != null && response.getTaskUuid().toString().equals(task.getUuid().toString())) {
             StringBuilder output = new StringBuilder();
             output.append(textAreaTerminal.getValue());
             if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
@@ -162,6 +172,7 @@ public final class CassandraWizard extends Window {
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
                 output.append("OK ").append(response.getStdOut().trim());
             }
+
             switch (response.getType()) {
                 case EXECUTE_RESPONSE_DONE: {
                     switch (step) {
@@ -172,21 +183,19 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 3: {
-                            step3.updateUI(response.getRequestSequenceNumber() + " "
-                                    + response.getTaskUuid() + " "
-                                    + " " + (response.getExitCode() == 0 ? "Success" : "Fail"));
+//                            step3.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 4: {
                             break;
                         }
                         case 5: {
+//                            step5.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 6: {
                             break;
                         }
-
                     }
                 }
             }
@@ -205,8 +214,11 @@ public final class CassandraWizard extends Window {
                 return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
             }
         }
-        
-        
+
         return null;
+    }
+
+    public List<Agent> getLxcList() {
+        return lxcList;
     }
 }

@@ -81,13 +81,13 @@ public class Step3 extends Panel {
     }
 
     public void addOutput(Task task, Response response) {
-        if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+        System.out.println(response);
+        if (task.getTaskStatus().equals(TaskStatus.SUCCESS)) {
             if(!Strings.isNullOrEmpty(response.getStdOut()) && !response.getStdOut().equals("null")) {
                 StringBuffer str = new StringBuffer();
                 str.append(terminal.getValue());
                 str.append("\n");
-                str.append(task.getDescription());
-                str.append(" successfully finished.");
+                str.append(response.getStdOut());
                 terminal.setValue(str);
             }
         } else {

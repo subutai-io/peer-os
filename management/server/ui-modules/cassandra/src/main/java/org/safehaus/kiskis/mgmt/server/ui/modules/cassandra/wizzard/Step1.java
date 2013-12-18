@@ -17,7 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public class Step1 extends Panel {
 
     public Step1(final CassandraWizard cassandraWizard) {
-        setCaption("Welcome");
+        setCaption("Welcome Step1");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -49,7 +49,7 @@ public class Step1 extends Panel {
         grid.addComponent(label, 2, 0, 5, 9);
         grid.setComponentAlignment(label, Alignment.TOP_CENTER);
 
-        Button next = new Button("Next");
+        Button next = new Button("Start");
         next.addListener(new Button.ClickListener() {
 
             @Override

@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms;
 
 import com.google.common.base.Strings;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
@@ -46,14 +45,13 @@ public class LxcCloneForm extends VerticalLayout implements
             "\" && cat /dev/null > /etc/resolvconf/resolv.conf.d/original " +
             "&& cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original\"\n" +
             "\t    ],\n" +
-            "\t    \"timeout\": 360\n" +
+            "\t    \"timeout\": 180\n" +
             "\t  }\n" +
             "\t}";
 
     private Set<Agent> physicalAgents;
     private Task cloneTask;
     private TextField textFieldLxcName;
-    private Slider slider;
     private Button buttonClone;
     private Panel outputPanel;
 
@@ -61,21 +59,13 @@ public class LxcCloneForm extends VerticalLayout implements
         setSpacing(true);
         // Panel 1 - with caption
         Panel panel = new Panel("Clone LXC template");
-
         textFieldLxcName = new TextField("Clone LXC Template");
-        slider = new Slider("Select lxc count");
-        slider.setMin(1);
-        slider.setMax(20);
-        slider.setWidth(150, Sizeable.UNITS_PIXELS);
-        slider.setImmediate(true);
         buttonClone = new Button("Clone");
         buttonClone.addListener(this);
 
         HorizontalLayout hLayout = new HorizontalLayout();
-        hLayout.setSpacing(true);
 
         hLayout.addComponent(textFieldLxcName);
-        hLayout.addComponent(slider);
         hLayout.addComponent(buttonClone);
         hLayout.setComponentAlignment(textFieldLxcName, Alignment.BOTTOM_CENTER);
         hLayout.setComponentAlignment(buttonClone, Alignment.BOTTOM_CENTER);
@@ -128,21 +118,18 @@ public class LxcCloneForm extends VerticalLayout implements
         jsonTemplate = jsonTemplate.replaceAll(":task", cloneTask.getUuid().toString());
         jsonTemplate = jsonTemplate.replaceAll(":source", LxcModule.MODULE_NAME);
 
-        Double count = (Double) slider.getValue();
-        for (int i = 1; i <= count; i++) {
-            for (Agent agent : physicalAgents) {
-                String json = jsonTemplate.replaceAll(":uuid", agent.getUuid().toString());
-                json = json.replaceAll(":requestSequenceNumber", cloneTask.getIncrementedReqSeqNumber().toString());
-                json = json.replaceAll(":lxc-host-name",
-                        agent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR + textFieldLxcName.getValue().toString() + i);
+        for (Agent agent : physicalAgents) {
+            String json = jsonTemplate.replaceAll(":uuid", agent.getUuid().toString());
+            json = json.replaceAll(":requestSequenceNumber", cloneTask.getIncrementedReqSeqNumber().toString());
+            json = json.replaceAll(":lxc-host-name",
+                    agent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR + textFieldLxcName.getValue().toString());
 
-                Request request = CommandJson.getRequest(json);
-                if (getCommandManager() != null) {
-                    getCommandManager().executeCommand(new Command(request));
-                }
-
-                buttonClone.setEnabled(false);
+            Request request = CommandJson.getRequest(json);
+            if (getCommandManager() != null) {
+                getCommandManager().executeCommand(new Command(request));
             }
+
+            buttonClone.setEnabled(false);
         }
     }
 
@@ -154,7 +141,6 @@ public class LxcCloneForm extends VerticalLayout implements
 
     public void setTaskStatus() {
         if (getCommandManager() != null) {
-            outputPanel.removeAllComponents();
             List<ParseResult> result = getCommandManager().parseTask(cloneTask, true);
             for (ParseResult pr : result) {
                 if (pr.getResponse().getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
@@ -165,16 +151,9 @@ public class LxcCloneForm extends VerticalLayout implements
 
                         buttonClone.setEnabled(true);
                     } else {
-                        if (pr.getResponse().getStdErr().contains("unable to write 'random state'")) {
-                            Label labelOk = new Label(pr.getResponse().getStdOut());
-                            labelOk.setIcon(new ThemeResource("icons/16/ok.png"));
-                            outputPanel.addComponent(labelOk);
-                        } else {
-                            Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
-                            labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
-                            outputPanel.addComponent(labelError);
-                        }
-
+                        Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
+                        labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
+                        outputPanel.addComponent(labelError);
 
                         buttonClone.setEnabled(true);
                     }

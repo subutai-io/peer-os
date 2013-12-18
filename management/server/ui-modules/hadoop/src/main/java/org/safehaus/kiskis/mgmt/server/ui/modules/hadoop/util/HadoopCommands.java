@@ -34,12 +34,12 @@ public class HadoopCommands {
              "\t    \"taskUuid\": :taskUuid,\n" +
              "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
              "\t    \"workingDirectory\": \"/\",\n" +
-             "\t    \"program\": \". /etc/profile && hadoop-configure.sh\",\n" +
+             "\t    \"program\": \"hadoop-configure.sh\",\n" +
              "\t    \"stdOut\": \"RETURN\",\n" +
              "\t    \"stdErr\": \"RETURN\",\n" +
              "\t    \"runAs\": \"root\",\n" +
              "\t    \"args\": [\n" +
-             "\t      \":namenode:8020\",\":jobtracker:9000\",\":replicationfactor\"\n" +
+             "\t      \"hdfs://:namenode:8020\",\":jobtracker:9000\",\":replicationfactor\"\n" +
              "\t    ],\n" +
              "\t    \"timeout\": 180\n" +
              "\t  }\n" +

@@ -19,6 +19,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private final ModuleService moduleService;
     private final AgentManagerInterface agentManagerService;
     private Window window;
+    private MgmtAgentManager mgmtAgentManager;
 
     public MgmtApplication(String title, ModuleService moduleService, AgentManagerInterface agentManagerService) {
         this.moduleService = moduleService;

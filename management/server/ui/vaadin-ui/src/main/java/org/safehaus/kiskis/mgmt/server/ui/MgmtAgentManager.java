@@ -38,6 +38,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
+        //setSpacing(true);
         setMargin(true);
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setMultiSelect(true);
@@ -79,7 +80,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                tree.setValue(null);
                 container.removeAllItems();
                 registeredAgents.clear();
                 if (AppData.getSelectedAgentList() != null) {

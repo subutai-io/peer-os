@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public class HadoopInstallation {
     private Task hadoopInstallationTask;
-    private Task hadoopConfigureTask;
+
 
     private String clusterName;
     private Agent nameNode, jobTracker, sNameNode;
@@ -29,22 +29,13 @@ public class HadoopInstallation {
     private List<Agent> allSlaveNodes;
     private CommandManagerInterface commandManager;
 
-    public HadoopInstallation(CommandManagerInterface commandManagerInterface) {
+    public HadoopInstallation(CommandManagerInterface commandManagerInterface){
         this.commandManager = commandManagerInterface;
     }
 
-    public void installHadoop() {
-        hadoopInstallationTask = createTask("Setup Hadoop cluster");
+    public void installHadoop(){
+        hadoopInstallationTask = createTask("Setup Hadoop package");
         createInstallationRequest();
-
-        if (hadoopInstallationTask.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-            configureHadoop();
-        }
-    }
-
-    public void configureHadoop() {
-        hadoopConfigureTask = createTask("Configure Hadoop cluster");
-        createConfigureRequest();
     }
 
     private Task createTask(String description) {
@@ -60,19 +51,36 @@ public class HadoopInstallation {
         return clusterTask;
     }
 
-
-    private void createInstallationRequest() {
-        for (Agent agent : allNodes) {
-            if (agent != null) {
-                createRequest(HadoopCommands.INSTALL_HADOOP, hadoopInstallationTask, agent);
-            }
+    private void removeDuplicateAgents() {
+        Set<Agent> allAgents = new HashSet<Agent>();
+        if(dataNodes != null){
+            allAgents.addAll(dataNodes);
         }
+        if(taskTrackers != null){
+            allAgents.addAll(taskTrackers);
+        }
+
+        this.allSlaveNodes = new ArrayList<Agent>();
+        this.allSlaveNodes.addAll(allAgents);
+
+        if(nameNode != null){
+            allAgents.add(nameNode);
+        }
+        if(jobTracker != null){
+            allAgents.add(jobTracker);
+        }
+        if(sNameNode != null){
+            allAgents.add(sNameNode);
+        }
+
+        this.allNodes = new ArrayList<Agent>();
+        this.allNodes.addAll(allAgents);
     }
 
-    private void createConfigureRequest() {
-        for (Agent agent : allNodes) {
-            if (agent != null) {
-                createRequest(HadoopCommands.CONFIGURE_SLAVES, hadoopConfigureTask, agent);
+    private void createInstallationRequest() {
+        for(Agent agent : allNodes){
+            if(agent != null){
+                createRequest(HadoopCommands.INSTALL_HADOOP, hadoopInstallationTask, agent);
             }
         }
     }
@@ -85,10 +93,6 @@ public class HadoopInstallation {
         json = json.replaceAll(":uuid", agent.getUuid().toString());
         json = json.replaceAll(":requestSequenceNumber", task.getIncrementedReqSeqNumber().toString());
 
-        json = json.replaceAll(":namenode", nameNode.getHostname());
-        json = json.replaceAll(":jobtracker", jobTracker.getHostname());
-        json = json.replaceAll(":replicationfactor", replicationFactor.toString());
-
         Request request = CommandJson.getRequest(json);
         if (commandManager != null) {
             commandManager.executeCommand(new Command(request));
@@ -97,38 +101,11 @@ public class HadoopInstallation {
         return request;
     }
 
-    public void onCommand(Response response, Step3 panel) {
-        hadoopInstallationTask = commandManager.getTask(hadoopInstallationTask.getUuid());
+    public void onCommand(Response response, Step3 panel){
         List<ParseResult> resultList = commandManager.parseTask(hadoopInstallationTask, true);
-        for (ParseResult pr : resultList) {
-            panel.addOutput(hadoopInstallationTask, pr.getResponse());
+        for(ParseResult pr : resultList){
+           panel.addOutput(hadoopInstallationTask, pr.getResponse());
         }
-    }
-
-    private void removeDuplicateAgents() {
-        Set<Agent> allAgents = new HashSet<Agent>();
-        if (dataNodes != null) {
-            allAgents.addAll(dataNodes);
-        }
-        if (taskTrackers != null) {
-            allAgents.addAll(taskTrackers);
-        }
-
-        this.allSlaveNodes = new ArrayList<Agent>();
-        this.allSlaveNodes.addAll(allAgents);
-
-        if (nameNode != null) {
-            allAgents.add(nameNode);
-        }
-        if (jobTracker != null) {
-            allAgents.add(jobTracker);
-        }
-        if (sNameNode != null) {
-            allAgents.add(sNameNode);
-        }
-
-        this.allNodes = new ArrayList<Agent>();
-        this.allNodes.addAll(allAgents);
     }
 
     public Task getHadoopInstallationTask() {

@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 public class LxcModule implements Module {
 
+
     private static final Logger LOG = Logger.getLogger(LxcModule.class.getName());
     private ModuleService service;
     private BundleContext context;
