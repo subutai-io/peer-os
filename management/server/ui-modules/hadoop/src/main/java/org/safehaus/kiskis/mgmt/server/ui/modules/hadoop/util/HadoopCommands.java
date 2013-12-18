@@ -115,7 +115,7 @@ public class HadoopCommands {
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \"slaves\",\":slave1-hostname\"\n" +
+            "\t      \"slaves\",\":slave-hostname\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
@@ -153,7 +153,7 @@ public class HadoopCommands {
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \"slaves\",\":slave1-hostname\"\n" +
+            "\t      \"slaves\",\":slave-hostname\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +

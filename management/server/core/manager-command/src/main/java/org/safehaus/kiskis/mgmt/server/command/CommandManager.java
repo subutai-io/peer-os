@@ -189,7 +189,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             Integer responseCount = persistenceCommand.getResponsesCount(task.getUuid());
 
             if (isResponseDone) {
-                if (requestList.size() != responseCount || task.getTaskStatus().compareTo(TaskStatus.NEW) != 0) {
+                if (requestList.size() != responseCount) {
                     return result;
                 }
             }

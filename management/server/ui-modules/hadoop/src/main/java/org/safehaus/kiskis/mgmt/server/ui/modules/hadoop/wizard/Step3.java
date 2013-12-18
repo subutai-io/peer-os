@@ -84,7 +84,6 @@ public class Step3 extends Panel {
         if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
             if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
-                str.append(terminal.getValue());
                 str.append("\n");
                 str.append(task.getUuid() + " ");
                 str.append(task.getDescription());
@@ -94,7 +93,6 @@ public class Step3 extends Panel {
         } else {
             if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
-                str.append(terminal.getValue());
                 str.append("\n");
                 str.append(task.getDescription());
                 str.append(stdResult);
