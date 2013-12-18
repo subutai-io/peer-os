@@ -14,36 +14,47 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 12/1/13
- * Time: 1:38 AM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
  */
-public class NodesWindow extends Window {
-    private Table table;
+public class NodesWindow extends Window implements CommandListener{
+
+    private final Table table;
     private IndexedContainer container;
-    private List<UUID> list;
-    
-    
+    private final List<UUID> list;
+    private final CommandManagerInterface commandManager;
+
     /**
-     * 
+     *
      * @param caption
-     * @param list 
+     * @param list
+     * @param commandManager
      */
-    public NodesWindow(String caption, List<UUID> list){
+    public NodesWindow(String caption, List<UUID> list, CommandManagerInterface commandManager) {
         this.list = list;
         setCaption(caption);
         setSizeUndefined();
+        setWidth("600px");
+        setHeight("400px");
 
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
 
-        table.setPageLength(20);
+        table.setPageLength(10);
         table.setImmediate(true);
 
         addComponent(table);
+        this.commandManager = commandManager;
     }
 
     private IndexedContainer getCassandraContainer() {
@@ -62,14 +73,87 @@ public class NodesWindow extends Window {
 
         return container;
     }
+    
 
-    private void addOrderToContainer(Container container, Agent agent) {
+    private void addOrderToContainer(Container container, final Agent agent) {
         Object itemId = container.addItem();
         Item item = container.getItem(itemId);
         item.getItemProperty("hostname").setValue(agent.getHostname());
         item.getItemProperty("uuid").setValue(agent.getUuid());
-        item.getItemProperty("Start").setValue(new Button("Start"));
-        item.getItemProperty("Stop").setValue(new Button("Stop"));
+
+        Button startButton = new Button("Start");
+        startButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                Task task = new Task();
+                task.setDescription("Starting node");
+                task.setTaskStatus(TaskStatus.NEW);
+                int reqSeqNumber = task.getIncrementedReqSeqNumber();
+
+                Command command = (Command) CommandFactory.createRequest(
+                        RequestType.EXECUTE_REQUEST,
+                        agent.getUuid(),
+                        "CassandraNodeStart",
+                        task.getUuid(),
+                        reqSeqNumber,
+                        "/",
+                        "service cassandra start",
+                        OutputRedirection.RETURN,
+                        OutputRedirection.RETURN,
+                        null,
+                        null,
+                        "root",
+                        null,
+                        null);
+                commandManager.executeCommand(command);
+                task.setTaskStatus(TaskStatus.SUCCESS);
+                commandManager.saveTask(task);
+            }
+        });
+        Button stopButton = new Button("Stop");
+        stopButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                Task task = new Task();
+                task.setDescription("Stopping node");
+                task.setTaskStatus(TaskStatus.NEW);
+                int reqSeqNumber = task.getIncrementedReqSeqNumber();
+
+                Command command = (Command) CommandFactory.createRequest(
+                        RequestType.EXECUTE_REQUEST,
+                        agent.getUuid(),
+                        "CassandraNodeStop",
+                        task.getUuid(),
+                        reqSeqNumber,
+                        "/",
+                        "service cassandra stop",
+                        OutputRedirection.RETURN,
+                        OutputRedirection.RETURN,
+                        null,
+                        null,
+                        "root",
+                        null,
+                        null);
+                commandManager.executeCommand(command);
+                getWindow().showNotification("Stop cassandra cluster");
+                task.setTaskStatus(TaskStatus.SUCCESS);
+                commandManager.saveTask(task);
+            }
+        });
+//        Button destroyButton = new Button("Destroy");
+//        destroyButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                getWindow().showNotification("Destroy cassandra node");
+//            }
+//        });
+
+        item.getItemProperty("Start").setValue(startButton);
+        item.getItemProperty("Stop").setValue(stopButton);
+//        item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
     public static AgentManagerInterface getAgentManager() {
@@ -83,5 +167,10 @@ public class NodesWindow extends Window {
         }
 
         return null;
+    }
+
+    @Override
+    public void onCommand(Response response) {
+        System.out.println("RESPONSE " + response.getStdOut() + " EXIT CODE " + response.getExitCode());
     }
 }

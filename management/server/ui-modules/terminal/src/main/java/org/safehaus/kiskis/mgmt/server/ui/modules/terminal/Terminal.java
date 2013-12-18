@@ -114,7 +114,6 @@ public class Terminal implements Module {
             textAreaOutput.setColumns(80);
             textAreaOutput.setImmediate(true);
             textAreaOutput.setWordwrap(false);
-
             verticalLayout.addComponent(labelOutput);
             verticalLayout.addComponent(textAreaOutput);
 
@@ -266,6 +265,18 @@ public class Terminal implements Module {
             return button;
         }
 
+        private Button genClearButton() {
+            Button button = new Button("Clear");
+            button.setDescription("Clears the output text area");
+            button.addListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    textAreaOutput.setValue("");
+                }
+            });
+            return button;
+        }
+
         private Button genGetRequestButton() {
             Button button = new Button("Get requests");
             button.setDescription("Gets requests from Cassandra");
@@ -411,6 +422,7 @@ public class Terminal implements Module {
 
     public void unsetModuleService(ModuleService service) {
         service.unregisterModule(this);
+
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
         }
