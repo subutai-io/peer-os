@@ -72,13 +72,23 @@ public class Step3 extends Panel {
         horizontalLayout.addComponent(next);
         horizontalLayout.addComponent(getButtonConfigureHadoop());
         horizontalLayout.addComponent(getButtonConfigureSecondaryNameNode());
-        horizontalLayout.addComponent(getButtonSetSlaveNameNodee());
-        horizontalLayout.addComponent(getButtonSetSlaveJobTracker());
-        horizontalLayout.addComponent(getButtonSetSSH());
-        horizontalLayout.addComponent(getButtonSetSSHMaster());
+        horizontalLayout.addComponent(getButtonSetSlaveNameNode());
+
+
+        HorizontalLayout horizontalLayout2 = new HorizontalLayout();
+        horizontalLayout2.addComponent(getButtonSetSlaveJobTracker());
+        horizontalLayout2.addComponent(getButtonSetSSH());
+        horizontalLayout2.addComponent(getButtonSetSSHMaster());
+        horizontalLayout2.addComponent(getButtonCopySSHSlaves());
+
+        HorizontalLayout horizontalLayout3 = new HorizontalLayout();
+        horizontalLayout3.addComponent(getButtonConfigSSHMaster());
+        horizontalLayout3.addComponent(getButtonFormatMaster());
 
         verticalLayout.addComponent(grid);
         verticalLayout.addComponent(horizontalLayout);
+        verticalLayout.addComponent(horizontalLayout2);
+        verticalLayout.addComponent(horizontalLayout3);
 
         addComponent(verticalLayout);
 
@@ -133,7 +143,7 @@ public class Step3 extends Panel {
         return button;
     }
 
-    private Button getButtonSetSlaveNameNodee(){
+    private Button getButtonSetSlaveNameNode(){
         Button button = new Button("SetSlaveNameNode");
         button.addListener(new Button.ClickListener() {
 
@@ -179,6 +189,45 @@ public class Step3 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().setSSHMaster();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonCopySSHSlaves(){
+        Button button = new Button("CopySSHSlaves");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().copySSHSlaves();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonConfigSSHMaster(){
+        Button button = new Button("ConfigSSHMaster");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().configSSHMaster();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonFormatMaster(){
+        Button button = new Button("formatMaster");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().formatMaster();
             }
         });
 

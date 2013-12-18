@@ -246,7 +246,9 @@ public class CommandTransport implements CommandTransportInterface {
     @Override
     public void addListener(ResponseListener listener) {
         try {
-            communicationMessageListener.addListener(listener);
+            if(listener != null && communicationMessageListener != null){
+                communicationMessageListener.addListener(listener);
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
         }

@@ -26,6 +26,9 @@ public class HadoopInstallation {
     private Task hadoopSlaveJobTracker;
     private Task hadoopSetSSH;
     private Task hadoopSSHMaster;
+    private Task hadoopCopySSHSlaves;
+    private Task hadoopConfigMasterSSH;
+    private Task hadoopFormatMaster;
 
     private String clusterName;
     private Agent nameNode, jobTracker, sNameNode;
@@ -33,6 +36,8 @@ public class HadoopInstallation {
     private Integer replicationFactor;
     private List<Agent> allNodes;
     private List<Agent> allSlaveNodes;
+    private List<String> keys;
+
     private CommandManagerInterface commandManager;
 
     public HadoopInstallation(CommandManagerInterface commandManagerInterface) {
@@ -72,8 +77,23 @@ public class HadoopInstallation {
     }
 
     public void setSSHMaster() {
-        hadoopSlaveJobTracker = createTask("Set Hadoop SSH master");
+        hadoopSSHMaster = createTask("Set Hadoop SSH master");
         createSSHMasterRequest();
+    }
+
+    public void copySSHSlaves() {
+        hadoopCopySSHSlaves = createTask("Copy Hadoop SSH key to slaves");
+        createCopySSHRequest();
+    }
+
+    public void configSSHMaster() {
+        hadoopConfigMasterSSH = createTask("Config SSH Masters");
+        createConfigSSHMasterRequest();
+    }
+
+    public void formatMaster() {
+        hadoopFormatMaster = createTask("Format name node");
+        createFormatMasterRequest();
     }
 
     private Task createTask(String description) {
@@ -89,7 +109,7 @@ public class HadoopInstallation {
     private void createInstallationRequest() {
         for (Agent agent : allNodes) {
             if (agent != null) {
-                createRequest(HadoopCommands.INSTALL_HADOOP, hadoopInstallationTask, agent, null);
+                createRequest(HadoopCommands.INSTALL_HADOOP, hadoopInstallationTask, agent, null, null);
             }
         }
     }
@@ -97,30 +117,30 @@ public class HadoopInstallation {
     private void createConfigureRequest() {
         for (Agent agent : allNodes) {
             if (agent != null) {
-                createRequest(HadoopCommands.CONFIGURE_SLAVES, hadoopConfigureTask, agent, null);
+                createRequest(HadoopCommands.CONFIGURE_SLAVES, hadoopConfigureTask, agent, null, null);
             }
         }
     }
 
     private void createSNameNodeRequest() {
-        createRequest(HadoopCommands.CLEAR_SECONDARY_NAME_NODE, hadoopSNameNodeTask, nameNode, null);
-        createRequest(HadoopCommands.SET_SECONDARY_NAME_NODE, hadoopSNameNodeTask, nameNode, null);
+        createRequest(HadoopCommands.CLEAR_SECONDARY_NAME_NODE, hadoopSNameNodeTask, nameNode, null, null);
+        createRequest(HadoopCommands.SET_SECONDARY_NAME_NODE, hadoopSNameNodeTask, nameNode, null, null);
     }
 
     private void createSetSlaveNameNodeRequest() {
-        createRequest(HadoopCommands.CLEAR_SLAVES_NAME_NODE, hadoopSlaveNameNode, nameNode, null);
+        createRequest(HadoopCommands.CLEAR_SLAVES_NAME_NODE, hadoopSlaveNameNode, nameNode, null, null);
         for (Agent agent : allSlaveNodes) {
             if (agent != null) {
-                createRequest(HadoopCommands.SET_SLAVES_NAME_NODE, hadoopSlaveNameNode, nameNode, agent);
+                createRequest(HadoopCommands.SET_SLAVES_NAME_NODE, hadoopSlaveNameNode, nameNode, agent, null);
             }
         }
     }
 
     private void createSetSlaveJobTrackerRequest() {
-        createRequest(HadoopCommands.CLEAR_SLAVES_JOB_TRACKER, hadoopSlaveJobTracker, jobTracker, null);
+        createRequest(HadoopCommands.CLEAR_SLAVES_JOB_TRACKER, hadoopSlaveJobTracker, jobTracker, null, null);
         for (Agent agent : allSlaveNodes) {
             if (agent != null) {
-                createRequest(HadoopCommands.SET_SLAVES_JOB_TRACKER, hadoopSlaveJobTracker, jobTracker, agent);
+                createRequest(HadoopCommands.SET_SLAVES_JOB_TRACKER, hadoopSlaveJobTracker, jobTracker, agent, null);
             }
         }
     }
@@ -128,16 +148,40 @@ public class HadoopInstallation {
     private void createSSHRequest() {
         for (Agent agent : allNodes) {
             if (agent != null) {
-                createRequest(HadoopCommands.SET_SSH_MASTERS, hadoopSetSSH, agent, null);
+                createRequest(HadoopCommands.SET_SSH_MASTERS, hadoopSetSSH, agent, null, null);
             }
         }
     }
 
-    private void createSSHMasterRequest() {
-        createRequest(HadoopCommands.COPY_SSH_SLAVES, hadoopSSHMaster, nameNode, null);
+    private void createCopySSHRequest() {
+        if (keys != null && !keys.isEmpty()) {
+            for (Agent agent : allSlaveNodes) {
+                if (agent != null) {
+                    for (String key : keys) {
+                        createRequest(HadoopCommands.COPY_SSH_SLAVES, hadoopCopySSHSlaves, agent, null, key);
+                    }
+                }
+            }
+        }
     }
 
-    private Request createRequest(final String command, Task task, Agent agent, Agent slave) {
+    private void createConfigSSHMasterRequest() {
+        createRequest(HadoopCommands.CONFIG_SSH_MASTER, hadoopConfigMasterSSH, nameNode, null, null);
+        createRequest(HadoopCommands.CONFIG_SSH_MASTER, hadoopConfigMasterSSH, sNameNode, null, null);
+        createRequest(HadoopCommands.CONFIG_SSH_MASTER, hadoopConfigMasterSSH, jobTracker, null, null);
+    }
+
+    private void createFormatMasterRequest() {
+        createRequest(HadoopCommands.FORMAT_NAME_NODE, hadoopFormatMaster, nameNode, null, null);
+    }
+
+    private void createSSHMasterRequest() {
+        createRequest(HadoopCommands.COPY_SSH_MASTERS, hadoopSSHMaster, nameNode, null, null);
+        createRequest(HadoopCommands.COPY_SSH_MASTERS, hadoopSSHMaster, sNameNode, null, null);
+        createRequest(HadoopCommands.COPY_SSH_MASTERS, hadoopSSHMaster, jobTracker, null, null);
+    }
+
+    private Request createRequest(final String command, Task task, Agent agent, Agent slave, String key) {
         String json = command;
         json = json.replaceAll(":taskUuid", task.getUuid().toString());
         json = json.replaceAll(":source", HadoopModule.MODULE_NAME);
@@ -148,6 +192,11 @@ public class HadoopInstallation {
         json = json.replaceAll(":namenode", nameNode.getHostname());
         json = json.replaceAll(":jobtracker", jobTracker.getHostname());
         json = json.replaceAll(":replicationfactor", replicationFactor.toString());
+
+        if (key != null) {
+            json = json.replaceAll(":PUB_KEY", key);
+        }
+
         if (slave != null) {
             json = json.replaceAll(":slave-hostname", slave.getHostname());
         }
@@ -223,16 +272,47 @@ public class HadoopInstallation {
                 panel.addOutput(hadoopSetSSH, " failed.\nDetails: " + getResponseError(resultList));
             }
         } else if (hadoopSSHMaster != null && response.getTaskUuid().compareTo(hadoopSSHMaster.getUuid()) == 0) {
-            List<ParseResult> resultList = commandManager.parseTask(hadoopSetSSH, true);
+            List<ParseResult> resultList = commandManager.parseTask(hadoopSSHMaster, true);
             hadoopSSHMaster = commandManager.getTask(hadoopSSHMaster.getUuid());
 
             if (resultList.size() > 0 && hadoopSSHMaster.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                 panel.addOutput(hadoopSSHMaster, " successfully finished.");
+                keys = new ArrayList<String>();
                 for (ParseResult pr : resultList) {
-                    panel.addOutput(hadoopSSHMaster, pr.getResponse().getStdOut());
+                    keys.add(pr.getResponse().getStdOut());
                 }
             } else if (hadoopSSHMaster.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
                 panel.addOutput(hadoopSSHMaster, " failed.\nDetails: " + getResponseError(resultList));
+            }
+        } else if (hadoopCopySSHSlaves != null && response.getTaskUuid().compareTo(hadoopCopySSHSlaves.getUuid()) == 0) {
+            List<ParseResult> resultList = commandManager.parseTask(hadoopCopySSHSlaves, true);
+            hadoopCopySSHSlaves = commandManager.getTask(hadoopCopySSHSlaves.getUuid());
+
+            if (resultList.size() > 0 && hadoopCopySSHSlaves.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                panel.addOutput(hadoopCopySSHSlaves, " successfully finished.");
+//                setSSHMaster();
+            } else if (hadoopCopySSHSlaves.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
+                panel.addOutput(hadoopCopySSHSlaves, " failed.\nDetails: " + getResponseError(resultList));
+            }
+        } else if (hadoopConfigMasterSSH != null && response.getTaskUuid().compareTo(hadoopConfigMasterSSH.getUuid()) == 0) {
+            List<ParseResult> resultList = commandManager.parseTask(hadoopConfigMasterSSH, true);
+            hadoopConfigMasterSSH = commandManager.getTask(hadoopConfigMasterSSH.getUuid());
+
+            if (resultList.size() > 0 && hadoopConfigMasterSSH.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                panel.addOutput(hadoopConfigMasterSSH, " successfully finished.");
+//                setSSHMaster();
+            } else if (hadoopConfigMasterSSH.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
+                panel.addOutput(hadoopConfigMasterSSH, " failed.\nDetails: " + getResponseError(resultList));
+            }
+        } else if (hadoopFormatMaster != null && response.getTaskUuid().compareTo(hadoopFormatMaster.getUuid()) == 0) {
+            List<ParseResult> resultList = commandManager.parseTask(hadoopFormatMaster, true);
+            hadoopFormatMaster = commandManager.getTask(hadoopFormatMaster.getUuid());
+
+            if (resultList.size() > 0 && hadoopFormatMaster.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                panel.addOutput(hadoopFormatMaster, " successfully finished.");
+//                setSSHMaster();
+            } else if (hadoopFormatMaster.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
+                panel.addOutput(hadoopFormatMaster, " failed.\nDetails: " + getResponseError(resultList));
             }
         }
     }
@@ -267,8 +347,10 @@ public class HadoopInstallation {
         StringBuilder stringBuilder = new StringBuilder();
         for (ParseResult pr : list) {
             if (!Strings.isNullOrEmpty(pr.getResponse().getStdErr())) {
+                stringBuilder.append(pr.getRequest());
                 stringBuilder.append("\n");
-                stringBuilder.append(pr.getResponse().getStdErr());
+                stringBuilder.append(pr.getResponse());
+                stringBuilder.append("\n");
             }
         }
 
