@@ -12,13 +12,13 @@ import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
@@ -43,7 +43,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setMultiSelect(true);
         tree.setImmediate(true);
-        tree.addListener(this) ;
+        tree.addListener(this);
         addComponent(getRefreshButton());
         addComponent(tree);
         agentManagerService.addListener(this);
@@ -80,7 +80,9 @@ public final class MgmtAgentManager extends VerticalLayout implements
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
+                tree.setValue(null);
                 container.removeAllItems();
+
                 registeredAgents.clear();
                 if (AppData.getSelectedAgentList() != null) {
                     AppData.getSelectedAgentList().clear();
