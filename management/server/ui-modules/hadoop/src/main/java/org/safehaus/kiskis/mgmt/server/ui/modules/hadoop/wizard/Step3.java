@@ -70,6 +70,12 @@ public class Step3 extends Panel {
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.addComponent(next);
+        horizontalLayout.addComponent(getButtonConfigureHadoop());
+        horizontalLayout.addComponent(getButtonConfigureSecondaryNameNode());
+        horizontalLayout.addComponent(getButtonSetSlaveNameNodee());
+        horizontalLayout.addComponent(getButtonSetSlaveJobTracker());
+        horizontalLayout.addComponent(getButtonSetSSH());
+        horizontalLayout.addComponent(getButtonSetSSHMaster());
 
         verticalLayout.addComponent(grid);
         verticalLayout.addComponent(horizontalLayout);
@@ -99,5 +105,83 @@ public class Step3 extends Panel {
                 terminal.setValue(str);
             }
         }
+    }
+
+    private Button getButtonConfigureHadoop(){
+        Button button = new Button("Configure");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().configureHadoop();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonConfigureSecondaryNameNode(){
+        Button button = new Button("Configure SNameNode");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().configureSNameNode();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSlaveNameNodee(){
+        Button button = new Button("SetSlaveNameNode");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSlaveNameNode();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSlaveJobTracker(){
+        Button button = new Button("setSlaveJobTracker");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSlaveJobTracker();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSSH(){
+        Button button = new Button("SetSSH");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSSH();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSSHMaster(){
+        Button button = new Button("SetSSHMaster");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSSHMaster();
+            }
+        });
+
+        return button;
     }
 }

@@ -34,7 +34,7 @@ public class HadoopCommands {
              "\t    \"taskUuid\": :taskUuid,\n" +
              "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
              "\t    \"workingDirectory\": \"/\",\n" +
-             "\t    \"program\": \"hadoop-configure.sh\",\n" +
+             "\t    \"program\": \". /etc/profile && hadoop-configure.sh\",\n" +
              "\t    \"stdOut\": \"RETURN\",\n" +
              "\t    \"stdErr\": \"RETURN\",\n" +
              "\t    \"runAs\": \"root\",\n" +
