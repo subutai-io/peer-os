@@ -2,7 +2,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -10,9 +12,12 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public final class CassandraWizard extends Window {
@@ -89,9 +94,15 @@ public final class CassandraWizard extends Window {
         putForm();
     }
 
-    public void showBack() {
-        step--;
-        putForm();
+    public void cancelWizard() {
+        for (Agent agent : getLxcList()) {
+            int reqSeqNumber = task.getIncrementedReqSeqNumber();
+            UUID taskUuid = task.getUuid();
+            List<String> args = new ArrayList<String>();
+            String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
+            Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
+            commandManagerInterface.executeCommand(command);
+        }
     }
 
     private void putForm() {
@@ -220,5 +231,23 @@ public final class CassandraWizard extends Window {
 
     public List<Agent> getLxcList() {
         return lxcList;
+    }
+
+    private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
+        return (Command) CommandFactory.createRequest(
+                RequestType.EXECUTE_REQUEST,
+                uuid,
+                CassandraModule.MODULE_NAME,
+                taskUuid,
+                reqSeqNumber,
+                "/",
+                program,
+                OutputRedirection.RETURN,
+                OutputRedirection.RETURN,
+                null,
+                null,
+                "root",
+                args,
+                null);
     }
 }

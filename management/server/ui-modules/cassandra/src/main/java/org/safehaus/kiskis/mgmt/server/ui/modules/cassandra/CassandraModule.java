@@ -29,7 +29,7 @@ public class CassandraModule implements Module {
 
         private final Button buttonInstallWizard;
         private final Button getClusters;
-        private CassandraWizard subwindow;
+        private CassandraWizard cassandraWizard;
         private CassandraTable cassandraTable;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
@@ -46,8 +46,8 @@ public class CassandraModule implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     if (getLxcAgents().size() > 0) {
-                        subwindow = new CassandraWizard(getLxcAgents());
-                        getApplication().getMainWindow().addWindow(subwindow);
+                        cassandraWizard = new CassandraWizard(getLxcAgents());
+                        getApplication().getMainWindow().addWindow(cassandraWizard);
                     }
                 }
 
@@ -85,8 +85,13 @@ public class CassandraModule implements Module {
         public synchronized void onCommand(Response response) {
             try {
                 if (response != null && response.getSource().equals(MODULE_NAME)) {
-                    if (subwindow != null && subwindow.isVisible()) {
-                        subwindow.setOutput(response);
+                    if (cassandraWizard != null && cassandraWizard.isVisible()
+                            && response.getTaskUuid().toString().equals(cassandraWizard.getTask().getUuid().toString())) {
+                        cassandraWizard.setOutput(response);
+                    } else if (cassandraTable.getNodesWindow() != null
+                            && cassandraTable.getNodesWindow().isVisible()
+                            && cassandraTable.getNodesWindow().getTask().getUuid().toString().equals(response.getUuid().toString())) {
+                        cassandraTable.getNodesWindow().setOutput(response);
                     }
                 }
             } catch (Exception ex) {

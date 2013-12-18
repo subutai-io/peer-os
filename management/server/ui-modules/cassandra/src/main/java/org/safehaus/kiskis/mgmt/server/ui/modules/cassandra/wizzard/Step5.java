@@ -10,8 +10,10 @@ import com.vaadin.ui.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
@@ -60,7 +62,6 @@ public class Step5 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 for (Agent agent : cassandraWizard.getLxcList()) {
-
                     if (clusterName.getValue().toString().length() > 0) {
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                         UUID taskUuid = cassandraWizard.getTask().getUuid();
@@ -69,10 +70,6 @@ public class Step5 extends Panel {
                         Command command = buildCommand(agent.getUuid(), changeNameCommand, reqSeqNumber, taskUuid, args);
                         cassandraWizard.runCommand(command);
                         cassandraWizard.getCluster().setName(clusterName.getValue().toString());
-                    } else {
-                        getWindow().showNotification(
-                                "Please provide cluster name.",
-                                Window.Notification.TYPE_TRAY_NOTIFICATION);
                     }
                 }
                 cassandraWizard.showNext();
@@ -83,7 +80,7 @@ public class Step5 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cassandraWizard.showBack();
+                cassandraWizard.cancelWizard();
             }
         });
 
@@ -98,23 +95,21 @@ public class Step5 extends Panel {
     }
 
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
-
-        Request request = new Request();
-        request.setSource("CassandraModule");
-        request.setProgram(program);
-        request.setUuid(uuid);
-        request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid(taskUuid);
-        request.setWorkingDirectory("/");
-        request.setStdOut(OutputRedirection.RETURN);
-        request.setStdErr(OutputRedirection.RETURN);
-        request.setRunAs("root");
-        request.setTimeout(0);
-        request.setArgs(args);
-        request.setRequestSequenceNumber(reqSeqNumber);
-        Command command = new Command(request);
-
-        return command;
+        return (Command) CommandFactory.createRequest(
+                RequestType.EXECUTE_REQUEST,
+                uuid,
+                CassandraModule.MODULE_NAME,
+                taskUuid,
+                reqSeqNumber,
+                "/",
+                program,
+                OutputRedirection.RETURN,
+                OutputRedirection.RETURN,
+                null,
+                null,
+                "root",
+                args,
+                null);
     }
 
 }

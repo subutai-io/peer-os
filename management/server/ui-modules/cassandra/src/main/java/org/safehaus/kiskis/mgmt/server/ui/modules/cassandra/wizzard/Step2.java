@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 
 /**
@@ -76,10 +77,6 @@ public class Step2 extends Panel {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
-//                    args.add("--force-yes");
-//                    args.add("--assume-yes");
-//                    args.add("install");
-//                    args.add("ksks-cassandra");
                     Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
 
@@ -92,18 +89,7 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Agent agent : cassandraWizard.getLxcList()) {
-                    int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
-                    UUID taskUuid = cassandraWizard.getTask().getUuid();
-                    List<String> args = new ArrayList<String>();
-//                    args.add("--force-yes");
-//                    args.add("--assume-yes");
-//                    args.add("purge");
-//                    args.add("ksks-cassandra");
-                    Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
-                    cassandraWizard.runCommand(command);
-                }
-                cassandraWizard.showBack();
+               cassandraWizard.cancelWizard();
             }
         });
 
@@ -118,26 +104,10 @@ public class Step2 extends Panel {
     }
 
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
-
-//        Request request = new Request();
-//        request.setSource("CassandraModule");
-//        request.setProgram(program);
-//        request.setUuid(uuid);
-//        request.setType(RequestType.EXECUTE_REQUEST);
-//        request.setTaskUuid(taskUuid);
-//        request.setWorkingDirectory("/");
-//        request.setStdOut(OutputRedirection.RETURN);
-//        request.setStdErr(OutputRedirection.RETURN);
-//        request.setRunAs("root");
-//        request.setTimeout(0);
-//        request.setArgs(args);
-//        request.setRequestSequenceNumber(reqSeqNumber);
-//        Command command = new Command(request);
-//        return command;
         return (Command) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST,
                 uuid,
-                "CassandraModule",
+                CassandraModule.MODULE_NAME,
                 taskUuid,
                 reqSeqNumber,
                 "/",
@@ -149,7 +119,6 @@ public class Step2 extends Panel {
                 "root",
                 args,
                 null);
-
     }
 
 }

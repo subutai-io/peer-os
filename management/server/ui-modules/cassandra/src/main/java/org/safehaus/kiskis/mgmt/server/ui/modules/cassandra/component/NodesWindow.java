@@ -5,6 +5,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -14,25 +15,28 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
  */
-public class NodesWindow extends Window implements CommandListener{
+public class NodesWindow extends Window {
 
     private final Table table;
     private IndexedContainer container;
     private final List<UUID> list;
     private final CommandManagerInterface commandManager;
+    private Task task;
+    private final TextArea terminal;
 
     /**
      *
@@ -42,6 +46,8 @@ public class NodesWindow extends Window implements CommandListener{
      */
     public NodesWindow(String caption, List<UUID> list, CommandManagerInterface commandManager) {
         this.list = list;
+        this.commandManager = commandManager;
+
         setCaption(caption);
         setSizeUndefined();
         setWidth("600px");
@@ -49,31 +55,30 @@ public class NodesWindow extends Window implements CommandListener{
 
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
-
         table.setPageLength(10);
         table.setImmediate(true);
 
         addComponent(table);
-        this.commandManager = commandManager;
+        terminal = new TextArea();
+        terminal.setRows(6);
+        terminal.setColumns(65);
+        terminal.setImmediate(true);
+        terminal.setWordwrap(true);
+        addComponent(terminal);
+
     }
 
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
-
-        // Create the container properties
         container.addContainerProperty("hostname", String.class, "");
         container.addContainerProperty("uuid", UUID.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
-
-        // Create some orders
         for (UUID uuid : list) {
             addOrderToContainer(container, getAgentManager().getAgent(uuid));
         }
-
         return container;
     }
-    
 
     private void addOrderToContainer(Container container, final Agent agent) {
         Object itemId = container.addItem();
@@ -86,15 +91,12 @@ public class NodesWindow extends Window implements CommandListener{
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Task task = new Task();
-                task.setDescription("Starting node");
-                task.setTaskStatus(TaskStatus.NEW);
+                createTask();
                 int reqSeqNumber = task.getIncrementedReqSeqNumber();
-
                 Command command = (Command) CommandFactory.createRequest(
                         RequestType.EXECUTE_REQUEST,
                         agent.getUuid(),
-                        "CassandraNodeStart",
+                        CassandraModule.MODULE_NAME,
                         task.getUuid(),
                         reqSeqNumber,
                         "/",
@@ -107,8 +109,6 @@ public class NodesWindow extends Window implements CommandListener{
                         null,
                         null);
                 commandManager.executeCommand(command);
-                task.setTaskStatus(TaskStatus.SUCCESS);
-                commandManager.saveTask(task);
             }
         });
         Button stopButton = new Button("Stop");
@@ -116,15 +116,12 @@ public class NodesWindow extends Window implements CommandListener{
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Task task = new Task();
-                task.setDescription("Stopping node");
-                task.setTaskStatus(TaskStatus.NEW);
+                createTask();
                 int reqSeqNumber = task.getIncrementedReqSeqNumber();
-
                 Command command = (Command) CommandFactory.createRequest(
                         RequestType.EXECUTE_REQUEST,
                         agent.getUuid(),
-                        "CassandraNodeStop",
+                        CassandraModule.MODULE_NAME,
                         task.getUuid(),
                         reqSeqNumber,
                         "/",
@@ -137,23 +134,10 @@ public class NodesWindow extends Window implements CommandListener{
                         null,
                         null);
                 commandManager.executeCommand(command);
-                getWindow().showNotification("Stop cassandra cluster");
-                task.setTaskStatus(TaskStatus.SUCCESS);
-                commandManager.saveTask(task);
             }
         });
-//        Button destroyButton = new Button("Destroy");
-//        destroyButton.addListener(new Button.ClickListener() {
-//
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-//                getWindow().showNotification("Destroy cassandra node");
-//            }
-//        });
-
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
-//        item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
     public static AgentManagerInterface getAgentManager() {
@@ -169,8 +153,20 @@ public class NodesWindow extends Window implements CommandListener{
         return null;
     }
 
-    @Override
-    public void onCommand(Response response) {
-        System.out.println("RESPONSE " + response.getStdOut() + " EXIT CODE " + response.getExitCode());
+    private void createTask() {
+        task = new Task();
+        task.setDescription("Nodes task");
+        task.setTaskStatus(TaskStatus.NEW);
     }
+
+    public void setOutput(Response response) {
+        for (ParseResult pr : commandManager.parseTask(task, true)) {
+            terminal.setValue(pr.getResponse().getStdOut());
+        }
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
 }
