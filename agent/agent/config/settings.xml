@@ -1,8 +1,9 @@
 <Settings>
-<BrokerIP>172.16.1.125</BrokerIP>
-<Port>61616</Port>
+<BrokerIP>yourBrokerIP</BrokerIP>
+<Port>yourBrokerSSLPort</Port>
 <reconnect>true</reconnect>
 <reconnect_timeout>10</reconnect_timeout>
 <reconnect_interval_max>10</reconnect_interval_max>
-<log_level>7</log_level>
+<log_level>6</log_level>
+<clientpasswd>yourSSLpassword</clientpasswd>
 </Settings>
