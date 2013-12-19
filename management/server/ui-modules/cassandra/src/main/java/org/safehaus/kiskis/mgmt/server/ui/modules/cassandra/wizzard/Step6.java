@@ -48,7 +48,7 @@ public class Step6 extends FormLayout {
                 + " 3) Set listen and rpc addresss<br>"
                 + " 4) Set seeds<br>"
                 + " 5) Set cluster name<br>"
-                + " 6) Set folders<br>"
+                + " 6) <strong>Set folders</strong><br>"
         );
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
@@ -82,14 +82,13 @@ public class Step6 extends FormLayout {
                 String dataDir = textFieldDataDir.getValue().toString();
                 String commitDir = textFieldCommitLogDir.getValue().toString();
                 String cacheDir = textFieldSavedCachesDir.getValue().toString();
-                List<UUID> nodes = new ArrayList<UUID>();
+                
                 if (dataDir.length() > 0 && commitDir.length() > 0 && cacheDir.length() > 0) {
                     cassandraWizard.getCluster().setDataDir(dataDir);
                     cassandraWizard.getCluster().setCommitLogDir(commitDir);
                     cassandraWizard.getCluster().setSavedCacheDir(cacheDir);
 
                     for (Agent agent : cassandraWizard.getLxcList()) {
-                        nodes.add(agent.getUuid());
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                         UUID taskUuid = cassandraWizard.getTask().getUuid();
                         List<String> args = new ArrayList<String>();
@@ -108,7 +107,6 @@ public class Step6 extends FormLayout {
                     }
                 } 
 
-                cassandraWizard.getCluster().setNodes(nodes);
                 cassandraWizard.showNext();
             }
         });

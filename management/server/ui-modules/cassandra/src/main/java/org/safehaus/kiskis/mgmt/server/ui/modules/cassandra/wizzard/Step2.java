@@ -44,8 +44,8 @@ public class Step2 extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) <font color=\"#f14c1a\"><strong>Welcome</strong></font><br>"
-                + " 2) Install<br>"
+                + " 1) <font color=\"#f14c1a\">Welcome</font><br>"
+                + " 2) <strong>Install</strong><br>"
                 + " 3) Set listen and rpc addresss<br>"
                 + " 4) Set seeds<br>"
                 + " 5) Set cluster name<br>"

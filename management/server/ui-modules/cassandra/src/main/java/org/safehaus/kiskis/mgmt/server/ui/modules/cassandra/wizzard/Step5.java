@@ -44,7 +44,7 @@ public class Step5 extends Panel {
                 + " 2) Install<br>"
                 + " 3) Set listen and rpc addresss<br>"
                 + " 4) Set seeds<br>"
-                + " 5) Set cluster name<br>"
+                + " 5) <strong>Set cluster name</strong><br>"
                 + " 6) Set folders<br>"
         );
         menu.setContentMode(Label.CONTENT_XHTML);
@@ -58,7 +58,7 @@ public class Step5 extends Panel {
         grid.addComponent(clusterName, 2, 0, 5, 1);
         grid.setComponentAlignment(clusterName, Alignment.MIDDLE_CENTER);
 
-        Button next = new Button("Rename cluster");
+        Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
             @Override

@@ -145,6 +145,7 @@ public final class CassandraWizard extends Window {
                 break;
             }
             case 7: {
+                cluster.setNodes(getAgentsUUIDS());
                 commandManagerInterface.saveCassandraClusterData(cluster);
                 task.setTaskStatus(TaskStatus.SUCCESS);
                 commandManagerInterface.saveTask(task);
@@ -249,5 +250,13 @@ public final class CassandraWizard extends Window {
                 "root",
                 args,
                 null);
+    }
+
+    private List<UUID> getAgentsUUIDS() {
+        List<UUID> uuids = new ArrayList<UUID>();
+        for (Agent agent : getLxcList()) {
+            uuids.add(agent.getUuid());
+        }
+        return uuids;
     }
 }

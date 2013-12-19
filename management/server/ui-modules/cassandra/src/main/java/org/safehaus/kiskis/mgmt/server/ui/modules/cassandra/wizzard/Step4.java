@@ -43,10 +43,10 @@ public class Step4 extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) <font color=\"#f14c1a\"><strong>Welcome</strong></font><br>"
+                + " 1) <font color=\"#f14c1a\">Welcome</font><br>"
                 + " 2) Install<br>"
                 + " 3) Set listen and rpc addresss<br>"
-                + " 4) Set seeds<br>"
+                + " 4) <strong>Set seeds </strong><br>"
                 + " 5) Set cluster name<br>"
                 + " 6) Set folders<br>"
         );
@@ -56,21 +56,24 @@ public class Step4 extends Panel {
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        Label label = new Label("Please enter the list of hosts to be included in the cluster");
+        Label label = new Label("Select seeds");
         label.setContentMode(Label.CONTENT_XHTML);
 
         grid.addComponent(label, 2, 0, 5, 0);
         grid.setComponentAlignment(label, Alignment.TOP_CENTER);
 
-        Label label1 = new Label("<strong>Target Hosts</strong><br>"
-                + "<br>");
+        StringBuilder sb = new StringBuilder();
+        for (Agent a : cassandraWizard.getLxcList()) {
+            sb.append(a.getHostname()).append("<br/>");
+        }
+        Label label1 = new Label(sb.toString());
         label1.setContentMode(Label.CONTENT_XHTML);
 
         grid.addComponent(label1, 2, 1, 5, 1);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
         BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
-        final ListSelect hostSelect = new ListSelect("Enter a list of hosts using Fully Qualified Domain Name or IP", agents);
+        final ListSelect hostSelect = new ListSelect("Hosts", agents);
 
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setItemCaptionPropertyId("hostname");
@@ -86,7 +89,7 @@ public class Step4 extends Panel {
         grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
-        Button next = new Button("Configure seeds");
+        Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
             @Override
