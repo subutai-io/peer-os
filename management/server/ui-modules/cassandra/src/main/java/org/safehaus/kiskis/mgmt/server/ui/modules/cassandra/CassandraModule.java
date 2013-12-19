@@ -85,9 +85,11 @@ public class CassandraModule implements Module {
         public void onCommand(Response response) {
             try {
                 if (response != null && response.getSource().equals(MODULE_NAME)) {
-                    if (cassandraWizard != null 
+                    if (cassandraWizard != null
                             && response.getTaskUuid().toString().equals(cassandraWizard.getTask().getUuid().toString())) {
                         cassandraWizard.setOutput(response);
+                    } else if (response.getTaskUuid().toString().equals(cassandraTable.getTask().getUuid().toString())) {
+                        cassandraTable.setOutput(response);
                     } else if (response.getTaskUuid().toString().equals(cassandraTable.getNodesWindow().getTask().getUuid().toString())) {
                         cassandraTable.getNodesWindow().setOutput(response);
                     }

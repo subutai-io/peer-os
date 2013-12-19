@@ -7,18 +7,26 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
+ *
  * @author bahadyr
  */
 public class Step5 extends Panel {
 
-    GridLayout grid;
-    VerticalLayout verticalLayoutForm;
-    Button next;
+    String changeNameCommand = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!cluster_name: \"%newName\"!'";
 
     public Step5(final CassandraWizard cassandraWizard) {
-        setCaption("Configuration Step31");
+        setCaption("Rename cluster");
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -26,44 +34,46 @@ public class Step5 extends Panel {
         verticalLayout.setHeight(600, Sizeable.UNITS_PIXELS);
         verticalLayout.setMargin(true);
 
-        grid = new GridLayout(6, 10);
+        GridLayout grid = new GridLayout(6, 10);
         grid.setSpacing(true);
         grid.setSizeFull();
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) Welcome<br>"
-                + " 2) List nodes<br>"
-                + " 3) <font color=\"#f14c1a\"><strong>Installation</strong></font><br>"
-                + " 4) Configuration");
+                + " 1) <font color=\"#f14c1a\"><strong>Welcome</strong></font><br>"
+                + " 2) Install<br>"
+                + " 3) Set listen and rpc addresss<br>"
+                + " 4) Set seeds<br>"
+                + " 5) Set cluster name<br>"
+                + " 6) Set folders<br>"
+        );
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
 
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        verticalLayoutForm = new VerticalLayout();
-        verticalLayoutForm.setSizeFull();
-        verticalLayout.setSpacing(true);
+        final TextField clusterName = new TextField("Name your Cluster:");
 
-        Label label = new Label("Please enter the list of hosts to be included in the cluster");
-        label.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(label);
+        grid.addComponent(clusterName, 2, 0, 5, 1);
+        grid.setComponentAlignment(clusterName, Alignment.MIDDLE_CENTER);
 
-        Label label1 = new Label("<strong>Status of nodes</strong><br>"
-                + "<br>");
-        label1.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(label1);
-
-        grid.addComponent(verticalLayoutForm, 2, 0, 5, 9);
-        grid.setComponentAlignment(verticalLayoutForm, Alignment.MIDDLE_CENTER);
-
-        next = new Button("Next");
-        next.setEnabled(false);
+        Button next = new Button("Rename cluster");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                for (Agent agent : cassandraWizard.getLxcList()) {
+                    if (clusterName.getValue().toString().length() > 0) {
+                        int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
+                        UUID taskUuid = cassandraWizard.getTask().getUuid();
+                        List<String> args = new ArrayList<String>();
+                        changeNameCommand = changeNameCommand.replace("%newName", clusterName.getValue().toString());
+                        Command command = buildCommand(agent.getUuid(), changeNameCommand, reqSeqNumber, taskUuid, args);
+                        cassandraWizard.runCommand(command);
+                        cassandraWizard.getCluster().setName(clusterName.getValue().toString());
+                    }
+                }
                 cassandraWizard.showNext();
             }
         });
@@ -72,7 +82,7 @@ public class Step5 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cassandraWizard.showBack();
+                cassandraWizard.cancelWizard();
             }
         });
 
@@ -86,11 +96,22 @@ public class Step5 extends Panel {
         addComponent(verticalLayout);
     }
 
-    void updateUI(String msg) {
-        Label label1 = new Label("<strong>" + msg + "</strong><br>");
-        label1.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(label1);
-        next.setEnabled(true);
+    private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
+        return (Command) CommandFactory.createRequest(
+                RequestType.EXECUTE_REQUEST,
+                uuid,
+                CassandraModule.MODULE_NAME,
+                taskUuid,
+                reqSeqNumber,
+                "/",
+                program,
+                OutputRedirection.RETURN,
+                OutputRedirection.RETURN,
+                null,
+                null,
+                "root",
+                args,
+                null);
     }
 
 }

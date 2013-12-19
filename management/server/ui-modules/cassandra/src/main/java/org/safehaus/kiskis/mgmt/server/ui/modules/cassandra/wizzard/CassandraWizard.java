@@ -2,7 +2,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -10,9 +12,13 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public final class CassandraWizard extends Window {
 
@@ -20,7 +26,7 @@ public final class CassandraWizard extends Window {
 
     private final VerticalLayout verticalLayout;
     private Task task;
-    CassandraClusterInfo cluster;
+    private CassandraClusterInfo cluster;
     private final List<Agent> lxcList;
     private final TextArea textAreaTerminal;
     private final ProgressIndicator progressBar;
@@ -32,8 +38,6 @@ public final class CassandraWizard extends Window {
     Step4 step4;
     Step5 step5;
     Step6 step6;
-    Step7 step7;
-    Step8 step8;
     int step = 1;
 
     /**
@@ -90,9 +94,15 @@ public final class CassandraWizard extends Window {
         putForm();
     }
 
-    public void showBack() {
-        step--;
-        putForm();
+    public void cancelWizard() {
+        for (Agent agent : getLxcList()) {
+            int reqSeqNumber = task.getIncrementedReqSeqNumber();
+            UUID taskUuid = task.getUuid();
+            List<String> args = new ArrayList<String>();
+            String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
+            Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
+            commandManagerInterface.executeCommand(command);
+        }
     }
 
     private void putForm() {
@@ -135,20 +145,13 @@ public final class CassandraWizard extends Window {
                 break;
             }
             case 7: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step7 = new Step7(this);
-                verticalLayout.addComponent(step7);
-                break;
-            }
-            case 8: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step8 = new Step8(this);
-                verticalLayout.addComponent(step8);
-//                commandManagerInterface.saveCassandraClusterData(cluster);
-                break;
+                commandManagerInterface.saveCassandraClusterData(cluster);
+                task.setTaskStatus(TaskStatus.SUCCESS);
+                commandManagerInterface.saveTask(task);
             }
             default: {
                 this.close();
+                removeWindow(this);
                 break;
             }
         }
@@ -191,23 +194,17 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 3: {
-                            step3.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
+//                            step3.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 4: {
                             break;
                         }
                         case 5: {
-                            step5.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
+//                            step5.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
                             break;
                         }
                         case 6: {
-                            break;
-                        }
-                        case 7: {
-                            break;
-                        }
-                        case 8: {
                             break;
                         }
                     }
@@ -234,5 +231,23 @@ public final class CassandraWizard extends Window {
 
     public List<Agent> getLxcList() {
         return lxcList;
+    }
+
+    private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
+        return (Command) CommandFactory.createRequest(
+                RequestType.EXECUTE_REQUEST,
+                uuid,
+                CassandraModule.MODULE_NAME,
+                taskUuid,
+                reqSeqNumber,
+                "/",
+                program,
+                OutputRedirection.RETURN,
+                OutputRedirection.RETURN,
+                null,
+                null,
+                "root",
+                args,
+                null);
     }
 }
