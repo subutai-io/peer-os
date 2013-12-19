@@ -10,25 +10,21 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author bahadyr
  */
 public class Step2 extends Panel {
-    HadoopWizard parent;
+    private HadoopWizard parent;
+    private TwinColSelect twinColSelectDataNodes;
+    private TwinColSelect twinColSelectTaskTrackers;
 
     public Step2(final HadoopWizard hadoopWizard) {
         parent = hadoopWizard;
-        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, parent.getLxcList());
 
         setCaption("Welcome to Hadoop Cluster Installation");
         setSizeFull();
@@ -62,7 +58,7 @@ public class Step2 extends Panel {
         verticalLayoutForm.addComponent(label);
 
 
-        TwinColSelect twinColSelectDataNodes = new TwinColSelect("", agents);
+        twinColSelectDataNodes = new TwinColSelect("", getDataSourceMasters());
         twinColSelectDataNodes.setItemCaptionPropertyId("hostname");
         twinColSelectDataNodes.setRows(10);
         twinColSelectDataNodes.setNullSelectionAllowed(true);
@@ -77,6 +73,8 @@ public class Step2 extends Panel {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 List<Agent> dataNodes = new ArrayList<Agent>(agentList);
                 parent.getHadoopInstallation().setDataNodes(dataNodes);
+
+                twinColSelectTaskTrackers.setContainerDataSource(getDataSourceMasters());
             }
         });
         verticalLayoutForm.addComponent(twinColSelectDataNodes);
@@ -86,7 +84,7 @@ public class Step2 extends Panel {
         labelTaskTrackerCaption.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(labelTaskTrackerCaption);
 
-        TwinColSelect twinColSelectTaskTrackers = new TwinColSelect("", agents);
+        twinColSelectTaskTrackers = new TwinColSelect("", getDataSourceMasters());
         twinColSelectTaskTrackers.setItemCaptionPropertyId("hostname");
         twinColSelectTaskTrackers.setRows(10);
         twinColSelectTaskTrackers.setNullSelectionAllowed(true);
@@ -133,6 +131,32 @@ public class Step2 extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
+    }
+
+    private BeanItemContainer<Agent> getDataSourceMasters(){
+        List<Agent> list = parent.getLxcList();
+
+        if(parent.getHadoopInstallation().getsNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getsNameNode());
+        }
+
+        if(parent.getHadoopInstallation().getNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getNameNode());
+        }
+
+        if(parent.getHadoopInstallation().getJobTracker() != null){
+            list.remove(parent.getHadoopInstallation().getJobTracker());
+        }
+
+        if(parent.getHadoopInstallation().getDataNodes() != null){
+            list.removeAll(parent.getHadoopInstallation().getDataNodes());
+        }
+
+        if(parent.getHadoopInstallation().getTaskTrackers() != null){
+            list.removeAll(parent.getHadoopInstallation().getTaskTrackers());
+        }
+
+        return new BeanItemContainer<Agent>(Agent.class, list);
     }
 
 }

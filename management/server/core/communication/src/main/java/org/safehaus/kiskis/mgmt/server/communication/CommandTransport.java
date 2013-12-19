@@ -113,7 +113,8 @@ public class CommandTransport implements CommandTransportInterface {
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);
                 String json = CommandJson.getJson(command);
-                System.out.println("Sending: " + json);
+                //LOG.info("Sending: " + json);
+                System.out.println("\nSending: " + json);
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
             } catch (JMSException ex) {
@@ -245,7 +246,9 @@ public class CommandTransport implements CommandTransportInterface {
     @Override
     public void addListener(ResponseListener listener) {
         try {
-            communicationMessageListener.addListener(listener);
+            if(listener != null && communicationMessageListener != null){
+                communicationMessageListener.addListener(listener);
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
         }

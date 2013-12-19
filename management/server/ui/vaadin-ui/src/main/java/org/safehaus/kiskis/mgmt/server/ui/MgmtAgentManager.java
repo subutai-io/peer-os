@@ -12,13 +12,13 @@ import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
@@ -28,9 +28,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public final class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentListener {
 
-    private AgentManagerInterface agentManagerInterface;
+    private final AgentManagerInterface agentManagerInterface;
     private List<Agent> registeredAgents;
-    private Tree tree;
+    private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
 
@@ -74,13 +74,15 @@ public final class MgmtAgentManager extends VerticalLayout implements
     }
 
     private Button getRefreshButton() {
-        Button button = new Button("Refresh agents");
+        Button button = new Button("Refresh");
         button.setDescription("Gets LXC agents from Cassandra");
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
+                tree.setValue(null);
                 container.removeAllItems();
+
                 registeredAgents.clear();
                 if (AppData.getSelectedAgentList() != null) {
                     AppData.getSelectedAgentList().clear();

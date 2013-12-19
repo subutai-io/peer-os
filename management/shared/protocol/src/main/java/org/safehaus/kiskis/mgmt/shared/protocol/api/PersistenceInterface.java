@@ -14,51 +14,72 @@ import java.util.UUID;
  */
 public interface PersistenceInterface {
 
-    //    //Commands section
-    boolean saveCommand(Command command);
+    /**
+     * Agent
+     */
+    public Agent getAgent(UUID uuid);
 
-    List<Request> getRequests(UUID taskuuid);
+    public boolean saveAgent(Agent agent);
 
-    Integer getResponsesCount(UUID taskUuid);
+    /**
+     * Heartbeat, LXC, Physical
+     */
+    public List<Agent> getRegisteredAgents(long freshness);
 
-    List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber);
+    public List<Agent> getRegisteredLxcAgents(long freshness);
 
-    boolean saveResponse(Response response);
+    public List<Agent> getUnknownChildLxcAgents(long freshness);
 
-    List<Agent> getRegisteredAgents(long freshness);
+    public List<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness);
 
-    List<Agent> getRegisteredLxcAgents(long freshness);
+    public List<Agent> getRegisteredPhysicalAgents(long freshness);
 
-    List<Agent> getUnknownChildLxcAgents(long freshness);
+    public Agent getRegisteredLxcAgentByHostname(String hostname, long freshness);
 
-    List<Agent> getRegisteredChildLxcAgents(Agent parent, long freshness);
+    public Agent getRegisteredPhysicalAgentByHostname(String hostname, long freshness);
 
-    List<Agent> getRegisteredPhysicalAgents(long freshness);
+    public List<Agent> getAgentsByHeartbeat(long from, long to);
 
-    Agent getRegisteredLxcAgentByHostname(String hostname, long freshness);
+    /**
+     * Commands
+     */
+    public boolean saveCommand(Command command);
 
-    Agent getRegisteredPhysicalAgentByHostname(String hostname, long freshness);
+    public List<Request> getRequests(UUID taskuuid);
 
-    List<Agent> getAgentsByHeartbeat(long from, long to);
+    public Integer getResponsesCount(UUID taskUuid);
 
-    Agent getAgent(UUID uuid);
+    public List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber);
 
-    boolean saveAgent(Agent agent);
+    public boolean saveResponse(Response response);
 
-    String saveTask(Task task);
+    /**
+     * Task
+     */
+    public String saveTask(Task task);
 
-    List<Task> getTasks();
+    public List<Task> getTasks();
 
-    Task getTask(UUID uuid);
+    public Task getTask(UUID uuid);
 
+    /**
+     * Utils
+     */
     public boolean truncateTables();
 
+    /**
+     * Cassandra
+     */
     public boolean saveCassandraClusterInfo(CassandraClusterInfo cluster);
 
     public List<CassandraClusterInfo> getCassandraClusterInfo();
 
     public CassandraClusterInfo getCassandraClusterInfo(String clusterName);
 
+
+    /**
+     *
+     */
     public boolean saveHadoopClusterInfo(HadoopClusterInfo cluster);
 
     public List<HadoopClusterInfo> getHadoopClusterInfo();

@@ -8,7 +8,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -71,35 +70,167 @@ public class Step3 extends Panel {
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.addComponent(next);
+        horizontalLayout.addComponent(getButtonConfigureHadoop());
+        horizontalLayout.addComponent(getButtonConfigureSecondaryNameNode());
+        horizontalLayout.addComponent(getButtonSetSlaveNameNode());
+
+
+        HorizontalLayout horizontalLayout2 = new HorizontalLayout();
+        horizontalLayout2.addComponent(getButtonSetSlaveJobTracker());
+        horizontalLayout2.addComponent(getButtonSetSSH());
+        horizontalLayout2.addComponent(getButtonSetSSHMaster());
+        horizontalLayout2.addComponent(getButtonCopySSHSlaves());
+
+        HorizontalLayout horizontalLayout3 = new HorizontalLayout();
+        horizontalLayout3.addComponent(getButtonConfigSSHMaster());
+        horizontalLayout3.addComponent(getButtonFormatMaster());
 
         verticalLayout.addComponent(grid);
         verticalLayout.addComponent(horizontalLayout);
+        verticalLayout.addComponent(horizontalLayout2);
+        verticalLayout.addComponent(horizontalLayout3);
 
         addComponent(verticalLayout);
 
+        parent.setClosable(true);
         parent.getHadoopInstallation().installHadoop();
     }
 
-    public void addOutput(Task task, Response response) {
-        System.out.println(response);
-        if (task.getTaskStatus().equals(TaskStatus.SUCCESS)) {
-            if(!Strings.isNullOrEmpty(response.getStdOut()) && !response.getStdOut().equals("null")) {
+    public void addOutput(Task task, String stdResult) {
+        if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+            if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
-                str.append(terminal.getValue());
                 str.append("\n");
-                str.append(response.getStdOut());
+                str.append(task.getUuid() + " ");
+                str.append(task.getDescription());
+                str.append(stdResult);
                 terminal.setValue(str);
             }
         } else {
-            if(!Strings.isNullOrEmpty(response.getStdErr()) && !response.getStdErr().equals("null")){
+            if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
-                str.append(terminal.getValue());
                 str.append("\n");
-                str.append(response.getStdErr());
+                str.append(task.getDescription());
+                str.append(stdResult);
                 terminal.setValue(str);
             }
         }
+    }
 
+    private Button getButtonConfigureHadoop(){
+        Button button = new Button("Configure");
+        button.addListener(new Button.ClickListener() {
 
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().configureHadoop();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonConfigureSecondaryNameNode(){
+        Button button = new Button("Configure SNameNode");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().configureSNameNode();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSlaveNameNode(){
+        Button button = new Button("SetSlaveNameNode");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSlaveNameNode();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSlaveJobTracker(){
+        Button button = new Button("setSlaveJobTracker");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSlaveJobTracker();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSSH(){
+        Button button = new Button("SetSSH");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSSH();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonSetSSHMaster(){
+        Button button = new Button("SetSSHMaster");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().setSSHMaster();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonCopySSHSlaves(){
+        Button button = new Button("CopySSHSlaves");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().copySSHSlaves();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonConfigSSHMaster(){
+        Button button = new Button("ConfigSSHMaster");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().configSSHMaster();
+            }
+        });
+
+        return button;
+    }
+
+    private Button getButtonFormatMaster(){
+        Button button = new Button("formatMaster");
+        button.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                parent.getHadoopInstallation().formatMaster();
+            }
+        });
+
+        return button;
     }
 }

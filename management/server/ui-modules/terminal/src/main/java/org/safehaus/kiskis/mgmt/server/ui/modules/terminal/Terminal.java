@@ -283,7 +283,13 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    List<Request> listofrequest = commandManagerInterface.getCommands(null);
+                    List<Request> listofrequest;
+                    if(!Strings.isNullOrEmpty(textAreaCommand.getValue().toString().trim())){
+                        listofrequest = commandManagerInterface.getCommands(UUID.fromString(textAreaCommand.getValue().toString().trim()));
+                    } else {
+                        listofrequest = commandManagerInterface.getCommands(null);
+                    }
+
                     StringBuilder sb = new StringBuilder();
                     for (Request request : listofrequest) {
                         sb.append(request).append("\n");

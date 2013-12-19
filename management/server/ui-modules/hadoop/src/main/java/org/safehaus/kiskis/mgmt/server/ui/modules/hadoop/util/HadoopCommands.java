@@ -34,12 +34,12 @@ public class HadoopCommands {
              "\t    \"taskUuid\": :taskUuid,\n" +
              "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
              "\t    \"workingDirectory\": \"/\",\n" +
-             "\t    \"program\": \"hadoop-configure.sh\",\n" +
+             "\t    \"program\": \". /etc/profile && hadoop-configure.sh\",\n" +
              "\t    \"stdOut\": \"RETURN\",\n" +
              "\t    \"stdErr\": \"RETURN\",\n" +
              "\t    \"runAs\": \"root\",\n" +
              "\t    \"args\": [\n" +
-             "\t      \"hdfs://:namenode:8020\",\":jobtracker:9000\",\":replicationfactor\"\n" +
+             "\t      \":namenode:8020\",\":jobtracker:9000\",\":replicationfactor\"\n" +
              "\t    ],\n" +
              "\t    \"timeout\": 180\n" +
              "\t  }\n" +
@@ -53,7 +53,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -72,7 +72,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -91,7 +91,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -110,12 +110,12 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \"slaves\",\":slave1-hostname\"\n" +
+            "\t      \"slaves\",\":slave-hostname\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
@@ -129,7 +129,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -148,12 +148,12 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \"slaves\",\":slave1-hostname\"\n" +
+            "\t      \"slaves\",\":slave-hostname\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
@@ -167,10 +167,29 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/bin/mkdir /home/.ssh && ssh-keygen -t dsa -P '' -f /home/.ssh/id_dsa\",\n" +
+            "\t    \"program\": \"/bin/mkdir -p /home/.ssh && ssh-keygen -t dsa -P '' -f /home/.ssh/id_dsa\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String COPY_SSH_MASTERS = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"/bin/cat\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"/home/.ssh/id_dsa.pub\"\n" +
+            "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
             "\t}";
@@ -188,7 +207,7 @@ public class HadoopCommands {
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \":PUB_KEY\",\">>\",\"home/.ssh/authorized_keys\"\n" +
+            "\t      \"':PUB_KEY'\",\">>\",\"/home/.ssh/authorized_keys\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
@@ -202,7 +221,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"echo \"Host *\" >> /home/.ssh/config && echo \"StrictHostKeyChecking no\" >> /home/.ssh/config\",\n" +
+            "\t    \"program\": \"echo 'Host *' >> /home/.ssh/config && echo 'StrictHostKeyChecking no' >> /home/.ssh/config\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -218,7 +237,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +

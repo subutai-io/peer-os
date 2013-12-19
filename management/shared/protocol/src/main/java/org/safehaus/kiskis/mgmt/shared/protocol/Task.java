@@ -66,4 +66,22 @@ public class Task implements Serializable {
         return "Task{" + "uuid=" + uuid + ", description=" + description + ", taskStatus=" + taskStatus + ", reqSeqNumber=" + reqSeqNumber + '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Task task = (Task) o;
+
+        return !(uuid != null ? !uuid.equals(task.uuid) : task.uuid != null);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? 1 : 0;
+    }
 }

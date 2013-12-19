@@ -32,7 +32,8 @@ public class CommunicationMessageListener implements MessageListener {
         try {
             String jsonCmd = txtMsg.getText();
             Response response = CommandJson.getResponse(jsonCmd);
-            System.out.println("Received " + CommandJson.getJson(new Command(response)));
+            //LOG.info("Received " + CommandJson.getJson(new Command(response)));
+            System.out.println("\nReceived " + CommandJson.getJson(new Command(response)));
             long ts = System.currentTimeMillis();
             if (response != null) {
                 notifyListeners(response);

@@ -27,23 +27,8 @@ public class Persistence implements PersistenceInterface {
     private String cassandraKeyspace;
     private int cassandraPort;
 
-    public void setCassandraKeyspace(String cassandraKeyspace) {
-        this.cassandraKeyspace = cassandraKeyspace;
-    }
-
-    public void setCassandraHost(String cassandraHost) {
-        this.cassandraHost = cassandraHost;
-    }
-
-    public void setCassandraPort(int cassandraPort) {
-        this.cassandraPort = cassandraPort;
-    }
-
     /**
-     * Saved Agent data into Cassandra agents table
-     *
-     * @param agent
-     * @return the result in boolean
+     * Agent
      */
     @Override
     public boolean saveAgent(Agent agent) {
@@ -54,7 +39,7 @@ public class Persistence implements PersistenceInterface {
                 PreparedStatement stmt = session.prepare(cql);
                 BoundStatement boundStatement = new BoundStatement(stmt);
 
-                ResultSet rs = session.execute(boundStatement.bind(agent.getUuid(),
+                session.execute(boundStatement.bind(agent.getUuid(),
                         agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
                         agent.getMacAddress(), new Date(), agent.getParentHostName()));
                 return true;
@@ -67,17 +52,14 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public List<Agent> getAgentsByHeartbeat(long from, long to) {
-        List<Agent> list = new ArrayList<Agent>();
+    public Agent getAgent(UUID uuid) {
+        Agent agent = new Agent();
         try {
-            String cql = "select * from agents where islxc = false and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
+            String cql = "select * from agents where uuid = ?";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(
-                    new Date(System.currentTimeMillis() - from * 60 * 1000),
-                    new Date(System.currentTimeMillis() - to * 60 * 1000)));
+            ResultSet rs = session.execute(boundStatement.bind(uuid));
             for (Row row : rs) {
-                Agent agent = new Agent();
                 agent.setUuid(row.getUUID("uuid"));
                 agent.setHostname(row.getString("hostname"));
                 agent.setIsLXC(row.getBool("islxc"));
@@ -85,30 +67,17 @@ public class Persistence implements PersistenceInterface {
                 agent.setListIP(row.getList("listip", String.class));
                 agent.setMacAddress(row.getString("macaddress"));
                 agent.setParentHostName(row.getString("parenthostname"));
-                list.add(agent);
             }
-            cql = "select * from agents where islxc = true and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
-            stmt = session.prepare(cql);
-            boundStatement = new BoundStatement(stmt);
-            rs = session.execute(boundStatement.bind(
-                    new Date(System.currentTimeMillis() - from * 60 * 1000),
-                    new Date(System.currentTimeMillis() - to * 60 * 1000)));
-            for (Row row : rs) {
-                Agent agent = new Agent();
-                agent.setUuid(row.getUUID("uuid"));
-                agent.setHostname(row.getString("hostname"));
-                agent.setIsLXC(row.getBool("islxc"));
-                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
-                agent.setListIP(row.getList("listip", String.class));
-                agent.setMacAddress(row.getString("macaddress"));
-                agent.setParentHostName(row.getString("parenthostname"));
-                list.add(agent);
-            }
+
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getAgentsByHeartbeat", ex);
+            LOG.log(Level.SEVERE, "Error in getAgent", ex);
         }
-        return list;
+        return agent;
     }
+
+    /**
+     * Heartbeat, LXC, Physical
+     */
 
     @Override
     public List<Agent> getRegisteredAgents(long freshness) {
@@ -279,14 +248,17 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public Agent getAgent(UUID uuid) {
-        Agent agent = new Agent();
+    public List<Agent> getAgentsByHeartbeat(long from, long to) {
+        List<Agent> list = new ArrayList<Agent>();
         try {
-            String cql = "select * from agents where uuid = ?";
+            String cql = "select * from agents where islxc = false and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            ResultSet rs = session.execute(boundStatement.bind(
+                    new Date(System.currentTimeMillis() - from * 60 * 1000),
+                    new Date(System.currentTimeMillis() - to * 60 * 1000)));
             for (Row row : rs) {
+                Agent agent = new Agent();
                 agent.setUuid(row.getUUID("uuid"));
                 agent.setHostname(row.getString("hostname"));
                 agent.setIsLXC(row.getBool("islxc"));
@@ -294,12 +266,29 @@ public class Persistence implements PersistenceInterface {
                 agent.setListIP(row.getList("listip", String.class));
                 agent.setMacAddress(row.getString("macaddress"));
                 agent.setParentHostName(row.getString("parenthostname"));
+                list.add(agent);
             }
-
+            cql = "select * from agents where islxc = true and lastheartbeat >= ? and lastheartbeat <= ? LIMIT 9999 ALLOW FILTERING";
+            stmt = session.prepare(cql);
+            boundStatement = new BoundStatement(stmt);
+            rs = session.execute(boundStatement.bind(
+                    new Date(System.currentTimeMillis() - from * 60 * 1000),
+                    new Date(System.currentTimeMillis() - to * 60 * 1000)));
+            for (Row row : rs) {
+                Agent agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+                list.add(agent);
+            }
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getAgent", ex);
+            LOG.log(Level.SEVERE, "Error in getAgentsByHeartbeat", ex);
         }
-        return agent;
+        return list;
     }
 
     // TODO Remove this method and reference in blueprint
@@ -308,7 +297,6 @@ public class Persistence implements PersistenceInterface {
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
             session = cluster.connect(cassandraKeyspace);
             System.out.println("Persistence started");
-
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
@@ -327,10 +315,7 @@ public class Persistence implements PersistenceInterface {
     }
 
     /**
-     * Saves command into cassandra
-     *
-     * @param command
-     * @return boolean result
+     * Command
      */
     @Override
     public boolean saveCommand(Command command) {
@@ -355,12 +340,6 @@ public class Persistence implements PersistenceInterface {
         return false;
     }
 
-    /**
-     * Saves response to cassandra
-     *
-     * @param response
-     * @return boolean result
-     */
     @Override
     public boolean saveResponse(Response response) {
         try {
@@ -445,33 +424,16 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
-    public String saveTask(Task task) {
-        try {
-            String cql = "insert into tasks (uuid, description, status) "
-                    + "values (?, ?, ?);";
-            PreparedStatement stmt = session.prepare(cql);
-
-            BoundStatement boundStatement = new BoundStatement(stmt);
-            session.execute(boundStatement.bind(task.getUuid(), task.getDescription(), task.getTaskStatus().toString()));
-
-            return task.getUuid().toString();
-
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveTask", ex);
-        }
-        return null;
-    }
-
-    @Override
     public List<Request> getRequests(UUID taskuuid) {
         List<Request> list = new ArrayList<Request>();
         try {
             String cql = "select * from requests";
             ResultSet rs;
             if (taskuuid == null) {
-                rs = session.execute("select * from requests order by agentuuid, reqseqnum;");
+                cql += " order by agentuuid, reqseqnum;";
+                rs = session.execute(cql);
             } else {
-                cql += " WHERE taskuuid = ? order by agentuuid, reqseqnum;;";
+                cql += " WHERE taskuuid = ? order by agentuuid, reqseqnum;";
                 PreparedStatement stmt = session.prepare(cql);
 
                 BoundStatement boundStatement = new BoundStatement(stmt);
@@ -508,6 +470,27 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getRequests", ex);
         }
         return list;
+    }
+
+    /**
+     * Task
+     */
+    @Override
+    public String saveTask(Task task) {
+        try {
+            String cql = "insert into tasks (uuid, description, status) "
+                    + "values (?, ?, ?);";
+            PreparedStatement stmt = session.prepare(cql);
+
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            session.execute(boundStatement.bind(task.getUuid(), task.getDescription(), task.getTaskStatus().toString()));
+
+            return task.getUuid().toString();
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveTask", ex);
+        }
+        return null;
     }
 
     @Override
@@ -550,6 +533,10 @@ public class Persistence implements PersistenceInterface {
         return task;
     }
 
+    /**
+     * Utils
+     */
+
     @Override
     public boolean truncateTables() {
         try {
@@ -565,6 +552,21 @@ public class Persistence implements PersistenceInterface {
         return true;
     }
 
+    public void setCassandraKeyspace(String cassandraKeyspace) {
+        this.cassandraKeyspace = cassandraKeyspace;
+    }
+
+    public void setCassandraHost(String cassandraHost) {
+        this.cassandraHost = cassandraHost;
+    }
+
+    public void setCassandraPort(int cassandraPort) {
+        this.cassandraPort = cassandraPort;
+    }
+
+    /**
+     * Cassandra
+     */
     @Override
     public boolean saveCassandraClusterInfo(CassandraClusterInfo cluster) {
         try {
@@ -589,8 +591,6 @@ public class Persistence implements PersistenceInterface {
         List<CassandraClusterInfo> list = new ArrayList<CassandraClusterInfo>();
         try {
             String cql = "select * from cassandra_cluster_info";
-//            PreparedStatement stmt = session.prepare(cql);
-//            BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(cql);
             for (Row row : rs) {
                 CassandraClusterInfo cd = new CassandraClusterInfo();
@@ -610,6 +610,35 @@ public class Persistence implements PersistenceInterface {
         return list;
     }
 
+    @Override
+    public CassandraClusterInfo getCassandraClusterInfo(String clusterName) {
+        CassandraClusterInfo cassandraClusterInfo = null;
+        try {
+            String cql = "select * from cassandra_cluster_info where name = ? limit 1 allow filtering";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(clusterName));
+            Row row = rs.one();
+            if (row != null) {
+                cassandraClusterInfo = new CassandraClusterInfo();
+                cassandraClusterInfo.setUuid(row.getUUID("uid"));
+                cassandraClusterInfo.setName(row.getString("name"));
+                cassandraClusterInfo.setCommitLogDir(row.getString("commitlogdir"));
+                cassandraClusterInfo.setDataDir(row.getString("datadir"));
+                cassandraClusterInfo.setSavedCacheDir(row.getString("savedcachedir"));
+                cassandraClusterInfo.setNodes(row.getList("nodes", UUID.class));
+                cassandraClusterInfo.setSeeds(row.getList("seeds", UUID.class));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+        }
+        return cassandraClusterInfo;
+    }
+
+    /**
+     * Hadoop
+     */
     @Override
     public boolean saveHadoopClusterInfo(HadoopClusterInfo cluster) {
         try {
@@ -636,8 +665,6 @@ public class Persistence implements PersistenceInterface {
         List<HadoopClusterInfo> list = new ArrayList<HadoopClusterInfo>();
         try {
             String cql = "select * from hadoop_cluster_info";
-//            PreparedStatement stmt = session.prepare(cql);
-//            BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(cql);
             for (Row row : rs) {
                 HadoopClusterInfo cd = new HadoopClusterInfo();
@@ -657,31 +684,6 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
         return list;
-    }
-
-    public CassandraClusterInfo getCassandraClusterInfo(String clusterName) {
-        CassandraClusterInfo cassandraClusterInfo = null;
-        try {
-            String cql = "select * from cassandra_cluster_info where name = ? limit 1 allow filtering";
-            PreparedStatement stmt = session.prepare(cql);
-            BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(clusterName));
-            Row row = rs.one();
-            if (row != null) {
-                cassandraClusterInfo = new CassandraClusterInfo();
-                cassandraClusterInfo.setUuid(row.getUUID("uid"));
-                cassandraClusterInfo.setName(row.getString("name"));
-                cassandraClusterInfo.setCommitLogDir(row.getString("commitlogdir"));
-                cassandraClusterInfo.setDataDir(row.getString("datadir"));
-                cassandraClusterInfo.setSavedCacheDir(row.getString("savedcachedir"));
-                cassandraClusterInfo.setNodes(row.getList("nodes", UUID.class));
-                cassandraClusterInfo.setSeeds(row.getList("seeds", UUID.class));
-            }
-
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
-        }
-        return cassandraClusterInfo;
     }
 
     public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
