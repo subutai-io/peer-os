@@ -91,7 +91,10 @@ public class CassandraClusterInfo {
 
     @Override
     public String toString() {
-        return "Cluster{" + "uuid=" + uuid + ", name=" + name + ", nodes=" + nodes + ", seeds=" + seeds + ", dataDir=" + dataDir + ", commitLogDir=" + commitLogDir + ", savedCacheDir=" + savedCacheDir + '}';
+        return "Cluster{" + "uuid=" + uuid + ", name=" + name + ", "
+                + "nodes=" + nodes + ", seeds=" + seeds + ", "
+                + "dataDir=" + dataDir + ", commitLogDir=" + commitLogDir + ", "
+                + "savedCacheDir=" + savedCacheDir + '}';
     }
 
 }
