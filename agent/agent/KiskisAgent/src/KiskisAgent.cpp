@@ -1,5 +1,4 @@
-/**   @copyright 2013 Safehaus.org
- *
+/**
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -11,12 +10,8 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- */
-/**   @copyright 2013 Safehaus.org
  *
- * Distributed under the Boost Software License, Version 1.0.
- *    (See accompanying file LICENSE_1_0.txt or copy at
- *          http://www.boost.org/LICENSE_1_0.txt)
+ *    @copyright 2013 Safehaus.org
  */
 /**
  *  @brief     KiskisAgent.cpp
@@ -29,7 +24,6 @@
  *  @version   1.0.1
  *  @date      Dec 17, 2013
  */
-
 /** \mainpage  Welcome to Project KiskisAgent
  *	\section   KisKisAgent
  * 			   The Kiskis Agent is a simple daemon designed to connect securely to an AMQP server to reliably receive and send messages on queues and topics.
@@ -58,6 +52,7 @@ string toString(int intcont)
 	dummy << intcont;
 	return dummy.str();
 }
+
 /**
  *  \details   KiskisAgent's settings.xml is read by this function.
  *  		   url: Broker address is fetched. (for instance: url = "failover://(ssl://localhost:61167))
@@ -81,6 +76,7 @@ int getSettings(string & url, string & connectionOptions, string & loglevel, str
 			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
 	return 0;
 }
+
 /**
  *  \details   UUID of the KiskisAgent is fetched from statically using this function.
  *  		   Example uuid:"ff28d7c7-54b4-4291-b246-faf3dd493544"
@@ -104,6 +100,7 @@ bool getUuid(string& Uuid)
 	}
 	return false;
 }
+
 /**
  *  \details   MACID(eth0) of the KiskisAgent is fetched from statically.
  */
@@ -126,6 +123,7 @@ bool getMacAddress(string& macaddress)
 	}
 	return false;
 }
+
 /**
  *  \details   Hostname of the KiskisAgent machine is fetched from statically.
  */
@@ -148,6 +146,7 @@ bool getHostname(string& hostname)
 	}
 	return false;
 }
+
 /**
  *  \details   IpAddress of the KiskisAgent machine is fetched from statically.
  */
@@ -182,6 +181,7 @@ bool getIpAddresses(vector<string>& myips)
 	}
 	return false;
 }
+
 /**
  *  \details   threadSend function sends string messages in the Shared Memory buffer to ActiveMQ Broker.
  *  		   This is a thread with working concurrently with main thread.
@@ -211,6 +211,7 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 		logMain->writeLog(3,logMain->setLogData("<KiskisAgent>::<threadsend>","New exception Handled:",ex.what()));
 	}
 }
+
 /**
  *  \details   This method checks the Default HeartBeat execution timeout value.
  *  		   if execution timeout is occured it returns true. Otherwise it returns false.
@@ -256,6 +257,7 @@ bool checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* e
 	}
 	return false;	//no timeout occured
 }
+
 /**
  *  \details   This function is the main thread of KiskisAgent.
  *  		   It sends and receives messages from ActiveMQ broker.
@@ -305,7 +307,6 @@ int main(int argc,char *argv[],char *envp[])
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","ConnectionOptions:",connectionOptions));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","LogLevel:",loglevel));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is read successfully.."));
-		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","clientpasswd:",clientpasswd));
 		stringstream(loglevel) >> level;
 		logMain.setLogLevel(level);
 	}

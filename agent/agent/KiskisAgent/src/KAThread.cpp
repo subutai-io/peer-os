@@ -1,5 +1,4 @@
-/**   @copyright 2013 Safehaus.org
- *
+/**
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -11,8 +10,11 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ *
+ *    @copyright 2013 Safehaus.org
  */
 #include "KAThread.h"
+
 /**
  *  \details   Default constructor of the KAThread class.
  */
@@ -25,6 +27,7 @@ KAThread::KAThread()
 	setEXITSTATUS(0);
 	// TODO Auto-generated constructor stub
 }
+
 /**
  *  \details   Default destructor of the KAThread class.
  */
@@ -32,6 +35,7 @@ KAThread::~KAThread()
 {
 	// TODO Auto-generated destructor stub
 }
+
 /**
  *  \details   This method checks CurrentWorking Directory in the command
  *  		   If given CWD does not exist on system, it returns false otherwise it returns true.
@@ -46,6 +50,7 @@ bool KAThread::checkCWD(KACommand *command)
 	else
 		return true;
 }
+
 /**
  *  \details   This method checks and add user Directory in the command
  *  		   If given CWD does not exist on system, it returns false otherwise it returns true.
@@ -66,6 +71,7 @@ bool KAThread::checkUID(KACommand *command)
 		return false;
 	}
 }
+
 /**
  *  \details   This method creates execution string.
  *  		   It combines (environment parameters set if it is exist) && program + arguments.
@@ -102,6 +108,7 @@ string KAThread::createExecString(KACommand *command)
 	logger.writeLog(6,logger.setLogData("<KAThread::createExecString>""Method finished....","pid",toString(getpid())));
 	return exec;
 }
+
 /**
  *  \details   This method check lastly buffer results and sends the buffers to the ActiveMQ broker.
  *  		   This method is only called when the timeout occured or process is done.
@@ -211,6 +218,7 @@ void KAThread::lastCheckAndSend(message_queue *messageQueue,KACommand* command)
 		}
 	}
 }
+
 /**
  *  \details   This method check buffer results and sends the buffers to the ActiveMQ broker.
  *  		   This method calls when any buffer result overflow MaxBuffSize=1000 bytes.
@@ -275,6 +283,7 @@ void KAThread::checkAndSend(message_queue* messageQueue,KACommand* command)
 
 	}
 }
+
 /**
  *  \details   This method is mainly writes the buffers to the files if the modes are capture.
  *  		   This method calls when any response comes to the error or output buffer.
@@ -371,6 +380,7 @@ void KAThread::checkAndWrite(message_queue *messageQueue,KACommand* command)
 		}
 	}
 }
+
 /**
  *  \details   This method checks the execution timeout value.
  *  		   if execution timeout is occured it returns true. Otherwise it returns false.
@@ -421,6 +431,7 @@ bool KAThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsig
 	}
 	return false;	//no timeout occured
 }
+
 /**
  *  \details   This method is creating the capturing threads and timeout thread.
  *  		   It also gets the process id of the execution.
@@ -684,6 +695,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int 
 	this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Capturing is Done!!"));
 	return true;
 }
+
 /**
  *  \details   This method is the main method that forking a new process.
  *  		   It execute the command.
@@ -788,6 +800,7 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 	}
 	return true; //child successfully done
 }
+
 /**
  *  \details   getting "logger" private variable of KAThread instance.
  */
@@ -795,6 +808,7 @@ KALogger& KAThread::getLogger()
 {
 	return this->logger;
 }
+
 /**
  *  \details   setting "logger" private variable of KAThread instance.
  */
@@ -802,6 +816,7 @@ void KAThread::setLogger(KALogger mylogger)
 {
 	this->logger=mylogger;
 }
+
 /**
  *  \details   getting "uid" private variable of KAThread instance.
  */
@@ -809,6 +824,7 @@ KAUserID& KAThread::getUserID()
 {
 	return this->uid;
 }
+
 /**
  *  \details   getting "response" KAResponsepack private variable of KAThread instance.
  */
@@ -816,6 +832,7 @@ KAResponsePack& KAThread::getResponse()
 {
 	return this->response;
 }
+
 /**
  *  \details   getting "errorStream" KAStreamReader private variable of KAThread instance.
  */
@@ -823,6 +840,7 @@ KAStreamReader& KAThread::getErrorStream()
 {
 	return this->errorStream;
 }
+
 /**
  *  \details   getting "outputStream" KAStreamReader private variable of KAThread instance.
  */
@@ -830,6 +848,7 @@ KAStreamReader& KAThread::getOutputStream()
 {
 	return this->outputStream;
 }
+
 /**
  *  \details   getting "CWDERR" private variable of KAThread instance.
  *  		   it shows the current working directory existence. false:CWD does not exist. true:it exist.
@@ -838,6 +857,7 @@ bool& KAThread::getCWDERR()
 {
 	return this->CWDERR;
 }
+
 /**
  *  \details   setting "CWDERR" private variable of KAThread instance.
  */
@@ -845,6 +865,7 @@ void KAThread::setCWDERR(bool cwderr)
 {
 	this->CWDERR=cwderr;
 }
+
 /**
  *  \details   getting "UIDERR" private variable of KAThread instance.
  *  		   it shows the current user existence. false:UID does not exist. true:it exist.
@@ -853,6 +874,7 @@ bool& KAThread::getUIDERR()
 {
 	return this->UIDERR;
 }
+
 /**
  *  \details   setting "UIDERR" private variable of KAThread instance.
  */
@@ -860,6 +882,7 @@ void KAThread::setUIDERR(bool uiderr)
 {
 	this->UIDERR=uiderr;
 }
+
 /**
  *  \details   getting "EXITSTATUS" private variable of KAThread instance.
  */
@@ -867,6 +890,7 @@ int& KAThread::getEXITSTATUS()
 {
 	return this->EXITSTATUS;
 }
+
 /**
  *  \details   setting "EXITSTATUS" private variable of KAThread instance.
  *  		   it shows the error state of the execution if it is bigger than "0" there is some error message in the execution if it is "0" false.
@@ -876,6 +900,7 @@ void KAThread::setEXITSTATUS(int exitstatus)
 {
 	this->EXITSTATUS = exitstatus;
 }
+
 /**
  *  \details   getting "ACTFLAG" private variable of KAThread instance.
  *  		   it shows the activity on the process within default 30 seconds. false:No activity. true:There is at least one activity.
@@ -884,6 +909,7 @@ bool& KAThread::getACTFLAG()
 {
 	return this->ACTFLAG;
 }
+
 /**
  *  \details   setting "ACTFLAG" private variable of KAThread instance.
  */
@@ -891,6 +917,7 @@ void KAThread::setACTFLAG(bool actflag)
 {
 	this->ACTFLAG=actflag;
 }
+
 /**
  *  \details   getting "responsecount" private variable of KAThread instance.
  *  		   it indicates the number of sending resposne.
@@ -899,6 +926,7 @@ int& KAThread::getResponsecount()
 {
 	return this->responsecount;
 }
+
 /**
  *  \details   setting "responsecount" private variable of KAThread instance.
  */
@@ -906,6 +934,7 @@ void KAThread::setResponsecount(int rspcount)
 {
 	this->responsecount=rspcount;
 }
+
 /**
  *  \details   getting "processpid" private variable of KAThread instance.
  *  		   it indicates the process id of the execution.
@@ -914,6 +943,7 @@ int& KAThread::getPpid()
 {
 	return this->processpid;
 }
+
 /**
  *  \details   setting "processpid" private variable of KAThread instance.
  */
@@ -921,6 +951,7 @@ void KAThread::setPpid(int Ppid)
 {
 	this->processpid=Ppid;
 }
+
 /**
  *  \details   getting "outBuff" private variable of KAThread instance.
  *  		   it stores output value to be send.
@@ -929,6 +960,7 @@ string& KAThread::getoutBuff()
 {
 	return this->outBuff;
 }
+
 /**
  *  \details   setting "outBuff" private variable of KAThread instance.
  */
@@ -936,6 +968,7 @@ void KAThread::setoutBuff(string outbuff)
 {
 	this->outBuff = outbuff;
 }
+
 /**
  *  \details   getting "errBuff" private variable of KAThread instance.
  *  		   it stores error value to be send.
@@ -944,6 +977,7 @@ string& KAThread::geterrBuff()
 {
 	return this->errBuff;
 }
+
 /**
  *  \details   setting "errBuff" private variable of KAThread instance.
  */
@@ -951,6 +985,7 @@ void KAThread::seterrBuff(string errbuff)
 {
 	this->errBuff = errbuff;
 }
+
 /**
  *  \details   This method executes the given command and returns its answer.
  *  		   This is used for getting pid of the execution.
@@ -975,6 +1010,7 @@ string KAThread::getProcessPid(const char* cmd)
 	pclose(pipe);
 	return result;
 }
+
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */

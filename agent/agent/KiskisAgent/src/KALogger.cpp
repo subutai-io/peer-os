@@ -1,5 +1,4 @@
-/**   @copyright 2013 Safehaus.org
- *
+/**
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -11,8 +10,11 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ *
+ *    @copyright 2013 Safehaus.org
  */
 #include "KALogger.h"
+
 /**
  *  \details   Default constructor of the KALogger class.
  */
@@ -20,6 +22,7 @@ KALogger::KALogger()
 {
 	// TODO Auto-generated constructor stub
 }
+
 /**
  *  \details   Default destructor of the KALogger class.
  */
@@ -27,6 +30,7 @@ KALogger::~KALogger()
 {
 	// TODO Auto-generated destructor stub
 }
+
 /**
  *  \details   getting "loglevel" private variable of the KALogger instance.
  */
@@ -34,6 +38,7 @@ int KALogger::getLogLevel()
 {
 	return this->loglevel;
 }
+
 /**
  *  \details   setting "loglevel" private variable of the KALogger instance.
  *  		   This level indicates that the loglevel status.
@@ -43,6 +48,7 @@ void KALogger::setLogLevel(int loglevel)
 {
 	this->loglevel=loglevel;
 }
+
 /**
  *  \details   This method creates local time values as a string.
  *  		   The return value as dd-mm-yy hh:mm::ss
@@ -53,6 +59,7 @@ string KALogger::getLocaltime()
 
 	return toString(now.date().day().as_number()) +"-"+ toString(now.date().month().as_number())+"-" +toString(now.date().year()) +" "+ toString(now.time_of_day().hours())+":"+toString(now.time_of_day().minutes())+":"+toString(now.time_of_day().seconds());
 }
+
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */
@@ -62,6 +69,7 @@ string KALogger::toString(int intcont)
 	dummy << intcont;
 	return dummy.str();
 }
+
 /**
  *  \details   This method opens a log file.
  *  		   For name production, local time,process ID and Sequence Number are used.
@@ -83,6 +91,7 @@ bool KALogger::openLogFile(int pid,int requestSequenceNumber)
 	else
 		return false;
 }
+
 /**
  *  \details   This method opens a log file with given name.
  *   		   return true if file pointer successfully created and assigned.
@@ -99,6 +108,7 @@ bool KALogger::openLogFileWithName(string logfilename)
 	else
 		return false;
 }
+
 /**
  *  \details   This method closed the log file.
  */
@@ -106,10 +116,15 @@ void KALogger::closeLogFile()
 {
 	fclose(logFile);
 }
+
+/**
+ *  \details   This method sets the log data.
+ */
 string KALogger::setLogData(string text,string param1,string value1,string param2,string value2)
 {
 	return text + " " + param1 + " " + value1 + " " + param2 + " " + value2;
 }
+
 /**
  *  \details   This method writes the logs to log files according to 8 log level.
  */
