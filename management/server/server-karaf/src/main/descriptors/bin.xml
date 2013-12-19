@@ -25,6 +25,7 @@
                 <exclude>etc/AmqConfig.cfg</exclude>
                 <exclude>etc/CassConfig.cfg</exclude>
                 <exclude>etc/AptRepoConfig.cfg</exclude>
+                <exclude>etc/MiscConfig.cfg</exclude>
             </excludes>
         </fileSet>
 
