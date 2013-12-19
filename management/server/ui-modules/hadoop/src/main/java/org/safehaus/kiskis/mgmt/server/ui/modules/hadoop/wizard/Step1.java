@@ -10,8 +10,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.List;
 
@@ -21,6 +19,9 @@ import java.util.List;
 public class Step1 extends Panel {
 
     private HadoopWizard parent;
+    private ComboBox comboBoxNameNode;
+    private ComboBox comboBoxJobTracker;
+    private ComboBox comboBoxSecondaryNameNode;
 
     public Step1(final HadoopWizard hadoopWizard) {
         this.parent = hadoopWizard;
@@ -61,15 +62,15 @@ public class Step1 extends Panel {
         Label labelNameNode = new Label("Choose the host that will run Name Node:");
         verticalLayoutForm.addComponent(labelNameNode);
 
-        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, parent.getLxcList());
-        ComboBox comboBoxNameNode = new ComboBox("Name Node", agents);
+        comboBoxNameNode = new ComboBox("Name Node", getDataSourceMasters());
         comboBoxNameNode.setMultiSelect(false);
         comboBoxNameNode.setImmediate(true);
         comboBoxNameNode.setItemCaptionPropertyId("hostname");
-        comboBoxNameNode.addListener(new Property.ValueChangeListener(){
+        comboBoxNameNode.addListener(new Property.ValueChangeListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent event){
+            public void valueChange(Property.ValueChangeEvent event) {
                 parent.getHadoopInstallation().setNameNode((Agent) event.getProperty().getValue());
+                comboBoxJobTracker.setContainerDataSource(getDataSourceMasters());
             }
         });
         verticalLayoutForm.addComponent(comboBoxNameNode);
@@ -77,14 +78,15 @@ public class Step1 extends Panel {
         Label labelJobTracker = new Label("Choose the host that will run Job Tracker:");
         verticalLayoutForm.addComponent(labelJobTracker);
 
-        ComboBox comboBoxJobTracker = new ComboBox("Job Tracker", agents);
+        comboBoxJobTracker = new ComboBox("Job Tracker", getDataSourceMasters());
         comboBoxJobTracker.setMultiSelect(false);
         comboBoxJobTracker.setImmediate(true);
         comboBoxJobTracker.setItemCaptionPropertyId("hostname");
-        comboBoxJobTracker.addListener(new Property.ValueChangeListener(){
+        comboBoxJobTracker.addListener(new Property.ValueChangeListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent event){
+            public void valueChange(Property.ValueChangeEvent event) {
                 parent.getHadoopInstallation().setJobTracker((Agent) event.getProperty().getValue());
+                comboBoxSecondaryNameNode.setContainerDataSource(getDataSourceMasters());
             }
         });
         verticalLayoutForm.addComponent(comboBoxJobTracker);
@@ -92,13 +94,13 @@ public class Step1 extends Panel {
         Label labelSecondaryNameNode = new Label("Choose the host that will run Secondary Name Node:");
         verticalLayoutForm.addComponent(labelSecondaryNameNode);
 
-        ComboBox comboBoxSecondaryNameNode = new ComboBox("Secondary Name Node", agents);
+        comboBoxSecondaryNameNode = new ComboBox("Secondary Name Node", getDataSourceMasters());
         comboBoxSecondaryNameNode.setMultiSelect(false);
         comboBoxSecondaryNameNode.setImmediate(true);
         comboBoxSecondaryNameNode.setItemCaptionPropertyId("hostname");
-        comboBoxSecondaryNameNode.addListener(new Property.ValueChangeListener(){
+        comboBoxSecondaryNameNode.addListener(new Property.ValueChangeListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent event){
+            public void valueChange(Property.ValueChangeEvent event) {
                 parent.getHadoopInstallation().setsNameNode((Agent) event.getProperty().getValue());
             }
         });
@@ -108,13 +110,13 @@ public class Step1 extends Panel {
         verticalLayoutForm.addComponent(labelReplicationFactor);
 
         ComboBox comboBoxReplicationFactor = new ComboBox("Dfs Replication Factor");
-        for(int i=1; i<=5; i++){
+        for (int i = 1; i <= 5; i++) {
             comboBoxReplicationFactor.addItem(i);
         }
         comboBoxReplicationFactor.setImmediate(true);
-        comboBoxReplicationFactor.addListener(new Property.ValueChangeListener(){
+        comboBoxReplicationFactor.addListener(new Property.ValueChangeListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent event){
+            public void valueChange(Property.ValueChangeEvent event) {
                 parent.getHadoopInstallation().setReplicationFactor((Integer) event.getProperty().getValue());
             }
         });
@@ -138,5 +140,23 @@ public class Step1 extends Panel {
         verticalLayout.addComponent(next);
 
         addComponent(verticalLayout);
+    }
+
+    private BeanItemContainer getDataSourceMasters(){
+        List<Agent> list = parent.getLxcList();
+
+        if(parent.getHadoopInstallation().getsNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getsNameNode());
+        }
+
+        if(parent.getHadoopInstallation().getNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getNameNode());
+        }
+
+        if(parent.getHadoopInstallation().getJobTracker() != null){
+            list.remove(parent.getHadoopInstallation().getJobTracker());
+        }
+
+        return new BeanItemContainer<Agent>(Agent.class, list);
     }
 }

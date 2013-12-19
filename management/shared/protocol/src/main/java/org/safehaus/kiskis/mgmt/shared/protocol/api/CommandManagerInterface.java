@@ -11,7 +11,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
  */
 public interface CommandManagerInterface {
 
-//    List<Command> getCommandList(Agent agent);
     void executeCommand(Command command);
 
     void addListener(CommandListener listener);
@@ -39,4 +38,8 @@ public interface CommandManagerInterface {
     public boolean saveCassandraClusterData(CassandraClusterInfo cluster);
 
     public List<CassandraClusterInfo> getCassandraClusterData();
+
+    public List<HadoopClusterInfo> getHadoopClusterData();
+
+    public boolean saveHadoopClusterData(HadoopClusterInfo cluster);
 }

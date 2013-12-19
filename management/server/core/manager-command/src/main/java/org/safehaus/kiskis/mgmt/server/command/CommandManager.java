@@ -176,6 +176,16 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
         return persistenceCommand.getCassandraClusterInfo();
     }
 
+    @Override
+    public List<HadoopClusterInfo> getHadoopClusterData() {
+        return persistenceCommand.getHadoopClusterInfo();
+    }
+
+    @Override
+    public boolean saveHadoopClusterData(HadoopClusterInfo cluster) {
+        return persistenceCommand.saveHadoopClusterInfo(cluster);
+    }
+
     public Task getTask(UUID uuid) {
         return persistenceCommand.getTask(uuid);
     }
