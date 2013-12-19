@@ -10,10 +10,11 @@ import com.vaadin.ui.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
@@ -42,17 +43,20 @@ public class Step6 extends FormLayout {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) Welcome<br>"
-                + " 2) List nodes<br>"
-                + " 3) Installation<br>"
-                + " 4) <font color=\"#f14c1a\"><strong>Configuration</strong></font>");
+                + " 1) <font color=\"#f14c1a\"><strong>Welcome</strong></font><br>"
+                + " 2) Install<br>"
+                + " 3) Set listen and rpc addresss<br>"
+                + " 4) Set seeds<br>"
+                + " 5) Set cluster name<br>"
+                + " 6) <strong>Set folders</strong><br>"
+        );
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
 
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        Label label = new Label("<strong>Choose directories</strong>");
+        Label label = new Label("<strong>Set directories</strong>");
         label.setContentMode(Label.CONTENT_XHTML);
 
         grid.addComponent(label, 2, 0, 5, 0);
@@ -70,7 +74,7 @@ public class Step6 extends FormLayout {
         grid.addComponent(textFieldSavedCachesDir, 2, 3, 5, 3);
         grid.setComponentAlignment(textFieldSavedCachesDir, Alignment.TOP_LEFT);
 
-        Button next = new Button("Set directories and Finish (Save)");
+        Button next = new Button("Finish");
         next.addListener(new Button.ClickListener() {
 
             @Override
@@ -78,21 +82,16 @@ public class Step6 extends FormLayout {
                 String dataDir = textFieldDataDir.getValue().toString();
                 String commitDir = textFieldCommitLogDir.getValue().toString();
                 String cacheDir = textFieldSavedCachesDir.getValue().toString();
-                List<UUID> nodes = new ArrayList<UUID>();
+                
                 if (dataDir.length() > 0 && commitDir.length() > 0 && cacheDir.length() > 0) {
                     cassandraWizard.getCluster().setDataDir(dataDir);
                     cassandraWizard.getCluster().setCommitLogDir(commitDir);
                     cassandraWizard.getCluster().setSavedCacheDir(cacheDir);
 
                     for (Agent agent : cassandraWizard.getLxcList()) {
-                        nodes.add(agent.getUuid());
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                         UUID taskUuid = cassandraWizard.getTask().getUuid();
                         List<String> args = new ArrayList<String>();
-//                    args.add("--force-yes");
-//                    args.add("--assume-yes");
-//                    args.add("install");
-//                    args.add("ksks-cassandra");
                         dataDirCommand = dataDirCommand.replace("%dir", dataDir);
                         Command command = buildCommand(agent.getUuid(), dataDirCommand, reqSeqNumber, taskUuid, args);
                         cassandraWizard.runCommand(command);
@@ -106,23 +105,18 @@ public class Step6 extends FormLayout {
                         cassandraWizard.runCommand(command);
 
                     }
-                } else {
-                    getWindow().showNotification(
-                            "Please fill the form.",
-                            Window.Notification.TYPE_TRAY_NOTIFICATION);
-                }
+                } 
 
-                cassandraWizard.getCluster().setNodes(nodes);
                 cassandraWizard.showNext();
             }
         });
 
-        Button back = new Button("Back");
+        Button back = new Button("Cancel");
         back.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cassandraWizard.showBack();
+                cassandraWizard.cancelWizard();
             }
         });
 
@@ -137,23 +131,21 @@ public class Step6 extends FormLayout {
     }
 
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
-
-        Request request = new Request();
-        request.setSource("CassandraModule");
-        request.setProgram(program);
-        request.setUuid(uuid);
-        request.setType(RequestType.EXECUTE_REQUEST);
-        request.setTaskUuid(taskUuid);
-        request.setWorkingDirectory("/");
-        request.setStdOut(OutputRedirection.RETURN);
-        request.setStdErr(OutputRedirection.RETURN);
-        request.setRunAs("root");
-        request.setTimeout(0);
-        request.setArgs(args);
-        request.setRequestSequenceNumber(reqSeqNumber);
-        Command command = new Command(request);
-
-        return command;
+        return (Command) CommandFactory.createRequest(
+                RequestType.EXECUTE_REQUEST,
+                uuid,
+                CassandraModule.MODULE_NAME,
+                taskUuid,
+                reqSeqNumber,
+                "/",
+                program,
+                OutputRedirection.RETURN,
+                OutputRedirection.RETURN,
+                null,
+                null,
+                "root",
+                args,
+                null);
     }
 
 }

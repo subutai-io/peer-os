@@ -32,9 +32,12 @@ public class Step1 extends Panel {
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
                 + " 1) <font color=\"#f14c1a\"><strong>Welcome</strong></font><br>"
-                + " 2) List nodes<br>"
-                + " 3) Installation<br>"
-                + " 4) Configuration<br>");
+                + " 2) Install<br>"
+                + " 3) Set listen and rpc addresss<br>"
+                + " 4) Set seeds<br>"
+                + " 5) Set cluster name<br>"
+                + " 6) Set folders<br>"
+        );
 
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);

@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 
 /**
@@ -22,7 +23,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
  */
 public class Step2 extends Panel {
 
-//    CassandraWizard cassandraWizard;
 //    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
     String installationCommand = "sudo dpkg -i /home/bahadyr/Downloads/ksks-cassandra-1.0.deb";
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
@@ -44,30 +44,36 @@ public class Step2 extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) Welcome<br>"
-                + " 2) <font color=\"#f14c1a\"><strong>List nodes</strong></font><br>"
-                + " 3) Installation<br>"
-                + " 4) Configuration<br>");
+                + " 1) <font color=\"#f14c1a\">Welcome</font><br>"
+                + " 2) <strong>Install</strong><br>"
+                + " 3) Set listen and rpc addresss<br>"
+                + " 4) Set seeds<br>"
+                + " 5) Set cluster name<br>"
+                + " 6) Set folders<br>"
+        );
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
 
         grid.addComponent(menu, 0, 0, 1, 5);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        Label label = new Label("Please enter the list of hosts to be included in the cluster");
+        Label label = new Label("Target hosts");
         label.setContentMode(Label.CONTENT_XHTML);
 
         grid.addComponent(label, 2, 0, 5, 0);
         grid.setComponentAlignment(label, Alignment.TOP_CENTER);
 
-        Label label1 = new Label("<strong>Target Hosts</strong><br>"
-                + "<br>");
+        StringBuilder sb = new StringBuilder();
+        for (Agent a : cassandraWizard.getLxcList()) {
+            sb.append(a.getHostname()).append("<br/>");
+        }
+        Label label1 = new Label(sb.toString());
         label1.setContentMode(Label.CONTENT_XHTML);
 
         grid.addComponent(label1, 2, 1, 5, 1);
         grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
 
-        Button next = new Button("Install");
+        Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
             @Override
@@ -76,10 +82,6 @@ public class Step2 extends Panel {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
-//                    args.add("--force-yes");
-//                    args.add("--assume-yes");
-//                    args.add("install");
-//                    args.add("ksks-cassandra");
                     Command command = buildCommand(agent.getUuid(), installationCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
 
@@ -87,23 +89,12 @@ public class Step2 extends Panel {
                 cassandraWizard.showNext();
             }
         });
-        Button back = new Button("Back");
+        Button back = new Button("Cancel");
         back.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Agent agent : cassandraWizard.getLxcList()) {
-                    int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
-                    UUID taskUuid = cassandraWizard.getTask().getUuid();
-                    List<String> args = new ArrayList<String>();
-//                    args.add("--force-yes");
-//                    args.add("--assume-yes");
-//                    args.add("purge");
-//                    args.add("ksks-cassandra");
-                    Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
-                    cassandraWizard.runCommand(command);
-                }
-                cassandraWizard.showBack();
+                cassandraWizard.cancelWizard();
             }
         });
 
@@ -118,26 +109,10 @@ public class Step2 extends Panel {
     }
 
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
-
-//        Request request = new Request();
-//        request.setSource("CassandraModule");
-//        request.setProgram(program);
-//        request.setUuid(uuid);
-//        request.setType(RequestType.EXECUTE_REQUEST);
-//        request.setTaskUuid(taskUuid);
-//        request.setWorkingDirectory("/");
-//        request.setStdOut(OutputRedirection.RETURN);
-//        request.setStdErr(OutputRedirection.RETURN);
-//        request.setRunAs("root");
-//        request.setTimeout(0);
-//        request.setArgs(args);
-//        request.setRequestSequenceNumber(reqSeqNumber);
-//        Command command = new Command(request);
-//        return command;
         return (Command) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST,
                 uuid,
-                "CassandraModule",
+                CassandraModule.MODULE_NAME,
                 taskUuid,
                 reqSeqNumber,
                 "/",
@@ -149,7 +124,6 @@ public class Step2 extends Panel {
                 "root",
                 args,
                 null);
-
     }
 
 }
