@@ -79,7 +79,7 @@ public:
 	void setoutBuff(string);
 	void seterrBuff(string);
 	void setLogger(KALogger);
-	int optionReadSend(message_queue*,KACommand*,int);
+	int optionReadSend(message_queue*,KACommand*,int,int*);
 	void checkAndWrite(message_queue*,KACommand*);
 	void checkAndSend(message_queue*,KACommand*);
 	void lastCheckAndSend(message_queue*,KACommand*);

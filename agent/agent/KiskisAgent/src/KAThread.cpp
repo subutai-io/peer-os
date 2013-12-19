@@ -437,7 +437,7 @@ bool KAThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsig
  *  		   It also gets the process id of the execution.
  *  		   It manages the lifecycle of the threads and handles capturing and sending execution responses using these threads.
  */
-int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int newpid)
+int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int newpid, int* ret)
 {
 	/*
 	 *	Getting system pid of child process
@@ -678,16 +678,19 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int 
 		/*
 		 * Execute Done Response is sending..
 		 */
+		int val;
+		close(ret[1]);
+		read(ret[0], &val, sizeof(val));
+		close(ret[0]);
 
-		int exitcode = 0;
-		if(this->getEXITSTATUS() || this->getCWDERR() == true || this->getUIDERR() == true)
-			exitcode = 1;
+		if(this->getCWDERR() == true || this->getUIDERR() == true)
+			val = 1;
 
 		this->lastCheckAndSend(messageQueue,command);
 
 		this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Done message is sending.."));
 		string message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-				this->getResponsecount(),command->getSource(),command->getTaskUuid(),exitcode);
+				this->getResponsecount(),command->getSource(),command->getTaskUuid(),val);
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
 		this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "Process Last Message",message));
 	}
@@ -728,6 +731,11 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			/* an error occurred pipe of pipeerror or output */
 			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Error opening pipes!!"));
 		}
+
+		int ret[2];
+		int val = 0; //for system return value
+		pipe(ret);
+		signal(SIGCHLD, SIG_DFL);
 		int newpid=fork();
 		if(newpid==0)
 		{	// Child execute the command
@@ -754,8 +762,14 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 				exit(1);
 				//problem about UID
 			}
+
 			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Execution is starting!!","pid",pidchldnumstr));
-			system(createExecString(command).c_str());	//execution of command is starting now..
+			val = system(createExecString(command).c_str());	//execution of command is starting now..
+
+			close(ret[0]);
+			write(ret[1], &val, sizeof(val));
+			close(ret[1]);
+
 			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
 			exit(EXIT_SUCCESS);
 		}
@@ -769,10 +783,11 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			//Parent read the result and send back
 			try
 			{
+				signal(SIGCHLD, SIG_IGN);
 				this->getErrorStream().closePipe(1);
 				this->getOutputStream().closePipe(1);
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend is starting!!","pid",toString(getpid())));
-				optionReadSend(messageQueue,command,newpid);
+				optionReadSend(messageQueue,command,newpid,ret);
 				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend has finished!!","pid",toString(getpid())));
 				this->getErrorStream().closePipe(0);
 				this->getOutputStream().closePipe(0);
