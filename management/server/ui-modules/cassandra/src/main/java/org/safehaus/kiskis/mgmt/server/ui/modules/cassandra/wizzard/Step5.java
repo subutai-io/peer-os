@@ -77,7 +77,7 @@ public class Step5 extends Panel {
                 cassandraWizard.showNext();
             }
         });
-        Button back = new Button("Back");
+        Button back = new Button("Cancel");
         back.addListener(new Button.ClickListener() {
 
             @Override

@@ -111,7 +111,7 @@ public class Step6 extends FormLayout {
             }
         });
 
-        Button back = new Button("Back");
+        Button back = new Button("Cancel");
         back.addListener(new Button.ClickListener() {
 
             @Override
