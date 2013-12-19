@@ -51,11 +51,11 @@ public class NodesWindow extends Window {
         setCaption(caption);
         setSizeUndefined();
         setWidth("600px");
-        setHeight("400px");
+        setHeight("500px");
 
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
-        table.setPageLength(10);
+        table.setPageLength(6);
         table.setImmediate(true);
 
         addComponent(table);
