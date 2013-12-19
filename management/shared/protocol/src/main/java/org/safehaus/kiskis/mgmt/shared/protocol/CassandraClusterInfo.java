@@ -22,12 +22,12 @@ public class CassandraClusterInfo {
             SAVEDCACHEDIR_LOG = "savedCacheDir";
 
     private UUID uuid;
-    private String name;
+    private String name = "Test Cluster";
     private List<UUID> nodes;
     private List<UUID> seeds;
-    private String dataDir;
-    private String commitLogDir;
-    private String savedCacheDir;
+    private String dataDir = "/var/lib/cassandra/data";
+    private String commitLogDir = "/var/lib/cassandra/commitlog";
+    private String savedCacheDir = "/var/lib/cassandra/saved_caches";
 
     public CassandraClusterInfo() {
         this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
@@ -91,7 +91,10 @@ public class CassandraClusterInfo {
 
     @Override
     public String toString() {
-        return "Cluster{" + "uuid=" + uuid + ", name=" + name + ", nodes=" + nodes + ", seeds=" + seeds + ", dataDir=" + dataDir + ", commitLogDir=" + commitLogDir + ", savedCacheDir=" + savedCacheDir + '}';
+        return "Cluster{" + "uuid=" + uuid + ", name=" + name + ", "
+                + "nodes=" + nodes + ", seeds=" + seeds + ", "
+                + "dataDir=" + dataDir + ", commitLogDir=" + commitLogDir + ", "
+                + "savedCacheDir=" + savedCacheDir + '}';
     }
 
 }
