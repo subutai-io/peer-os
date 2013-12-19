@@ -1,7 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
-import com.vaadin.terminal.ClassResource;
-import com.vaadin.terminal.FileResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
