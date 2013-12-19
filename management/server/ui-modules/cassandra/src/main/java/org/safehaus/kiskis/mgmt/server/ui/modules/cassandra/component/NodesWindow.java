@@ -5,6 +5,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -14,62 +15,129 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 12/1/13
- * Time: 1:38 AM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
  */
 public class NodesWindow extends Window {
-    private Table table;
+
+    private final Table table;
     private IndexedContainer container;
-    private List<UUID> list;
-    
-    
+    private final List<UUID> list;
+    private final CommandManagerInterface commandManager;
+    private Task task;
+    private final TextArea terminal;
+
     /**
-     * 
+     *
      * @param caption
-     * @param list 
+     * @param list
+     * @param commandManager
      */
-    public NodesWindow(String caption, List<UUID> list){
+    public NodesWindow(String caption, List<UUID> list, CommandManagerInterface commandManager) {
         this.list = list;
+        this.commandManager = commandManager;
+
         setCaption(caption);
         setSizeUndefined();
+        setWidth("600px");
+        setHeight("500px");
 
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
-
-        table.setPageLength(20);
+        table.setPageLength(6);
         table.setImmediate(true);
 
         addComponent(table);
+        terminal = new TextArea();
+        terminal.setRows(6);
+        terminal.setColumns(65);
+        terminal.setImmediate(true);
+        terminal.setWordwrap(true);
+        addComponent(terminal);
+
     }
 
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
-
-        // Create the container properties
         container.addContainerProperty("hostname", String.class, "");
         container.addContainerProperty("uuid", UUID.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
-
-        // Create some orders
         for (UUID uuid : list) {
             addOrderToContainer(container, getAgentManager().getAgent(uuid));
         }
-
         return container;
     }
 
-    private void addOrderToContainer(Container container, Agent agent) {
+    private void addOrderToContainer(Container container, final Agent agent) {
         Object itemId = container.addItem();
         Item item = container.getItem(itemId);
         item.getItemProperty("hostname").setValue(agent.getHostname());
         item.getItemProperty("uuid").setValue(agent.getUuid());
-        item.getItemProperty("Start").setValue(new Button("Start"));
-        item.getItemProperty("Stop").setValue(new Button("Stop"));
+
+        Button startButton = new Button("Start");
+        startButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                createTask();
+                int reqSeqNumber = task.getIncrementedReqSeqNumber();
+                Command command = (Command) CommandFactory.createRequest(
+                        RequestType.EXECUTE_REQUEST,
+                        agent.getUuid(),
+                        CassandraModule.MODULE_NAME,
+                        task.getUuid(),
+                        reqSeqNumber,
+                        "/",
+                        "service cassandra start",
+                        OutputRedirection.RETURN,
+                        OutputRedirection.RETURN,
+                        null,
+                        null,
+                        "root",
+                        null,
+                        null);
+                commandManager.executeCommand(command);
+            }
+        });
+        Button stopButton = new Button("Stop");
+        stopButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                createTask();
+                int reqSeqNumber = task.getIncrementedReqSeqNumber();
+                Command command = (Command) CommandFactory.createRequest(
+                        RequestType.EXECUTE_REQUEST,
+                        agent.getUuid(),
+                        CassandraModule.MODULE_NAME,
+                        task.getUuid(),
+                        reqSeqNumber,
+                        "/",
+                        "service cassandra stop",
+                        OutputRedirection.RETURN,
+                        OutputRedirection.RETURN,
+                        null,
+                        null,
+                        "root",
+                        null,
+                        null);
+                commandManager.executeCommand(command);
+            }
+        });
+        item.getItemProperty("Start").setValue(startButton);
+        item.getItemProperty("Stop").setValue(stopButton);
     }
 
     public static AgentManagerInterface getAgentManager() {
@@ -84,4 +152,22 @@ public class NodesWindow extends Window {
 
         return null;
     }
+
+    private void createTask() {
+        task = new Task();
+        task.setDescription("Nodes task");
+        task.setTaskStatus(TaskStatus.NEW);
+    }
+
+    public void setOutput(Response response) {
+        System.out.println("setoutput" + response.getTaskUuid());
+        for (ParseResult pr : commandManager.parseTask(task, true)) {
+            terminal.setValue(pr.getResponse().getStdOut());
+        }
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
 }
