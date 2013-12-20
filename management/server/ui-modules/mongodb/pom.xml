@@ -46,7 +46,7 @@
                         <configuration>
                             <tasks>
                                 <copy file="${basedir}/target/mongodb-module-0.0.1-SNAPSHOT.jar" 
-                                       todir="/home/dilshat/Temp/mgmt-server-karaf-0.0.1-SNAPSHOT/system/kiskis-server"/>
+                                      todir="/home/dilshat/Temp/mgmt-server-karaf-0.0.1-SNAPSHOT/system/kiskis-server"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -54,7 +54,25 @@
                         </goals>
                     </execution> 
                 </executions>
-            </plugin>            
+            </plugin>          
+            
+<!--            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>/home/dilshat/Temp/mgmt-server-karaf-0.0.1-SNAPSHOT/data</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>-->
+            
         </plugins>
     </build>
     <!--
