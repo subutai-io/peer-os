@@ -27,5 +27,6 @@
         <module>pig</module>
         <module>hive</module>
         <module>hcatalog</module>
+        <module>flume</module>
     </modules>
 </project>
