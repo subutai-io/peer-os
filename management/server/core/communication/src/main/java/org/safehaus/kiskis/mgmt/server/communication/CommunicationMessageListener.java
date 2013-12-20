@@ -33,14 +33,14 @@ public class CommunicationMessageListener implements MessageListener {
             String jsonCmd = txtMsg.getText();
             Response response = CommandJson.getResponse(jsonCmd);
             //LOG.info("Received " + CommandJson.getJson(new Command(response)));
-            System.out.println("\nReceived " + CommandJson.getJson(new Command(response)));
+            LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(new Command(response)));
             long ts = System.currentTimeMillis();
             if (response != null) {
                 notifyListeners(response);
             } else {
-                System.out.println("Could not parse response");
+                LOG.log(Level.WARNING, "Could not parse response{0}", jsonCmd);
             }
-            System.out.println("Processed notify listeners in Communication in " + (System.currentTimeMillis() - ts) + " ms");
+            LOG.log(Level.INFO, "Processed notify listeners in Communication in {0} ms", (System.currentTimeMillis() - ts));
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, "Error in onMessage", ex);
         }

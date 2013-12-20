@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.services;
 
-import java.util.List;
+import java.util.Queue;
 
 public interface ModuleService {
 
@@ -8,7 +8,7 @@ public interface ModuleService {
 
     public void unregisterModule(Module module);
 
-    public List<Module> getModules();
+    public Queue<Module> getModules();
 
     public void addListener(ModuleServiceListener listener);
 

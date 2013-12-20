@@ -111,9 +111,9 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
                     //
                 }
                 agentNotifier.refresh = true;
-                System.out.println(String.format("Agent %s is %s", agent.getHostname(), register ? "registered" : "updated"));
+                LOG.log(Level.INFO, String.format("Agent %s is %s", agent.getHostname(), register ? "registered" : "updated"));
             } else {
-                System.out.println(String.format("\nError %s agent %s", register ? "registering" : "updating", agent.getHostname()));
+                LOG.log(Level.WARNING, String.format("\nError %s agent %s", register ? "registering" : "updating", agent.getHostname()));
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in updatAgent", ex);

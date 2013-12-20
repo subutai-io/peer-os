@@ -284,7 +284,7 @@ public class Terminal implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     List<Request> listofrequest;
-                    if(!Strings.isNullOrEmpty(textAreaCommand.getValue().toString().trim())){
+                    if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString().trim())) {
                         listofrequest = commandManagerInterface.getCommands(UUID.fromString(textAreaCommand.getValue().toString().trim()));
                     } else {
                         listofrequest = commandManagerInterface.getCommands(null);
@@ -416,17 +416,17 @@ public class Terminal implements Module {
     }
 
     public void setModuleService(ModuleService service) {
-        System.out.println("Terminal: registering with ModuleService");
+        LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
         service.registerModule(this);
     }
 
     public void unsetModuleService(ModuleService service) {
+        LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
         service.unregisterModule(this);
 
         if (getCommandManager() != null) {
             getCommandManager().removeListener(component);
         }
-        System.out.println("Terminal: Unregistering with ModuleService");
     }
 
     public static CommandManagerInterface getCommandManager() {

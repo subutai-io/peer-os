@@ -114,7 +114,7 @@ public class CommandTransport implements CommandTransportInterface {
                 producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);
                 String json = CommandJson.getJson(command);
                 //LOG.info("Sending: " + json);
-                System.out.println("\nSending: " + json);
+                LOG.log(Level.INFO, "\nSending: {0}", json);
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
             } catch (JMSException ex) {
@@ -195,7 +195,7 @@ public class CommandTransport implements CommandTransportInterface {
             pooledConnectionFactory.setMaxConnections(amqMaxPooledConnections);
             pooledConnectionFactory.start();
             setupListener();
-            System.out.println("ActiveMQ started...");
+            LOG.log(Level.INFO, "ActiveMQ started...");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
@@ -222,7 +222,7 @@ public class CommandTransport implements CommandTransportInterface {
                 } catch (Exception e) {
                 }
             }
-            System.out.println("ActiveMQ stopped...");
+            LOG.log(Level.INFO, "ActiveMQ stopped...");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
@@ -246,7 +246,7 @@ public class CommandTransport implements CommandTransportInterface {
     @Override
     public void addListener(ResponseListener listener) {
         try {
-            if(listener != null && communicationMessageListener != null){
+            if (listener != null && communicationMessageListener != null) {
                 communicationMessageListener.addListener(listener);
             }
         } catch (Exception ex) {

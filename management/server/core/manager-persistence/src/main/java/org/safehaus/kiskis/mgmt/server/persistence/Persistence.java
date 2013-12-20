@@ -78,7 +78,6 @@ public class Persistence implements PersistenceInterface {
     /**
      * Heartbeat, LXC, Physical
      */
-
     @Override
     public List<Agent> getRegisteredAgents(long freshness) {
         List<Agent> list = new ArrayList<Agent>();
@@ -296,7 +295,7 @@ public class Persistence implements PersistenceInterface {
         try {
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
             session = cluster.connect(cassandraKeyspace);
-            System.out.println("Persistence started");
+            LOG.log(Level.INFO, "Persistence started");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
@@ -311,7 +310,7 @@ public class Persistence implements PersistenceInterface {
             cluster.shutdown();
         } catch (Exception e) {
         }
-        System.out.println("Persistence stopped");
+        LOG.log(Level.INFO, "Persistence stopped");
     }
 
     /**
@@ -526,7 +525,6 @@ public class Persistence implements PersistenceInterface {
                 task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
             }
 
-
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTask", ex);
         }
@@ -536,7 +534,6 @@ public class Persistence implements PersistenceInterface {
     /**
      * Utils
      */
-
     @Override
     public boolean truncateTables() {
         try {

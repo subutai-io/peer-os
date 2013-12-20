@@ -6,6 +6,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -20,6 +22,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 public class CassandraModule implements Module {
+
+    private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
 
     public static final String MODULE_NAME = "CassandraModule";
     private static ModuleComponent component;
@@ -95,7 +99,7 @@ public class CassandraModule implements Module {
                     }
                 }
             } catch (Exception ex) {
-                System.out.println("outputCommand event Exception\n" + ex);
+                LOG.log(Level.SEVERE, "Error in onCommand", ex);
             }
         }
 
@@ -120,7 +124,7 @@ public class CassandraModule implements Module {
     }
 
     public void setModuleService(ModuleService service) {
-        System.out.println("CassandraModule: registering with ModuleService");
+        LOG.log(Level.INFO, "CassandraModule: registering with ModuleService");
         service.registerModule(this);
     }
 

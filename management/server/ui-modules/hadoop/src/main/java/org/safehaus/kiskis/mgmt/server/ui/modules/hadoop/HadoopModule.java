@@ -18,6 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HadoopModule implements Module {
@@ -93,7 +94,7 @@ public class HadoopModule implements Module {
     }
 
     public void setModuleService(ModuleService service) {
-        System.out.println(MODULE_NAME + " registering with ModuleService");
+        LOG.log(Level.INFO, "{0} registering with ModuleService", MODULE_NAME);
         service.registerModule(this);
     }
 
@@ -102,7 +103,7 @@ public class HadoopModule implements Module {
             getCommandManager().removeListener(component);
         }
         service.unregisterModule(this);
-        System.out.println(MODULE_NAME + " Unregistering with ModuleService");
+        LOG.log(Level.INFO, "{0} Unregistering with ModuleService", MODULE_NAME);
     }
 
     public static CommandManagerInterface getCommandManager() {
