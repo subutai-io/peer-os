@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class CassandraModule implements Module {
         private final Button getClusters;
         private CassandraWizard cassandraWizard;
         private CassandraTable cassandraTable;
+        private final TextArea terminal;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
 
@@ -40,6 +42,7 @@ public class CassandraModule implements Module {
 
             // Create table
             cassandraTable = new CassandraTable(getCommandManager(), this);
+            cassandraTable.setPageLength(6);
 
             buttonInstallWizard = new Button("CassandraModule Installation Wizard");
             buttonInstallWizard.addListener(new Button.ClickListener() {
@@ -66,7 +69,7 @@ public class CassandraModule implements Module {
             });
             verticalLayout.addComponent(buttonInstallWizard);
 
-            getClusters = new Button("Get Cassandra clusters");
+            getClusters = new Button("Get Cassandra clusters" + System.currentTimeMillis());
             getClusters.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
@@ -76,6 +79,12 @@ public class CassandraModule implements Module {
 
             verticalLayout.addComponent(getClusters);
             verticalLayout.addComponent(cassandraTable);
+            terminal = new TextArea();
+            terminal.setRows(10);
+            terminal.setColumns(65);
+            terminal.setImmediate(true);
+            terminal.setWordwrap(true);
+            verticalLayout.addComponent(terminal);
 
             setCompositionRoot(verticalLayout);
 
@@ -85,14 +94,23 @@ public class CassandraModule implements Module {
         public void onCommand(Response response) {
             try {
                 if (response != null && response.getSource().equals(MODULE_NAME)) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(terminal.getValue());
+                    sb.append(response.getStdOut());
+                    terminal.setValue(sb);
+                    terminal.setCursorPosition(sb.length() - 1);
                     if (cassandraWizard != null
                             && response.getTaskUuid().toString().equals(cassandraWizard.getTask().getUuid().toString())) {
                         cassandraWizard.setOutput(response);
-                    } else if (response.getTaskUuid().toString().equals(cassandraTable.getTask().getUuid().toString())) {
-                        cassandraTable.setOutput(response);
-                    } else if (response.getTaskUuid().toString().equals(cassandraTable.getNodesWindow().getTask().getUuid().toString())) {
-                        cassandraTable.getNodesWindow().setOutput(response);
                     }
+
+//                    else if (cassandraTable != null & cassandraTable.getTask() != null 
+//                            & response.getTaskUuid().toString().equals(cassandraTable.getTask().getUuid().toString())) {
+//                        cassandraTable.setOutput(response);
+//                    } else if (cassandraTable != null & cassandraTable.getNodesWindow().getTask() != null 
+//                            & response.getTaskUuid().toString().equals(cassandraTable.getNodesWindow().getTask().getUuid().toString())) {
+//                        cassandraTable.getNodesWindow().setOutput(response);
+//                    }
                 }
             } catch (Exception ex) {
                 System.out.println("outputCommand event Exception\n" + ex);
