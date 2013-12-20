@@ -23,8 +23,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
  */
 public class Step2 extends Panel {
 
-//    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
-    String installationCommand = "sudo dpkg -i /home/bahadyr/Downloads/ksks-cassandra-1.0.deb";
+    String installationCommand = "apt-get --force-yes --assume-yes install ksks-cassandra";
     String purgeCommand = "apt-get --force-yes --assume-yes purge ksks-cassandra";
 
     public Step2(final CassandraWizard cassandraWizard) {
@@ -44,7 +43,7 @@ public class Step2 extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) <font color=\"#f14c1a\">Welcome</font><br>"
+                + " 1) Welcome<br>"
                 + " 2) <strong>Install</strong><br>"
                 + " 3) Set listen and rpc addresss<br>"
                 + " 4) Set seeds<br>"

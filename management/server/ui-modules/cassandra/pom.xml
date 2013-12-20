@@ -35,15 +35,34 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/target/cassandra-module-0.0.1-SNAPSHOT.jar" 
+                                      todir="/home/bahadyr/Temp/mgmt-server-karaf-0.0.1-SNAPSHOT/system/kiskis-server" />
+                            </tasks>
+                        </configuration>
+                    </execution>    
+                </executions>
+            </plugin>
+            
         </plugins>
     </build>
     <!--
-        <repositories>
-            <repository>
-                <id>vaadin-addons</id>
-                <url>http://maven.vaadin.com/vaadin-addons</url>
-            </repository>
-        </repositories>-->
+    <repositories>
+        <repository>
+            <id>vaadin-addons</id>
+            <url>http://maven.vaadin.com/vaadin-addons</url>
+        </repository>
+    </repositories>-->
 
     <dependencies>
         <dependency>
