@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.event.Action;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
 import org.osgi.framework.BundleContext;
@@ -23,6 +24,11 @@ import java.util.List;
 public class HadoopClusterTable extends Table {
     private IndexedContainer container;
 
+    static final Action ACTION_NAME_NODE = new Action("Edit name node and data trackers");
+    static final Action ACTION_JOB_TRACKER = new Action("Edit job tracker and task trackers");
+    static final Action[] ACTIONS = new Action[]{ACTION_NAME_NODE,
+            ACTION_JOB_TRACKER};
+
     public HadoopClusterTable() {
         this.setCaption(" Hadoop Clusters");
         this.setContainerDataSource(getContainer());
@@ -33,6 +39,29 @@ public class HadoopClusterTable extends Table {
         this.setPageLength(10);
         this.setSelectable(true);
         this.setImmediate(true);
+
+        // Actions (a.k.a context menu)
+        addActionHandler(new Action.Handler() {
+            @Override
+            public Action[] getActions(Object target, Object sender) {
+                return ACTIONS;
+            }
+
+            @Override
+            public void handleAction(Action action, Object sender, Object target) {
+                Item item = getItem(target);
+                if (ACTION_NAME_NODE == action) {
+                    getWindow().showNotification(
+                            "Selected cluster NN",
+                            (String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
+                } else if (ACTION_JOB_TRACKER == action) {
+                    getWindow().showNotification(
+                            "Selected cluster JB",
+                            (String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
+                }
+            }
+
+        });
     }
 
     private IndexedContainer getContainer() {
@@ -61,12 +90,18 @@ public class HadoopClusterTable extends Table {
         Item item = container.getItem(itemId);
 
         item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).setValue(cluster.getClusterName());
-        item.getItemProperty(HadoopClusterInfo.NAME_NODE_LABEL).setValue(getAgentManager().getAgent(cluster.getNameNode()).getHostname());
-        item.getItemProperty(HadoopClusterInfo.SECONDARY_NAME_NODE_LABEL).setValue(getAgentManager().getAgent(cluster.getSecondaryNameNode()).getHostname());
-        item.getItemProperty(HadoopClusterInfo.JOB_TRACKER_LABEL).setValue(getAgentManager().getAgent(cluster.getJobTracker()).getHostname());
-        item.getItemProperty(HadoopClusterInfo.REPLICATION_FACTOR_LABEL).setValue(cluster.getReplicationFactor());
-        item.getItemProperty(HadoopClusterInfo.DATA_NODES_LABEL).setValue(cluster.getDataNodes().size());
-        item.getItemProperty(HadoopClusterInfo.TASK_TRACKERS_LABEL).setValue(cluster.getTaskTrackers().size());
+        item.getItemProperty(HadoopClusterInfo.NAME_NODE_LABEL)
+                .setValue(getAgentManager().getAgent(cluster.getNameNode()).getHostname());
+        item.getItemProperty(HadoopClusterInfo.SECONDARY_NAME_NODE_LABEL)
+                .setValue(getAgentManager().getAgent(cluster.getSecondaryNameNode()).getHostname());
+        item.getItemProperty(HadoopClusterInfo.JOB_TRACKER_LABEL)
+                .setValue(getAgentManager().getAgent(cluster.getJobTracker()).getHostname());
+        item.getItemProperty(HadoopClusterInfo.REPLICATION_FACTOR_LABEL)
+                .setValue(cluster.getReplicationFactor());
+        item.getItemProperty(HadoopClusterInfo.DATA_NODES_LABEL)
+                .setValue(cluster.getDataNodes().size());
+        item.getItemProperty(HadoopClusterInfo.TASK_TRACKERS_LABEL)
+                .setValue(cluster.getTaskTrackers().size());
     }
 
     public void refreshDataSource() {
