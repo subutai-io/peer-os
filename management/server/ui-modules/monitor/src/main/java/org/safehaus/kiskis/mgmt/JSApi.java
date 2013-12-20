@@ -37,6 +37,7 @@ public class JSApi extends VerticalLayout {
         addComponent(script);
 
         addComponent(new Button("Run script", new Button.ClickListener() {
+            @Override
             public void buttonClick(ClickEvent event) {
                 getWindow().executeJavaScript(script.getValue().toString());
             }
