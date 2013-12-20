@@ -12,13 +12,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.List;
-import java.util.Set;
 
 public class Terminal implements Module {
 
     private ModuleService service;
     private BundleContext context;
-    private static final String name = "Oozie";
+    private static final String name = "Flume";
 
     public static class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
