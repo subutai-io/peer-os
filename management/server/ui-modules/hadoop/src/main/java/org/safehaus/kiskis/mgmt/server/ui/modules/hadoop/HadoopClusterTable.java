@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 import java.util.List;
@@ -39,12 +39,13 @@ public class HadoopClusterTable extends Table {
         container = new IndexedContainer();
 
         // Create the container properties
-        container.addContainerProperty("name", String.class, "");
-        container.addContainerProperty("Name Node", String.class, "");
-        container.addContainerProperty("Secondary Name Node", String.class, "");
-        container.addContainerProperty("Job Tracker", String.class, "");
-        container.addContainerProperty("Data Nodes", Integer.class, "");
-        container.addContainerProperty("Task Trackers", Integer.class, "");
+        container.addContainerProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL, String.class, "");
+        container.addContainerProperty(HadoopClusterInfo.NAME_NODE_LABEL, String.class, "");
+        container.addContainerProperty(HadoopClusterInfo.SECONDARY_NAME_NODE_LABEL, String.class, "");
+        container.addContainerProperty(HadoopClusterInfo.JOB_TRACKER_LABEL, String.class, "");
+        container.addContainerProperty(HadoopClusterInfo.REPLICATION_FACTOR_LABEL, Integer.class, "");
+        container.addContainerProperty(HadoopClusterInfo.DATA_NODES_LABEL, Integer.class, "");
+        container.addContainerProperty(HadoopClusterInfo.TASK_TRACKERS_LABEL, Integer.class, "");
 
         // Create some orders
         List<HadoopClusterInfo> cdList = getCommandManager().getHadoopClusterData();
@@ -59,35 +60,17 @@ public class HadoopClusterTable extends Table {
         Object itemId = container.addItem();
         Item item = container.getItem(itemId);
 
-        item.getItemProperty("name").setValue(cluster.getClusterName());
-//        item.getItemProperty("Name Node").setValue(getCommandManager().);
+        item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).setValue(cluster.getClusterName());
+        item.getItemProperty(HadoopClusterInfo.NAME_NODE_LABEL).setValue(getAgentManager().getAgent(cluster.getNameNode()).getHostname());
+        item.getItemProperty(HadoopClusterInfo.SECONDARY_NAME_NODE_LABEL).setValue(getAgentManager().getAgent(cluster.getSecondaryNameNode()).getHostname());
+        item.getItemProperty(HadoopClusterInfo.JOB_TRACKER_LABEL).setValue(getAgentManager().getAgent(cluster.getJobTracker()).getHostname());
+        item.getItemProperty(HadoopClusterInfo.REPLICATION_FACTOR_LABEL).setValue(cluster.getReplicationFactor());
+        item.getItemProperty(HadoopClusterInfo.DATA_NODES_LABEL).setValue(cluster.getDataNodes().size());
+        item.getItemProperty(HadoopClusterInfo.TASK_TRACKERS_LABEL).setValue(cluster.getTaskTrackers().size());
     }
 
-    private void refreshDataSource(ParseResult parseResult) {
-//        this.setCaption(agent.getHostname() + " LXC containers");
-//
-//        String[] lxcs = parseResult.getResponse().getStdOut().split("\\n");
-//        ArrayList<String> startedLXC = new ArrayList<String>();
-//        ArrayList<String> stoppedLXC = new ArrayList<String>();
-//        ArrayList<String> frozenLXC = new ArrayList<String>();
-//
-//        ArrayList<String> temp = null;
-//        for(String s : lxcs){
-//            if(s.trim().contains("RUNNING")){
-//                temp = startedLXC;
-//            } else if(s.trim().contains("STOPPED")){
-//                temp = stoppedLXC;
-//            }  else if(s.trim().contains("FROZEN")){
-//                temp = frozenLXC;
-//            } else {
-//                if (!Strings.isNullOrEmpty(s.trim()) && temp != null && !s.trim().equals("base-container")) {
-//                    temp.add(s.trim());
-//                }
-//            }
-//
-//        }
-//
-//        this.setContainerDataSource(getContainer(startedLXC, stoppedLXC));
+    public void refreshDataSource() {
+        this.setContainerDataSource(getContainer());
     }
 
     public CommandManagerInterface getCommandManager() {
@@ -97,6 +80,19 @@ public class HadoopClusterTable extends Table {
             ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
             if (serviceReference != null) {
                 return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
+    }
+
+    public AgentManagerInterface getAgentManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
             }
         }
 

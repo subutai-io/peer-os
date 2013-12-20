@@ -28,17 +28,32 @@ public class HadoopModule implements Module {
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
-
-        private final Button buttonInstallWizard;
         private HadoopWizard subwindow;
+        private HadoopClusterTable table;
 
         public ModuleComponent() {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
-            buttonInstallWizard = new Button("HadoopModule Installation Wizard");
-            buttonInstallWizard.addListener(new Button.ClickListener() {
+
+            verticalLayout.addComponent(getButtonInstallWizard());
+            verticalLayout.addComponent(getButtonRefresh());
+            verticalLayout.addComponent(getHadoopClusterTable());
+
+            setCompositionRoot(verticalLayout);
+            HadoopModule.getCommandManager().addListener(this);
+
+        }
+
+        private HadoopClusterTable getHadoopClusterTable() {
+            table = new HadoopClusterTable();
+            return table;
+        }
+
+        private Button getButtonInstallWizard() {
+            Button button = new Button("HadoopModule Installation Wizard");
+            button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     if (getLxcAgents().size() > 0) {
@@ -47,11 +62,20 @@ public class HadoopModule implements Module {
                     }
                 }
             });
-            verticalLayout.addComponent(buttonInstallWizard);
 
-            setCompositionRoot(verticalLayout);
-            HadoopModule.getCommandManager().addListener(this);
+            return button;
+        }
 
+        private Button getButtonRefresh() {
+            Button button = new Button("Refresh Hadoop Cluster Table");
+            button.addListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    table.refreshDataSource();
+                }
+            });
+
+            return button;
         }
 
         @Override
