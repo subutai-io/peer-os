@@ -54,13 +54,13 @@ public class HadoopInstallation {
         cluster.setJobTracker(jobTracker.getUuid());
 
         List<UUID> list = new ArrayList<UUID>();
-        for(Agent agent : dataNodes){
+        for (Agent agent : dataNodes) {
             list.add(agent.getUuid());
         }
         cluster.setDataNodes(list);
 
         list = new ArrayList<UUID>();
-        for(Agent agent : taskTrackers){
+        for (Agent agent : taskTrackers) {
             list.add(agent.getUuid());
         }
         cluster.setTaskTrackers(list);
