@@ -8,7 +8,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
@@ -16,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +38,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
-        //setSpacing(true);
         setMargin(true);
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setMultiSelect(true);
@@ -65,7 +64,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
                 }
             }
 
-            AppData.setSelectedAgentList(selectedList);
+            MgmtApplication.setSelectedAgents(selectedList);
             getWindow().showNotification(
                     "Selected agents",
                     selectedList.toString(),
@@ -82,11 +81,8 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 tree.setValue(null);
                 container.removeAllItems();
-
                 registeredAgents.clear();
-                if (AppData.getSelectedAgentList() != null) {
-                    AppData.getSelectedAgentList().clear();
-                }
+                MgmtApplication.getSelectedAgents().clear();
                 refreshAgents(agentManagerInterface.getRegisteredAgents());
             }
         });
@@ -147,7 +143,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
                 for (Agent possibleOrphan : childAgents) {
                     if (possibleOrphan.getParentHostName() == null
                             || Common.UNKNOWN_LXC_PARENT_NAME.equalsIgnoreCase(possibleOrphan.getParentHostName())) {
-//                        possibleOrphan.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
                         orphanAgents.add(possibleOrphan);
                     } else {
                         boolean parentFound = false;
@@ -158,7 +153,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
                             }
                         }
                         if (!parentFound) {
-//                            possibleOrphan.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
                             orphanAgents.add(possibleOrphan);
                         }
                     }
@@ -179,9 +173,27 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 registeredAgents.clear();
                 registeredAgents.addAll(allFreshAgents);
-//                if (AppData.getSelectedAgentList() != null && !AppData.getSelectedAgentList().isEmpty()) {
-//                    AppData.getSelectedAgentList().retainAll(allFreshAgents);
-//                }
+                //process bizzare situations
+                List<List<Agent>> allSessionsSelectedAgents = MgmtApplication.getAllSessionsSelectedAgents();
+                if (!allSessionsSelectedAgents.isEmpty()) {
+                    //iterate all sessions' selected agents
+                    for (List<Agent> singleSessionsSelectedAgents : allSessionsSelectedAgents) {
+                        if (!singleSessionsSelectedAgents.isEmpty()) {
+                            //replace agents whose hostnames are the same but uuids changed somehow
+                            for (ListIterator<Agent> iter = singleSessionsSelectedAgents.listIterator(); iter.hasNext();) {
+                                Agent selectedAgent = iter.next();
+                                for (Agent freshAgent : allFreshAgents) {
+                                    if (selectedAgent.getHostname().equalsIgnoreCase(freshAgent.getHostname())
+                                            && selectedAgent.getUuid().compareTo(freshAgent.getUuid()) != 0) {
+                                        iter.set(freshAgent);
+                                    }
+                                }
+                            }
+                            //keep only fresh agents
+                            singleSessionsSelectedAgents.retainAll(allFreshAgents);
+                        }
+                    }
+                }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
             }

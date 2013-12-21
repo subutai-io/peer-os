@@ -8,7 +8,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -19,6 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class Terminal implements Module {
@@ -201,7 +202,8 @@ public class Terminal implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     try {
-                        agents = AppData.getSelectedAgentList();
+//                        agents = AppData.getSelectedAgentList();
+                        agents = MgmtApplication.getSelectedAgents();
                         if (agents != null && agents.size() > 0) {
                             task = new Task();
                             task.setDescription("JSON executing");
@@ -374,15 +376,18 @@ public class Terminal implements Module {
                     clusterData.setDataDir("Data dir");
                     clusterData.setSavedCacheDir("Saved Cache Dir");
 
-                    List<Agent> agents = AppData.getSelectedAgentList();
-                    List<UUID> listUuid = new ArrayList<UUID>();
-                    for (Agent agent : agents) {
-                        listUuid.add(agent.getUuid());
+//                    List<Agent> agents = AppData.getSelectedAgentList();
+                    List<Agent> agents = MgmtApplication.getSelectedAgents();
+                    if (agents != null && !agents.isEmpty()) {
+                        List<UUID> listUuid = new ArrayList<UUID>();
+                        for (Agent agent : agents) {
+                            listUuid.add(agent.getUuid());
+                        }
+                        clusterData.setNodes(listUuid);
+                        clusterData.setSeeds(listUuid);
+                        commandManagerInterface.saveCassandraClusterData(clusterData);
+                        textAreaOutput.setValue(clusterData);
                     }
-                    clusterData.setNodes(listUuid);
-                    clusterData.setSeeds(listUuid);
-                    commandManagerInterface.saveCassandraClusterData(clusterData);
-                    textAreaOutput.setValue(clusterData);
                 }
             });
             return button;
