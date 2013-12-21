@@ -112,6 +112,7 @@ public class CassandraTable extends Table {
                             null,
                             "root",
                             null,
+                            null,
                             null);
                     commandManager.executeCommand(command);
                 }
@@ -137,6 +138,7 @@ public class CassandraTable extends Table {
                             null,
                             null,
                             "root",
+                            null,
                             null,
                             null);
                     commandManager.executeCommand(command);

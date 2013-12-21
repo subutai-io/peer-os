@@ -82,7 +82,7 @@ public class Step6 extends FormLayout {
                 String dataDir = textFieldDataDir.getValue().toString();
                 String commitDir = textFieldCommitLogDir.getValue().toString();
                 String cacheDir = textFieldSavedCachesDir.getValue().toString();
-                
+
                 if (dataDir.length() > 0 && commitDir.length() > 0 && cacheDir.length() > 0) {
                     cassandraWizard.getCluster().setDataDir(dataDir);
                     cassandraWizard.getCluster().setCommitLogDir(commitDir);
@@ -105,7 +105,7 @@ public class Step6 extends FormLayout {
                         cassandraWizard.runCommand(command);
 
                     }
-                } 
+                }
 
                 cassandraWizard.showNext();
             }
@@ -145,6 +145,7 @@ public class Step6 extends FormLayout {
                 null,
                 "root",
                 args,
+                null,
                 null);
     }
 

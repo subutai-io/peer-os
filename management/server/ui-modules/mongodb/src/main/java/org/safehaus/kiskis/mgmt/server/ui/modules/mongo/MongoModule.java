@@ -16,10 +16,10 @@ import java.util.logging.Logger;
 
 public class MongoModule implements Module {
 
-    private static final Logger LOG = Logger.getLogger(MongoModule.class.getName());
+    public static final String MODULE_NAME = "MongoDB";
 
+    private static final Logger LOG = Logger.getLogger(MongoModule.class.getName());
     private BundleContext context;
-    private static final String MODULE_NAME = "MongoDB";
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
@@ -40,7 +40,7 @@ public class MongoModule implements Module {
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
 
-            mongoSheet.addTab(new MongoWizard().getContent(), "Install");
+            mongoSheet.addTab(new MongoWizard().getContent(), "Install!");
             mongoSheet.addTab(new MongoManager().getContent(), "Manage");
 
             verticalLayout.addComponent(mongoSheet);

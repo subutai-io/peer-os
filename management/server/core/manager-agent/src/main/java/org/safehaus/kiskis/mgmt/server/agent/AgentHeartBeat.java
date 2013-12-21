@@ -45,7 +45,7 @@ public class AgentHeartBeat implements Runnable {
                                     RequestType.HEARTBEAT_REQUEST,
                                     agent.getUuid(),
                                     "HEARTBEAT",
-                                    null, null, null, null, null, null, null, null, null, null, null));
+                                    null, null, null, null, null, null, null, null, null, null, null, null));
                         }
                     }
                 }
