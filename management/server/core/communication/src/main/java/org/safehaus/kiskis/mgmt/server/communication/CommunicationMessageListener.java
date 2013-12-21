@@ -8,7 +8,11 @@ import javax.jms.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.activemq.command.ActiveMQMessage;
+import org.apache.activemq.command.ActiveMQTextMessage;
+import org.apache.activemq.command.RemoveInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 12:13 AM
@@ -18,9 +22,6 @@ public class CommunicationMessageListener implements MessageListener {
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
     private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<ResponseListener>();
 
-    public CommunicationMessageListener() {
-    }
-
     /**
      * Distributes incoming message to appropriate bundles.
      *
@@ -28,19 +29,30 @@ public class CommunicationMessageListener implements MessageListener {
      */
     @Override
     public void onMessage(Message message) {
-        TextMessage txtMsg = (TextMessage) message;
         try {
-            String jsonCmd = txtMsg.getText();
-            Response response = CommandJson.getResponse(jsonCmd);
-            //LOG.info("Received " + CommandJson.getJson(new Command(response)));
-            LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(new Command(response)));
-            long ts = System.currentTimeMillis();
-            if (response != null) {
-                notifyListeners(response);
-            } else {
-                LOG.log(Level.WARNING, "Could not parse response{0}", jsonCmd);
+            if (message instanceof TextMessage) {
+                TextMessage txtMsg = (TextMessage) message;
+                String jsonCmd = txtMsg.getText();
+                Response response = CommandJson.getResponse(jsonCmd);
+                LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(new Command(response)));
+                long ts = System.currentTimeMillis();
+                if (response != null) {
+                    response.setTransportId(((ActiveMQTextMessage) message).getProducerId().toString());
+                    notifyListeners(response);
+                } else {
+                    LOG.log(Level.WARNING, "Could not parse response{0}", jsonCmd);
+                }
+                LOG.log(Level.INFO, "Processed notify listeners in Communication in {0} ms", (System.currentTimeMillis() - ts));
+
+            } else if (message instanceof ActiveMQMessage) {
+                ActiveMQMessage aMsg = (ActiveMQMessage) message;
+                if (aMsg.getDataStructure() instanceof RemoveInfo) {
+                    Response agentDisconnect = new Response();
+                    agentDisconnect.setType(ResponseType.AGENT_DISCONNECT);
+                    agentDisconnect.setTransportId(((RemoveInfo) aMsg.getDataStructure()).getObjectId().toString());
+                    notifyListeners(agentDisconnect);
+                }
             }
-            LOG.log(Level.INFO, "Processed notify listeners in Communication in {0} ms", (System.currentTimeMillis() - ts));
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, "Error in onMessage", ex);
         }

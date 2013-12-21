@@ -10,7 +10,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,10 +36,27 @@ public class Persistence implements PersistenceInterface {
     public boolean saveAgent(Agent agent) {
         if (agent != null) {
             try {
-                String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname) "
-                        + "values (?,?,?,?,?,?,?)";
+                String cql = "select uuid from agents where hostname = ?";
                 PreparedStatement stmt = session.prepare(cql);
                 BoundStatement boundStatement = new BoundStatement(stmt);
+                ResultSet rs = session.execute(boundStatement.bind(agent.getHostname()));
+                Set<UUID> uuids = new HashSet<UUID>();
+                for (Row row : rs) {
+                    uuids.add(row.getUUID("uuid"));
+                }
+
+                cql = "delete from agents where uuid = ?";
+                stmt = session.prepare(cql);
+                boundStatement = new BoundStatement(stmt);
+
+                for (UUID uuid : uuids) {
+                    session.execute(boundStatement.bind(uuid));
+                }
+
+                cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname) "
+                        + "values (?,?,?,?,?,?,?)";
+                stmt = session.prepare(cql);
+                boundStatement = new BoundStatement(stmt);
 
                 session.execute(boundStatement.bind(agent.getUuid(),
                         agent.getHostname(), agent.isIsLXC(), agent.getListIP(),

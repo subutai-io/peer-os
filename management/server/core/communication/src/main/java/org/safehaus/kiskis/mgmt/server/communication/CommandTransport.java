@@ -11,6 +11,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import javax.jms.*;
+import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.broker.region.policy.AbortSlowAckConsumerStrategy;
 import org.apache.activemq.broker.region.policy.DeadLetterStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
@@ -34,10 +35,11 @@ public class CommandTransport implements CommandTransportInterface {
     private String amqBrokerTrustStorePwd;
     private int amqPort;
     private int amqMaxMessageToAgentTtlSec;
-    private int amqMaxOfflineAgentQueueTtlSec;
+    private int amqMaxOfflineAgentTtlSec;
     private int amqMaxSlowAgentConnectionTtlSec;
     private int amqMaxPooledConnections;
     private int amqMaxSenderPoolSize;
+    private int amqInactiveQueuesDropTimeoutSec;
 
     public void setAmqPort(int amqPort) {
         this.amqPort = amqPort;
@@ -71,8 +73,8 @@ public class CommandTransport implements CommandTransportInterface {
         this.amqMaxMessageToAgentTtlSec = amqMaxMessageToAgentTtlSec;
     }
 
-    public void setAmqMaxOfflineAgentQueueTtlSec(int amqMaxOfflineAgentQueueTtlSec) {
-        this.amqMaxOfflineAgentQueueTtlSec = amqMaxOfflineAgentQueueTtlSec;
+    public void setAmqMaxOfflineAgentTtlSec(int amqMaxOfflineAgentTtlSec) {
+        this.amqMaxOfflineAgentTtlSec = amqMaxOfflineAgentTtlSec;
     }
 
     public void setAmqMaxSlowAgentConnectionTtlSec(int amqMaxSlowAgentConnectionTtlSec) {
@@ -85,6 +87,10 @@ public class CommandTransport implements CommandTransportInterface {
 
     public void setAmqMaxSenderPoolSize(int amqMaxSenderPoolSize) {
         this.amqMaxSenderPoolSize = amqMaxSenderPoolSize;
+    }
+
+    public void setAmqInactiveQueuesDropTimeoutSec(int amqInactiveQueuesDropTimeoutSec) {
+        this.amqInactiveQueuesDropTimeoutSec = amqInactiveQueuesDropTimeoutSec;
     }
 
     @Override
@@ -167,18 +173,24 @@ public class CommandTransport implements CommandTransportInterface {
             broker = new BrokerService();
             //***policy
             PolicyMap policy = new PolicyMap();
-            PolicyEntry pentry = new PolicyEntry();
+            PolicyEntry allDestinationsPolicyEntry = new PolicyEntry();
             //abort consumers not acking message within this period of time
             AbortSlowAckConsumerStrategy slowConsumerStrategy = new AbortSlowAckConsumerStrategy();
             slowConsumerStrategy.setMaxTimeSinceLastAck(amqMaxSlowAgentConnectionTtlSec * 1000);
-            pentry.setSlowConsumerStrategy(slowConsumerStrategy);
+            allDestinationsPolicyEntry.setSlowConsumerStrategy(slowConsumerStrategy);
             //drop expired messages instead of sending to DLQ
             DeadLetterStrategy deadLetterStrategy = new SharedDeadLetterStrategy();
             deadLetterStrategy.setProcessExpired(false);
-            pentry.setDeadLetterStrategy(deadLetterStrategy);
-            policy.setDefaultEntry(pentry);
-            //drop queues whose clients are offline for this amount of time
-            broker.setOfflineDurableSubscriberTimeout(amqMaxOfflineAgentQueueTtlSec * 1000);
+            allDestinationsPolicyEntry.setDeadLetterStrategy(deadLetterStrategy);
+            //drop queues inactive fo this period of time
+            allDestinationsPolicyEntry.setGcInactiveDestinations(true);
+            allDestinationsPolicyEntry.setInactiveTimoutBeforeGC(amqInactiveQueuesDropTimeoutSec * 1000);
+            broker.setSchedulePeriodForDestinationPurge(30000);
+            //
+            policy.setDefaultEntry(allDestinationsPolicyEntry);
+            //unsubscribe durable subscribers that are offline for this amount of time
+            broker.setOfflineDurableSubscriberTimeout(amqMaxOfflineAgentTtlSec * 1000);
+            //
             broker.setDestinationPolicy(policy);
             //***policy
             broker.setPersistent(true);
@@ -231,13 +243,17 @@ public class CommandTransport implements CommandTransportInterface {
     private void setupListener() {
         try {
             Connection connection = pooledConnectionFactory.createConnection();
-            //don not close this connection to not return it to the pool so no consumers are closed
+            //don not close this connection otherwise server listener will be closed
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination adminQueue = session.createQueue(this.amqServiceQueue);
             MessageConsumer consumer = session.createConsumer(adminQueue);
             communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener(communicationMessageListener);
+
+            Destination advisoryDestination = AdvisorySupport.getProducerAdvisoryTopic(adminQueue);
+            MessageConsumer advConsumer = session.createConsumer(advisoryDestination);
+            advConsumer.setMessageListener(communicationMessageListener);
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, "Error in setupListener", ex);
         }

@@ -179,9 +179,9 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 registeredAgents.clear();
                 registeredAgents.addAll(allFreshAgents);
-                if (AppData.getSelectedAgentList() != null && !AppData.getSelectedAgentList().isEmpty()) {
-                    AppData.getSelectedAgentList().retainAll(allFreshAgents);
-                }
+//                if (AppData.getSelectedAgentList() != null && !AppData.getSelectedAgentList().isEmpty()) {
+//                    AppData.getSelectedAgentList().retainAll(allFreshAgents);
+//                }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
             }
