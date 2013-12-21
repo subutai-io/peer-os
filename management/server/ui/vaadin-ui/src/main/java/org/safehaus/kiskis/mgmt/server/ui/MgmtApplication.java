@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.Iterator;
@@ -69,11 +69,10 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             app = this;
             window = new Window(title);
             // Create the application data instance
-            AppData sessionData = new AppData(this);
+//            AppData sessionData = new AppData(this);
 
             // Register it as a listener in the application context
-            getContext().addTransactionListener(sessionData);
-
+//            getContext().addTransactionListener(sessionData);
             setMainWindow(window);
 
             VerticalLayout layout = new VerticalLayout();

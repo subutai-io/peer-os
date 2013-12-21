@@ -173,6 +173,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 registeredAgents.clear();
                 registeredAgents.addAll(allFreshAgents);
+                
                 //process bizzare situations
                 List<List<Agent>> allSessionsSelectedAgents = MgmtApplication.getAllSessionsSelectedAgents();
                 if (!allSessionsSelectedAgents.isEmpty()) {
@@ -186,6 +187,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
                                     if (selectedAgent.getHostname().equalsIgnoreCase(freshAgent.getHostname())
                                             && selectedAgent.getUuid().compareTo(freshAgent.getUuid()) != 0) {
                                         iter.set(freshAgent);
+                                        break;
                                     }
                                 }
                             }

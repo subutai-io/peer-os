@@ -8,7 +8,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -18,37 +18,36 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 12/1/13
- * Time: 5:56 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
  */
 @SuppressWarnings("serial")
 public class LxcCloneForm extends VerticalLayout implements
         Button.ClickListener {
-    private static final String CLONE_LXC = "" +
-            "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": \":source\",\n" +
-            "\t    \"uuid\": \":uuid\",\n" +
-            "\t    \"taskUuid\": \":task\",\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/lxc-clone\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name\"," +
-            "\" && cat /dev/null > /etc/resolvconf/resolv.conf.d/original " +
-            "&& cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 360\n" +
-            "\t  }\n" +
-            "\t}";
+
+    private static final String CLONE_LXC = ""
+            + "{\n"
+            + "\t  \"command\": {\n"
+            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+            + "\t    \"source\": \":source\",\n"
+            + "\t    \"uuid\": \":uuid\",\n"
+            + "\t    \"taskUuid\": \":task\",\n"
+            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+            + "\t    \"workingDirectory\": \"/\",\n"
+            + "\t    \"program\": \"/usr/bin/lxc-clone\",\n"
+            + "\t    \"stdOut\": \"RETURN\",\n"
+            + "\t    \"stdErr\": \"RETURN\",\n"
+            + "\t    \"runAs\": \"root\",\n"
+            + "\t    \"args\": [\n"
+            + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name\","
+            + "\" && cat /dev/null > /etc/resolvconf/resolv.conf.d/original "
+            + "&& cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original\"\n"
+            + "\t    ],\n"
+            + "\t    \"timeout\": 360\n"
+            + "\t  }\n"
+            + "\t}";
 
     private Set<Agent> physicalAgents;
     private Task cloneTask;
@@ -92,7 +91,8 @@ public class LxcCloneForm extends VerticalLayout implements
 
     @Override
     public void buttonClick(Button.ClickEvent clickEvent) {
-        List<Agent> agents = AppData.getSelectedAgentList();
+//        List<Agent> agents = AppData.getSelectedAgentList();
+        List<Agent> agents = MgmtApplication.getSelectedAgents();
         if (agents != null && agents.size() > 0) {
             physicalAgents = new HashSet<Agent>();
             for (Agent agent : agents) {

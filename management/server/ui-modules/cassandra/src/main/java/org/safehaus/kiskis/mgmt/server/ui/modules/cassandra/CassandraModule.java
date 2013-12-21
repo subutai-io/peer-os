@@ -11,11 +11,12 @@ import java.util.logging.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.component.CassandraTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -57,8 +58,9 @@ public class CassandraModule implements Module {
 
                 private List<Agent> getLxcAgents() {
                     List<Agent> list = new ArrayList<Agent>();
-                    if (AppData.getSelectedAgentList() != null) {
-                        for (Agent agent : AppData.getSelectedAgentList()) {
+//                    if (AppData.getSelectedAgentList() != null) {
+                    if (MgmtApplication.getSelectedAgents() != null && !MgmtApplication.getSelectedAgents().isEmpty()) {
+                        for (Agent agent : MgmtApplication.getSelectedAgents()) {
                             if (agent.isIsLXC()) {
                                 list.add(agent);
                             }

@@ -3,18 +3,16 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 12/1/13
- * Time: 5:56 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
  */
 @SuppressWarnings("serial")
 public class LxcManageForm extends VerticalLayout {
@@ -43,7 +41,8 @@ public class LxcManageForm extends VerticalLayout {
         buttonRefresh.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                List<Agent> agents = AppData.getSelectedAgentList();
+//                List<Agent> agents = AppData.getSelectedAgentList();
+                List<Agent> agents = MgmtApplication.getSelectedAgents();
                 if (agents != null && agents.size() > 0) {
                     Set<Agent> physicalAgents = new HashSet<Agent>();
                     for (Agent agent : agents) {
