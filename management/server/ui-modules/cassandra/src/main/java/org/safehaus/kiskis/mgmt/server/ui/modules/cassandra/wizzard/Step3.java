@@ -83,10 +83,10 @@ public class Step3 extends Panel {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
-                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
+                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getListIP().get(0));
                     Command command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
-                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
+                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getListIP().get(0));
                     command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
                 }
