@@ -21,6 +21,8 @@ public interface PersistenceInterface {
 
     public boolean saveAgent(Agent agent);
 
+    public boolean removeAgent(String transportId);
+
     /**
      * Heartbeat, LXC, Physical
      */
@@ -75,7 +77,6 @@ public interface PersistenceInterface {
     public List<CassandraClusterInfo> getCassandraClusterInfo();
 
     public CassandraClusterInfo getCassandraClusterInfo(String clusterName);
-
 
     /**
      *

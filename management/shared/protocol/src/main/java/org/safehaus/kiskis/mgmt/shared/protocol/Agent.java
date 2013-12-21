@@ -18,6 +18,15 @@ public class Agent implements Serializable {
     private boolean isLXC;
     private Date lastHeartbeat;
     private String parentHostName;
+    private String transportId;
+
+    public String getTransportId() {
+        return transportId;
+    }
+
+    public void setTransportId(String transportId) {
+        this.transportId = transportId;
+    }
 
     public String getParentHostName() {
         return parentHostName;
@@ -77,7 +86,7 @@ public class Agent implements Serializable {
 
     @Override
     public String toString() {
-        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP=" + listIP + ", isLXC=" + isLXC + ", lastHeartbeat=" + lastHeartbeat + ", parentHostName=" + parentHostName + '}';
+        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP=" + listIP + ", isLXC=" + isLXC + ", lastHeartbeat=" + lastHeartbeat + ", parentHostName=" + parentHostName + ", transportId=" + transportId + '}';
     }
 
     @Override

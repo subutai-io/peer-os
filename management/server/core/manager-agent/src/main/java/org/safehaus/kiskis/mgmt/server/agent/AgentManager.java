@@ -46,10 +46,22 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
             }
             case HEARTBEAT_RESPONSE: {
                 updateAgent(response, false);
+                break;
+            }
+            case AGENT_DISCONNECT: {
+                removeAgent(response);
+                break;
             }
             default: {
                 break;
             }
+        }
+    }
+
+    private void removeAgent(Response response) {
+        if (persistenceAgent.removeAgent(response.getTransportId())) {
+            LOG.log(Level.INFO, "Removed agent by transport id = {0}", response.getTransportId());
+            agentNotifier.refresh = true;
         }
     }
 
@@ -67,6 +79,7 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
             agent.setUuid(response.getUuid());
             agent.setHostname(response.getHostname());
             agent.setMacAddress(response.getMacAddress());
+            agent.setTransportId(response.getTransportId());
             if (response.isIsLxc() == null) {
                 agent.setIsLXC(false);
             } else {

@@ -53,19 +53,47 @@ public class Persistence implements PersistenceInterface {
                     session.execute(boundStatement.bind(uuid));
                 }
 
-                cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname) "
-                        + "values (?,?,?,?,?,?,?)";
+                cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname,transportid) "
+                        + "values (?,?,?,?,?,?,?,?)";
                 stmt = session.prepare(cql);
                 boundStatement = new BoundStatement(stmt);
 
                 session.execute(boundStatement.bind(agent.getUuid(),
                         agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                        agent.getMacAddress(), new Date(), agent.getParentHostName()));
+                        agent.getMacAddress(), new Date(),
+                        agent.getParentHostName(), agent.getTransportId()));
                 return true;
 
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in saveAgent", ex);
             }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeAgent(String transportId) {
+        try {
+
+            String cql = "select uuid from agents where transportid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(transportId));
+            Set<UUID> uuids = new HashSet<UUID>();
+            for (Row row : rs) {
+                uuids.add(row.getUUID("uuid"));
+            }
+
+            cql = "delete from agents where uuid = ?";
+            stmt = session.prepare(cql);
+            boundStatement = new BoundStatement(stmt);
+
+            for (UUID uuid : uuids) {
+                session.execute(boundStatement.bind(uuid));
+            }
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
         }
         return false;
     }

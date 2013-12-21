@@ -124,18 +124,26 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 //grab children
                 List<Agent> childAgents = new ArrayList<Agent>();
-                for (Agent parent : parents) {
-                    List<Agent> children = new ArrayList<Agent>();
+                if (!parents.isEmpty()) {
+                    for (Agent parent : parents) {
+                        List<Agent> children = new ArrayList<Agent>();
+                        for (Agent possibleChild : allFreshAgents) {
+                            if (possibleChild.isIsLXC()) {
+                                if (possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                                    children.add(possibleChild);
+                                }
+
+                                childAgents.add(possibleChild);
+                            }
+                        }
+                        refreshNodeContainer(children, false, parent);
+                    }
+                } else {
                     for (Agent possibleChild : allFreshAgents) {
                         if (possibleChild.isIsLXC()) {
-                            if (possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                                children.add(possibleChild);
-                            }
-
                             childAgents.add(possibleChild);
                         }
                     }
-                    refreshNodeContainer(children, false, parent);
                 }
 
                 //process orphan agents
@@ -173,7 +181,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 registeredAgents.clear();
                 registeredAgents.addAll(allFreshAgents);
-                
+
                 //process bizzare situations
                 List<List<Agent>> allSessionsSelectedAgents = MgmtApplication.getAllSessionsSelectedAgents();
                 if (!allSessionsSelectedAgents.isEmpty()) {
