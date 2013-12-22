@@ -22,7 +22,6 @@ import java.util.List;
  * Time: 6:56 PM
  */
 public class HadoopClusterTable extends Table {
-    private IndexedContainer container;
 
     static final Action ACTION_NAME_NODE = new Action("Edit name node and data trackers");
     static final Action ACTION_JOB_TRACKER = new Action("Edit job tracker and task trackers");
@@ -65,7 +64,7 @@ public class HadoopClusterTable extends Table {
     }
 
     private IndexedContainer getContainer() {
-        container = new IndexedContainer();
+        IndexedContainer container = new IndexedContainer();
 
         // Create the container properties
         container.addContainerProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL, String.class, "");
