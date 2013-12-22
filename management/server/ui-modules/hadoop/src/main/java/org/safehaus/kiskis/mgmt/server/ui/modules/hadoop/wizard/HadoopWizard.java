@@ -15,8 +15,6 @@ import java.util.List;
 
 public final class HadoopWizard extends Window {
 
-    private final CommandManagerInterface commandManagerInterface;
-
     private final VerticalLayout verticalLayout;
     HadoopInstallation hadoopInstallation;
     private List<Agent> lxcList;
@@ -34,7 +32,6 @@ public final class HadoopWizard extends Window {
         hadoopInstallation = new HadoopInstallation(getCommandManager());
 
         this.lxcList = lxcList;
-        this.commandManagerInterface = getCommandManager();
         setCaption("HadoopModule Wizard");
 
         GridLayout gridLayout = new GridLayout(1, 15);

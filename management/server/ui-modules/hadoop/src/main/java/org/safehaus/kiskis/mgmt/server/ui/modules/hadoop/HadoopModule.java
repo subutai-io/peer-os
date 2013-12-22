@@ -7,6 +7,7 @@ import com.vaadin.ui.VerticalLayout;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.HadoopClusterTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
