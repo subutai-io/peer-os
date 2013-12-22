@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Tree;
@@ -14,9 +15,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +32,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
         Property.ValueChangeListener, AgentListener {
 
     private final AgentManagerInterface agentManagerInterface;
-    private List<Agent> registeredAgents;
     private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
@@ -57,7 +58,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
         if (event.getProperty().getValue() instanceof Set) {
             Tree t = (Tree) event.getProperty();
 
-            List<Agent> selectedList = new ArrayList<Agent>();
+            Set<Agent> selectedList = new HashSet<Agent>();
 
             for (Object o : (Set<Object>) t.getValue()) {
                 if (tree.getItem(o).getItemProperty("value").getValue() != null) {
@@ -82,8 +83,9 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 tree.setValue(null);
                 container.removeAllItems();
-                registeredAgents.clear();
-                MgmtApplication.getSelectedAgents().clear();
+                if (MgmtApplication.getSelectedAgents() != null) {
+                    MgmtApplication.getSelectedAgents().clear();
+                }
                 refreshAgents(agentManagerInterface.getRegisteredAgents());
             }
         });
@@ -96,10 +98,9 @@ public final class MgmtAgentManager extends VerticalLayout implements
     }
 
     public HierarchicalContainer getNodeContainer() {
-        registeredAgents = new ArrayList<Agent>();
         container = new HierarchicalContainer();
         container.addContainerProperty("value", Agent.class, null);
-        container.addContainerProperty("icon", ThemeResource.class,
+        container.addContainerProperty("icon", Resource.class,
                 new ThemeResource("icons/16/folder.png"));
         refreshAgents(agentManagerInterface.getRegisteredAgents());
         return container;
@@ -108,84 +109,101 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private void refreshAgents(List<Agent> allFreshAgents) {
         if (allFreshAgents != null) {
             try {
-                // clear all agents
-                List<Agent> setToRemove = new ArrayList<Agent>();
-                setToRemove.addAll(registeredAgents);
-                setToRemove.removeAll(allFreshAgents);
-                refreshNodeContainer(setToRemove, true, null);
+
+                //remember selection
+                Set<String> selectedHostnames = (Set<String>) tree.getValue();
+
+                //clear tree
+                container.removeAllItems();
 
                 //grab parents
-                List<Agent> parents = new ArrayList<Agent>();
+                Set<Agent> parents = new HashSet<Agent>();
                 for (Agent agent : allFreshAgents) {
-                    if (!agent.isIsLXC()) {
+                    if (!agent.isIsLXC() && agent.getUuid() != null && agent.getHostname() != null) {
                         parents.add(agent);
                     }
                 }
-                refreshNodeContainer(parents, false, null);
 
-                //grab children
-                List<Agent> childAgents = new ArrayList<Agent>();
+                //find children
+                Set<Agent> possibleOrpans = new HashSet<Agent>();
+                Map<Agent, Set<Agent>> families = new HashMap<Agent, Set<Agent>>();
                 if (!parents.isEmpty()) {
+                    Set<Agent> childAgentsWithParents = new HashSet<Agent>();
                     for (Agent parent : parents) {
-                        List<Agent> children = new ArrayList<Agent>();
+                        //find children
+                        Set<Agent> children = new HashSet<Agent>();
                         for (Agent possibleChild : allFreshAgents) {
-                            if (possibleChild.isIsLXC()) {
-                                if (possibleChild.getHostname() != null && possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                            if (possibleChild.isIsLXC()
+                                    && possibleChild.getUuid() != null && possibleChild.getHostname() != null) {
+                                //add for further orphan children processing    
+                                possibleOrpans.add(possibleChild);
+                                //check if this is own child
+                                if (possibleChild.getHostname().startsWith(parent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR)) {
                                     children.add(possibleChild);
                                 }
-
-                                childAgents.add(possibleChild);
                             }
                         }
-                        refreshNodeContainer(children, false, parent);
+                        if (!children.isEmpty()) {
+                            //add children to parent
+                            childAgentsWithParents.addAll(children);
+                            families.put(parent, children);
+                        } else {
+                            families.put(parent, null);
+                        }
                     }
+
+                    //remove all child agents having parents
+                    possibleOrpans.removeAll(childAgentsWithParents);
                 } else {
+                    //all agents are orphans
                     for (Agent possibleChild : allFreshAgents) {
-                        if (possibleChild.isIsLXC()) {
-                            childAgents.add(possibleChild);
+                        if (possibleChild.isIsLXC()
+                                && possibleChild.getUuid() != null && possibleChild.getHostname() != null) {
+                            //add for further orphan children processing 
+                            possibleOrpans.add(possibleChild);
                         }
                     }
                 }
 
-                //process orphan agents
-                List<Agent> orphanAgents = new ArrayList<Agent>();
-                for (Agent possibleOrphan : childAgents) {
-                    if (possibleOrphan.getParentHostName() == null
-                            || Common.UNKNOWN_LXC_PARENT_NAME.equalsIgnoreCase(possibleOrphan.getParentHostName())) {
-                        orphanAgents.add(possibleOrphan);
-                    } else {
-                        boolean parentFound = false;
-                        for (Agent parent : parents) {
-                            if (possibleOrphan.getParentHostName().equals(parent.getHostname())) {
-                                parentFound = true;
-                                break;
+                //add families to tree
+                if (!families.isEmpty()) {
+                    for (Map.Entry<Agent, Set<Agent>> family : families.entrySet()) {
+                        Agent parentAgent = family.getKey();
+                        Item parent = container.addItem(parentAgent.getHostname());
+                        if (parent != null) {
+                            container.setChildrenAllowed(parentAgent.getHostname(), true);
+                            for (Agent childAgent : family.getValue()) {
+                                Item child = container.addItem(childAgent.getHostname());
+                                if (child != null) {
+                                    child.getItemProperty("value").setValue(childAgent);
+                                    child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
+                                    container.setParent(childAgent.getHostname(), parentAgent.getHostname());
+                                    container.setChildrenAllowed(childAgent.getHostname(), false);
+                                }
                             }
                         }
-                        if (!parentFound) {
-                            orphanAgents.add(possibleOrphan);
-                        }
                     }
                 }
-                container.removeItemRecursively(Common.UNKNOWN_LXC_PARENT_NAME);
-                if (!orphanAgents.isEmpty()) {
-                    container.addItem(Common.UNKNOWN_LXC_PARENT_NAME);
-                    container.setChildrenAllowed(Common.UNKNOWN_LXC_PARENT_NAME, true);
-                    for (Agent orphanAgent : orphanAgents) {
-                        Item item = container.addItem(orphanAgent.getHostname());
-                        if (item != null) {
-                            item.getItemProperty("value").setValue(orphanAgent);
-                            container.setParent(orphanAgent.getHostname(), Common.UNKNOWN_LXC_PARENT_NAME);
-                            container.setChildrenAllowed(orphanAgent.getHostname(), false);
+
+                //add orphans to tree
+                if (!possibleOrpans.isEmpty()) {
+                    Item parent = container.addItem(Common.UNKNOWN_LXC_PARENT_NAME);
+                    if (parent != null) {
+                        container.setChildrenAllowed(Common.UNKNOWN_LXC_PARENT_NAME, true);
+                        for (Agent orphanAgent : possibleOrpans) {
+                            Item child = container.addItem(orphanAgent.getHostname());
+                            if (child != null) {
+                                child.getItemProperty("value").setValue(orphanAgent);
+                                child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
+                                container.setParent(orphanAgent.getHostname(), Common.UNKNOWN_LXC_PARENT_NAME);
+                                container.setChildrenAllowed(orphanAgent.getHostname(), false);
+                            }
                         }
                     }
                 }
 
-                registeredAgents.clear();
-                registeredAgents.addAll(allFreshAgents);
-
-                //deselect agents in tree that are not in allFreshAgents
+                //return selection and deselect agents in tree that are not in allFreshAgents or have different uuids
                 if (tree != null) {
-                    Set<String> selectedHostnames = (Set<String>) tree.getValue();
                     if (selectedHostnames != null && !selectedHostnames.isEmpty()) {
                         Set<String> actualSelectedHostnames = new HashSet<String>();
                         for (String selectedHostname : selectedHostnames) {
@@ -201,66 +219,12 @@ public final class MgmtAgentManager extends VerticalLayout implements
                                 }
                             }
                         }
-//                        System.out.println("SeTING VALUES " + actualSelectedHostnames);
                         tree.setValue(actualSelectedHostnames);
-                    }
-                }
-
-                //process bizzare situations
-                List<List<Agent>> allSessionsSelectedAgents = MgmtApplication.getAllSessionsSelectedAgents();
-                if (!allSessionsSelectedAgents.isEmpty()) {
-                    //iterate all sessions' selected agents
-                    for (List<Agent> singleSessionsSelectedAgents : allSessionsSelectedAgents) {
-                        if (!singleSessionsSelectedAgents.isEmpty()) {
-                            //replace agents whose hostnames are the same but uuids changed somehow
-                            for (ListIterator<Agent> iter = singleSessionsSelectedAgents.listIterator(); iter.hasNext();) {
-                                Agent selectedAgent = iter.next();
-                                for (Agent freshAgent : allFreshAgents) {
-                                    if (selectedAgent.getHostname().equalsIgnoreCase(freshAgent.getHostname())
-                                            && selectedAgent.getUuid().compareTo(freshAgent.getUuid()) != 0) {
-                                        iter.set(freshAgent);
-                                        break;
-                                    }
-                                }
-                            }
-                            //keep only fresh agents
-                            singleSessionsSelectedAgents.retainAll(allFreshAgents);
-                        }
                     }
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
             }
-        }
-    }
-
-    public void refreshNodeContainer(List<Agent> agents, boolean delete, Agent parent) {
-        try {
-            if (delete) {
-                for (Agent agent : agents) {
-                    container.removeItemRecursively(agent.getHostname());
-                }
-            } else {
-                for (Agent agent : agents) {
-                    if (container.getItem(agent.getHostname()) == null) {
-                        if (agent.getUuid() != null && agent.getHostname() != null) {
-                            Item item = container.addItem(agent.getHostname());
-                            if (item != null) {
-                                item.getItemProperty("value").setValue(agent);
-                                if (!agent.isIsLXC()) {
-                                    container.setChildrenAllowed(agent.getHostname(), true);
-                                } else {
-                                    item.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
-                                    container.setParent(agent.getHostname(), parent.getHostname());
-                                    container.setChildrenAllowed(agent.getHostname(), false);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in refreshNodeContainer", ex);
         }
     }
 }

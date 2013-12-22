@@ -39,7 +39,6 @@ public class Terminal implements Module {
         private final TextField textFieldTimeout;
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
-        private List<Agent> agents;
         private final CommandManagerInterface commandManagerInterface;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
@@ -203,7 +202,7 @@ public class Terminal implements Module {
                 public void buttonClick(Button.ClickEvent event) {
                     try {
 //                        agents = AppData.getSelectedAgentList();
-                        agents = MgmtApplication.getSelectedAgents();
+                        Set<Agent> agents = MgmtApplication.getSelectedAgents();
                         if (agents != null && agents.size() > 0) {
                             task = new Task();
                             task.setDescription("JSON executing");
@@ -377,7 +376,7 @@ public class Terminal implements Module {
                     clusterData.setSavedCacheDir("Saved Cache Dir");
 
 //                    List<Agent> agents = AppData.getSelectedAgentList();
-                    List<Agent> agents = MgmtApplication.getSelectedAgents();
+                    Set<Agent> agents = MgmtApplication.getSelectedAgents();
                     if (agents != null && !agents.isEmpty()) {
                         List<UUID> listUuid = new ArrayList<UUID>();
                         for (Agent agent : agents) {

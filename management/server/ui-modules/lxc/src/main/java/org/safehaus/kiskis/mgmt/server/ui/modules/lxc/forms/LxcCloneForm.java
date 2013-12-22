@@ -92,7 +92,7 @@ public class LxcCloneForm extends VerticalLayout implements
     @Override
     public void buttonClick(Button.ClickEvent clickEvent) {
 //        List<Agent> agents = AppData.getSelectedAgentList();
-        List<Agent> agents = MgmtApplication.getSelectedAgents();
+        Set<Agent> agents = MgmtApplication.getSelectedAgents();
         if (agents != null && agents.size() > 0) {
             physicalAgents = new HashSet<Agent>();
             for (Agent agent : agents) {

@@ -7,7 +7,6 @@ import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 
@@ -42,7 +41,7 @@ public class LxcManageForm extends VerticalLayout {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 //                List<Agent> agents = AppData.getSelectedAgentList();
-                List<Agent> agents = MgmtApplication.getSelectedAgents();
+                Set<Agent> agents = MgmtApplication.getSelectedAgents();
                 if (agents != null && agents.size() > 0) {
                     Set<Agent> physicalAgents = new HashSet<Agent>();
                     for (Agent agent : agents) {
