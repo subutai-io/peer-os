@@ -14,6 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -181,6 +182,29 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
                 registeredAgents.clear();
                 registeredAgents.addAll(allFreshAgents);
+
+                //deselect agents in tree that are not in allFreshAgents
+                if (tree != null) {
+                    Set<String> selectedHostnames = (Set<String>) tree.getValue();
+                    if (selectedHostnames != null && !selectedHostnames.isEmpty()) {
+                        Set<String> actualSelectedHostnames = new HashSet<String>();
+                        for (String selectedHostname : selectedHostnames) {
+                            for (Agent agent : allFreshAgents) {
+                                if (agent.getHostname().equalsIgnoreCase(selectedHostname)) {
+                                    Object value
+                                            = container.getItem(selectedHostname).getItemProperty("value").getValue();
+                                    if (value != null && value instanceof Agent
+                                            && ((Agent) value).getUuid().compareTo(agent.getUuid()) == 0) {
+                                        actualSelectedHostnames.add(selectedHostname);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+//                        System.out.println("SeTING VALUES " + actualSelectedHostnames);
+                        tree.setValue(actualSelectedHostnames);
+                    }
+                }
 
                 //process bizzare situations
                 List<List<Agent>> allSessionsSelectedAgents = MgmtApplication.getAllSessionsSelectedAgents();
