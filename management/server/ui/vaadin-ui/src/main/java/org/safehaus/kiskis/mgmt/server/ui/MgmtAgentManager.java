@@ -14,7 +14,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
