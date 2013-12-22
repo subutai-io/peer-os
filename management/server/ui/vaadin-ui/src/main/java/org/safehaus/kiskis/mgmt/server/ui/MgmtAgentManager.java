@@ -36,11 +36,11 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
-
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
         setMargin(true);
         tree = new Tree("List of nodes", getNodeContainer());
+        tree.setItemIconPropertyId("icon");
         tree.setMultiSelect(true);
         tree.setImmediate(true);
         tree.addListener(this);
@@ -170,6 +170,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
                         Agent parentAgent = family.getKey();
                         Item parent = container.addItem(parentAgent.getHostname());
                         if (parent != null) {
+                            parent.getItemProperty("value").setValue(parentAgent);
                             container.setChildrenAllowed(parentAgent.getHostname(), true);
                             for (Agent childAgent : family.getValue()) {
                                 Item child = container.addItem(childAgent.getHostname());
