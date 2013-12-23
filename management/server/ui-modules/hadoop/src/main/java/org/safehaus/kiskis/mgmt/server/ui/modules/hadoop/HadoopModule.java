@@ -84,6 +84,10 @@ public class HadoopModule implements Module {
             if (subwindow != null && subwindow.isVisible()) {
                 subwindow.setOutput(response);
             }
+
+            if (table != null) {
+                table.onCommand(response);
+            }
         }
 
         @Override

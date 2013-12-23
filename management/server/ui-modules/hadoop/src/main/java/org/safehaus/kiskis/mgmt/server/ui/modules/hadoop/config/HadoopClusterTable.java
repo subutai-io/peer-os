@@ -11,6 +11,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
@@ -53,7 +54,7 @@ public class HadoopClusterTable extends Table {
             public void handleAction(Action action, Object sender, Object target) {
                 Item item = getItem(target);
                 if (ACTION_NAME_NODE == action) {
-                    hadoopDataNodesWindow = new HadoopDataNodesWindow();
+                    hadoopDataNodesWindow = new HadoopDataNodesWindow((String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
                     getApplication().getMainWindow().addWindow(hadoopDataNodesWindow);
                 } else if (ACTION_JOB_TRACKER == action) {
                     getWindow().showNotification(
@@ -107,6 +108,12 @@ public class HadoopClusterTable extends Table {
 
     public void refreshDataSource() {
         this.setContainerDataSource(getContainer());
+    }
+
+    public void onCommand(Response response){
+         if(hadoopDataNodesWindow != null && hadoopDataNodesWindow.isVisible()){
+             hadoopDataNodesWindow.onCommand(response);
+         }
     }
 
     public CommandManagerInterface getCommandManager() {
