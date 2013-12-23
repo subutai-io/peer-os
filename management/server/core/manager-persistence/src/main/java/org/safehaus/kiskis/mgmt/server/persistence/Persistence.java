@@ -78,7 +78,6 @@ public class Persistence implements PersistenceInterface {
     /**
      * Heartbeat, LXC, Physical
      */
-
     @Override
     public List<Agent> getRegisteredAgents(long freshness) {
         List<Agent> list = new ArrayList<Agent>();
@@ -526,7 +525,6 @@ public class Persistence implements PersistenceInterface {
                 task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
             }
 
-
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTask", ex);
         }
@@ -536,7 +534,6 @@ public class Persistence implements PersistenceInterface {
     /**
      * Utils
      */
-
     @Override
     public boolean truncateTables() {
         try {
@@ -711,5 +708,18 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);
         }
         return hadoopClusterInfo;
+    }
+
+    public boolean deleteCassandraClusterInfo(String uuid) {
+        try {
+            String cql = "delete from cassandra_cluster_info where uid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(UUID.fromString(uuid)));
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+        }
+        return true;
     }
 }
