@@ -77,6 +77,9 @@ public interface PersistenceInterface {
     public List<CassandraClusterInfo> getCassandraClusterInfo();
 
     public CassandraClusterInfo getCassandraClusterInfo(String clusterName);
+    
+    public boolean deleteCassandraClusterInfo(String uuid);
+
 
     /**
      *

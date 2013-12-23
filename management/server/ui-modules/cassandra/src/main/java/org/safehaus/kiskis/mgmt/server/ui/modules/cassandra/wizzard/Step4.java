@@ -43,7 +43,7 @@ public class Step4 extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) <font color=\"#f14c1a\">Welcome</font><br>"
+                + " 1) Welcome<br>"
                 + " 2) Install<br>"
                 + " 3) Set listen and rpc addresss<br>"
                 + " 4) <strong>Set seeds </strong><br>"
@@ -62,15 +62,16 @@ public class Step4 extends Panel {
         grid.addComponent(label, 2, 0, 5, 0);
         grid.setComponentAlignment(label, Alignment.TOP_CENTER);
 
-        StringBuilder sb = new StringBuilder();
-        for (Agent a : cassandraWizard.getLxcList()) {
-            sb.append(a.getHostname()).append("<br/>");
-        }
-        Label label1 = new Label(sb.toString());
-        label1.setContentMode(Label.CONTENT_XHTML);
+//        StringBuilder sb = new StringBuilder();
+//        for (Agent a : cassandraWizard.getLxcList()) {
+//            sb.append(a.getHostname()).append("<br/>");
+//        }
+//        Label label1 = new Label(sb.toString());
+//        label1.setContentMode(Label.CONTENT_XHTML);
 
-        grid.addComponent(label1, 2, 1, 5, 1);
-        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
+        final TextField domainName = new TextField("Domain:");
+        grid.addComponent(domainName, 2, 1, 5, 1);
+        grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
 
         BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
         final ListSelect hostSelect = new ListSelect("Hosts", agents);
@@ -87,7 +88,7 @@ public class Step4 extends Panel {
         });
 
         grid.addComponent(hostSelect, 2, 2, 5, 9);
-        grid.setComponentAlignment(label1, Alignment.TOP_CENTER);
+        grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -98,7 +99,7 @@ public class Step4 extends Panel {
                 List<UUID> seeds = new ArrayList<UUID>();
                 for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
                     Agent agent = (Agent) i.next();
-                    sb.append(agent.getHostname()).append(",");
+                    sb.append(agent.getHostname()).append(domainName.getValue()).append(",");
                     seeds.add(agent.getUuid());
                 }
                 cassandraWizard.getCluster().setSeeds(seeds);

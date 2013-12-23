@@ -28,7 +28,7 @@ public final class CassandraWizard extends Window {
     private Task task;
     private CassandraClusterInfo cluster;
     private final List<Agent> lxcList;
-    private final TextArea textAreaTerminal;
+//    private final TextArea terminal;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 5;
 
@@ -72,13 +72,13 @@ public final class CassandraWizard extends Window {
         gridLayout.addComponent(verticalLayout, 0, 1, 0, 8);
         gridLayout.setComponentAlignment(verticalLayout, Alignment.MIDDLE_CENTER);
 
-        textAreaTerminal = new TextArea();
-        textAreaTerminal.setRows(10);
-        textAreaTerminal.setColumns(65);
-        textAreaTerminal.setImmediate(true);
-        textAreaTerminal.setWordwrap(true);
-        gridLayout.addComponent(textAreaTerminal, 0, 9);
-        gridLayout.setComponentAlignment(textAreaTerminal, Alignment.TOP_CENTER);
+//        terminal = new TextArea();
+//        terminal.setRows(10);
+//        terminal.setColumns(65);
+//        terminal.setImmediate(true);
+//        terminal.setWordwrap(true);
+//        gridLayout.addComponent(terminal, 0, 9);
+//        gridLayout.setComponentAlignment(terminal, Alignment.TOP_CENTER);
 
         putForm();
 
@@ -103,6 +103,8 @@ public final class CassandraWizard extends Window {
             Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
             commandManagerInterface.executeCommand(command);
         }
+//        boolean removeWindow = ((Window) getWindow().getParent()).removeWindow(this);
+        removeWindow(this);
     }
 
     private void putForm() {
@@ -176,13 +178,13 @@ public final class CassandraWizard extends Window {
 
     public void setOutput(Response response) {
         if (task != null && response.getTaskUuid().toString().equals(task.getUuid().toString())) {
-            StringBuilder output = new StringBuilder();
-            output.append(textAreaTerminal.getValue());
+//            StringBuilder output = new StringBuilder();
+//            output.append(terminal.getValue());
             if (response.getStdErr() != null && response.getStdErr().trim().length() != 0) {
-                output.append("ERROR ").append(response.getStdErr().trim());
+//                output.append("ERROR ").append(response.getStdErr().trim());
             }
             if (response.getStdOut() != null && response.getStdOut().trim().length() != 0) {
-                output.append("OK ").append(response.getStdOut().trim());
+//                output.append("OK ").append(response.getStdOut().trim());
             }
 
             switch (response.getType()) {
@@ -192,10 +194,13 @@ public final class CassandraWizard extends Window {
                             break;
                         }
                         case 2: {
+//                            terminal.setValue("Step 2");
                             break;
                         }
                         case 3: {
-//                            step3.updateUI(response.getExitCode() == 0 ? "Success" : "Fail");
+//                            for (ParseResult pr : commandManagerInterface.parseTask(task, true)) {
+//                                terminal.setValue("OUTPUT" + pr.getResponse().getStdOut());
+//                            }
                             break;
                         }
                         case 4: {
@@ -212,8 +217,8 @@ public final class CassandraWizard extends Window {
                 }
             }
 
-            textAreaTerminal.setValue(output);
-            textAreaTerminal.setCursorPosition(output.length() - 1);
+//            terminal.setValue(output);
+//            terminal.setCursorPosition(output.length() - 1);
         }
     }
 

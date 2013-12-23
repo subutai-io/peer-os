@@ -43,7 +43,7 @@ public class Step3 extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) <font color=\"#f14c1a\">Welcome</font><br>"
+                + " 1) Welcome<br>"
                 + " 2) Install<br>"
                 + " 3) <strong>Set listen and rpc addresss</strong><br>"
                 + " 4) Set seeds<br>"
@@ -83,10 +83,10 @@ public class Step3 extends Panel {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();
-                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getHostname());
+                    listenAddressCommand = listenAddressCommand.replace("%ip", agent.getListIP().get(0));
                     Command command = buildCommand(agent.getUuid(), listenAddressCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
-                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getHostname());
+                    rpcAddressCommand = rpcAddressCommand.replace("%ip", agent.getListIP().get(0));
                     command = buildCommand(agent.getUuid(), rpcAddressCommand, reqSeqNumber, taskUuid, args);
                     cassandraWizard.runCommand(command);
                 }

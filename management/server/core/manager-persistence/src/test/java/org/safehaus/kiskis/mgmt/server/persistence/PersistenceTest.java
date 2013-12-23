@@ -15,7 +15,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -34,7 +33,7 @@ public class PersistenceTest {
     @BeforeClass
     public static void setUpClass() {
         instance = new Persistence();
-        instance.setCassandraHost("localhost");
+        instance.setCassandraHost("172.16.10.0");
         instance.setCassandraPort(9042);
         instance.setCassandraKeyspace("kiskis");
         instance.init();
@@ -260,5 +259,10 @@ public class PersistenceTest {
 
         boolean result = instance.saveCassandraClusterInfo(cd);
         assertEquals(true, result);
+    }
+    
+    @Test
+    public void testCassandraClusterDataDelete() {
+        instance.deleteCassandraClusterInfo("107c6a70-6ba2-11e3-859a-2eec37ec3ee3");
     }
 }

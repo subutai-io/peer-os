@@ -5,7 +5,9 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -41,6 +43,18 @@ public final class MgmtAgentManager extends VerticalLayout implements
         setMargin(true);
         tree = new Tree("List of nodes", getNodeContainer());
         tree.setItemIconPropertyId("icon");
+        tree.setItemDescriptionGenerator(new AbstractSelect.ItemDescriptionGenerator() {
+
+            @Override
+            public String generateDescription(Component source, Object itemId,
+                    Object propertyId) {
+                Item item = tree.getItem(itemId);
+                Agent agent = (Agent) item.getItemProperty("value").getValue();
+                return "Hostname: " + agent.getHostname() + "\t"
+                        + "Is LXC: " + agent.isIsLXC() + "\t"
+                        + "IP: " + agent.getListIP();
+            }
+        });
         tree.setMultiSelect(true);
         tree.setImmediate(true);
         tree.addListener(this);
