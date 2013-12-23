@@ -110,7 +110,10 @@ public final class MgmtAgentManager extends VerticalLayout implements
             try {
 
                 //remember selection
-                Set<String> selectedHostnames = (Set<String>) tree.getValue();
+                Set<String> selectedHostnames = null;
+                if (tree != null) {
+                    selectedHostnames = (Set<String>) tree.getValue();
+                }
 
                 //clear tree
                 container.removeAllItems();
@@ -205,24 +208,22 @@ public final class MgmtAgentManager extends VerticalLayout implements
                 }
 
                 //return selection and deselect agents in tree that are not in allFreshAgents or have different uuids
-                if (tree != null) {
-                    if (selectedHostnames != null && !selectedHostnames.isEmpty()) {
-                        Set<String> actualSelectedHostnames = new HashSet<String>();
-                        for (String selectedHostname : selectedHostnames) {
-                            for (Agent agent : allFreshAgents) {
-                                if (agent.getHostname().equalsIgnoreCase(selectedHostname)) {
-                                    Object value
-                                            = container.getItem(selectedHostname).getItemProperty("value").getValue();
-                                    if (value != null && value instanceof Agent
-                                            && ((Agent) value).getUuid().compareTo(agent.getUuid()) == 0) {
-                                        actualSelectedHostnames.add(selectedHostname);
-                                    }
-                                    break;
+                if (selectedHostnames != null && !selectedHostnames.isEmpty()) {
+                    Set<String> actualSelectedHostnames = new HashSet<String>();
+                    for (String selectedHostname : selectedHostnames) {
+                        for (Agent agent : allFreshAgents) {
+                            if (agent.getHostname().equalsIgnoreCase(selectedHostname)) {
+                                Object value
+                                        = container.getItem(selectedHostname).getItemProperty("value").getValue();
+                                if (value != null && value instanceof Agent
+                                        && ((Agent) value).getUuid().compareTo(agent.getUuid()) == 0) {
+                                    actualSelectedHostnames.add(selectedHostname);
                                 }
+                                break;
                             }
                         }
-                        tree.setValue(actualSelectedHostnames);
                     }
+                    tree.setValue(actualSelectedHostnames);
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
