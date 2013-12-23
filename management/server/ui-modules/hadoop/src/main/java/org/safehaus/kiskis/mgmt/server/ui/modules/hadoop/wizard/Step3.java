@@ -117,117 +117,126 @@ public class Step3 extends Panel {
         }
     }
 
-    private Button getButtonConfigureHadoop(){
-        Button button = new Button("Configure");
+    private Button getButtonConfigureHadoop() {
+        final Button button = new Button("Configure");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().configureHadoop();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonConfigureSecondaryNameNode(){
-        Button button = new Button("Configure SNameNode");
+    private Button getButtonConfigureSecondaryNameNode() {
+        final Button button = new Button("Configure SNameNode");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().configureSNameNode();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonSetSlaveNameNode(){
-        Button button = new Button("SetSlaveNameNode");
+    private Button getButtonSetSlaveNameNode() {
+        final Button button = new Button("SetSlaveNameNode");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().setSlaveNameNode();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonSetSlaveJobTracker(){
-        Button button = new Button("setSlaveJobTracker");
+    private Button getButtonSetSlaveJobTracker() {
+        final Button button = new Button("setSlaveJobTracker");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().setSlaveJobTracker();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonSetSSH(){
-        Button button = new Button("SetSSH");
+    private Button getButtonSetSSH() {
+        final Button button = new Button("SetSSH");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().setSSH();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonSetSSHMaster(){
-        Button button = new Button("SetSSHMaster");
+    private Button getButtonSetSSHMaster() {
+        final Button button = new Button("SetSSHMaster");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().setSSHMaster();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonCopySSHSlaves(){
-        Button button = new Button("CopySSHSlaves");
+    private Button getButtonCopySSHSlaves() {
+        final Button button = new Button("CopySSHSlaves");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().copySSHSlaves();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonConfigSSHMaster(){
-        Button button = new Button("ConfigSSHMaster");
+    private Button getButtonConfigSSHMaster() {
+        final Button button = new Button("ConfigSSHMaster");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().configSSHMaster();
+                button.setEnabled(false);
             }
         });
 
         return button;
     }
 
-    private Button getButtonFormatMaster(){
-        Button button = new Button("formatMaster");
+    private Button getButtonFormatMaster() {
+        final Button button = new Button("formatMaster");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().formatMaster();
+                button.setEnabled(false);
             }
         });
 

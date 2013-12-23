@@ -66,8 +66,8 @@ public class HadoopInstallation {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", agent.getUuid().toString());
 
-                map.put(":namenode", nameNode.getHostname());
-                map.put(":jobtracker", jobTracker.getHostname());
+                map.put(":namenode", nameNode.getListIP().get(0));
+                map.put(":jobtracker", jobTracker.getListIP().get(0));
                 map.put(":replicationfactor", replicationFactor.toString());
 
                 RequestUtil.createRequest(commandManager, HadoopCommands.CONFIGURE_SLAVES, hadoopConfigureTask, map);
@@ -108,7 +108,7 @@ public class HadoopInstallation {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", nameNode.getUuid().toString());
 
-                map.put(":slave-hostname", agent.getHostname());
+                map.put(":slave-hostname", agent.getListIP().get(0));
 
                 RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES_NAME_NODE, hadoopSlaveNameNode, map);
             }
@@ -131,7 +131,7 @@ public class HadoopInstallation {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", jobTracker.getUuid().toString());
 
-                map.put(":slave-hostname", agent.getHostname());
+                map.put(":slave-hostname", agent.getListIP().get(0));
 
                 RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES_JOB_TRACKER, hadoopSlaveJobTracker, map);
             }

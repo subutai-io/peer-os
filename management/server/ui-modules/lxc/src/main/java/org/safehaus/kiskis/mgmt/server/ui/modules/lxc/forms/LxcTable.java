@@ -207,6 +207,7 @@ public class LxcTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 destroyTask = createTask("Destroy lxc container");
+                createRequest(STOP_LXC, destroyTask, lxc);
                 createRequest(DESTROY_LXC, destroyTask, lxc);
             }
         });
