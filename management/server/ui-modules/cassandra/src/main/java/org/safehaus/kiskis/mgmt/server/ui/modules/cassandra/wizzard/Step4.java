@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -73,7 +74,7 @@ public class Step4 extends Panel {
         grid.addComponent(domainName, 2, 1, 5, 1);
         grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
 
-        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, (Collection<? extends Agent>) cassandraWizard.getLxcList());
         final ListSelect hostSelect = new ListSelect("Hosts", agents);
 
         hostSelect.setRows(6); // perfect length in out case

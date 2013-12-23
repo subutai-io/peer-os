@@ -22,13 +22,14 @@ public class CassandraTable extends Table {
 
     private final CommandManagerInterface commandManager;
     private IndexedContainer container;
-    private final CassandraModule.ModuleComponent parent;
+//    private final CassandraModule.ModuleComponent parent;
     private NodesWindow window;
     private Task task;
 
-    public CassandraTable(final CommandManagerInterface commandManager, final CassandraModule.ModuleComponent window) {
+//    public CassandraTable(final CommandManagerInterface commandManager, final CassandraModule.ModuleComponent window) {
+    public CassandraTable(final CommandManagerInterface commandManager) {
         this.commandManager = commandManager;
-        this.parent = window;
+//        this.parent = window;
 
         this.setCaption("Cassandra clusters");
         this.setContainerDataSource(getCassandraContainer());
