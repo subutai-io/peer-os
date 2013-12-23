@@ -145,11 +145,16 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     }
 
     public static Set<Agent> getSelectedAgents() {
-        return getInstance().selectedAgents;
+        if (getInstance() != null) {
+            return getInstance().selectedAgents;
+        }
+        return null;
     }
 
     public static void setSelectedAgents(Set<Agent> agents) {
-        getInstance().selectedAgents = agents;
+        if (getInstance() != null && agents != null) {
+            getInstance().selectedAgents = agents;
+        }
     }
 
 }

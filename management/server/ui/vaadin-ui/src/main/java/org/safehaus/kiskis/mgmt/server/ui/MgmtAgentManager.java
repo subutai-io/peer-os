@@ -171,14 +171,16 @@ public final class MgmtAgentManager extends VerticalLayout implements
                         Item parent = container.addItem(parentAgent.getHostname());
                         if (parent != null) {
                             parent.getItemProperty("value").setValue(parentAgent);
-                            container.setChildrenAllowed(parentAgent.getHostname(), true);
-                            for (Agent childAgent : family.getValue()) {
-                                Item child = container.addItem(childAgent.getHostname());
-                                if (child != null) {
-                                    child.getItemProperty("value").setValue(childAgent);
-                                    child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
-                                    container.setParent(childAgent.getHostname(), parentAgent.getHostname());
-                                    container.setChildrenAllowed(childAgent.getHostname(), false);
+                            if (family.getValue() != null) {
+                                container.setChildrenAllowed(parentAgent.getHostname(), true);
+                                for (Agent childAgent : family.getValue()) {
+                                    Item child = container.addItem(childAgent.getHostname());
+                                    if (child != null) {
+                                        child.getItemProperty("value").setValue(childAgent);
+                                        child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
+                                        container.setParent(childAgent.getHostname(), parentAgent.getHostname());
+                                        container.setChildrenAllowed(childAgent.getHostname(), false);
+                                    }
                                 }
                             }
                         }
