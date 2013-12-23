@@ -13,8 +13,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +25,25 @@ import java.util.UUID;
  * Time: 6:56 PM
  */
 public class DataNodesTable extends Table {
+    public static final String REMOVE_NODE = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"slaves\",\"clear\",\":slave-hostname\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
 
     public static final String HOSTNAME = "hostname",
             STATUS = "status",
@@ -78,30 +97,19 @@ public class DataNodesTable extends Table {
         buttonRemove.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                final String removeCommand = "{\n" +
-                        "\t  \"command\": {\n" +
-                        "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-                        "\t    \"source\": :source,\n" +
-                        "\t    \"uuid\": :uuid,\n" +
-                        "\t    \"taskUuid\": :taskUuid,\n" +
-                        "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-                        "\t    \"workingDirectory\": \"/\",\n" +
-                        "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
-                        "\t    \"stdOut\": \"RETURN\",\n" +
-                        "\t    \"stdErr\": \"RETURN\",\n" +
-                        "\t    \"runAs\": \"root\",\n" +
-                        "\t    \"args\": [\n" +
-                        "\t      \"slaves\",\"clear\",\":slave-hostname\"\n" +
-                        "\t    ],\n" +
-                        "\t    \"timeout\": 180\n" +
-                        "\t  }\n" +
-                        "\t}";
-
                 Agent master = getAgentManager().getAgent(cluster.getNameNode());
+                cluster = getCommandManager().getHadoopClusterData(clusterName);
                 cluster.getDataNodes().remove(agent.getUuid());
 
-                removeTask = createTask("Remove data node from Hadoop Cluster");
-                createRequest(removeCommand, removeTask, master, agent);
+                removeTask = RequestUtil.createTask(getCommandManager(), "Remove data node from Hadoop Cluster");
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":taskUuid", removeTask.getUuid().toString());
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", master.getUuid().toString());
+                map.put(":requestSequenceNumber", removeTask.getIncrementedReqSeqNumber().toString());
+                map.put(":slave-hostname", agent.getUuid().toString());
+
+                RequestUtil.createRequest(getCommandManager(), REMOVE_NODE, map);
             }
         });
         item.getItemProperty(REMOVE).setValue(buttonRemove);
@@ -112,49 +120,16 @@ public class DataNodesTable extends Table {
     }
 
     public void onCommand(Response response) {
-        if(removeTask != null){
-            Task task = getCommandManager().getTask(response.getTaskUuid());
-            List<ParseResult> list = getCommandManager().parseTask(task, true);
-            task = getCommandManager().getTask(response.getTaskUuid());
+        Task task = getCommandManager().getTask(response.getTaskUuid());
+        List<ParseResult> list = getCommandManager().parseTask(task, true);
+        task = getCommandManager().getTask(response.getTaskUuid());
 
-            if(task.equals(removeTask)){
+        if (removeTask != null) {
+            if (task.equals(removeTask)) {
                 getCommandManager().saveHadoopClusterData(cluster);
                 refreshDataSource();
-                System.out.println(list);
             }
         }
-    }
-
-    private Task createTask(String description) {
-        Task task = new Task();
-        task.setTaskStatus(TaskStatus.NEW);
-        task.setDescription(description);
-        if (getCommandManager() != null) {
-            getCommandManager().saveTask(task);
-        }
-
-        return task;
-    }
-
-    private Request createRequest(final String command, Task task, Agent agent, Agent slave) {
-        String json = command;
-        json = json.replaceAll(":taskUuid", task.getUuid().toString());
-        json = json.replaceAll(":source", HadoopModule.MODULE_NAME);
-
-        json = json.replaceAll(":uuid", agent.getUuid().toString());
-        json = json.replaceAll(":requestSequenceNumber", task.getIncrementedReqSeqNumber().toString());
-
-        if (slave != null) {
-            json = json.replaceAll(":slave-hostname", slave.getHostname());
-        }
-
-
-        Request request = CommandJson.getRequest(json);
-        if (getCommandManager() != null) {
-            getCommandManager().executeCommand(new Command(request));
-        }
-
-        return request;
     }
 
     public CommandManagerInterface getCommandManager() {

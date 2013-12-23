@@ -11,9 +11,48 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.HashMap;
 import java.util.List;
 
 public final class HadoopDataNodesWindow extends Window {
+
+    public static final String ADD_NODE = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"slaves\",\":slave-hostname\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String STATUS_CLUSTER = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"/usr/bin/service\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"hadoop-dfs\",\":command\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
 
     private Button startButton, stopButton, restartButton;
     private Label statusLabel;
@@ -21,7 +60,7 @@ public final class HadoopDataNodesWindow extends Window {
     private DataNodesTable dataNodesTable;
 
     private HadoopClusterInfo cluster;
-    private Task addTask;
+    private Task addTask, statusTask;
 
     public HadoopDataNodesWindow(String clusterName) {
         setModal(true);
@@ -52,6 +91,18 @@ public final class HadoopDataNodesWindow extends Window {
         verticalLayout.addComponent(agentsLayout);
         verticalLayout.addComponent(getTable());
         setContent(verticalLayout);
+
+        statusTask = RequestUtil.createTask(getCommandManager(), "Get status for Hadoop Data Node");
+        Agent master = getAgentManager().getAgent(cluster.getNameNode());
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":taskUuid", statusTask.getUuid().toString());
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", master.getUuid().toString());
+        map.put(":command", "status");
+        map.put(":requestSequenceNumber", statusTask.getIncrementedReqSeqNumber().toString());
+
+        RequestUtil.createRequest(getCommandManager(), STATUS_CLUSTER, map);
     }
 
     private Button getStartButton() {
@@ -73,35 +124,25 @@ public final class HadoopDataNodesWindow extends Window {
     }
 
     private Button getAddButton() {
-        final String addNode = "{\n" +
-                "\t  \"command\": {\n" +
-                "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-                "\t    \"source\": :source,\n" +
-                "\t    \"uuid\": :uuid,\n" +
-                "\t    \"taskUuid\": :taskUuid,\n" +
-                "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-                "\t    \"workingDirectory\": \"/\",\n" +
-                "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
-                "\t    \"stdOut\": \"RETURN\",\n" +
-                "\t    \"stdErr\": \"RETURN\",\n" +
-                "\t    \"runAs\": \"root\",\n" +
-                "\t    \"args\": [\n" +
-                "\t      \"slaves\",\":slave-hostname\"\n" +
-                "\t    ],\n" +
-                "\t    \"timeout\": 180\n" +
-                "\t  }\n" +
-                "\t}";
-
         Button button = new Button("Add");
         button.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Agent agent = (Agent) agentsComboBox.getValue();
+                cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
                 cluster.getDataNodes().add(agent.getUuid());
 
-                addTask = createTask("Adding data node to Hadoop Cluster");
-                createRequest(addNode, addTask, getAgentManager().getAgent(cluster.getNameNode()), agent);
+                addTask = RequestUtil.createTask(getCommandManager(), "Adding data node to Hadoop Cluster");
+
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":taskUuid", addTask.getUuid().toString());
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+                map.put(":requestSequenceNumber", addTask.getIncrementedReqSeqNumber().toString());
+                map.put(":slave-hostname", agent.getUuid().toString());
+
+                RequestUtil.createRequest(getCommandManager(), ADD_NODE, map);
             }
         });
 
@@ -122,18 +163,18 @@ public final class HadoopDataNodesWindow extends Window {
     }
 
     public void onCommand(Response response) {
-        if (addTask != null) {
-            Task task = getCommandManager().getTask(response.getTaskUuid());
-            List<ParseResult> list = getCommandManager().parseTask(task, true);
-            task = getCommandManager().getTask(response.getTaskUuid());
+        Task task = getCommandManager().getTask(response.getTaskUuid());
+        List<ParseResult> list = getCommandManager().parseTask(task, true);
+        task = getCommandManager().getTask(response.getTaskUuid());
 
+        if (addTask != null) {
             if (!list.isEmpty()) {
                 if (task.equals(addTask)) {
                     if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                        getCommandManager().saveHadoopClusterData(cluster);
+
                         agentsComboBox.refreshDataSource();
                         dataNodesTable.refreshDataSource();
-                        getCommandManager().saveHadoopClusterData(cluster);
-                        statusLabel.setValue("Data Node added");
                     } else {
                         cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
                         agentsComboBox.refreshDataSource();
@@ -143,37 +184,15 @@ public final class HadoopDataNodesWindow extends Window {
             }
         }
 
+        if (statusTask != null) {
+            if (task.equals(statusTask)) {
+                for (ParseResult pr : list) {
+                    statusLabel.setValue(pr.getResponse().getStdOut());
+                }
+            }
+        }
+
         dataNodesTable.onCommand(response);
-    }
-
-    private Task createTask(String description) {
-        Task clusterTask = new Task();
-        clusterTask.setTaskStatus(TaskStatus.NEW);
-        clusterTask.setDescription(description);
-        getCommandManager().saveTask(clusterTask);
-
-        return clusterTask;
-    }
-
-    private Request createRequest(final String command, Task task, Agent agent, Agent slave) {
-        String json = command;
-        json = json.replaceAll(":taskUuid", task.getUuid().toString());
-        json = json.replaceAll(":source", HadoopModule.MODULE_NAME);
-
-        json = json.replaceAll(":uuid", agent.getUuid().toString());
-        json = json.replaceAll(":requestSequenceNumber", task.getIncrementedReqSeqNumber().toString());
-
-        if (slave != null) {
-            json = json.replaceAll(":slave-hostname", slave.getHostname());
-        }
-
-
-        Request request = CommandJson.getRequest(json);
-        if (getCommandManager() != null) {
-            getCommandManager().executeCommand(new Command(request));
-        }
-
-        return request;
     }
 
     public CommandManagerInterface getCommandManager() {
