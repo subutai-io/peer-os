@@ -15,7 +15,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/apt-get\",\n" +
+            "\t    \"program\": \"/usr/bin/apt-get update && /usr/bin/apt-get\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +

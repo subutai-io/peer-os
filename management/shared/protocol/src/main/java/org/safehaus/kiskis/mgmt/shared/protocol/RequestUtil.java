@@ -23,8 +23,11 @@ public class RequestUtil {
         return task;
     }
 
-    public static Request createRequest(CommandManagerInterface manager, final String command, HashMap<String, String> map) {
+    public static Request createRequest(CommandManagerInterface manager, final String command, Task task, HashMap<String, String> map) {
         String json = command;
+
+        json = json.replaceAll(":taskUuid", task.getUuid().toString());
+        json = json.replaceAll(":requestSequenceNumber", task.getIncrementedReqSeqNumber().toString());
 
         for(String key : map.keySet()){
             json = json.replaceAll(key, map.get(key));

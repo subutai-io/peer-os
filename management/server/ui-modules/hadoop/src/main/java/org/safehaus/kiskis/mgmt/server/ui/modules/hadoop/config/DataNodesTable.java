@@ -13,6 +13,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public class DataNodesTable extends Table {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-master-slave.sh\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -44,14 +45,91 @@ public class DataNodesTable extends Table {
             "\t  }\n" +
             "\t}";
 
+    public static final String EXCLUDE_NODE = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"dfs.exclude\",\":IP\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String REFRESH_NODES = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"dfsadmin\",\"-refreshNodes\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String STOP_NODE = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"hadoop-daemon.sh\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"stop\",\"datanode\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String STATUS_NODE = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"/usr/bin/service\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"hadoop-all\",\"status\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
 
     public static final String HOSTNAME = "hostname",
             STATUS = "status",
             REMOVE = "remove";
     private String clusterName;
+    private IndexedContainer container;
 
     private HadoopClusterInfo cluster;
-    private Task removeTask;
+    private Task removeTask, statusTask;
 
     public DataNodesTable(String clusterName) {
         this.clusterName = clusterName;
@@ -69,18 +147,24 @@ public class DataNodesTable extends Table {
 
     private IndexedContainer getContainer() {
         this.cluster = getCommandManager().getHadoopClusterData(clusterName);
-        IndexedContainer container = new IndexedContainer();
+        container = new IndexedContainer();
 
         // Create the container properties
         container.addContainerProperty(HOSTNAME, String.class, "");
         container.addContainerProperty(STATUS, String.class, "");
         container.addContainerProperty(REMOVE, Button.class, "");
 
+        statusTask = RequestUtil.createTask(getCommandManager(), "Status data node from Hadoop Cluster");
         // Create some orders
         List<UUID> list = cluster.getDataNodes();
         for (UUID item : list) {
             Agent agent = getAgentManager().getAgent(item);
             addOrderToContainer(container, agent);
+
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", agent.getUuid().toString());
+            RequestUtil.createRequest(getCommandManager(), STATUS_NODE, statusTask, map);
         }
 
         return container;
@@ -102,14 +186,30 @@ public class DataNodesTable extends Table {
                 cluster.getDataNodes().remove(agent.getUuid());
 
                 removeTask = RequestUtil.createTask(getCommandManager(), "Remove data node from Hadoop Cluster");
+
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put(":taskUuid", removeTask.getUuid().toString());
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", master.getUuid().toString());
-                map.put(":requestSequenceNumber", removeTask.getIncrementedReqSeqNumber().toString());
                 map.put(":slave-hostname", agent.getUuid().toString());
+                RequestUtil.createRequest(getCommandManager(), REMOVE_NODE, removeTask, map);
 
-                RequestUtil.createRequest(getCommandManager(), REMOVE_NODE, map);
+                if (!agent.getListIP().isEmpty()) {
+                    map = new HashMap<String, String>();
+                    map.put(":source", HadoopModule.MODULE_NAME);
+                    map.put(":uuid", master.getUuid().toString());
+                    map.put(":IP", agent.getListIP().get(0));
+                    RequestUtil.createRequest(getCommandManager(), EXCLUDE_NODE, removeTask, map);
+                }
+
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", master.getUuid().toString());
+                RequestUtil.createRequest(getCommandManager(), REFRESH_NODES, removeTask, map);
+
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                RequestUtil.createRequest(getCommandManager(), STOP_NODE, removeTask, map);
             }
         });
         item.getItemProperty(REMOVE).setValue(buttonRemove);
@@ -126,8 +226,34 @@ public class DataNodesTable extends Table {
 
         if (removeTask != null) {
             if (task.equals(removeTask)) {
-                getCommandManager().saveHadoopClusterData(cluster);
+                if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                    getCommandManager().saveHadoopClusterData(cluster);
+                }
                 refreshDataSource();
+            }
+        }
+
+        if (statusTask != null) {
+            if (task.equals(statusTask)) {
+                if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                    for (ParseResult pr : list) {
+                        findRow(pr);
+                    }
+                }
+            }
+        }
+    }
+
+    private void findRow(ParseResult parseResult) {
+        Agent agent = getAgentManager().getAgent(parseResult.getRequest().getUuid());
+
+        for (Object itemId : container.getItemIds()) {
+            Item item = container.getItem(itemId);
+
+            String name = (String) item.getItemProperty(HOSTNAME).getValue();
+
+            if (name.equals(agent.getHostname())) {
+                item.getItemProperty(STATUS).setValue(parseResult.getResponse().getStdOut());
             }
         }
     }

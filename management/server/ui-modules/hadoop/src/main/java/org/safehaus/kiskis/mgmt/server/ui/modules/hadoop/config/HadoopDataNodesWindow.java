@@ -35,6 +35,44 @@ public final class HadoopDataNodesWindow extends Window {
             "\t  }\n" +
             "\t}";
 
+    public static final String START_NODE = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-daemon.sh\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"start\",\"datanode\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String INCLUDE_NODE = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"dfs.include\",\":IP\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
     public static final String STATUS_CLUSTER = "{\n" +
             "\t  \"command\": {\n" +
             "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
@@ -49,6 +87,25 @@ public final class HadoopDataNodesWindow extends Window {
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
             "\t      \"hadoop-dfs\",\":command\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String REFRESH_NODES = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \". /etc/profile && hadoop\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"dfsadmin\",\"-refreshNodes\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
@@ -96,13 +153,11 @@ public final class HadoopDataNodesWindow extends Window {
         Agent master = getAgentManager().getAgent(cluster.getNameNode());
 
         HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":taskUuid", statusTask.getUuid().toString());
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", master.getUuid().toString());
         map.put(":command", "status");
-        map.put(":requestSequenceNumber", statusTask.getIncrementedReqSeqNumber().toString());
 
-        RequestUtil.createRequest(getCommandManager(), STATUS_CLUSTER, map);
+        RequestUtil.createRequest(getCommandManager(), STATUS_CLUSTER, statusTask, map);
     }
 
     private Button getStartButton() {
@@ -136,13 +191,29 @@ public final class HadoopDataNodesWindow extends Window {
                 addTask = RequestUtil.createTask(getCommandManager(), "Adding data node to Hadoop Cluster");
 
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put(":taskUuid", addTask.getUuid().toString());
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
-                map.put(":requestSequenceNumber", addTask.getIncrementedReqSeqNumber().toString());
                 map.put(":slave-hostname", agent.getUuid().toString());
+                RequestUtil.createRequest(getCommandManager(), ADD_NODE, addTask, map);
 
-                RequestUtil.createRequest(getCommandManager(), ADD_NODE, map);
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                RequestUtil.createRequest(getCommandManager(), START_NODE, addTask, map);
+
+
+                if(!agent.getListIP().isEmpty()){
+                    map = new HashMap<String, String>();
+                    map.put(":source", HadoopModule.MODULE_NAME);
+                    map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+                    map.put(":IP", agent.getListIP().get(0));
+                    RequestUtil.createRequest(getCommandManager(), INCLUDE_NODE, addTask, map);
+                }
+
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+                RequestUtil.createRequest(getCommandManager(), REFRESH_NODES, addTask, map);
             }
         });
 
