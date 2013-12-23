@@ -18,8 +18,7 @@
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"/>
 
 
-    <service interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory"
-             ranking="3">
+    <service interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory">
         <service-properties>
             <entry key="alias" value="/mgmt-ui"/>
         </service-properties>

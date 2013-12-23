@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 public class LxcModule implements Module {
 
-
     private static final Logger LOG = Logger.getLogger(LxcModule.class.getName());
     private ModuleService service;
     private BundleContext context;
@@ -68,7 +67,7 @@ public class LxcModule implements Module {
         }
 
         @Override
-        public synchronized String getName() {
+        public String getName() {
             return MODULE_NAME;
         }
 
@@ -92,7 +91,7 @@ public class LxcModule implements Module {
 
     public void setModuleService(ModuleService service) {
         if (service != null) {
-            System.out.println(MODULE_NAME + " registering with ModuleService");
+            LOG.log(Level.INFO, "{0} registering with ModuleService", MODULE_NAME);
             this.service = service;
             this.service.registerModule(this);
         }
@@ -101,7 +100,7 @@ public class LxcModule implements Module {
     public void unsetModuleService(ModuleService service) {
         if (service != null) {
             this.service.unregisterModule(this);
-            System.out.println(MODULE_NAME + " Unregistering with ModuleService");
+            LOG.log(Level.INFO, "{0} Unregistering with ModuleService", MODULE_NAME);
         }
     }
 

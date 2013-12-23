@@ -21,6 +21,8 @@ public interface PersistenceInterface {
 
     public boolean saveAgent(Agent agent);
 
+    public boolean removeAgent(String transportId);
+
     /**
      * Heartbeat, LXC, Physical
      */

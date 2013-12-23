@@ -16,10 +16,11 @@
             <cm:property name="amqBrokerCertificatePwd" value="broker"/>
             <cm:property name="amqBrokerTrustStorePwd" value="broker"/>
             <cm:property name="amqMaxMessageToAgentTtlSec" value="60"/>
-            <cm:property name="amqMaxOfflineAgentQueueTtlSec" value="300"/>
+            <cm:property name="amqMaxOfflineAgentTtlSec" value="300"/>
             <cm:property name="amqMaxSlowAgentConnectionTtlSec" value="30"/>
             <cm:property name="amqMaxPooledConnections" value="11"/>
             <cm:property name="amqMaxSenderPoolSize" value="20"/>
+            <cm:property name="amqInactiveQueuesDropTimeoutSec" value="3600"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -34,10 +35,11 @@
         <property name="amqBrokerCertificatePwd" value="${amqBrokerCertificatePwd}"/>
         <property name="amqBrokerTrustStorePwd" value="${amqBrokerTrustStorePwd}"/>
         <property name="amqMaxMessageToAgentTtlSec" value="${amqMaxMessageToAgentTtlSec}"/>
-        <property name="amqMaxOfflineAgentQueueTtlSec" value="${amqMaxOfflineAgentQueueTtlSec}"/>
+        <property name="amqMaxOfflineAgentTtlSec" value="${amqMaxOfflineAgentTtlSec}"/>
         <property name="amqMaxSlowAgentConnectionTtlSec" value="${amqMaxSlowAgentConnectionTtlSec}"/>
         <property name="amqMaxPooledConnections" value="${amqMaxPooledConnections}"/>
         <property name="amqMaxSenderPoolSize" value="${amqMaxSenderPoolSize}"/>
+        <property name="amqInactiveQueuesDropTimeoutSec" value="${amqInactiveQueuesDropTimeoutSec}"/>
     </bean>
 
     <service ref="communicationService"

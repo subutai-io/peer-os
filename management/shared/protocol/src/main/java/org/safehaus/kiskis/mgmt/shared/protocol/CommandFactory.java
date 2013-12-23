@@ -19,10 +19,10 @@ import java.util.UUID;
 public class CommandFactory {
 
     public static CommandInterface createRequest(RequestType type, UUID uuid, String source, UUID taskUuid,
-                                                 Integer reqSeqNum, String workDir, String program,
-                                                 OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath,
-                                                 String stdErrPath, String runAs, List<String> args,
-                                                 Map<String, String> envVars) {
+            Integer reqSeqNum, String workDir, String program,
+            OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath,
+            String stdErrPath, String runAs, List<String> args,
+            Map<String, String> envVars, Integer timeout) {
         Request req = new Request();
         req.setSource(source);
         req.setType(type);
@@ -38,14 +38,15 @@ public class CommandFactory {
         req.setRunAs(runAs);
         req.setArgs(args);
         req.setEnvironment(envVars);
+        req.setTimeout(timeout);
 
         return new Command(req);
     }
 
     public static CommandInterface createResponse(ResponseType type, UUID uuid, String source, UUID taskUuid,
-                                                  Integer exitCode, String stdOut, String stdErr, Integer reqSeqNum,
-                                                  Integer resSeqnum, Integer pid, String macAddress, String hostname,
-                                                  List<String> ips, Boolean isLxc) {
+            Integer exitCode, String stdOut, String stdErr, Integer reqSeqNum,
+            Integer resSeqnum, Integer pid, String macAddress, String hostname,
+            List<String> ips, Boolean isLxc) {
         Response res = new Response();
         res.setSource(source);
         res.setType(type);

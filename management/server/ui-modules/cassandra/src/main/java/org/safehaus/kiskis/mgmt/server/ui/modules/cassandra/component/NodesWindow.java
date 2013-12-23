@@ -107,6 +107,7 @@ public class NodesWindow extends Window {
                         null,
                         "root",
                         null,
+                        null,
                         null);
                 commandManager.executeCommand(command);
             }
@@ -131,6 +132,7 @@ public class NodesWindow extends Window {
                         null,
                         null,
                         "root",
+                        null,
                         null,
                         null);
                 commandManager.executeCommand(command);
