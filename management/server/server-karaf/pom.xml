@@ -159,6 +159,12 @@
                     <include>**/*</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src/main/img</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>

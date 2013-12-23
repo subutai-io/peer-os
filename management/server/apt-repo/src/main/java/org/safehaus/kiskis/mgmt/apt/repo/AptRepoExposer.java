@@ -35,12 +35,13 @@ public class AptRepoExposer {
             try {
                 server = new Server();
                 SelectChannelConnector connector = new SelectChannelConnector();
-                connector.setPort(aptRepoPort);
+//                connector.setPort(aptRepoPort);
+                connector.setPort(8888);
                 server.addConnector(connector);
 
                 ResourceHandler resource_handler = new ResourceHandler();
                 resource_handler.setDirectoriesListed(true);
-                resource_handler.setResourceBase(aptRepoPath);
+                resource_handler.setResourceBase(System.getProperty("karaf.base") + "/res");
 
                 HandlerList handlers = new HandlerList();
                 handlers.setHandlers(new Handler[]{resource_handler});

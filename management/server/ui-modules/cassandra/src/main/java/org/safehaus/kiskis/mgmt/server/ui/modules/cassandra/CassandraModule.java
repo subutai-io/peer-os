@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
+
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;

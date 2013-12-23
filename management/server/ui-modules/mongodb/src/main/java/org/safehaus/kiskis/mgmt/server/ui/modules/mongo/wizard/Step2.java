@@ -11,7 +11,6 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
@@ -44,9 +43,9 @@ public class Step2 extends Panel {
         grid.setSizeFull();
 
         Panel panel = new Panel();
-        Label menu = new Label("Cluster Install Wizard<br>"
-                + " 1) <strong>Config Servers and Routers<br>"
-                + " 2) <font color=\"#f14c1a\">Replica Set Configurations</strong></font>");
+        Label menu = new Label("Cluster Installation Wizard<br>"
+                + " 1) <font color=\"#f14c1a\"><strong>Config Servers and Routers</strong></font><br>"
+                + " 2) Replica Set Configurations");
 
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
@@ -57,75 +56,90 @@ public class Step2 extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
-        final TextField replicaNameTxtFld = new TextField("Enter Replica Set name");
-        replicaNameTxtFld.setInputPrompt("Replica Set name");
-        replicaNameTxtFld.setRequired(true);
-        replicaNameTxtFld.setMaxLength(10);
-        replicaNameTxtFld.addListener(new Property.ValueChangeListener() {
+        final TextField clusterNameTxtFld = new TextField("Enter cluster name");
+        clusterNameTxtFld.setInputPrompt("Cluster name");
+        clusterNameTxtFld.setRequired(true);
+        clusterNameTxtFld.setMaxLength(30);
+        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                mongoWizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
+                mongoWizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
             }
         });
-        verticalLayoutForm.addComponent(replicaNameTxtFld);
+        verticalLayoutForm.addComponent(clusterNameTxtFld);
 
-        Label configServersLabel = new Label("<strong>Choose hosts that will act as shards<br>"
-                + "(Recommended odd number of servers, provide at least 1)</strong>");
+        Label configServersLabel = new Label("<strong>Choose hosts that will act as config servers<br>"
+                + "(Recommended 3 servers)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
-        TwinColSelect shardsColSel = new TwinColSelect("", new ArrayList<Agent>());
-        shardsColSel.setItemCaptionPropertyId("hostname");
-        shardsColSel.setRows(7);
-        shardsColSel.setNullSelectionAllowed(true);
-        shardsColSel.setMultiSelect(true);
-        shardsColSel.setImmediate(true);
-        shardsColSel.setRequired(true);
-        shardsColSel.setLeftColumnCaption("Available Nodes");
-        shardsColSel.setRightColumnCaption("Shards");
-        shardsColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        shardsColSel.addListener(new Property.ValueChangeListener() {
+        final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
+        configServersColSel.setItemCaptionPropertyId("hostname");
+        configServersColSel.setRows(7);
+        configServersColSel.setNullSelectionAllowed(true);
+        configServersColSel.setMultiSelect(true);
+        configServersColSel.setImmediate(true);
+        configServersColSel.setLeftColumnCaption("Available Nodes");
+        configServersColSel.setRightColumnCaption("Config Servers");
+        configServersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        configServersColSel.setRequired(true);
+        configServersColSel.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                List<Agent> shards = new ArrayList<Agent>(agentList);
-                mongoWizard.getConfig().setShards(shards);
+                List<Agent> configServers = new ArrayList<Agent>(agentList);
+                mongoWizard.getConfig().setConfigServers(configServers);
             }
         });
-        verticalLayoutForm.addComponent(shardsColSel);
+        verticalLayoutForm.addComponent(configServersColSel);
+
+        Label routersLabel = new Label("<strong>Choose hosts that will act as routers<br>"
+                + "(Provide at least 2 servers)</strong>");
+        routersLabel.setContentMode(Label.CONTENT_XHTML);
+        verticalLayoutForm.addComponent(routersLabel);
+
+        final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
+        routersColSel.setItemCaptionPropertyId("hostname");
+        routersColSel.setRows(7);
+        routersColSel.setNullSelectionAllowed(true);
+        routersColSel.setMultiSelect(true);
+        routersColSel.setImmediate(true);
+        routersColSel.setLeftColumnCaption("Available Nodes");
+        routersColSel.setRightColumnCaption("Routers");
+        routersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        routersColSel.setRequired(true);
+        routersColSel.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                List<Agent> routerServers = new ArrayList<Agent>(agentList);
+                mongoWizard.getConfig().setRouterServers(routerServers);
+            }
+        });
+        verticalLayoutForm.addComponent(routersColSel);
 
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
-        Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.back();
-            }
-        });
-        Button next = new Button("Finish");
+        Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (Util.isStringEmpty(mongoWizard.getConfig().getReplicaSetName())) {
-                    show("Please provide replica set name");
-                } else if (mongoWizard.getConfig().getShards().isEmpty()) {
-                    show("Please add shards");
+                if (Util.isStringEmpty(mongoWizard.getConfig().getClusterName())) {
+                    show("Please provide cluster name");
+                } else if (mongoWizard.getConfig().getConfigServers().isEmpty()) {
+                    show("Please add config servers");
+                } else if (mongoWizard.getConfig().getRouterServers().isEmpty()) {
+                    show("Please add routers");
                 } else {
-                    show("INSTALLATION STARTED!!!");
+                    mongoWizard.next();
                 }
             }
         });
 
         verticalLayout.addComponent(grid);
-
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.addComponent(back);
-        horizontalLayout.addComponent(next);
-        verticalLayout.addComponent(horizontalLayout);
+        verticalLayout.addComponent(next);
 
         addComponent(verticalLayout);
 
@@ -139,14 +153,18 @@ public class Step2 extends Panel {
         List<Agent> sampleAgents = new ArrayList<Agent>();
         sampleAgents.add(agent1);
         sampleAgents.add(agent2);
-        shardsColSel.setContainerDataSource(
+        routersColSel.setContainerDataSource(
+                new BeanItemContainer<Agent>(
+                        Agent.class, sampleAgents));
+        configServersColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(
                         Agent.class, sampleAgents));
         //add sample data=======================================================
 
         //set values if this is back button
-        replicaNameTxtFld.setValue(mongoWizard.getConfig().getReplicaSetName());
-        shardsColSel.setValue(mongoWizard.getConfig().getShards());
+        clusterNameTxtFld.setValue(mongoWizard.getConfig().getClusterName());
+        configServersColSel.setValue(mongoWizard.getConfig().getConfigServers());
+        routersColSel.setValue(mongoWizard.getConfig().getRouterServers());
     }
 
     private void show(String notification) {

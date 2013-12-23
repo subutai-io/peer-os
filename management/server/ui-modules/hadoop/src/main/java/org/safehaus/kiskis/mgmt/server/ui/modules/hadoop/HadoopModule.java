@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop;
 
+
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
@@ -30,6 +31,7 @@ public class HadoopModule implements Module {
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
+
         private HadoopWizard subwindow;
         private HadoopClusterTable table;
 
@@ -37,7 +39,6 @@ public class HadoopModule implements Module {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
-
 
             verticalLayout.addComponent(getButtonInstallWizard());
             verticalLayout.addComponent(getButtonRefresh());
