@@ -118,8 +118,8 @@ public class DataNodesTable extends Table {
             task = getCommandManager().getTask(response.getTaskUuid());
 
             if(task.equals(removeTask)){
-                refreshDataSource();
                 getCommandManager().saveHadoopClusterData(cluster);
+                refreshDataSource();
                 System.out.println(list);
             }
         }
