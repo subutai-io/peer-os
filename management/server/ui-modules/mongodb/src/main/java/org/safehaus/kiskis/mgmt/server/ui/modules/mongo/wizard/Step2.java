@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -55,11 +57,17 @@ public class Step2 extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
-        final TextField textFieldClusterName = new TextField("Enter Replicate Set name");
-        textFieldClusterName.setInputPrompt("Replica Set name");
-        textFieldClusterName.setRequired(true);
-        textFieldClusterName.setRequiredError("Must have a name");
-        verticalLayoutForm.addComponent(textFieldClusterName);
+        final TextField replicaNameTxtFld = new TextField("Enter Replica Set name");
+        replicaNameTxtFld.setInputPrompt("Replica Set name");
+        replicaNameTxtFld.setRequired(true);
+        replicaNameTxtFld.setMaxLength(10);
+        replicaNameTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                mongoWizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
+            }
+        });
+        verticalLayoutForm.addComponent(replicaNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as shards<br>"
                 + "(Recommended odd number of servers, provide at least 1)</strong>");
@@ -72,6 +80,7 @@ public class Step2 extends Panel {
         shardsColSel.setNullSelectionAllowed(true);
         shardsColSel.setMultiSelect(true);
         shardsColSel.setImmediate(true);
+        shardsColSel.setRequired(true);
         shardsColSel.setLeftColumnCaption("Available Nodes");
         shardsColSel.setRightColumnCaption("Shards");
         shardsColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
@@ -93,7 +102,7 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.showBack();
+                mongoWizard.back();
             }
         });
         Button next = new Button("Finish");
@@ -101,7 +110,13 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                System.out.println("Finish!!!!");
+                if (Util.isStringEmpty(mongoWizard.getConfig().getReplicaSetName())) {
+                    show("Please provide replica set name");
+                } else if (mongoWizard.getConfig().getShards().isEmpty()) {
+                    show("Please add shards");
+                } else {
+                    show("INSTALLATION STARTED!!!");
+                }
             }
         });
 
@@ -113,6 +128,29 @@ public class Step2 extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
+
+        //add sample data=======================================================
+        Agent agent1 = new Agent();
+        agent1.setHostname("AGENT-1");
+        agent1.setUuid(java.util.UUID.fromString("2ea0b741-73e4-44fc-9663-5a49dfd69ac8"));
+        Agent agent2 = new Agent();
+        agent2.setUuid(java.util.UUID.fromString("26753a44-e51c-4b93-b303-4fbedaef8e22"));
+        agent2.setHostname("AGENT-2");
+        List<Agent> sampleAgents = new ArrayList<Agent>();
+        sampleAgents.add(agent1);
+        sampleAgents.add(agent2);
+        shardsColSel.setContainerDataSource(
+                new BeanItemContainer<Agent>(
+                        Agent.class, sampleAgents));
+        //add sample data=======================================================
+
+        //set values if this is back button
+        replicaNameTxtFld.setValue(mongoWizard.getConfig().getReplicaSetName());
+        shardsColSel.setValue(mongoWizard.getConfig().getShards());
+    }
+
+    private void show(String notification) {
+        getWindow().showNotification(notification);
     }
 
 }

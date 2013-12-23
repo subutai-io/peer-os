@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -54,18 +56,24 @@ public class Step1 extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
-        final TextField textFieldClusterName = new TextField("Enter cluster name");
-        textFieldClusterName.setInputPrompt("Cluster name");
-        textFieldClusterName.setRequired(true);
-        textFieldClusterName.setRequiredError("Must have a name");
-        verticalLayoutForm.addComponent(textFieldClusterName);
+        final TextField clusterNameTxtFld = new TextField("Enter cluster name");
+        clusterNameTxtFld.setInputPrompt("Cluster name");
+        clusterNameTxtFld.setRequired(true);
+        clusterNameTxtFld.setMaxLength(30);
+        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                mongoWizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
+            }
+        });
+        verticalLayoutForm.addComponent(clusterNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as config servers<br>"
                 + "(Recommended 3 servers)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
-        TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
+        final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
         configServersColSel.setItemCaptionPropertyId("hostname");
         configServersColSel.setRows(7);
         configServersColSel.setNullSelectionAllowed(true);
@@ -74,6 +82,7 @@ public class Step1 extends Panel {
         configServersColSel.setLeftColumnCaption("Available Nodes");
         configServersColSel.setRightColumnCaption("Config Servers");
         configServersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        configServersColSel.setRequired(true);
         configServersColSel.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -89,7 +98,7 @@ public class Step1 extends Panel {
         routersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(routersLabel);
 
-        TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
+        final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         routersColSel.setItemCaptionPropertyId("hostname");
         routersColSel.setRows(7);
         routersColSel.setNullSelectionAllowed(true);
@@ -98,6 +107,7 @@ public class Step1 extends Panel {
         routersColSel.setLeftColumnCaption("Available Nodes");
         routersColSel.setRightColumnCaption("Routers");
         routersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        routersColSel.setRequired(true);
         routersColSel.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -116,7 +126,15 @@ public class Step1 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.showNext();
+                if (Util.isStringEmpty(mongoWizard.getConfig().getClusterName())) {
+                    show("Please provide cluster name");
+                } else if (mongoWizard.getConfig().getConfigServers().isEmpty()) {
+                    show("Please add config servers");
+                } else if (mongoWizard.getConfig().getRouterServers().isEmpty()) {
+                    show("Please add routers");
+                } else {
+                    mongoWizard.next();
+                }
             }
         });
 
@@ -124,6 +142,33 @@ public class Step1 extends Panel {
         verticalLayout.addComponent(next);
 
         addComponent(verticalLayout);
+
+        //add sample data=======================================================
+        Agent agent1 = new Agent();
+        agent1.setHostname("AGENT-1");
+        agent1.setUuid(java.util.UUID.fromString("2ea0b741-73e4-44fc-9663-5a49dfd69ac8"));
+        Agent agent2 = new Agent();
+        agent2.setUuid(java.util.UUID.fromString("26753a44-e51c-4b93-b303-4fbedaef8e22"));
+        agent2.setHostname("AGENT-2");
+        List<Agent> sampleAgents = new ArrayList<Agent>();
+        sampleAgents.add(agent1);
+        sampleAgents.add(agent2);
+        routersColSel.setContainerDataSource(
+                new BeanItemContainer<Agent>(
+                        Agent.class, sampleAgents));
+        configServersColSel.setContainerDataSource(
+                new BeanItemContainer<Agent>(
+                        Agent.class, sampleAgents));
+        //add sample data=======================================================
+
+        //set values if this is back button
+        clusterNameTxtFld.setValue(mongoWizard.getConfig().getClusterName());
+        configServersColSel.setValue(mongoWizard.getConfig().getConfigServers());
+        routersColSel.setValue(mongoWizard.getConfig().getRouterServers());
+    }
+
+    private void show(String notification) {
+        getWindow().showNotification(notification);
     }
 
 }

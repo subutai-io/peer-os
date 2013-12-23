@@ -64,12 +64,12 @@ public class MongoWizard {
         return contentRoot;
     }
 
-    protected void showNext() {
+    protected void next() {
         step++;
         putForm();
     }
 
-    protected void showBack() {
+    protected void back() {
         step--;
         putForm();
     }
