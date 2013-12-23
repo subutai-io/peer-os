@@ -4,62 +4,72 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ModuleServiceImpl implements ModuleService {
 
-    private ArrayList<Module> modules = new ArrayList<Module>();
+    private static final Logger LOG = Logger.getLogger(ModuleServiceImpl.class.getName());
 
-    private ArrayList<ModuleServiceListener> listeners = new ArrayList<ModuleServiceListener>();
+    private final Queue<Module> modules = new ConcurrentLinkedQueue<Module>();
+
+    private final Queue<ModuleServiceListener> listeners = new ConcurrentLinkedQueue<ModuleServiceListener>();
 
     @SuppressWarnings("unchecked")
-    public synchronized void registerModule(Module module) {
-        System.out.println("ModuleServiceImpl: Registering module " + module);
+    @Override
+    public void registerModule(Module module) {
         try {
+            LOG.log(Level.INFO, "ModuleServiceImpl: Registering module {0}", module);
             modules.add(module);
-            for (ModuleServiceListener listener : (ArrayList<ModuleServiceListener>) listeners.clone()) {
+            for (ModuleServiceListener listener : listeners) {
                 listener.moduleRegistered(this, module);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in registerModule", ex);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized void unregisterModule(Module module) {
-        System.out.println("ModuleServiceImpl: Unregistering module " + module);
+    @Override
+    public void unregisterModule(Module module) {
         try {
+            LOG.log(Level.INFO, "ModuleServiceImpl: Unregistering module {0}", module);
             modules.remove(module);
-            for (ModuleServiceListener listener : (ArrayList<ModuleServiceListener>) listeners.clone()) {
+            for (ModuleServiceListener listener : listeners) {
                 listener.moduleUnregistered(this, module);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in unregisterModule", ex);
         }
     }
 
-    public List<Module> getModules() {
-        return Collections.unmodifiableList(modules);
+    @Override
+    public Queue<Module> getModules() {
+        return modules;
     }
 
-    public synchronized void addListener(ModuleServiceListener listener) {
-        System.out.println("ModuleServiceImpl: Adding listener " + listener);
-        try {
-            listeners.add(listener);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public synchronized void removeListener(ModuleServiceListener listener) {
-        if(listener !=null){
-//            System.out.println("ModuleServiceImpl: Removing listener " + listener);
+    @Override
+    public void addListener(ModuleServiceListener listener) {
+        if (listener != null) {
             try {
+                LOG.log(Level.INFO, "ModuleServiceImpl: Adding listener {0}", listener);
+                listeners.add(listener);
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Error in addListener", ex);
+            }
+        }
+    }
+
+    @Override
+    public void removeListener(ModuleServiceListener listener) {
+        if (listener != null) {
+            try {
+                LOG.log(Level.INFO, "ModuleServiceImpl: Removing listener {0}", listener);
                 listeners.remove(listener);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.log(Level.SEVERE, "Error in removeListener", ex);
             }
         }
     }

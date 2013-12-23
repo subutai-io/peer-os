@@ -138,7 +138,7 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.13</version>
         </dependency>
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>1.1.0-M4</version>
@@ -234,6 +234,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mongodb-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -407,7 +412,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Apt Repo Exposer-->
-<!--                                <artifactItem>
+                                <!--                                <artifactItem>
                                     <groupId>org.xerial.snappy</groupId>
                                     <artifactId>snappy-java</artifactId>
                                     <version>1.1.0-M4</version>

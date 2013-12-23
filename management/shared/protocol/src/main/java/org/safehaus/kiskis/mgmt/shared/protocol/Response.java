@@ -29,6 +29,15 @@ public class Response implements Serializable {
     public String hostname;
     public List<String> ips;
     public Boolean isLxc;
+    private String transportId;
+
+    public String getTransportId() {
+        return transportId;
+    }
+
+    public void setTransportId(String transportId) {
+        this.transportId = transportId;
+    }
 
     public Boolean isIsLxc() {
         return isLxc;
@@ -144,6 +153,7 @@ public class Response implements Serializable {
 
     @Override
     public String toString() {
-        return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", ips=" + ips + ", isLxc=" + isLxc + '}';
+        return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", ips=" + ips + ", isLxc=" + isLxc + ", transportId=" + transportId + '}';
     }
+
 }

@@ -10,7 +10,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,19 +36,64 @@ public class Persistence implements PersistenceInterface {
     public boolean saveAgent(Agent agent) {
         if (agent != null) {
             try {
-                String cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname) "
-                        + "values (?,?,?,?,?,?,?)";
+                String cql = "select uuid from agents where hostname = ?";
                 PreparedStatement stmt = session.prepare(cql);
                 BoundStatement boundStatement = new BoundStatement(stmt);
+                ResultSet rs = session.execute(boundStatement.bind(agent.getHostname()));
+                Set<UUID> uuids = new HashSet<UUID>();
+                for (Row row : rs) {
+                    uuids.add(row.getUUID("uuid"));
+                }
+
+                cql = "delete from agents where uuid = ?";
+                stmt = session.prepare(cql);
+                boundStatement = new BoundStatement(stmt);
+
+                for (UUID uuid : uuids) {
+                    session.execute(boundStatement.bind(uuid));
+                }
+
+                cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname,transportid) "
+                        + "values (?,?,?,?,?,?,?,?)";
+                stmt = session.prepare(cql);
+                boundStatement = new BoundStatement(stmt);
 
                 session.execute(boundStatement.bind(agent.getUuid(),
                         agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
-                        agent.getMacAddress(), new Date(), agent.getParentHostName()));
+                        agent.getMacAddress(), new Date(),
+                        agent.getParentHostName(), agent.getTransportId()));
                 return true;
 
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in saveAgent", ex);
             }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeAgent(String transportId) {
+        try {
+
+            String cql = "select uuid from agents where transportid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(transportId));
+            Set<UUID> uuids = new HashSet<UUID>();
+            for (Row row : rs) {
+                uuids.add(row.getUUID("uuid"));
+            }
+
+            cql = "delete from agents where uuid = ?";
+            stmt = session.prepare(cql);
+            boundStatement = new BoundStatement(stmt);
+
+            for (UUID uuid : uuids) {
+                session.execute(boundStatement.bind(uuid));
+            }
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in removeAgent", ex);
         }
         return false;
     }
@@ -78,7 +125,6 @@ public class Persistence implements PersistenceInterface {
     /**
      * Heartbeat, LXC, Physical
      */
-
     @Override
     public List<Agent> getRegisteredAgents(long freshness) {
         List<Agent> list = new ArrayList<Agent>();
@@ -296,7 +342,7 @@ public class Persistence implements PersistenceInterface {
         try {
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
             session = cluster.connect(cassandraKeyspace);
-            System.out.println("Persistence started");
+            LOG.log(Level.INFO, "Persistence started");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
@@ -311,7 +357,7 @@ public class Persistence implements PersistenceInterface {
             cluster.shutdown();
         } catch (Exception e) {
         }
-        System.out.println("Persistence stopped");
+        LOG.log(Level.INFO, "Persistence stopped");
     }
 
     /**
@@ -526,7 +572,6 @@ public class Persistence implements PersistenceInterface {
                 task.setTaskStatus(TaskStatus.valueOf(row.getString("status")));
             }
 
-
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTask", ex);
         }
@@ -536,7 +581,6 @@ public class Persistence implements PersistenceInterface {
     /**
      * Utils
      */
-
     @Override
     public boolean truncateTables() {
         try {
@@ -711,5 +755,18 @@ public class Persistence implements PersistenceInterface {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);
         }
         return hadoopClusterInfo;
+    }
+
+    public boolean deleteCassandraClusterInfo(String uuid) {
+        try {
+            String cql = "delete from cassandra_cluster_info where uid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(UUID.fromString(uuid)));
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+        }
+        return true;
     }
 }

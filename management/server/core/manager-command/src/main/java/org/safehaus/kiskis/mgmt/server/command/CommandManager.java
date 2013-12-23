@@ -66,7 +66,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     @Override
     public void addListener(CommandListener listener) {
         try {
-            System.out.println("Adding module listener : " + listener.getName());
+            LOG.log(Level.INFO, "Adding module listener : {0}", listener.getName());
             listeners.add(listener);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
@@ -76,7 +76,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     @Override
     public void removeListener(CommandListener listener) {
         try {
-            System.out.println("Removing module listener : " + listener.getName());
+            LOG.log(Level.INFO, "Removing module listener : {0}", listener.getName());
             listeners.remove(listener);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in removeListener", ex);
@@ -217,7 +217,6 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
                     return result;
                 }
             }
-
 
             Integer exitCode = 0;
             for (Request request : requestList) {

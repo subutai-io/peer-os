@@ -254,6 +254,7 @@ public final class CassandraWizard extends Window {
                 null,
                 "root",
                 args,
+                null,
                 null);
     }
 

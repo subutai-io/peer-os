@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.HadoopClusterTab
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -19,7 +19,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 
 public class HadoopModule implements Module {
 
@@ -97,8 +99,9 @@ public class HadoopModule implements Module {
 
         private List<Agent> getLxcAgents() {
             List<Agent> list = new ArrayList<Agent>();
-            if (AppData.getSelectedAgentList() != null) {
-                for (Agent agent : AppData.getSelectedAgentList()) {
+//            if (AppData.getSelectedAgentList() != null) {
+            if (MgmtApplication.getSelectedAgents() != null && !MgmtApplication.getSelectedAgents().isEmpty()) {
+                for (Agent agent : MgmtApplication.getSelectedAgents()) {
                     if (agent.isIsLXC()) {
                         list.add(agent);
                     }
@@ -122,7 +125,7 @@ public class HadoopModule implements Module {
     }
 
     public void setModuleService(ModuleService service) {
-        System.out.println(MODULE_NAME + " registering with ModuleService");
+        LOG.log(Level.INFO, "{0} registering with ModuleService", MODULE_NAME);
         service.registerModule(this);
     }
 
@@ -131,7 +134,7 @@ public class HadoopModule implements Module {
             getCommandManager().removeListener(component);
         }
         service.unregisterModule(this);
-        System.out.println(MODULE_NAME + " Unregistering with ModuleService");
+        LOG.log(Level.INFO, "{0} Unregistering with ModuleService", MODULE_NAME);
     }
 
     public static CommandManagerInterface getCommandManager() {
