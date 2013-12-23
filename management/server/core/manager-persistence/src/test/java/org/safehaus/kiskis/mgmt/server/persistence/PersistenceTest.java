@@ -261,7 +261,7 @@ public class PersistenceTest {
         assertEquals(true, result);
     }
     
-    @Test
+//    @Test
     public void testCassandraClusterDataDelete() {
         instance.deleteCassandraClusterInfo("107c6a70-6ba2-11e3-859a-2eec37ec3ee3");
     }
