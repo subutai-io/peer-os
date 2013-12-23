@@ -473,43 +473,37 @@ public class Persistence implements PersistenceInterface {
     public List<Request> getRequests(UUID taskuuid) {
         List<Request> list = new ArrayList<Request>();
         try {
-            String cql = "select * from requests";
-            ResultSet rs;
-            if (taskuuid == null) {
-                cql += " order by agentuuid, reqseqnum;";
-                rs = session.execute(cql);
-            } else {
-                cql += " WHERE taskuuid = ? order by agentuuid, reqseqnum;";
+            if (taskuuid != null) {
+                String cql = "select * from requests WHERE taskuuid = ? order by agentuuid, reqseqnum;";
                 PreparedStatement stmt = session.prepare(cql);
-
                 BoundStatement boundStatement = new BoundStatement(stmt);
-                rs = session.execute(boundStatement.bind(taskuuid));
-            }
+                ResultSet rs = session.execute(boundStatement.bind(taskuuid));
 
-            for (Row row : rs) {
-                Request request = new Request();
-                request.setProgram(row.getString("program"));
-                request.setArgs(row.getList("args", String.class));
-                request.setEnvironment(row.getMap("environment", String.class, String.class));
-                request.setPid(row.getInt("pid"));
-                request.setProgram(row.getString("program"));
-                request.setRequestSequenceNumber(row.getInt("reqseqnum"));
-                request.setRunAs(row.getString("runsas"));
-                request.setSource(row.getString("source"));
-                if (row.getString("outputredirectionstderr") != null) {
-                    request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                for (Row row : rs) {
+                    Request request = new Request();
+                    request.setProgram(row.getString("program"));
+                    request.setArgs(row.getList("args", String.class));
+                    request.setEnvironment(row.getMap("environment", String.class, String.class));
+                    request.setPid(row.getInt("pid"));
+                    request.setProgram(row.getString("program"));
+                    request.setRequestSequenceNumber(row.getInt("reqseqnum"));
+                    request.setRunAs(row.getString("runsas"));
+                    request.setSource(row.getString("source"));
+                    if (row.getString("outputredirectionstderr") != null) {
+                        request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                    }
+                    request.setStdErrPath(row.getString("erroutpath"));
+                    if (row.getString("outputredirectionstdout") != null) {
+                        request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
+                    }
+                    request.setStdOutPath(row.getString("stdoutpath"));
+                    request.setTaskUuid(row.getUUID("taskuuid"));
+                    request.setTimeout(row.getInt("timeout"));
+                    request.setType(RequestType.valueOf(row.getString("type")));
+                    request.setUuid(row.getUUID("agentuuid"));
+                    request.setWorkingDirectory(row.getString("workingdirectory"));
+                    list.add(request);
                 }
-                request.setStdErrPath(row.getString("erroutpath"));
-                if (row.getString("outputredirectionstdout") != null) {
-                    request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
-                }
-                request.setStdOutPath(row.getString("stdoutpath"));
-                request.setTaskUuid(row.getUUID("taskuuid"));
-                request.setTimeout(row.getInt("timeout"));
-                request.setType(RequestType.valueOf(row.getString("type")));
-                request.setUuid(row.getUUID("agentuuid"));
-                request.setWorkingDirectory(row.getString("workingdirectory"));
-                list.add(request);
             }
 
         } catch (Exception ex) {
@@ -543,7 +537,7 @@ public class Persistence implements PersistenceInterface {
     public List<Task> getTasks() {
         List<Task> list = new ArrayList<Task>();
         try {
-            ResultSet rs = session.execute("select * from tasks");
+            ResultSet rs = session.execute("select * from tasks limit 1000");
             for (Row row : rs) {
                 Task task = new Task();
                 task.setUuid(row.getUUID("uuid"));
@@ -589,6 +583,7 @@ public class Persistence implements PersistenceInterface {
             session.execute("truncate requests");
             session.execute("truncate responses");
             session.execute("truncate cassandra_cluster_info");
+            session.execute("truncate hadoop_cluster_info");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
             return false;

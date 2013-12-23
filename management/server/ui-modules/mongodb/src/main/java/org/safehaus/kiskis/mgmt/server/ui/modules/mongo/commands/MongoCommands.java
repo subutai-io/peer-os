@@ -277,9 +277,34 @@ public class MongoCommands {
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--host",
-                ":MONGO_HOST",
+                ":MONGO_HOST", //supply host of node under examination
                 "--port",
-                ":MONGO_PORT"
+                ":MONGO_PORT" //supply port of node under examination
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    //execute on any cluster member
+    public static Command getShutdownMongodCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("mongod");
+        req.setArgs(Arrays.asList(
+                "--shutdown"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    //execute on any cluster member
+    public static Command getShutdownMongod2Command() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/kill");
+        req.setArgs(Arrays.asList(
+                " -2",
+                "`pgrep -f mongod`"
         ));
         req.setTimeout(10);
         return cmd;

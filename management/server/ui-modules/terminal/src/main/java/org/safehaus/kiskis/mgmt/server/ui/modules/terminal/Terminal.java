@@ -287,15 +287,15 @@ public class Terminal implements Module {
                     List<Request> listofrequest;
                     if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString().trim())) {
                         listofrequest = commandManagerInterface.getCommands(UUID.fromString(textAreaCommand.getValue().toString().trim()));
+                        StringBuilder sb = new StringBuilder();
+                        for (Request request : listofrequest) {
+                            sb.append(request).append("\n");
+                        }
+                        textAreaOutput.setValue(sb.toString());
                     } else {
-                        listofrequest = commandManagerInterface.getCommands(null);
+                        getWindow().showNotification("Enter task uuid");
                     }
 
-                    StringBuilder sb = new StringBuilder();
-                    for (Request request : listofrequest) {
-                        sb.append(request).append("\n");
-                    }
-                    textAreaOutput.setValue(sb.toString());
                 }
             });
             return button;
