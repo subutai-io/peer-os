@@ -637,7 +637,6 @@ public class Persistence implements PersistenceInterface {
             String cql = "select * from cassandra_cluster_info";
             ResultSet rs = session.execute(cql);
             for (Row row : rs) {
-                System.out.println(rs.toString()+ "NAMENAMENAME");
                 CassandraClusterInfo cd = new CassandraClusterInfo();
                 cd.setUuid(row.getUUID("uid"));
                 cd.setName(row.getString("name"));
@@ -649,7 +648,6 @@ public class Persistence implements PersistenceInterface {
                 list.add(cd);
             }
         } catch (Exception ex) {
-            System.out.println("--------------------------------111111");
             LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo", ex);
         }
         return list;
