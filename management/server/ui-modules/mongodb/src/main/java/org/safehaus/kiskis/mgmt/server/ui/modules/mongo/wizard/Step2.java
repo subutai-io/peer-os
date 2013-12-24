@@ -55,7 +55,7 @@ public class Step2 extends Panel {
         final TextField clusterNameTxtFld = new TextField("Enter cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
         clusterNameTxtFld.setRequired(true);
-        clusterNameTxtFld.setMaxLength(30);
+        clusterNameTxtFld.setMaxLength(20);
 //        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
 //            @Override
 //            public void valueChange(Property.ValueChangeEvent event) {

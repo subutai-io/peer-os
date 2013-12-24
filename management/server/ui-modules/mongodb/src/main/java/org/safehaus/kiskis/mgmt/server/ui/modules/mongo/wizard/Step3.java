@@ -55,7 +55,7 @@ public class Step3 extends Panel {
         final TextField replicaNameTxtFld = new TextField("Enter Replica Set name");
         replicaNameTxtFld.setInputPrompt("Replica Set name");
         replicaNameTxtFld.setRequired(true);
-        replicaNameTxtFld.setMaxLength(10);
+        replicaNameTxtFld.setMaxLength(20);
 //        replicaNameTxtFld.addListener(new Property.ValueChangeListener() {
 //            @Override
 //            public void valueChange(Property.ValueChangeEvent event) {
