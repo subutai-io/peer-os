@@ -238,6 +238,8 @@ public final class MgmtAgentManager extends VerticalLayout implements
                         }
                     }
                     tree.setValue(actualSelectedHostnames);
+                    System.out.println("Setting selection on tree with " + actualSelectedHostnames);
+                    System.out.println("Setting selection on tree after " + tree.getValue());
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);

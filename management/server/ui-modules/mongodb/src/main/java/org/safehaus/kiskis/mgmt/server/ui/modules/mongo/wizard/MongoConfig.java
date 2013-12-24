@@ -5,10 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -16,21 +14,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class MongoConfig {
 
-    private String clusterName = "";
-    private String replicaSetName = "";
-    private Set<Agent> configServers = new HashSet<Agent>();
-    private Set<Agent> routerServers = new HashSet<Agent>();
-    private Set<Agent> shards = new HashSet<Agent>();
-    private Set<Agent> selectedAgents = new HashSet<Agent>();
+    private String clusterName;
+    private String replicaSetName;
+    private Set<Agent> configServers;
+    private Set<Agent> routerServers;
+    private Set<Agent> shards;
+    private Set<Agent> selectedAgents;
 
     public String getReplicaSetName() {
         return replicaSetName;
     }
 
     public void setReplicaSetName(String replicaSetName) {
-        if (!Util.isStringEmpty(clusterName)) {
-            this.replicaSetName = replicaSetName;
-        }
+        this.replicaSetName = replicaSetName;
     }
 
     public String getClusterName() {
@@ -38,9 +34,7 @@ public class MongoConfig {
     }
 
     public void setClusterName(String clusterName) {
-        if (!Util.isStringEmpty(clusterName)) {
-            this.clusterName = clusterName;
-        }
+        this.clusterName = clusterName;
     }
 
     public Set<Agent> getConfigServers() {
@@ -48,9 +42,7 @@ public class MongoConfig {
     }
 
     public void setConfigServers(Set<Agent> configServers) {
-        if (configServers != null) {
-            this.configServers = configServers;
-        }
+        this.configServers = configServers;
     }
 
     public Set<Agent> getRouterServers() {
@@ -58,9 +50,7 @@ public class MongoConfig {
     }
 
     public void setRouterServers(Set<Agent> routerServers) {
-        if (routerServers != null) {
-            this.routerServers = routerServers;
-        }
+        this.routerServers = routerServers;
     }
 
     public Set<Agent> getShards() {
@@ -68,9 +58,7 @@ public class MongoConfig {
     }
 
     public void setShards(Set<Agent> shards) {
-        if (shards != null) {
-            this.shards = shards;
-        }
+        this.shards = shards;
     }
 
     public Set<Agent> getSelectedAgents() {
@@ -78,9 +66,7 @@ public class MongoConfig {
     }
 
     public void setSelectedAgents(Set<Agent> selectedAgents) {
-        if (selectedAgents != null) {
-            this.selectedAgents = selectedAgents;
-        }
+        this.selectedAgents = selectedAgents;
     }
 
     @Override

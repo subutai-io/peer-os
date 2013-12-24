@@ -50,11 +50,13 @@ public class Step1 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
+
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
                     mongoWizard.getConfig().setSelectedAgents(selectedAgents);
                     mongoWizard.next();
+                    System.out.println(MgmtApplication.getSelectedAgents());
                 }
             }
         });
