@@ -229,4 +229,8 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
 
         return result;
     }
+
+    public boolean deleteCassandraClusterData(UUID uuid) {
+        return persistenceCommand.deleteCassandraClusterInfo(uuid);
+    }
 }

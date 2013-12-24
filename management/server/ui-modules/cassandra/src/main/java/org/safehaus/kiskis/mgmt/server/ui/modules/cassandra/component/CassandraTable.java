@@ -66,9 +66,9 @@ public class CassandraTable extends Table {
         return container;
     }
 
-    private void addOrderToContainer(Container container, final CassandraClusterInfo cd) {
+    private void addOrderToContainer(final Container container, final CassandraClusterInfo cd) {
         Object itemId = container.addItem();
-        Item item = container.getItem(itemId);
+        final Item item = container.getItem(itemId);
         item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cd.getUuid());
         item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cd.getName());
 //        item.getItemProperty(CassandraClusterInfo.DATADIR_LABEL).setValue(cd.getDataDir());
@@ -137,7 +137,10 @@ public class CassandraTable extends Table {
                             null,
                             null);
                     commandManager.executeCommand(command);
+
                 }
+                commandManager.deleteCassandraClusterData(cd.getUuid());
+                container.removeItem(item);
             }
         });
 

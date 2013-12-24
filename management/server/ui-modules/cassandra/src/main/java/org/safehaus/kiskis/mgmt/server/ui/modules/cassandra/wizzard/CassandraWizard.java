@@ -28,7 +28,6 @@ public final class CassandraWizard {
     private Task task;
     private CassandraClusterInfo cluster;
 //    private final List<Agent> lxcList;
-//    private final TextArea terminal;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 5;
     GridLayout gridLayout;
@@ -75,18 +74,9 @@ public final class CassandraWizard {
         gridLayout.addComponent(verticalLayout, 0, 1, 0, 8);
         gridLayout.setComponentAlignment(verticalLayout, Alignment.MIDDLE_CENTER);
 
-//        terminal = new TextArea();
-//        terminal.setRows(10);
-//        terminal.setColumns(65);
-//        terminal.setImmediate(true);
-//        terminal.setWordwrap(true);
-//        gridLayout.addComponent(terminal, 0, 9);
-//        gridLayout.setComponentAlignment(terminal, Alignment.TOP_CENTER);
         putForm();
 
-//        setContent(gridLayout);
     }
-
 
     public void runCommand(Command command) {
         commandManagerInterface.executeCommand(command);
@@ -108,8 +98,6 @@ public final class CassandraWizard {
         }
         step = 1;
         putForm();
-//        boolean removeWindow = ((Window) getWindow().getParent()).removeWindow(this);
-//        removeWindow(this);
     }
 
     private void putForm() {
@@ -156,6 +144,8 @@ public final class CassandraWizard {
                 commandManagerInterface.saveCassandraClusterData(cluster);
                 task.setTaskStatus(TaskStatus.SUCCESS);
                 commandManagerInterface.saveTask(task);
+                step = 1;
+                putForm();
             }
             default: {
 //                this.close();
@@ -243,7 +233,6 @@ public final class CassandraWizard {
 //    public List<Agent> getLxcList() {
 //        return lxcList;
 //    }
-
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
         return (Command) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST,
