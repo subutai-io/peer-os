@@ -88,7 +88,7 @@ public class HadoopInstallation {
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", nameNode.getUuid().toString());
 
-        map.put(":secondarynamenode", nameNode.getUuid().toString());
+        map.put(":secondarynamenode", sNameNode.getListIP().get(0));
 
         RequestUtil.createRequest(commandManager, HadoopCommands.SET_SECONDARY_NAME_NODE, hadoopSNameNodeTask, map);
     }
@@ -175,7 +175,7 @@ public class HadoopInstallation {
         hadoopCopySSHSlaves = RequestUtil.createTask(commandManager, "Copy Hadoop SSH key to slaves");
 
         if (keys != null && !keys.isEmpty()) {
-            for (Agent agent : allSlaveNodes) {
+            for (Agent agent : allNodes) {
                 if (agent != null) {
                     for (String key : keys) {
                         HashMap<String, String> map = new HashMap<String, String>();
@@ -237,7 +237,7 @@ public class HadoopInstallation {
             if (hadoopSSHMaster != null && hadoopSSHMaster.equals(task)) {
                 keys = new ArrayList<String>();
                 for (ParseResult pr : list) {
-                    keys.add(pr.getResponse().getStdOut());
+                    keys.add(pr.getResponse().getStdOut().trim());
                 }
             }
         }

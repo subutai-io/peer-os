@@ -137,10 +137,10 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             for (Response r : list) {
                 response = r;
                 if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdOut())) {
-                    stdOut += "\n" + r.getStdOut();
+                    stdOut += r.getStdOut();
                 }
                 if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdErr())) {
-                    stdErr += "\n" + r.getStdErr();
+                    stdErr += r.getStdErr();
                 }
             }
 

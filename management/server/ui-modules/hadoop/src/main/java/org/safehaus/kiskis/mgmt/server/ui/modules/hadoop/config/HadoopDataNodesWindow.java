@@ -193,7 +193,7 @@ public final class HadoopDataNodesWindow extends Window {
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
-                map.put(":slave-hostname", agent.getUuid().toString());
+                map.put(":slave-hostname", agent.getListIP().get(0));
                 RequestUtil.createRequest(getCommandManager(), ADD_NODE, addTask, map);
 
                 map = new HashMap<String, String>();
