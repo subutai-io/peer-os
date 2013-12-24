@@ -633,10 +633,14 @@ public class Persistence implements PersistenceInterface {
     @Override
     public List<CassandraClusterInfo> getCassandraClusterInfo() {
         List<CassandraClusterInfo> list = new ArrayList<CassandraClusterInfo>();
+        System.out.println("333333");
         try {
+            System.out.println("77777");
             String cql = "select * from cassandra_cluster_info";
             ResultSet rs = session.execute(cql);
+            System.out.println("000000");
             for (Row row : rs) {
+                System.out.println("444");
                 CassandraClusterInfo cd = new CassandraClusterInfo();
                 cd.setUuid(row.getUUID("uid"));
                 cd.setName(row.getString("name"));
@@ -761,12 +765,12 @@ public class Persistence implements PersistenceInterface {
             String cql = "delete from cassandra_cluster_info where uid = ?";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            session.execute(boundStatement.bind(uuid));
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
         }
-        return true;
+        return false;
     }
 
 }

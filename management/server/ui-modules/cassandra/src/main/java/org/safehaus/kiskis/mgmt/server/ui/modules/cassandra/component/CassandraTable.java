@@ -56,10 +56,11 @@ public class CassandraTable extends Table {
         container.addContainerProperty("Destroy", Button.class, "");
 //        container.addContainerProperty(CassandraClusterInfo.NODES_LABEL, List.class, 0);
 //        container.addContainerProperty(CassandraClusterInfo.SEEDS_LABEL, List.class, 0);
-
+        System.out.println("111");
         // Create some orders
         List<CassandraClusterInfo> cdList = commandManager.getCassandraClusterData();
         for (CassandraClusterInfo cluster : cdList) {
+            System.out.println("222");
             addOrderToContainer(container, cluster);
         }
 
