@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt;
 
+
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -8,7 +9,6 @@ import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
-
 
 public class Terminal implements Module {
 

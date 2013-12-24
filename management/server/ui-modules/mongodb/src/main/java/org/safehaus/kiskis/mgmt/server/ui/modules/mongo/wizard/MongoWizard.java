@@ -18,7 +18,7 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class MongoWizard {
 
-    private static final int MAX_STEPS = 2;
+    private static final int MAX_STEPS = 3;
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
@@ -64,12 +64,12 @@ public class MongoWizard {
         return contentRoot;
     }
 
-    protected void showNext() {
+    protected void next() {
         step++;
         putForm();
     }
 
-    protected void showBack() {
+    protected void back() {
         step--;
         putForm();
     }
@@ -89,6 +89,11 @@ public class MongoWizard {
             case 2: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 verticalLayout.addComponent(new Step2(this));
+                break;
+            }
+            case 3: {
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                verticalLayout.addComponent(new Step3(this));
                 break;
             }
             default: {

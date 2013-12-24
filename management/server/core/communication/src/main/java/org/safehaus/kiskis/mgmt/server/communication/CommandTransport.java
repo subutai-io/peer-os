@@ -165,9 +165,9 @@ public class CommandTransport implements CommandTransportInterface {
         }
 
         try {
-            System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/" + this.amqBrokerCertificateName);
+            System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerCertificateName);
             System.setProperty("javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd);
-            System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/" + this.amqBrokerTrustStoreName);
+            System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerTrustStoreName);
             System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
 
             broker = new BrokerService();

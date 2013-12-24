@@ -29,12 +29,12 @@
     </parent>
 
     <groupId>org.safehaus.kiskis.mgmt</groupId>
-    <artifactId>apt-repo</artifactId>
+    <artifactId>web-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>Kiskis Management Apt Repo</name>
-    <description>apt-repo exposer bundle project.</description>
+    <name>Kiskis Management Web Server</name>
+    <description>embedded web server bundle project.</description>
 
     <build>
         <plugins>
@@ -59,6 +59,11 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>7.6.8.v20121106</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
