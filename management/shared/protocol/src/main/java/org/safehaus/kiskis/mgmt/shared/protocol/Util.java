@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -21,7 +22,7 @@ public class Util {
         return col == null || col.isEmpty();
     }
 
-    public static Collection retainValues(Collection col1, Collection col2) {
+    public static Set retainValues(Set col1, Set col2) {
         if (col1 == null || col2 == null) {
             return null;
         } else {
