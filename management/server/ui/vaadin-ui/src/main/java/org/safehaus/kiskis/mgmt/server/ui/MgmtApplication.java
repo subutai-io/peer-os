@@ -38,9 +38,11 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     }
     private final String title;
     private TabSheet tabs;
+    public static String APP_URL;
 
     @Override
     public void init() {
+        APP_URL = getURL().getHost();
         setInstance(this);
         try {
             setTheme(Runo.themeName());
@@ -95,7 +97,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             indicator.setHeight("1px");
             getMainWindow().addComponent(indicator);
             //            
-
+//            getMainWindow().executeJavaScript("var url = location.protocol+'//'+location.hostname;");
         } catch (Exception ex) {
         } finally {
         }
