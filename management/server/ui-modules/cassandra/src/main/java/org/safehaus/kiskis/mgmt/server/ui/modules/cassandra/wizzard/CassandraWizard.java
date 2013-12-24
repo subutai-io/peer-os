@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
@@ -23,7 +25,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public final class CassandraWizard {
 
     private final CommandManagerInterface commandManagerInterface;
-
+    private CassandraConfig config = new CassandraConfig();
     private final VerticalLayout verticalLayout;
     private Task task;
     private CassandraClusterInfo cluster;
@@ -31,7 +33,6 @@ public final class CassandraWizard {
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 5;
     GridLayout gridLayout;
-    CassandraModule.ModuleComponent cm;
 
     Step1 step1;
     Step2 step2;
@@ -43,13 +44,11 @@ public final class CassandraWizard {
 
     /**
      *
-     * @param cm
      */
-    public CassandraWizard(CassandraModule.ModuleComponent cm) {
+    public CassandraWizard() {
 //        setModal(true);
 //        this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
-        this.cm = cm;
 //        setCaption("Cassandra Wizard");
 
         gridLayout = new GridLayout(1, 10);
@@ -88,7 +87,7 @@ public final class CassandraWizard {
     }
 
     public void cancelWizard() {
-        for (Agent agent : cm.getLxcList()) {
+        for (Agent agent : MgmtApplication.getSelectedAgents()) {
             int reqSeqNumber = task.getIncrementedReqSeqNumber();
             UUID taskUuid = task.getUuid();
             List<String> args = new ArrayList<String>();
@@ -254,7 +253,7 @@ public final class CassandraWizard {
 
     private List<UUID> getAgentsUUIDS() {
         List<UUID> uuids = new ArrayList<UUID>();
-        for (Agent agent : cm.getLxcList()) {
+        for (Agent agent : MgmtApplication.getSelectedAgents()) {
             uuids.add(agent.getUuid());
         }
         return uuids;
@@ -264,7 +263,8 @@ public final class CassandraWizard {
         return gridLayout;
     }
 
-    Iterable<Agent> getLxcList() {
-        return cm.getLxcList();
+    public CassandraConfig getConfig() {
+        return config;
     }
+
 }

@@ -33,6 +33,7 @@ public class CassandraModule implements Module {
 //        private final Button buttonInstallWizard;
 //        private final Button getClusters;
         private CassandraWizard cassandraWizard;
+        private CassandraManage cassandraManage;
 //        private CassandraTable cassandraTable;
 //        private final TextArea terminal;
 
@@ -49,8 +50,10 @@ public class CassandraModule implements Module {
             cassandraSheet.setStyleName(Runo.TABSHEET_SMALL);
             cassandraSheet.setSizeFull();
 
-            cassandraSheet.addTab(new CassandraWizard(this).getContent(), "Install!");
-            cassandraSheet.addTab(new CassandraManage(this).getContent(), "Manage");
+            cassandraWizard = new CassandraWizard();
+            cassandraManage = new CassandraManage();
+            cassandraSheet.addTab(cassandraWizard.getContent(), "Install");
+            cassandraSheet.addTab(cassandraManage.getContent(), "Manage");
 //            mongoSheet.addTab(new MongoManager().getContent(), "Manage");
 
             verticalLayout.addComponent(cassandraSheet);
@@ -101,7 +104,6 @@ public class CassandraModule implements Module {
 //
 //            return list;
 //        }
-
         @Override
         public void onCommand(Response response) {
             try {
@@ -134,9 +136,6 @@ public class CassandraModule implements Module {
             return CassandraModule.MODULE_NAME;
         }
 
-        public Iterable<Agent> getLxcList() {
-           return MgmtApplication.getSelectedAgents();
-        }
     }
 
     @Override

@@ -7,8 +7,12 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -57,7 +61,13 @@ public class Step1 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cassandraWizard.showNext();
+                Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
+                if (Util.isCollectionEmpty(selectedAgents)) {
+                    show("Select nodes in the tree on the left first");
+                } else {
+                    cassandraWizard.getConfig().setSelectedAgents(selectedAgents);
+                    cassandraWizard.showNext();
+                }
             }
         });
 
@@ -75,4 +85,7 @@ public class Step1 extends Panel {
         cassandraWizard.setCluster(cluster);
     }
 
+    private void show(String notification) {
+        getWindow().showNotification(notification);
+    }
 }

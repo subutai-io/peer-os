@@ -27,14 +27,12 @@ public class CassandraManage {
 //    private final ProgressIndicator progressBar;
     private final Button getClusters;
     private final CassandraTable cassandraTable;
-    private CassandraModule.ModuleComponent cm;
 
     /**
      *
      * @param cm
      */
-    public CassandraManage(CassandraModule.ModuleComponent cm) {
-        this.cm = cm;
+    public CassandraManage() {
         verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);
         verticalLayout.setSizeFull();
