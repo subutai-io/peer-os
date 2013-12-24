@@ -56,12 +56,7 @@ public class Step3 extends Panel {
         replicaNameTxtFld.setInputPrompt("Replica Set name");
         replicaNameTxtFld.setRequired(true);
         replicaNameTxtFld.setMaxLength(20);
-//        replicaNameTxtFld.addListener(new Property.ValueChangeListener() {
-//            @Override
-//            public void valueChange(Property.ValueChangeEvent event) {
-//                mongoWizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
-//            }
-//        });
+
         verticalLayoutForm.addComponent(replicaNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as shards<br>"
@@ -79,13 +74,7 @@ public class Step3 extends Panel {
         shardsColSel.setLeftColumnCaption("Available Nodes");
         shardsColSel.setRightColumnCaption("Shards");
         shardsColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-//        shardsColSel.addListener(new Property.ValueChangeListener() {
-//            @Override
-//            public void valueChange(Property.ValueChangeEvent event) {
-//                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-//                mongoWizard.getConfig().setShards(agentList);
-//            }
-//        });
+
         verticalLayoutForm.addComponent(shardsColSel);
 
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
@@ -129,17 +118,6 @@ public class Step3 extends Panel {
 
         addComponent(verticalLayout);
 
-        //add sample data=======================================================
-//        Agent agent1 = new Agent();
-//        agent1.setHostname("AGENT-1");
-//        agent1.setUuid(java.util.UUID.fromString("2ea0b741-73e4-44fc-9663-5a49dfd69ac8"));
-//        Agent agent2 = new Agent();
-//        agent2.setUuid(java.util.UUID.fromString("26753a44-e51c-4b93-b303-4fbedaef8e22"));
-//        agent2.setHostname("AGENT-2");
-//        List<Agent> sampleAgents = new ArrayList<Agent>();
-//        sampleAgents.add(agent1);
-//        sampleAgents.add(agent2);
-        //add sample data=======================================================
         shardsColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(
                         Agent.class, mongoWizard.getConfig().getSelectedAgents()));

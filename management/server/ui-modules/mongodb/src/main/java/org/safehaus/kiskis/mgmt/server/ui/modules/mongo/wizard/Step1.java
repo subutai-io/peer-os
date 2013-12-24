@@ -23,9 +23,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Step1 extends Panel {
 
-//    private final MongoWizard mongoWizard;
     public Step1(final MongoWizard mongoWizard) {
-//        this.mongoWizard = mongoWizard;
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
@@ -54,6 +52,7 @@ public class Step1 extends Panel {
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
+                    mongoWizard.getConfig().reset();
                     mongoWizard.getConfig().setSelectedAgents(selectedAgents);
                     mongoWizard.next();
                 }

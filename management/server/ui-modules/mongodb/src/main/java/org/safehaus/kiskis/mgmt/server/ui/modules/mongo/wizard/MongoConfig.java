@@ -14,8 +14,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class MongoConfig {
 
-    private String clusterName="";
-    private String replicaSetName="";
+    private String clusterName = "";
+    private String replicaSetName = "";
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
     private Set<Agent> shards;
@@ -72,6 +72,15 @@ public class MongoConfig {
     @Override
     public String toString() {
         return "MongoConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routerServers=" + routerServers + ", shards=" + shards + ", selectedAgents=" + selectedAgents + '}';
+    }
+
+    public void reset() {
+        clusterName = "";
+        replicaSetName = "";
+        configServers = null;
+        routerServers = null;
+        shards = null;
+        selectedAgents = null;
     }
 
 }
