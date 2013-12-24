@@ -9,7 +9,6 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
@@ -29,7 +28,7 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("serial")
 
-public final class MgmtAgentManager extends VerticalLayout implements
+public final class MgmtAgentManager extends ConcurrentComponent implements
         Property.ValueChangeListener, AgentListener {
 
     private final AgentManagerInterface agentManagerInterface;
@@ -64,9 +63,19 @@ public final class MgmtAgentManager extends VerticalLayout implements
         agentManagerService.addListener(this);
     }
 
+    @Override
+    public synchronized void setParent(Component parent) {
+        super.setParent(parent);
+    }
+
+    @Override
+    public synchronized Component getParent() {
+        return super.getParent();
+    }
     /*
      * Shows a notification when a selection is made.
      */
+
     @Override
     public void valueChange(Property.ValueChangeEvent event) {
         if (event.getProperty().getValue() instanceof Set) {
@@ -110,8 +119,12 @@ public final class MgmtAgentManager extends VerticalLayout implements
     }
 
     @Override
-    public void onAgent(List<Agent> freshAgents) {
-        refreshAgents(freshAgents);
+    public void onAgent(final List<Agent> freshAgents) {
+        executeUpdate(new Runnable() {
+            public void run() {
+                refreshAgents(freshAgents);
+            }
+        });
     }
 
     public HierarchicalContainer getNodeContainer() {
