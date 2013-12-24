@@ -10,6 +10,7 @@ import com.vaadin.ui.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -88,7 +89,7 @@ public class Step6 extends FormLayout {
                     cassandraWizard.getCluster().setCommitLogDir(commitDir);
                     cassandraWizard.getCluster().setSavedCacheDir(cacheDir);
 
-                    for (Agent agent : cassandraWizard.getLxcList()) {
+                    for (Agent agent : MgmtApplication.getSelectedAgents()) {
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                         UUID taskUuid = cassandraWizard.getTask().getUuid();
                         List<String> args = new ArrayList<String>();

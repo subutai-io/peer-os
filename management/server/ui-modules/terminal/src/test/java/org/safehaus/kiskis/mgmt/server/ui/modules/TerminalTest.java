@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.safehaus.kiskis.mgmt.server.ui.modules;
 
 import com.vaadin.ui.Component;
@@ -22,22 +21,22 @@ import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
  * @author bahadyr
  */
 public class TerminalTest {
-    
+
     public TerminalTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -51,20 +50,6 @@ public class TerminalTest {
         Terminal instance = new Terminal();
         String expResult = "";
         String result = instance.getName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of createComponent method, of class Terminal.
-     */
-//    @Test
-    public void testCreateComponent() {
-        System.out.println("createComponent");
-        Terminal instance = new Terminal();
-        Component expResult = null;
-        Component result = instance.createComponent();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -108,5 +93,4 @@ public class TerminalTest {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
-    
 }

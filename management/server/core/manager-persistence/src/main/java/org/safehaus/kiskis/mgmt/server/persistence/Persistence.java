@@ -473,43 +473,37 @@ public class Persistence implements PersistenceInterface {
     public List<Request> getRequests(UUID taskuuid) {
         List<Request> list = new ArrayList<Request>();
         try {
-            String cql = "select * from requests";
-            ResultSet rs;
-            if (taskuuid == null) {
-                cql += " order by agentuuid, reqseqnum;";
-                rs = session.execute(cql);
-            } else {
-                cql += " WHERE taskuuid = ? order by agentuuid, reqseqnum;";
+            if (taskuuid != null) {
+                String cql = "select * from requests WHERE taskuuid = ? order by agentuuid, reqseqnum;";
                 PreparedStatement stmt = session.prepare(cql);
-
                 BoundStatement boundStatement = new BoundStatement(stmt);
-                rs = session.execute(boundStatement.bind(taskuuid));
-            }
+                ResultSet rs = session.execute(boundStatement.bind(taskuuid));
 
-            for (Row row : rs) {
-                Request request = new Request();
-                request.setProgram(row.getString("program"));
-                request.setArgs(row.getList("args", String.class));
-                request.setEnvironment(row.getMap("environment", String.class, String.class));
-                request.setPid(row.getInt("pid"));
-                request.setProgram(row.getString("program"));
-                request.setRequestSequenceNumber(row.getInt("reqseqnum"));
-                request.setRunAs(row.getString("runsas"));
-                request.setSource(row.getString("source"));
-                if (row.getString("outputredirectionstderr") != null) {
-                    request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                for (Row row : rs) {
+                    Request request = new Request();
+                    request.setProgram(row.getString("program"));
+                    request.setArgs(row.getList("args", String.class));
+                    request.setEnvironment(row.getMap("environment", String.class, String.class));
+                    request.setPid(row.getInt("pid"));
+                    request.setProgram(row.getString("program"));
+                    request.setRequestSequenceNumber(row.getInt("reqseqnum"));
+                    request.setRunAs(row.getString("runsas"));
+                    request.setSource(row.getString("source"));
+                    if (row.getString("outputredirectionstderr") != null) {
+                        request.setStdErr(OutputRedirection.valueOf(row.getString("outputredirectionstderr")));
+                    }
+                    request.setStdErrPath(row.getString("erroutpath"));
+                    if (row.getString("outputredirectionstdout") != null) {
+                        request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
+                    }
+                    request.setStdOutPath(row.getString("stdoutpath"));
+                    request.setTaskUuid(row.getUUID("taskuuid"));
+                    request.setTimeout(row.getInt("timeout"));
+                    request.setType(RequestType.valueOf(row.getString("type")));
+                    request.setUuid(row.getUUID("agentuuid"));
+                    request.setWorkingDirectory(row.getString("workingdirectory"));
+                    list.add(request);
                 }
-                request.setStdErrPath(row.getString("erroutpath"));
-                if (row.getString("outputredirectionstdout") != null) {
-                    request.setStdOut(OutputRedirection.valueOf(row.getString("outputredirectionstdout")));
-                }
-                request.setStdOutPath(row.getString("stdoutpath"));
-                request.setTaskUuid(row.getUUID("taskuuid"));
-                request.setTimeout(row.getInt("timeout"));
-                request.setType(RequestType.valueOf(row.getString("type")));
-                request.setUuid(row.getUUID("agentuuid"));
-                request.setWorkingDirectory(row.getString("workingdirectory"));
-                list.add(request);
             }
 
         } catch (Exception ex) {
@@ -543,7 +537,7 @@ public class Persistence implements PersistenceInterface {
     public List<Task> getTasks() {
         List<Task> list = new ArrayList<Task>();
         try {
-            ResultSet rs = session.execute("select * from tasks");
+            ResultSet rs = session.execute("select * from tasks limit 1000");
             for (Row row : rs) {
                 Task task = new Task();
                 task.setUuid(row.getUUID("uuid"));
@@ -589,6 +583,7 @@ public class Persistence implements PersistenceInterface {
             session.execute("truncate requests");
             session.execute("truncate responses");
             session.execute("truncate cassandra_cluster_info");
+            session.execute("truncate hadoop_cluster_info");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
             return false;
@@ -615,13 +610,13 @@ public class Persistence implements PersistenceInterface {
     public boolean saveCassandraClusterInfo(CassandraClusterInfo cluster) {
         try {
             String cql = "insert into cassandra_cluster_info (uid, name, commitlogdir, datadir, "
-                    + "nodes, savedcachedir, seeds) "
-                    + "values (?,?,?,?,?,?,?)";
+                    + "nodes, savedcachedir, seeds, domainname) "
+                    + "values (?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(cluster.getUuid(), cluster.getName(),
                     cluster.getCommitLogDir(), cluster.getDataDir(), cluster.getNodes(),
-                    cluster.getSavedCacheDir(), cluster.getSeeds()));
+                    cluster.getSavedCacheDir(), cluster.getSeeds(), cluster.getDomainName()));
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveCassandraClusterInfo", ex);
@@ -633,10 +628,14 @@ public class Persistence implements PersistenceInterface {
     @Override
     public List<CassandraClusterInfo> getCassandraClusterInfo() {
         List<CassandraClusterInfo> list = new ArrayList<CassandraClusterInfo>();
+        System.out.println("333333");
         try {
+            System.out.println("77777");
             String cql = "select * from cassandra_cluster_info";
             ResultSet rs = session.execute(cql);
+            System.out.println("000000");
             for (Row row : rs) {
+                System.out.println("444");
                 CassandraClusterInfo cd = new CassandraClusterInfo();
                 cd.setUuid(row.getUUID("uid"));
                 cd.setName(row.getString("name"));
@@ -647,7 +646,6 @@ public class Persistence implements PersistenceInterface {
                 cd.setSeeds(row.getList("seeds", UUID.class));
                 list.add(cd);
             }
-
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo", ex);
         }
@@ -757,16 +755,17 @@ public class Persistence implements PersistenceInterface {
         return hadoopClusterInfo;
     }
 
-    public boolean deleteCassandraClusterInfo(String uuid) {
+    public boolean deleteCassandraClusterInfo(UUID uuid) {
         try {
             String cql = "delete from cassandra_cluster_info where uid = ?";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(UUID.fromString(uuid)));
+            session.execute(boundStatement.bind(uuid));
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
         }
-        return true;
+        return false;
     }
+
 }

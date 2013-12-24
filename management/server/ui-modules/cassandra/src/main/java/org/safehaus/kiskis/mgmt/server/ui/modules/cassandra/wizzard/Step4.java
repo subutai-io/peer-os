@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard;
 
-import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
@@ -15,9 +14,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 
@@ -68,24 +69,19 @@ public class Step4 extends Panel {
 //        }
 //        Label label1 = new Label(sb.toString());
 //        label1.setContentMode(Label.CONTENT_XHTML);
-
         final TextField domainName = new TextField("Domain:");
         grid.addComponent(domainName, 2, 1, 5, 1);
         grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
 
-        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+        BeanItemContainer<Agent> agents
+                = new BeanItemContainer<Agent>(
+                        Agent.class, (Collection<? extends Agent>) MgmtApplication.getSelectedAgents());
         final ListSelect hostSelect = new ListSelect("Hosts", agents);
 
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setItemCaptionPropertyId("hostname");
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
         hostSelect.setMultiSelect(true);
-        hostSelect.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                getWindow().showNotification("hosts selected");
-            }
-        });
 
         grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
@@ -99,11 +95,12 @@ public class Step4 extends Panel {
                 List<UUID> seeds = new ArrayList<UUID>();
                 for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
                     Agent agent = (Agent) i.next();
-                    sb.append(agent.getHostname()).append(domainName.getValue()).append(",");
+                    sb.append(agent.getHostname()).append(".").append(domainName.getValue()).append(",");
                     seeds.add(agent.getUuid());
                 }
                 cassandraWizard.getCluster().setSeeds(seeds);
-                for (Agent agent : cassandraWizard.getLxcList()) {
+                cassandraWizard.getCluster().setDomainName((String) domainName.getValue());
+                for (Agent agent : MgmtApplication.getSelectedAgents()) {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();

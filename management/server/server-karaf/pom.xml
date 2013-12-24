@@ -96,17 +96,17 @@
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>2.0.0-beta2</version>
+            <version>2.0.0-rc1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-thrift</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.3</version>
         </dependency>
         <dependency>
             <groupId>net.jpountz.lz4</groupId>
@@ -155,6 +155,12 @@
             </resource>
             <resource>
                 <directory>src/main/certs</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/img</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
@@ -268,17 +274,17 @@
                                 <artifactItem>
                                     <groupId>com.datastax.cassandra</groupId>
                                     <artifactId>cassandra-driver-core</artifactId>
-                                    <version>2.0.0-beta2</version>
+                                    <version>2.0.0-rc1</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.cassandra</groupId>
                                     <artifactId>cassandra-all</artifactId>
-                                    <version>2.0.1</version>
+                                    <version>2.0.3</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.cassandra</groupId>
                                     <artifactId>cassandra-thrift</artifactId>
-                                    <version>2.0.1</version>
+                                    <version>2.0.3</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>net.jpountz.lz4</groupId>

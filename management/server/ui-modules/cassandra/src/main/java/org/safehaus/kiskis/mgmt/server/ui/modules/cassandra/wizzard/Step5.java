@@ -10,6 +10,7 @@ import com.vaadin.ui.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -63,7 +64,7 @@ public class Step5 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Agent agent : cassandraWizard.getLxcList()) {
+                for (Agent agent : MgmtApplication.getSelectedAgents()) {
                     if (clusterName.getValue().toString().length() > 0) {
                         int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                         UUID taskUuid = cassandraWizard.getTask().getUuid();

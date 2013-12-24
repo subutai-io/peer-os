@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 
@@ -63,7 +64,7 @@ public class Step3 extends Panel {
         grid.setComponentAlignment(label, Alignment.TOP_CENTER);
 
         StringBuilder sb = new StringBuilder();
-        for (Agent a : cassandraWizard.getLxcList()) {
+        for (Agent a : MgmtApplication.getSelectedAgents()) {
             sb.append(a.getHostname()).append("<br/>");
         }
         Label label1 = new Label(sb.toString());
@@ -79,7 +80,7 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Agent agent : cassandraWizard.getLxcList()) {
+                for (Agent agent : MgmtApplication.getSelectedAgents()) {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
                     List<String> args = new ArrayList<String>();

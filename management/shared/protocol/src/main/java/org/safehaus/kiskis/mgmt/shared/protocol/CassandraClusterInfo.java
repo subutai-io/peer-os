@@ -19,7 +19,8 @@ public class CassandraClusterInfo {
             SEEDS_LABEL = "seeds",
             DATADIR_LABEL = "dataDir",
             COMMITLOGDIR_LABEL = "commitLogDir",
-            SAVEDCACHEDIR_LOG = "savedCacheDir";
+            SAVEDCACHEDIR_LOG = "savedCacheDir",
+            DOMAINNAME_LABEL = "domainName";
 
     private UUID uuid;
     private String name = "Test Cluster";
@@ -28,6 +29,7 @@ public class CassandraClusterInfo {
     private String dataDir = "/var/lib/cassandra/data";
     private String commitLogDir = "/var/lib/cassandra/commitlog";
     private String savedCacheDir = "/var/lib/cassandra/saved_caches";
+    private String domainName;
 
     public CassandraClusterInfo() {
         this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
@@ -87,6 +89,14 @@ public class CassandraClusterInfo {
 
     public void setSavedCacheDir(String savedCacheDir) {
         this.savedCacheDir = savedCacheDir;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
     }
 
     @Override

@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
@@ -20,17 +22,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
-public final class CassandraWizard extends Window {
+public final class CassandraWizard {
 
     private final CommandManagerInterface commandManagerInterface;
-
+    private CassandraConfig config = new CassandraConfig();
     private final VerticalLayout verticalLayout;
     private Task task;
     private CassandraClusterInfo cluster;
-    private final List<Agent> lxcList;
-//    private final TextArea terminal;
+//    private final List<Agent> lxcList;
     private final ProgressIndicator progressBar;
     private static final int MAX_STEPS = 5;
+    GridLayout gridLayout;
 
     Step1 step1;
     Step2 step2;
@@ -42,15 +44,14 @@ public final class CassandraWizard extends Window {
 
     /**
      *
-     * @param lxcList
      */
-    public CassandraWizard(List<Agent> lxcList) {
-        setModal(true);
-        this.lxcList = lxcList;
+    public CassandraWizard() {
+//        setModal(true);
+//        this.lxcList = lxcList;
         this.commandManagerInterface = getCommandManager();
-        setCaption("Cassandra Wizard");
+//        setCaption("Cassandra Wizard");
 
-        GridLayout gridLayout = new GridLayout(1, 10);
+        gridLayout = new GridLayout(1, 10);
         gridLayout.setSpacing(true);
         gridLayout.setMargin(false, true, false, true);
         gridLayout.setHeight(600, Sizeable.UNITS_PIXELS);
@@ -72,17 +73,8 @@ public final class CassandraWizard extends Window {
         gridLayout.addComponent(verticalLayout, 0, 1, 0, 8);
         gridLayout.setComponentAlignment(verticalLayout, Alignment.MIDDLE_CENTER);
 
-//        terminal = new TextArea();
-//        terminal.setRows(10);
-//        terminal.setColumns(65);
-//        terminal.setImmediate(true);
-//        terminal.setWordwrap(true);
-//        gridLayout.addComponent(terminal, 0, 9);
-//        gridLayout.setComponentAlignment(terminal, Alignment.TOP_CENTER);
-
         putForm();
 
-        setContent(gridLayout);
     }
 
     public void runCommand(Command command) {
@@ -95,7 +87,7 @@ public final class CassandraWizard extends Window {
     }
 
     public void cancelWizard() {
-        for (Agent agent : getLxcList()) {
+        for (Agent agent : MgmtApplication.getSelectedAgents()) {
             int reqSeqNumber = task.getIncrementedReqSeqNumber();
             UUID taskUuid = task.getUuid();
             List<String> args = new ArrayList<String>();
@@ -103,8 +95,8 @@ public final class CassandraWizard extends Window {
             Command command = buildCommand(agent.getUuid(), purgeCommand, reqSeqNumber, taskUuid, args);
             commandManagerInterface.executeCommand(command);
         }
-//        boolean removeWindow = ((Window) getWindow().getParent()).removeWindow(this);
-        removeWindow(this);
+        step = 1;
+        putForm();
     }
 
     private void putForm() {
@@ -151,10 +143,12 @@ public final class CassandraWizard extends Window {
                 commandManagerInterface.saveCassandraClusterData(cluster);
                 task.setTaskStatus(TaskStatus.SUCCESS);
                 commandManagerInterface.saveTask(task);
+                step = 1;
+                putForm();
             }
             default: {
-                this.close();
-                removeWindow(this);
+//                this.close();
+//                removeWindow(this);
                 break;
             }
         }
@@ -235,10 +229,9 @@ public final class CassandraWizard extends Window {
         return null;
     }
 
-    public List<Agent> getLxcList() {
-        return lxcList;
-    }
-
+//    public List<Agent> getLxcList() {
+//        return lxcList;
+//    }
     private Command buildCommand(UUID uuid, String program, int reqSeqNumber, UUID taskUuid, List<String> args) {
         return (Command) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST,
@@ -260,9 +253,18 @@ public final class CassandraWizard extends Window {
 
     private List<UUID> getAgentsUUIDS() {
         List<UUID> uuids = new ArrayList<UUID>();
-        for (Agent agent : getLxcList()) {
+        for (Agent agent : MgmtApplication.getSelectedAgents()) {
             uuids.add(agent.getUuid());
         }
         return uuids;
     }
+
+    public Component getContent() {
+        return gridLayout;
+    }
+
+    public CassandraConfig getConfig() {
+        return config;
+    }
+
 }
