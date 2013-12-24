@@ -14,8 +14,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class MongoConfig {
 
-    private String clusterName;
-    private String replicaSetName;
+    private String clusterName="";
+    private String replicaSetName="";
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
     private Set<Agent> shards;
