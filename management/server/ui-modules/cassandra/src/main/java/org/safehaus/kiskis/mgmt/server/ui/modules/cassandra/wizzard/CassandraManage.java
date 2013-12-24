@@ -58,7 +58,7 @@ public class CassandraManage {
 //                
 //            });
 //        verticalLayout.addComponent(buttonInstallWizard);
-        getClusters = new Button("Get Cassandra clusters" + System.currentTimeMillis());
+        getClusters = new Button("Get Cassandra clusters");
         getClusters.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
