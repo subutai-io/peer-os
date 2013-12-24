@@ -15,7 +15,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/apt-get\",\n" +
+            "\t    \"program\": \"/usr/bin/apt-get update && /usr/bin/apt-get\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -167,7 +167,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/bin/mkdir -p /home/.ssh && ssh-keygen -t dsa -P '' -f /home/.ssh/id_dsa\",\n" +
+            "\t    \"program\": \"/bin/mkdir -p ~/.ssh && ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
@@ -188,7 +188,7 @@ public class HadoopCommands {
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \"/home/.ssh/id_dsa.pub\"\n" +
+            "\t      \"~/.ssh/id_dsa.pub\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
@@ -207,7 +207,7 @@ public class HadoopCommands {
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
-            "\t      \"':PUB_KEY'\",\">>\",\"/home/.ssh/authorized_keys\"\n" +
+            "\t      \"':PUB_KEY'\",\">>\",\"~/.ssh/authorized_keys\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
@@ -221,7 +221,7 @@ public class HadoopCommands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"echo 'Host *' >> /home/.ssh/config && echo 'StrictHostKeyChecking no' >> /home/.ssh/config\",\n" +
+            "\t    \"program\": \"echo 'Host *' >> ~/.ssh/config && echo 'StrictHostKeyChecking no' >> ~/.ssh/config\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
