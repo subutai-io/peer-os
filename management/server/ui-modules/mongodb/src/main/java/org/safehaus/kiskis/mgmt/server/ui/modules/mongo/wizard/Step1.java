@@ -36,7 +36,8 @@ public class Step1 extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-        Label logoImg = new Label("<img src='http://localhost:" + Common.WEB_SERVER_PORT + "/mongodb-logo.png' width='150px'/>");
+        Label logoImg = new Label(
+                String.format("<img src='http://%s:%s/mongodb-logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
