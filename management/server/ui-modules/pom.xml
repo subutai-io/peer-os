@@ -16,7 +16,6 @@
         <module>terminal</module>
         <module>lxc</module>
         <module>hadoop</module>
-        <module>cassandra</module>
         <module>mongodb</module>
         <module>nutch</module>
         <module>solr</module>
