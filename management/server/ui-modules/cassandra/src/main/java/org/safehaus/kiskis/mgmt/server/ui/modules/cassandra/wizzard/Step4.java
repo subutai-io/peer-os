@@ -81,12 +81,6 @@ public class Step4 extends Panel {
         hostSelect.setItemCaptionPropertyId("hostname");
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
         hostSelect.setMultiSelect(true);
-        hostSelect.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                getWindow().showNotification("hosts selected");
-            }
-        });
 
         grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
@@ -100,10 +94,11 @@ public class Step4 extends Panel {
                 List<UUID> seeds = new ArrayList<UUID>();
                 for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
                     Agent agent = (Agent) i.next();
-                    sb.append(agent.getHostname()).append(domainName.getValue()).append(",");
+                    sb.append(agent.getHostname()).append(".").append(domainName.getValue()).append(",");
                     seeds.add(agent.getUuid());
                 }
                 cassandraWizard.getCluster().setSeeds(seeds);
+                cassandraWizard.getCluster().setDomainName((String) domainName.getValue());
                 for (Agent agent : cassandraWizard.getLxcList()) {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();
