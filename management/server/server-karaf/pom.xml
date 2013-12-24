@@ -410,15 +410,16 @@
                                     <artifactId>gson</artifactId>
                                     <version>${gson.version}</version>
                                 </artifactItem>
-                                <!--Apt Repo Exposer-->
-
+                                
+                                <!--Web Server-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>apt-repo</artifactId>
+                                    <artifactId>web-server</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--Apt Repo Exposer-->
-                                <!--                                <artifactItem>
+                                <!--Web Server-->
+                                
+                                <!--  <artifactItem>
                                     <groupId>org.xerial.snappy</groupId>
                                     <artifactId>snappy-java</artifactId>
                                     <version>1.1.0-M4</version>

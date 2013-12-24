@@ -111,6 +111,9 @@ public class Step3 extends Panel {
                 } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getShards())) {
                     show("Please add shards");
                 } else {
+                    //disable back command
+                    //save config to db 
+                    //start installation
                     show("INSTALLATION STARTED!!!");
                 }
             }
