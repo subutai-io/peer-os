@@ -207,6 +207,7 @@ public class LxcTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 destroyTask = createTask("Destroy lxc container");
+                createRequest(STOP_LXC, destroyTask, lxc);
                 createRequest(DESTROY_LXC, destroyTask, lxc);
             }
         });
@@ -262,27 +263,31 @@ public class LxcTable extends Table {
                 for (ParseResult pr : output) {
                     findRow(pr);
                 }
+
+                listTask = createTask("List lxc container");
+                createRequest(LIST_LXC, listTask, null);
             }
-            listTask = createTask("List lxc container");
-            createRequest(LIST_LXC, listTask, null);
         } else if (startTask != null && response.getTaskUuid().compareTo(startTask.getUuid()) == 0) {
             output = getCommandManager().parseTask(startTask, true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
                 }
+
+                listTask = createTask("List lxc container");
+                createRequest(LIST_LXC, listTask, null);
             }
-            listTask = createTask("List lxc container");
-            createRequest(LIST_LXC, listTask, null);
         } else if (stopTask != null && response.getTaskUuid().compareTo(stopTask.getUuid()) == 0) {
             output = getCommandManager().parseTask(stopTask, true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
                 }
+
+                listTask = createTask("List lxc container");
+                createRequest(LIST_LXC, listTask, null);
             }
-            listTask = createTask("List lxc container");
-            createRequest(LIST_LXC, listTask, null);
+
         }
     }
 

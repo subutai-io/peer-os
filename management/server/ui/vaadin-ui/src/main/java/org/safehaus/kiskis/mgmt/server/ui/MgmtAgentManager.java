@@ -5,22 +5,13 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,12 +38,20 @@ public final class MgmtAgentManager extends VerticalLayout implements
 
             @Override
             public String generateDescription(Component source, Object itemId,
-                    Object propertyId) {
+                                              Object propertyId) {
+                String description = "";
+
                 Item item = tree.getItem(itemId);
-                Agent agent = (Agent) item.getItemProperty("value").getValue();
-                return "Hostname: " + agent.getHostname() + "\t"
-                        + "Is LXC: " + agent.isIsLXC() + "\t"
-                        + "IP: " + agent.getListIP();
+                if (item != null) {
+                    Agent agent = (Agent) item.getItemProperty("value").getValue();
+                    if (agent != null) {
+                        description = "Hostname: " + agent.getHostname() + "<br>"
+                                + "Is LXC: " + agent.isIsLXC() + "<br>"
+                                + "IP: " + agent.getListIP();
+                    }
+                }
+
+                return description;
             }
         });
         tree.setMultiSelect(true);
