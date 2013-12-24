@@ -36,6 +36,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
     private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
+    private Set<String> selectedHostnames = null;
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
         this.agentManagerInterface = agentManagerService;
@@ -72,13 +73,16 @@ public final class MgmtAgentManager extends VerticalLayout implements
             Tree t = (Tree) event.getProperty();
 
             Set<Agent> selectedList = new HashSet<Agent>();
+            Set<String> selectedHosts = new HashSet<String>();
 
             for (Object o : (Set<Object>) t.getValue()) {
                 if (tree.getItem(o).getItemProperty("value").getValue() != null) {
-                    selectedList.add((Agent) tree.getItem(o).getItemProperty("value").getValue());
+                    Agent agent = (Agent) tree.getItem(o).getItemProperty("value").getValue();
+                    selectedList.add(agent);
+                    selectedHosts.add(agent.getHostname());
                 }
             }
-
+            selectedHostnames = selectedHosts;
             MgmtApplication.setSelectedAgents(selectedList);
             getWindow().showNotification(
                     "Selected agents",
@@ -124,11 +128,10 @@ public final class MgmtAgentManager extends VerticalLayout implements
             try {
 
                 //remember selection
-                Set<String> selectedHostnames = null;
-                if (tree != null) {
-                    selectedHostnames = (Set<String>) tree.getValue();
-                }
-
+//                Set<String> selectedHostnames = null;
+//                if (tree != null) {
+//                    selectedHostnames = (Set<String>) tree.getValue();
+//                }
                 //clear tree
                 container.removeAllItems();
 
@@ -222,7 +225,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
                 }
 
                 //return selection and deselect agents in tree that are not in allFreshAgents or have different uuids
-                if (selectedHostnames != null && !selectedHostnames.isEmpty()) {
+                if (tree != null && selectedHostnames != null && !selectedHostnames.isEmpty()) {
                     Set<String> actualSelectedHostnames = new HashSet<String>();
                     for (String selectedHostname : selectedHostnames) {
                         for (Agent agent : allFreshAgents) {
@@ -238,8 +241,6 @@ public final class MgmtAgentManager extends VerticalLayout implements
                         }
                     }
                     tree.setValue(actualSelectedHostnames);
-                    System.out.println("Setting selection on tree with " + actualSelectedHostnames);
-                    System.out.println("Setting selection on tree after " + tree.getValue());
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
