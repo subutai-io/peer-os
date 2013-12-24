@@ -29,7 +29,7 @@
     </properties>
 
     <modules>
-        <module>apt-repo</module>
+        <module>web-server</module>
         <module>core</module>
         <module>ui</module>
         <module>ui-modules</module>

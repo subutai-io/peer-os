@@ -28,10 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step2 extends Panel {
 
-    private final MongoWizard mongoWizard;
-
     public Step2(final MongoWizard mongoWizard) {
-        this.mongoWizard = mongoWizard;
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -87,8 +84,7 @@ public class Step2 extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                List<Agent> configServers = new ArrayList<Agent>(agentList);
-                mongoWizard.getConfig().setConfigServers(configServers);
+                mongoWizard.getConfig().setConfigServers(agentList);
             }
         });
         verticalLayoutForm.addComponent(configServersColSel);
@@ -112,8 +108,7 @@ public class Step2 extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                List<Agent> routerServers = new ArrayList<Agent>(agentList);
-                mongoWizard.getConfig().setRouterServers(routerServers);
+                mongoWizard.getConfig().setRouterServers(agentList);
             }
         });
         verticalLayoutForm.addComponent(routersColSel);
@@ -128,9 +123,9 @@ public class Step2 extends Panel {
             public void buttonClick(Button.ClickEvent event) {
                 if (Util.isStringEmpty(mongoWizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
-                } else if (mongoWizard.getConfig().getConfigServers().isEmpty()) {
+                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getConfigServers())) {
                     show("Please add config servers");
-                } else if (mongoWizard.getConfig().getRouterServers().isEmpty()) {
+                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getRouterServers())) {
                     show("Please add routers");
                 } else {
                     mongoWizard.next();

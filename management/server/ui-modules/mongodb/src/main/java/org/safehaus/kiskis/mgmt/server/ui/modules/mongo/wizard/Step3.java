@@ -29,10 +29,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step3 extends Panel {
 
-    private final MongoWizard mongoWizard;
-
     public Step3(final MongoWizard mongoWizard) {
-        this.mongoWizard = mongoWizard;
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -88,8 +85,7 @@ public class Step3 extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                List<Agent> shards = new ArrayList<Agent>(agentList);
-                mongoWizard.getConfig().setShards(shards);
+                mongoWizard.getConfig().setShards(agentList);
             }
         });
         verticalLayoutForm.addComponent(shardsColSel);
@@ -112,7 +108,7 @@ public class Step3 extends Panel {
             public void buttonClick(Button.ClickEvent event) {
                 if (Util.isStringEmpty(mongoWizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");
-                } else if (mongoWizard.getConfig().getShards().isEmpty()) {
+                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getShards())) {
                     show("Please add shards");
                 } else {
                     show("INSTALLATION STARTED!!!");

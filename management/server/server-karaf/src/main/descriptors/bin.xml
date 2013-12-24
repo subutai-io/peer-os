@@ -22,10 +22,6 @@
                 <exclude>karaf-manual*.html</exclude>
                 <exclude>karaf-manual*.pdf</exclude>
                 <exclude>etc/org.apache.karaf.features.cfg</exclude>
-                <!--<exclude>etc/AmqConfig.cfg</exclude>-->
-                <!--<exclude>etc/CassConfig.cfg</exclude>-->
-                <!--<exclude>etc/AptRepoConfig.cfg</exclude>-->
-                <!--<exclude>etc/MiscConfig.cfg</exclude>-->
             </excludes>
         </fileSet>
 

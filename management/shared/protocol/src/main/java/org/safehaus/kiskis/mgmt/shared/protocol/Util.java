@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import java.util.Collection;
+
 /**
  *
  * @author dilshat
@@ -13,5 +15,9 @@ public class Util {
 
     public static boolean isStringEmpty(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    public static boolean isCollectionEmpty(Collection col) {
+        return col == null || col.isEmpty();
     }
 }
