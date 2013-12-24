@@ -139,8 +139,9 @@ public class CassandraTable extends Table {
                     commandManager.executeCommand(command);
 
                 }
-                commandManager.deleteCassandraClusterData(cd.getUuid());
-                container.removeItem(item);
+                if (commandManager.deleteCassandraClusterData(cd.getUuid())) {
+                    getCassandraContainer();
+                }
             }
         });
 
