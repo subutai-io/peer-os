@@ -20,4 +20,13 @@ public class Util {
     public static boolean isCollectionEmpty(Collection col) {
         return col == null || col.isEmpty();
     }
+
+    public static Collection retainValues(Collection col1, Collection col2) {
+        if (col1 == null || col2 == null) {
+            return null;
+        } else {
+            col1.retainAll(col2);
+            return col1;
+        }
+    }
 }

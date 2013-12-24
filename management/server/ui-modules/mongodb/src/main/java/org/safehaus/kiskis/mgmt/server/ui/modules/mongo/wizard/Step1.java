@@ -56,7 +56,6 @@ public class Step1 extends Panel {
                 } else {
                     mongoWizard.getConfig().setSelectedAgents(selectedAgents);
                     mongoWizard.next();
-                    System.out.println(MgmtApplication.getSelectedAgents());
                 }
             }
         });

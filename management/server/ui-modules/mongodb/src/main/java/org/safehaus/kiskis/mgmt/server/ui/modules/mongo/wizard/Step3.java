@@ -18,6 +18,7 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -106,7 +107,7 @@ public class Step3 extends Panel {
             public void buttonClick(Button.ClickEvent event) {
                 mongoWizard.getConfig().setReplicaSetName(replicaNameTxtFld.getValue().toString().trim());
                 mongoWizard.getConfig().setShards((Set<Agent>) shardsColSel.getValue());
-                
+
                 if (Util.isStringEmpty(mongoWizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");
                 } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getShards())) {
@@ -146,7 +147,7 @@ public class Step3 extends Panel {
 
         //set values if this is a second visit
         replicaNameTxtFld.setValue(mongoWizard.getConfig().getReplicaSetName());
-        shardsColSel.setValue(mongoWizard.getConfig().getShards());
+        shardsColSel.setValue(Util.retainValues(mongoWizard.getConfig().getShards(), MgmtApplication.getSelectedAgents()));
     }
 
     private void show(String notification) {
