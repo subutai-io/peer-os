@@ -18,7 +18,6 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -147,7 +146,7 @@ public class Step3 extends Panel {
 
         //set values if this is a second visit
         replicaNameTxtFld.setValue(mongoWizard.getConfig().getReplicaSetName());
-        shardsColSel.setValue(Util.retainValues(mongoWizard.getConfig().getShards(), MgmtApplication.getSelectedAgents()));
+        shardsColSel.setValue(Util.retainValues(mongoWizard.getConfig().getShards(), mongoWizard.getConfig().getSelectedAgents()));
     }
 
     private void show(String notification) {

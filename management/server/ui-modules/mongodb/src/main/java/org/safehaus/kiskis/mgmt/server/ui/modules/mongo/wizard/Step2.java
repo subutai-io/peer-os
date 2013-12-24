@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -19,7 +18,6 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -175,8 +173,8 @@ public class Step2 extends Panel {
 
         //set values if this is a second visit
         clusterNameTxtFld.setValue(mongoWizard.getConfig().getClusterName());
-        configServersColSel.setValue(Util.retainValues(mongoWizard.getConfig().getConfigServers(), MgmtApplication.getSelectedAgents()));
-        routersColSel.setValue(Util.retainValues(mongoWizard.getConfig().getRouterServers(), MgmtApplication.getSelectedAgents()));
+        configServersColSel.setValue(Util.retainValues(mongoWizard.getConfig().getConfigServers(), mongoWizard.getConfig().getSelectedAgents()));
+        routersColSel.setValue(Util.retainValues(mongoWizard.getConfig().getRouterServers(), mongoWizard.getConfig().getSelectedAgents()));
     }
 
     private void show(String notification) {
