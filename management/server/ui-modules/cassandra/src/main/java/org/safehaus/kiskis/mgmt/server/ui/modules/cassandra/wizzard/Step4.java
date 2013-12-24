@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -73,19 +74,13 @@ public class Step4 extends Panel {
         grid.addComponent(domainName, 2, 1, 5, 1);
         grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
 
-        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, cassandraWizard.getLxcList());
+        BeanItemContainer<Agent> agents = new BeanItemContainer<Agent>(Agent.class, (Collection<? extends Agent>) cassandraWizard.getLxcList());
         final ListSelect hostSelect = new ListSelect("Hosts", agents);
 
         hostSelect.setRows(6); // perfect length in out case
         hostSelect.setItemCaptionPropertyId("hostname");
         hostSelect.setNullSelectionAllowed(true); // user can not 'unselect'
         hostSelect.setMultiSelect(true);
-        hostSelect.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                getWindow().showNotification("hosts selected");
-            }
-        });
 
         grid.addComponent(hostSelect, 2, 2, 5, 9);
         grid.setComponentAlignment(domainName, Alignment.TOP_CENTER);
@@ -99,10 +94,11 @@ public class Step4 extends Panel {
                 List<UUID> seeds = new ArrayList<UUID>();
                 for (Iterator i = hostSelect.getItemIds().iterator(); i.hasNext();) {
                     Agent agent = (Agent) i.next();
-                    sb.append(agent.getHostname()).append(domainName.getValue()).append(",");
+                    sb.append(agent.getHostname()).append(".").append(domainName.getValue()).append(",");
                     seeds.add(agent.getUuid());
                 }
                 cassandraWizard.getCluster().setSeeds(seeds);
+                cassandraWizard.getCluster().setDomainName((String) domainName.getValue());
                 for (Agent agent : cassandraWizard.getLxcList()) {
                     int reqSeqNumber = cassandraWizard.getTask().getIncrementedReqSeqNumber();
                     UUID taskUuid = cassandraWizard.getTask().getUuid();

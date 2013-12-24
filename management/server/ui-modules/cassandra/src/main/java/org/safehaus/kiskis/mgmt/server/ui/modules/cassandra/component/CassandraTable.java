@@ -22,13 +22,14 @@ public class CassandraTable extends Table {
 
     private final CommandManagerInterface commandManager;
     private IndexedContainer container;
-    private final CassandraModule.ModuleComponent parent;
+//    private final CassandraModule.ModuleComponent parent;
     private NodesWindow window;
     private Task task;
 
-    public CassandraTable(final CommandManagerInterface commandManager, final CassandraModule.ModuleComponent window) {
+//    public CassandraTable(final CommandManagerInterface commandManager, final CassandraModule.ModuleComponent window) {
+    public CassandraTable(final CommandManagerInterface commandManager) {
         this.commandManager = commandManager;
-        this.parent = window;
+//        this.parent = window;
 
         this.setCaption("Cassandra clusters");
         this.setContainerDataSource(getCassandraContainer());
@@ -55,19 +56,20 @@ public class CassandraTable extends Table {
         container.addContainerProperty("Destroy", Button.class, "");
 //        container.addContainerProperty(CassandraClusterInfo.NODES_LABEL, List.class, 0);
 //        container.addContainerProperty(CassandraClusterInfo.SEEDS_LABEL, List.class, 0);
-
+        System.out.println("111");
         // Create some orders
         List<CassandraClusterInfo> cdList = commandManager.getCassandraClusterData();
         for (CassandraClusterInfo cluster : cdList) {
+            System.out.println("222");
             addOrderToContainer(container, cluster);
         }
 
         return container;
     }
 
-    private void addOrderToContainer(Container container, final CassandraClusterInfo cd) {
-        Object itemId = container.addItem();
-        Item item = container.getItem(itemId);
+    private void addOrderToContainer(final Container container, final CassandraClusterInfo cd) {
+        final Object itemId = container.addItem();
+        final Item item = container.getItem(itemId);
         item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cd.getUuid());
         item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cd.getName());
 //        item.getItemProperty(CassandraClusterInfo.DATADIR_LABEL).setValue(cd.getDataDir());
@@ -136,6 +138,10 @@ public class CassandraTable extends Table {
                             null,
                             null);
                     commandManager.executeCommand(command);
+
+                }
+                if (commandManager.deleteCassandraClusterData(cd.getUuid())) {
+                    container.removeItem(itemId);
                 }
             }
         });

@@ -1,24 +1,20 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
-
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
-import java.util.List;
+import com.vaadin.ui.themes.Runo;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.component.CassandraTable;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraManage;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -34,11 +30,11 @@ public class CassandraModule implements Module {
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
-        private final Button buttonInstallWizard;
-        private final Button getClusters;
+//        private final Button buttonInstallWizard;
+//        private final Button getClusters;
         private CassandraWizard cassandraWizard;
-        private CassandraTable cassandraTable;
-        private final TextArea terminal;
+//        private CassandraTable cassandraTable;
+//        private final TextArea terminal;
 
         public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
 
@@ -47,65 +43,74 @@ public class CassandraModule implements Module {
             verticalLayout.setSizeFull();
 
             // Create table
-            cassandraTable = new CassandraTable(getCommandManager(), this);
-            cassandraTable.setPageLength(6);
+//            cassandraTable = new CassandraTable(getCommandManager(), this);
+//            cassandraTable.setPageLength(6);
+            TabSheet cassandraSheet = new TabSheet();
+            cassandraSheet.setStyleName(Runo.TABSHEET_SMALL);
+            cassandraSheet.setSizeFull();
 
-            buttonInstallWizard = new Button("CassandraModule Installation Wizard");
-            buttonInstallWizard.addListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    if (getLxcAgents().size() > 0) {
-                        cassandraWizard = new CassandraWizard(getLxcAgents());
-                        getApplication().getMainWindow().addWindow(cassandraWizard);
-                    }
-                }
+            cassandraSheet.addTab(new CassandraWizard(this).getContent(), "Install!");
+            cassandraSheet.addTab(new CassandraManage(this).getContent(), "Manage");
+//            mongoSheet.addTab(new MongoManager().getContent(), "Manage");
 
-                private List<Agent> getLxcAgents() {
-                    List<Agent> list = new ArrayList<Agent>();
-//                    if (AppData.getSelectedAgentList() != null) {
-                    if (MgmtApplication.getSelectedAgents() != null && !MgmtApplication.getSelectedAgents().isEmpty()) {
-                        for (Agent agent : MgmtApplication.getSelectedAgents()) {
-                            if (agent.isIsLXC()) {
-                                list.add(agent);
-                            }
-                        }
-                    }
+            verticalLayout.addComponent(cassandraSheet);
 
-                    return list;
-                }
-            });
-            verticalLayout.addComponent(buttonInstallWizard);
-
-            getClusters = new Button("Get Cassandra clusters" + System.currentTimeMillis());
-            getClusters.addListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    cassandraTable.refreshDatasource();
-                }
-            });
-
-            verticalLayout.addComponent(getClusters);
-            verticalLayout.addComponent(cassandraTable);
-            terminal = new TextArea();
-            terminal.setRows(10);
-            terminal.setColumns(65);
-            terminal.setImmediate(true);
-            terminal.setWordwrap(true);
-            verticalLayout.addComponent(terminal);
-
+//            buttonInstallWizard = new Button("Cassandra Cluster Installation Wizard");
+//            buttonInstallWizard.addListener(new Button.ClickListener() {
+//                @Override
+//                public void buttonClick(Button.ClickEvent event) {
+//                    if (getLxcAgents().size() > 0) {
+//                        cassandraWizard = new CassandraWizard(getLxcAgents());
+//                        getApplication().getMainWindow().addWindow(cassandraWizard);
+//                    }
+//                }
+//
+//                
+//            });
+//            verticalLayout.addComponent(buttonInstallWizard);
+//            getClusters = new Button("Get Cassandra clusters" + System.currentTimeMillis());
+//            getClusters.addListener(new Button.ClickListener() {
+//                @Override
+//                public void buttonClick(Button.ClickEvent event) {
+//                    cassandraTable.refreshDatasource();
+//                }
+//            });
+//
+//            verticalLayout.addComponent(getClusters);
+//            verticalLayout.addComponent(cassandraTable);
+//            terminal = new TextArea();
+//            terminal.setRows(10);
+//            terminal.setColumns(65);
+//            terminal.setImmediate(true);
+//            terminal.setWordwrap(true);
+//            verticalLayout.addComponent(terminal);
             setCompositionRoot(verticalLayout);
 
         }
+
+//        private List<Agent> getLxcAgents() {
+//            List<Agent> list = new ArrayList<Agent>();
+////                    if (AppData.getSelectedAgentList() != null) {
+//            if (MgmtApplication.getSelectedAgents() != null && !MgmtApplication.getSelectedAgents().isEmpty()) {
+//                for (Agent agent : MgmtApplication.getSelectedAgents()) {
+//                    if (agent.isIsLXC()) {
+//                        list.add(agent);
+//                    }
+//                }
+//            }
+//
+//            return list;
+//        }
 
         @Override
         public void onCommand(Response response) {
             try {
                 if (response != null && response.getSource().equals(MODULE_NAME)) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append(terminal.getValue());
-                    sb.append(response.getStdOut());
-                    terminal.setValue(sb);
-                    terminal.setCursorPosition(sb.length() - 1);
+//                    sb.append(terminal.getValue());
+//                    sb.append(response.getStdOut());
+//                    terminal.setValue(sb);
+//                    terminal.setCursorPosition(sb.length() - 1);
                     if (cassandraWizard != null
                             && response.getTaskUuid().toString().equals(cassandraWizard.getTask().getUuid().toString())) {
                         cassandraWizard.setOutput(response);
@@ -127,6 +132,10 @@ public class CassandraModule implements Module {
         @Override
         public String getName() {
             return CassandraModule.MODULE_NAME;
+        }
+
+        public Iterable<Agent> getLxcList() {
+           return MgmtApplication.getSelectedAgents();
         }
     }
 

@@ -37,6 +37,8 @@ public interface CommandManagerInterface {
 
     public boolean saveCassandraClusterData(CassandraClusterInfo cluster);
 
+    public boolean deleteCassandraClusterData(UUID uuid);
+
     public List<CassandraClusterInfo> getCassandraClusterData();
 
     public List<HadoopClusterInfo> getHadoopClusterData();

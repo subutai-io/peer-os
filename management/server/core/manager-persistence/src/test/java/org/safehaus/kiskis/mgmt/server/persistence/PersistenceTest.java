@@ -59,8 +59,21 @@ public class PersistenceTest {
             System.out.println(agent);
         }
     }
+    
+        
+//    @Test
+    public void testGetCassandraClusterInfo() {
+        List<CassandraClusterInfo> list = instance.getCassandraClusterInfo();
+            System.out.println("TTT55");
+        for (CassandraClusterInfo cs : list) {
+            System.out.println("TTT");
+            CassandraClusterInfo cassandraClusterInfo =cs;
+            System.out.println(cassandraClusterInfo.getName());
+        }
+//        assertEquals(0, list.size());
+    }
 
-    @Test
+//    @Test
     public void testGetLxcAgents() {
         List<Agent> agents = instance.getRegisteredLxcAgents(300);
         for (Agent agent : agents) {
@@ -260,9 +273,11 @@ public class PersistenceTest {
         boolean result = instance.saveCassandraClusterInfo(cd);
         assertEquals(true, result);
     }
+
     
-    @Test
-    public void testCassandraClusterDataDelete() {
-        instance.deleteCassandraClusterInfo("107c6a70-6ba2-11e3-859a-2eec37ec3ee3");
+//    @Test
+    public void testGet() {
+        List<HadoopClusterInfo> list = instance.getHadoopClusterInfo();
+        assertEquals(0, list.size());
     }
 }
