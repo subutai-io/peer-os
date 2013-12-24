@@ -615,13 +615,13 @@ public class Persistence implements PersistenceInterface {
     public boolean saveCassandraClusterInfo(CassandraClusterInfo cluster) {
         try {
             String cql = "insert into cassandra_cluster_info (uid, name, commitlogdir, datadir, "
-                    + "nodes, savedcachedir, seeds) "
-                    + "values (?,?,?,?,?,?,?)";
+                    + "nodes, savedcachedir, seeds, domainname) "
+                    + "values (?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(cluster.getUuid(), cluster.getName(),
                     cluster.getCommitLogDir(), cluster.getDataDir(), cluster.getNodes(),
-                    cluster.getSavedCacheDir(), cluster.getSeeds()));
+                    cluster.getSavedCacheDir(), cluster.getSeeds(), cluster.getDomainName()));
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveCassandraClusterInfo", ex);
