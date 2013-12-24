@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -26,8 +27,9 @@ public class Util {
         if (col1 == null || col2 == null) {
             return null;
         } else {
-            col1.retainAll(col2);
-            return col1;
+            Set tmp = new HashSet(col1);
+            tmp.retainAll(col2);
+            return tmp;
         }
     }
 }
