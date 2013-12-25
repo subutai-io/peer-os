@@ -23,9 +23,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Step1 extends Panel {
 
-//    private final MongoWizard mongoWizard;
     public Step1(final MongoWizard mongoWizard) {
-//        this.mongoWizard = mongoWizard;
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
@@ -39,6 +37,8 @@ public class Step1 extends Panel {
         Label logoImg = new Label(
                 String.format("<img src='http://%s:%s/mongodb-logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
         logoImg.setContentMode(Label.CONTENT_XHTML);
+        logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
+        logoImg.setWidth(150, Sizeable.UNITS_PIXELS);
         gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Next");
@@ -49,10 +49,14 @@ public class Step1 extends Panel {
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                //TODO                
+                //FILTER SELECTED AGENT AND SELECT ONLY LXC
                 Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
+
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
+                    mongoWizard.getConfig().reset();
                     mongoWizard.getConfig().setSelectedAgents(selectedAgents);
                     mongoWizard.next();
                 }

@@ -5,7 +5,11 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Tree;
+import com.vaadin.ui.Window;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
@@ -20,13 +24,14 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("serial")
 
-public final class MgmtAgentManager extends VerticalLayout implements
+public final class MgmtAgentManager extends ConcurrentComponent implements
         Property.ValueChangeListener, AgentListener {
 
     private final AgentManagerInterface agentManagerInterface;
     private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
+    private Set<String> selectedHostnames = null;
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
         this.agentManagerInterface = agentManagerService;
@@ -62,22 +67,35 @@ public final class MgmtAgentManager extends VerticalLayout implements
         agentManagerService.addListener(this);
     }
 
+    @Override
+    public synchronized void setParent(Component parent) {
+        super.setParent(parent);
+    }
+
+    @Override
+    public synchronized Component getParent() {
+        return super.getParent();
+    }
     /*
      * Shows a notification when a selection is made.
      */
+
     @Override
     public void valueChange(Property.ValueChangeEvent event) {
         if (event.getProperty().getValue() instanceof Set) {
             Tree t = (Tree) event.getProperty();
 
             Set<Agent> selectedList = new HashSet<Agent>();
+            Set<String> selectedHosts = new HashSet<String>();
 
             for (Object o : (Set<Object>) t.getValue()) {
                 if (tree.getItem(o).getItemProperty("value").getValue() != null) {
-                    selectedList.add((Agent) tree.getItem(o).getItemProperty("value").getValue());
+                    Agent agent = (Agent) tree.getItem(o).getItemProperty("value").getValue();
+                    selectedList.add(agent);
+                    selectedHosts.add(agent.getHostname());
                 }
             }
-
+            selectedHostnames = selectedHosts;
             MgmtApplication.setSelectedAgents(selectedList);
             getWindow().showNotification(
                     "Selected agents",
@@ -105,8 +123,12 @@ public final class MgmtAgentManager extends VerticalLayout implements
     }
 
     @Override
-    public void onAgent(List<Agent> freshAgents) {
-        refreshAgents(freshAgents);
+    public void onAgent(final List<Agent> freshAgents) {
+        executeUpdate(new Runnable() {
+            public void run() {
+                refreshAgents(freshAgents);
+            }
+        });
     }
 
     public HierarchicalContainer getNodeContainer() {
@@ -123,11 +145,10 @@ public final class MgmtAgentManager extends VerticalLayout implements
             try {
 
                 //remember selection
-                Set<String> selectedHostnames = null;
-                if (tree != null) {
-                    selectedHostnames = (Set<String>) tree.getValue();
-                }
-
+//                Set<String> selectedHostnames = null;
+//                if (tree != null) {
+//                    selectedHostnames = (Set<String>) tree.getValue();
+//                }
                 //clear tree
                 container.removeAllItems();
 
@@ -221,7 +242,7 @@ public final class MgmtAgentManager extends VerticalLayout implements
                 }
 
                 //return selection and deselect agents in tree that are not in allFreshAgents or have different uuids
-                if (selectedHostnames != null && !selectedHostnames.isEmpty()) {
+                if (tree != null && selectedHostnames != null && !selectedHostnames.isEmpty()) {
                     Set<String> actualSelectedHostnames = new HashSet<String>();
                     for (String selectedHostname : selectedHostnames) {
                         for (Agent agent : allFreshAgents) {
