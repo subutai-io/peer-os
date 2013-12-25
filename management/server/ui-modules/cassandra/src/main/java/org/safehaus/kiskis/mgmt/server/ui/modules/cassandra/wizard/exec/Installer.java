@@ -26,13 +26,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  */
 public class Installer {
 
-//    private final CassandraConfig config;
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
     private Task currentTask;
 
     public Installer(CassandraConfig config, TextArea terminal) {
-//        this.config = config;
         this.terminal = terminal;
 
         Task installTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Install Cassandra");
@@ -108,7 +106,7 @@ public class Installer {
         currentTask = tasks.poll();
         if (currentTask != null) {
             for (Command command : currentTask.getCommands()) {
-                CassandraModule.getCommandManager().executeCommand(command);
+                executeCommand(command);
             }
         }
     }
@@ -130,7 +128,7 @@ public class Installer {
                     moveToNextTask();
                     if (currentTask != null) {
                         for (Command command : currentTask.getCommands()) {
-                            CassandraModule.getCommandManager().executeCommand(command);
+                            executeCommand(command);
                         }
                         terminal.setValue(terminal.getValue().toString() + "\nRunning next step...");
                     } else {
@@ -142,6 +140,11 @@ public class Installer {
             }
 
         }
+    }
+
+    private void executeCommand(Command command) {
+        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
+        CassandraModule.getCommandManager().executeCommand(command);
     }
 
 }
