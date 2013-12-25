@@ -234,7 +234,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>cass-module</artifactId>
+                                    <artifactId>cassandra-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
