@@ -19,17 +19,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
  * @author dilshat
  */
-public class StepSetClusterName extends Panel {
+public class StepStart extends Panel {
 
     private Task task;
 
-    public StepSetClusterName(final CassandraWizard wizard) {
+    public StepStart(final CassandraWizard wizard) {
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
@@ -40,9 +39,9 @@ public class StepSetClusterName extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-        Label logoImg = new Label("<img src='http://localhost:" + Common.WEB_SERVER_PORT + "/cassandra-logo.png' width='150px'/>");
-        logoImg.setContentMode(Label.CONTENT_XHTML);
-        gridLayout.addComponent(logoImg, 1, 3, 2, 5);
+//        Label logoImg = new Label("<img src='http://localhost:" + Common.WEB_SERVER_PORT + "/cassandra-logo.png' width='150px'/>");
+//        logoImg.setContentMode(Label.CONTENT_XHTML);
+//        gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Next");
         next.setWidth(100, Sizeable.UNITS_PIXELS);
@@ -59,15 +58,14 @@ public class StepSetClusterName extends Panel {
                     wizard.getConfig().setSelectedAgents(selectedAgents);
                     task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Intall Cassandra");
                     for (Agent agent : wizard.getConfig().getSelectedAgents()) {
-                        
-                        Command command  = CassandraCommands.getSetClusterNameCommand();
+
+                        Command command = CassandraCommands.getInstallCommand();
                         command.getRequest().setUuid(agent.getUuid());
                         command.getRequest().setSource(CassandraWizard.SOURCE);
                         command.getRequest().setUuid(agent.getUuid());
                         command.getRequest().setTaskUuid(task.getUuid());
                         command.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-                        
-                        CassandraWizard.getCommandManager().executeCommand(command);
+//                        CassandraWizard.getCommandManager().executeCommand(command);
                     }
                     wizard.next();
                 }
@@ -80,7 +78,5 @@ public class StepSetClusterName extends Panel {
     private void show(String notification) {
         getWindow().showNotification(notification);
     }
-    
-    
 
 }

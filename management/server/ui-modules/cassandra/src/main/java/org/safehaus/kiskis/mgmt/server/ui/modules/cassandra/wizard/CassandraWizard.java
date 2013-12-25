@@ -88,12 +88,12 @@ public class CassandraWizard {
         switch (step) {
             case 1: {
                 progressBar.setValue(0f);
-                verticalLayout.addComponent(new Step1(this));
+                verticalLayout.addComponent(new StepStart(this));
                 break;
             }
             case 2: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new StepListenRPC(this));
+                verticalLayout.addComponent(new StepListenRPCAdresses(this));
                 break;
             }
             case 3: {
@@ -103,20 +103,18 @@ public class CassandraWizard {
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new StepSetClusterName(this));
+                verticalLayout.addComponent(new StepSetDirectories(this));
                 break;
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new StepSetDirectories(this));
-                break;
-            }
-            case 6: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step3(this));
+                verticalLayout.addComponent(new StepFinish(this));
                 break;
             }
             default: {
+                step = 1;
+                progressBar.setValue(0f);
+                verticalLayout.addComponent(new StepStart(this));
                 break;
             }
         }
