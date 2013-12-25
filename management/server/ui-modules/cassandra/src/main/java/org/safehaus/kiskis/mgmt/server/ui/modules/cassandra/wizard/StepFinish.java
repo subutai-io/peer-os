@@ -36,16 +36,6 @@ public class StepFinish extends Panel {
         grid.setSpacing(true);
         grid.setSizeFull();
 
-        Panel panel = new Panel();
-        Label menu = new Label("Cluster Installation Wizard<br>"
-                + " 1) <font color=\"#f14c1a\"><strong>Config Servers and Routers</strong></font><br>"
-                + " 2) Replica Set Configurations");
-
-        menu.setContentMode(Label.CONTENT_XHTML);
-        panel.addComponent(menu);
-        grid.addComponent(menu, 0, 0, 2, 1);
-        grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
-
         VerticalLayout verticalLayoutForm = new VerticalLayout();
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
