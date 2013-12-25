@@ -26,7 +26,7 @@ public class CassandraWizard {
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
-    private final CassandraConfig mongoConfig = new CassandraConfig();
+    private final CassandraConfig config = new CassandraConfig();
     private final VerticalLayout contentRoot;
     public static final String SOURCE = "CASSANDRA_WIZARD";
 
@@ -80,7 +80,7 @@ public class CassandraWizard {
     }
 
     protected CassandraConfig getConfig() {
-        return mongoConfig;
+        return config;
     }
 
     private void putForm() {

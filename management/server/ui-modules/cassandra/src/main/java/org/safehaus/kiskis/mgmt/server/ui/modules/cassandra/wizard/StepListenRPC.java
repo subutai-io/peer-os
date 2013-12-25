@@ -29,9 +29,7 @@ public class StepListenRPC extends Panel {
 
     private Task task;
 
-//    private final MongoWizard mongoWizard;
     public StepListenRPC(final CassandraWizard cassWizard) {
-//        this.mongoWizard = mongoWizard;
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();

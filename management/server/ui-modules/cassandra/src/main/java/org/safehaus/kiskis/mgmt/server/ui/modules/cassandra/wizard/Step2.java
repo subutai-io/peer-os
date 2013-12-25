@@ -28,7 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step2 extends Panel {
 
-    public Step2(final CassandraWizard mongoWizard) {
+    public Step2(final CassandraWizard wizard) {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -60,7 +60,7 @@ public class Step2 extends Panel {
         clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                mongoWizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
+                wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
             }
         });
         verticalLayoutForm.addComponent(clusterNameTxtFld);
@@ -84,7 +84,7 @@ public class Step2 extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                mongoWizard.getConfig().setConfigServers(agentList);
+                wizard.getConfig().setConfigServers(agentList);
             }
         });
         verticalLayoutForm.addComponent(configServersColSel);
@@ -108,7 +108,7 @@ public class Step2 extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                mongoWizard.getConfig().setRouterServers(agentList);
+                wizard.getConfig().setRouterServers(agentList);
             }
         });
         verticalLayoutForm.addComponent(routersColSel);
@@ -121,14 +121,14 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (Util.isStringEmpty(mongoWizard.getConfig().getClusterName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
-                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getConfigServers())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getConfigServers())) {
                     show("Please add config servers");
-                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getRouterServers())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getRouterServers())) {
                     show("Please add routers");
                 } else {
-                    mongoWizard.next();
+                    wizard.next();
                 }
             }
         });
@@ -157,9 +157,9 @@ public class Step2 extends Panel {
         //add sample data=======================================================
 
         //set values if this is back button
-        clusterNameTxtFld.setValue(mongoWizard.getConfig().getClusterName());
-        configServersColSel.setValue(mongoWizard.getConfig().getConfigServers());
-        routersColSel.setValue(mongoWizard.getConfig().getRouterServers());
+        clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
+        configServersColSel.setValue(wizard.getConfig().getConfigServers());
+        routersColSel.setValue(wizard.getConfig().getRouterServers());
     }
 
     private void show(String notification) {

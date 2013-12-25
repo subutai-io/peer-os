@@ -29,7 +29,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step3 extends Panel {
 
-    public Step3(final CassandraWizard mongoWizard) {
+    public Step3(final CassandraWizard wizard) {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -61,7 +61,7 @@ public class Step3 extends Panel {
         replicaNameTxtFld.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                mongoWizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
+                wizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
             }
         });
         verticalLayoutForm.addComponent(replicaNameTxtFld);
@@ -85,7 +85,7 @@ public class Step3 extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                mongoWizard.getConfig().setShards(agentList);
+                wizard.getConfig().setShards(agentList);
             }
         });
         verticalLayoutForm.addComponent(shardsColSel);
@@ -98,7 +98,7 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.back();
+                wizard.back();
             }
         });
         Button next = new Button("Finish");
@@ -106,9 +106,9 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (Util.isStringEmpty(mongoWizard.getConfig().getReplicaSetName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");
-                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getShards())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getShards())) {
                     show("Please add shards");
                 } else {
                     show("INSTALLATION STARTED!!!");
@@ -141,8 +141,8 @@ public class Step3 extends Panel {
         //add sample data=======================================================
 
         //set values if this is back button
-        replicaNameTxtFld.setValue(mongoWizard.getConfig().getReplicaSetName());
-        shardsColSel.setValue(mongoWizard.getConfig().getShards());
+        replicaNameTxtFld.setValue(wizard.getConfig().getReplicaSetName());
+        shardsColSel.setValue(wizard.getConfig().getShards());
     }
 
     private void show(String notification) {

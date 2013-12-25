@@ -29,9 +29,7 @@ public class StepSeeds extends Panel {
 
     private Task task;
 
-//    private final MongoWizard mongoWizard;
-    public StepSeeds(final CassandraWizard cassWizard) {
-//        this.mongoWizard = mongoWizard;
+    public StepSeeds(final CassandraWizard wizard) {
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
@@ -58,9 +56,9 @@ public class StepSeeds extends Panel {
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
-                    cassWizard.getConfig().setSelectedAgents(selectedAgents);
+                    wizard.getConfig().setSelectedAgents(selectedAgents);
                     task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Intall Cassandra");
-                    for (Agent agent : cassWizard.getConfig().getSelectedAgents()) {
+                    for (Agent agent : wizard.getConfig().getSelectedAgents()) {
                         
                         Command listenAddressCommand  = CassandraCommands.getSetListenAddressCommand();
                         listenAddressCommand.getRequest().setUuid(agent.getUuid());
@@ -80,7 +78,7 @@ public class StepSeeds extends Panel {
                         CassandraWizard.getCommandManager().executeCommand(listenAddressCommand);
                         CassandraWizard.getCommandManager().executeCommand(rpcAddressCommand);
                     }
-                    cassWizard.next();
+                    wizard.next();
                 }
             }
         });

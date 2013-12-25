@@ -36,14 +36,14 @@ public class CassandraModule implements Module {
             verticalLayout.setSpacing(true);
             verticalLayout.setSizeFull();
 
-            TabSheet mongoSheet = new TabSheet();
-            mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
-            mongoSheet.setSizeFull();
+            TabSheet sheet = new TabSheet();
+            sheet.setStyleName(Runo.TABSHEET_SMALL);
+            sheet.setSizeFull();
 
-            mongoSheet.addTab(new CassandraWizard().getContent(), "Install!");
-            mongoSheet.addTab(new CassandraManager().getContent(), "Manage");
+            sheet.addTab(new CassandraWizard().getContent(), "Install!");
+            sheet.addTab(new CassandraManager().getContent(), "Manage");
 
-            verticalLayout.addComponent(mongoSheet);
+            verticalLayout.addComponent(sheet);
 
             setCompositionRoot(verticalLayout);
 
