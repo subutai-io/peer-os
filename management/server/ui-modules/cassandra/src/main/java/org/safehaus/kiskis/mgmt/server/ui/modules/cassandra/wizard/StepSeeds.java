@@ -39,9 +39,7 @@ public class StepSeeds extends Panel {
         grid.setSizeFull();
 
         Panel panel = new Panel();
-        Label menu = new Label("Cluster Installation Wizard<br>"
-                + " 1) <font color=\"#f14c1a\"><strong>Set cluster name</strong></font><br>"
-                + " 2) Set seeds");
+         Label menu = new Label("Cluster Installation Wizard");
 
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
@@ -52,14 +50,19 @@ public class StepSeeds extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
-        final TextField clusterNameTxtFld = new TextField("Enter cluster name");
+        final TextField domainNameTxtFld = new TextField("Domain name");
+        domainNameTxtFld.setInputPrompt("Domain name");
+        domainNameTxtFld.setRequired(true);
+        domainNameTxtFld.setMaxLength(20);
+        verticalLayoutForm.addComponent(domainNameTxtFld);
+        
+        final TextField clusterNameTxtFld = new TextField("Cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength(20);
         verticalLayoutForm.addComponent(clusterNameTxtFld);
 
-        Label configServersLabel = new Label("<strong>Choose hosts that will act as seeds<br>"
-                + "(Recommended 1 servers)</strong>");
+        Label configServersLabel = new Label("<strong>Choose hosts that will act as seeds");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
@@ -84,6 +87,7 @@ public class StepSeeds extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                wizard.getConfig().setDomainName(domainNameTxtFld.getValue().toString().trim());
                 wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
                 wizard.getConfig().setSeeds((Set<Agent>) seedsColSel.getValue());
 
@@ -117,6 +121,7 @@ public class StepSeeds extends Panel {
                         Agent.class, wizard.getConfig().getSelectedAgents()));
 
         //set values if this is a second visit
+        domainNameTxtFld.setValue(wizard.getConfig().getDomainName());
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
         seedsColSel.setValue(Util.retainValues(wizard.getConfig().getSeeds(), wizard.getConfig().getSelectedAgents()));
     }

@@ -36,10 +36,8 @@ public class StepSetDirectories extends Panel {
         grid.setSizeFull();
 
         Panel panel = new Panel();
-        Label menu = new Label("Cluster Installation Wizard<br>"
-                + " 1) <font color=\"#f14c1a\"><strong>Config Servers and Routers</strong></font><br>"
-                + " 2) Replica Set Configurations");
-
+        Label menu = new Label("Cluster Installation Wizard");
+        
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
         grid.addComponent(menu, 0, 0, 2, 1);

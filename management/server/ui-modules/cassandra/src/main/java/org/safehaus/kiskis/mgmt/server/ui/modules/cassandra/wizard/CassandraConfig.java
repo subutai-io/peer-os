@@ -18,6 +18,7 @@ public class CassandraConfig {
     private String dataDirectory = "";
     private String commitLogDirectory = "";
     private String savedCachesDirectory = "";
+    private String domainName = "";
     private Set<Agent> seeds;
     private Set<Agent> selectedAgents;
 
@@ -69,18 +70,27 @@ public class CassandraConfig {
         this.selectedAgents = selectedAgents;
     }
 
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
     public void reset() {
         clusterName = "";
         dataDirectory = "";
         commitLogDirectory = "";
         savedCachesDirectory = "";
+        domainName = "";
         seeds = null;
         selectedAgents = null;
     }
 
     @Override
     public String toString() {
-        return "CassandraConfig{" + "clusterName=" + clusterName + ", dataDirectory=" + dataDirectory + ", commitLogDirectory=" + commitLogDirectory + ", savedCachesDirectory=" + savedCachesDirectory + ", seeds=" + seeds + ", selectedAgents=" + selectedAgents + '}';
+        return "CassandraConfig{" + "clusterName=" + clusterName + ", dataDirectory=" + dataDirectory + ", commitLogDirectory=" + commitLogDirectory + ", savedCachesDirectory=" + savedCachesDirectory + ", domainName=" + domainName + ", seeds=" + seeds + ", selectedAgents=" + selectedAgents + '}';
     }
 
 }
