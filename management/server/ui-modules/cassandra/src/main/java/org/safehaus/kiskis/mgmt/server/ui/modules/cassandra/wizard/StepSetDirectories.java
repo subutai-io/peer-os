@@ -25,17 +25,18 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  */
-public class StepListenRPC extends Panel {
+public class StepSetDirectories extends Panel {
 
     private Task task;
 
-    public StepListenRPC(final CassandraWizard cassWizard) {
+    public StepSetDirectories(final CassandraWizard wizard) {
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
 
         Label welcomeMsg = new Label(
-                "<center><h2>Setting Lister and RPC addresses!</h2></center>");
+                "<center><h2>Welcome to Cassandra Installation Wizard!</h2><br/>"
+                + "Please select nodes in the tree on the left to continue</center>");
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
@@ -55,29 +56,20 @@ public class StepListenRPC extends Panel {
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
-                    cassWizard.getConfig().setSelectedAgents(selectedAgents);
+                    wizard.getConfig().setSelectedAgents(selectedAgents);
                     task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Intall Cassandra");
-                    for (Agent agent : cassWizard.getConfig().getSelectedAgents()) {
+                    for (Agent agent : wizard.getConfig().getSelectedAgents()) {
                         
-                        Command listenAddressCommand  = CassandraCommands.getSetListenAddressCommand();
-                        listenAddressCommand.getRequest().setUuid(agent.getUuid());
-                        listenAddressCommand.getRequest().setSource(CassandraWizard.SOURCE);
-                        listenAddressCommand.getRequest().setUuid(agent.getUuid());
-                        listenAddressCommand.getRequest().setTaskUuid(task.getUuid());
-                        listenAddressCommand.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+                        Command command  = CassandraCommands.getSetDataDirectoryCommand();
+                        command.getRequest().setUuid(agent.getUuid());
+                        command.getRequest().setSource(CassandraWizard.SOURCE);
+                        command.getRequest().setUuid(agent.getUuid());
+                        command.getRequest().setTaskUuid(task.getUuid());
+                        command.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
                         
-                        Command rpcAddressCommand  = CassandraCommands.getSetListenAddressCommand();
-                        rpcAddressCommand.getRequest().setUuid(agent.getUuid());
-                        rpcAddressCommand.getRequest().setSource(CassandraWizard.SOURCE);
-                        rpcAddressCommand.getRequest().setUuid(agent.getUuid());
-                        rpcAddressCommand.getRequest().setTaskUuid(task.getUuid());
-                        rpcAddressCommand.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//                        Map<String, String> map = new HashMap<String, String>();
-//                        Request request = RequestUtil.createRequest(CassandraWizard.getCommandManager(), CommandJson., task, map);
-                        CassandraWizard.getCommandManager().executeCommand(listenAddressCommand);
-                        CassandraWizard.getCommandManager().executeCommand(rpcAddressCommand);
+                        CassandraWizard.getCommandManager().executeCommand(command);
                     }
-                    cassWizard.next();
+                    wizard.next();
                 }
             }
         });
@@ -88,7 +80,5 @@ public class StepListenRPC extends Panel {
     private void show(String notification) {
         getWindow().showNotification(notification);
     }
-    
-    
 
 }
