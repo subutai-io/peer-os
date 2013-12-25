@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -13,7 +13,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.CassandraCommands;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
@@ -25,12 +25,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  */
-public class StepListenRPC extends Panel {
+public class StepSeeds extends Panel {
 
     private Task task;
 
 //    private final MongoWizard mongoWizard;
-    public StepListenRPC(final CassandraWizard cassWizard) {
+    public StepSeeds(final CassandraWizard cassWizard) {
 //        this.mongoWizard = mongoWizard;
 
         GridLayout gridLayout = new GridLayout(10, 6);

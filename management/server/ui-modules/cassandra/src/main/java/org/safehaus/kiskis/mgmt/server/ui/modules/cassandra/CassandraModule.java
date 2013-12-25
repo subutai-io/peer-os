@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.CassandraWizard;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.management.CassandraManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWizard;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraManager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.osgi.framework.BundleContext;

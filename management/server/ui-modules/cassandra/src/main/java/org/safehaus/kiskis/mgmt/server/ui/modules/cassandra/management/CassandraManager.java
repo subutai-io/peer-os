@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.management;
+package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management;
 
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;

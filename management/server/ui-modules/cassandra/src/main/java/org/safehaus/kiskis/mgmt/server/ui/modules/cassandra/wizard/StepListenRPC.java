@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -13,7 +13,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.CassandraCommands;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
@@ -25,12 +25,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  */
-public class Step1 extends Panel {
+public class StepListenRPC extends Panel {
 
     private Task task;
 
 //    private final MongoWizard mongoWizard;
-    public Step1(final CassandraWizard cassWizard) {
+    public StepListenRPC(final CassandraWizard cassWizard) {
 //        this.mongoWizard = mongoWizard;
 
         GridLayout gridLayout = new GridLayout(10, 6);
@@ -62,15 +62,23 @@ public class Step1 extends Panel {
                     task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Intall Cassandra");
                     for (Agent agent : cassWizard.getConfig().getSelectedAgents()) {
                         
-                        Command command  = CassandraCommands.getInstallCommand();
-                        command.getRequest().setUuid(agent.getUuid());
-                        command.getRequest().setSource(CassandraWizard.SOURCE);
-                        command.getRequest().setUuid(agent.getUuid());
-                        command.getRequest().setTaskUuid(task.getUuid());
-                        command.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+                        Command listenAddressCommand  = CassandraCommands.getSetListenAddressCommand();
+                        listenAddressCommand.getRequest().setUuid(agent.getUuid());
+                        listenAddressCommand.getRequest().setSource(CassandraWizard.SOURCE);
+                        listenAddressCommand.getRequest().setUuid(agent.getUuid());
+                        listenAddressCommand.getRequest().setTaskUuid(task.getUuid());
+                        listenAddressCommand.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+                        
+                        Command rpcAddressCommand  = CassandraCommands.getSetListenAddressCommand();
+                        rpcAddressCommand.getRequest().setUuid(agent.getUuid());
+                        rpcAddressCommand.getRequest().setSource(CassandraWizard.SOURCE);
+                        rpcAddressCommand.getRequest().setUuid(agent.getUuid());
+                        rpcAddressCommand.getRequest().setTaskUuid(task.getUuid());
+                        rpcAddressCommand.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
 //                        Map<String, String> map = new HashMap<String, String>();
 //                        Request request = RequestUtil.createRequest(CassandraWizard.getCommandManager(), CommandJson., task, map);
-                        CassandraWizard.getCommandManager().executeCommand(command);
+                        CassandraWizard.getCommandManager().executeCommand(listenAddressCommand);
+                        CassandraWizard.getCommandManager().executeCommand(rpcAddressCommand);
                     }
                     cassWizard.next();
                 }
