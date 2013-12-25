@@ -39,7 +39,7 @@ public class CassandraModule implements Module {
 
             cassandraWizard = new CassandraWizard();
             cassandraManager = new CassandraManager();
-            sheet.addTab(cassandraWizard.getContent(), "Install!");
+            sheet.addTab(cassandraWizard.getContent(), "Install");
             sheet.addTab(cassandraManager.getContent(), "Manage");
 
             verticalLayout.addComponent(sheet);
