@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
+package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraManager;

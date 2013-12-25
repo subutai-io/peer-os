@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands;
 
 import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.CassandraModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
