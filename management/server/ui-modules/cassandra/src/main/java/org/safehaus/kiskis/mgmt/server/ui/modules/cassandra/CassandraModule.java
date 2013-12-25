@@ -20,23 +20,15 @@ public class CassandraModule implements Module {
     public static final String MODULE_NAME = "Cassandra";
 
     private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
-//    private BundleContext context;
     private static ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
-//        private Queue<ResponseListener> listeners = new ConcurrentLinkedQueue<ResponseListener>();
-//        private final BundleContext context;
         CassandraWizard cassandraWizard;
         CassandraManager cassandraManager;
 
         public ModuleComponent() {
-//            this.context = context;
-
-//            ThemeResource resource = new ThemeResource("icons/32/document.png");
-//            Embedded image = new Embedded("", resource);
-//            verticalLayout.addComponent(image);
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
             verticalLayout.setSizeFull();
@@ -58,21 +50,7 @@ public class CassandraModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            System.out.println("555 " + response.getStdOut());
-            LOG.log(Level.INFO, "555 ", response);
             cassandraWizard.setOutput(response);
-//            for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext();) {
-//                ResponseListener l = it.next();
-//                try {
-//                    if (l != null) {
-//                        l.onResponse(response);
-//                    } else {
-//                        it.remove();
-//                    }
-//                } catch (Exception e) {
-//                }
-//            }
-
         }
 
         @Override
@@ -80,11 +58,6 @@ public class CassandraModule implements Module {
             return MODULE_NAME;
         }
 
-//        private CommandManagerInterface getCommandManager() {
-//            ServiceReference reference = context
-//                    .getServiceReference(CommandManagerInterface.class.getName());
-//            return (CommandManagerInterface) context.getService(reference);
-//        }
         public static CommandManagerInterface getCommandManager() {
             // get bundle instance via the OSGi Framework Util class
             BundleContext ctx = FrameworkUtil.getBundle(CassandraModule.class).getBundleContext();
@@ -98,10 +71,6 @@ public class CassandraModule implements Module {
             return null;
         }
 
-//        @Override
-//        public void registerListener(ResponseListener listener) {
-//            listeners.add(listener);
-//        }
     }
 
     @Override
