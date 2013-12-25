@@ -42,7 +42,7 @@ public class StepSeeds extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-        Label logoImg = new Label("<img src='http://localhost:" + Common.WEB_SERVER_PORT + "/mongodb-logo.png' width='150px'/>");
+        Label logoImg = new Label("<img src='http://localhost:" + Common.WEB_SERVER_PORT + "/cassandra-logo.png' width='150px'/>");
         logoImg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
