@@ -19,6 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
@@ -39,9 +40,12 @@ public class StepStart extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-//        Label logoImg = new Label("<img src='http://localhost:" + Common.WEB_SERVER_PORT + "/cassandra-logo.png' width='150px'/>");
-//        logoImg.setContentMode(Label.CONTENT_XHTML);
-//        gridLayout.addComponent(logoImg, 1, 3, 2, 5);
+         Label logoImg = new Label(
+                String.format("<img src='http://%s:%s/cassandra-logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
+        logoImg.setContentMode(Label.CONTENT_XHTML);
+        logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
+        logoImg.setWidth(220, Sizeable.UNITS_PIXELS);
+        gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Next");
         next.setWidth(100, Sizeable.UNITS_PIXELS);
