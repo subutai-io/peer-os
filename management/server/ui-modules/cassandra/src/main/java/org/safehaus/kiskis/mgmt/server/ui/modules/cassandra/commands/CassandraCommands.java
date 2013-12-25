@@ -18,7 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  * @author dilshat
  */
 public class CassandraCommands {
-    
+
     private static String conf = "/opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     // INSTALLATION COMMANDS ===================================================
@@ -105,26 +105,29 @@ public class CassandraCommands {
         return cmd;
     }
 
-    public static Command getSetDataDirectoryCommand() {
+    public static Command getSetDataDirectoryCommand(String dir) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sed -i " + conf + " -e `expr $(sed -n '/data_file_directories:/=' " + conf + ") + 1`'s!.*!     - %dir!'");
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/data_file_directories:/=' " + conf + ") + 1`'s!.*!     - %dir!'";
+        req.setProgram(program.replace("%dir", dir));
         req.setTimeout(30);
         return cmd;
     }
 
-    public static Command getSetCommitLogDirectoryCommand() {
+    public static Command getSetCommitLogDirectoryCommand(String dir) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory:%dir!'");
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory:%dir!'";
+        req.setProgram(program.replace("%dir", dir));
         req.setTimeout(30);
         return cmd;
     }
 
-    public static Command getSetSavedCachesDirectoryCommand() {
+    public static Command getSetSavedCachesDirectoryCommand(String dir) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory:%dir!'");
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory:%dir!'";
+        req.setProgram(program.replace("%dir", dir));
         req.setTimeout(30);
         return cmd;
     }

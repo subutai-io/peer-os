@@ -32,7 +32,7 @@ public class Installer {
 
     public Installer(CassandraConfig config, TextArea terminal) {
         this.terminal = terminal;
-
+        
         Task installTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Install Cassandra");
         for (Agent agent : config.getSelectedAgents()) {
             Command command = CassandraCommands.getInstallCommand();
@@ -99,6 +99,44 @@ public class Installer {
 
             }
             tasks.add(clusterRenameTask);
+        }
+
+        if (!config.getDataDirectory().isEmpty()) {
+            Task setDataDirectory = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change data directory");
+            for (Agent agent : config.getSelectedAgents()) {
+                Command setDataDir = CassandraCommands.getSetDataDirectoryCommand(config.getDataDirectory());
+                setDataDir.getRequest().setUuid(agent.getUuid());
+                setDataDir.getRequest().setTaskUuid(setDataDirectory.getUuid());
+                setDataDir.getRequest().setRequestSequenceNumber(setDataDirectory.getIncrementedReqSeqNumber());
+                setDataDirectory.addCommand(setDataDir);
+
+            }
+            tasks.add(setDataDirectory);
+        }
+
+        if (!config.getDataDirectory().isEmpty()) {
+            Task setCommitLogDirectoryTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change Commit log directory");
+            for (Agent agent : config.getSelectedAgents()) {
+                Command setCommitLogDir = CassandraCommands.getSetCommitLogDirectoryCommand(config.getCommitLogDirectory());
+                setCommitLogDir.getRequest().setUuid(agent.getUuid());
+                setCommitLogDir.getRequest().setTaskUuid(setCommitLogDirectoryTask.getUuid());
+                setCommitLogDir.getRequest().setRequestSequenceNumber(setCommitLogDirectoryTask.getIncrementedReqSeqNumber());
+                setCommitLogDirectoryTask.addCommand(setCommitLogDir);
+            }
+            tasks.add(setCommitLogDirectoryTask);
+        }
+
+        if (!config.getDataDirectory().isEmpty()) {
+            Task setSavedCashesDirectoryTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change Saved caches directory");
+            for (Agent agent : config.getSelectedAgents()) {
+                Command setSavedCachesDir = CassandraCommands.getSetSavedCachesDirectoryCommand(config.getSavedCachesDirectory());
+                setSavedCachesDir.getRequest().setUuid(agent.getUuid());
+                setSavedCachesDir.getRequest().setTaskUuid(setSavedCashesDirectoryTask.getUuid());
+                setSavedCachesDir.getRequest().setRequestSequenceNumber(setSavedCashesDirectoryTask.getIncrementedReqSeqNumber());
+                setSavedCashesDirectoryTask.addCommand(setSavedCachesDir);
+
+            }
+            tasks.add(setSavedCashesDirectoryTask);
         }
     }
 
