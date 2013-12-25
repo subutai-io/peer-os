@@ -5,7 +5,10 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
@@ -86,6 +89,22 @@ public class CassandraConfig {
         domainName = "";
         seeds = null;
         selectedAgents = null;
+    }
+
+    public List<UUID> getSeedsUUIDList() {
+        List<UUID> list = new ArrayList<UUID>();
+        for (Agent s : seeds) {
+            list.add(s.getUuid());
+        }
+        return list;
+    }
+
+    public List<UUID> getAgentsUUIDList() {
+        List<UUID> list = new ArrayList<UUID>();
+        for (Agent s : selectedAgents) {
+            list.add(s.getUuid());
+        }
+        return list;
     }
 
     @Override

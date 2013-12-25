@@ -5,17 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management;
 
-import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
 
 /**
  *
@@ -40,102 +37,35 @@ public class CassandraManager {
         contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
         contentRoot.setMargin(true);
 
-        Label clusterNameLabel = new Label("Select the cluster");
-        content.addComponent(clusterNameLabel);
-
-        ComboBox clusterCombo = new ComboBox("Cluster", new ArrayList<Object>());
-        clusterCombo.setMultiSelect(false);
-        clusterCombo.setImmediate(true);
-        clusterCombo.setItemCaptionPropertyId("cluster name");
-        clusterCombo.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-            }
-        });
-        content.addComponent(clusterCombo);
-
-        Table routersTable = new Table("Query Routers");
-        routersTable.addContainerProperty("Host", String.class, null);
-        routersTable.addContainerProperty("Start", Button.class, null);
-        routersTable.addContainerProperty("Stop", Button.class, null);
-
-        routersTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        routersTable.setHeight(100, Sizeable.UNITS_PIXELS);
-
-        routersTable.setPageLength(10);
-        routersTable.setSelectable(true);
-        routersTable.setImmediate(true);
-
-        //sample data for UI test=============================
-        routersTable.addItem(new Object[]{
-            "Router-1", new Button("Start"), new Button("Stop")}, new Integer(1));
-        routersTable.addItem(new Object[]{
-            "Router-2", new Button("Start"), new Button("Stop")}, new Integer(2));
-        //====================================================
-
-        content.addComponent(routersTable);
-
-        Table configServersTable = new Table("Config Servers");
-        configServersTable.addContainerProperty("Host", String.class, null);
-        configServersTable.addContainerProperty("Start", Button.class, null);
-        configServersTable.addContainerProperty("Stop", Button.class, null);
-
-        configServersTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        configServersTable.setHeight(100, Sizeable.UNITS_PIXELS);
-
-        configServersTable.setPageLength(10);
-        configServersTable.setSelectable(true);
-        configServersTable.setImmediate(true);
-
-        //sample data for UI test=============================
-        configServersTable.addItem(new Object[]{
-            "Config-1", new Button("Start"), new Button("Stop")}, new Integer(1));
-        configServersTable.addItem(new Object[]{
-            "Config-2", new Button("Start"), new Button("Stop")}, new Integer(2));
-        //====================================================
-
-        content.addComponent(configServersTable);
-
-        Label replicaSetLabel = new Label("Select the replica set");
-        content.addComponent(replicaSetLabel);
-
-        ComboBox replicaCombo = new ComboBox("Replica", new ArrayList<Object>());
-        replicaCombo.setMultiSelect(false);
-        replicaCombo.setImmediate(true);
-        replicaCombo.setItemCaptionPropertyId("replica set");
-        replicaCombo.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-            }
-        });
-        content.addComponent(replicaCombo);
-
-        Table shardsTable = new Table("Shards");
-        shardsTable.addContainerProperty("Host", String.class, null);
-        shardsTable.addContainerProperty("Start", Button.class, null);
-        shardsTable.addContainerProperty("Stop", Button.class, null);
-
-        shardsTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        shardsTable.setHeight(100, Sizeable.UNITS_PIXELS);
-
-        shardsTable.setPageLength(10);
-        shardsTable.setSelectable(true);
-        shardsTable.setImmediate(true);
-
-        //sample data for UI test=============================
-        shardsTable.addItem(new Object[]{
-            "Shard-1", new Button("Start"), new Button("Stop")}, new Integer(1));
-        shardsTable.addItem(new Object[]{
-            "Shard-2", new Button("Start"), new Button("Stop")}, new Integer(2));
-        //====================================================
-
-        content.addComponent(shardsTable);
-
         HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(new Button("Cancel"));
+        buttons.addComponent(new Button("Get clusters"));
         buttons.addComponent(new Button("Apply Changes"));
 
         content.addComponent(buttons);
+
+        Label clusterNameLabel = new Label("Select the cluster");
+        content.addComponent(clusterNameLabel);
+
+        Table clustersTable = new Table("Cluster");
+        clustersTable.addContainerProperty("Host", String.class, null);
+        clustersTable.addContainerProperty("Start", Button.class, null);
+        clustersTable.addContainerProperty("Stop", Button.class, null);
+
+        clustersTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        clustersTable.setHeight(100, Sizeable.UNITS_PIXELS);
+
+        clustersTable.setPageLength(10);
+        clustersTable.setSelectable(true);
+        clustersTable.setImmediate(true);
+
+        //sample data for UI test=============================
+        clustersTable.addItem(new Object[]{
+            "Router-1", new Button("Start"), new Button("Stop")}, new Integer(1));
+        clustersTable.addItem(new Object[]{
+            "Router-2", new Button("Start"), new Button("Stop")}, new Integer(2));
+        //====================================================
+
+        content.addComponent(clustersTable);
 
     }
 
