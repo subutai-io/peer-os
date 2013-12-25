@@ -79,7 +79,7 @@ public class Installer implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-
+        System.out.println("RESPONSE==============" + response);
         if (currentTask != null && response != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
 

@@ -82,6 +82,11 @@ public class CassandraWizard {
         step--;
         putForm();
     }
+    
+    protected void cancel() {
+        step = 1;
+        putForm();
+    }
 
     protected CassandraConfig getConfig() {
         return config;
