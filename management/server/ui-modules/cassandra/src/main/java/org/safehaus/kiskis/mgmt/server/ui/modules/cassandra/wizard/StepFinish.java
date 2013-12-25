@@ -56,6 +56,5 @@ public class StepFinish extends Panel {
     private void show(String notification) {
         getWindow().showNotification(notification);
     }
-    
 
 }

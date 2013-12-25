@@ -18,11 +18,7 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
@@ -31,7 +27,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class StepSeeds extends Panel {
 
-    private Task task;
 
     public StepSeeds(final CassandraWizard wizard) {
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -95,26 +90,6 @@ public class StepSeeds extends Panel {
                 if (Util.isCollectionEmpty(wizard.getConfig().getSeeds())) {
                     show("Please add seeds servers");
                 } else {
-//                    task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Set lister and rpc addresses");
-//                    for (Agent agent : wizard.getConfig().getSelectedAgents()) {
-//                        
-//                        Command command1 = CassandraCommands.getSetSeedsCommand();
-//                        command1.getRequest().setUuid(agent.getUuid());
-//                        command1.getRequest().setSource(CassandraWizard.SOURCE);
-//                        command1.getRequest().setUuid(agent.getUuid());
-//                        command1.getRequest().setTaskUuid(task.getUuid());
-//                        command1.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//                        
-//                        Command command2 = CassandraCommands.getSetSeedsCommand();
-//                        command2.getRequest().setUuid(agent.getUuid());
-//                        command2.getRequest().setSource(CassandraWizard.SOURCE);
-//                        command2.getRequest().setUuid(agent.getUuid());
-//                        command2.getRequest().setTaskUuid(task.getUuid());
-//                        command2.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//
-////                    CassandraWizard.getCommandManager().executeCommand(command1);
-////                    CassandraWizard.getCommandManager().executeCommand(command2);
-//                    }
                     wizard.next();
                 }
             }

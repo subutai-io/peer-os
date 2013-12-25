@@ -86,8 +86,8 @@ public class CassandraWizard {
     protected CassandraConfig getConfig() {
         return config;
     }
-    
-    public void registerResponseListener(ResponseListener listener){
+
+    public void registerResponseListener(ResponseListener listener) {
         responseNotifier.registerListener(listener);
     }
 
@@ -99,11 +99,6 @@ public class CassandraWizard {
                 verticalLayout.addComponent(new StepStart(this));
                 break;
             }
-//            case 2: {
-//                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-//                verticalLayout.addComponent(new StepListenRPCAdresses(this));
-//                break;
-//            }
             case 2: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 verticalLayout.addComponent(new StepSeeds(this));

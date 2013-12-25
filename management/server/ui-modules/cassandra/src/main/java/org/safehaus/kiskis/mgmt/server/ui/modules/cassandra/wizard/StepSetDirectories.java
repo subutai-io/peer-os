@@ -89,58 +89,6 @@ public class StepSetDirectories extends Panel {
                 wizard.getConfig().setDataDirectory(dataDirTxtFld.getValue().toString().trim());
                 wizard.getConfig().setSavedCachesDirectory(savedCachesTxtFld.getValue().toString().trim());
 
-//                task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Set directories");
-//                for (Agent agent : wizard.getConfig().getSelectedAgents()) {
-//
-//                    Command command1 = CassandraCommands.getSetDataDirectoryCommand();
-//                    command1.getRequest().setUuid(agent.getUuid());
-//                    command1.getRequest().setSource(CassandraWizard.SOURCE);
-//                    command1.getRequest().setUuid(agent.getUuid());
-//                    command1.getRequest().setTaskUuid(task.getUuid());
-//                    command1.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//
-//                    Command command11 = CassandraCommands.getDeleteDataDirectoryCommand();
-//                    command11.getRequest().setUuid(agent.getUuid());
-//                    command11.getRequest().setSource(CassandraWizard.SOURCE);
-//                    command11.getRequest().setUuid(agent.getUuid());
-//                    command11.getRequest().setTaskUuid(task.getUuid());
-//                    command11.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//
-//                    Command command2 = CassandraCommands.getSetCommitLogDirectoryCommand();
-//                    command2.getRequest().setUuid(agent.getUuid());
-//                    command2.getRequest().setSource(CassandraWizard.SOURCE);
-//                    command2.getRequest().setUuid(agent.getUuid());
-//                    command2.getRequest().setTaskUuid(task.getUuid());
-//                    command2.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//
-//                    Command command22 = CassandraCommands.getDeleteCommitLogDirectoryCommand();
-//                    command22.getRequest().setUuid(agent.getUuid());
-//                    command22.getRequest().setSource(CassandraWizard.SOURCE);
-//                    command22.getRequest().setUuid(agent.getUuid());
-//                    command22.getRequest().setTaskUuid(task.getUuid());
-//                    command22.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//
-//                    Command command3 = CassandraCommands.getSetSavedCachesDirectoryCommand();
-//                    command3.getRequest().setUuid(agent.getUuid());
-//                    command3.getRequest().setSource(CassandraWizard.SOURCE);
-//                    command3.getRequest().setUuid(agent.getUuid());
-//                    command3.getRequest().setTaskUuid(task.getUuid());
-//                    command3.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//
-//                    Command command33 = CassandraCommands.getDeleteSavedCachesDirectoryCommand();
-//                    command33.getRequest().setUuid(agent.getUuid());
-//                    command33.getRequest().setSource(CassandraWizard.SOURCE);
-//                    command33.getRequest().setUuid(agent.getUuid());
-//                    command33.getRequest().setTaskUuid(task.getUuid());
-//                    command33.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//
-////                        CassandraWizard.getCommandManager().executeCommand(command1);
-////                        CassandraWizard.getCommandManager().executeCommand(command11);
-////                        CassandraWizard.getCommandManager().executeCommand(command2);
-////                        CassandraWizard.getCommandManager().executeCommand(command22);
-////                        CassandraWizard.getCommandManager().executeCommand(command3);
-////                        CassandraWizard.getCommandManager().executeCommand(command33);
-//                }
                 wizard.next();
             }
         });

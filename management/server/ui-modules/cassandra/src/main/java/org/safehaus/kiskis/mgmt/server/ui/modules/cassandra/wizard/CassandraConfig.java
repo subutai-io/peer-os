@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
-import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 

@@ -23,7 +23,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class StepStart extends Panel {
 
-//    private Task task;
     public StepStart(final CassandraWizard wizard) {
 
         GridLayout gridLayout = new GridLayout(10, 6);
@@ -54,20 +53,8 @@ public class StepStart extends Panel {
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
-                    wizard.getConfig().setSelectedAgents(selectedAgents);
-//                    task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Intall Cassandra");
-//                    for (Agent agent : wizard.getConfig().getSelectedAgents()) {
-//
-//                        Command command = CassandraCommands.getInstallCommand();
-//                        command.getRequest().setUuid(agent.getUuid());
-//                        command.getRequest().setSource(CassandraWizard.SOURCE);
-//                        command.getRequest().setUuid(agent.getUuid());
-//                        command.getRequest().setTaskUuid(task.getUuid());
-//                        command.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//                        
-////                        CassandraWizard.getCommandManager().executeCommand(command);
-//                    }
                     wizard.getConfig().reset();
+                    wizard.getConfig().setSelectedAgents(selectedAgents);
                     wizard.next();
                 }
             }

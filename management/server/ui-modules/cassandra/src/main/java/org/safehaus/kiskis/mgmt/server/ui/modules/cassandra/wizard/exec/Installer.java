@@ -58,7 +58,6 @@ public class Installer implements ResponseListener {
             setListenAddressTask.addCommand(command);
         }
 
-        //=============
         tasks.add(installTask);
         tasks.add(setListenAddressTask);
     }
