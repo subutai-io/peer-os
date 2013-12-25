@@ -159,7 +159,7 @@ public class CassandraCommands {
     public static Command getSourceEtcProfileUpdateCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("source /etc/profile");
+        req.setProgram(". /etc/profile");
         req.setTimeout(30);
         return cmd;
     }
