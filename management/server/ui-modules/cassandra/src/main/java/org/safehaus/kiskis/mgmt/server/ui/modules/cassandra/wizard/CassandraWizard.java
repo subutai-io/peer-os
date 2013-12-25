@@ -11,11 +11,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 /**
  *
@@ -30,11 +26,9 @@ public class CassandraWizard {
     private final CassandraConfig config = new CassandraConfig();
     private final VerticalLayout contentRoot;
     public static final String SOURCE = "CASSANDRA_WIZARD";
-//    private final ResponseNotifier responseNotifier;
     private StepFinish stepFinish;
 
     public CassandraWizard() {
-//        this.responseNotifier = responseNotifier;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -92,9 +86,6 @@ public class CassandraWizard {
         return config;
     }
 
-//    public void registerResponseListener(ResponseListener listener) {
-//        responseNotifier.registerListener(listener);
-//    }
     private void putForm() {
         verticalLayout.removeAllComponents();
         switch (step) {
@@ -126,18 +117,6 @@ public class CassandraWizard {
                 break;
             }
         }
-    }
-
-    public static CommandManagerInterface getCommandManager() {
-        BundleContext ctx = FrameworkUtil.getBundle(CassandraWizard.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
-            if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
     }
 
     public void setOutput(Response response) {

@@ -9,23 +9,24 @@ import com.vaadin.ui.TextArea;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author bahadyr
  */
-public class Installer implements ResponseListener {
+public class Installer {
 
 //    private final CassandraConfig config;
     private final Queue<Task> tasks = new LinkedList<Task>();
@@ -36,11 +37,9 @@ public class Installer implements ResponseListener {
 //        this.config = config;
         this.terminal = terminal;
 
-        Task installTask = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Install Cassandra");
+        Task installTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Install Cassandra");
         for (Agent agent : config.getSelectedAgents()) {
             Command command = CassandraCommands.getInstallCommand();
-            command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setSource(CassandraWizard.SOURCE);
             command.getRequest().setUuid(agent.getUuid());
             command.getRequest().setTaskUuid(installTask.getUuid());
             command.getRequest().setRequestSequenceNumber(installTask.getIncrementedReqSeqNumber());
@@ -48,19 +47,15 @@ public class Installer implements ResponseListener {
         }
         tasks.add(installTask);
 
-        Task setListenAddressTask = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Set listen addresses");
+        Task setListenAddressTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set listen addresses");
         for (Agent agent : config.getSelectedAgents()) {
             Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname());
-            setListenAddressCommand.getRequest().setUuid(agent.getUuid());
-            setListenAddressCommand.getRequest().setSource(CassandraWizard.SOURCE);
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
             setListenAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setListenAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(setListenAddressCommand);
 
             Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname());
-            setRpcAddressCommand.getRequest().setUuid(agent.getUuid());
-            setRpcAddressCommand.getRequest().setSource(CassandraWizard.SOURCE);
             setRpcAddressCommand.getRequest().setUuid(agent.getUuid());
             setRpcAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setRpcAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
@@ -73,8 +68,6 @@ public class Installer implements ResponseListener {
 
             Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
             setSeedsCommand.getRequest().setUuid(agent.getUuid());
-            setSeedsCommand.getRequest().setSource(CassandraWizard.SOURCE);
-            setSeedsCommand.getRequest().setUuid(agent.getUuid());
             setSeedsCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setSeedsCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(setSeedsCommand);
@@ -82,11 +75,9 @@ public class Installer implements ResponseListener {
         tasks.add(setListenAddressTask);
 
         if (!config.getClusterName().isEmpty()) {
-            Task clusterRenameTask = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Rename cluster");
+            Task clusterRenameTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Rename cluster");
             for (Agent agent : config.getSelectedAgents()) {
                 Command setClusterNameCommand = CassandraCommands.getSetClusterNameCommand(config.getClusterName());
-                setClusterNameCommand.getRequest().setUuid(agent.getUuid());
-                setClusterNameCommand.getRequest().setSource(CassandraWizard.SOURCE);
                 setClusterNameCommand.getRequest().setUuid(agent.getUuid());
                 setClusterNameCommand.getRequest().setTaskUuid(clusterRenameTask.getUuid());
                 setClusterNameCommand.getRequest().setRequestSequenceNumber(clusterRenameTask.getIncrementedReqSeqNumber());
@@ -94,23 +85,17 @@ public class Installer implements ResponseListener {
 
                 Command deleteDataDir = CassandraCommands.getDeleteDataDirectoryCommand();
                 deleteDataDir.getRequest().setUuid(agent.getUuid());
-                deleteDataDir.getRequest().setSource(CassandraWizard.SOURCE);
-                deleteDataDir.getRequest().setUuid(agent.getUuid());
                 deleteDataDir.getRequest().setTaskUuid(clusterRenameTask.getUuid());
                 deleteDataDir.getRequest().setRequestSequenceNumber(clusterRenameTask.getIncrementedReqSeqNumber());
                 clusterRenameTask.addCommand(deleteDataDir);
 
                 Command deleteCommitLogDit = CassandraCommands.getDeleteCommitLogDirectoryCommand();
                 deleteCommitLogDit.getRequest().setUuid(agent.getUuid());
-                deleteCommitLogDit.getRequest().setSource(CassandraWizard.SOURCE);
-                deleteCommitLogDit.getRequest().setUuid(agent.getUuid());
                 deleteCommitLogDit.getRequest().setTaskUuid(clusterRenameTask.getUuid());
                 deleteCommitLogDit.getRequest().setRequestSequenceNumber(clusterRenameTask.getIncrementedReqSeqNumber());
                 clusterRenameTask.addCommand(deleteCommitLogDit);
 
                 Command deleteSavedCashesDir = CassandraCommands.getDeleteSavedCachesDirectoryCommand();
-                deleteSavedCashesDir.getRequest().setUuid(agent.getUuid());
-                deleteSavedCashesDir.getRequest().setSource(CassandraWizard.SOURCE);
                 deleteSavedCashesDir.getRequest().setUuid(agent.getUuid());
                 deleteSavedCashesDir.getRequest().setTaskUuid(clusterRenameTask.getUuid());
                 deleteSavedCashesDir.getRequest().setRequestSequenceNumber(clusterRenameTask.getIncrementedReqSeqNumber());
@@ -125,7 +110,7 @@ public class Installer implements ResponseListener {
         currentTask = tasks.poll();
         if (currentTask != null) {
             for (Command command : currentTask.getCommands()) {
-                CassandraWizard.getCommandManager().executeCommand(command);
+                CassandraModule.getCommandManager().executeCommand(command);
             }
         }
     }
@@ -134,21 +119,21 @@ public class Installer implements ResponseListener {
         currentTask = tasks.poll();
     }
 
-    @Override
     public void onResponse(Response response) {
-        if (currentTask != null && response != null && response.getTaskUuid() != null
+        terminal.setValue(terminal.getValue() + response.getStdOut());
+        if (currentTask != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
 
-            Task task = CassandraWizard.getCommandManager().getTask(response.getTaskUuid());
-            List<ParseResult> list = CassandraWizard.getCommandManager().parseTask(task, true);
-            task = CassandraWizard.getCommandManager().getTask(response.getTaskUuid());
+            Task task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
+            List<ParseResult> list = CassandraModule.getCommandManager().parseTask(task, true);
+            task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
                 if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                     terminal.setValue(terminal.getValue().toString() + "\nStep successfully finished.");
                     moveToNextTask();
                     if (currentTask != null) {
                         for (Command command : currentTask.getCommands()) {
-                            CassandraWizard.getCommandManager().executeCommand(command);
+                            CassandraModule.getCommandManager().executeCommand(command);
                         }
                         terminal.setValue(terminal.getValue().toString() + "\nRunning next step...");
                     } else {

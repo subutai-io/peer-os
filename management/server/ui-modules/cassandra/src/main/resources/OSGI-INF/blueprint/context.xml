@@ -3,10 +3,8 @@
     <reference-list id="moduleService" availability="mandatory"
                     interface="org.safehaus.kiskis.mgmt.server.ui.services.ModuleService">
         <reference-listener
-            bind-method="setModuleService" unbind-method="unsetModuleService">
-            <bean class="org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule">
-                <property name="context" ref="blueprintBundleContext"/>
-            </bean>
+                bind-method="setModuleService" unbind-method="unsetModuleService">
+            <bean class="org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule"/>
         </reference-listener>
     </reference-list>
 </blueprint>
