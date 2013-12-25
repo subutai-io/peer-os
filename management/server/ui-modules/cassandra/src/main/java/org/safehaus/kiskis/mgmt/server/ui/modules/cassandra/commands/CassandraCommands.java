@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class CassandraCommands {
 
-    private static String conf = "/opt/cassandra-2.0.0/conf/cassandra.yaml";
+    private static final String conf = "/opt/cassandra-2.0.0/conf/cassandra.yaml";
 
     // INSTALLATION COMMANDS ===================================================
     public static Command getTemplate() {
@@ -90,7 +90,7 @@ public class CassandraCommands {
     public static Command getSetSeedsCommand(String seeds) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: \"%seeds\"!'";
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seeds!'";
         req.setProgram(program.replace("%seeds", seeds));
         req.setTimeout(30);
         return cmd;
@@ -99,7 +99,7 @@ public class CassandraCommands {
     public static Command getSetClusterNameCommand(String clusterName) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/cluster_name:/=' " + conf + ")`'s!.*!cluster_name: \"%clusterName\"!'";
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/cluster_name:/=' " + conf + ")`'s!.*!cluster_name: %clusterName!'";
         req.setProgram(program.replace("%clusterName", clusterName));
         req.setTimeout(30);
         return cmd;
@@ -117,7 +117,7 @@ public class CassandraCommands {
     public static Command getSetCommitLogDirectoryCommand(String dir) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory:%dir!'";
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
         req.setTimeout(30);
         return cmd;
@@ -126,7 +126,7 @@ public class CassandraCommands {
     public static Command getSetSavedCachesDirectoryCommand(String dir) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory:%dir!'";
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
         req.setTimeout(30);
         return cmd;

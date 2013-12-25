@@ -45,6 +45,12 @@ public class Installer {
 
         Task setListenAddressTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set listen addresses");
         for (Agent agent : config.getSelectedAgents()) {
+            Command sourceEtcProfileCommand = CassandraCommands.getSourceEtcProfileUpdateCommand();
+            sourceEtcProfileCommand.getRequest().setUuid(agent.getUuid());
+            sourceEtcProfileCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
+            sourceEtcProfileCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
+            setListenAddressTask.addCommand(sourceEtcProfileCommand);
+            
             Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname());
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
             setListenAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
