@@ -32,7 +32,7 @@ public class Installer {
 
     public Installer(CassandraConfig config, TextArea terminal) {
         this.terminal = terminal;
-        
+
         Task installTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Install Cassandra");
         for (Agent agent : config.getSelectedAgents()) {
             Command command = CassandraCommands.getInstallCommand();
@@ -50,7 +50,7 @@ public class Installer {
             sourceEtcProfileCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             sourceEtcProfileCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(sourceEtcProfileCommand);
-            
+
             Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname());
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
             setListenAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
@@ -168,18 +168,18 @@ public class Installer {
             task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
                 if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-                    terminal.setValue(terminal.getValue().toString() + "\nStep successfully finished.");
+                    terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
                     moveToNextTask();
                     if (currentTask != null) {
                         for (Command command : currentTask.getCommands()) {
                             executeCommand(command);
                         }
-                        terminal.setValue(terminal.getValue().toString() + "\nRunning next step...");
+                        terminal.setValue(terminal.getValue().toString() + "\nRunning next step " + task.getDescription());
                     } else {
                         terminal.setValue(terminal.getValue().toString() + "\nInstallation finished");
                     }
                 } else if (task.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
-                    terminal.setValue("\n" + task + " failed");
+                    terminal.setValue("\n" + task.getDescription() + " failed");
                 }
             }
 
