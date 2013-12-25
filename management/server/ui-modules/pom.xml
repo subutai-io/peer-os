@@ -27,6 +27,6 @@
         <module>hive</module>
         <module>hcatalog</module>
         <module>flume</module>
-        <module>cass</module>
+        <module>cassandra</module>
     </modules>
 </project>

@@ -9,10 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>cass-module</artifactId>
+    <artifactId>cassandra-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Cass</name>
-    <description>Kiskis Management Cass</description>
+    <name>Kiskis Management Cassandra</name>
+    <description>Kiskis Management Cassandra</description>
 
     <build>
         <plugins>

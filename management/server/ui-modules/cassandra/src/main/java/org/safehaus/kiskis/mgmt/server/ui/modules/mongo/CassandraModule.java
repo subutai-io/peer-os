@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class CassandraModule implements Module {
 
-    public static final String MODULE_NAME = "Cass";
+    public static final String MODULE_NAME = "Cassandra";
 
     private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
     private BundleContext context;
