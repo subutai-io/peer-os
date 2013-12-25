@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -13,17 +12,12 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -46,8 +40,10 @@ public class StepListenRPCAdresses extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Installation Wizard<br>"
+                + " 1) <font color=\"#f14c1a\"><strong>Installation</strong></font><br>"
                 + " 1) <font color=\"#f14c1a\"><strong>Set listen and rpc addresses</strong></font><br>"
-                + " 2) Replica Set Configurations");
+                + " 2) Replica Set Configurations"
+        );
 
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);

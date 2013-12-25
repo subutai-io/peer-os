@@ -14,7 +14,9 @@ import com.vaadin.ui.VerticalLayout;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.ResponseNotifier;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
@@ -29,8 +31,10 @@ public class CassandraWizard {
     private final CassandraConfig config = new CassandraConfig();
     private final VerticalLayout contentRoot;
     public static final String SOURCE = "CASSANDRA_WIZARD";
+    private ResponseNotifier responseNotifier;
 
-    public CassandraWizard() {
+    public CassandraWizard(ResponseNotifier responseNotifier) {
+        this.responseNotifier = responseNotifier;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -82,6 +86,10 @@ public class CassandraWizard {
     protected CassandraConfig getConfig() {
         return config;
     }
+    
+    public void registerResponseListener(ResponseListener listener){
+        responseNotifier.registerListener(listener);
+    }
 
     private void putForm() {
         verticalLayout.removeAllComponents();
@@ -91,22 +99,22 @@ public class CassandraWizard {
                 verticalLayout.addComponent(new StepStart(this));
                 break;
             }
+//            case 2: {
+//                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+//                verticalLayout.addComponent(new StepListenRPCAdresses(this));
+//                break;
+//            }
             case 2: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new StepListenRPCAdresses(this));
-                break;
-            }
-            case 3: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 verticalLayout.addComponent(new StepSeeds(this));
                 break;
             }
-            case 4: {
+            case 3: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 verticalLayout.addComponent(new StepSetDirectories(this));
                 break;
             }
-            case 5: {
+            case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 verticalLayout.addComponent(new StepFinish(this));
                 break;

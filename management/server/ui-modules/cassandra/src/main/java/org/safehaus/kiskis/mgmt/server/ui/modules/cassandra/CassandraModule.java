@@ -4,6 +4,9 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWiza
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraManager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -13,6 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 public class CassandraModule implements Module {
 
@@ -22,8 +26,9 @@ public class CassandraModule implements Module {
     private BundleContext context;
 
     public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+            CommandListener, ResponseNotifier {
 
+        private Queue<ResponseListener> listeners = new ConcurrentLinkedQueue<ResponseListener>();
         private final BundleContext context;
 
         public ModuleComponent(BundleContext context) {
@@ -40,7 +45,7 @@ public class CassandraModule implements Module {
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
 
-            sheet.addTab(new CassandraWizard().getContent(), "Install!");
+            sheet.addTab(new CassandraWizard(this).getContent(), "Install!");
             sheet.addTab(new CassandraManager().getContent(), "Manage");
 
             verticalLayout.addComponent(sheet);
@@ -57,9 +62,18 @@ public class CassandraModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            
-            System.out.println("CASS " + response);
-            
+            for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext();) {
+                ResponseListener l = it.next();
+                try {
+                    if (l != null) {
+                        l.onResponse(response);
+                    } else {
+                        it.remove();
+                    }
+                } catch (Exception e) {
+                }
+            }
+
         }
 
         @Override
@@ -71,6 +85,11 @@ public class CassandraModule implements Module {
             ServiceReference reference = context
                     .getServiceReference(CommandManagerInterface.class.getName());
             return (CommandManagerInterface) context.getService(reference);
+        }
+
+        @Override
+        public void registerListener(ResponseListener listener) {
+            listeners.add(listener);
         }
 
     }

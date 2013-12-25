@@ -58,23 +58,23 @@ public class StepSetDirectories extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
-        final TextField dir1 = new TextField("Enter Data directory");
-        dir1.setInputPrompt("/var/lib/cassandra/data");
-        dir1.setRequired(true);
-        dir1.setMaxLength(20);
-        verticalLayoutForm.addComponent(dir1);
+        final TextField dataDirTxtFld = new TextField("Enter Data directory");
+        dataDirTxtFld.setInputPrompt("/var/lib/cassandra/data");
+        dataDirTxtFld.setRequired(true);
+        dataDirTxtFld.setMaxLength(20);
+        verticalLayoutForm.addComponent(dataDirTxtFld);
 
-        final TextField dir2 = new TextField("Enter Commitlog directory");
-        dir2.setInputPrompt("/var/lib/cassandra/commitlog");
-        dir2.setRequired(true);
-        dir2.setMaxLength(20);
-        verticalLayoutForm.addComponent(dir2);
+        final TextField commitLogTxtFld = new TextField("Enter Commitlog directory");
+        commitLogTxtFld.setInputPrompt("/var/lib/cassandra/commitlog");
+        commitLogTxtFld.setRequired(true);
+        commitLogTxtFld.setMaxLength(20);
+        verticalLayoutForm.addComponent(commitLogTxtFld);
 
-        final TextField dir3 = new TextField("Enter Saved Caches directory");
-        dir3.setInputPrompt("/var/lib/cassandra/saved_caches");
-        dir3.setRequired(true);
-        dir3.setMaxLength(20);
-        verticalLayoutForm.addComponent(dir3);
+        final TextField savedCachesTxtFld = new TextField("Enter Saved Caches directory");
+        savedCachesTxtFld.setInputPrompt("/var/lib/cassandra/saved_caches");
+        savedCachesTxtFld.setRequired(true);
+        savedCachesTxtFld.setMaxLength(20);
+        verticalLayoutForm.addComponent(savedCachesTxtFld);
 
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
@@ -85,58 +85,62 @@ public class StepSetDirectories extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Set directories");
-                for (Agent agent : wizard.getConfig().getSelectedAgents()) {
+                wizard.getConfig().setCommitLogDirectory(commitLogTxtFld.getValue().toString().trim());
+                wizard.getConfig().setDataDirectory(dataDirTxtFld.getValue().toString().trim());
+                wizard.getConfig().setSavedCachesDirectory(savedCachesTxtFld.getValue().toString().trim());
 
-                    Command command1 = CassandraCommands.getSetDataDirectoryCommand();
-                    command1.getRequest().setUuid(agent.getUuid());
-                    command1.getRequest().setSource(CassandraWizard.SOURCE);
-                    command1.getRequest().setUuid(agent.getUuid());
-                    command1.getRequest().setTaskUuid(task.getUuid());
-                    command1.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-
-                    Command command11 = CassandraCommands.getDeleteDataDirectoryCommand();
-                    command11.getRequest().setUuid(agent.getUuid());
-                    command11.getRequest().setSource(CassandraWizard.SOURCE);
-                    command11.getRequest().setUuid(agent.getUuid());
-                    command11.getRequest().setTaskUuid(task.getUuid());
-                    command11.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-
-                    Command command2 = CassandraCommands.getSetCommitLogDirectoryCommand();
-                    command2.getRequest().setUuid(agent.getUuid());
-                    command2.getRequest().setSource(CassandraWizard.SOURCE);
-                    command2.getRequest().setUuid(agent.getUuid());
-                    command2.getRequest().setTaskUuid(task.getUuid());
-                    command2.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-
-                    Command command22 = CassandraCommands.getDeleteCommitLogDirectoryCommand();
-                    command22.getRequest().setUuid(agent.getUuid());
-                    command22.getRequest().setSource(CassandraWizard.SOURCE);
-                    command22.getRequest().setUuid(agent.getUuid());
-                    command22.getRequest().setTaskUuid(task.getUuid());
-                    command22.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-
-                    Command command3 = CassandraCommands.getSetSavedCachesDirectoryCommand();
-                    command3.getRequest().setUuid(agent.getUuid());
-                    command3.getRequest().setSource(CassandraWizard.SOURCE);
-                    command3.getRequest().setUuid(agent.getUuid());
-                    command3.getRequest().setTaskUuid(task.getUuid());
-                    command3.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-
-                    Command command33 = CassandraCommands.getDeleteSavedCachesDirectoryCommand();
-                    command33.getRequest().setUuid(agent.getUuid());
-                    command33.getRequest().setSource(CassandraWizard.SOURCE);
-                    command33.getRequest().setUuid(agent.getUuid());
-                    command33.getRequest().setTaskUuid(task.getUuid());
-                    command33.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-
-//                        CassandraWizard.getCommandManager().executeCommand(command1);
-//                        CassandraWizard.getCommandManager().executeCommand(command11);
-//                        CassandraWizard.getCommandManager().executeCommand(command2);
-//                        CassandraWizard.getCommandManager().executeCommand(command22);
-//                        CassandraWizard.getCommandManager().executeCommand(command3);
-//                        CassandraWizard.getCommandManager().executeCommand(command33);
-                }
+//                task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Set directories");
+//                for (Agent agent : wizard.getConfig().getSelectedAgents()) {
+//
+//                    Command command1 = CassandraCommands.getSetDataDirectoryCommand();
+//                    command1.getRequest().setUuid(agent.getUuid());
+//                    command1.getRequest().setSource(CassandraWizard.SOURCE);
+//                    command1.getRequest().setUuid(agent.getUuid());
+//                    command1.getRequest().setTaskUuid(task.getUuid());
+//                    command1.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+//
+//                    Command command11 = CassandraCommands.getDeleteDataDirectoryCommand();
+//                    command11.getRequest().setUuid(agent.getUuid());
+//                    command11.getRequest().setSource(CassandraWizard.SOURCE);
+//                    command11.getRequest().setUuid(agent.getUuid());
+//                    command11.getRequest().setTaskUuid(task.getUuid());
+//                    command11.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+//
+//                    Command command2 = CassandraCommands.getSetCommitLogDirectoryCommand();
+//                    command2.getRequest().setUuid(agent.getUuid());
+//                    command2.getRequest().setSource(CassandraWizard.SOURCE);
+//                    command2.getRequest().setUuid(agent.getUuid());
+//                    command2.getRequest().setTaskUuid(task.getUuid());
+//                    command2.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+//
+//                    Command command22 = CassandraCommands.getDeleteCommitLogDirectoryCommand();
+//                    command22.getRequest().setUuid(agent.getUuid());
+//                    command22.getRequest().setSource(CassandraWizard.SOURCE);
+//                    command22.getRequest().setUuid(agent.getUuid());
+//                    command22.getRequest().setTaskUuid(task.getUuid());
+//                    command22.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+//
+//                    Command command3 = CassandraCommands.getSetSavedCachesDirectoryCommand();
+//                    command3.getRequest().setUuid(agent.getUuid());
+//                    command3.getRequest().setSource(CassandraWizard.SOURCE);
+//                    command3.getRequest().setUuid(agent.getUuid());
+//                    command3.getRequest().setTaskUuid(task.getUuid());
+//                    command3.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+//
+//                    Command command33 = CassandraCommands.getDeleteSavedCachesDirectoryCommand();
+//                    command33.getRequest().setUuid(agent.getUuid());
+//                    command33.getRequest().setSource(CassandraWizard.SOURCE);
+//                    command33.getRequest().setUuid(agent.getUuid());
+//                    command33.getRequest().setTaskUuid(task.getUuid());
+//                    command33.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+//
+////                        CassandraWizard.getCommandManager().executeCommand(command1);
+////                        CassandraWizard.getCommandManager().executeCommand(command11);
+////                        CassandraWizard.getCommandManager().executeCommand(command2);
+////                        CassandraWizard.getCommandManager().executeCommand(command22);
+////                        CassandraWizard.getCommandManager().executeCommand(command3);
+////                        CassandraWizard.getCommandManager().executeCommand(command33);
+//                }
                 wizard.next();
             }
         });
@@ -157,6 +161,11 @@ public class StepSetDirectories extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
+
+        //set values if this is a second visit
+        dataDirTxtFld.setValue(wizard.getConfig().getDataDirectory());
+        savedCachesTxtFld.setValue(wizard.getConfig().getSavedCachesDirectory());
+        commitLogTxtFld.setValue(wizard.getConfig().getCommitLogDirectory());
 
     }
 

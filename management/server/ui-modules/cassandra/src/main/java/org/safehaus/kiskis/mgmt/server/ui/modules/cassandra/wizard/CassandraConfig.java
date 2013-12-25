@@ -8,7 +8,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -17,60 +16,50 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 public class CassandraConfig {
 
     private String clusterName = "";
-    private String replicaSetName = "";
-    private Set<Agent> configServers = new HashSet<Agent>();
-    private Set<Agent> routerServers = new HashSet<Agent>();
-    private Set<Agent> shards = new HashSet<Agent>();
-    private Set<Agent> selectedAgents = new HashSet<Agent>();
-
-    public String getReplicaSetName() {
-        return replicaSetName;
-    }
-
-    public void setReplicaSetName(String replicaSetName) {
-        if (!Util.isStringEmpty(clusterName)) {
-            this.replicaSetName = replicaSetName;
-        }
-    }
+    private String dataDirectory = "";
+    private String commitLogDirectory = "";
+    private String savedCachesDirectory = "";
+    private Set<Agent> seeds;
+    private Set<Agent> selectedAgents;
 
     public String getClusterName() {
         return clusterName;
     }
 
     public void setClusterName(String clusterName) {
-        if (!Util.isStringEmpty(clusterName)) {
-            this.clusterName = clusterName;
-        }
+        this.clusterName = clusterName;
     }
 
-    public Set<Agent> getConfigServers() {
-        return configServers;
+    public String getDataDirectory() {
+        return dataDirectory;
     }
 
-    public void setConfigServers(Set<Agent> configServers) {
-        if (configServers != null) {
-            this.configServers = configServers;
-        }
+    public void setDataDirectory(String dataDirectory) {
+        this.dataDirectory = dataDirectory;
     }
 
-    public Set<Agent> getRouterServers() {
-        return routerServers;
+    public String getCommitLogDirectory() {
+        return commitLogDirectory;
     }
 
-    public void setRouterServers(Set<Agent> routerServers) {
-        if (routerServers != null) {
-            this.routerServers = routerServers;
-        }
+    public void setCommitLogDirectory(String commitLogDirectory) {
+        this.commitLogDirectory = commitLogDirectory;
     }
 
-    public Set<Agent> getShards() {
-        return shards;
+    public String getSavedCachesDirectory() {
+        return savedCachesDirectory;
     }
 
-    public void setShards(Set<Agent> shards) {
-        if (shards != null) {
-            this.shards = shards;
-        }
+    public void setSavedCachesDirectory(String savedCachesDirectory) {
+        this.savedCachesDirectory = savedCachesDirectory;
+    }
+
+    public Set<Agent> getSeeds() {
+        return seeds;
+    }
+
+    public void setSeeds(Set<Agent> seeds) {
+        this.seeds = seeds;
     }
 
     public Set<Agent> getSelectedAgents() {
@@ -78,14 +67,21 @@ public class CassandraConfig {
     }
 
     public void setSelectedAgents(Set<Agent> selectedAgents) {
-        if (selectedAgents != null) {
-            this.selectedAgents = selectedAgents;
-        }
+        this.selectedAgents = selectedAgents;
+    }
+
+    public void reset() {
+        clusterName = "";
+        dataDirectory = "";
+        commitLogDirectory = "";
+        savedCachesDirectory = "";
+        seeds = null;
+        selectedAgents = null;
     }
 
     @Override
     public String toString() {
-        return "CassandraConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routerServers=" + routerServers + ", shards=" + shards + ", selectedAgents=" + selectedAgents + '}';
+        return "CassandraConfig{" + "clusterName=" + clusterName + ", dataDirectory=" + dataDirectory + ", commitLogDirectory=" + commitLogDirectory + ", savedCachesDirectory=" + savedCachesDirectory + ", seeds=" + seeds + ", selectedAgents=" + selectedAgents + '}';
     }
 
 }

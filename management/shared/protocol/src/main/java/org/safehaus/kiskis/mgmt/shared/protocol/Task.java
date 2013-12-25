@@ -8,6 +8,8 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -19,10 +21,20 @@ public class Task implements Serializable {
     private String description;
     private TaskStatus taskStatus;
     private Integer reqSeqNumber;
+    private final List<Command> commands;
+
+    public void addCommand(Command command) {
+        commands.add(command);
+    }
 
     public Task() {
         uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
         reqSeqNumber = 0;
+        commands = new ArrayList<Command>();
+    }
+
+    public List<Command> getCommands() {
+        return commands;
     }
 
     public Integer getIncrementedReqSeqNumber() {

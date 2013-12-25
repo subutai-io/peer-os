@@ -5,34 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.Installer;
 
 /**
  *
  * @author dilshat
  */
 public class StepFinish extends Panel {
+
+    private TextArea terminal;
 
     public StepFinish(final CassandraWizard wizard) {
 
@@ -52,15 +41,21 @@ public class StepFinish extends Panel {
         finish.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.next();
+                Installer installer = new Installer(wizard.getConfig(), terminal);
+                wizard.registerResponseListener(installer);
+                installer.start();
             }
         });
-
+        terminal = new TextArea();
+        terminal.setRows(10);
+        terminal.setColumns(50);
+        gridLayout.addComponent(terminal);
         addComponent(gridLayout);
     }
 
     private void show(String notification) {
         getWindow().showNotification(notification);
     }
+    
 
 }

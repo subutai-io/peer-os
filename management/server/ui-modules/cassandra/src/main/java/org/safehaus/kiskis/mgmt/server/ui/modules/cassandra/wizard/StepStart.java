@@ -13,11 +13,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
@@ -27,8 +23,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class StepStart extends Panel {
 
-    private Task task;
-
+//    private Task task;
     public StepStart(final CassandraWizard wizard) {
 
         GridLayout gridLayout = new GridLayout(10, 6);
@@ -40,14 +35,14 @@ public class StepStart extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-         Label logoImg = new Label(
+        Label logoImg = new Label(
                 String.format("<img src='http://%s:%s/cassandra-logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
         logoImg.setWidth(220, Sizeable.UNITS_PIXELS);
         gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
-        Button next = new Button("Next");
+        Button next = new Button("Start");
         next.setWidth(100, Sizeable.UNITS_PIXELS);
         gridLayout.addComponent(next, 6, 4, 6, 4);
         gridLayout.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
@@ -60,17 +55,19 @@ public class StepStart extends Panel {
                     show("Select nodes in the tree on the left first");
                 } else {
                     wizard.getConfig().setSelectedAgents(selectedAgents);
-                    task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Intall Cassandra");
-                    for (Agent agent : wizard.getConfig().getSelectedAgents()) {
-
-                        Command command = CassandraCommands.getInstallCommand();
-                        command.getRequest().setUuid(agent.getUuid());
-                        command.getRequest().setSource(CassandraWizard.SOURCE);
-                        command.getRequest().setUuid(agent.getUuid());
-                        command.getRequest().setTaskUuid(task.getUuid());
-                        command.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-//                        CassandraWizard.getCommandManager().executeCommand(command);
-                    }
+//                    task = RequestUtil.createTask(CassandraWizard.getCommandManager(), "Intall Cassandra");
+//                    for (Agent agent : wizard.getConfig().getSelectedAgents()) {
+//
+//                        Command command = CassandraCommands.getInstallCommand();
+//                        command.getRequest().setUuid(agent.getUuid());
+//                        command.getRequest().setSource(CassandraWizard.SOURCE);
+//                        command.getRequest().setUuid(agent.getUuid());
+//                        command.getRequest().setTaskUuid(task.getUuid());
+//                        command.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+//                        
+////                        CassandraWizard.getCommandManager().executeCommand(command);
+//                    }
+                    wizard.getConfig().reset();
                     wizard.next();
                 }
             }
