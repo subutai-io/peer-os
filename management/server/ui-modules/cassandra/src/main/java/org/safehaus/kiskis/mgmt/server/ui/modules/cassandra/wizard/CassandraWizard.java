@@ -14,9 +14,8 @@ import com.vaadin.ui.VerticalLayout;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.ResponseNotifier;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
@@ -31,10 +30,11 @@ public class CassandraWizard {
     private final CassandraConfig config = new CassandraConfig();
     private final VerticalLayout contentRoot;
     public static final String SOURCE = "CASSANDRA_WIZARD";
-    private ResponseNotifier responseNotifier;
+//    private final ResponseNotifier responseNotifier;
+    private StepFinish stepFinish;
 
-    public CassandraWizard(ResponseNotifier responseNotifier) {
-        this.responseNotifier = responseNotifier;
+    public CassandraWizard() {
+//        this.responseNotifier = responseNotifier;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -82,7 +82,7 @@ public class CassandraWizard {
         step--;
         putForm();
     }
-    
+
     protected void cancel() {
         step = 1;
         putForm();
@@ -92,10 +92,9 @@ public class CassandraWizard {
         return config;
     }
 
-    public void registerResponseListener(ResponseListener listener) {
-        responseNotifier.registerListener(listener);
-    }
-
+//    public void registerResponseListener(ResponseListener listener) {
+//        responseNotifier.registerListener(listener);
+//    }
     private void putForm() {
         verticalLayout.removeAllComponents();
         switch (step) {
@@ -116,7 +115,8 @@ public class CassandraWizard {
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new StepFinish(this));
+                stepFinish = new StepFinish(this);
+                verticalLayout.addComponent(stepFinish);
                 break;
             }
             default: {
@@ -138,6 +138,10 @@ public class CassandraWizard {
         }
 
         return null;
+    }
+
+    public void setOutput(Response response) {
+        stepFinish.getInstaller().onResponse(response);
     }
 
 }

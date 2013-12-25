@@ -23,6 +23,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.Installe
 public class StepFinish extends Panel {
 
     private TextArea terminal;
+    Installer installer;
 
     public StepFinish(final CassandraWizard wizard) {
 
@@ -61,8 +62,8 @@ public class StepFinish extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Installer installer = new Installer(wizard.getConfig(), terminal);
-                wizard.registerResponseListener(installer);
+                installer = new Installer(wizard.getConfig(), terminal);
+//                wizard.registerResponseListener(installer);
                 installer.start();
             }
         });
@@ -84,6 +85,10 @@ public class StepFinish extends Panel {
 
         addComponent(verticalLayout);
 
+    }
+
+    public Installer getInstaller() {
+        return installer;
     }
 
     private void show(String notification) {

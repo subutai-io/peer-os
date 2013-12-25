@@ -67,34 +67,38 @@ public class CassandraCommands {
         return cmd;
     }
 
-    public static Command getSetListenAddressCommand() {
+    public static Command getSetListenAddressCommand(String listenAddress) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/listen_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!listen_address: %ip!'");
+        String program = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/listen_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!listen_address: %listenAddress!'";
+        req.setProgram(program.replace("%listenAddress", listenAddress));
         req.setTimeout(30);
         return cmd;
     }
 
-    public static Command getSetRpcAddressCommand() {
+    public static Command getSetRpcAddressCommand(String rpcAddress) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/rpc_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!rpc_address: %ip!'");
+        String program = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/rpc_address:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!rpc_address: %rpcAddress!'";
+        req.setProgram(program.replace("%rpcAddress", rpcAddress));
         req.setTimeout(30);
         return cmd;
     }
 
-    public static Command getSetSeedsCommand() {
+    public static Command getSetSeedsCommand(String seeds) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/- seeds:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!             - seeds: \"%ips\"!'");
+        String program = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/- seeds:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!             - seeds: \"%seeds\"!'";
+        req.setProgram(program.replace("%seeds", seeds));
         req.setTimeout(30);
         return cmd;
     }
 
-    public static Command getSetClusterNameCommand() {
+    public static Command getSetClusterNameCommand(String clusterName) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!cluster_name: \"%newName\"!'");
+        String program = "sed -i /opt/cassandra-2.0.0/conf/cassandra.yaml -e `expr $(sed -n '/cluster_name:/=' /opt/cassandra-2.0.0/conf/cassandra.yaml)`'s!.*!cluster_name: \"%clusterName\"!'";
+        req.setProgram(program.replace("%clusterName", clusterName));
         req.setTimeout(30);
         return cmd;
     }
