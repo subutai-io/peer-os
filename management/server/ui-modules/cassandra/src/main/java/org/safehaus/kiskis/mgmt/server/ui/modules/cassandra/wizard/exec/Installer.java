@@ -120,7 +120,6 @@ public class Installer {
     }
 
     public void onResponse(Response response) {
-        terminal.setValue(terminal.getValue() + response.getStdOut());
         if (currentTask != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
 
