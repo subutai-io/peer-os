@@ -4,11 +4,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWiza
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraManager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraManage;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -18,7 +14,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.osgi.framework.FrameworkUtil;
 
 public class CassandraModule implements Module {
 
@@ -51,7 +46,6 @@ public class CassandraModule implements Module {
             verticalLayout.addComponent(sheet);
 
             setCompositionRoot(verticalLayout);
-            CassandraModule.getCommandManager().addListener(this);
         }
 
 //        private List<Agent> getLxcAgents() {
@@ -120,9 +114,6 @@ public class CassandraModule implements Module {
             service.unregisterModule(this);
             LOG.log(Level.INFO, "{0} Unregistering with ModuleService", MODULE_NAME);
         }
-        service.unregisterModule(this);
-        LOG.log(Level.INFO, "{0} Unregistering with ModuleService", MODULE_NAME);
     }
-
 
 }

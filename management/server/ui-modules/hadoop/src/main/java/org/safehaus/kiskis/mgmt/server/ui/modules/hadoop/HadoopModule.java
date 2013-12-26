@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.HadoopClusterTable;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 public class HadoopModule implements Module {
