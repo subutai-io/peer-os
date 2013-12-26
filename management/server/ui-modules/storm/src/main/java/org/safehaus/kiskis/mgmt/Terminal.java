@@ -1,23 +1,25 @@
 package org.safehaus.kiskis.mgmt;
 
-
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Terminal implements Module {
+
+    private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
 
     private ModuleService service;
     private BundleContext context;
     private static final String name = "Storm";
+    private Component com;
 
     public static class ModuleComponent extends CustomComponent implements
             Button.ClickListener, CommandListener {
@@ -60,34 +62,11 @@ public class Terminal implements Module {
 
             setCompositionRoot(verticalLayout);
 
-            try {
-                System.out.println("~~~~~~~~~~~~~~~~~~~~");
-                System.out.println("Adding " + getName());
-                getCommandManager().addListener(this);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
         }
 
         @Override
         public void buttonClick(Button.ClickEvent event) {
-            List<Agent> agents = AppData.getSelectedAgentList();
-            if (agents != null && agents.size() > 0) {
-                for (Agent agent : agents) {
-                    Request r = CommandJson.getRequest(textAreaCommand.getValue().toString());
-                    r.setUuid(agent.getUuid());
-                    r.setSource(name);
 
-                    Command command = new Command(r);
-                    try {
-                        getCommandManager().executeCommand(command);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            } else {
-                getWindow().showNotification("Select agent!");
-            }
         }
 
         @Override
@@ -120,11 +99,12 @@ public class Terminal implements Module {
             return name;
         }
 
-        private CommandManagerInterface getCommandManager() {
-            ServiceReference reference = context
-                    .getServiceReference(CommandManagerInterface.class.getName());
-            return (CommandManagerInterface) context.getService(reference);
-        }
+    }
+
+    private CommandManagerInterface getCommandManager() {
+        ServiceReference reference = context
+                .getServiceReference(CommandManagerInterface.class.getName());
+        return (CommandManagerInterface) context.getService(reference);
     }
 
     @Override
@@ -134,7 +114,23 @@ public class Terminal implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(context);
+        com = new ModuleComponent(context);
+        try {
+            getCommandManager().addListener((CommandListener) com);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error registering with command manager: {0}", e);
+        }
+        return com;
+    }
+
+    @Override
+    public void dispose() {
+        try {
+            getCommandManager().removeListener((CommandListener) com);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error unregistering with command manager: {0}", e);
+        }
+
     }
 
     public void setModuleService(ModuleService service) {

@@ -1,9 +1,8 @@
 package org.safehaus.kiskis.mgmt;
 
-
 import com.vaadin.ui.*;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -12,32 +11,23 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 public class Terminal implements Module {
 
-    private ModuleService service;
-    private BundleContext context;
-    private static final String name = "Monitor";
+    private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
+
+    public static final String MODULE_NAME = "Monitor";
+    private ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
         private TextArea textAreaOutput;
-        private Button buttonSend;
-        private BundleContext context;
 
-        public ModuleComponent(BundleContext context) {
-            this.context = context;
+        public ModuleComponent() {
 
             VerticalLayout verticalLayout = new JSApi();
             verticalLayout.setSpacing(true);
 
             setCompositionRoot(verticalLayout);
 
-            try {
-                System.out.println("~~~~~~~~~~~~~~~~~~~~");
-                System.out.println("Adding " + getName());
-                getCommandManager().addListener(this);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
         }
 
         @Override
@@ -67,37 +57,48 @@ public class Terminal implements Module {
 
         @Override
         public synchronized String getName() {
-            return name;
+            return MODULE_NAME;
         }
 
-        private CommandManagerInterface getCommandManager() {
-            ServiceReference reference = context
-                    .getServiceReference(CommandManagerInterface.class.getName());
-            return (CommandManagerInterface) context.getService(reference);
-        }
     }
 
     @Override
     public String getName() {
-        return name;
+        return MODULE_NAME;
     }
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(context);
+        try {
+            component = new ModuleComponent();
+            ServiceLocator.getService(CommandManagerInterface.class).addListener(component);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in createComponent", e);
+        }
+        return component;
+    }
+
+    @Override
+    public void dispose() {
+        try {
+            ServiceLocator.getService(CommandManagerInterface.class).removeListener(component);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in dispose", e);
+        }
     }
 
     public void setModuleService(ModuleService service) {
-        System.out.println("Terminal: registering with ModuleService");
-        this.service = service;
-        this.service.registerModule(this);
+        if (service != null) {
+            LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
+            service.registerModule(this);
+        }
     }
 
     public void unsetModuleService(ModuleService service) {
-        this.service.unregisterModule(this);
+        if (service != null) {
+            service.unregisterModule(this);
+            LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
+        }
     }
 
-    public void setContext(BundleContext context) {
-        this.context = context;
-    }
 }
