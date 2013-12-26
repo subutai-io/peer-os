@@ -18,7 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  */
 public class Step4 extends Panel {
 
-    private TextArea outputTxtArea;
+    private final TextArea outputTxtArea;
 
     public Step4(final MongoWizard mongoWizard) {
 
@@ -27,7 +27,7 @@ public class Step4 extends Panel {
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Output");
+        outputTxtArea = new TextArea("Installation output");
         outputTxtArea.setRows(20);
         outputTxtArea.setColumns(100);
         outputTxtArea.setImmediate(true);
