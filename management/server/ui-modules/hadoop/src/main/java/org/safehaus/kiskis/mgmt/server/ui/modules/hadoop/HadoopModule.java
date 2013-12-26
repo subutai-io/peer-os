@@ -4,20 +4,21 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.HadoopClusterTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.HadoopClusterTable;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 public class HadoopModule implements Module {
 
@@ -41,7 +42,6 @@ public class HadoopModule implements Module {
             verticalLayout.addComponent(getHadoopClusterTable());
 
             setCompositionRoot(verticalLayout);
-
         }
 
         private HadoopClusterTable getHadoopClusterTable() {
