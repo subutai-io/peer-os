@@ -50,7 +50,11 @@ public class CassandraModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            cassandraWizard.setOutput(response);
+            if (response.getSource().equals(ResponseDestinationEnum.CASSANDRA_WIZARD)) {
+                cassandraWizard.setOutput(response);
+            } else if (response.getSource().equals(ResponseDestinationEnum.CASSANDRA_MANAGER)) {
+                cassandraManager.setOutput(response);
+            }
         }
 
         @Override

@@ -11,7 +11,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.CassandraServiceManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
  *
@@ -21,8 +24,12 @@ public class CassandraManager {
 
     private final VerticalLayout contentRoot;
     CassandraTable cassandraTable;
+    CassandraServiceManager manager;
+    private final TextArea terminal;
+//    public static final String SOURCE = "CASSANDRA_MANAGER";
 
     public CassandraManager() {
+
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -53,17 +60,22 @@ public class CassandraManager {
 
         Label clusterNameLabel = new Label("Select the cluster");
         content.addComponent(clusterNameLabel);
-        cassandraTable = new CassandraTable();
+        terminal = new TextArea();
+        terminal.setRows(10);
+        terminal.setColumns(60);
+        manager = new CassandraServiceManager(terminal);
+        cassandraTable = new CassandraTable(manager);
         content.addComponent(cassandraTable);
-
-    }
-
-    private void updateTableData() {
+        content.addComponent(terminal);
 
     }
 
     public Component getContent() {
         return contentRoot;
+    }
+
+    public void setOutput(Response response) {
+        manager.onResponse(response);
     }
 
 }
