@@ -26,6 +26,7 @@ public class MongoWizard implements ResponseListener {
     private int step = 1;
     private final MongoConfig mongoConfig = new MongoConfig();
     private final VerticalLayout contentRoot;
+    private Step4 step4;
 
     public MongoWizard() {
         contentRoot = new VerticalLayout();
@@ -76,6 +77,11 @@ public class MongoWizard implements ResponseListener {
         putForm();
     }
 
+    protected void init() {
+        step = 1;
+        putForm();
+    }
+
     protected MongoConfig getConfig() {
         return mongoConfig;
     }
@@ -98,6 +104,12 @@ public class MongoWizard implements ResponseListener {
                 verticalLayout.addComponent(new Step3(this));
                 break;
             }
+            case 4: {
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                step4 = new Step4(this);
+                verticalLayout.addComponent(step4);
+                break;
+            }
             default: {
                 break;
             }
@@ -106,9 +118,13 @@ public class MongoWizard implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
+        if (step == 4 && step4 != null) {
+            step4.onResponse(response);
+        }
 
     }
 
+    @Override
     public String getSource() {
         return getClass().getName();
     }
