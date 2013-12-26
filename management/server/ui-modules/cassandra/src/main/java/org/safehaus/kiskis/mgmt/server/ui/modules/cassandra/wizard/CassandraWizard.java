@@ -120,7 +120,9 @@ public class CassandraWizard {
     }
 
     public void setOutput(Response response) {
-        stepFinish.getInstaller().onResponse(response);
+        if (stepFinish != null) {
+            stepFinish.getInstaller().onResponse(response);
+        }
     }
 
 }

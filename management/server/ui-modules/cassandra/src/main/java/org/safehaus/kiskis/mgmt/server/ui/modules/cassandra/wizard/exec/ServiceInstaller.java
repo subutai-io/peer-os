@@ -25,14 +25,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author bahadyr
  */
-public class Installer {
+public class ServiceInstaller {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
     private Task currentTask;
     CassandraConfig config;
 
-    public Installer(CassandraConfig config, TextArea terminal) {
+    public ServiceInstaller(CassandraConfig config, TextArea terminal) {
         this.terminal = terminal;
         this.config = config;
 
@@ -191,7 +191,8 @@ public class Installer {
                             executeCommand(command);
                         }
                     } else {
-                        terminal.setValue(terminal.getValue().toString() + "\nInstallation finished.");
+                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.");
+
                         CassandraClusterInfo cci = new CassandraClusterInfo();
                         cci.setName(config.getClusterName());
                         cci.setDataDir(config.getDataDirectory());
@@ -201,7 +202,9 @@ public class Installer {
                         cci.setNodes(config.getAgentsUUIDList());
                         cci.setDomainName(config.getDomainName());
 
-                        CassandraModule.getCommandManager().saveCassandraClusterData(cci);
+                        if (CassandraModule.getCommandManager().saveCassandraClusterData(cci)) {
+                            terminal.setValue(terminal.getValue().toString() + "\n" + cci.getUuid() + " cluster saved into keyspace.");
+                        }
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     terminal.setValue("\n" + task.getDescription() + " failed");

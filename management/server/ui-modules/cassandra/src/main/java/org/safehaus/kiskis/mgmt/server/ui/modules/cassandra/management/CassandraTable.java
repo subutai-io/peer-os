@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.CassandraServiceManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 
 /**
@@ -19,9 +19,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 public class CassandraTable extends Table {
 
 //    private IndexedContainer container;
-    CassandraServiceManager manager;
+    ServiceManager manager;
 
-    public CassandraTable(CassandraServiceManager manager) {
+    public CassandraTable(ServiceManager manager) {
         this.manager = manager;
         this.setCaption("Cassandra clusters");
         this.setContainerDataSource(getCassandraContainer());
@@ -38,6 +38,7 @@ public class CassandraTable extends Table {
         container.addContainerProperty(CassandraClusterInfo.NAME_LABEL, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
+        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
         List<CassandraClusterInfo> cdList = CassandraModule.getCommandManager().getCassandraClusterData();
         for (CassandraClusterInfo cluster : cdList) {
@@ -51,6 +52,7 @@ public class CassandraTable extends Table {
         final Item item = container.getItem(itemId);
         item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cd.getUuid());
         item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cd.getName());
+
         Button startButton = new Button("Start");
         startButton.addListener(new Button.ClickListener() {
 
@@ -59,6 +61,7 @@ public class CassandraTable extends Table {
                 manager.startCassandraServices(cd.getNodes());
             }
         });
+
         Button stopButton = new Button("Stop");
         stopButton.addListener(new Button.ClickListener() {
 
@@ -67,20 +70,32 @@ public class CassandraTable extends Table {
                 manager.stopCassandraServices(cd.getNodes());
             }
         });
+
+        Button statusButton = new Button("Status");
+        statusButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                manager.statusCassandraServices(cd.getNodes());
+            }
+        });
+
         Button destroyButton = new Button("Destroy");
         destroyButton.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-
+                manager.purgeCassandraServices(cd.getNodes());
                 if (CassandraModule.getCommandManager().deleteCassandraClusterData(cd.getUuid())) {
-                    container.removeItem(itemId);
+//                    container.removeItem(itemId);
+                    refreshDatasource();
                 }
             }
         });
 
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
+        item.getItemProperty("Status").setValue(statusButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
 

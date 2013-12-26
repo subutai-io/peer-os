@@ -23,13 +23,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author bahadyr
  */
-public class CassandraServiceManager {
+public class ServiceManager {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
     private final TextArea terminal;
 
-    public CassandraServiceManager(TextArea textArea) {
+    public ServiceManager(TextArea textArea) {
         this.terminal = textArea;
     }
 
@@ -59,6 +59,32 @@ public class CassandraServiceManager {
         start();
     }
 
+    public void statusCassandraServices(List<UUID> list) {
+        Task statusTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Cassandra service status check");
+        for (UUID uuid : list) {
+            Command command = CassandraCommands.getServiceCassandraStatusCommand();
+            command.getRequest().setUuid(uuid);
+            command.getRequest().setTaskUuid(statusTask.getUuid());
+            command.getRequest().setRequestSequenceNumber(statusTask.getIncrementedReqSeqNumber());
+            statusTask.addCommand(command);
+        }
+        tasks.add(statusTask);
+        start();
+    }
+
+    public void purgeCassandraServices(List<UUID> list) {
+        Task purgeTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Purge Cassandra");
+        for (UUID uuid : list) {
+            Command command = CassandraCommands.getUninstallCommand();
+            command.getRequest().setUuid(uuid);
+            command.getRequest().setTaskUuid(purgeTask.getUuid());
+            command.getRequest().setRequestSequenceNumber(purgeTask.getIncrementedReqSeqNumber());
+            purgeTask.addCommand(command);
+        }
+        tasks.add(purgeTask);
+        start();
+    }
+
     public void start() {
         moveToNextTask();
         if (currentTask != null) {
@@ -75,12 +101,14 @@ public class CassandraServiceManager {
     public void onResponse(Response response) {
         if (currentTask != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-
             Task task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
             List<ParseResult> list = CassandraModule.getCommandManager().parseTask(task, true);
             task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                    for (ParseResult pr : CassandraModule.getCommandManager().parseTask(task, true)) {
+                        terminal.setValue(terminal.getValue().toString() + "\n" + pr.getResponse().getStdOut());
+                    }
                     terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
                     moveToNextTask();
                     if (currentTask != null) {
@@ -89,7 +117,7 @@ public class CassandraServiceManager {
                             executeCommand(command);
                         }
                     } else {
-                        terminal.setValue(terminal.getValue().toString() + "\nInstallation finished.");
+                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.");
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     terminal.setValue("\n" + task.getDescription() + " failed");

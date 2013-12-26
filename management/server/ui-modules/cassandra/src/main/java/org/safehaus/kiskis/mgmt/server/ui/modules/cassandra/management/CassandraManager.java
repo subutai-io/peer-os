@@ -13,7 +13,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.CassandraServiceManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
@@ -24,9 +24,8 @@ public class CassandraManager {
 
     private final VerticalLayout contentRoot;
     CassandraTable cassandraTable;
-    CassandraServiceManager manager;
+    ServiceManager manager;
     private final TextArea terminal;
-//    public static final String SOURCE = "CASSANDRA_MANAGER";
 
     public CassandraManager() {
 
@@ -45,6 +44,14 @@ public class CassandraManager {
         contentRoot.setMargin(true);
 
         HorizontalLayout buttons = new HorizontalLayout();
+
+        Label clusterNameLabel = new Label("Select the cluster");
+        content.addComponent(clusterNameLabel);
+        terminal = new TextArea();
+        terminal.setRows(10);
+        terminal.setColumns(60);
+        manager = new ServiceManager(terminal);
+        cassandraTable = new CassandraTable(manager);
         Button getClustersBtn = new Button("Get clusters");
         getClustersBtn.addListener(new Button.ClickListener() {
 
@@ -57,14 +64,6 @@ public class CassandraManager {
         buttons.addComponent(new Button("Apply Changes"));
 
         content.addComponent(buttons);
-
-        Label clusterNameLabel = new Label("Select the cluster");
-        content.addComponent(clusterNameLabel);
-        terminal = new TextArea();
-        terminal.setRows(10);
-        terminal.setColumns(60);
-        manager = new CassandraServiceManager(terminal);
-        cassandraTable = new CassandraTable(manager);
         content.addComponent(cassandraTable);
         content.addComponent(terminal);
 
@@ -75,7 +74,9 @@ public class CassandraManager {
     }
 
     public void setOutput(Response response) {
-        manager.onResponse(response);
+        if (manager != null) {
+            manager.onResponse(response);
+        }
     }
 
 }

@@ -18,7 +18,6 @@ import org.osgi.framework.FrameworkUtil;
 public class CassandraModule implements Module {
 
     public static final String MODULE_NAME = "Cassandra";
-
     private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
     private static ModuleComponent component;
 
@@ -50,9 +49,10 @@ public class CassandraModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            if (response.getSource().equals(ResponseDestinationEnum.CASSANDRA_WIZARD)) {
+            if (cassandraWizard != null) {
                 cassandraWizard.setOutput(response);
-            } else if (response.getSource().equals(ResponseDestinationEnum.CASSANDRA_MANAGER)) {
+            }
+            if (cassandraManager != null) {
                 cassandraManager.setOutput(response);
             }
         }
