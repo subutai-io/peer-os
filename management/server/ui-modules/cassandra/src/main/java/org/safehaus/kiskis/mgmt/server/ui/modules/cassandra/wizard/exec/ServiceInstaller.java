@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
+import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,15 +60,15 @@ public class ServiceInstaller {
 
         Task setListenAddressTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set listen addresses");
         for (Agent agent : config.getSelectedAgents()) {
-            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
-//            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
+//            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
+            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
             setListenAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setListenAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(setListenAddressCommand);
 
-            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname() + "." + config.getDomainName());
-//            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getListIP().get(0));
+//            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname() + "." + config.getDomainName());
+            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getListIP().get(0));
             setRpcAddressCommand.getRequest().setUuid(agent.getUuid());
             setRpcAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setRpcAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
@@ -79,8 +80,8 @@ public class ServiceInstaller {
         Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set seeds addresses");
         StringBuilder seedsSB = new StringBuilder();
         for (Agent seed : config.getSeeds()) {
-            seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
-//            seedsSB.append(seed.getListIP().get(0)).append(",");
+//            seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
+            seedsSB.append(seed.getListIP().get(0)).append(",");
         }
         for (Agent agent : config.getSelectedAgents()) {
             Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
@@ -160,6 +161,7 @@ public class ServiceInstaller {
             tasks.add(setSavedCashesDirectoryTask);
         }
     }
+
 
     public void start() {
         terminal.setValue("Cassandra cluster installation started...");

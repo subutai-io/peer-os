@@ -73,7 +73,7 @@ public class StepSeeds extends Panel {
         seedsColSel.setMultiSelect(true);
         seedsColSel.setImmediate(true);
         seedsColSel.setLeftColumnCaption("Available Nodes");
-        seedsColSel.setRightColumnCaption("Config Servers");
+        seedsColSel.setRightColumnCaption("Seeds");
         seedsColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         seedsColSel.setRequired(true);
 
