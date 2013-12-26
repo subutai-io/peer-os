@@ -126,7 +126,7 @@ public class Installer {
             tasks.add(setDataDirectory);
         }
 
-        if (!config.getDataDirectory().isEmpty()) {
+        if (!config.getCommitLogDirectory().isEmpty()) {
             Task setCommitLogDirectoryTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change Commit log directory");
             for (Agent agent : config.getSelectedAgents()) {
                 Command setCommitLogDir = CassandraCommands.getSetCommitLogDirectoryCommand(config.getCommitLogDirectory());
@@ -138,7 +138,7 @@ public class Installer {
             tasks.add(setCommitLogDirectoryTask);
         }
 
-        if (!config.getDataDirectory().isEmpty()) {
+        if (!config.getSavedCachesDirectory().isEmpty()) {
             Task setSavedCashesDirectoryTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change Saved caches directory");
             for (Agent agent : config.getSelectedAgents()) {
                 Command setSavedCachesDir = CassandraCommands.getSetSavedCachesDirectoryCommand(config.getSavedCachesDirectory());
@@ -153,7 +153,8 @@ public class Installer {
     }
 
     public void start() {
-        currentTask = tasks.poll();
+        terminal.setValue("Cassandra cluster installation started...");
+        moveToNextTask();
         if (currentTask != null) {
             for (Command command : currentTask.getCommands()) {
                 executeCommand(command);
@@ -173,14 +174,14 @@ public class Installer {
             List<ParseResult> list = CassandraModule.getCommandManager().parseTask(task, true);
             task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
-                if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
                     moveToNextTask();
                     if (currentTask != null) {
+                        terminal.setValue(terminal.getValue().toString() + "\nRunning next step " + currentTask.getDescription());
                         for (Command command : currentTask.getCommands()) {
                             executeCommand(command);
                         }
-                        terminal.setValue(terminal.getValue().toString() + "\nRunning next step " + task.getDescription());
                     } else {
                         terminal.setValue(terminal.getValue().toString() + "\nInstallation finished");
                         CassandraClusterInfo cci = new CassandraClusterInfo();
@@ -194,7 +195,7 @@ public class Installer {
 
                         CassandraModule.getCommandManager().saveCassandraClusterData(cci);
                     }
-                } else if (task.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
+                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     terminal.setValue("\n" + task.getDescription() + " failed");
                 }
             }
@@ -203,7 +204,7 @@ public class Installer {
     }
 
     private void executeCommand(Command command) {
-        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
+//        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
         CassandraModule.getCommandManager().executeCommand(command);
     }
 
