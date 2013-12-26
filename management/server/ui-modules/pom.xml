@@ -16,9 +16,9 @@
         <module>terminal</module>
         <module>lxc</module>
         <module>hadoop</module>
-        <module>cassandra</module>
         <module>mongodb</module>
-        <module>nutch</module>
+        <module>cassandra</module>
+        <!--        <module>nutch</module>
         <module>solr</module>
         <module>sqoop</module>
         <module>storm</module>
@@ -28,5 +28,7 @@
         <module>hive</module>
         <module>hcatalog</module>
         <module>flume</module>
+        <module>hbase</module> -->
     </modules>
+   
 </project>

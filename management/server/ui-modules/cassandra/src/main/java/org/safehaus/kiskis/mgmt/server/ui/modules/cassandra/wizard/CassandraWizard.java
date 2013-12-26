@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -12,23 +12,23 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
  * @author dilshat
  */
-public class MongoWizard implements ResponseListener {
+public class CassandraWizard {
 
     private static final int MAX_STEPS = 3;
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
-    private final MongoConfig mongoConfig = new MongoConfig();
+    private final CassandraConfig config = new CassandraConfig();
     private final VerticalLayout contentRoot;
-    private Step4 step4;
+//    public static final String SOURCE = "CASSANDRA_WIZARD";
+    private StepFinish stepFinish;
 
-    public MongoWizard() {
+    public CassandraWizard() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -77,13 +77,13 @@ public class MongoWizard implements ResponseListener {
         putForm();
     }
 
-    protected void init() {
+    protected void cancel() {
         step = 1;
         putForm();
     }
 
-    protected MongoConfig getConfig() {
-        return mongoConfig;
+    protected CassandraConfig getConfig() {
+        return config;
     }
 
     private void putForm() {
@@ -91,42 +91,38 @@ public class MongoWizard implements ResponseListener {
         switch (step) {
             case 1: {
                 progressBar.setValue(0f);
-                verticalLayout.addComponent(new Step1(this));
+                verticalLayout.addComponent(new StepStart(this));
                 break;
             }
             case 2: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step2(this));
+                verticalLayout.addComponent(new StepSeeds(this));
                 break;
             }
             case 3: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step3(this));
+                verticalLayout.addComponent(new StepSetDirectories(this));
                 break;
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step4 = new Step4(this);
-                verticalLayout.addComponent(step4);
+                stepFinish = new StepFinish(this);
+                verticalLayout.addComponent(stepFinish);
                 break;
             }
             default: {
+                step = 1;
+                progressBar.setValue(0f);
+                verticalLayout.addComponent(new StepStart(this));
                 break;
             }
         }
     }
 
-    @Override
-    public void onResponse(Response response) {
-        if (step == 4 && step4 != null) {
-            step4.onResponse(response);
+    public void setOutput(Response response) {
+        if (stepFinish != null) {
+            stepFinish.getInstaller().onResponse(response);
         }
-
-    }
-
-    @Override
-    public String getSource() {
-        return getClass().getName();
     }
 
 }

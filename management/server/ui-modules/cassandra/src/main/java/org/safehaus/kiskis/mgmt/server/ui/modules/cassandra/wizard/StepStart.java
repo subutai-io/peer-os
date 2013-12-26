@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -21,27 +21,27 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  */
-public class Step1 extends Panel {
+public class StepStart extends Panel {
 
-    public Step1(final MongoWizard mongoWizard) {
+    public StepStart(final CassandraWizard wizard) {
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
 
         Label welcomeMsg = new Label(
-                "<center><h2>Welcome to Mongo Installation Wizard!</h2><br/>"
+                "<center><h2>Welcome to Cassandra Installation Wizard!</h2><br/>"
                 + "Please select nodes in the tree on the left to continue</center>");
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label(
-                String.format("<img src='http://%s:%s/mongodb-logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
+                String.format("<img src='http://%s:%s/cassandra-logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
-        logoImg.setWidth(150, Sizeable.UNITS_PIXELS);
+        logoImg.setWidth(220, Sizeable.UNITS_PIXELS);
         gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
-        Button next = new Button("Next");
+        Button next = new Button("Start");
         next.setWidth(100, Sizeable.UNITS_PIXELS);
         gridLayout.addComponent(next, 6, 4, 6, 4);
         gridLayout.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
@@ -49,16 +49,13 @@ public class Step1 extends Panel {
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                //TODO                
-                //FILTER SELECTED AGENT AND SELECT ONLY LXC
                 Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
-
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
-                    mongoWizard.getConfig().reset();
-                    mongoWizard.getConfig().setSelectedAgents(selectedAgents);
-                    mongoWizard.next();
+                    wizard.getConfig().reset();
+                    wizard.getConfig().setSelectedAgents(selectedAgents);
+                    wizard.next();
                 }
             }
         });

@@ -5,7 +5,7 @@
         <reference-listener
                 bind-method="setModuleService" unbind-method="unsetModuleService">
             <bean class="org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule">
-                <property name="context" ref="blueprintBundleContext"/>
+                <!--<property name="context" ref="blueprintBundleContext"/>-->
             </bean>
         </reference-listener>
     </reference-list>

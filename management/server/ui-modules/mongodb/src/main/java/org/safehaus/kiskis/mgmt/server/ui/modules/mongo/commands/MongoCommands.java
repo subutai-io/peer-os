@@ -152,6 +152,28 @@ public class MongoCommands {
         req.setTimeout(30);
         return cmd;
     }
+    
+    //execute on primary replica
+    //used for adding shard to existing cluster
+    public static Command getAddSecondaryReplicasToPrimaryExistCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("mongod");
+        req.setArgs(Arrays.asList(
+                "--config",
+                "/etc/mongodb.conf",
+                "&&",
+                "/bin/echo",
+                "-e",
+                ":SECONDARY_REPLICAS",
+                //add each secondary node newline-separated and replace placeholder
+                //e.g.: [\n'rs.add(\":NON_PRIMARY_REPLICA_HOST\")']
+                "|",
+                "mongo"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
 
     //execute on any cluster member
     public static Command getRegisterPrimaryOnRouterCommand() {
@@ -309,5 +331,9 @@ public class MongoCommands {
         req.setTimeout(10);
         return cmd;
     }
+    
+    // RECONFIGURATION COMMANDS
+    
+    
 
 }
