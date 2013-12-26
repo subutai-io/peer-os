@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -9,7 +9,9 @@ import com.vaadin.ui.Table;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
@@ -22,12 +24,13 @@ import java.util.List;
  * Time: 6:56 PM
  */
 public class HadoopClusterTable extends Table {
-    private IndexedContainer container;
 
     static final Action ACTION_NAME_NODE = new Action("Edit name node and data trackers");
     static final Action ACTION_JOB_TRACKER = new Action("Edit job tracker and task trackers");
     static final Action[] ACTIONS = new Action[]{ACTION_NAME_NODE,
             ACTION_JOB_TRACKER};
+
+    private HadoopDataNodesWindow hadoopDataNodesWindow;
 
     public HadoopClusterTable() {
         this.setCaption(" Hadoop Clusters");
@@ -51,9 +54,8 @@ public class HadoopClusterTable extends Table {
             public void handleAction(Action action, Object sender, Object target) {
                 Item item = getItem(target);
                 if (ACTION_NAME_NODE == action) {
-                    getWindow().showNotification(
-                            "Selected cluster NN",
-                            (String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
+                    hadoopDataNodesWindow = new HadoopDataNodesWindow((String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
+                    getApplication().getMainWindow().addWindow(hadoopDataNodesWindow);
                 } else if (ACTION_JOB_TRACKER == action) {
                     getWindow().showNotification(
                             "Selected cluster JB",
@@ -65,7 +67,7 @@ public class HadoopClusterTable extends Table {
     }
 
     private IndexedContainer getContainer() {
-        container = new IndexedContainer();
+        IndexedContainer container = new IndexedContainer();
 
         // Create the container properties
         container.addContainerProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL, String.class, "");
@@ -106,6 +108,12 @@ public class HadoopClusterTable extends Table {
 
     public void refreshDataSource() {
         this.setContainerDataSource(getContainer());
+    }
+
+    public void onCommand(Response response){
+         if(hadoopDataNodesWindow != null && hadoopDataNodesWindow.isVisible()){
+             hadoopDataNodesWindow.onCommand(response);
+         }
     }
 
     public CommandManagerInterface getCommandManager() {

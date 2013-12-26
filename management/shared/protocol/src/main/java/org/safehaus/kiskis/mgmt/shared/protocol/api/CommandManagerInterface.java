@@ -1,10 +1,10 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 10:40 PM
@@ -42,6 +42,8 @@ public interface CommandManagerInterface {
     public List<CassandraClusterInfo> getCassandraClusterData();
 
     public List<HadoopClusterInfo> getHadoopClusterData();
+
+    public HadoopClusterInfo getHadoopClusterData(String clusterName);
 
     public boolean saveHadoopClusterData(HadoopClusterInfo cluster);
 }

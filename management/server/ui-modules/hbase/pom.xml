@@ -9,10 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>cassandra-module</artifactId>
+    <artifactId>hbase-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Cassandra</name>
-    <description>Kiskis Management Cassandra</description>
+    <name>Kiskis Management HBase</name>
+    <description>Kiskis Management HBase</description>
 
     <build>
         <plugins>

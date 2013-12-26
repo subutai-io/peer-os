@@ -2,11 +2,12 @@ package org.safehaus.kiskis.mgmt.server.command;
 
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/7/13 Time: 11:16 PM
@@ -117,6 +117,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
         this.communicationService = communicationService;
     }
 
+    @Override
     public List<Request> getCommands(UUID taskuuid) {
         return persistenceCommand.getRequests(taskuuid);
     }
@@ -126,6 +127,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
         return persistenceCommand.getResponsesCount(taskuuid);
     }
 
+    @Override
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber) {
         Response response = null;
         try {
@@ -135,10 +137,10 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             for (Response r : list) {
                 response = r;
                 if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdOut())) {
-                    stdOut += "\n" + r.getStdOut();
+                    stdOut += r.getStdOut();
                 }
                 if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdErr())) {
-                    stdErr += "\n" + r.getStdErr();
+                    stdErr += r.getStdErr();
                 }
             }
 
@@ -152,26 +154,32 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
         return response;
     }
 
+    @Override
     public void saveResponse(Response response) {
         persistenceCommand.saveResponse(response);
     }
 
+    @Override
     public String saveTask(Task task) {
         return persistenceCommand.saveTask(task);
     }
 
+    @Override
     public List<Task> getTasks() {
         return persistenceCommand.getTasks();
     }
 
+    @Override
     public boolean truncateTables() {
         return persistenceCommand.truncateTables();
     }
 
+    @Override
     public boolean saveCassandraClusterData(CassandraClusterInfo cluster) {
         return persistenceCommand.saveCassandraClusterInfo(cluster);
     }
 
+    @Override
     public List<CassandraClusterInfo> getCassandraClusterData() {
         return persistenceCommand.getCassandraClusterInfo();
     }
@@ -182,10 +190,16 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     }
 
     @Override
+    public HadoopClusterInfo getHadoopClusterData(String clusterName) {
+        return persistenceCommand.getHadoopClusterInfo(clusterName);
+    }
+
+    @Override
     public boolean saveHadoopClusterData(HadoopClusterInfo cluster) {
         return persistenceCommand.saveHadoopClusterInfo(cluster);
     }
 
+    @Override
     public Task getTask(UUID uuid) {
         return persistenceCommand.getTask(uuid);
     }
