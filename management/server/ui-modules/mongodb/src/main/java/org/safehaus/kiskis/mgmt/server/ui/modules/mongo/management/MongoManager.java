@@ -16,12 +16,14 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
  * @author dilshat
  */
-public class MongoManager {
+public class MongoManager implements ResponseListener {
 
     private final VerticalLayout contentRoot;
 
@@ -141,6 +143,14 @@ public class MongoManager {
 
     public Component getContent() {
         return contentRoot;
+    }
+
+    @Override
+    public void onResponse(Response response) {
+    }
+
+    public String getSource() {
+        return getClass().getName();
     }
 
 }

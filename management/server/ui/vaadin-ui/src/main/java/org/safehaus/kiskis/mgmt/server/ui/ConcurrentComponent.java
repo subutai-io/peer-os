@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 
 /**
@@ -27,17 +26,16 @@ public abstract class ConcurrentComponent extends VerticalLayout {
     }
 
     protected void executeUpdate(Runnable update) {
-        Application application = null;
+        Application application;
         synchronized (this) {
             application = getApplication();
             if (application == null) {
                 update.run();
+                return;
             }
         }
-        if (application != null) {
-            synchronized (application) {
-                update.run();
-            }
+        synchronized (application) {
+            update.run();
         }
     }
 }

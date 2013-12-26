@@ -11,12 +11,14 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
  * @author dilshat
  */
-public class MongoWizard {
+public class MongoWizard implements ResponseListener {
 
     private static final int MAX_STEPS = 3;
     private final ProgressIndicator progressBar;
@@ -100,6 +102,15 @@ public class MongoWizard {
                 break;
             }
         }
+    }
+
+    @Override
+    public void onResponse(Response response) {
+
+    }
+
+    public String getSource() {
+        return getClass().getName();
     }
 
 }

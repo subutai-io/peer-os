@@ -44,7 +44,7 @@ public class AgentNotifier implements Runnable {
                         }
                     }
                 }
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in AgentNotifier.run", ex);
             }

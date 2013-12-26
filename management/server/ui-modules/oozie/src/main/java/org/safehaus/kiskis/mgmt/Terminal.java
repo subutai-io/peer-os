@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt;
 
-
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -136,6 +135,11 @@ public class Terminal implements Module {
     @Override
     public Component createComponent() {
         return new ModuleComponent(context);
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     public void setModuleService(ModuleService service) {

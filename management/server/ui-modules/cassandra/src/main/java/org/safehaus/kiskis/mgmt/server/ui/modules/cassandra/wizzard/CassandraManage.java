@@ -9,9 +9,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule.getCommandManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.component.CassandraTable;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 /**
  *
@@ -40,7 +41,7 @@ public class CassandraManage {
         verticalLayout.setSizeFull();
 
         // Create table
-        cassandraTable = new CassandraTable(getCommandManager());
+        cassandraTable = new CassandraTable(ServiceLocator.getService(CommandManagerInterface.class));
         cassandraTable.setPageLength(6);
 
         verticalLayout.addComponent(cassandraTable);

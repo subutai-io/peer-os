@@ -4,9 +4,6 @@ import com.google.common.base.Strings;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 //import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
@@ -16,7 +13,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -413,50 +409,39 @@ public class Terminal implements Module {
 
     @Override
     public Component createComponent() {
-        CommandManagerInterface commandManagerInterface = getCommandManager();
-        component = new ModuleComponent(commandManagerInterface);
-        commandManagerInterface.addListener(component);
-
+        try {
+            component = new ModuleComponent(ServiceLocator.getService(CommandManagerInterface.class));
+            ServiceLocator.getService(CommandManagerInterface.class).addListener(component);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in createComponent", e);
+        }
         return component;
     }
 
+    @Override
+    public void dispose() {
+        try {
+            ServiceLocator.getService(CommandManagerInterface.class).removeListener(component);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in dispose", e);
+        }
+    }
+
     public void setModuleService(ModuleService service) {
-        LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
-        service.registerModule(this);
+        if (service != null) {
+            LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
+            service.registerModule(this);
+        }
     }
 
     public void unsetModuleService(ModuleService service) {
-        LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
-        service.unregisterModule(this);
-
-        if (getCommandManager() != null) {
-            getCommandManager().removeListener(component);
+        if (service != null) {
+            service.unregisterModule(this);
+            LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
         }
-    }
-
-    public static CommandManagerInterface getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(Terminal.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
-            if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
     }
 
     public static AgentManagerInterface getAgentManager() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(Terminal.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
-            if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
+        return ServiceLocator.getService(AgentManagerInterface.class);
     }
 }

@@ -7,9 +7,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraManage;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizzard.CassandraWizard;
@@ -17,6 +14,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
@@ -36,7 +34,7 @@ public class CassandraModule implements Module {
 //        private CassandraTable cassandraTable;
 //        private final TextArea terminal;
 
-        public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
+        public ModuleComponent() {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -101,7 +99,6 @@ public class CassandraModule implements Module {
 //
 //            return list;
 //        }
-
         @Override
         public void onCommand(Response response) {
             try {
@@ -135,7 +132,7 @@ public class CassandraModule implements Module {
         }
 
         public Iterable<Agent> getLxcList() {
-           return MgmtApplication.getSelectedAgents();
+            return MgmtApplication.getSelectedAgents();
         }
     }
 
@@ -146,34 +143,36 @@ public class CassandraModule implements Module {
 
     @Override
     public Component createComponent() {
-        CommandManagerInterface commandManagerInterface = getCommandManager();
-        component = new ModuleComponent(commandManagerInterface);
-        commandManagerInterface.addListener(component);
-
+        try {
+            component = new ModuleComponent();
+            ServiceLocator.getService(CommandManagerInterface.class).addListener(component);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in createComponent", e);
+        }
         return component;
     }
 
+    @Override
+    public void dispose() {
+        try {
+            ServiceLocator.getService(CommandManagerInterface.class).removeListener(component);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in dispose", e);
+        }
+    }
+
     public void setModuleService(ModuleService service) {
-        LOG.log(Level.INFO, "CassandraModule: registering with ModuleService");
-        service.registerModule(this);
+        if (service != null) {
+            LOG.log(Level.INFO, "{0} registering with ModuleService", MODULE_NAME);
+            service.registerModule(this);
+        }
     }
 
     public void unsetModuleService(ModuleService service) {
-        if (getCommandManager() != null) {
-            getCommandManager().removeListener(component);
+        if (service != null) {
             service.unregisterModule(this);
+            LOG.log(Level.INFO, "{0} Unregistering with ModuleService", MODULE_NAME);
         }
     }
 
-    public static CommandManagerInterface getCommandManager() {
-        BundleContext ctx = FrameworkUtil.getBundle(CassandraModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
-            if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
-    }
 }
