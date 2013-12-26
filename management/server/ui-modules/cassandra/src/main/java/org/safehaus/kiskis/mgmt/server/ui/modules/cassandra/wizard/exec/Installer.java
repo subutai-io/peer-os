@@ -58,15 +58,15 @@ public class Installer {
 
         Task setListenAddressTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set listen addresses");
         for (Agent agent : config.getSelectedAgents()) {
-//            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
-            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
+            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
+//            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
             setListenAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setListenAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(setListenAddressCommand);
 
-//            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname() + "." + config.getDomainName());
-            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getListIP().get(0));
+            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname() + "." + config.getDomainName());
+//            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getListIP().get(0));
             setRpcAddressCommand.getRequest().setUuid(agent.getUuid());
             setRpcAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setRpcAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
@@ -78,8 +78,8 @@ public class Installer {
         Task setSeedsTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set seeds addresses");
         StringBuilder seedsSB = new StringBuilder();
         for (Agent seed : config.getSeeds()) {
-//                seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
-            seedsSB.append(seed.getListIP().get(0)).append(",");
+            seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
+//            seedsSB.append(seed.getListIP().get(0)).append(",");
         }
         for (Agent agent : config.getSelectedAgents()) {
             Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
