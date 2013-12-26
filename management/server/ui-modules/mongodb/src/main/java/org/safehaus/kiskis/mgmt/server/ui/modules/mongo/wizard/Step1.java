@@ -25,26 +25,26 @@ public class Step1 extends Panel {
 
     public Step1(final MongoWizard mongoWizard) {
 
-        GridLayout gridLayout = new GridLayout(10, 6);
-        gridLayout.setSizeFull();
+        GridLayout grid = new GridLayout(10, 6);
+        grid.setSizeFull();
 
         Label welcomeMsg = new Label(
                 "<center><h2>Welcome to Mongo Installation Wizard!</h2><br/>"
                 + "Please select nodes in the tree on the left to continue</center>");
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
-        gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
+        grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label(
                 String.format("<img src='http://%s:%s/mongodb-logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
         logoImg.setWidth(150, Sizeable.UNITS_PIXELS);
-        gridLayout.addComponent(logoImg, 1, 3, 2, 5);
+        grid.addComponent(logoImg, 1, 3, 2, 5);
 
-        Button next = new Button("Next");
+        Button next = new Button("Start");
         next.setWidth(100, Sizeable.UNITS_PIXELS);
-        gridLayout.addComponent(next, 6, 4, 6, 4);
-        gridLayout.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
+        grid.addComponent(next, 6, 4, 6, 4);
+        grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
         next.addListener(new Button.ClickListener() {
             @Override
@@ -63,7 +63,7 @@ public class Step1 extends Panel {
             }
         });
 
-        addComponent(gridLayout);
+        addComponent(grid);
     }
 
     private void show(String notification) {

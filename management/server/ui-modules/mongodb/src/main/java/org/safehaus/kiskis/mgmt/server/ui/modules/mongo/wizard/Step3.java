@@ -29,10 +29,10 @@ public class Step3 extends Panel {
 
     public Step3(final MongoWizard mongoWizard) {
 
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        verticalLayout.setMargin(true);
+        VerticalLayout content = new VerticalLayout();
+        content.setSizeFull();
+        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        content.setMargin(true);
 
         GridLayout grid = new GridLayout(10, 10);
         grid.setSpacing(true);
@@ -48,21 +48,21 @@ public class Step3 extends Panel {
         grid.addComponent(menu, 0, 0, 2, 1);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        VerticalLayout verticalLayoutForm = new VerticalLayout();
-        verticalLayoutForm.setSizeFull();
-        verticalLayoutForm.setSpacing(true);
+        VerticalLayout mainContent = new VerticalLayout();
+        mainContent.setSizeFull();
+        mainContent.setSpacing(true);
 
         final TextField replicaNameTxtFld = new TextField("Enter Replica Set name");
         replicaNameTxtFld.setInputPrompt("Replica Set name");
         replicaNameTxtFld.setRequired(true);
         replicaNameTxtFld.setMaxLength(20);
 
-        verticalLayoutForm.addComponent(replicaNameTxtFld);
+        mainContent.addComponent(replicaNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as shards<br>"
                 + "(Recommended odd number of servers, provide at least 1)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(configServersLabel);
+        mainContent.addComponent(configServersLabel);
 
         final TwinColSelect shardsColSel = new TwinColSelect("", new ArrayList<Agent>());
         shardsColSel.setItemCaptionPropertyId("hostname");
@@ -75,10 +75,10 @@ public class Step3 extends Panel {
         shardsColSel.setRightColumnCaption("Shards");
         shardsColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
 
-        verticalLayoutForm.addComponent(shardsColSel);
+        mainContent.addComponent(shardsColSel);
 
-        grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
-        grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
+        grid.addComponent(mainContent, 3, 0, 9, 9);
+        grid.setComponentAlignment(mainContent, Alignment.TOP_CENTER);
 
         Button back = new Button("Back");
         back.addListener(new Button.ClickListener() {
@@ -109,14 +109,14 @@ public class Step3 extends Panel {
             }
         });
 
-        verticalLayout.addComponent(grid);
+        content.addComponent(grid);
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.addComponent(back);
-        horizontalLayout.addComponent(next);
-        verticalLayout.addComponent(horizontalLayout);
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(back);
+        buttons.addComponent(next);
+        content.addComponent(buttons);
 
-        addComponent(verticalLayout);
+        addComponent(content);
 
         shardsColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(

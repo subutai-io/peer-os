@@ -29,10 +29,10 @@ public class Step2 extends Panel {
 
     public Step2(final MongoWizard mongoWizard) {
 
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        verticalLayout.setMargin(true);
+        VerticalLayout content = new VerticalLayout();
+        content.setSizeFull();
+        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        content.setMargin(true);
 
         GridLayout grid = new GridLayout(10, 10);
         grid.setSpacing(true);
@@ -48,21 +48,21 @@ public class Step2 extends Panel {
         grid.addComponent(menu, 0, 0, 2, 1);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-        VerticalLayout verticalLayoutForm = new VerticalLayout();
-        verticalLayoutForm.setSizeFull();
-        verticalLayoutForm.setSpacing(true);
+        VerticalLayout mainContent = new VerticalLayout();
+        mainContent.setSizeFull();
+        mainContent.setSpacing(true);
 
         final TextField clusterNameTxtFld = new TextField("Enter cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength(20);
 
-        verticalLayoutForm.addComponent(clusterNameTxtFld);
+        mainContent.addComponent(clusterNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as config servers<br>"
                 + "(Recommended 3 servers)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(configServersLabel);
+        mainContent.addComponent(configServersLabel);
 
         final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
         configServersColSel.setItemCaptionPropertyId("hostname");
@@ -75,12 +75,12 @@ public class Step2 extends Panel {
         configServersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         configServersColSel.setRequired(true);
 
-        verticalLayoutForm.addComponent(configServersColSel);
+        mainContent.addComponent(configServersColSel);
 
         Label routersLabel = new Label("<strong>Choose hosts that will act as routers<br>"
                 + "(Provide at least 2 servers)</strong>");
         routersLabel.setContentMode(Label.CONTENT_XHTML);
-        verticalLayoutForm.addComponent(routersLabel);
+        mainContent.addComponent(routersLabel);
 
         final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         routersColSel.setItemCaptionPropertyId("hostname");
@@ -93,10 +93,10 @@ public class Step2 extends Panel {
         routersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         routersColSel.setRequired(true);
 
-        verticalLayoutForm.addComponent(routersColSel);
+        mainContent.addComponent(routersColSel);
 
-        grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
-        grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
+        grid.addComponent(mainContent, 3, 0, 9, 9);
+        grid.setComponentAlignment(mainContent, Alignment.TOP_CENTER);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -127,14 +127,14 @@ public class Step2 extends Panel {
             }
         });
 
-        verticalLayout.addComponent(grid);
+        content.addComponent(grid);
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.addComponent(back);
-        horizontalLayout.addComponent(next);
-        verticalLayout.addComponent(horizontalLayout);
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(back);
+        buttons.addComponent(next);
+        content.addComponent(buttons);
 
-        addComponent(verticalLayout);
+        addComponent(content);
 
         routersColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(

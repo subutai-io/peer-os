@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands;
 
 import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
@@ -24,7 +24,7 @@ public class MongoCommands {
         return (Command) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
-                MongoModule.MODULE_NAME, //     source
+                null, //                        !! source
                 null, //                        !! task uuid 
                 1, //                           !! request sequence number
                 "/", //                         cwd
@@ -152,7 +152,7 @@ public class MongoCommands {
         req.setTimeout(30);
         return cmd;
     }
-    
+
     //execute on primary replica
     //used for adding shard to existing cluster
     public static Command getAddSecondaryReplicasToPrimaryExistCommand() {
@@ -207,7 +207,7 @@ public class MongoCommands {
                 "--dbpath",
                 "/data/configdb",
                 "--port",
-                ":CONFIG_SERVER_PORT" // this might be user-supplied
+                Constants.MONGO_CONFIG_SERVER_PORT + "" // this might be user-supplied
         ));
         req.setTimeout(180);
         return cmd;
@@ -219,7 +219,7 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("mongos");
         req.setArgs(Arrays.asList(
-                "--configdb :REPLICAS"
+                "--configdb"
         //add config servers (with ports) based on user selection, comma-separated
         //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
         //and replace placeholder
@@ -331,9 +331,6 @@ public class MongoCommands {
         req.setTimeout(10);
         return cmd;
     }
-    
-    // RECONFIGURATION COMMANDS
-    
-    
 
+    // RECONFIGURATION COMMANDS
 }
