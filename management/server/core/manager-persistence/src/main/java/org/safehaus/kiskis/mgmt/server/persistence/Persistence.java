@@ -756,7 +756,7 @@ public class Persistence implements PersistenceInterface {
             String cql = "delete from cassandra_cluster_info where uid = ?";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            session.execute(boundStatement.bind(uuid));
+            session.executeAsync(boundStatement.bind(uuid));
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
