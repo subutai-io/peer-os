@@ -10,22 +10,15 @@ import com.vaadin.ui.Window;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-
-import java.util.List;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
@@ -161,7 +154,7 @@ public class NodesWindow extends Window {
 
     public void setOutput(Response response) {
         System.out.println("setoutput" + response.getTaskUuid());
-        for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(task, true)) {
+        for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true)) {
             terminal.setValue(pr.getResponse().getStdOut());
         }
     }

@@ -420,6 +420,15 @@ public class Terminal implements Module {
         return component;
     }
 
+    @Override
+    public void dispose() {
+        try {
+            ServiceLocator.getService(CommandManagerInterface.class).removeListener(component);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in dispose", e);
+        }
+    }
+
     public void setModuleService(ModuleService service) {
         LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
         service.registerModule(this);
