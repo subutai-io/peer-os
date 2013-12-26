@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.management;
 
-import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -49,11 +48,6 @@ public class MongoManager implements ResponseListener {
         clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.setItemCaptionPropertyId("cluster name");
-        clusterCombo.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-            }
-        });
         content.addComponent(clusterCombo);
 
         Table routersTable = new Table("Query Routers");
@@ -101,16 +95,8 @@ public class MongoManager implements ResponseListener {
         Label replicaSetLabel = new Label("Select the replica set");
         content.addComponent(replicaSetLabel);
 
-        ComboBox replicaCombo = new ComboBox("Replica", new ArrayList<Object>());
-        replicaCombo.setMultiSelect(false);
-        replicaCombo.setImmediate(true);
-        replicaCombo.setItemCaptionPropertyId("replica set");
-        replicaCombo.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-            }
-        });
-        content.addComponent(replicaCombo);
+        Label replicaNameLabel = new Label("Replica: rs0");
+        content.addComponent(replicaNameLabel);
 
         Table shardsTable = new Table("Shards");
         shardsTable.addContainerProperty("Host", String.class, null);
@@ -149,6 +135,7 @@ public class MongoManager implements ResponseListener {
     public void onResponse(Response response) {
     }
 
+    @Override
     public String getSource() {
         return getClass().getName();
     }
