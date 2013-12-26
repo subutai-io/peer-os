@@ -37,7 +37,7 @@ public final class HadoopWizard extends Window {
         GridLayout gridLayout = new GridLayout(1, 15);
         gridLayout.setSpacing(true);
         gridLayout.setMargin(false, true, false, true);
-        gridLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        gridLayout.setHeight(600, Sizeable.UNITS_PIXELS);
         gridLayout.setWidth(900, Sizeable.UNITS_PIXELS);
 
         progressBar = new ProgressIndicator();

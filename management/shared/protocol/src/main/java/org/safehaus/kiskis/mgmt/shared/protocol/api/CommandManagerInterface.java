@@ -23,7 +23,7 @@ public interface CommandManagerInterface {
 
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber);
 
-    public List<ParseResult> parseTask(Task task, boolean isResponseDone);
+    public List<ParseResult> parseTask(UUID taskUuid, boolean isResponseDone);
 
     public void saveResponse(Response response);
 

@@ -1,23 +1,27 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
 import com.google.common.base.Strings;
-
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 
 public class Terminal implements Module {
 
@@ -121,7 +125,7 @@ public class Terminal implements Module {
         @Override
         public void onCommand(Response response) {
             if (task != null && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
-                List<ParseResult> result = commandManagerInterface.parseTask(task, false);
+                List<ParseResult> result = commandManagerInterface.parseTask(response.getTaskUuid(), false);
                 StringBuilder sb = new StringBuilder();
                 for (ParseResult parseResult : result) {
                     if (parseResult.getResponse() != null) {
@@ -409,12 +413,10 @@ public class Terminal implements Module {
 
     @Override
     public Component createComponent() {
-        try {
-            component = new ModuleComponent(ServiceLocator.getService(CommandManagerInterface.class));
-            ServiceLocator.getService(CommandManagerInterface.class).addListener(component);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in createComponent", e);
-        }
+        CommandManagerInterface commandManagerInterface = getCommandManager();
+        component = new ModuleComponent(commandManagerInterface);
+        commandManagerInterface.addListener(component);
+
         return component;
     }
 
@@ -428,20 +430,42 @@ public class Terminal implements Module {
     }
 
     public void setModuleService(ModuleService service) {
-        if (service != null) {
-            LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
-            service.registerModule(this);
-        }
+        LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
+        service.registerModule(this);
     }
 
     public void unsetModuleService(ModuleService service) {
-        if (service != null) {
-            service.unregisterModule(this);
-            LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
+        LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
+        service.unregisterModule(this);
+
+        if (getCommandManager() != null) {
+            getCommandManager().removeListener(component);
         }
     }
 
+    public static CommandManagerInterface getCommandManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(Terminal.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
+    }
+
     public static AgentManagerInterface getAgentManager() {
-        return ServiceLocator.getService(AgentManagerInterface.class);
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(Terminal.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 }

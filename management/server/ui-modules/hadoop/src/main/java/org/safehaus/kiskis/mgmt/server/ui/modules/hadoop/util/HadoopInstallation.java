@@ -37,208 +37,296 @@ public class HadoopInstallation {
     private List<String> keys;
 
     private CommandManagerInterface commandManager;
+    private Step3 panel;
 
     public HadoopInstallation(CommandManagerInterface commandManagerInterface) {
         this.commandManager = commandManagerInterface;
+
+        hadoopInstallationTask = null;
+        hadoopConfigureTask = null;
+        hadoopSNameNodeTask = null;
+        hadoopSlaveNameNode = null;
+        hadoopSlaveJobTracker = null;
+        hadoopSetSSH = null;
+        hadoopSSHMaster = null;
+        hadoopCopySSHSlaves = null;
+        hadoopConfigMasterSSH = null;
+        hadoopFormatMaster = null;
+    }
+
+    public void setPanel(Step3 step) {
+        this.panel = step;
     }
 
     public void installHadoop() {
         setCluster();
-        hadoopInstallationTask = RequestUtil.createTask(commandManager, "Setup Hadoop cluster");
+        if (hadoopInstallationTask == null) {
+            hadoopInstallationTask = RequestUtil.createTask(commandManager, "Setup Hadoop cluster");
+            panel.addOutput(hadoopInstallationTask, " started...");
 
-        for (Agent agent : allNodes) {
-            if (agent != null) {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", agent.getUuid().toString());
+            for (Agent agent : allNodes) {
+                if (agent != null) {
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    map.put(":source", HadoopModule.MODULE_NAME);
+                    map.put(":uuid", agent.getUuid().toString());
 
-                RequestUtil.createRequest(commandManager, HadoopCommands.INSTALL_HADOOP, hadoopInstallationTask, map);
+                    RequestUtil.createRequest(commandManager, HadoopCommands.INSTALL_DEB, hadoopInstallationTask, map);
+                }
             }
         }
     }
 
     public void configureHadoop() {
-        hadoopConfigureTask = RequestUtil.createTask(commandManager, "Configure Hadoop cluster");
+        if (hadoopConfigureTask == null) {
+            hadoopConfigureTask = RequestUtil.createTask(commandManager, "Configure Hadoop cluster");
+            panel.addOutput(hadoopConfigureTask, " started...");
 
-        for (Agent agent : allNodes) {
-            if (agent != null) {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", agent.getUuid().toString());
+            for (Agent agent : allNodes) {
+                if (agent != null) {
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    map.put(":source", HadoopModule.MODULE_NAME);
+                    map.put(":uuid", agent.getUuid().toString());
 
-                map.put(":namenode", nameNode.getListIP().get(0));
-                map.put(":jobtracker", jobTracker.getListIP().get(0));
-                map.put(":replicationfactor", replicationFactor.toString());
+                    map.put(":namenode", nameNode.getListIP().get(0));
+                    map.put(":jobtracker", jobTracker.getListIP().get(0));
+                    map.put(":replicationfactor", replicationFactor.toString());
 
-                RequestUtil.createRequest(commandManager, HadoopCommands.CONFIGURE_SLAVES, hadoopConfigureTask, map);
+                    RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTERS, hadoopConfigureTask, map);
+                }
             }
         }
     }
 
     public void configureSNameNode() {
-        hadoopSNameNodeTask = RequestUtil.createTask(commandManager, "Configure Hadoop secondary name node");
+        if (hadoopSNameNodeTask == null) {
+            hadoopSNameNodeTask = RequestUtil.createTask(commandManager, "Configure Hadoop secondary name node");
+            panel.addOutput(hadoopSNameNodeTask, " started...");
 
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", nameNode.getUuid().toString());
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", nameNode.getUuid().toString());
 
-        RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_SECONDARY_NAME_NODE, hadoopSNameNodeTask, map);
+            RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_MASTER, hadoopSNameNodeTask, map);
 
-        map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", nameNode.getUuid().toString());
+            map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", nameNode.getUuid().toString());
 
-        map.put(":secondarynamenode", sNameNode.getListIP().get(0));
+            map.put(":secondarynamenode", sNameNode.getListIP().get(0));
 
-        RequestUtil.createRequest(commandManager, HadoopCommands.SET_SECONDARY_NAME_NODE, hadoopSNameNodeTask, map);
+            RequestUtil.createRequest(commandManager, HadoopCommands.SET_SECONDARY_NAME_NODE, hadoopSNameNodeTask, map);
+        }
     }
 
     public void setSlaveNameNode() {
-        hadoopSlaveNameNode = RequestUtil.createTask(commandManager, "Set Hadoop slave name nodes");
+        if (hadoopSlaveNameNode == null) {
+            hadoopSlaveNameNode = RequestUtil.createTask(commandManager, "Set Hadoop slave name nodes");
+            panel.addOutput(hadoopSlaveNameNode, " started...");
 
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", nameNode.getUuid().toString());
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", nameNode.getUuid().toString());
 
-        RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_SLAVES_NAME_NODE, hadoopSlaveNameNode, map);
+            RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_SLAVES, hadoopSlaveNameNode, map);
 
-        for (Agent agent : allSlaveNodes) {
-            if (agent != null) {
-                map = new HashMap<String, String>();
-                map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", nameNode.getUuid().toString());
+            for (Agent agent : dataNodes) {
+                if (agent != null) {
+                    map = new HashMap<String, String>();
+                    map.put(":source", HadoopModule.MODULE_NAME);
+                    map.put(":uuid", nameNode.getUuid().toString());
 
-                map.put(":slave-hostname", agent.getListIP().get(0));
+                    map.put(":slave-hostname", agent.getListIP().get(0));
 
-                RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES_NAME_NODE, hadoopSlaveNameNode, map);
+                    RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES, hadoopSlaveNameNode, map);
+                }
             }
         }
+
     }
 
     public void setSlaveJobTracker() {
-        hadoopSlaveJobTracker = RequestUtil.createTask(commandManager, "Set Hadoop slave job tracker");
+        if (hadoopSlaveJobTracker == null) {
+            hadoopSlaveJobTracker = RequestUtil.createTask(commandManager, "Set Hadoop slave job tracker");
+            panel.addOutput(hadoopSlaveJobTracker, " started...");
 
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", jobTracker.getUuid().toString());
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", jobTracker.getUuid().toString());
 
-        RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_SLAVES_JOB_TRACKER, hadoopSlaveJobTracker, map);
+            RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_SLAVES, hadoopSlaveJobTracker, map);
 
-        for (Agent agent : allSlaveNodes) {
-            if (agent != null) {
+            for (Agent agent : taskTrackers) {
+                if (agent != null) {
 
-                map = new HashMap<String, String>();
-                map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", jobTracker.getUuid().toString());
+                    map = new HashMap<String, String>();
+                    map.put(":source", HadoopModule.MODULE_NAME);
+                    map.put(":uuid", jobTracker.getUuid().toString());
 
-                map.put(":slave-hostname", agent.getListIP().get(0));
+                    map.put(":slave-hostname", agent.getListIP().get(0));
 
-                RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES_JOB_TRACKER, hadoopSlaveJobTracker, map);
+                    RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES, hadoopSlaveJobTracker, map);
+                }
             }
         }
+
     }
 
     public void setSSH() {
-        hadoopSetSSH = RequestUtil.createTask(commandManager, "Set Hadoop configure SSH");
+        if (hadoopSetSSH == null) {
+            hadoopSetSSH = RequestUtil.createTask(commandManager, "Set Hadoop configure SSH");
+            panel.addOutput(hadoopSetSSH, " started...");
 
-        for (Agent agent : allNodes) {
-            if (agent != null) {
-                HashMap<String, String> map = new HashMap<String, String>();
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", nameNode.getUuid().toString());
+            RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_KEY, hadoopSetSSH, map);
+
+            if (!nameNode.equals(sNameNode)) {
+                map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", agent.getUuid().toString());
+                map.put(":uuid", sNameNode.getUuid().toString());
+                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_KEY, hadoopSetSSH, map);
+            }
 
-                RequestUtil.createRequest(commandManager, HadoopCommands.SET_SSH_MASTERS, hadoopSetSSH, map);
+            if (!jobTracker.equals(nameNode) && !jobTracker.equals(sNameNode)) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", jobTracker.getUuid().toString());
+                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_KEY, hadoopSetSSH, map);
             }
         }
+
     }
 
     public void setSSHMaster() {
-        hadoopSSHMaster = RequestUtil.createTask(commandManager, "Set Hadoop SSH master");
+        if (hadoopSSHMaster == null) {
+            hadoopSSHMaster = RequestUtil.createTask(commandManager, "Set Hadoop SSH master");
+            panel.addOutput(hadoopSSHMaster, " started...");
 
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", nameNode.getUuid().toString());
-        RequestUtil.createRequest(commandManager, HadoopCommands.COPY_SSH_MASTERS, hadoopSSHMaster, map);
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", nameNode.getUuid().toString());
+            RequestUtil.createRequest(commandManager, HadoopCommands.COPY_MASTER_KEY, hadoopSSHMaster, map);
 
-        map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", sNameNode.getUuid().toString());
-        RequestUtil.createRequest(commandManager, HadoopCommands.COPY_SSH_MASTERS, hadoopSSHMaster, map);
+            if (!nameNode.equals(sNameNode)) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", sNameNode.getUuid().toString());
+                RequestUtil.createRequest(commandManager, HadoopCommands.COPY_MASTER_KEY, hadoopSSHMaster, map);
+            }
 
-        map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", jobTracker.getUuid().toString());
-        RequestUtil.createRequest(commandManager, HadoopCommands.COPY_SSH_MASTERS, hadoopSSHMaster, map);
+            if (!jobTracker.equals(nameNode) && !jobTracker.equals(sNameNode)) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", jobTracker.getUuid().toString());
+                RequestUtil.createRequest(commandManager, HadoopCommands.COPY_MASTER_KEY, hadoopSSHMaster, map);
+            }
+        }
+
     }
 
     public void copySSHSlaves() {
-        hadoopCopySSHSlaves = RequestUtil.createTask(commandManager, "Copy Hadoop SSH key to slaves");
+        if (hadoopCopySSHSlaves == null) {
+            hadoopCopySSHSlaves = RequestUtil.createTask(commandManager, "Copy Hadoop SSH key to slaves");
+            panel.addOutput(hadoopCopySSHSlaves, " started...");
 
-        if (keys != null && !keys.isEmpty()) {
-            for (Agent agent : allNodes) {
-                if (agent != null) {
-                    for (String key : keys) {
-                        HashMap<String, String> map = new HashMap<String, String>();
-                        map.put(":source", HadoopModule.MODULE_NAME);
-                        map.put(":uuid", agent.getUuid().toString());
+            if (keys != null && !keys.isEmpty()) {
+                for (Agent agent : allNodes) {
+                    if (agent != null) {
+                        for (String key : keys) {
+                            HashMap<String, String> map = new HashMap<String, String>();
+                            map.put(":source", HadoopModule.MODULE_NAME);
+                            map.put(":uuid", agent.getUuid().toString());
 
-                        map.put(":PUB_KEY", key);
+                            map.put(":PUB_KEY", key);
 
-                        RequestUtil.createRequest(commandManager, HadoopCommands.COPY_SSH_SLAVES, hadoopCopySSHSlaves, map);
+                            RequestUtil.createRequest(commandManager, HadoopCommands.PASTE_MASTER_KEY, hadoopCopySSHSlaves, map);
+                        }
                     }
                 }
             }
         }
+
     }
 
     public void configSSHMaster() {
-        hadoopConfigMasterSSH = RequestUtil.createTask(commandManager, "Config SSH Masters");
+        if (hadoopConfigMasterSSH == null) {
+            hadoopConfigMasterSSH = RequestUtil.createTask(commandManager, "Config SSH Masters");
+            panel.addOutput(hadoopConfigMasterSSH, " started...");
 
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", nameNode.getUuid().toString());
-        RequestUtil.createRequest(commandManager, HadoopCommands.CONFIG_SSH_MASTER, hadoopConfigMasterSSH, map);
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", nameNode.getUuid().toString());
+            RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
 
-        map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", sNameNode.getUuid().toString());
-        RequestUtil.createRequest(commandManager, HadoopCommands.CONFIG_SSH_MASTER, hadoopConfigMasterSSH, map);
+            if (!nameNode.equals(sNameNode)) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", sNameNode.getUuid().toString());
+                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
+            }
 
-        map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", jobTracker.getUuid().toString());
-        RequestUtil.createRequest(commandManager, HadoopCommands.CONFIG_SSH_MASTER, hadoopConfigMasterSSH, map);
+            if (!jobTracker.equals(nameNode) && !jobTracker.equals(sNameNode)) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", jobTracker.getUuid().toString());
+                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
+            }
+        }
+
     }
 
     public void formatMaster() {
-        hadoopFormatMaster = RequestUtil.createTask(commandManager, "Format name node");
+        if (hadoopFormatMaster == null) {
+            hadoopFormatMaster = RequestUtil.createTask(commandManager, "Format name node");
+            panel.addOutput(hadoopFormatMaster, " started...");
 
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", nameNode.getUuid().toString());
-        RequestUtil.createRequest(commandManager, HadoopCommands.FORMAT_NAME_NODE, hadoopFormatMaster, map);
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", nameNode.getUuid().toString());
+            RequestUtil.createRequest(commandManager, HadoopCommands.FORMAT_NAME_NODE, hadoopFormatMaster, map);
 
-        System.out.println(cluster);
-        commandManager.saveHadoopClusterData(cluster);
+            System.out.println(cluster);
+            commandManager.saveHadoopClusterData(cluster);
+        }
+
     }
 
     public void onCommand(Response response, Step3 panel) {
+        List<ParseResult> list = commandManager.parseTask(response.getTaskUuid(), true);
         Task task = commandManager.getTask(response.getTaskUuid());
-        List<ParseResult> list = commandManager.parseTask(task, true);
-        task = commandManager.getTask(response.getTaskUuid());
-        if (!list.isEmpty() && panel != null) {
+        int count = commandManager.getResponseCount(task.getUuid());
+        if (!list.isEmpty() && panel != null && list.size() == count) {
             if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-                panel.addOutput(task, " successfully finished.");
+                if (task.equals(hadoopInstallationTask)) {
+                    configureHadoop();
+                } else if (task.equals(hadoopConfigureTask)) {
+                    configureSNameNode();
+                } else if (task.equals(hadoopSNameNodeTask)) {
+                    setSlaveNameNode();
+                } else if (task.equals(hadoopSlaveNameNode)) {
+                    setSlaveJobTracker();
+                } else if (task.equals(hadoopSlaveJobTracker)) {
+                    setSSH();
+                } else if (task.equals(hadoopSetSSH)) {
+                    setSSHMaster();
+                } else if (task.equals(hadoopSSHMaster)) {
+                    keys = new ArrayList<String>();
+                    for (ParseResult pr : list) {
+                        keys.add(pr.getResponse().getStdOut().trim());
+                    }
+                    copySSHSlaves();
+                } else if (task.equals(hadoopCopySSHSlaves)) {
+                    configSSHMaster();
+                } else if (task.equals(hadoopConfigMasterSSH)) {
+                    formatMaster();
+                } else if (task.equals(hadoopFormatMaster)) {
+                    panel.setCloseable();
+                }
             } else if (task.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
                 panel.addOutput(task, " failed.\n" +
                         "Details: " + getResponseError(list));
-            }
-
-            if (hadoopSSHMaster != null && hadoopSSHMaster.equals(task)) {
-                keys = new ArrayList<String>();
-                for (ParseResult pr : list) {
-                    keys.add(pr.getResponse().getStdOut().trim());
-                }
+                panel.setCloseable();
             }
         }
     }

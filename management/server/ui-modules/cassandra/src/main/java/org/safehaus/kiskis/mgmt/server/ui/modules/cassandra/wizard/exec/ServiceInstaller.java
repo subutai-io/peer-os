@@ -6,21 +6,15 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
 import com.vaadin.ui.TextArea;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraConfig;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraConfig;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
-import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
@@ -179,9 +173,8 @@ public class ServiceInstaller {
         if (currentTask != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
 
+            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true);
             Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
-            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(task, true);
-            task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
