@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 public class CassandraModule implements Module {
 
     public static final String MODULE_NAME = "Cassandra";
-
     private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
     private static ModuleComponent component;
 
@@ -63,7 +62,12 @@ public class CassandraModule implements Module {
 //        }
         @Override
         public void onCommand(Response response) {
-            cassandraWizard.setOutput(response);
+            if (cassandraWizard != null) {
+                cassandraWizard.setOutput(response);
+            }
+            if (cassandraManager != null) {
+                cassandraManager.setOutput(response);
+            }
         }
 
         @Override

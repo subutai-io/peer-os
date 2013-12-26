@@ -17,6 +17,7 @@
         <module>lxc</module>
         <module>hadoop</module>
         <module>mongodb</module>
+        <module>cassandra</module>
         <!--        <module>nutch</module>
         <module>solr</module>
         <module>sqoop</module>
@@ -27,7 +28,6 @@
         <module>hive</module>
         <module>hcatalog</module>
         <module>flume</module>
-        <module>cassandra</module>
         <module>hbase</module> -->
     </modules>
    

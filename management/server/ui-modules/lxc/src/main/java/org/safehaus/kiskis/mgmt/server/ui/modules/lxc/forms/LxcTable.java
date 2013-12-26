@@ -243,7 +243,7 @@ public class LxcTable extends Table {
     public void outputResponse(Response response) {
         List<ParseResult> output;
         if (listTask != null && response.getTaskUuid().compareTo(listTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(listTask, true);
+            output = getCommandManager().parseTask(listTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     refreshDataSource(pr);
@@ -251,14 +251,14 @@ public class LxcTable extends Table {
             }
 
         } else if (infoTask != null && response.getTaskUuid().compareTo(infoTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(infoTask, true);
+            output = getCommandManager().parseTask(infoTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
                 }
             }
         } else if (destroyTask != null && response.getTaskUuid().compareTo(destroyTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(destroyTask, true);
+            output = getCommandManager().parseTask(destroyTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -268,7 +268,7 @@ public class LxcTable extends Table {
                 createRequest(LIST_LXC, listTask, null);
             }
         } else if (startTask != null && response.getTaskUuid().compareTo(startTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(startTask, true);
+            output = getCommandManager().parseTask(startTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -278,7 +278,7 @@ public class LxcTable extends Table {
                 createRequest(LIST_LXC, listTask, null);
             }
         } else if (stopTask != null && response.getTaskUuid().compareTo(stopTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(stopTask, true);
+            output = getCommandManager().parseTask(stopTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);

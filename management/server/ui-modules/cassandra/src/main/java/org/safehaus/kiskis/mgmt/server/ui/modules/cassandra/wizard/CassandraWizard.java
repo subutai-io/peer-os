@@ -25,7 +25,7 @@ public class CassandraWizard {
     private int step = 1;
     private final CassandraConfig config = new CassandraConfig();
     private final VerticalLayout contentRoot;
-    public static final String SOURCE = "CASSANDRA_WIZARD";
+//    public static final String SOURCE = "CASSANDRA_WIZARD";
     private StepFinish stepFinish;
 
     public CassandraWizard() {
@@ -120,7 +120,9 @@ public class CassandraWizard {
     }
 
     public void setOutput(Response response) {
-        stepFinish.getInstaller().onResponse(response);
+        if (stepFinish != null) {
+            stepFinish.getInstaller().onResponse(response);
+        }
     }
 
 }
