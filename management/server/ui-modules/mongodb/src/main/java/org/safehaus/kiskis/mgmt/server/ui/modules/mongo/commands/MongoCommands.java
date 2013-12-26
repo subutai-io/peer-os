@@ -70,13 +70,13 @@ public class MongoCommands {
     }
 
     //execute on each replica
-    public static Command getSetReplicaSetNameCommand() {
+    public static Command getSetReplicaSetNameCommand(String replicaSetName) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/sed");
         req.setArgs(Arrays.asList(
                 "-i",
-                "'s/# replSet = setname/replSet = :REPLICA_SET_NAME/1'",//replace placeholder with actual data
+                String.format("'s/# replSet = setname/replSet = %s/1'", replicaSetName),//replace placeholder with actual data
                 "'/etc/mongodb.conf'"
         ));
         req.setTimeout(30);
@@ -84,13 +84,13 @@ public class MongoCommands {
     }
 
     //execute for each replica adding info about each of the other replicas
-    public static Command getAddReplicaHostToOthersCommand() {
+    public static Command getAddShardHostToOtherShardsCommand(String otherShardsHosts) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/echo");
         req.setArgs(Arrays.asList(
                 "-e",
-                ":REPLICAS",
+                otherShardsHosts,
                 //add [echo -e "\nIP HOST\nIP HOST\nIP HOST"] with each replica's data
                 //except the one to whom this command is aimed and replace placeholder
                 ">>",
@@ -133,7 +133,7 @@ public class MongoCommands {
     }
 
     //execute on primary replica
-    public static Command getAddSecondaryReplicasToPrimaryCommand() {
+    public static Command getAddSecondaryReplicasToPrimaryCommand(String secondaryNodes) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongod");
@@ -143,7 +143,7 @@ public class MongoCommands {
                 "&&",
                 "/bin/echo",
                 "-e",
-                "'rs.initiate()':SECONDARY_REPLICAS",
+                String.format("'rs.initiate()'%s", secondaryNodes),
                 //add each secondary node newline-separated and replace placeholder
                 //e.g.: [\n'rs.add(\":NON_PRIMARY_REPLICA_HOST\")']
                 "|",
@@ -176,18 +176,19 @@ public class MongoCommands {
     }
 
     //execute on any cluster member
-    public static Command getRegisterPrimaryOnRouterCommand() {
+    public static Command getRegisterPrimaryOnRouterCommand(String replicaSetName, String primaryHost, String routerHost) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/echo");
         req.setArgs(Arrays.asList(
-                "'sh.addShard(\":REPLICA_SET_NAME/:PRIMARY_REPLICA_HOST::PORT\")'",
+                String.format("'sh.addShard(\"%s/%s:%s\")'",
+                        replicaSetName, primaryHost, Constants.MONGO_SHARD_PORT),
                 "|",
                 "mongo",
                 "--host",
-                ":ROUTER_HOST", //supply any one router host
+                routerHost, //supply any one router host
                 "--port",
-                ":ROUTER_PORT" //supply router port
+                Constants.MONGO_ROUTER_PORT + "" //supply router port
         ));
         req.setTimeout(60);
         return cmd;
@@ -214,12 +215,12 @@ public class MongoCommands {
     }
 
     //execute on router
-    public static Command getStartRouterCommand() {
+    public static Command getStartRouterCommand(String configServersArg) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongos");
         req.setArgs(Arrays.asList(
-                "--configdb"
+                "--configdb", configServersArg
         //add config servers (with ports) based on user selection, comma-separated
         //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
         //and replace placeholder

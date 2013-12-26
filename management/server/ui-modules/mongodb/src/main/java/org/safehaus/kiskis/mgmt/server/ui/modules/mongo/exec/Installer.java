@@ -69,17 +69,76 @@ public class Installer {
             configServersArg.setLength(configServersArg.length() - 1);
         }
         for (Agent agent : mongoWizard.getConfig().getRouterServers()) {
-            Command cmd = MongoCommands.getStartRouterCommand();
+            Command cmd = MongoCommands.getStartRouterCommand(configServersArg.toString());
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startRoutersTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startRoutersTask.getIncrementedReqSeqNumber());
             cmd.getRequest().setSource(mongoWizard.getSource());
-            cmd.getRequest().getArgs().add(configServersArg.toString());
             startRoutersTask.addCommand(cmd);
         }
-        
-        //
 
+        //Add replica to each others /etc/hosts
+        Task setReplicaSetNameTask = RequestUtil.createTask(commandManager, "Set ReplicaSet name");
+        for (Agent agent : mongoWizard.getConfig().getShards()) {
+            Command cmd = MongoCommands.getSetReplicaSetNameCommand(mongoWizard.getConfig().getReplicaSetName());
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(setReplicaSetNameTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(mongoWizard.getSource());
+            setReplicaSetNameTask.addCommand(cmd);
+        }
+
+        //Add host name of each shard to other shard's /etc/hosts file
+        Task addShardHostToOtherShardsTask = RequestUtil.createTask(commandManager, "Add Shard Host To Other Shards");
+        for (Agent agent : mongoWizard.getConfig().getShards()) {
+            StringBuilder hosts = new StringBuilder();
+            for (Agent otherAgent : mongoWizard.getConfig().getShards()) {
+                if (agent != otherAgent) {
+                    hosts.append("\n").append(RequestUtil.getAgentIpByMask(otherAgent, Common.IP_MASK))
+                            .append(" ").append(otherAgent.getHostname());
+                }
+            }
+
+            Command cmd = MongoCommands.getAddShardHostToOtherShardsCommand(hosts.toString());
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(addShardHostToOtherShardsTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(addShardHostToOtherShardsTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(mongoWizard.getSource());
+            addShardHostToOtherShardsTask.addCommand(cmd);
+        }
+
+        //Restart shards
+        Task restartShards = RequestUtil.createTask(commandManager, "Restart shards");
+        for (Agent agent : mongoWizard.getConfig().getShards()) {
+            Command cmd = MongoCommands.getRestartShardCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(restartShards.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(restartShards.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(mongoWizard.getSource());
+            restartShards.addCommand(cmd);
+        }
+
+        //Register secondary nodes on primary
+        Task registerSecondaryNodesWithPrimaryTask = RequestUtil.createTask(commandManager, "Register secondary nodes with primary");
+        //Make the first node as primary
+        Agent primaryNode = mongoWizard.getConfig().getShards().iterator().next();
+        StringBuilder secondaryStr = new StringBuilder();
+        for (Agent agent : mongoWizard.getConfig().getShards()) {
+            if (agent != primaryNode) {
+                secondaryStr.append("\n'rs.add(\"").append(agent.getHostname()).append("\")'");
+            }
+        }
+        Command cmd = MongoCommands.getAddSecondaryReplicasToPrimaryCommand(secondaryStr.toString());
+        registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
+
+        //Register primary node with one of the routers
+        Task registerPrimaryWithRouterTask = RequestUtil.createTask(commandManager, "Register primary with router");
+        Agent router = mongoWizard.getConfig().getRouterServers().iterator().next();
+        cmd = MongoCommands.getRegisterPrimaryOnRouterCommand(mongoWizard.getConfig().getReplicaSetName(),
+                primaryNode.getHostname(), router.getHostname());
+        registerPrimaryWithRouterTask.addCommand(cmd);
+
+        //
     }
 
 }
