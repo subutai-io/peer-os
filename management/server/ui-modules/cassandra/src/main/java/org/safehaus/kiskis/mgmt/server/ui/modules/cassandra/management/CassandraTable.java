@@ -6,12 +6,13 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
@@ -40,7 +41,7 @@ public class CassandraTable extends Table {
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
-        List<CassandraClusterInfo> cdList = CassandraModule.getCommandManager().getCassandraClusterData();
+        List<CassandraClusterInfo> cdList = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterData();
         for (CassandraClusterInfo cluster : cdList) {
             addClusterDataToContainer(container, cluster);
         }
@@ -86,7 +87,7 @@ public class CassandraTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 manager.purgeCassandraServices(cd.getNodes());
-                if (CassandraModule.getCommandManager().deleteCassandraClusterData(cd.getUuid())) {
+                if (ServiceLocator.getService(CommandManagerInterface.class).deleteCassandraClusterData(cd.getUuid())) {
 //                    container.removeItem(itemId);
                     refreshDatasource();
                 }

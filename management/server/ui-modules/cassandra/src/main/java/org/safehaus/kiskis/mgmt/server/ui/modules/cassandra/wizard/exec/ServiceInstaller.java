@@ -9,7 +9,6 @@ import com.vaadin.ui.TextArea;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -18,7 +17,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -36,7 +37,7 @@ public class ServiceInstaller {
         this.terminal = terminal;
         this.config = config;
 
-        Task installTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Install Cassandra");
+        Task installTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Install Cassandra");
         for (Agent agent : config.getSelectedAgents()) {
             Command command = CassandraCommands.getInstallCommand();
             command.getRequest().setUuid(agent.getUuid());
@@ -46,7 +47,7 @@ public class ServiceInstaller {
         }
         tasks.add(installTask);
 
-        Task sourceEtcProfileTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Update profile");
+        Task sourceEtcProfileTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Update profile");
         for (Agent agent : config.getSelectedAgents()) {
             Command sourceEtcProfileCommand = CassandraCommands.getSourceEtcProfileUpdateCommand();
             sourceEtcProfileCommand.getRequest().setUuid(agent.getUuid());
@@ -56,7 +57,7 @@ public class ServiceInstaller {
         }
         tasks.add(sourceEtcProfileTask);
 
-        Task setListenAddressTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set listen addresses");
+        Task setListenAddressTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set listen addresses");
         for (Agent agent : config.getSelectedAgents()) {
             Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
 //            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
@@ -75,7 +76,7 @@ public class ServiceInstaller {
         }
         tasks.add(setListenAddressTask);
 
-        Task setSeedsTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set seeds addresses");
+        Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set seeds addresses");
         StringBuilder seedsSB = new StringBuilder();
         for (Agent seed : config.getSeeds()) {
             seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
@@ -91,7 +92,7 @@ public class ServiceInstaller {
         tasks.add(setSeedsTask);
 
         if (!config.getClusterName().isEmpty()) {
-            Task clusterRenameTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Rename cluster");
+            Task clusterRenameTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Rename cluster");
             for (Agent agent : config.getSelectedAgents()) {
                 Command setClusterNameCommand = CassandraCommands.getSetClusterNameCommand(config.getClusterName());
                 setClusterNameCommand.getRequest().setUuid(agent.getUuid());
@@ -122,7 +123,7 @@ public class ServiceInstaller {
         }
 
         if (!config.getDataDirectory().isEmpty()) {
-            Task setDataDirectory = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change data directory");
+            Task setDataDirectory = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Change data directory");
             for (Agent agent : config.getSelectedAgents()) {
                 Command setDataDir = CassandraCommands.getSetDataDirectoryCommand(config.getDataDirectory());
                 setDataDir.getRequest().setUuid(agent.getUuid());
@@ -135,7 +136,7 @@ public class ServiceInstaller {
         }
 
         if (!config.getCommitLogDirectory().isEmpty()) {
-            Task setCommitLogDirectoryTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change Commit log directory");
+            Task setCommitLogDirectoryTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Change Commit log directory");
             for (Agent agent : config.getSelectedAgents()) {
                 Command setCommitLogDir = CassandraCommands.getSetCommitLogDirectoryCommand(config.getCommitLogDirectory());
                 setCommitLogDir.getRequest().setUuid(agent.getUuid());
@@ -147,7 +148,7 @@ public class ServiceInstaller {
         }
 
         if (!config.getSavedCachesDirectory().isEmpty()) {
-            Task setSavedCashesDirectoryTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Change Saved caches directory");
+            Task setSavedCashesDirectoryTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Change Saved caches directory");
             for (Agent agent : config.getSelectedAgents()) {
                 Command setSavedCachesDir = CassandraCommands.getSetSavedCachesDirectoryCommand(config.getSavedCachesDirectory());
                 setSavedCachesDir.getRequest().setUuid(agent.getUuid());
@@ -178,9 +179,9 @@ public class ServiceInstaller {
         if (currentTask != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
 
-            Task task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
-            List<ParseResult> list = CassandraModule.getCommandManager().parseTask(task, true);
-            task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
+            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
+            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(task, true);
+            task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
@@ -202,7 +203,7 @@ public class ServiceInstaller {
                         cci.setNodes(config.getAgentsUUIDList());
                         cci.setDomainName(config.getDomainName());
 
-                        if (CassandraModule.getCommandManager().saveCassandraClusterData(cci)) {
+                        if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
                             terminal.setValue(terminal.getValue().toString() + "\n" + cci.getUuid() + " cluster saved into keyspace.");
                         }
                     }
@@ -216,7 +217,7 @@ public class ServiceInstaller {
 
     private void executeCommand(Command command) {
         terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
-        CassandraModule.getCommandManager().executeCommand(command);
+        ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
     }
 
 }

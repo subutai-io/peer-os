@@ -10,13 +10,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -34,7 +35,7 @@ public class ServiceManager {
     }
 
     public void startCassandraServices(List<UUID> list) {
-        Task startTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Start Cassandra");
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Start Cassandra");
         for (UUID uuid : list) {
             Command command = CassandraCommands.getServiceCassandraStartCommand();
             command.getRequest().setUuid(uuid);
@@ -47,7 +48,7 @@ public class ServiceManager {
     }
 
     public void stopCassandraServices(List<UUID> list) {
-        Task stopTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Stop Cassandra");
+        Task stopTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Stop Cassandra");
         for (UUID uuid : list) {
             Command command = CassandraCommands.getServiceCassandraStopCommand();
             command.getRequest().setUuid(uuid);
@@ -60,7 +61,7 @@ public class ServiceManager {
     }
 
     public void statusCassandraServices(List<UUID> list) {
-        Task statusTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Cassandra service status check");
+        Task statusTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Cassandra service status check");
         for (UUID uuid : list) {
             Command command = CassandraCommands.getServiceCassandraStatusCommand();
             command.getRequest().setUuid(uuid);
@@ -73,7 +74,7 @@ public class ServiceManager {
     }
 
     public void purgeCassandraServices(List<UUID> list) {
-        Task purgeTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Purge Cassandra");
+        Task purgeTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Purge Cassandra");
         for (UUID uuid : list) {
             Command command = CassandraCommands.getUninstallCommand();
             command.getRequest().setUuid(uuid);
@@ -101,12 +102,12 @@ public class ServiceManager {
     public void onResponse(Response response) {
         if (currentTask != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-            Task task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
-            List<ParseResult> list = CassandraModule.getCommandManager().parseTask(task, true);
-            task = CassandraModule.getCommandManager().getTask(response.getTaskUuid());
+            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
+            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(task, true);
+            task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    for (ParseResult pr : CassandraModule.getCommandManager().parseTask(task, true)) {
+                    for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(task, true)) {
                         terminal.setValue(terminal.getValue().toString() + "\n" + pr.getResponse().getStdOut());
                     }
                     terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
@@ -129,7 +130,7 @@ public class ServiceManager {
 
     private void executeCommand(Command command) {
         terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
-        CassandraModule.getCommandManager().executeCommand(command);
+        ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
     }
 
 }

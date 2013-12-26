@@ -21,7 +21,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -105,7 +107,7 @@ public class NodesWindow extends Window {
                         null,
                         null,
                         null);
-                CassandraModule.getCommandManager().executeCommand(command);
+                ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
             }
         });
         Button stopButton = new Button("Stop");
@@ -131,7 +133,7 @@ public class NodesWindow extends Window {
                         null,
                         null,
                         null);
-                CassandraModule.getCommandManager().executeCommand(command);
+                ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
             }
         });
         item.getItemProperty("Start").setValue(startButton);
@@ -159,7 +161,7 @@ public class NodesWindow extends Window {
 
     public void setOutput(Response response) {
         System.out.println("setoutput" + response.getTaskUuid());
-        for (ParseResult pr : CassandraModule.getCommandManager().parseTask(task, true)) {
+        for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(task, true)) {
             terminal.setValue(pr.getResponse().getStdOut());
         }
     }
