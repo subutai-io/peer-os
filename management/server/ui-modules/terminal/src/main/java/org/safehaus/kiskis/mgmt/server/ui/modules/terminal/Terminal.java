@@ -37,9 +37,11 @@ public class Terminal implements Module {
         private final TextArea textAreaCommand;
         private final TextArea textAreaOutput;
         private final CommandManagerInterface commandManagerInterface;
+        private final AgentManagerInterface agentManagerInterface;
 
-        public ModuleComponent(final CommandManagerInterface commandManagerInterface) {
-            this.commandManagerInterface = commandManagerInterface;
+        public ModuleComponent() {
+            commandManagerInterface = ServiceLocator.getService(CommandManagerInterface.class);
+            agentManagerInterface = ServiceLocator.getService(AgentManagerInterface.class);
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -91,7 +93,6 @@ public class Terminal implements Module {
             Button truncateTables = getTruncateTablesButton();
             Button buttonGetPhysicalAgents = getPhysicalAgents();
             Button buttonGetLxcAgents = getLxcAgents();
-            Button buttonCreateCluster = getClusterButton();
 
             hLayout.addComponent(buttonSend);
             hLayout.addComponent(buttonClear);
@@ -101,7 +102,6 @@ public class Terminal implements Module {
             hLayout.addComponent(truncateTables);
             hLayout.addComponent(buttonGetPhysicalAgents);
             hLayout.addComponent(buttonGetLxcAgents);
-            hLayout.addComponent(buttonCreateCluster);
 
             verticalLayout.addComponent(hLayout);
 
@@ -156,13 +156,13 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    List<Agent> agents = getAgentManager().getRegisteredPhysicalAgents();
+                    List<Agent> agents = agentManagerInterface.getRegisteredPhysicalAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
                         sb.append(agent).append("\n");
 
-                        List<Agent> childAgents = getAgentManager().getChildLxcAgents(agent);
+                        List<Agent> childAgents = agentManagerInterface.getChildLxcAgents(agent);
                         for (Agent lxcAgent : childAgents) {
                             sb.append("\t").append(lxcAgent).append("\n");
                         }
@@ -179,7 +179,7 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    List<Agent> agents = getAgentManager().getRegisteredLxcAgents();
+                    List<Agent> agents = agentManagerInterface.getRegisteredLxcAgents();
                     StringBuilder sb = new StringBuilder();
 
                     for (Agent agent : agents) {
@@ -360,35 +360,6 @@ public class Terminal implements Module {
             return button;
         }
 
-        private Button getClusterButton() {
-            Button button = new Button("Create cluster data");
-            button.setDescription("Creates Cluster Data");
-            button.addListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    CassandraClusterInfo clusterData = new CassandraClusterInfo();
-                    clusterData.setName(textAreaCommand.getValue().toString());
-                    clusterData.setCommitLogDir("Commit log Dir");
-                    clusterData.setDataDir("Data dir");
-                    clusterData.setSavedCacheDir("Saved Cache Dir");
-
-//                    List<Agent> agents = AppData.getSelectedAgentList();
-                    Set<Agent> agents = MgmtApplication.getSelectedAgents();
-                    if (agents != null && !agents.isEmpty()) {
-                        List<UUID> listUuid = new ArrayList<UUID>();
-                        for (Agent agent : agents) {
-                            listUuid.add(agent.getUuid());
-                        }
-                        clusterData.setNodes(listUuid);
-                        clusterData.setSeeds(listUuid);
-                        commandManagerInterface.saveCassandraClusterData(clusterData);
-                        textAreaOutput.setValue(clusterData);
-                    }
-                }
-            });
-            return button;
-        }
-
         private Button getClearButton() {
             Button button = new Button("Clear");
             button.setDescription("Clear output area");
@@ -409,47 +380,26 @@ public class Terminal implements Module {
 
     @Override
     public Component createComponent() {
-        try {
-            CommandManagerInterface commandManagerInterface = getCommandManager();
-            component = new ModuleComponent(commandManagerInterface);
-            ServiceLocator.getService(CommandManagerInterface.class).addListener(component);
-            commandManagerInterface.addListener(component);
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in createComponent", e);
-        }
-
-        return component;
-    }
-
-    @Override
-    public void dispose() {
-        try {
-            getCommandManager().removeListener(component);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in dispose", e);
-        }
+        return new ModuleComponent();
     }
 
     public void setModuleService(ModuleService service) {
-        if (service != null) {
+        try {
             LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
             service.registerModule(this);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in setModuleService", e);
         }
+
     }
 
     public void unsetModuleService(ModuleService service) {
-        if (service != null) {
+        try {
             service.unregisterModule(this);
             LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in unsetModuleService", e);
         }
     }
 
-    public static CommandManagerInterface getCommandManager() {
-        return ServiceLocator.getService(CommandManagerInterface.class);
-    }
-
-    public static AgentManagerInterface getAgentManager() {
-        return ServiceLocator.getService(AgentManagerInterface.class);
-    }
 }

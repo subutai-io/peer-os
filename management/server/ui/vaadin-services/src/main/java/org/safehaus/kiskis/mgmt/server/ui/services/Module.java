@@ -8,6 +8,5 @@ public interface Module {
 
     public Component createComponent();
 
-    public void dispose();
-
+//    public void dispose();
 }
