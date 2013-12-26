@@ -1,27 +1,27 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
 import com.google.common.base.Strings;
-
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
-//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 
 public class Terminal implements Module {
 
@@ -125,7 +125,7 @@ public class Terminal implements Module {
         @Override
         public void onCommand(Response response) {
             if (task != null && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
-                List<ParseResult> result = commandManagerInterface.parseTask(task, false);
+                List<ParseResult> result = commandManagerInterface.parseTask(response.getTaskUuid(), false);
                 StringBuilder sb = new StringBuilder();
                 for (ParseResult parseResult : result) {
                     if (parseResult.getResponse() != null) {

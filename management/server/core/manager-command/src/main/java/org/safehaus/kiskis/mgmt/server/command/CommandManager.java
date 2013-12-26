@@ -205,12 +205,12 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     }
 
     @Override
-    public List<ParseResult> parseTask(Task task, boolean isResponseDone) {
+    public List<ParseResult> parseTask(UUID taskUuid, boolean isResponseDone) {
         List<ParseResult> result = new ArrayList<ParseResult>();
 
         if (persistenceCommand != null) {
-            List<Request> requestList = persistenceCommand.getRequests(task.getUuid());
-            Integer responseCount = persistenceCommand.getResponsesCount(task.getUuid());
+            List<Request> requestList = persistenceCommand.getRequests(taskUuid);
+            Integer responseCount = persistenceCommand.getResponsesCount(taskUuid);
 
             if (isResponseDone) {
                 if (requestList.size() != responseCount) {
@@ -220,7 +220,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
 
             Integer exitCode = 0;
             for (Request request : requestList) {
-                Response response = getResponse(task.getUuid(), request.getRequestSequenceNumber());
+                Response response = getResponse(taskUuid, request.getRequestSequenceNumber());
                 if (response != null) {
                     result.add(new ParseResult(request, response));
                     if (response.getType().compareTo(ResponseType.EXECUTE_RESPONSE_DONE) == 0) {
@@ -232,6 +232,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             }
 
             if (requestList.size() == responseCount) {
+                Task task = getTask(taskUuid);
                 if (exitCode == 0) {
                     task.setTaskStatus(TaskStatus.SUCCESS);
                 } else {

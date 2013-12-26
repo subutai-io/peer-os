@@ -70,29 +70,13 @@ public class Step3 extends Panel {
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.addComponent(next);
-        horizontalLayout.addComponent(getButtonConfigureHadoop());
-        horizontalLayout.addComponent(getButtonConfigureSecondaryNameNode());
-        horizontalLayout.addComponent(getButtonSetSlaveNameNode());
-
-
-        HorizontalLayout horizontalLayout2 = new HorizontalLayout();
-        horizontalLayout2.addComponent(getButtonSetSlaveJobTracker());
-        horizontalLayout2.addComponent(getButtonSetSSH());
-        horizontalLayout2.addComponent(getButtonSetSSHMaster());
-        horizontalLayout2.addComponent(getButtonCopySSHSlaves());
-
-        HorizontalLayout horizontalLayout3 = new HorizontalLayout();
-        horizontalLayout3.addComponent(getButtonConfigSSHMaster());
-        horizontalLayout3.addComponent(getButtonFormatMaster());
 
         verticalLayout.addComponent(grid);
         verticalLayout.addComponent(horizontalLayout);
-        verticalLayout.addComponent(horizontalLayout2);
-        verticalLayout.addComponent(horizontalLayout3);
 
         addComponent(verticalLayout);
 
-        parent.setClosable(true);
+        parent.hadoopInstallation.setPanel(this);
         parent.getHadoopInstallation().installHadoop();
     }
 
@@ -100,8 +84,8 @@ public class Step3 extends Panel {
         if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
             if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
+                str.append(terminal.getValue());
                 str.append("\n");
-                str.append(task.getUuid() + " ");
                 str.append(task.getDescription());
                 str.append(stdResult);
                 terminal.setValue(str);
@@ -109,6 +93,7 @@ public class Step3 extends Panel {
         } else {
             if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
+                str.append(terminal.getValue());
                 str.append("\n");
                 str.append(task.getDescription());
                 str.append(stdResult);
@@ -117,129 +102,7 @@ public class Step3 extends Panel {
         }
     }
 
-    private Button getButtonConfigureHadoop() {
-        final Button button = new Button("Configure");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().configureHadoop();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonConfigureSecondaryNameNode() {
-        final Button button = new Button("Configure SNameNode");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().configureSNameNode();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonSetSlaveNameNode() {
-        final Button button = new Button("SetSlaveNameNode");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().setSlaveNameNode();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonSetSlaveJobTracker() {
-        final Button button = new Button("setSlaveJobTracker");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().setSlaveJobTracker();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonSetSSH() {
-        final Button button = new Button("SetSSH");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().setSSH();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonSetSSHMaster() {
-        final Button button = new Button("SetSSHMaster");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().setSSHMaster();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonCopySSHSlaves() {
-        final Button button = new Button("CopySSHSlaves");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().copySSHSlaves();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonConfigSSHMaster() {
-        final Button button = new Button("ConfigSSHMaster");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().configSSHMaster();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
-    }
-
-    private Button getButtonFormatMaster() {
-        final Button button = new Button("formatMaster");
-        button.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().formatMaster();
-                button.setEnabled(false);
-            }
-        });
-
-        return button;
+    public void setCloseable(){
+        next.setEnabled(true);
     }
 }

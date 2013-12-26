@@ -4,15 +4,16 @@
  */
 package org.safehaus.kiskis.mgmt.server.agent;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * s
@@ -39,7 +40,7 @@ public class AgentHeartBeat implements Runnable {
                 if (commandSender != null) {
                     List<Agent> agents = agentManager.getAgentsToHeartbeat();
                     if (!agents.isEmpty()) {
-                        LOG.log(Level.INFO, "Sending heartbeat to agents");
+//                        LOG.log(Level.INFO, "Sending heartbeat to agents");
                         for (Agent agent : agents) {
                             commandSender.sendCommand((Command) CommandFactory.createRequest(
                                     RequestType.HEARTBEAT_REQUEST,

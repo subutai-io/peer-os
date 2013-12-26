@@ -169,7 +169,7 @@ public class CassandraTable extends Table {
 
     public void setOutput(Response response) {
         System.out.println(response.getStdOut());
-        for (ParseResult pr : commandManager.parseTask(task, true)) {
+        for (ParseResult pr : commandManager.parseTask(response.getTaskUuid(), true)) {
             System.out.println(pr.getResponse().getStdOut());
         }
     }

@@ -7,8 +7,8 @@ import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
-//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -18,7 +18,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+
+//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
@@ -154,7 +155,7 @@ public class LxcCloneForm extends VerticalLayout implements
     public void setTaskStatus() {
         if (getCommandManager() != null) {
             outputPanel.removeAllComponents();
-            List<ParseResult> result = getCommandManager().parseTask(cloneTask, true);
+            List<ParseResult> result = getCommandManager().parseTask(cloneTask.getUuid(), true);
             for (ParseResult pr : result) {
                 if (pr.getResponse().getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
                     if (pr.getResponse().getExitCode() == 0) {
