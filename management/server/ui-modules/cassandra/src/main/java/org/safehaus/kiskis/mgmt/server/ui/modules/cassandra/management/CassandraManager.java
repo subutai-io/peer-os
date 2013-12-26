@@ -11,7 +11,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 /**
@@ -21,6 +20,7 @@ import com.vaadin.ui.VerticalLayout;
 public class CassandraManager {
 
     private final VerticalLayout contentRoot;
+    CassandraTable cassandraTable;
 
     public CassandraManager() {
         contentRoot = new VerticalLayout();
@@ -38,34 +38,27 @@ public class CassandraManager {
         contentRoot.setMargin(true);
 
         HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(new Button("Get clusters"));
+        Button getClustersBtn = new Button("Get clusters");
+        getClustersBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                cassandraTable.refreshDatasource();
+            }
+        });
+        buttons.addComponent(getClustersBtn);
         buttons.addComponent(new Button("Apply Changes"));
 
         content.addComponent(buttons);
 
         Label clusterNameLabel = new Label("Select the cluster");
         content.addComponent(clusterNameLabel);
+        cassandraTable = new CassandraTable();
+        content.addComponent(cassandraTable);
 
-        Table clustersTable = new Table("Cluster");
-        clustersTable.addContainerProperty("Host", String.class, null);
-        clustersTable.addContainerProperty("Start", Button.class, null);
-        clustersTable.addContainerProperty("Stop", Button.class, null);
+    }
 
-        clustersTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        clustersTable.setHeight(100, Sizeable.UNITS_PIXELS);
-
-        clustersTable.setPageLength(10);
-        clustersTable.setSelectable(true);
-        clustersTable.setImmediate(true);
-
-        //sample data for UI test=============================
-        clustersTable.addItem(new Object[]{
-            "Router-1", new Button("Start"), new Button("Stop")}, new Integer(1));
-        clustersTable.addItem(new Object[]{
-            "Router-2", new Button("Start"), new Button("Stop")}, new Integer(2));
-        //====================================================
-
-        content.addComponent(clustersTable);
+    private void updateTableData() {
 
     }
 
