@@ -24,8 +24,8 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("serial")
 
-public final class MgmtAgentManager extends ConcurrentComponent implements
-        Property.ValueChangeListener, AgentListener {
+public final class MgmtAgentManager extends ConcurrentComponent
+        implements AgentListener {
 
     private final AgentManagerInterface agentManagerInterface;
     private final Tree tree;
@@ -61,10 +61,34 @@ public final class MgmtAgentManager extends ConcurrentComponent implements
         });
         tree.setMultiSelect(true);
         tree.setImmediate(true);
-        tree.addListener(this);
+        tree.addListener(new Property.ValueChangeListener() {
+
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() instanceof Set) {
+                    Tree t = (Tree) event.getProperty();
+
+                    Set<Agent> selectedList = new HashSet<Agent>();
+                    Set<String> selectedHosts = new HashSet<String>();
+
+                    for (Object o : (Set<Object>) t.getValue()) {
+                        if (tree.getItem(o).getItemProperty("value").getValue() != null) {
+                            Agent agent = (Agent) tree.getItem(o).getItemProperty("value").getValue();
+                            selectedList.add(agent);
+                            selectedHosts.add(agent.getHostname());
+                        }
+                    }
+                    selectedHostnames = selectedHosts;
+                    MgmtApplication.setSelectedAgents(selectedList);
+                    getWindow().showNotification(
+                            "Selected agents",
+                            selectedList.toString(),
+                            Window.Notification.TYPE_TRAY_NOTIFICATION);
+                }
+            }
+        });
         addComponent(getRefreshButton());
         addComponent(tree);
-        agentManagerService.addListener(this);
     }
 
     @Override
@@ -75,33 +99,6 @@ public final class MgmtAgentManager extends ConcurrentComponent implements
     @Override
     public synchronized Component getParent() {
         return super.getParent();
-    }
-    /*
-     * Shows a notification when a selection is made.
-     */
-
-    @Override
-    public void valueChange(Property.ValueChangeEvent event) {
-        if (event.getProperty().getValue() instanceof Set) {
-            Tree t = (Tree) event.getProperty();
-
-            Set<Agent> selectedList = new HashSet<Agent>();
-            Set<String> selectedHosts = new HashSet<String>();
-
-            for (Object o : (Set<Object>) t.getValue()) {
-                if (tree.getItem(o).getItemProperty("value").getValue() != null) {
-                    Agent agent = (Agent) tree.getItem(o).getItemProperty("value").getValue();
-                    selectedList.add(agent);
-                    selectedHosts.add(agent.getHostname());
-                }
-            }
-            selectedHostnames = selectedHosts;
-            MgmtApplication.setSelectedAgents(selectedList);
-            getWindow().showNotification(
-                    "Selected agents",
-                    selectedList.toString(),
-                    Window.Notification.TYPE_TRAY_NOTIFICATION);
-        }
     }
 
     private Button getRefreshButton() {
@@ -125,6 +122,7 @@ public final class MgmtAgentManager extends ConcurrentComponent implements
     @Override
     public void onAgent(final List<Agent> freshAgents) {
         executeUpdate(new Runnable() {
+            @Override
             public void run() {
                 refreshAgents(freshAgents);
             }
@@ -259,7 +257,9 @@ public final class MgmtAgentManager extends ConcurrentComponent implements
                     }
                     tree.setValue(actualSelectedHostnames);
                 }
-            } catch (Exception ex) {
+            } catch (Property.ReadOnlyException ex) {
+                LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
+            } catch (Property.ConversionException ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
             }
         }

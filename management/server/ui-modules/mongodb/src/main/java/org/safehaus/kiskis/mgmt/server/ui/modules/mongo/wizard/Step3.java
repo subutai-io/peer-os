@@ -104,7 +104,7 @@ public class Step3 extends Panel {
                     //disable back command
                     //save config to db 
                     //start installation
-                    show("INSTALLATION STARTED!!!");
+                    mongoWizard.next();
                 }
             }
         });

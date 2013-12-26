@@ -239,4 +239,8 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
     public List<Agent> getUnknownChildLxcAgents() {
         return persistenceAgent.getUnknownChildLxcAgents(agentFreshnessMin);
     }
+
+    public String getSource() {
+        return getClass().getName();
+    }
 }
