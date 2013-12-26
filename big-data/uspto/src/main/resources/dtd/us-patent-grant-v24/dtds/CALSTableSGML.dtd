@@ -1,0 +1,113 @@
+<!-- ***** CALS TABLE TAGS  -  ELEMENTS AND ATTRIBUTES *****         -->
+
+
+     <!-- The following declarations may be referred to using a public
+     entity as follows:
+
+     <!ENTITY % tablepac PUBLIC 
+                   "-//USA-DOD//DTD CALS MIL-M-28001 TABLEPAK 950127 //EN">
+
+     -->
+
+<!ENTITY % bodyatt       "id            ID             #IMPLIED"  >
+
+<!ENTITY % yesorno "NUMBER" > 
+
+<!-- ***** CALS TABLE TAGS  -  MAIN STRUCTURES *****         -->
+
+<!ELEMENT (table )  - -       ((%titles;), tgroup+) -(table) > 
+<!ATTLIST (table)   tabstyle    NMTOKEN             #IMPLIED 
+                            tocentry    %yesorno;           "1" 
+                            shortentry  %yesorno;           #IMPLIED 
+                            frame       (top | bottom |
+                                        topbot | all |  
+                                        sides | none)       #IMPLIED 
+                            colsep      %yesorno;           #IMPLIED 
+                            rowsep      %yesorno;           #IMPLIED 
+                            orient      (port | land)       #IMPLIED 
+                            pgwide      %yesorno;           #IMPLIED 
+                            %bodyatt;                              > 
+      
+<!ELEMENT tgroup         - o       (colspec*, 
+
+                                        spanspec*, 
+                                   thead?, tfoot?, 
+                                   tbody) > 
+<!ATTLIST tgroup  cols        NUMBER              #REQUIRED 
+                  tgroupstyle NMTOKEN             #IMPLIED 
+                  colsep      %yesorno;           #IMPLIED 
+                  rowsep      %yesorno;           #IMPLIED 
+                  align       (left | right | 
+                              center | justify 
+                              | char )            "left" 
+                  charoff     NUTOKEN             "50" 
+                  char        CDATA               "" 
+                   > 
+      
+<!ELEMENT colspec        - o       EMPTY> 
+<!ATTLIST colspec  colnum     NUMBER              #IMPLIED 
+                   colname    NMTOKEN             #IMPLIED 
+                   align      (left | right |
+                              center | justify 
+                              | char)             #IMPLIED 
+                   charoff    NUTOKEN             #IMPLIED 
+                   char       CDATA               #IMPLIED 
+                   colwidth   CDATA               #IMPLIED 
+                   colsep     %yesorno;           #IMPLIED 
+                   rowsep     %yesorno;           #IMPLIED> 
+      
+<!ELEMENT spanspec       - o       EMPTY > 
+<!ATTLIST spanspec  namest    NMTOKEN        #REQUIRED 
+                    nameend   NMTOKEN        #REQUIRED 
+                    spanname  NMTOKEN        #REQUIRED 
+                    align     (left|right|
+                              center|justify
+                              |char)         "center" 
+                    charoff   NUTOKEN        #IMPLIED 
+                    char      CDATA          #IMPLIED 
+                    colsep    %yesorno;      #IMPLIED 
+                    rowsep    %yesorno;      #IMPLIED> 
+      
+<!ELEMENT (thead | tfoot)       - o       (colspec*, row+)    -(entrytbl) > 
+<!ATTLIST thead   valign  (top | middle | bottom) "bottom"  > 
+<!ATTLIST tfoot   valign   (top | middle | bottom) "top" > 
+
+ 
+<!ELEMENT tbody          - o       (row+) > 
+<!ATTLIST tbody   valign  (top | middle | bottom)  "top"  > 
+
+<!ELEMENT row            - o       (entry | entrytbl)+ > 
+ <!ATTLIST row   rowsep   %yesorno;   #IMPLIED > 
+ 
+ 
+<!ELEMENT entry          - o       (para | %paracon;)+> 
+<!ATTLIST entry   colname     NMTOKEN             #IMPLIED 
+             namest      NMTOKEN             #IMPLIED 
+                  nameend     NMTOKEN             #IMPLIED 
+                  spanname    NMTOKEN             #IMPLIED 
+                  morerows    NUMBER              "0" 
+                  colsep      %yesorno;           #IMPLIED 
+                  rowsep      %yesorno;           #IMPLIED 
+                  rotate      %yesorno;           "0" 
+                  valign      (top | bottom | 
+                              middle)             "top" 
+                  align       (left | right | 
+                              center | justify 
+                              | char )            #IMPLIED 
+                  charoff      NUTOKEN            #IMPLIED 
+                  char         CDATA              #IMPLIED  > 
+      
+<!ELEMENT entrytbl    - -  (colspec*, spanspec*, thead?, tbody)+     -(entrytbl)> 
+<!ATTLIST entrytbl  
+	cols           NUMBER              #REQUIRED 
+               tgroupstyle    	NMTOKEN             #IMPLIED 
+               colname        NMTOKEN             #IMPLIED 
+               spanname       NMTOKEN             #IMPLIED 
+               colsep         %yesorno;           #IMPLIED 
+               rowsep         %yesorno;           #IMPLIED 
+               align          (left | right |
+                              center | justify 
+                              | char )            #IMPLIED 
+              charoff         NUTOKEN             #IMPLIED 
+              char            CDATA               #IMPLIED > 
+

@@ -1,0 +1,365 @@
+<!-- DOCUMENT COMMON CONTENT MODEL DTD PTO DOCUMENTS -->
+<!-- Draft Version for Electronic Filing 5/29/96
+
+                                                                             
+	This version of the DTD is intended for use by the  USPTO.
+	-->
+<!-- The following set of declarations may be referred  to using a public entity as follows:
+<!ENTITY % PTOcomm PUBLIC  "-//USA-PTO//DTD Common Elements 950525//EN">
+%PTOcomm;
+-->
+<!-- *************** PTO COMMON ENTITIES ******************         -->
+
+<!ENTITY % PTOent PUBLIC  "-//USA-PTO//DTD Common Entities 960607//EN">
+%PTOent;
+
+<!-- *************** ISO CHARACTER ENTITIES ******************         -->
+
+<!ENTITY % ISOnum PUBLIC  "ISO 8879-1986//ENTITIES Numeric and Special Graphic//EN">
+%ISOnum;
+<!ENTITY % ISOpub PUBLIC  "ISO 8879-1986//ENTITIES Publishing//EN">
+%ISOpub;
+<!ENTITY % ISOtech PUBLIC  "ISO 8879-1986//ENTITIES General Technical//EN">
+%ISOtech;
+<!ENTITY % ISOlat1 PUBLIC
+  "ISO 8879-1986//ENTITIES Added Latin 1//EN">
+%ISOlat1;
+<!ENTITY % ISOlat2 PUBLIC
+  "ISO 8879-1986//ENTITIES Added Latin 2//EN">
+%ISOlat2;
+<!ENTITY % ISOgrk1  PUBLIC
+  "ISO 8879-1986//ENTITIES Greek Letters//EN">
+%ISOgrk1;
+<!ENTITY % ISOgrk2  PUBLIC
+  "ISO 8879-1986//ENTITIES Monotoniko Greek//EN">
+%ISOgrk2;
+<!ENTITY % ISOgrk3  PUBLIC
+  "ISO 8879-1986//ENTITIES Greek Symbols//EN">
+%ISOgrk3;
+<!ENTITY % ISOgrk4  PUBLIC
+  "ISO 8879-1986//ENTITIES Alternative Greek Symbols//EN">
+%ISOgrk4;
+<!ENTITY % ISOamso  PUBLIC
+  "ISO 8879-1986//ENTITIES Added Math Symbols: Ordinary//EN">
+%ISOamso;
+<!ENTITY % ISOamsb  PUBLIC
+  "ISO 8879-1986//ENTITIES Added Math Symbols: Binary Operators//EN">
+%ISOamsb;
+<!ENTITY % ISOamsr  PUBLIC
+  "ISO 8879-1986//ENTITIES Added Math Symbols: Relations//EN">
+%ISOamsr;
+<!ENTITY % ISOamsn  PUBLIC
+  "ISO 8879-1986//ENTITIES Added Math Symbols: Negated Relations//EN">
+%ISOamsn;
+<!ENTITY % ISOamsa  PUBLIC
+  "ISO 8879-1986//ENTITIES Added Math Symbols: Arrow Relations//EN">
+%ISOamsa;
+<!ENTITY % ISOamsc  PUBLIC
+  "ISO 8879-1986//ENTITIES Added Math Symbols: Delimiters//EN">
+%ISOamsc;
+<!ENTITY % ISObox  PUBLIC
+  "ISO 8879-1986//ENTITIES Box and Line Drawing//EN">
+%ISObox;
+<!ENTITY % ISOdia  PUBLIC
+  "ISO 8879-1986//ENTITIES Diacritical Marks//EN">
+%ISOdia;                 														 
+
+<!-- NOTATION DECLARATIONS -->
+
+<!NOTATION CGM PUBLIC "-//USA-DOD//NOTATION Computer Graphics Metafile//EN" >
+<!NOTATION IGS PUBLIC "-//USA-DOD//NOTATION Initial Graphics Exchange
+Specification//EN" >
+<!NOTATION FAX PUBLIC "-//CCITT VII.3 T 4//NOTATION Blue Book - Terminal equipment and protocols for telematic services - Facsimile encoding schemes and coding control functions for group 3 facsimile apparatus//EN">
+<!NOTATION G4 PUBLIC "-//USA-DOD//NOTATION CCITT Group 4  Facsimile Type 1 //EN">
+<!NOTATION JPG PUBLIC "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of Continuous-tone Still Images//EN">
+<!NOTATION RTF PUBLIC "-//Microsoft Corporation//NOTATION Rich Text File Format//EN">
+<!NOTATION MPG PUBLIC "ISO/IEC 11172-2:1993//NOTATION Information Technology - Coding of moving pictures and associated audio for digital storage media at up to 1.5 Mbit/s - Part 2: Video//EN">
+<!NOTATION TIF PUBLIC "-//Aldus//NOTATION Tagged Image File Format//EN" >
+<!NOTATION EPS PUBLIC "+//ISBN 0-201-10174-2::Adobe//NOTATION PostScript Language Reference Manual//EN">
+<!NOTATION GIF PUBLIC "-//CompuServe Inc.//NOTATION CompuServe Graphic Bitmap Format 89A//EN">
+<!NOTATION BMP PUBLIC "-//Microsoft Corporation//NOTATION Windows Bitmap File Format//EN">
+<!NOTATION WPG PUBLIC "-//WordPerfect Corp.//NOTATION WordPerfect Graphics Format//EN">
+<!NOTATION HTM PUBLIC "-//IETF//NOTATION HyperText Markup Language  v3.2//EN">
+<!NOTATION WMF PUBLIC "-//Microsoft Corporation//NOTATION Windows Metafile//EN">
+<!NOTATION DXF PUBLIC "-//Autodesk Inc.//NOTATION AutoCAD Vector File Format//EN">
+<!NOTATION AVI PUBLIC "-//Microsoft Corporation//NOTATION Audio Video Interleave//EN">
+<!NOTATION WRL PUBLIC "-//IETF//NOTATION Virtual Reality Markup Language 1.0 Format//EN">
+<!NOTATION PDF PUBLIC "-//Adobe Inc.//NOTATION Portable Data Format//EN">
+<!NOTATION PCD PUBLIC "-//Kodak Corporation//NOTATION Kodak PhotoCD File Format//EN">
+<!NOTATION CXF PUBLIC "-//CAS//NOTATION Chemical Exchange Format//EN">
+<!NOTATION PDB PUBLIC "-//BNL//NOTATION Brookhaven National Laboratory Protein Data Bank format//EN">
+<!NOTATION MID PUBLIC "-//International MIDI Association//NOTATION Musical Instrument Digital Interface Format, Release 1.0//EN">
+<!NOTATION WAV PUBLIC "-//Microsoft Corporation//NOTATION Waveform Audio File Format//EN">
+<!NOTATION TEX PUBLIC "+//ISBN 0-201-13448-9::Knuth//NOTATION The TeXbook//EN">
+<!NOTATION CHD PUBLIC "-//Cambridge Scientific Computing Inc.//NOTATION ChemDraw 2.X File Format//EN">
+<!NOTATION MOL PUBLIC "-//MDL Information Systems//NOTATION Chemical Expression File Format//EN">
+
+
+<!-- ****************** GROUPED ATTRIBUTES *************************         -->
+<!--                                                                         -->
+
+<!-- Yes or No as numeric 1=Yes 0=No                                                        -->
+<!ENTITY % yorn "NAME" >
+
+<!ENTITY % mediafmt " TIF | CGM | G4 | EPS | IGS | JPG | WRL | WPG | DXF |
+                              GIF | BMP | WMF | PDF | PCD | MPG | AVI | WAV |
+                               MID | MOV ">
+<!--                                                                         -->
+<!-- Types of embedded media and captions                                   -->
+<!ENTITY % img  "emi | emr | ele "                          
+>
+<!-- Types of highlighting, superscripts, subscripts, references, and floating accents   -->
+<!ENTITY % hil  "b | i | o | u | bai | han | sp | sb | chf | fla | clrf |chrf"          >
+
+<!-- Types of lists                                                          -->
+<!ENTITY % lst  "dl | ol | sl | ul"            >
+
+<!-- Types of math  markup                                                       -->
+<!ENTITY % math " |math | dfref | f  | df | dfg " >
+
+<!ENTITY % table " | table | tblref " >
+
+<!-- Five types of complex material inside or outside of paragraphs          -->
+<!-- bioseq is forseen for later use                                         -->
+<!ENTITY % compl "(%lst;) %table; %math; | chem | bioseq | artifact | pageimg"   >
+
+<!-- Contents of a paragraph  with Complex Work Units                             -->
+<!ENTITY % ptext "#PCDATA | (%hil;) | (%img;) | (%compl;) "   >
+
+<!-- Contents of a paragraph  without Complex Work Units                             -->
+<!ENTITY % ntext "#PCDATA | (%hil;) |(%lst;)"   >
+
+
+
+
+
+<!-- ****************** GROUPED ENTITIES ***************************         -->
+
+<!-- Name and identification of an organization                              -->
+<!ENTITY % ORG   "ONM,(ODV,DID?)*"                                       
+>
+<!-- Name of an individual                                                   -->
+<!ENTITY % NAM   "TTL?,FNM,SNM,SFX?"                          
+>
+<!-- Components of an address                                                -->
+<!ENTITY % ADR "PBX?,STR*,CITY,STA,CTRY,PCODE,EAD*,
+                 TEL*,FAX*"                                                   
+>
+<!-- Components of party                                                     -->
+<!ENTITY % PARTY "((%NAM;)|(%ORG;)),(%ADR;),DTXT?,RCTRY?,NCTRY?"             
+>
+
+
+<!--                     Math and Table Inclusions                                     
+      Future versions of this DTD may include provisions for the use of ISO12083 math markup -->
+
+<!ENTITY % mathpac PUBLIC 
+                     "-//USA-DOD//DTD SUP MIL-M-28001 MATHPACK 911001//EN"> 
+              %mathpac;    
+    
+
+<!-- The following elements/entities are redefined to accomodate the CALS tables-->
+
+
+<!ENTITY % paracon "( #PCDATA | (%hil;) | (%img;) | (%compl;))" >
+<!ENTITY % titles "( #PCDATA | (%hil;) | (%img;) | (%compl;))" >
+<!ELEMENT para  - - ((#PCDATA | (%hil;) | (%img;) | (%compl;))+)    >
+<!ELEMENT tblref  - o    EMPTY     -- Table reference -->
+<!ATTLIST   tblref     id  IDREFS     #IMPLIED            -- Table reference(s)     -->
+
+
+<!ENTITY % tablepac PUBLIC 
+                   "-//USA-DOD//DTD CALS MIL-M-28001 TABLEPAK 950127 //EN"> 
+              %tablepac;
+
+
+<!--    ******** COMMON DOCUMENT ELEMENTS *********       -->
+
+<!-- ******* MAJOR CONTENTS OF SUBDOCUMENTS ***********   -->
+<!--                                                                         -->
+<!ELEMENT h     - - (%ptext;)                 -- Header                      -->
+<!ATTLIST h    lvl NUMBER #IMPLIED            -- Header level                --
+                         id      ID     #IMPLIED            -- Unique  ID        -->
+
+<!ELEMENT t     - - (#PCDATA)              -- Paragraph elements          -->
+
+
+<!ELEMENT p     - - ((%ptext;)+)              -- Paragraph elements          -->
+<!ATTLIST p    id   ID      #IMPLIED            -- Reference number            -->
+
+<!-- ************ HIGHLIGHTED ELEMENTS **************            -->
+<!--                                                                         -->
+<!ELEMENT b     - - (%ptext;)+ -(b|fla)       -- Bold typeface               -->
+<!ELEMENT i     - - (%ptext;)+ -(i)           -- Italics                     -->
+<!ELEMENT bai   - - (%ptext;)+ -(bai|han)     -- Expanded font               -->
+<!ELEMENT han   - - (%ptext;)+ -(han|bai)     -- Compressed font             -->
+<!ELEMENT o     - - (%ptext;)+ -(o)           -- Overscore                   -->
+<!ELEMENT u     - - (%ptext;)+ -(u)           -- Underscore                  -->
+<!ATTLIST (o|u) st  (S|D|T|B|DA|DT) "S"       -- Line style (default single) --
+              type  (dot|dotdot|dot3|dot4|tie|tiebrace|
+                     hat|haczeck|acute|grave|cedil|ring|macron|
+                     ogonek|dblac|breve|tilde|vec|rvec|dyad|bar)
+                       "bar" -- types of over and under scores (default bar) -->
+
+<!-- ************** SUPER/SUBSCRIPTS **********************             -->
+<!--                                                                         -->
+<!ELEMENT sp    - - (%ptext;)* -(fla)         -- Superscript                 -->
+<!ELEMENT sb    - - (%ptext;)* -(fla)         -- Subscript                   -->
+<!ATTLIST (sp|sb) pos (PRE|MID|POST) "POST"   -- Position (default post)     -->
+<!--                                                                         -->
+<!-- ************** CONSTRUCTS *****************************             -->
+<!--                                                                         -->
+<!ELEMENT chf   - - (t,(bar|commat),t)  -- Character fraction    -->
+<!ELEMENT bar    - o  EMPTY                   -- Causes horizontal line      -->
+<!ELEMENT commat - o  EMPTY                   -- No horizontal separator     -->
+<!ELEMENT fla   - - (t,bar,t)     -- Floating accent (overstrike)-->
+<!--                                                                         -->
+
+<!-- ********** ALL KINDS OF LISTS ****************************              -->
+<!--                                                                         -->
+<!ELEMENT dl   - - (dt,dd)+                   -- Definition list             -->
+<!ATTLIST dl   tsize NUMBER #IMPLIED          -- Term size attribute         --
+               		compact (compact) #IMPLIED     -- Spacing between items       --
+		  id      ID     #IMPLIED            -- Unique  ID        -->
+<!ELEMENT dt   - o (%ptext;)                  -- Definition term             -->
+<!ELEMENT dd   - o ((%ptext;)|p)+             -- Definition description      -->
+<!ELEMENT ol   - - ((li+)|(clm+))             -- Ordered list                -->
+<!ATTLIST ol   compact (compact) #IMPLIED     -- Spacing between items       --
+               level  NUMBER #IMPLIED         -- Nesting level of list       --
+               prefix CDATA #IMPLIED          -- Prefix for each list item   --
+               numstyle CDATA #IMPLIED        -- Numbering style             --
+                id      ID     #IMPLIED            -- Unique  ID        -->
+<!ELEMENT sl    - - (li)+                     -- Simple list                 -->
+<!ATTLIST sl  compact (compact) #IMPLIED      -- Spacing between items       --
+              level  NUMBER #IMPLIED          -- Nesting level of list       --
+	  id      ID     #IMPLIED            -- Unique  ID        -->
+<!ELEMENT ul    - -  (li)+                    -- Unordered list              -->
+<!ATTLIST ul  st  CDATA  #IMPLIED            -- Ulist symbol                --
+              level  NUMBER #IMPLIED          -- Nesting level of list       --
+              compact (compact) #IMPLIED      -- Spacing between items       --
+	     id      ID     #IMPLIED            -- Unique  ID        -->
+<!ELEMENT li    - o ((%ptext;)|p)+            -- List item                   -->
+<!ELEMENT clm   - - ((%ptext;)|p)+  -- Text of claim           -->
+<!ATTLIST clm    cid   ID #IMPLIED                          -- Unique claim ID -- >
+
+<!--                                                                         -->
+<!-- ***********MEDIA RELATED ELEMENTS*************************              -->
+<!--    -->
+<!ELEMENT emi   - o  EMPTY                    -- Embedded media              -->
+<!ATTLIST emi  id  ID #IMPLIED         -- Unique identity              --
+               he  NUMBER  #IMPLIED          -- Height in mm                --
+               wi  NUMBER  #IMPLIED          -- Width in mm                 --
+               lx  NUMBER  #IMPLIED           -- X-coord 1/10 mm             --
+               ly  NUMBER  #IMPLIED           -- Y-coord 1/10 mm             --
+               boardno ENTITY #REQUIRED  -- external entity reference --
+               imf (%mediafmt;)  #REQUIRED       -- Format stored emi           -->
+
+<!ELEMENT emr   - o EMPTY                     -- Reference to emi or page image           -->
+<!ATTLIST emr  id  IDREFS  #IMPLIED       >
+
+<!ELEMENT ele   - - (%ptext;)+                -- Media object caption              -->
+<!ATTLIST ele  id  ID  #IMPLIED           >
+
+<!-- *************** Artifacts  and Page Images*****************   -->
+<!--                                                                         -->
+<!ELEMENT pageimg   - - (#PCDATA)    -- A page image description             -->
+<!ATTLIST pageimg  id  ID #IMPLIED         -- Image identity              --
+   	   boardno ENTITY #REQUIRED
+  	   pimf (TIF | FAX | PDF | HTM |RTF )  #REQUIRED    -- Format stored page image        -->
+
+
+<!--  Artifacts are be pointers to external items such as models, 
+        video tapes, faxes, etc. Binary types may be pointers to refer to
+        electronically storable items such as computer source code or other
+        generic binary data    -->
+
+<!ELEMENT artifact   - -  (#PCDATA)     -- Artifact Reference (i.e., its description)        -->
+<!ATTLIST   artifact
+              id   ID  #IMPLIED                        --  Unique identifier        --
+              afmt (BIN|OTHER) "OTHER"             --  artifact format        --
+              boardno ENTITY     #IMPLIED        -- File Entity if binary                  --
+              artfmt CDATA #IMPLIED             --  binary format        -->
+<!-- ********** CHEMISTRY NOTATION  *********              -->
+<!-- Future versions of this DTD may include provisions for the use of 
+        Chemical Markup Language (CML)     -->
+<!--                                                                         -->
+<!ELEMENT (chem)   - o  EMPTY     -- Chemical Notation              -->
+<!ATTLIST   chem 
+              id   ID  #IMPLIED                      -- Chemical expression id        --
+              he  NUMBER  #IMPLIED          -- Height in mm                --
+              wi  NUMBER  #IMPLIED          -- Width in mm                 --
+              lx  NUMBER  #IMPLIED           -- X-coord 1/10 mm             --
+              ly  NUMBER  #IMPLIED           -- Y-coord 1/10 mm             --
+              cfmt ( MOL | CHD | EPS | BMP|WMF|PDB|WPG|TIF|
+                           CXF|WRL  )   #REQUIRED -- Chem File format      --
+              boardno ENTITY     #REQUIRED        -- File Entity                    -->
+<!ELEMENT chrf   - o EMPTY                     -- Reference to chemical expression           -->
+<!ATTLIST chrf  id  IDREFS  #REQUIRED       >
+
+<!--                                                                         -->
+<!-- ****** MATH NOTATION  *********              -->
+
+<!--                                                                         -->
+<!ELEMENT (math)   - o EMPTY    -- Math Expression            -->
+<!ATTLIST math  num CDATA #IMPLIED               
+                     id  ID  #IMPLIED           -- Math expression id   --
+                     mfmt (TEX | EPS |BMP| WMF|WPG)   #REQUIRED  -- Math format --
+                     boardno ENTITY     #REQUIRED        -- File Entity                    -->
+
+
+<!--                                                                         -->
+<!-- *************** Miscellaneous *********************************         -->
+<!--                                                                         -->
+<!ELEMENT br    - o EMPTY                     -- Line break                  -->
+<!ELEMENT foo   - - (%ptext;)+                -- Footnotes                   -->
+<!ATTLIST foo  fn  NUTOKEN  #REQUIRED         -- Footnote id.                -->
+<!ELEMENT for   - - (%ptext;)+                -- Footnote reference          -->
+<!ATTLIST for  id  IDREFS  #REQUIRED         -- Footref id.                 -->
+<!ELEMENT clrf  - o EMPTY                -- Reference to a claim        -->
+<!ATTLIST    clrf     id  IDREFS     #REQUIRED            -- Unique  ID        -->
+
+<!--                                                                         -->
+<!-- ********** BIOLOGICAL SEQUENCES *******************************         -->
+<!-- This  section forseen for later use (PATENTIN)                          -->
+<!--                                                                         -->
+<!ELEMENT bioseq - - CDATA                    -- (Stub for later expansion)  -->
+<!ATTLIST bioseq   id ID #IMPLIED          -- Reference number            -->
+
+
+<!-- Components of a name (NAM)                                              -->
+<!ELEMENT TTL  - o (#PCDATA)       -- Title (e.g., Mr., Mrs., Dr., CPT)      -->
+<!ELEMENT FNM  - o (#PCDATA)       -- Given and middle name(s) or initials   -->
+<!ELEMENT SNM  - o (#PCDATA)       -- Family, last, or surname               -->
+<!ELEMENT SFX  - o (#PCDATA)       -- Suffix (e.g., II, Jr., Esq. et al.)    -->
+<!--                                                                         -->
+<!-- Components of an organization (ORG)                                     -->
+<!ELEMENT ONM  - o (#PCDATA)       -- Organization name                      -->
+<!ELEMENT ODV  - o (#PCDATA)       -- Division of organization               -->
+<!ELEMENT DID  - o (#PCDATA)       -- Identifying number of division         -->
+<!--                                                                         -->
+<!--  Components of an address (ADR)                                         -->
+<!ELEMENT PBX  - o (#PCDATA)       -- Post Office box number                 -->
+<!ELEMENT STR  - o (#PCDATA)       -- Street, house number or name,          -->
+<!ELEMENT CITY  - o (#PCDATA)      -- City or town                           -->
+<!ELEMENT STA  - o (#PCDATA)       -- Region of country (state, province)    -->
+<!ELEMENT CTRY - o (#PCDATA)       -- Country (ST.3)                         -->
+<!ELEMENT PCODE - o (#PCDATA)      -- Postal Code or zip code                -->
+<!ELEMENT EAD  - o (#PCDATA)       -- Electronic address (e.g., email)       -->
+<!ELEMENT TEL  - o (#PCDATA)       -- Telephone number w/ regional/area code -->
+<!ELEMENT FAX  - o (#PCDATA)       -- Facsimile telephone number             -->
+<!--                                                                         -->
+<!--  Components of party (PARTY)                                            -->
+<!--      NAM                         Name of person                         -->
+<!--      ORG                         Name of organization                   -->
+<!--      ADR                         Address                                -->
+<!ELEMENT DTXT  - o (#PCDATA)      -- Descriptive text                       -->
+<!ELEMENT RCTRY - o (CTRY)         -- Country of residence                   -->
+<!ELEMENT NCTRY - o (CTRY)         -- Country of nationality                 -->
+<!--  Components of a date(DATE)                                             -->
+<!ELEMENT DATE - o (#PCDATA,TIME?) -- YYYYMMDD                               -->
+<!ELEMENT TIME - o (#PCDATA)       -- HHMMSS (UCT)                           -->
+<!ELEMENT appnr - - (#PCDATA)  -- application nr  -- >
+<!ELEMENT filedate - - (DATE)  -- Filing date  -- >
+
+
+

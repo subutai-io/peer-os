@@ -1,0 +1,157 @@
+<!-- ************************************************************************	-->
+<!-- ************************************************************************	-->
+<!-- ************************************************************************	-->
+<!--  		DOCUMENT TYPE DEFINITION FOR PCT PATENT APPLICATIONS		-->
+<!-- 		Draft Version for Electronic Filing 9/1/1997     		-->
+<!-- ************************************************************************	-->
+<!-- ************************************************************************	-->
+<!-- ************************************************************************	-->
+<!-- The following set of declarations may be referred
+     to using a public entity as follows:
+  <!ENTITY % PCTapp PUBLIC  "-//USPTO//DTD PCT Patent Application 971001//EN">
+  %PCTapp;
+										-->
+<!-- ********** Common Elements Model  *********************         -->
+  <!ENTITY % PTOcomm PUBLIC  "-//USPTO//DTD Common Elements 970901//EN">
+  %PTOcomm;
+
+
+<!-- ************************************************************************	-->
+<!--    	       TOP LEVEL APPLICATION MODEL              		-->
+<!-- ************************************************************************	-->
+
+<!ELEMENT	pctapp 	- - 	(pct-application | amendment)   --Top Level Element -->
+
+
+
+<!-- ************************************************************************	-->
+<!--               TOP LEVEL UTILITY APPLICATION MODEL         			-->
+<!-- ************************************************************************	-->
+
+<!ELEMENT 	pct-application - - (request, specification, drawings?, 
+                                     accompanying-parts?) >
+
+					
+
+<!-- ************************************************************************	-->
+<!--  This information uniquely identifies the application and applicant    	-->
+<!-- ************************************************************************	-->
+
+<!ELEMENT 	request - - 	(docket, title, first-applicant, other-inventor*,
+                                 (correspondence?| agent* |common-rep?), designation,
+                                 priority*, search-authority)   
+						-- Identification Information 	-->
+
+
+<!ELEMENT 	title 	- - 	(p+)  -(%img;) -- Title of The Invention  -- >
+<!ATTLIST   	title	id     	ID 	#REQUIRED	-- Unique  ID        -->    
+
+<!ELEMENT  	correspondence - - 	(%PARTY;)  	-- Correspondence Name and 
+							   Correspondence Address -- >
+<!ATTLIST    	correspondence	id      ID     #REQUIRED  -- Unique  ID        -->
+
+<!ELEMENT  	agent - - 	(%PARTY;)  		-- Agent Name and Address -- >
+<!ATTLIST    	agent	id      ID     #REQUIRED	-- Unique  ID        -->
+
+<!ELEMENT  	common-rep - - 	(%PARTY;)  		-- Common representative Name and Address -- >
+<!ATTLIST    	common-rep	id      ID     #REQUIRED	-- Unique  ID        -->
+
+<!ELEMENT	designation - -   (regional?, national-1?, national-2?,except? )    --Designated Countries -->
+<!ATTLIST    	designation	id      ID     #REQUIRED	-- Unique  ID        -->
+
+<!ELEMENT	regional   - - (aripo?, eurasion?, european?, oapi?)   --Regional Application -->
+<!ELEMENT	(aripo, eurasion, european)    - o	EMPTY     --   -->
+<!ELEMENT	oapi   - -	(#PCDATA)     --   -->
+
+<!ELEMENT	national-1  - - (AL?,AM?,AT?,AU?,AZ?,BA?,BB?,BG?,BR?,BY-1?,CA?,CHLI?,CN?,CU?,CZ?,DE?,DK?,EE?,ES?,
+                               FI?,GB?,GE?,HU?,IL?,IS?,JP?,KE?,KG?,KP?,KR?,KZ?,LC?,LK?,LR?,LS?,LT?,LU?)     --Nations 1  -->
+
+<!ELEMENT	national-2  - - (LV?,MD?,MG?,MK?,MN?,MW?,MX?,NO?,NZ?,PL?,PT?,RO?,RU?,SD?,SE?,SG?,SI?,SK?,TJ?,
+                               TM?,TR?,TT?,UA?,UG?,US?,UZ?,VN?, OTHER1?,OTHER2?,OTHER3?,OTHER4?)   -- Nations 2   -->
+
+<!ELEMENT 	(AL|AM|AT|AU|AZ|BA|BB|BG|BR|BY-1|CA|CHLI|CN|CU|CZ|DE|DK|EE|ES|
+                 FI|GB|GE|HU|IL|IS|JP|KE|KG|KP|KR|KZ|LC|LK|LR|LS|LT|LU) - - (#PCDATA)    --Country Group 1   -->
+
+<!ELEMENT       (LV |MD|MG|MK|MN|MW|MX|NO|NZ|PL|PT|RO|RU|SD|SE|SG|SI|SK|TJ|
+                 TM|TR|TT|UA|UG|US|UZ|VN| OTHER1|OTHER2|OTHER3|OTHER4) - - (#PCDATA)   --Country Group 2   -->
+
+<!ELEMENT	except - -   (#PCDATA)    -- Exceptions     -->
+                                
+
+
+<!ELEMENT	first-applicant  - - 	(%PARTY;, applicant-purpose?, applicant-type?)	--1st Applicant/Inventor  -->
+<!ATTLIST    	first-applicant	id 	ID     #REQUIRED	-- Unique  ID        -->
+<!ELEMENT 	other-inventor 	- - 	(%PARTY;, applicant-purpose?, applicant-type?)	
+                                                     	-- Other Inventor(s)/Applicant(s)  Name and  Address -- >
+<!ATTLIST    	other-inventor	id 	ID     #REQUIRED	-- Unique  ID        -->
+<!ELEMENT	applicant-purpose - -      (allstates| allbut-us| us-only| states-indicated)  -- purpose -->
+<!ELEMENT	allstates    - o	EMPTY     -- Elect all States  -->
+<!ELEMENT	allbut-us    - o	EMPTY     -- Elect all States but U.S.  -->
+<!ELEMENT	us-only    - o	EMPTY     -- U.S. only  -->
+<!ELEMENT	states-indicated    - o	EMPTY     -- Only the States Indicated  -->
+<!ELEMENT 	applicant-type    - - (applicant|applicant-inventor|inventor)    --Nature of Applicant -->
+<!ELEMENT	applicant    - o	EMPTY     -- Applicant   -->
+<!ELEMENT	applicant-inventor    - o	EMPTY     --Applicant and Inventor   -->
+<!ELEMENT	inventor    - o	EMPTY     -- Inventor  -->
+ 
+
+<!ELEMENT	priority - -   (file-country, file-date, application-nr, office?)  --priority claim-->
+<!ATTLIST       priority    transmit %yorn; #IMPLIED >
+
+<!ELEMENT	file-country - -   (COUNTRY)  -- Country where filed -->
+<!ELEMENT	file-date - -   (DATE)        -- Date Filed -->
+<!ELEMENT	office - -   (#PCDATA)    -- International office for Filing -->
+
+<!ELEMENT	search-authority - -   (isa, prior-search?)   -- Elected Search Authority -->
+<!ELEMENT	isa - -   (#PCDATA)     -- choice of ISA country -->
+<!ELEMENT	prior-search - -   (COUNTRY, DATE, search-number)  -- Prior Search Information -->
+
+<!ELEMENT	search-number - - (#PCDATA)  -- Search Report Number -->
+
+<!--  **********************  Specification Section  ************************* -->
+<!ELEMENT 	specification	- - 	(background,summary,  
+				        drawing-description,detail-description, 
+                                        claims, abstract)    -(pageimage) 		--Specification--> 
+<!ATTLIST    	specification  	id	ID	#REQUIRED	-- Unique  ID        -->    
+<!ELEMENT 	abstract - - 	((p|%img;|%compl;)+) +(claim-ref|footnote|footnote-ref|break|image-reference|DATE|dfref)
+       							--Abstract of the Disclosure -- >
+<!ATTLIST    	abstract id     ID 	#REQUIRED	-- Unique  ID        -->    
+
+<!ELEMENT 	background - - 	((p|%img;|%compl;)+) +(claim-ref|footnote|footnote-ref|break|image-reference|DATE|dfref)
+							--Background of the Invention -- >
+<!ATTLIST   	background	id     	ID 	#REQUIRED 	-- Unique  ID        -->    
+<!ELEMENT 	summary - - 	((p|%img;|%compl;)+) +(claim-ref|footnote|footnote-ref|break|image-reference|DATE|dfref)
+                                                        --Brief Summary of the Invention-- >
+<!ATTLIST    	summary	id     	ID 	#REQUIRED 	-- Unique  ID        -->
+<!ELEMENT 	drawing-description - - 	(p)*  +(claim-ref|footnote|footnote-ref|break|image-reference|DATE|dfref) 
+							--Brief Description of the Drawings-->
+<!ATTLIST    	drawing-description id     ID 	#REQUIRED 	-- Unique  ID        -->    
+   
+<!ELEMENT 	detail-description 	- - 	((header|p|%img;|%compl;)+) +(claim-ref|footnote|footnote-ref|
+                                                                             break|image-reference|DATE|dfref )
+							--Detailed Description   -- >
+<!ATTLIST    	detail-description   	id     	ID 	#REQUIRED	-- Unique  ID        -->    
+<!ELEMENT 	claims 	- - 	(pn, claim+) +(claim-ref|footnote|footnote-ref|
+                                               break|image-reference|DATE|dfref)
+    							-- Claim(s)-->
+
+<!--  **********************  Drawing Section  ************************* -->
+<!ELEMENT 	drawings 	- - 	(representative-figure, (%img;)+)  --Drawings-->
+<!ELEMENT	representative-figure - -   (#PCDATA)   -- figure to publish-->
+
+<!--  **********************  Accompanying Parts  ************************* -->
+ 
+<!ELEMENT       accompanying-parts  - -  (power-of-attorney?, general-power-att?, explain-no-signature?,
+                                          priority-documents*, fee-calculations?, microorganisms?,
+                                          sequence-listing?, other-attachments?)      >
+
+<!ELEMENT      power-of-attorney - o    EMPTY     -- stubbed for future development -->
+<!ELEMENT      general-power-att - o    EMPTY     -- stubbed for future development -->
+<!ELEMENT      explain-no-signature - o    EMPTY     -- stubbed for future development -->
+<!ELEMENT      priority-documents - o    EMPTY     -- stubbed for future development -->
+<!ELEMENT      fee-calculations - o    EMPTY     -- stubbed for future development -->
+<!ELEMENT      microorganisms - o    EMPTY     -- stubbed for future development -->
+<!ELEMENT      sequence-listing - o    EMPTY     -- stubbed for future development -->
+<!ELEMENT      other-attachments - o    EMPTY     -- stubbed for future development -->
+
+

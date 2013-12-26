@@ -1,0 +1,129 @@
+<!-- (C) International Organization for Standardization 1991
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOAMSB  PUBLIC
+       "ISO 9573-13:1991//ENTITIES Added Math Symbols: Binary Operators //EN">
+     %ISOAMSB;
+-->
+<!ENTITY ac       SDATA "[ac      ]" --most positive-->
+<!ENTITY acE      SDATA "[acE     ]" --most positive, two lines below-->
+<!ENTITY amalg    SDATA "[amalg   ]" --/amalg B: amalgamation or coproduct-->
+<!ENTITY barvee   SDATA "[barvee  ]" --bar, vee-->
+<!ENTITY barwed   SDATA "[barwed  ]" --/barwedge B: logical and, bar above-->
+<!ENTITY Barwed   SDATA "[Barwed  ]" --/doublebarwedge B: log and, dbl bar above-->
+<!ENTITY bsolb    SDATA "[bsolb   ]" --reverse solidus in square-->
+<!ENTITY Cap      SDATA "[Cap     ]" --/Cap /doublecap B: dbl intersection-->
+<!ENTITY capand   SDATA "[capand  ]" --intersection, and-->
+<!ENTITY capbrcup SDATA "[capbrcup]" --intersection, bar, union-->
+<!ENTITY capcap   SDATA "[capcap  ]" --intersection, intersection, joined-->
+<!ENTITY capcup   SDATA "[capcup  ]" --intersection above union-->
+<!ENTITY capdot   SDATA "[capdot  ]" --intersection, with dot-->
+<!ENTITY caps     SDATA "[caps    ]" --intersection, serifs-->
+<!ENTITY ccaps    SDATA "[ccaps   ]" --closed intersection, serifs-->
+<!ENTITY ccups    SDATA "[ccups   ]" --closed union, serifs-->
+<!ENTITY ccupssm  SDATA "[ccupssm ]" --closed union, serifs, smash product-->
+<!ENTITY coprod   SDATA "[coprod  ]" --/coprod L: coproduct operator-->
+<!ENTITY Cup      SDATA "[Cup     ]" --/Cup /doublecup B: dbl union-->
+<!ENTITY cupbrcap SDATA "[cupbrcap]" --union, bar, intersection-->
+<!ENTITY cupcap   SDATA "[cupcap  ]" --union above intersection-->
+<!ENTITY cupcup   SDATA "[cupcup  ]" --union, union, joined-->
+<!ENTITY cupdot   SDATA "[cupdot  ]" --union, with dot-->
+<!ENTITY cupor    SDATA "[cupor   ]" --union, or-->
+<!ENTITY cups     SDATA "[cups    ]" --union, serifs-->
+<!ENTITY cuvee    SDATA "[cuvee   ]" --/curlyvee B: curly logical or-->
+<!ENTITY cuwed    SDATA "[cuwed   ]" --/curlywedge B: curly logical and-->
+<!ENTITY dagger   SDATA "[dagger  ]" --/dagger B: dagger relation-->
+<!ENTITY Dagger   SDATA "[Dagger  ]" --/ddagger B: double dagger relation-->
+<!ENTITY diam     SDATA "[diam    ]" --/diamond B: open diamond-->
+<!ENTITY divonx   SDATA "[divonx  ]" --/divideontimes B: division on times-->
+<!ENTITY eplus    SDATA "[eplus   ]" --equal, plus-->
+<!ENTITY hercon   SDATA "[hercon  ]" --hermitian conjugate matrix-->
+<!ENTITY intcal   SDATA "[intcal  ]" --/intercal B: intercal-->
+<!ENTITY iprod    SDATA "[iprod   ]" --/intprod-->
+<!ENTITY loplus   SDATA "[loplus  ]" --plus sign in left half circle-->
+<!ENTITY lotimes  SDATA "[lotimes ]" --multiply sign in left half circle-->
+<!ENTITY lthree   SDATA "[lthree  ]" --/leftthreetimes B:-->
+<!ENTITY ltimes   SDATA "[ltimes  ]" --/ltimes B: times sign, left closed-->
+<!ENTITY midast   SDATA "[midast  ]" --/ast B: asterisk-->
+<!ENTITY minusb   SDATA "[minusb  ]" --/boxminus B: minus sign in box-->
+<!ENTITY minusd   SDATA "[minusd  ]" --/dotminus B: minus sign, dot above-->
+<!ENTITY minusdu  SDATA "[minusdu ]" --minus sign, dot below-->
+<!ENTITY ncap     SDATA "[ncap    ]" --bar, intersection-->
+<!ENTITY ncup     SDATA "[ncup    ]" --bar, union-->
+<!ENTITY oast     SDATA "[oast    ]" --/circledast B: asterisk in circle-->
+<!ENTITY ocir     SDATA "[ocir    ]" --/circledcirc B: small circle in circle-->
+<!ENTITY odash    SDATA "[odash   ]" --/circleddash B: hyphen in circle-->
+<!ENTITY odiv     SDATA "[odiv    ]" --divide in circle-->
+<!ENTITY odot     SDATA "[odot    ]" --/odot B: middle dot in circle-->
+<!ENTITY odsold   SDATA "[odsold  ]" --dot, solidus, dot in circle-->
+<!ENTITY ofcir    SDATA "[ofcir   ]" --filled circle in circle-->
+<!ENTITY ogt      SDATA "[ogt     ]" --greater-than in circle-->
+<!ENTITY ohbar    SDATA "[ohbar   ]" --circle with horizontal bar-->
+<!ENTITY olcir    SDATA "[olcir   ]" --large circle in circle-->
+<!ENTITY olt      SDATA "[olt     ]" --less-than in circle-->
+<!ENTITY omid     SDATA "[omid    ]" --vertical bar in circle-->
+<!ENTITY ominus   SDATA "[ominus  ]" --/ominus B: minus sign in circle-->
+<!ENTITY opar     SDATA "[opar    ]" --parallel in circle-->
+<!ENTITY operp    SDATA "[operp   ]" --perpendicular in circle-->
+<!ENTITY oplus    SDATA "[oplus   ]" --/oplus B: plus sign in circle-->
+<!ENTITY osol     SDATA "[osol    ]" --/oslash B: solidus in circle-->
+<!ENTITY otimes   SDATA "[otimes  ]" --/otimes B: multiply sign in circle-->
+<!ENTITY Otimes   SDATA "[Otimes  ]" --multiply sign in double circle-->
+<!ENTITY otimesas SDATA "[otimesas]" --multiply sign in circle, circumflex accent-->
+<!ENTITY ovbar    SDATA "[ovbar   ]" --circle with vertical bar-->
+<!ENTITY plusacir SDATA "[plusacir]" --plus, circumflex accent above-->
+<!ENTITY plusb    SDATA "[plusb   ]" --/boxplus B: plus sign in box-->
+<!ENTITY pluscir  SDATA "[pluscir ]" --plus, small circle above-->
+<!ENTITY plusdo   SDATA "[plusdo  ]" --/dotplus B: plus sign, dot above-->
+<!ENTITY plusdu   SDATA "[plusdu  ]" --plus sign, dot below-->
+<!ENTITY pluse    SDATA "[pluse   ]" --plus, equals-->
+<!ENTITY plussim  SDATA "[plussim ]" --plus, similar below-->
+<!ENTITY plustwo  SDATA "[plustwo ]" --plus, two; Nim-addition-->
+<!ENTITY prod     SDATA "[prod    ]" --/prod L: product operator-->
+<!ENTITY race     SDATA "[race    ]" --reverse most positive, line below-->
+<!ENTITY roplus   SDATA "[roplus  ]" --plus sign in right half circle-->
+<!ENTITY rotimes  SDATA "[rotimes ]" --multiply sign in right half circle-->
+<!ENTITY rthree   SDATA "[rthree  ]" --/rightthreetimes B:-->
+<!ENTITY rtimes   SDATA "[rtimes  ]" --/rtimes B: times sign, right closed-->
+<!ENTITY sdot     SDATA "[sdot    ]" --/cdot B: small middle dot-->
+<!ENTITY sdotb    SDATA "[sdotb   ]" --/dotsquare /boxdot B: small dot in box-->
+<!ENTITY setmn    SDATA "[setmn   ]" --/setminus B: reverse solidus-->
+<!ENTITY simplus  SDATA "[simplus ]" --plus, similar above-->
+<!ENTITY smashp   SDATA "[smashp  ]" --smash product-->
+<!ENTITY solb     SDATA "[solb    ]" --solidus in square-->
+<!ENTITY sqcap    SDATA "[sqcap   ]" --/sqcap B: square intersection-->
+<!ENTITY sqcaps   SDATA "[sqcaps  ]" --square intersection, serifs-->
+<!ENTITY sqcup    SDATA "[sqcup   ]" --/sqcup B: square union-->
+<!ENTITY sqcups   SDATA "[sqcups  ]" --square union, serifs-->
+<!ENTITY ssetmn   SDATA "[ssetmn  ]" --/smallsetminus B: sm reverse solidus-->
+<!ENTITY sstarf   SDATA "[sstarf  ]" --/star B: small star, filled-->
+<!ENTITY subdot   SDATA "[subdot  ]" --subset, with dot-->
+<!ENTITY sum      SDATA "[sum     ]" --/sum L: summation operator-->
+<!ENTITY supdot   SDATA "[supdot  ]" --superset, with dot-->
+<!ENTITY timesb   SDATA "[timesb  ]" --/boxtimes B: multiply sign in box-->
+<!ENTITY timesbar SDATA "[timesbar]" --multiply sign, bar below-->
+<!ENTITY timesd   SDATA "[timesd  ]" --times, dot-->
+<!ENTITY tridot   SDATA "[tridot  ]" --dot in triangle-->
+<!ENTITY triminus SDATA "[triminus]" --minus in triangle-->
+<!ENTITY triplus  SDATA "[triplus ]" --plus in triangle-->
+<!ENTITY trisb    SDATA "[trisb   ]" --triangle, serifs at bottom-->
+<!ENTITY tritime  SDATA "[tritime ]" --multiply in triangle-->
+<!ENTITY uplus    SDATA "[uplus   ]" --/uplus B: plus sign in union-->
+<!ENTITY veebar   SDATA "[veebar  ]" --/veebar B: logical or, bar below-->
+<!ENTITY wedbar   SDATA "[wedbar  ]" --wedge, bar below-->
+<!ENTITY wreath   SDATA "[wreath  ]" --/wr B: wreath product-->
+<!ENTITY xcap     SDATA "[xcap    ]" --/bigcap L: intersection operator-->
+<!ENTITY xcirc    SDATA "[xcirc   ]" --/bigcirc B: large circle-->
+<!ENTITY xcup     SDATA "[xcup    ]" --/bigcup L: union operator-->
+<!ENTITY xdtri    SDATA "[xdtri   ]" --/bigtriangledown B: big dn tri, open-->
+<!ENTITY xodot    SDATA "[xodot   ]" --/bigodot L: circle dot operator-->
+<!ENTITY xoplus   SDATA "[xoplus  ]" --/bigoplus L: circle plus operator-->
+<!ENTITY xotime   SDATA "[xotime  ]" --/bigotimes L: circle times operator-->
+<!ENTITY xsqcup   SDATA "[xsqcup  ]" --/bigsqcup L: square union operator-->
+<!ENTITY xuplus   SDATA "[xuplus  ]" --/biguplus L:-->
+<!ENTITY xutri    SDATA "[xutri   ]" --/bigtriangleup B: big up tri, open-->
+<!ENTITY xvee     SDATA "[xvee    ]" --/bigvee L: logical and operator-->
+<!ENTITY xwedge   SDATA "[xwedge  ]" --/bigwedge L: logical or operator-->

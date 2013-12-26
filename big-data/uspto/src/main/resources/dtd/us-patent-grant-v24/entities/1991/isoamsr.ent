@@ -1,0 +1,190 @@
+<!-- (C) International Organization for Standardization 1991
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOAMSR  PUBLIC
+       "ISO 9573-13:1991//ENTITIES Added Math Symbols: Relations //EN">
+     %ISOAMSR;
+-->
+<!ENTITY ape      SDATA "[ape     ]" --/approxeq R: approximate, equals-->
+<!ENTITY apE      SDATA "[apE     ]" --approximately equal or equal to-->
+<!ENTITY apid     SDATA "[apid    ]" --approximately identical to-->
+<!ENTITY asymp    SDATA "[asymp   ]" --/asymp R: asymptotically equal to-->
+<!ENTITY Barv     SDATA "[Barv    ]" --vert, dbl bar (over)-->
+<!ENTITY bcong    SDATA "[bcong   ]" --/backcong R: reverse congruent-->
+<!ENTITY bepsi    SDATA "[bepsi   ]" --/backepsilon R: such that-->
+<!ENTITY bowtie   SDATA "[bowtie  ]" --/bowtie R:-->
+<!ENTITY bsim     SDATA "[bsim    ]" --/backsim R: reverse similar-->
+<!ENTITY bsime    SDATA "[bsime   ]" --/backsimeq R: reverse similar, eq-->
+<!ENTITY bsolhsub SDATA "[bsolhsub]" --reverse solidus, subset-->
+<!ENTITY bump     SDATA "[bump    ]" --/Bumpeq R: bumpy equals-->
+<!ENTITY bumpe    SDATA "[bumpe   ]" --/bumpeq R: bumpy equals, equals-->
+<!ENTITY bumpE    SDATA "[bumpE   ]" --bump, equals-->
+<!ENTITY cire     SDATA "[cire    ]" --/circeq R: circle, equals-->
+<!ENTITY Colon    SDATA "[Colon   ]" --/Colon, two colons-->
+<!ENTITY colone   SDATA "[colone  ]" --/coloneq R: colon, equals-->
+<!ENTITY Colone   SDATA "[Colone  ]" --double colon, equals-->
+<!ENTITY congdot  SDATA "[congdot ]" --congruent, dot-->
+<!ENTITY csub     SDATA "[csub    ]" --subset, closed-->
+<!ENTITY csube    SDATA "[csube   ]" --subset, closed, equals-->
+<!ENTITY csup     SDATA "[csup    ]" --superset, closed-->
+<!ENTITY csupe    SDATA "[csupe   ]" --superset, closed, equals-->
+<!ENTITY cuepr    SDATA "[cuepr   ]" --/curlyeqprec R: curly eq, precedes-->
+<!ENTITY cuesc    SDATA "[cuesc   ]" --/curlyeqsucc R: curly eq, succeeds-->
+<!ENTITY dashv    SDATA "[dashv   ]" --/dashv R: dash, vertical-->
+<!ENTITY Dashv    SDATA "[Dashv   ]" --dbl dash, vertical-->
+<!ENTITY easter   SDATA "[easter  ]" --equal, asterisk above-->
+<!ENTITY ecir     SDATA "[ecir    ]" --/eqcirc R: circle on equals sign-->
+<!ENTITY ecolon   SDATA "[ecolon  ]" --/eqcolon R: equals, colon-->
+<!ENTITY eDDot    SDATA "[eDDot   ]" --/ddotseq R: equal with four dots-->
+<!ENTITY eDot     SDATA "[eDot    ]" --/doteqdot /Doteq R: eq, even dots-->
+<!ENTITY efDot    SDATA "[efDot   ]" --/fallingdotseq R: eq, falling dots-->
+<!ENTITY eg       SDATA "[eg      ]" --equal-or-greater-->
+<!ENTITY egs      SDATA "[egs     ]" --/eqslantgtr R: equal-or-gtr, slanted-->
+<!ENTITY egsdot   SDATA "[egsdot  ]" --equal-or-greater, slanted, dot inside-->
+<!ENTITY el       SDATA "[el      ]" --equal-or-less-->
+<!ENTITY els      SDATA "[els     ]" --/eqslantless R: eq-or-less, slanted-->
+<!ENTITY elsdot   SDATA "[elsdot  ]" --equal-or-less, slanted, dot inside-->
+<!ENTITY equest   SDATA "[equest  ]" --/questeq R: equal with questionmark-->
+<!ENTITY equivDD  SDATA "[equivDD ]" --equivalent, four dots above-->
+<!ENTITY erDot    SDATA "[erDot   ]" --/risingdotseq R: eq, rising dots-->
+<!ENTITY esdot    SDATA "[esdot   ]" --/doteq R: equals, single dot above-->
+<!ENTITY esim     SDATA "[esim    ]" --/esim R: equals, similar-->
+<!ENTITY Esim     SDATA "[Esim    ]" --equal, similar-->
+<!ENTITY fork     SDATA "[fork    ]" --/pitchfork R: pitchfork-->
+<!ENTITY forkv    SDATA "[forkv   ]" --fork, variant-->
+<!ENTITY frown    SDATA "[frown   ]" --/frown R: down curve-->
+<!ENTITY gap      SDATA "[gap     ]" --/gtrapprox R: greater, approximate-->
+<!ENTITY gE       SDATA "[gE      ]" --/geqq R: greater, double equals-->
+<!ENTITY gel      SDATA "[gel     ]" --/gtreqless R: greater, equals, less-->
+<!ENTITY gEl      SDATA "[gEl     ]" --/gtreqqless R: gt, dbl equals, less-->
+<!ENTITY ges      SDATA "[ges     ]" --/geqslant R: gt-or-equal, slanted-->
+<!ENTITY gescc    SDATA "[gescc   ]" --greater than, closed by curve, equal, slanted-->
+<!ENTITY gesdot   SDATA "[gesdot  ]" --greater-than-or-equal, slanted, dot inside-->
+<!ENTITY gesdoto  SDATA "[gesdoto ]" --greater-than-or-equal, slanted, dot above-->
+<!ENTITY gesdotol SDATA "[gesdotol]" --greater-than-or-equal, slanted, dot above left-->
+<!ENTITY gesl     SDATA "[gesl    ]" --greater, equal, slanted, less-->
+<!ENTITY gesles   SDATA "[gesles  ]" --greater, equal, slanted, less, equal, slanted-->
+<!ENTITY Gg       SDATA "[Gg      ]" --/ggg /Gg /gggtr R: triple gtr-than-->
+<!ENTITY gl       SDATA "[gl      ]" --/gtrless R: greater, less-->
+<!ENTITY gla      SDATA "[gla     ]" --greater, less, apart-->
+<!ENTITY glE      SDATA "[glE     ]" --greater, less, equal-->
+<!ENTITY glj      SDATA "[glj     ]" --greater, less, overlapping-->
+<!ENTITY gsim     SDATA "[gsim    ]" --/gtrsim R: greater, similar-->
+<!ENTITY gsime    SDATA "[gsime   ]" --greater, similar, equal-->
+<!ENTITY gsiml    SDATA "[gsiml   ]" --greater, similar, less-->
+<!ENTITY Gt       SDATA "[Gt      ]" --/gg R: dbl greater-than sign-->
+<!ENTITY gtcc     SDATA "[gtcc    ]" --greater than, closed by curve-->
+<!ENTITY gtcir    SDATA "[gtcir   ]" --greater than, circle inside-->
+<!ENTITY gtdot    SDATA "[gtdot   ]" --/gtrdot R: greater than, with dot-->
+<!ENTITY gtquest  SDATA "[gtquest ]" --greater than, questionmark above-->
+<!ENTITY gtrarr   SDATA "[gtrarr  ]" --greater than, right arrow-->
+<!ENTITY homtht   SDATA "[homtht  ]" --homothetic-->
+<!ENTITY lap      SDATA "[lap     ]" --/lessapprox R: less, approximate-->
+<!ENTITY lat      SDATA "[lat     ]" --larger than-->
+<!ENTITY late     SDATA "[late    ]" --larger than or equal-->
+<!ENTITY lates    SDATA "[lates   ]" --larger than or equal, slanted-->
+<!ENTITY lE       SDATA "[lE      ]" --/leqq R: less, double equals-->
+<!ENTITY leg      SDATA "[leg     ]" --/lesseqgtr R: less, eq, greater-->
+<!ENTITY lEg      SDATA "[lEg     ]" --/lesseqqgtr R: less, dbl eq, greater-->
+<!ENTITY les      SDATA "[les     ]" --/leqslant R: less-than-or-eq, slant-->
+<!ENTITY lescc    SDATA "[lescc   ]" --less than, closed by curve, equal, slanted-->
+<!ENTITY lesdot   SDATA "[lesdot  ]" --less-than-or-equal, slanted, dot inside-->
+<!ENTITY lesdoto  SDATA "[lesdoto ]" --less-than-or-equal, slanted, dot above-->
+<!ENTITY lesdotor SDATA "[lesdotor]" --less-than-or-equal, slanted, dot above right-->
+<!ENTITY lesg     SDATA "[lesg    ]" --less, equal, slanted, greater-->
+<!ENTITY lesges   SDATA "[lesges  ]" --less, equal, slanted, greater, equal, slanted-->
+<!ENTITY lg       SDATA "[lg      ]" --/lessgtr R: less, greater-->
+<!ENTITY lgE      SDATA "[lgE     ]" --less, greater, equal-->
+<!ENTITY Ll       SDATA "[Ll      ]" --/Ll /lll /llless R: triple less-than-->
+<!ENTITY lsim     SDATA "[lsim    ]" --/lesssim R: less, similar-->
+<!ENTITY lsime    SDATA "[lsime   ]" --less, similar, equal-->
+<!ENTITY lsimg    SDATA "[lsimg   ]" --less, similar, greater-->
+<!ENTITY Lt       SDATA "[Lt      ]" --/ll R: double less-than sign-->
+<!ENTITY ltcc     SDATA "[ltcc    ]" --less than, closed by curve-->
+<!ENTITY ltcir    SDATA "[ltcir   ]" --less than, circle inside-->
+<!ENTITY ltdot    SDATA "[ltdot   ]" --/lessdot R: less than, with dot-->
+<!ENTITY ltlarr   SDATA "[ltlarr  ]" --less than, left arrow-->
+<!ENTITY ltquest  SDATA "[ltquest ]" --less than, questionmark above-->
+<!ENTITY ltrie    SDATA "[ltrie   ]" --/trianglelefteq R: left triangle, eq-->
+<!ENTITY mcomma   SDATA "[mcomma  ]" --minus, comma above-->
+<!ENTITY mDDot    SDATA "[mDDot   ]" --minus with four dots, geometric properties-->
+<!ENTITY mid      SDATA "[mid     ]" --/mid R:-->
+<!ENTITY mlcp     SDATA "[mlcp    ]" --/mlcp-->
+<!ENTITY models   SDATA "[models  ]" --/models R:-->
+<!ENTITY mstpos   SDATA "[mstpos  ]" --most positive-->
+<!ENTITY pr       SDATA "[pr      ]" --/prec R: precedes-->
+<!ENTITY Pr       SDATA "[Pr      ]" --dbl precedes-->
+<!ENTITY prap     SDATA "[prap    ]" --/precapprox R: precedes, approximate-->
+<!ENTITY prcue    SDATA "[prcue   ]" --/preccurlyeq R: precedes, curly eq-->
+<!ENTITY pre      SDATA "[pre     ]" --/preceq R: precedes, equals-->
+<!ENTITY prE      SDATA "[prE     ]" --precedes, dbl equals-->
+<!ENTITY prsim    SDATA "[prsim   ]" --/precsim R: precedes, similar-->
+<!ENTITY prurel   SDATA "[prurel  ]" --element precedes under relation-->
+<!ENTITY ratio    SDATA "[ratio   ]" --/ratio-->
+<!ENTITY rtrie    SDATA "[rtrie   ]" --/trianglerighteq R: right tri, eq-->
+<!ENTITY rtriltri SDATA "[rtriltri]" --right triangle above left triangle-->
+<!ENTITY sc       SDATA "[sc      ]" --/succ R: succeeds-->
+<!ENTITY Sc       SDATA "[Sc      ]" --dbl succeeds-->
+<!ENTITY scap     SDATA "[scap    ]" --/succapprox R: succeeds, approximate-->
+<!ENTITY sccue    SDATA "[sccue   ]" --/succcurlyeq R: succeeds, curly eq-->
+<!ENTITY sce      SDATA "[sce     ]" --/succeq R: succeeds, equals-->
+<!ENTITY scE      SDATA "[scE     ]" --succeeds, dbl equals-->
+<!ENTITY scsim    SDATA "[scsim   ]" --/succsim R: succeeds, similar-->
+<!ENTITY sdote    SDATA "[sdote   ]" --equal, dot below-->
+<!ENTITY sfrown   SDATA "[sfrown  ]" --/smallfrown R: small down curve-->
+<!ENTITY simg     SDATA "[simg    ]" --similar, greater-->
+<!ENTITY simgE    SDATA "[simgE   ]" --similar, greater, equal-->
+<!ENTITY siml     SDATA "[siml    ]" --similar, less-->
+<!ENTITY simlE    SDATA "[simlE   ]" --similar, less, equal-->
+<!ENTITY smid     SDATA "[smid    ]" --/shortmid R:-->
+<!ENTITY smile    SDATA "[smile   ]" --/smile R: up curve-->
+<!ENTITY smt      SDATA "[smt     ]" --smaller than-->
+<!ENTITY smte     SDATA "[smte    ]" --smaller than or equal-->
+<!ENTITY smtes    SDATA "[smtes   ]" --smaller than or equal, slanted-->
+<!ENTITY spar     SDATA "[spar    ]" --/shortparallel R: short parallel-->
+<!ENTITY sqsub    SDATA "[sqsub   ]" --/sqsubset R: square subset-->
+<!ENTITY sqsube   SDATA "[sqsube  ]" --/sqsubseteq R: square subset, equals-->
+<!ENTITY sqsup    SDATA "[sqsup   ]" --/sqsupset R: square superset-->
+<!ENTITY sqsupe   SDATA "[sqsupe  ]" --/sqsupseteq R: square superset, eq-->
+<!ENTITY ssmile   SDATA "[ssmile  ]" --/smallsmile R: small up curve-->
+<!ENTITY Sub      SDATA "[Sub     ]" --/Subset R: double subset-->
+<!ENTITY subE     SDATA "[subE    ]" --/subseteqq R: subset, dbl equals-->
+<!ENTITY subedot  SDATA "[subedot ]" --subset, equals, dot-->
+<!ENTITY submult  SDATA "[submult ]" --subset, multiply-->
+<!ENTITY subplus  SDATA "[subplus ]" --subset, plus-->
+<!ENTITY subrarr  SDATA "[subrarr ]" --subset, right arrow-->
+<!ENTITY subsim   SDATA "[subsim  ]" --subset, similar-->
+<!ENTITY subsub   SDATA "[subsub  ]" --subset above subset-->
+<!ENTITY subsup   SDATA "[subsup  ]" --subset above superset-->
+<!ENTITY Sup      SDATA "[Sup     ]" --/Supset R: dbl superset-->
+<!ENTITY supdsub  SDATA "[supdsub ]" --superset, subset, dash joining them-->
+<!ENTITY supE     SDATA "[supE    ]" --/supseteqq R: superset, dbl equals-->
+<!ENTITY supedot  SDATA "[supedot ]" --superset, equals, dot-->
+<!ENTITY suphsol  SDATA "[suphsol ]" --superset, solidus-->
+<!ENTITY suphsub  SDATA "[suphsub ]" --superset, subset-->
+<!ENTITY suplarr  SDATA "[suplarr ]" --superset, left arrow-->
+<!ENTITY supmult  SDATA "[supmult ]" --superset, multiply-->
+<!ENTITY supplus  SDATA "[supplus ]" --superset, plus-->
+<!ENTITY supsim   SDATA "[supsim  ]" --superset, similar-->
+<!ENTITY supsub   SDATA "[supsub  ]" --superset above subset-->
+<!ENTITY supsup   SDATA "[supsup  ]" --superset above superset-->
+<!ENTITY thkap    SDATA "[thkap   ]" --/thickapprox R: thick approximate-->
+<!ENTITY thksim   SDATA "[thksim  ]" --/thicksim R: thick similar-->
+<!ENTITY topfork  SDATA "[topfork ]" --fork with top-->
+<!ENTITY trie     SDATA "[trie    ]" --/triangleq R: triangle, equals-->
+<!ENTITY twixt    SDATA "[twixt   ]" --/between R: between-->
+<!ENTITY vBar     SDATA "[vBar    ]" --vert, dbl bar (under)-->
+<!ENTITY Vbar     SDATA "[Vbar    ]" --dbl vert, bar (under)-->
+<!ENTITY vBarv    SDATA "[vBarv   ]" --dbl bar, vert over and under-->
+<!ENTITY vdash    SDATA "[vdash   ]" --/vdash R: vertical, dash-->
+<!ENTITY vDash    SDATA "[vDash   ]" --/vDash R: vertical, dbl dash-->
+<!ENTITY Vdash    SDATA "[Vdash   ]" --/Vdash R: dbl vertical, dash-->
+<!ENTITY VDash    SDATA "[VDash   ]" --dbl vert, dbl dash-->
+<!ENTITY Vdashl   SDATA "[Vdashl  ]" --vertical, dash (long)-->
+<!ENTITY vltri    SDATA "[vltri   ]" --/vartriangleleft R: l tri, open, var-->
+<!ENTITY vprop    SDATA "[vprop   ]" --/varpropto R: proportional, variant-->
+<!ENTITY vrtri    SDATA "[vrtri   ]" --/vartriangleright R: r tri, open, var-->
+<!ENTITY Vvdash   SDATA "[Vvdash  ]" --/Vvdash R: triple vertical, dash-->

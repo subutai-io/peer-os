@@ -1,0 +1,46 @@
+<!-- (C) International Organization for Standardization 1992
+    Permission to copy in any form is granted for use with
+    conforming SGML systems and applications as defined in
+    ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set.  Typical invocation:
+     <!ENTITY % ISOCH    PUBLIC
+      "ISO 9573-11:1992//ENTITIES Chemistry //EN">
+     %ISOCH;
+-->
+<!ENTITY ch.equil SDATA "[ch.equil]"--equilibrium-->
+<!ENTITY ch.rarr  SDATA "[ch.rarr ]"--yields (reaction left-right)-->
+<!ENTITY ch.larr  SDATA "[ch.larr ]"--yielded by (reaction right-left)-->
+<!ENTITY pmasmas  SDATA "[pmasmas ]"--% (m/m)-->
+<!ENTITY pvolvol  SDATA "[pvolvol ]"--% (V/V)-->
+<!ENTITY pmolmol  SDATA "[pmolmol ]"--% (mol/mol)-->
+<!ENTITY pll      SDATA "[pll     ]"--% (l/l)-->
+<!ENTITY ch.n     SDATA "[ch.n    ]"--prefix n-->
+<!ENTITY ch.o     SDATA "[ch.o    ]"--prefix o-->
+<!ENTITY ch.m     SDATA "[ch.m    ]"--prefix m-->
+<!ENTITY ch.p     SDATA "[ch.p    ]"--prefix p-->
+<!ENTITY prismant SDATA "[prismant]"--prefix antiprismo-->
+<!ENTITY prism3   SDATA "[prism3  ]"--prefix triprismo-->
+<!ENTITY prism5   SDATA "[prism5  ]"--prefix pentaprismo-->
+<!ENTITY prism6   SDATA "[prism6  ]"--prefix hexaprismo-->
+<!ENTITY hedro4   SDATA "[hedro4  ]"--prefix tetrahedro-->
+<!ENTITY hedro6   SDATA "[hedro6  ]"--prefix hexahedro-->
+<!ENTITY hedro8   SDATA "[hedro8  ]"--prefix octahedro-->
+<!ENTITY hedro12  SDATA "[hedro12 ]"--prefix dodecahedro-->
+<!ENTITY hedro20  SDATA "[hedro20 ]"--prefix icosahedro-->
+<!ENTITY asym     SDATA "[asym    ]"--prefix asym-->
+<!ENTITY catena   SDATA "[catena  ]"--prefix catena-->
+<!ENTITY cis      SDATA "[cis     ]"--prefix cis-->
+<!ENTITY closo    SDATA "[closo   ]"--prefix closo-->
+<!ENTITY cyclo    SDATA "[cyclo   ]"--prefix cyclo-->
+<!ENTITY fac      SDATA "[fac     ]"--prefix fac-->
+<!ENTITY mer      SDATA "[mer     ]"--prefix mer-->
+<!ENTITY nido     SDATA "[nido    ]"--prefix nido-->
+<!ENTITY quadro   SDATA "[quadro  ]"--prefix quadro-->
+<!ENTITY sec      SDATA "[sec     ]"--prefix sec-->
+<!ENTITY sym      SDATA "[sym     ]"--prefix sym-->
+<!ENTITY tert     SDATA "[tert    ]"--prefix tert-->
+<!ENTITY trans    SDATA "[trans   ]"--prefix trans-->
+<!ENTITY triangul SDATA "[triangul]"--prefix triangulo-->
+<!ENTITY l.opt    SDATA "[l.opt   ]"--optical L-->
+<!ENTITY d.opt    SDATA "[d.opt   ]"--optical D--> 

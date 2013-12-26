@@ -1,0 +1,379 @@
+<!-- DOCUMENT COMMON CONTENT MODEL DTD PTO DOCUMENTS -->
+<!-- Draft Version for Electronic Filing 9/1/97
+
+                                                                             
+	This version of the DTD is intended for use by the  USPTO.
+	-->
+<!-- The following set of declarations may be referred  to using a public entity as follows:
+     <!ENTITY % PTOcomm PUBLIC  "-//USPTO//DTD Common Elements 970630//EN">
+     %PTOcomm;
+-->
+
+
+<!-- *************** ISO CHARACTER ENTITIES ******************         -->
+<!-- ******************** ISO CHARACTER ENTITIES *******************         -->
+<!-- (C) International Organization for Standardization 1986
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.               -->
+<!--                                                                         -->
+<!--
+<!ENTITY % ISOnum PUBLIC  "ISO 8879:1986//ENTITIES Numeric and Special Graphic//EN">
+%ISOnum;
+<!ENTITY % ISOpub PUBLIC  "ISO 8879:1986//ENTITIES Publishing//EN">
+%ISOpub;
+<!ENTITY % ISOtech PUBLIC  "ISO 8879:1986//ENTITIES General Technical//EN">
+%ISOtech;
+<!ENTITY % ISOlat1 PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN">
+%ISOlat1;
+<!ENTITY % ISOlat2 PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 2//EN">
+%ISOlat2;
+<!ENTITY % ISOgrk1  PUBLIC  "ISO 8879:1986//ENTITIES Greek Letters//EN">
+%ISOgrk1;
+<!ENTITY % ISOgrk2  PUBLIC  "ISO 8879:1986//ENTITIES Monotoniko Greek//EN">
+%ISOgrk2;
+<!ENTITY % ISOgrk3  PUBLIC  "ISO 8879:1986//ENTITIES Greek Symbols//EN">
+%ISOgrk3;
+<!ENTITY % ISOgrk4  PUBLIC  "ISO 8879:1986//ENTITIES Alternative Greek Symbols//EN">
+%ISOgrk4;
+<!ENTITY % ISOcyr1 PUBLIC   "ISO 8879:1986//ENTITIES Russian Cyrillic//EN">
+%ISOcyr1;
+<!ENTITY % ISOcyr2 PUBLIC   "ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN">
+%ISOcyr2;
+<!ENTITY % ISOamso  PUBLIC  "ISO 8879:1986//ENTITIES Added Math Symbols: Ordinary//EN">
+%ISOamso;
+<!ENTITY % ISOamsb  PUBLIC  "ISO 8879:1986//ENTITIES Added Math Symbols: Binary Operators//EN">
+%ISOamsb;
+<!ENTITY % ISOamsr  PUBLIC  "ISO 8879:1986//ENTITIES Added Math Symbols: Relations//EN">
+%ISOamsr;
+<!ENTITY % ISOamsn  PUBLIC  "ISO 8879:1986//ENTITIES Added Math Symbols: Negated Relations//EN">
+%ISOamsn;
+<!ENTITY % ISOamsa  PUBLIC  "ISO 8879:1986//ENTITIES Added Math Symbols: Arrow Relations//EN">
+%ISOamsa;
+<!ENTITY % ISOamsc  PUBLIC  "ISO 8879:1986//ENTITIES Added Math Symbols: Delimiters//EN">
+%ISOamsc;
+<!ENTITY % ISObox  PUBLIC  "ISO 8879:1986//ENTITIES Box and Line Drawing//EN">
+%ISObox;
+<!ENTITY % ISOdia  PUBLIC  "ISO 8879:1986//ENTITIES Diacritical Marks//EN">
+%ISOdia;      
+<!ENTITY % ISOchem  PUBLIC "ISO 9573-13:1991//ENTITIES Chemistry //EN">
+%ISOchem;       
+<!ENTITY % ISOch    PUBLIC "ISO 9573-11:1992//ENTITIES Chemistry //EN">
+%ISOch;    
+-->	
+<!-- (C) International Organization for Standardization 1991
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.               -->
+<!--                                                                         -->
+<!--
+<!ENTITY % ISOAMSA  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Added Math Symbols: Arrow Relations//EN">
+%ISOAMSA;
+<!ENTITY % ISOAMSB  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Added Math Symbols: Binary Operators//EN">
+%ISOAMSB;
+<!ENTITY % ISOAMSC  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Added Math Symbols: Delimiters//EN">
+%ISOAMSC;
+<!ENTITY % ISOAMSN  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Added Math Symbols: Negated Relations//EN">
+%ISOAMSN;
+<!ENTITY % ISOAMSO  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Added Math Symbols: Ordinary//EN">
+%ISOAMSO;
+<!ENTITY % ISOAMSR  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Added Math Symbols: Relations//EN">
+%ISOAMSR;
+<!ENTITY % ISOCHEM  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Chemistry//EN">
+%ISOCHEM;
+<!ENTITY % ISOGRK3  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Greek Symbols//EN">
+%ISOGRK3;
+<!ENTITY % ISOGRK4  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Alternative Greek Symbols//EN">
+%ISOGRK4;
+<!ENTITY % ISOMFRK  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Math Alphabets: Fraktur//EN">
+%ISOMFRK;
+<!ENTITY % ISOMOPF  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Math Alphabets: Open Face//EN">
+%ISOMOPF;
+<!ENTITY % ISOMSCR  PUBLIC
+  "ISO 9573-13:1991//ENTITIES Math Alphabets: Script//EN">
+%ISOMSCR;
+<!ENTITY % ISOPUB   PUBLIC
+  "ISO 9573-13:1991//ENTITIES Publishing//EN">
+%ISOPUB;
+<!ENTITY % ISOTECH  PUBLIC
+   "ISO 9573-13:1991//ENTITIES General Technical//EN">
+%ISOTECH;
+-->
+<!-- (C) International Organization for Standardization 1992
+    Permission to copy in any form is granted for use with
+    conforming SGML systems and applications as defined in
+    ISO 8879, provided this notice is included in all copies.                -->
+<!--
+<!ENTITY % ISOCH    PUBLIC
+   "ISO 9573-11:1992//ENTITIES Chemistry//EN">
+%ISOCH;													 
+-->
+
+
+<!-- ****************** GROUPED ATTRIBUTES *************************         -->
+<!--                                                                         -->
+
+<!-- Yes or No as numeric 1=Yes 0=No                                                        -->
+<!ENTITY % yorn "NAME" >
+
+<!ENTITY % mediafmt " TIF | CGM | JPG | PDF ">
+<!--                                                                         -->
+<!-- Types of embedded media and captions                                   -->
+<!ENTITY % img  "image | image-reference | image-caption "                          
+>
+<!-- Types of highlighting, superscripts, subscripts, references, and floating accents   -->
+<!ENTITY % hil  "bold | ital | overscore | underscore | superscript
+                  | subscript | claim-ref"          >
+
+<!-- Types of lists                                                          -->
+<!ENTITY % lst  "definition-list | ordered-list | simple-list | unordered-list"            >
+
+<!-- Types of math  markup                                                       -->
+<!ENTITY % math " |math | dfref | f  | df | dfg " >
+
+<!ENTITY % table " | table | tblref " >
+
+<!-- Five types of complex material inside or outside of paragraphs          -->
+<!-- bioseq is forseen for later use                                         -->
+<!ENTITY % compl "(%lst;) %table; %math; | artifact | pageimage"   >
+
+<!-- Contents of a paragraph  with Complex Work Units                             -->
+<!ENTITY % ptext "#PCDATA | (%hil;) | (%img;) | (%compl;) "   >
+
+<!-- Contents of a paragraph  without Complex Work Units                             -->
+<!ENTITY % ntext "(#PCDATA | (%hil;))*"   >
+
+
+
+
+<!-- ****************** GROUPED ENTITIES ***************************         -->
+
+<!-- Name and identification of an organization                              -->
+<!ENTITY % ORG   "ONM,(ODV,DID)+"                                       
+>
+<!-- Name of an individual                                                   -->
+<!ENTITY % NAM   "TTL,FNM,SNM,SFX"                          
+>
+<!-- Components of an address                                                -->
+<!ENTITY % ADR "PBX,STR+,CITY,STA,COUNTRY,PCODE,EAD+,
+                 TEL+,FAX+"                                                   
+>
+<!-- Components of party                                                     -->
+<!ENTITY % PARTY "((%NAM;)|(%ORG;)),(%ADR;),DTXT,RCTRY,NCTRY"             
+>
+
+
+<!--                     Math and Table Inclusions                                     
+      Future versions of this DTD may include provisions for the use of ISO12083 math markup -->
+
+<!ENTITY % mathpac PUBLIC 
+                     "-//USA-DOD//DTD SUP MIL-M-28001 MATHPACK 911001//EN"> 
+              %mathpac;    
+    
+
+<!-- The following elements/entities are redefined to accomodate the CALS tables-->
+
+
+<!ENTITY % paracon "( #PCDATA | (%hil;) | (%img;) | (%compl;))" >
+<!ENTITY % titles "( #PCDATA | (%hil;) | (%img;) | (%compl;))" >
+<!ELEMENT para  - - ((#PCDATA | (%hil;) | (%img;) | (%compl;))+)    >
+<!ELEMENT tblref  - o    EMPTY     -- Table reference -->
+<!ATTLIST   tblref     id  IDREFS     #REQUIRED            -- Table reference(s)     -->
+
+
+<!ENTITY % tablepac PUBLIC 
+                   "-//USA-DOD//DTD CALS MIL-M-28001 TABLEPAK 950127 //EN"> 
+              %tablepac;
+
+<!-- ********** Amendment Request Model  *********************         -->
+<!ENTITY % PTOamd PUBLIC  "-//USPTO//DTD Amendment Request 970630//EN">
+%PTOamd;
+<!--    ******** COMMON DOCUMENT ELEMENTS *********       -->
+
+<!-- ******* MAJOR CONTENTS OF SUBDOCUMENTS ***********   -->
+<!--                                                                         -->
+<!ELEMENT header     - - (pn)                 -- Header                      -->
+<!ATTLIST header    lvl NUMBER #IMPLIED            -- Header level                --
+                         id      ID     #REQUIRED            -- Unique  ID        -->
+
+
+<!ELEMENT p     - - ((%ptext;)+)              -- Paragraph elements          -->
+<!ATTLIST p    id   ID      #REQUIRED            -- Reference number            -->
+
+<!ELEMENT pn     - - ((%ntext;)+)              -- Simple Paragraph elements          -->
+<!ATTLIST pn    id   ID      #REQUIRED            -- Reference number            -->
+
+<!-- ************ HIGHLIGHTED ELEMENTS **************            -->
+<!--                                                                         -->
+<!ELEMENT bold     - - (%ntext;)+ -(bold)       -- Bold typeface               -->
+<!ELEMENT ital     - - (%ntext;)+ -(ital)           -- Italics                     -->
+<!ELEMENT expanded   - - (%ntext;)+ -(expanded|compressed)     -- Expanded font               -->
+<!ELEMENT compressed   - - (%ntext;)+ -(compressed|expanded)     -- Compressed font             -->
+<!ELEMENT overscore     - - (%ntext;)+ -(overscore)           -- Overscore                   -->
+<!ELEMENT underscore     - - (%ntext;)+ -(underscore)           -- Underscore                  -->
+<!ATTLIST (overscore|underscore) st  (S|D|T|B|DA|DT) "S"       -- Line style (default single) --
+              type  (dot|dotdot|dot3|dot4|tie|tiebrace|
+                     hat|haczeck|acute|grave|cedil|ring|macron|
+                     ogonek|dblac|breve|tilde|vec|rvec|dyad|bar)
+                       "bar" -- types of over and under scores (default bar) -->
+
+<!-- ************** SUPER/SUBSCRIPTS **********************             -->
+<!--                                                                         -->
+<!ELEMENT superscript    - - (%ntext;)*          -- Superscript                 -->
+<!ELEMENT subscript    - - (%ntext;)*          -- Subscript                   -->
+<!ATTLIST (superscript|subscript) pos (PRE|MID|POST) "POST"   -- Position (default post)     -->
+<!--                                                                         -->
+
+<!-- ********** ALL KINDS OF LISTS ****************************              -->
+<!--                                                                         -->
+<!ELEMENT definition-list   - - (term,definition)+                   -- Definition list             -->
+<!ATTLIST definition-list   tsize NUMBER #IMPLIED          -- Term size attribute         --
+               		compact (compact) #IMPLIED     -- Spacing between items       --
+		  id      ID     #REQUIRED            -- Unique  ID        -->
+<!ELEMENT term   - o (%ntext;)                  -- Definition term             -->
+<!ELEMENT definition   - o ((%ntext;)|pn)+             -- Definition description      -->
+<!ELEMENT ordered-list   - - (list-item+)             -- Ordered list                -->
+<!ATTLIST ordered-list   compact (compact) #IMPLIED     -- Spacing between items       --
+               level  NUMBER #IMPLIED         -- Nesting level of list       --
+               prefix CDATA #IMPLIED          -- Prefix for each list item   --
+               numstyle CDATA #IMPLIED        -- Numbering style             --
+                id      ID     #REQUIRED            -- Unique  ID        -->
+<!ELEMENT simple-list    - - (list-item)+                     -- Simple list                 -->
+<!ATTLIST simple-list  compact (compact) #IMPLIED      -- Spacing between items       --
+              level  NUMBER #IMPLIED          -- Nesting level of list       --
+	  id      ID     #REQUIRED            -- Unique  ID        -->
+<!ELEMENT unordered-list    - -  (list-item)+                    -- Unordered list              -->
+<!ATTLIST unordered-list  st  CDATA  #REQUIRED            -- Ulist symbol                --
+              level  NUMBER #IMPLIED          -- Nesting level of list       --
+              compact (compact) #IMPLIED      -- Spacing between items       --
+	     id      ID     #REQUIRED            -- Unique  ID        -->
+<!ELEMENT list-item    - o ((%ptext;)|p)+            -- List item                   -->
+<!--                                                                         -->
+<!-- ***********CLAIMS RELATED ELEMENTS*************************              -->
+<!--    -->
+
+
+<!ELEMENT claim   - - ((%ntext) | claim-element-list)+  -- Text of claim           -->
+<!ATTLIST claim    id   ID #REQUIRED         -- Unique claim ID -- >
+<!ELEMENT claim-element-list   - - (claim-element)+ -- A list of claim elements-->
+<!ELEMENT claim-element - - (%ntext)+ -- An element of a claim-->
+<!ELEMENT claim-ref  - o EMPTY                -- Reference to a claim        -->
+<!ATTLIST claim-ref     id  IDREFS     #REQUIRED            -- Unique  ID        -->
+
+
+
+<!--                                                                         -->
+<!-- ***********MEDIA RELATED ELEMENTS*************************              -->
+<!--    -->
+<!ELEMENT image   - o  EMPTY                    -- Embedded media              -->
+<!ATTLIST image  id  ID #REQUIRED         -- Unique identity              --
+               boardno ENTITY #REQUIRED  -- external entity reference --
+               imf (%mediafmt;)  #REQUIRED       -- Format stored emi           -->
+
+<!ELEMENT image-reference   - o EMPTY                     -- Reference to emi or page image           -->
+<!ATTLIST image-reference  id  IDREFS  #REQUIRED       >
+
+<!ELEMENT image-caption   - - (%ntext;)+                -- Media object caption              -->
+<!ATTLIST image-caption  id  ID  #REQUIRED           >
+
+<!-- *************** Artifacts  and Page Images*****************   -->
+<!--                                                                         -->
+<!ELEMENT pageimage   - o EMPTY    -- A page image description             -->
+<!ATTLIST pageimage  id  ID #IMPLIED         -- Image identity              --
+   	  boardno ENTITY #REQUIRED
+          desc    CDATA #IMPLIED  -- Description --
+  	  pimf (TIF | PDF)  #REQUIRED    -- Format stored page image        -->
+
+
+<!--  Artifacts are be pointers to external items such as models, 
+        video tapes, faxes, etc. Binary types may be pointers to refer to
+        electronically storable items such as computer source code or other
+        generic binary data    -->
+
+<!ELEMENT artifact   - o EMPTY      -- Artifact Reference        -->
+<!ATTLIST   artifact
+              id   ID  #IMPLIED                        --  Unique identifier        --
+              afmt (BIN|OTHER) "OTHER"             --  artifact format        --
+              boardno ENTITY     #IMPLIED        -- File Entity if binary                  --
+              desc  CDATA #IMPLIED              -- Description --
+              artfmt CDATA #IMPLIED             --  binary format        -->
+
+<!--                                                                         -->
+<!-- ****** MATH NOTATION  *********              -->
+
+<!--                                                                         -->
+<!ELEMENT (math)   - o EMPTY    -- Math Expression            -->
+<!ATTLIST math  num CDATA #IMPLIED               
+                     id  ID  #IMPLIED           -- Math expression id   --
+                     mfmt (TEX | CGM | TIF )   #REQUIRED  -- Math format --
+                     boardno ENTITY     #REQUIRED        -- File Entity                    -->
+
+
+<!--                                                                         -->
+<!-- *************** Miscellaneous *********************************         -->
+<!--                                                                         -->
+<!ELEMENT line-break    - o EMPTY                     -- Line break                  -->
+<!ELEMENT footnote   - - (%ntext;)+                -- Footnotes                   -->
+<!ATTLIST footnote  id  ID  #REQUIRED         -- Footnote id.                -->
+<!ELEMENT footnote-ref   - - (%ntext;)+                -- Footnote reference          -->
+<!ATTLIST footnote-ref  id  IDREFS  #REQUIRED         -- Footref id.                 -->
+
+
+<!--                                                                         -->
+
+
+<!ELEMENT 	first-named-inventor 	- - 	((%PARTY;), petition-filed, inventor-authority)   -- First Named Inventor -->
+<!ATTLIST    	first-named-inventor id     ID 	#REQUIRED	-- Unique  ID        -->   
+<!ELEMENT 	docket 	- - 	(#PCDATA)  	-- Attorney Docket Number  	-->
+<!ELEMENT 	petition-filed 	- - 	(#PCDATA)  	-- Unsigned Petition Filed? Y/N 	-->
+<!ELEMENT 	inventor-authority - - 	(#PCDATA)  	-- Inventor Authority 	-->
+
+<!-- Components of a name (NAM)                                              -->
+<!ELEMENT TTL  - o (#PCDATA)       -- Title (e.g., Mr., Mrs., Dr., CPT)      -->
+<!ELEMENT FNM  - o (#PCDATA)       -- Given and middle name(s) or initials   -->
+<!ELEMENT SNM  - o (%ntext;)+       -- Family, last, or surname               -->
+<!ELEMENT SFX  - o (#PCDATA)       -- Suffix (e.g., II, Jr., Esq. et al.)    -->
+<!--                                                                         -->
+<!-- Components of an organization (ORG)                                     -->
+<!ELEMENT ONM  - - (%ntext;)+       -- Organization name                      -->
+<!ELEMENT ODV  - - (%ntext;)+       -- Division of organization               -->
+<!ELEMENT DID  - - (%ntext;)+       -- Identifying number of division         -->
+<!--                                                                         -->
+<!--  Components of an address (ADR)                                         -->
+<!ELEMENT PBX  - o (#PCDATA)       -- Post Office box number                 -->
+<!ELEMENT STR  - o (#PCDATA)       -- Street, house number or name,          -->
+<!ELEMENT CITY  - o (#PCDATA)      -- City or town                           -->
+<!ELEMENT STA  - o (#PCDATA)       -- Region of country (state, province)    -->
+<!ELEMENT COUNTRY - o (#PCDATA)       -- Country (ST.3)                         -->
+<!ELEMENT PCODE - o (#PCDATA)      -- Postal Code or zip code                -->
+<!ELEMENT EAD  - o (#PCDATA)       -- Electronic address (e.g., email)       -->
+<!ELEMENT TEL  - o (#PCDATA)       -- Telephone number w/ regional/area code -->
+<!ELEMENT FAX  - o (#PCDATA)       -- Facsimile telephone number             -->
+<!--                                                                         -->
+<!--  Components of party (PARTY)                                            -->
+<!--      NAM                         Name of person                         -->
+<!--      ORG                         Name of organization                   -->
+<!--      ADR                         Address                                -->
+<!ELEMENT DTXT  - o (#PCDATA)      -- Descriptive text                       -->
+<!ELEMENT RCTRY - o (COUNTRY)         -- Country of residence                   -->
+<!ELEMENT NCTRY - o (COUNTRY)         -- Country of nationality                 -->
+<!--  Components of a date(DATE)                                             -->
+<!ELEMENT DATE - o (#PCDATA,TIME?) -- YYYYMMDD                               -->
+<!ELEMENT TIME - o (#PCDATA)       -- HHMMSS (UCT)                           -->
+<!ELEMENT application-nr - - (#PCDATA)  -- application nr  -- >
+<!ELEMENT application-filing-date - - (DATE)  -- Filing date  -- >
+<!ELEMENT document-date - - (DATE) >
+
+
+

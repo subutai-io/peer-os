@@ -1,0 +1,171 @@
+<!-- (C) International Organization for Standardization 1991
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOTECH  PUBLIC
+       "ISO 9573-13:1991//ENTITIES General Technical //EN">
+     %ISOTECH;
+-->
+<!ENTITY acd      SDATA "[acd     ]" --ac current-->
+<!ENTITY aleph    SDATA "[aleph   ]" --/aleph aleph, Hebrew-->
+<!ENTITY and      SDATA "[and     ]" --/wedge /land B: logical and-->
+<!ENTITY And      SDATA "[And     ]" --dbl logical and-->
+<!ENTITY andand   SDATA "[andand  ]" --two logical and-->
+<!ENTITY andd     SDATA "[andd    ]" --and, horizontal dash-->
+<!ENTITY andslope SDATA "[andslope]" --sloping large and-->
+<!ENTITY andv     SDATA "[andv    ]" --and with middle stem-->
+<!ENTITY angrt    SDATA "[angrt   ]" --right (90 degree) angle-->
+<!ENTITY angsph   SDATA "[angsph  ]" --/sphericalangle angle-spherical-->
+<!ENTITY angst    SDATA "[angst   ]" --Angstrom capital A, ring-->
+<!ENTITY ap       SDATA "[ap      ]" --/approx R: approximate-->
+<!ENTITY apacir   SDATA "[apacir  ]" --approximate, circumflex accent-->
+<!ENTITY awconint SDATA "[awconint]" --contour integral, anti-clockwise-->
+<!ENTITY awint    SDATA "[awint   ]" --anti clock-wise integration-->
+<!ENTITY becaus   SDATA "[becaus  ]" --/because R: because-->
+<!ENTITY bernou   SDATA "[bernou  ]" --Bernoulli function (script capital B)-->
+<!ENTITY bne      SDATA "[bne     ]" --reverse not equal-->
+<!ENTITY bnequiv  SDATA "[bnequiv ]" --reverse not equivalent-->
+<!ENTITY bnot     SDATA "[bnot    ]" --reverse not-->
+<!ENTITY bNot     SDATA "[bNot    ]" --reverse not with two horizontal strokes-->
+<!ENTITY bottom   SDATA "[bottom  ]" --/bot bottom-->
+<!ENTITY cap      SDATA "[cap     ]" --/cap B: intersection-->
+<!ENTITY Cconint  SDATA "[Cconint ]" --triple contour integral operator-->
+<!ENTITY cirfnint SDATA "[cirfnint]" --circulation function-->
+<!ENTITY compfn   SDATA "[compfn  ]" --/circ B: composite function (small circle)-->
+<!ENTITY cong     SDATA "[cong    ]" --/cong R: congruent with-->
+<!ENTITY conint   SDATA "[conint  ]" --/oint L: contour integral operator-->
+<!ENTITY Conint   SDATA "[Conint  ]" --double contour integral operator-->
+<!ENTITY ctdot    SDATA "[ctdot   ]" --/cdots, three dots, centered-->
+<!ENTITY cup      SDATA "[cup     ]" --/cup B: union or logical sum-->
+<!ENTITY cwconint SDATA "[cwconint]" --contour integral, clockwise-->
+<!ENTITY cwint    SDATA "[cwint   ]" --clockwise integral-->
+<!ENTITY cylcty   SDATA "[cylcty  ]" --cylindricity-->
+<!ENTITY disin    SDATA "[disin   ]" --set membership, long horizontal stroke-->
+<!ENTITY Dot      SDATA "[Dot     ]" --dieresis or umlaut mark-->
+<!ENTITY DotDot   SDATA "[DotDot  ]" --four dots above-->
+<!ENTITY dsol     SDATA "[dsol    ]" --solidus, bar above-->
+<!ENTITY dtdot    SDATA "[dtdot   ]" --/ddots, three dots, descending-->
+<!ENTITY dwangle  SDATA "[dwangle ]" --large downward pointing angle-->
+<!ENTITY elinters SDATA "[elinters]" --electrical intersection-->
+<!ENTITY epar     SDATA "[epar    ]" --parallel, equal; equal or parallel-->
+<!ENTITY eparsl   SDATA "[eparsl  ]" --parallel, slanted, equal; homothetically congruent to-->
+<!ENTITY equiv    SDATA "[equiv   ]" --/equiv R: identical with-->
+<!ENTITY eqvparsl SDATA "[eqvparsl]" --equivalent, equal; congruent and parallel-->
+<!ENTITY exist    SDATA "[exist   ]" --/exists at least one exists-->
+<!ENTITY fltns    SDATA "[fltns   ]" --flatness-->
+<!ENTITY fnof     SDATA "[fnof    ]" --function of (italic small f)-->
+<!ENTITY forall   SDATA "[forall  ]" --/forall for all-->
+<!ENTITY fpartint SDATA "[fpartint]" --finite part integral-->
+<!ENTITY ge       SDATA "[ge      ]" --/geq /ge R: greater-than-or-equal-->
+<!ENTITY hamilt   SDATA "[hamilt  ]" --Hamiltonian (script capital H)-->
+<!ENTITY iff      SDATA "[iff     ]" --/iff if and only if-->
+<!ENTITY iinfin   SDATA "[iinfin  ]" --infinity sign, incomplete-->
+<!ENTITY imped    SDATA "[imped   ]" --impedance-->
+<!ENTITY infin    SDATA "[infin   ]" --/infty infinity-->
+<!ENTITY infintie SDATA "[infintie]" --tie, infinity-->
+<!ENTITY int      SDATA "[int     ]" --/int L: integral operator-->
+<!ENTITY Int      SDATA "[Int     ]" --double integral operator-->
+<!ENTITY intlarhk SDATA "[intlarhk]" --integral, left arrow with hook-->
+<!ENTITY isin     SDATA "[isin    ]" --/in R: set membership-->
+<!ENTITY isindot  SDATA "[isindot ]" --set membership, dot above-->
+<!ENTITY isinE    SDATA "[isinE   ]" --set membership, two horizontal strokes-->
+<!ENTITY isins    SDATA "[isins   ]" --set membership, vertical bar on horizontal stroke-->
+<!ENTITY isinsv   SDATA "[isinsv  ]" --large set membership, vertical bar on horizontal stroke-->
+<!ENTITY isinv    SDATA "[isinv   ]" --set membership, variant-->
+<!ENTITY lagran   SDATA "[lagran  ]" --Lagrangian (script capital L)-->
+<!ENTITY lang     SDATA "[lang    ]" --/langle O: left angle bracket-->
+<!ENTITY Lang     SDATA "[Lang    ]" --left angle bracket, double-->
+<!ENTITY lArr     SDATA "[lArr    ]" --/Leftarrow A: is implied by-->
+<!ENTITY lbbrk    SDATA "[lbbrk   ]" --left broken bracket-->
+<!ENTITY le       SDATA "[le      ]" --/leq /le R: less-than-or-equal-->
+<!ENTITY loang    SDATA "[loang   ]" --left open angular bracket-->
+<!ENTITY lobrk    SDATA "[lobrk   ]" --left open bracket-->
+<!ENTITY lopar    SDATA "[lopar   ]" --left open parenthesis-->
+<!ENTITY lowast   SDATA "[lowast  ]" --low asterisk-->
+<!ENTITY minus    SDATA "[minus   ]" --B: minus sign-->
+<!ENTITY mnplus   SDATA "[mnplus  ]" --/mp B: minus-or-plus sign-->
+<!ENTITY nabla    SDATA "[nabla   ]" --/nabla del, Hamilton operator-->
+<!ENTITY ne       SDATA "[ne      ]" --/ne /neq R: not equal-->
+<!ENTITY nedot    SDATA "[nedot   ]" --not equal, dot-->
+<!ENTITY nhpar    SDATA "[nhpar   ]" --not, horizontal, parallel-->
+<!ENTITY ni       SDATA "[ni      ]" --/ni /owns R: contains-->
+<!ENTITY nis      SDATA "[nis     ]" --contains, vertical bar on horizontal stroke-->
+<!ENTITY nisd     SDATA "[nisd    ]" --contains, long horizontal stroke-->
+<!ENTITY niv      SDATA "[niv     ]" --contains, variant-->
+<!ENTITY Not      SDATA "[Not     ]" --not with two horizontal strokes-->
+<!ENTITY notin    SDATA "[notin   ]" --/notin N: negated set membership-->
+<!ENTITY notindot SDATA "[notindot]" --negated set membership, dot above-->
+<!ENTITY notinE   SDATA "[notinE  ]" --negated set membership, two horizontal strokes-->
+<!ENTITY notinva  SDATA "[notinva ]" --negated set membership, variant-->
+<!ENTITY notinvb  SDATA "[notinvb ]" --negated set membership, variant-->
+<!ENTITY notinvc  SDATA "[notinvc ]" --negated set membership, variant-->
+<!ENTITY notni    SDATA "[notni   ]" --negated contains-->
+<!ENTITY notniva  SDATA "[notniva ]" --negated contains, variant-->
+<!ENTITY notnivb  SDATA "[notnivb ]" --contains, variant-->
+<!ENTITY notnivc  SDATA "[notnivc ]" --contains, variant-->
+<!ENTITY nparsl   SDATA "[nparsl  ]" --not parallel, slanted-->
+<!ENTITY npart    SDATA "[npart   ]" --not partial differential-->
+<!ENTITY npolint  SDATA "[npolint ]" --line integration, not including the pole-->
+<!ENTITY nvinfin  SDATA "[nvinfin ]" --not, vert, infinity-->
+<!ENTITY olcross  SDATA "[olcross ]" --circle, cross-->
+<!ENTITY or       SDATA "[or      ]" --/vee /lor B: logical or-->
+<!ENTITY Or       SDATA "[Or      ]" --dbl logical or-->
+<!ENTITY ord      SDATA "[ord     ]" --or, horizontal dash-->
+<!ENTITY order    SDATA "[order   ]" --order of (script small o)-->
+<!ENTITY oror     SDATA "[oror    ]" --two logical or-->
+<!ENTITY orslope  SDATA "[orslope ]" --sloping large or-->
+<!ENTITY orv      SDATA "[orv     ]" --or with middle stem-->
+<!ENTITY par      SDATA "[par     ]" --/parallel R: parallel-->
+<!ENTITY parsl    SDATA "[parsl   ]" --parallel, slanted-->
+<!ENTITY part     SDATA "[part    ]" --/partial partial differential-->
+<!ENTITY permil   SDATA "[permil  ]" --per thousand-->
+<!ENTITY perp     SDATA "[perp    ]" --/perp R: perpendicular-->
+<!ENTITY pertenk  SDATA "[pertenk ]" --per 10 thousand-->
+<!ENTITY phmmat   SDATA "[phmmat  ]" --physics M-matrix (script capital M)-->
+<!ENTITY pointint SDATA "[pointint]" --integral around a point operator-->
+<!ENTITY prime    SDATA "[prime   ]" --/prime prime or minute-->
+<!ENTITY Prime    SDATA "[Prime   ]" --double prime or second-->
+<!ENTITY profalar SDATA "[profalar]" --all-around profile-->
+<!ENTITY profline SDATA "[profline]" --profile of a line-->
+<!ENTITY profsurf SDATA "[profsurf]" --profile of a surface-->
+<!ENTITY prop     SDATA "[prop    ]" --/propto R: is proportional to-->
+<!ENTITY qint     SDATA "[qint    ]" --/iiiint quadruple integral operator-->
+<!ENTITY qprime   SDATA "[qprime  ]" --quadruple prime-->
+<!ENTITY quatint  SDATA "[quatint ]" --quaternion integral operator-->
+<!ENTITY radic    SDATA "[radic   ]" --/surd radical-->
+<!ENTITY rang     SDATA "[rang    ]" --/rangle C: right angle bracket-->
+<!ENTITY Rang     SDATA "[Rang    ]" --right angle bracket, double-->
+<!ENTITY rArr     SDATA "[rArr    ]" --/Rightarrow A: implies-->
+<!ENTITY rbbrk    SDATA "[rbbrk   ]" --right broken bracket-->
+<!ENTITY roang    SDATA "[roang   ]" --right open angular bracket-->
+<!ENTITY robrk    SDATA "[robrk   ]" --right open bracket-->
+<!ENTITY ropar    SDATA "[ropar   ]" --right open parenthesis-->
+<!ENTITY rppolint SDATA "[rppolint]" --line integration, rectangular path around pole-->
+<!ENTITY scpolint SDATA "[scpolint]" --line integration, semi-circular path around pole-->
+<!ENTITY sim      SDATA "[sim     ]" --/sim R: similar-->
+<!ENTITY simdot   SDATA "[simdot  ]" --similar, dot-->
+<!ENTITY sime     SDATA "[sime    ]" --/simeq R: similar, equals-->
+<!ENTITY smeparsl SDATA "[smeparsl]" --similar, parallel, slanted, equal-->
+<!ENTITY square   SDATA "[square  ]" --/square, square-->
+<!ENTITY squarf   SDATA "[squarf  ]" --/blacksquare, square, filled-->
+<!ENTITY strns    SDATA "[strns   ]" --straightness-->
+<!ENTITY sub      SDATA "[sub     ]" --/subset R: subset or is implied by-->
+<!ENTITY sube     SDATA "[sube    ]" --/subseteq R: subset, equals-->
+<!ENTITY sup      SDATA "[sup     ]" --/supset R: superset or implies-->
+<!ENTITY supe     SDATA "[supe    ]" --/supseteq R: superset, equals-->
+<!ENTITY tdot     SDATA "[tdot    ]" --three dots above-->
+<!ENTITY there4   SDATA "[there4  ]" --/therefore R: therefore-->
+<!ENTITY tint     SDATA "[tint    ]" --/iiint triple integral operator-->
+<!ENTITY top      SDATA "[top     ]" --/top top-->
+<!ENTITY topbot   SDATA "[topbot  ]" --top and bottom-->
+<!ENTITY topcir   SDATA "[topcir  ]" --top, circle below-->
+<!ENTITY tprime   SDATA "[tprime  ]" --triple prime-->
+<!ENTITY utdot    SDATA "[utdot   ]" --three dots, ascending-->
+<!ENTITY uwangle  SDATA "[uwangle ]" --large upward pointing angle-->
+<!ENTITY vangrt   SDATA "[vangrt  ]" --right angle, variant-->
+<!ENTITY veeeq    SDATA "[veeeq   ]" --logical or, equals-->
+<!ENTITY Verbar   SDATA "[Verbar  ]" --/Vert dbl vertical bar-->
+<!ENTITY wedgeq   SDATA "[wedgeq  ]" --/wedgeq R: corresponds to (wedge, equals)-->
+<!ENTITY xnis     SDATA "[xnis    ]" --large contains, vertical bar on horizontal stroke-->

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Document Type Definition for Open Index
+Reference this DTD as PUBLIC "-//USPTO//DTD open-index v1.0 2003-12-08//EN" 
+Contact: Bruce B. Cox 
+U.S. Patent and Trademark Office 
+Crystal Park 3, Suite 451 
+Washington, DC 20231 
++1-703-306-2606 
+bruce.cox@uspto.gov 
+***** Revision History *****
+2003-12-08
+.First public release.
+.Open-index concept from WIPO Standard ST.40.
+***** End Revision History *****-->
+
+<!--A list of documents in the payload indicating their path.-->
+<!ELEMENT open-index  (from,volume-id,volume-label,main-path,supplemental-path?,
+               open-index-file,(image-content | xml-content)) >
+
+<!ATTLIST open-index
+               lang  CDATA    #REQUIRED 
+               dtd-version  CDATA    #IMPLIED 
+               file  CDATA    #IMPLIED 
+               status  CDATA    #IMPLIED 
+               date-produced  CDATA    #IMPLIED  >
+
+<!--the office that sends the document-->
+<!ELEMENT from  (country) >
+
+<!--Volume identifier for the physical carrier of the payload described in this open index.-->
+<!ELEMENT volume-id  (#PCDATA) >
+
+<!ELEMENT volume-label  (#PCDATA) >
+
+<!--The full path and file name of the file containing either all the image files or all the XML instances and associated external entities.-->
+<!ELEMENT main-path  (#PCDATA) >
+
+<!--The full path and file name of the file containing all the mega content supplementary files.-->
+<!ELEMENT supplemental-path  (#PCDATA) >
+
+<!--The full path and file name of this open index file. The open index file points to itself.-->
+<!ELEMENT open-index-file  (#PCDATA) >
+
+<!ELEMENT image-content  (documents) >
+
+<!ELEMENT xml-content  (documents) >
+
+<!--WIPO Standard ST.3 two-letter country code for the office or organization issuing the documents.-->
+<!ELEMENT country  (#PCDATA) >
+
+<!ELEMENT documents  (doc+) >
+
+<!--One doc record per document on the carrier.-->
+<!ELEMENT doc  (doc-number,(m-path,m-file*),(s-path,s-file+)?) >
+
+<!--The number of the document. For US patent documents, the following formats are used:
+-->
+<!ELEMENT doc-number  (#PCDATA) >
+
+<!--The full path to the file in the main section of the volume. Normally, this is an archive file that may contain either an XML instance and its associated external entities, or an image file.-->
+<!ELEMENT m-path  (#PCDATA) >
+
+<!--Optional listing of the files at m-path, especially if it is an archive.-->
+<!ELEMENT m-file  (#PCDATA) >
+
+<!--The full path to the corresponding file in the supplemental section of the volume. For US documents, supplemental files may be XML, image, or ASCII. All the mega content for a given document are in a single *.zip file in the supplemental section.-->
+<!ELEMENT s-path  (#PCDATA) >
+
+<!--Required listing of the files at s-path.-->
+<!ELEMENT s-file  (#PCDATA) >
+
