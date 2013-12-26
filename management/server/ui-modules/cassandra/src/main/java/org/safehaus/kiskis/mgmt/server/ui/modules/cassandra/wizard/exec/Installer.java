@@ -54,15 +54,15 @@ public class Installer {
             sourceEtcProfileCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(sourceEtcProfileCommand);
 
-            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
-//            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
+//            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
+            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
             setListenAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setListenAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(setListenAddressCommand);
 
-            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname() + "." + config.getDomainName());
-//            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getListIP().get(0));
+//            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname() + "." + config.getDomainName());
+            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getListIP().get(0));
             setRpcAddressCommand.getRequest().setUuid(agent.getUuid());
             setRpcAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setRpcAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
@@ -70,8 +70,8 @@ public class Installer {
 
             StringBuilder seedsSB = new StringBuilder();
             for (Agent seed : config.getSeeds()) {
-                seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
-//                seedsSB.append(agent.getListIP().get(0)).append(",");
+//                seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
+                seedsSB.append(agent.getListIP().get(0)).append(",");
             }
 
             Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
@@ -183,7 +183,7 @@ public class Installer {
                             executeCommand(command);
                         }
                     } else {
-                        terminal.setValue(terminal.getValue().toString() + "\nInstallation finished");
+                        terminal.setValue(terminal.getValue().toString() + "\nInstallation finished.");
                         CassandraClusterInfo cci = new CassandraClusterInfo();
                         cci.setName(config.getClusterName());
                         cci.setDataDir(config.getDataDirectory());
