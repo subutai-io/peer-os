@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public final class HadoopDataNodesWindow extends Window {
 
@@ -87,7 +88,11 @@ public final class HadoopDataNodesWindow extends Window {
             public void buttonClick(Button.ClickEvent event) {
                 Agent agent = (Agent) agentsComboBox.getValue();
                 cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
-                cluster.getDataNodes().add(agent.getUuid());
+
+                List<UUID> list = new ArrayList<UUID>();
+                list.addAll(cluster.getDataNodes());
+
+                cluster.setDataNodes(list);
                 addButton.setEnabled(false);
 
                 configureNode(agent);
