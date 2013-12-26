@@ -46,14 +46,18 @@ public class Installer {
         }
         tasks.add(installTask);
 
-        Task setListenAddressTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set listen addresses");
+        Task sourceEtcProfileTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Update profile");
         for (Agent agent : config.getSelectedAgents()) {
             Command sourceEtcProfileCommand = CassandraCommands.getSourceEtcProfileUpdateCommand();
             sourceEtcProfileCommand.getRequest().setUuid(agent.getUuid());
-            sourceEtcProfileCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
-            sourceEtcProfileCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
-            setListenAddressTask.addCommand(sourceEtcProfileCommand);
+            sourceEtcProfileCommand.getRequest().setTaskUuid(sourceEtcProfileTask.getUuid());
+            sourceEtcProfileCommand.getRequest().setRequestSequenceNumber(sourceEtcProfileTask.getIncrementedReqSeqNumber());
+            sourceEtcProfileTask.addCommand(sourceEtcProfileCommand);
+        }
+        tasks.add(sourceEtcProfileTask);
 
+        Task setListenAddressTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set listen addresses");
+        for (Agent agent : config.getSelectedAgents()) {
 //            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
             Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
@@ -68,19 +72,23 @@ public class Installer {
             setRpcAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(setRpcAddressCommand);
 
-            StringBuilder seedsSB = new StringBuilder();
-            for (Agent seed : config.getSeeds()) {
-//                seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
-                seedsSB.append(agent.getListIP().get(0)).append(",");
-            }
-
-            Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
-            setSeedsCommand.getRequest().setUuid(agent.getUuid());
-            setSeedsCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
-            setSeedsCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
-            setListenAddressTask.addCommand(setSeedsCommand);
         }
         tasks.add(setListenAddressTask);
+
+        Task setSeedsTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Set seeds addresses");
+        StringBuilder seedsSB = new StringBuilder();
+        for (Agent seed : config.getSeeds()) {
+//                seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
+            seedsSB.append(seed.getListIP().get(0)).append(",");
+        }
+        for (Agent agent : config.getSelectedAgents()) {
+            Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
+            setSeedsCommand.getRequest().setUuid(agent.getUuid());
+            setSeedsCommand.getRequest().setTaskUuid(setSeedsTask.getUuid());
+            setSeedsCommand.getRequest().setRequestSequenceNumber(setSeedsTask.getIncrementedReqSeqNumber());
+            setSeedsTask.addCommand(setSeedsCommand);
+        }
+        tasks.add(setSeedsTask);
 
         if (!config.getClusterName().isEmpty()) {
             Task clusterRenameTask = RequestUtil.createTask(CassandraModule.getCommandManager(), "Rename cluster");
@@ -204,7 +212,7 @@ public class Installer {
     }
 
     private void executeCommand(Command command) {
-//        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
+        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
         CassandraModule.getCommandManager().executeCommand(command);
     }
 
