@@ -45,9 +45,9 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
-                //                "update",
-                //                "&&",
-                //                "/usr/bin/apt-get",                
+                "update",
+                "&&",
+                "/usr/bin/apt-get",
                 "--force-yes",
                 "--assume-yes",
                 "install",
