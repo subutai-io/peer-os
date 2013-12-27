@@ -209,7 +209,7 @@ public class ServiceInstaller {
     }
 
     private void executeCommand(Command command) {
-        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
+//        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
         ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
     }
 
