@@ -93,7 +93,7 @@ public class MongoCommands {
         req.setProgram("/bin/echo");
         req.setArgs(Arrays.asList(
                 "-e",
-                otherShardsHosts,
+                "\"" + otherShardsHosts + "\"",
                 //add [echo -e "\nIP HOST\nIP HOST\nIP HOST"] with each replica's data
                 //except the one to whom this command is aimed and replace placeholder
                 ">>",
