@@ -227,7 +227,7 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
 
     /**
      * assume the following: lets say that physical agent's hostname is "py01"
-     * then its child lxc agents will be like "py01_lxc_hadoop-node-1"
+     * then its child lxc agents will be like "py01-lxc-hadoop-node-1"
      *
      * @param physicalAgent - physical agent
      * @return child lxc agents of a physical agent
