@@ -219,6 +219,7 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("/bin/mkdir");
         req.setArgs(Arrays.asList(
+                "-p",
                 "/data/configdb",
                 ";",
                 "mongod",

@@ -94,6 +94,7 @@ public class Step4 extends Panel {
                                         prevTaskDescription));
                     }
                 } else {
+                    currentTask = null;
                     outputTxtArea.setValue(
                             MessageFormat.format("{0}\n\nTask {1} failed.\n\nInstallation aborted.",
                                     outputTxtArea.getValue(),
