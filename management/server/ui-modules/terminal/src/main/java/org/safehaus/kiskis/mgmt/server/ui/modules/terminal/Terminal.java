@@ -18,7 +18,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
 public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
@@ -138,7 +137,7 @@ public class Terminal implements Module {
                         }
                     }
                 }
-                String res = sb.toString().replace("\\n", "\n");
+                String res = sb.toString().replace("\\n", "\n").replace("\\\"", "\"");
                 textAreaOutput.setValue(res);
                 textAreaOutput.setCursorPosition(res.length() - 1);
             }
@@ -198,7 +197,6 @@ public class Terminal implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     try {
-//                        agents = AppData.getSelectedAgentList();
                         Set<Agent> agents = MgmtApplication.getSelectedAgents();
                         if (agents != null && agents.size() > 0) {
                             task = new Task();
@@ -224,10 +222,6 @@ public class Terminal implements Module {
                                         textAreaOutput.setValue("ERROR IN COMMAND JSON");
                                     }
                                 } else {
-//                                    task = new Task();
-//                                    task.setDescription("JSON executing");
-//                                    task.setTaskStatus(TaskStatus.NEW);
-//                                    commandManagerInterface.saveTask(task);
 
                                     Request r = new Request();
 
