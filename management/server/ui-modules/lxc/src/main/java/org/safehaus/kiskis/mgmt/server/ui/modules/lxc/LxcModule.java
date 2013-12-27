@@ -10,17 +10,14 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms.LxcManageForm;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 public class LxcModule implements Module {
 
     private static final Logger LOG = Logger.getLogger(LxcModule.class.getName());
     public static final String MODULE_NAME = "LXC";
-    private ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements CommandListener {
 
@@ -69,36 +66,25 @@ public class LxcModule implements Module {
 
     @Override
     public Component createComponent() {
-        try {
-            component = new ModuleComponent();
-            ServiceLocator.getService(CommandManagerInterface.class).addListener(component);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in createComponent", e);
-        }
-        return component;
-    }
-
-    @Override
-    public void dispose() {
-        try {
-            ServiceLocator.getService(CommandManagerInterface.class).removeListener(component);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in dispose", e);
-        }
+        return new ModuleComponent();
     }
 
     public void setModuleService(ModuleService service) {
-        if (service != null) {
-            LOG.log(Level.INFO, "{0} registering with ModuleService", MODULE_NAME);
+        try {
+            LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
             service.registerModule(this);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in setModuleService", e);
         }
+
     }
 
     public void unsetModuleService(ModuleService service) {
-        if (service != null) {
+        try {
             service.unregisterModule(this);
-            LOG.log(Level.INFO, "{0} Unregistering with ModuleService", MODULE_NAME);
+            LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in unsetModuleService", e);
         }
     }
-
 }
