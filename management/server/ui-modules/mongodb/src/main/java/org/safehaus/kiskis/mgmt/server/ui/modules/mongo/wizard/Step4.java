@@ -10,6 +10,9 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Installer;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
@@ -47,6 +50,8 @@ public class Step4 extends Panel {
         content.addComponent(ok);
         addComponent(content);
 
+        Installer installer = new Installer(mongoWizard);
+        installer.start();
     }
 
     private void show(String notification) {
@@ -54,7 +59,8 @@ public class Step4 extends Panel {
     }
 
     protected void onResponse(Response response) {
-        String output = outputTxtArea.getValue() + "\n";
+        String output = outputTxtArea.getValue() + "\n"
+                + CommandJson.getJson(new Command(response));
         outputTxtArea.setValue(output);
         outputTxtArea.setCursorPosition(output.length() - 1);
     }

@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
@@ -27,6 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public class Installer {
 
     private List<Task> tasks = new ArrayList<Task>();
+    private Iterator<Task> tasksIterator;
 
     public Installer(MongoWizard mongoWizard) {
         CommandManagerInterface commandManager = ServiceLocator.getService(CommandManagerInterface.class);
@@ -152,6 +154,26 @@ public class Installer {
         tasks.add(registerPrimaryWithRouterTask);
 
         //
+        tasksIterator = tasks.iterator();
+    }
+
+    public void start() {
+        executeNextTask();
+    }
+
+    public boolean executeNextTask() {
+        Task currentTask = null;
+        if (tasksIterator.hasNext()) {
+            currentTask = tasksIterator.next();
+        }
+        if (currentTask != null && currentTask.getCommands() != null
+                && !currentTask.getCommands().isEmpty()) {
+            for (Command cmd : currentTask.getCommands()) {
+                ServiceLocator.getService(CommandManagerInterface.class).executeCommand(cmd);
+            }
+            return true;
+        }
+        return false;
     }
 
 }
