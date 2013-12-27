@@ -84,6 +84,29 @@ public class MongoCommands {
         return cmd;
     }
 
+    public static Command getRemoveConfDirCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/rm");
+        req.setArgs(Arrays.asList(
+                "-R",
+                "/data/configdb"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    public static Command getRemoveReplicaConfFileCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/rm");
+        req.setArgs(Arrays.asList(
+                "/etc/mongodb.conf"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
     //execute on each replica
     public static Command getSetReplicaSetNameCommand(String replicaSetName) {
         Command cmd = getTemplate();
@@ -245,7 +268,7 @@ public class MongoCommands {
                 "/var/log/mongodb.log"
         //                        "--logappend"
         ));
-        req.setTimeout(0);
+        req.setTimeout(180);
         return cmd;
     }
 
