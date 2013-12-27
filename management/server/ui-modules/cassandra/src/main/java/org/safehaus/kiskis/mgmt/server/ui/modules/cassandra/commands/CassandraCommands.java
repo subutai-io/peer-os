@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class CassandraCommands {
 
-    private static final String conf = "/opt/cassandra-2.0.0/conf/cassandra.yaml";
+    private static final String conf = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
 
     // INSTALLATION COMMANDS ===================================================
     public static Command getTemplate() {
