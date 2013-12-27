@@ -137,7 +137,7 @@ public class Terminal implements Module {
                         }
                     }
                 }
-                String res = sb.toString().replace("\\n", "\n").replace("\\\"", "\"");
+                String res = sb.toString().replace("\\n", "\n");
                 textAreaOutput.setValue(res);
                 textAreaOutput.setCursorPosition(res.length() - 1);
             }
