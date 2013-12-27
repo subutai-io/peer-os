@@ -90,8 +90,8 @@ public class CassandraCommands {
     public static Command getSetSeedsCommand(String seeds) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seeds!'";
-        req.setProgram(program.replace("%seeds", seeds));
+        String program = "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seedsIps!'";
+        req.setProgram(program.replace("%seedsIps", seeds));
         req.setTimeout(30);
         return cmd;
     }
