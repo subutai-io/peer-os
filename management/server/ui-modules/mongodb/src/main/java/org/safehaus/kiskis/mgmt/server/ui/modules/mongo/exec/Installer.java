@@ -61,7 +61,7 @@ public class Installer {
         }
         tasks.add(uninstallMongoTask);
         //INSTALL MONGO
-        Task installMongoTask = RequestUtil.createTask(commandManager, "Mongo Install");
+        Task installMongoTask = RequestUtil.createTask(commandManager, "Install Mongo");
         for (Agent agent : allClusterMembers) {
             Command cmd = MongoCommands.getInstallCommand();
             cmd.getRequest().setUuid(agent.getUuid());
