@@ -40,12 +40,15 @@ public class RequestUtil {
     }
 
     public static String getAgentIpByMask(Agent agent, String mask) {
-        if (agent != null && agent.getListIP() != null && !agent.getListIP().isEmpty()) {
-            for (String ip : agent.getListIP()) {
-                if (ip.matches(mask)) {
-                    return ip;
+        if (agent != null) {
+            if (agent.getListIP() != null && !agent.getListIP().isEmpty()) {
+                for (String ip : agent.getListIP()) {
+                    if (ip.matches(mask)) {
+                        return ip;
+                    }
                 }
             }
+            return agent.getHostname();
         }
         return null;
     }

@@ -5,7 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.MongoCommands;
@@ -23,6 +25,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * @author dilshat
  */
 public class Installer {
+
+    private List<Task> tasks = new ArrayList<Task>();
 
     public Installer(MongoWizard mongoWizard) {
         CommandManagerInterface commandManager = ServiceLocator.getService(CommandManagerInterface.class);
@@ -42,6 +46,7 @@ public class Installer {
             cmd.getRequest().setSource(mongoWizard.getSource());
             installMongoTask.addCommand(cmd);
         }
+        tasks.add(installMongoTask);
 
         //START CONFIG SERVERS
         Task startConfigServersTask = RequestUtil.createTask(commandManager, "Start config servers");
@@ -53,16 +58,14 @@ public class Installer {
             cmd.getRequest().setSource(mongoWizard.getSource());
             startConfigServersTask.addCommand(cmd);
         }
+        tasks.add(startConfigServersTask);
 
         //START ROUTERS
         Task startRoutersTask = RequestUtil.createTask(commandManager, "Start routers");
         StringBuilder configServersArg = new StringBuilder();
         for (Agent agent : mongoWizard.getConfig().getConfigServers()) {
-            String ipOrHost = RequestUtil.getAgentIpByMask(agent, Common.IP_MASK);
-            if (ipOrHost == null) {
-                ipOrHost = agent.getHostname();
-            }
-            configServersArg.append(ipOrHost).append(":").append(Constants.MONGO_CONFIG_SERVER_PORT).append(",");
+            configServersArg.append(RequestUtil.getAgentIpByMask(agent, Common.IP_MASK)).//use hostname when fixed
+                    append(":").append(Constants.MONGO_CONFIG_SERVER_PORT).append(",");
         }
         //drop comma
         if (configServersArg.length() > 0) {
@@ -76,8 +79,9 @@ public class Installer {
             cmd.getRequest().setSource(mongoWizard.getSource());
             startRoutersTask.addCommand(cmd);
         }
+        tasks.add(startRoutersTask);
 
-        //Add replica to each others /etc/hosts
+        //ADD REPLICA TO EACH OTHERS /ETC/HOSTS
         Task setReplicaSetNameTask = RequestUtil.createTask(commandManager, "Set ReplicaSet name");
         for (Agent agent : mongoWizard.getConfig().getShards()) {
             Command cmd = MongoCommands.getSetReplicaSetNameCommand(mongoWizard.getConfig().getReplicaSetName());
@@ -87,8 +91,9 @@ public class Installer {
             cmd.getRequest().setSource(mongoWizard.getSource());
             setReplicaSetNameTask.addCommand(cmd);
         }
+        tasks.add(setReplicaSetNameTask);
 
-        //Add host name of each shard to other shard's /etc/hosts file
+        //ADD HOST NAME OF EACH SHARD TO OTHER SHARD'S /ETC/HOSTS FILE
         Task addShardHostToOtherShardsTask = RequestUtil.createTask(commandManager, "Add Shard Host To Other Shards");
         for (Agent agent : mongoWizard.getConfig().getShards()) {
             StringBuilder hosts = new StringBuilder();
@@ -106,8 +111,9 @@ public class Installer {
             cmd.getRequest().setSource(mongoWizard.getSource());
             addShardHostToOtherShardsTask.addCommand(cmd);
         }
+        tasks.add(addShardHostToOtherShardsTask);
 
-        //Restart shards
+        //RESTART SHARDS
         Task restartShards = RequestUtil.createTask(commandManager, "Restart shards");
         for (Agent agent : mongoWizard.getConfig().getShards()) {
             Command cmd = MongoCommands.getRestartShardCommand();
@@ -117,26 +123,33 @@ public class Installer {
             cmd.getRequest().setSource(mongoWizard.getSource());
             restartShards.addCommand(cmd);
         }
+        tasks.add(restartShards);
 
-        //Register secondary nodes on primary
+        //REGISTER SECONDARY NODES ON PRIMARY
         Task registerSecondaryNodesWithPrimaryTask = RequestUtil.createTask(commandManager, "Register secondary nodes with primary");
         //Make the first node as primary
         Agent primaryNode = mongoWizard.getConfig().getShards().iterator().next();
         StringBuilder secondaryStr = new StringBuilder();
         for (Agent agent : mongoWizard.getConfig().getShards()) {
             if (agent != primaryNode) {
-                secondaryStr.append("\n'rs.add(\"").append(agent.getHostname()).append("\")'");
+                secondaryStr.append("\n'rs.add(\"").
+                        append(RequestUtil.getAgentIpByMask(agent, Common.IP_MASK)).//use hostname when fixed
+                        append("\")'");
             }
         }
         Command cmd = MongoCommands.getAddSecondaryReplicasToPrimaryCommand(secondaryStr.toString());
         registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
+        tasks.add(registerSecondaryNodesWithPrimaryTask);
 
-        //Register primary node with one of the routers
+        //REGISTER PRIMARY NODE WITH ONE OF THE ROUTERS
         Task registerPrimaryWithRouterTask = RequestUtil.createTask(commandManager, "Register primary with router");
         Agent router = mongoWizard.getConfig().getRouterServers().iterator().next();
-        cmd = MongoCommands.getRegisterPrimaryOnRouterCommand(mongoWizard.getConfig().getReplicaSetName(),
-                primaryNode.getHostname(), router.getHostname());
+        cmd = MongoCommands.getRegisterPrimaryOnRouterCommand(
+                mongoWizard.getConfig().getReplicaSetName(),
+                RequestUtil.getAgentIpByMask(primaryNode, Common.IP_MASK),//use hostname when fixed
+                RequestUtil.getAgentIpByMask(router, Common.IP_MASK));//use hostname when fixed
         registerPrimaryWithRouterTask.addCommand(cmd);
+        tasks.add(registerPrimaryWithRouterTask);
 
         //
     }
