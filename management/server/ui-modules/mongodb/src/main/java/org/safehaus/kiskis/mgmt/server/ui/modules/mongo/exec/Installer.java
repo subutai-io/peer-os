@@ -41,6 +41,16 @@ public class Installer {
 
         //UNINSTALL MONGO
         Task uninstallMongoTask = RequestUtil.createTask(commandManager, Constants.MONGO_UNINSTALL_TASK_NAME);
+        //kill mongod
+        for (Agent agent : allClusterMembers) {
+            Command cmd = MongoCommands.getForceKillMongodCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(mongoWizard.getSource());
+            uninstallMongoTask.addCommand(cmd);
+        }
+        //uninstall it
         for (Agent agent : allClusterMembers) {
             Command cmd = MongoCommands.getUninstallCommand();
             cmd.getRequest().setUuid(agent.getUuid());

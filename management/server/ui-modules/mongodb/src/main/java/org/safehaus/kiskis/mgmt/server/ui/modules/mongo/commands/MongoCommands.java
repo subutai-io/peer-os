@@ -339,7 +339,7 @@ public class MongoCommands {
         req.setArgs(Arrays.asList(
                 "--shutdown"
         ));
-        req.setTimeout(30);
+        req.setTimeout(60);
         return cmd;
     }
 
@@ -349,10 +349,22 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("/bin/kill");
         req.setArgs(Arrays.asList(
-                " -2",
+                "-2",
                 "`pgrep -f mongod`"
         ));
         req.setTimeout(10);
+        return cmd;
+    }
+
+    public static Command getForceKillMongodCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/kill");
+        req.setArgs(Arrays.asList(
+                "-9",
+                "`pgrep -f mongod`"
+        ));
+        req.setTimeout(30);
         return cmd;
     }
 
