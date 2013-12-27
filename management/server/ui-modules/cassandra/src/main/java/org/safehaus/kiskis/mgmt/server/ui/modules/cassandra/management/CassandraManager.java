@@ -23,7 +23,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class CassandraManager {
 
     private final VerticalLayout contentRoot;
-    CassandraTable cassandraTable;
+//    CassandraTable cassandraTable;
     ServiceManager manager;
     private final TextArea terminal;
 
@@ -51,7 +51,7 @@ public class CassandraManager {
         terminal.setRows(10);
         terminal.setColumns(60);
         manager = new ServiceManager(terminal);
-        cassandraTable = new CassandraTable(manager);
+        final CassandraTable cassandraTable = new CassandraTable(manager);
         Button getClustersBtn = new Button("Get clusters");
         getClustersBtn.addListener(new Button.ClickListener() {
 
