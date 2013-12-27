@@ -22,7 +22,6 @@ public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
     private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
-    private ModuleComponent component;
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
