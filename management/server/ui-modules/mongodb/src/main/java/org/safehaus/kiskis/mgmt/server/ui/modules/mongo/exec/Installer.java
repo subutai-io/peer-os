@@ -50,6 +50,15 @@ public class Installer {
             cmd.getRequest().setSource(mongoWizard.getSource());
             uninstallMongoTask.addCommand(cmd);
         }
+        //remove mongo data
+        for (Agent agent : allClusterMembers) {
+            Command cmd = MongoCommands.getRemoveDataDirCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(mongoWizard.getSource());
+            uninstallMongoTask.addCommand(cmd);
+        }
         //uninstall it
         for (Agent agent : allClusterMembers) {
             Command cmd = MongoCommands.getUninstallCommand();

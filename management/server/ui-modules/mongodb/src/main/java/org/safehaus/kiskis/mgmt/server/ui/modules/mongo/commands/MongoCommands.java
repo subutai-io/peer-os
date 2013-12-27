@@ -72,6 +72,18 @@ public class MongoCommands {
         return cmd;
     }
 
+    public static Command getRemoveDataDirCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/rm");
+        req.setArgs(Arrays.asList(
+                "-R",
+                "/var/lib/mongodb"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
     //execute on each replica
     public static Command getSetReplicaSetNameCommand(String replicaSetName) {
         Command cmd = getTemplate();
@@ -227,11 +239,11 @@ public class MongoCommands {
                 "--dbpath",
                 "/data/configdb",
                 "--port",
-                Constants.MONGO_CONFIG_SERVER_PORT + "" // this might be user-supplied
-        //                "--fork",
-        //                "--logpath",
-        //                "/var/log/mongodb.log",
-        //                "--logappend"
+                Constants.MONGO_CONFIG_SERVER_PORT + "", // this might be user-supplied
+                "--fork",
+                "--logpath",
+                "/var/log/mongodb.log"
+        //                        "--logappend"
         ));
         req.setTimeout(0);
         return cmd;
