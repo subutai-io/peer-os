@@ -44,7 +44,7 @@ public class CommunicationMessageListener implements MessageListener {
                 } else {
                     LOG.log(Level.WARNING, "Could not parse response{0}", jsonCmd);
                 }
-                LOG.log(Level.INFO, "Processed notify listeners in Communication in {0} ms", (System.currentTimeMillis() - ts));
+//                LOG.log(Level.INFO, "Processed notify listeners in Communication in {0} ms", (System.currentTimeMillis() - ts));
 
             } else if (message instanceof ActiveMQMessage) {
                 ActiveMQMessage aMsg = (ActiveMQMessage) message;

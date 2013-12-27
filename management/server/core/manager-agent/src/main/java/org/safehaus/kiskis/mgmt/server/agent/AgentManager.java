@@ -122,9 +122,9 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
                     task.setTaskStatus(TaskStatus.SUCCESS);
                     persistenceAgent.saveTask(task);
                     //
+                    LOG.log(Level.INFO, String.format("Agent %s is registered", agent.getHostname()));
                 }
                 agentNotifier.refresh = true;
-                LOG.log(Level.INFO, String.format("Agent %s is %s", agent.getHostname(), register ? "registered" : "updated"));
             } else {
                 LOG.log(Level.WARNING, String.format("\nError %s agent %s", register ? "registering" : "updating", agent.getHostname()));
             }
