@@ -61,6 +61,7 @@ public class Step4 extends Panel {
 
         installer = new Installer(mongoWizard);
         currentTask = installer.start();
+        outputTxtArea.setValue(MessageFormat.format("Running task {0}...", currentTask.getDescription()));
     }
 
     private void show(String notification) {
@@ -75,11 +76,11 @@ public class Step4 extends Panel {
             int count = commandManager.getResponseCount(currentTask.getUuid());
             if (currentTask.getCommands().size() == count) {
                 int okCount = commandManager.getSuccessfullResponseCount(currentTask.getUuid());
+                String prevTaskDescription = currentTask.getDescription();
                 if (count == okCount
                         || currentTask.getDescription().equalsIgnoreCase(Constants.MONGO_UNINSTALL_TASK_NAME)) {
                     currentTask.setTaskStatus(TaskStatus.SUCCESS);
                     commandManager.saveTask(currentTask);
-                    String prevTaskDescription = currentTask.getDescription();
                     currentTask = installer.executeNextTask();
                     if (currentTask != null) {
                         outputTxtArea.setValue(
@@ -98,7 +99,7 @@ public class Step4 extends Panel {
                     outputTxtArea.setValue(
                             MessageFormat.format("{0}\n\nTask {1} failed.\n\nInstallation aborted.",
                                     outputTxtArea.getValue(),
-                                    currentTask.getDescription()));
+                                    prevTaskDescription));
                     //PROBABLY RUN HERE UNINSTALL COMMAND
                 }
                 outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
