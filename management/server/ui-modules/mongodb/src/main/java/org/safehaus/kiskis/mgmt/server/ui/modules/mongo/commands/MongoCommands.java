@@ -222,7 +222,6 @@ public class MongoCommands {
                 "-p",
                 "/data/configdb",
                 ";",
-                "daemon",//?????
                 "mongod",
                 "--configsvr",
                 "--dbpath",
@@ -232,7 +231,7 @@ public class MongoCommands {
                 "--fork",
                 "--logpath",
                 "/var/log/mongodb.log",
-                "&"
+                "--logappend"
         ));
         req.setTimeout(180);
         return cmd;
