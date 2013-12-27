@@ -10,10 +10,15 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+import java.text.MessageFormat;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Installer;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
@@ -21,7 +26,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  */
 public class Step4 extends Panel {
 
+    private static final Logger LOG = Logger.getLogger(Step4.class.getName());
+
     private final TextArea outputTxtArea;
+    private Task currentTask = null;
+    private final Installer installer;
 
     public Step4(final MongoWizard mongoWizard) {
 
@@ -50,8 +59,8 @@ public class Step4 extends Panel {
         content.addComponent(ok);
         addComponent(content);
 
-        Installer installer = new Installer(mongoWizard);
-        installer.start();
+        installer = new Installer(mongoWizard);
+        currentTask = installer.start();
     }
 
     private void show(String notification) {
@@ -59,10 +68,41 @@ public class Step4 extends Panel {
     }
 
     protected void onResponse(Response response) {
-        String output = outputTxtArea.getValue() + "\n"
-                + CommandJson.getJson(new Command(response));
-        outputTxtArea.setValue(output);
-        outputTxtArea.setCursorPosition(output.length() - 1);
-    }
+        if (currentTask != null && response != null
+                && currentTask.getUuid() != null && response.getTaskUuid() != null
+                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
+            CommandManagerInterface commandManager = ServiceLocator.getService(CommandManagerInterface.class);
+            int count = commandManager.getResponseCount(currentTask.getUuid());
+            if (currentTask.getCommands().size() == count) {
+                int okCount = commandManager.getSuccessfullResponseCount(currentTask.getUuid());
+                if (count == okCount
+                        || currentTask.getDescription().equalsIgnoreCase(Constants.MONGO_UNINSTALL_TASK_NAME)) {
+                    currentTask.setTaskStatus(TaskStatus.SUCCESS);
+                    commandManager.saveTask(currentTask);
+                    String prevTaskDescription = currentTask.getDescription();
+                    currentTask = installer.executeNextTask();
+                    if (currentTask != null) {
+                        outputTxtArea.setValue(
+                                MessageFormat.format("{0}\n\nTask {1} succeeded\n\nRunning next task {2}...",
+                                        outputTxtArea.getValue(),
+                                        prevTaskDescription,
+                                        currentTask.getDescription()));
+                    } else {
+                        outputTxtArea.setValue(
+                                MessageFormat.format("{0}\n\nTask {1} succeeded.\n\nInstallation completed successfully.",
+                                        outputTxtArea.getValue(),
+                                        prevTaskDescription));
+                    }
+                } else {
+                    outputTxtArea.setValue(
+                            MessageFormat.format("{0}\n\nTask {1} failed.\n\nInstallation aborted.",
+                                    outputTxtArea.getValue(),
+                                    currentTask.getDescription()));
+                    //PROBABLY RUN HERE UNINSTALL COMMAND
+                }
+                outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+            }
+        }
 
+    }
 }

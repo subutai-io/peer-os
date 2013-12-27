@@ -45,6 +45,9 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
+                //                "update",
+                //                "&&",
+                //                "/usr/bin/apt-get",                
                 "--force-yes",
                 "--assume-yes",
                 "install",
@@ -189,6 +192,21 @@ public class MongoCommands {
                 routerHost, //supply any one router host
                 "--port",
                 Constants.MONGO_ROUTER_PORT + "" //supply router port
+        ));
+        req.setTimeout(60);
+        return cmd;
+    }
+
+    //execute on any router member
+    public static Command getRegisterPrimaryWithRouterCommand(String replicaSetName, String primaryHost) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/echo");
+        req.setArgs(Arrays.asList(
+                String.format("'sh.addShard(\"%s/%s:%s\")'",
+                        replicaSetName, primaryHost, Constants.MONGO_SHARD_PORT),
+                "|",
+                "mongo"
         ));
         req.setTimeout(60);
         return cmd;

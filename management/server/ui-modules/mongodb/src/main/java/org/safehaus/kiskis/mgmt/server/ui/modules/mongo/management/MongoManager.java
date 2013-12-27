@@ -15,6 +15,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
@@ -137,7 +138,7 @@ public class MongoManager implements ResponseListener {
 
     @Override
     public String getSource() {
-        return getClass().getName();
+        return MongoModule.MODULE_NAME;
     }
 
 }
