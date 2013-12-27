@@ -227,13 +227,13 @@ public class MongoCommands {
                 "--dbpath",
                 "/data/configdb",
                 "--port",
-                Constants.MONGO_CONFIG_SERVER_PORT + "", // this might be user-supplied
-                "--fork",
-                "--logpath",
-                "/var/log/mongodb.log",
-                "--logappend"
+                Constants.MONGO_CONFIG_SERVER_PORT + "" // this might be user-supplied
+        //                "--fork",
+        //                "--logpath",
+        //                "/var/log/mongodb.log",
+        //                "--logappend"
         ));
-        req.setTimeout(180);
+        req.setTimeout(0);
         return cmd;
     }
 
