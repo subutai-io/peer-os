@@ -82,7 +82,7 @@ public class MongoWizard implements ResponseListener {
         putForm();
     }
 
-    protected MongoConfig getConfig() {
+    public MongoConfig getConfig() {
         return mongoConfig;
     }
 

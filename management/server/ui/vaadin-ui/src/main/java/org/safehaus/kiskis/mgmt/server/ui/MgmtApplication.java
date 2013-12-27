@@ -19,6 +19,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener, HttpServletRequestListener {
@@ -73,7 +76,11 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             tabs.setSizeFull();
             tabs.setImmediate(true);
             for (Module module : moduleService.getModules()) {
-                tabs.addTab(module.createComponent(), module.getName(), null);
+                Component component = module.createComponent();
+                tabs.addTab(component, module.getName(), null);
+                if (component instanceof CommandListener) {
+                    ServiceLocator.getService(CommandManagerInterface.class).addListener((CommandListener) component);
+                }
             }
             horizontalSplit.setSecondComponent(tabs);
 
@@ -83,15 +90,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             getMainWindow().addListener(new Window.CloseListener() {
                 @Override
                 public void windowClose(Window.CloseEvent e) {
-                    try {
-                        if (moduleService != null) {
-                            agentManagerService.removeListener(agentManager);
-                            moduleService.removeListener(app);
-                            LOG.log(Level.INFO, "Removing app as module listener");
-                        }
-                    } catch (Exception ex) {
-                        LOG.log(Level.SEVERE, "Error in windowClose", ex);
-                    }
+                    close();
                 }
             });
             //
@@ -102,7 +101,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             indicator.setHeight("1px");
             getMainWindow().addComponent(indicator);
             //            
-//            getMainWindow().executeJavaScript("var url = location.protocol+'//'+location.hostname;");
         } catch (Exception ex) {
         } finally {
         }
@@ -114,6 +112,14 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             super.close();
             agentManagerService.removeListener(agentManager);
             moduleService.removeListener(app);
+            //dispose all modules     
+            Iterator<Component> it = tabs.getComponentIterator();
+            while (it.hasNext()) {
+                Component component = it.next();
+                if (component instanceof CommandListener) {
+                    ServiceLocator.getService(CommandManagerInterface.class).removeListener((CommandListener) component);
+                }
+            }
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Application closing, removing module service listener");
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error closing", e);
@@ -124,7 +130,11 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     public void moduleRegistered(ModuleService source, Module module) {
         try {
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Module registered, adding tab");
-            tabs.addTab(module.createComponent(), module.getName(), null);
+            Component component = module.createComponent();
+            tabs.addTab(component, module.getName(), null);
+            if (component instanceof CommandListener) {
+                ServiceLocator.getService(CommandManagerInterface.class).addListener((CommandListener) component);
+            }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error registering module{0}", e);
         }
@@ -136,13 +146,16 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Module unregistered, removing tab");
             Iterator<Component> it = tabs.getComponentIterator();
             while (it.hasNext()) {
-                Component c = it.next();
-                if (tabs.getTab(c).getCaption().equals(module.getName())) {
-                    tabs.removeComponent(c);
+                Component component = it.next();
+                if (tabs.getTab(component).getCaption().equals(module.getName())) {
+                    tabs.removeComponent(component);
+                    if (component instanceof CommandListener) {
+                        ServiceLocator.getService(CommandManagerInterface.class).removeListener((CommandListener) component);
+                    }
                     return;
                 }
             }
-            module.dispose();
+
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error unregistering module{0}", e);
         }

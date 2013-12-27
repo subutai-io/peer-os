@@ -31,19 +31,20 @@ public final class MgmtAgentManager extends ConcurrentComponent
     private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
-    private Set<String> selectedHostnames = null;
+    private List<Agent> currentAgents = new ArrayList<Agent>();
 
     public MgmtAgentManager(AgentManagerInterface agentManagerService) {
         this.agentManagerInterface = agentManagerService;
         setSizeFull();
         setMargin(true);
-        tree = new Tree("List of nodes", getNodeContainer());
+        tree = new Tree("List of nodes");
+        tree.setContainerDataSource(getNodeContainer());
         tree.setItemIconPropertyId("icon");
         tree.setItemDescriptionGenerator(new AbstractSelect.ItemDescriptionGenerator() {
 
             @Override
             public String generateDescription(Component source, Object itemId,
-                                              Object propertyId) {
+                    Object propertyId) {
                 String description = "";
 
                 Item item = tree.getItem(itemId);
@@ -69,16 +70,14 @@ public final class MgmtAgentManager extends ConcurrentComponent
                     Tree t = (Tree) event.getProperty();
 
                     Set<Agent> selectedList = new HashSet<Agent>();
-                    Set<String> selectedHosts = new HashSet<String>();
 
                     for (Object o : (Set<Object>) t.getValue()) {
                         if (tree.getItem(o).getItemProperty("value").getValue() != null) {
                             Agent agent = (Agent) tree.getItem(o).getItemProperty("value").getValue();
                             selectedList.add(agent);
-                            selectedHosts.add(agent.getHostname());
                         }
                     }
-                    selectedHostnames = selectedHosts;
+
                     MgmtApplication.setSelectedAgents(selectedList);
                     getWindow().showNotification(
                             "Selected agents",
@@ -107,9 +106,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-
                 tree.setValue(null);
-                container.removeAllItems();
                 if (MgmtApplication.getSelectedAgents() != null) {
                     MgmtApplication.getSelectedAgents().clear();
                 }
@@ -139,16 +136,16 @@ public final class MgmtAgentManager extends ConcurrentComponent
     }
 
     private void refreshAgents(List<Agent> allFreshAgents) {
-        if (allFreshAgents != null) {
+        if (allFreshAgents != null && tree != null) {
             try {
 
-                //remember selection
-//                Set<String> selectedHostnames = null;
-//                if (tree != null) {
-//                    selectedHostnames = (Set<String>) tree.getValue();
-//                }
-                //clear tree
-                container.removeAllItems();
+                currentAgents.removeAll(allFreshAgents);
+
+                if (!currentAgents.isEmpty()) {
+                    for (Agent missingAgent : currentAgents) {
+                        container.removeItemRecursively(missingAgent.getUuid());
+                    }
+                }
 
                 //grab parents
                 Set<Agent> parents = new HashSet<Agent>();
@@ -203,20 +200,33 @@ public final class MgmtAgentManager extends ConcurrentComponent
                 if (!families.isEmpty()) {
                     for (Map.Entry<Agent, Set<Agent>> family : families.entrySet()) {
                         Agent parentAgent = family.getKey();
-                        Item parent = container.addItem(parentAgent.getHostname());
+
+                        Item parent = container.getItem(parentAgent.getUuid());
+                        //agent is not yet in the tree
+                        if (parent == null) {
+                            parent = container.addItem(parentAgent.getUuid());
+                        }
                         if (parent != null) {
+                            tree.setItemCaption(parentAgent.getUuid(), parentAgent.getHostname());
                             parent.getItemProperty("value").setValue(parentAgent);
                             if (family.getValue() != null) {
-                                container.setChildrenAllowed(parentAgent.getHostname(), true);
+                                container.setChildrenAllowed(parentAgent.getUuid(), true);
                                 for (Agent childAgent : family.getValue()) {
-                                    Item child = container.addItem(childAgent.getHostname());
+                                    Item child = container.getItem(childAgent.getUuid());
+                                    //child is not yet in the tree
+                                    if (child == null) {
+                                        child = container.addItem(childAgent.getUuid());
+                                    }
                                     if (child != null) {
+                                        tree.setItemCaption(childAgent.getUuid(), childAgent.getHostname());
                                         child.getItemProperty("value").setValue(childAgent);
                                         child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
-                                        container.setParent(childAgent.getHostname(), parentAgent.getHostname());
-                                        container.setChildrenAllowed(childAgent.getHostname(), false);
+                                        container.setParent(childAgent.getUuid(), parentAgent.getUuid());
+                                        container.setChildrenAllowed(childAgent.getUuid(), false);
                                     }
                                 }
+                            } else {
+                                container.setChildrenAllowed(parentAgent.getUuid(), false);
                             }
                         }
                     }
@@ -224,39 +234,33 @@ public final class MgmtAgentManager extends ConcurrentComponent
 
                 //add orphans to tree
                 if (!possibleOrpans.isEmpty()) {
-                    Item parent = container.addItem(Common.UNKNOWN_LXC_PARENT_NAME);
+                    Item parent = container.getItem(Common.UNKNOWN_LXC_PARENT_NAME);
+                    if (parent == null) {
+                        parent = container.addItem(Common.UNKNOWN_LXC_PARENT_NAME);
+                    }
                     if (parent != null) {
                         container.setChildrenAllowed(Common.UNKNOWN_LXC_PARENT_NAME, true);
                         for (Agent orphanAgent : possibleOrpans) {
-                            Item child = container.addItem(orphanAgent.getHostname());
+                            Item child = container.getItem(orphanAgent.getUuid());
+                            //orphan is not yet in the tree
+                            if (child == null) {
+                                child = container.addItem(orphanAgent.getUuid());
+                            }
                             if (child != null) {
+                                tree.setItemCaption(orphanAgent.getUuid(), orphanAgent.getHostname());
                                 child.getItemProperty("value").setValue(orphanAgent);
                                 child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
-                                container.setParent(orphanAgent.getHostname(), Common.UNKNOWN_LXC_PARENT_NAME);
-                                container.setChildrenAllowed(orphanAgent.getHostname(), false);
+                                container.setParent(orphanAgent.getUuid(), Common.UNKNOWN_LXC_PARENT_NAME);
+                                container.setChildrenAllowed(orphanAgent.getUuid(), false);
                             }
                         }
                     }
+                } else {
+                    container.removeItemRecursively(Common.UNKNOWN_LXC_PARENT_NAME);
                 }
 
-                //return selection and deselect agents in tree that are not in allFreshAgents or have different uuids
-                if (tree != null && selectedHostnames != null && !selectedHostnames.isEmpty()) {
-                    Set<String> actualSelectedHostnames = new HashSet<String>();
-                    for (String selectedHostname : selectedHostnames) {
-                        for (Agent agent : allFreshAgents) {
-                            if (agent.getHostname().equalsIgnoreCase(selectedHostname)) {
-                                Object value
-                                        = container.getItem(selectedHostname).getItemProperty("value").getValue();
-                                if (value != null && value instanceof Agent
-                                        && ((Agent) value).getUuid().compareTo(agent.getUuid()) == 0) {
-                                    actualSelectedHostnames.add(selectedHostname);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    tree.setValue(actualSelectedHostnames);
-                }
+                currentAgents = allFreshAgents;
+
             } catch (Property.ReadOnlyException ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
             } catch (Property.ConversionException ex) {
