@@ -72,6 +72,7 @@ public class MongoCommands {
         return cmd;
     }
 
+    //JOIN ALL CLEANUP COMMANDS INTO ONE
     public static Command getRemoveDataDirCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();

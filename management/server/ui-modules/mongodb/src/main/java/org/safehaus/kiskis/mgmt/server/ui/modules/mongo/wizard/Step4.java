@@ -55,6 +55,8 @@ public class Step4 extends Panel {
                 mongoWizard.init();
             }
         });
+        
+        //ADD CANCEL BUTTON WITH UNINSTALLATION
 
         content.addComponent(ok);
         addComponent(content);
@@ -95,6 +97,8 @@ public class Step4 extends Panel {
                                         prevTaskDescription));
                     }
                 } else {
+                    currentTask.setTaskStatus(TaskStatus.FAIL);
+                    commandManager.saveTask(currentTask);
                     currentTask = null;
                     outputTxtArea.setValue(
                             MessageFormat.format("{0}\n\nTask {1} failed.\n\nInstallation aborted.",
