@@ -222,6 +222,7 @@ public class MongoCommands {
                 "-p",
                 "/data/configdb",
                 ";",
+                "daemon",//?????
                 "mongod",
                 "--configsvr",
                 "--dbpath",
