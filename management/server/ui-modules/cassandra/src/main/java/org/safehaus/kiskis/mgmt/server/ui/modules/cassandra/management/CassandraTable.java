@@ -25,7 +25,7 @@ public class CassandraTable extends Table {
     public CassandraTable(ServiceManager manager) {
         this.manager = manager;
         this.setCaption("Cassandra clusters");
-        this.setContainerDataSource(getCassandraContainer());
+//        this.setContainerDataSource(getCassandraContainer());
         this.setWidth("100%");
         this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         this.setPageLength(10);
