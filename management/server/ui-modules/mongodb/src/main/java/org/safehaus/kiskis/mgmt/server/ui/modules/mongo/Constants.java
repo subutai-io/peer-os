@@ -15,6 +15,6 @@ public class Constants {
     public static final int MONGO_ROUTER_PORT = 27017;
     public static final int MONGO_SHARD_PORT = 27017;
     public static final String DOMAIN = ".intra.lan";
-    public static final String MONGO_UNINSTALL_TASK_NAME = "Uninstall Mongo";
+//    public static final String MONGO_UNINSTALL_TASK_NAME = "Uninstall Mongo";
 
 }

@@ -68,7 +68,6 @@ public class Step4 extends Panel implements ResponseListener {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cancel.setEnabled(false);
-                stopRunningOperation();
                 startOperation(new Uninstaller(wizard.getConfig()));
             }
         });
@@ -84,16 +83,6 @@ public class Step4 extends Panel implements ResponseListener {
         addComponent(content);
 
         startOperation(new Installer(wizard.getConfig()));
-    }
-
-    private void stopRunningOperation() {
-        if (this.operation != null) {
-            try {
-                this.operation.stop();
-            } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Error in stopRunningOperation", e);
-            }
-        }
     }
 
     private void startOperation(final Operation operation) {

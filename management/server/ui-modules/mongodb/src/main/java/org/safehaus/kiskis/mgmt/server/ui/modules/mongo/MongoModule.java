@@ -44,11 +44,8 @@ public class MongoModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            if (wizard.getSource().equalsIgnoreCase(response.getSource())) {
-                wizard.onResponse(response);
-            } else if (mongoManager.getSource().equalsIgnoreCase(response.getSource())) {
-                mongoManager.onResponse(response);
-            }
+            wizard.onResponse(response);
+            mongoManager.onResponse(response);
         }
 
         @Override

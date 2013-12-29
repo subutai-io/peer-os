@@ -4,11 +4,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/23/13 Time: 3:11 PM
  */
 public class RequestUtil {
+
+    private static final Logger LOG = Logger.getLogger(RequestUtil.class.getName());
 
     public static Task createTask(CommandManagerInterface manager, String description) {
         Task task = new Task();
@@ -39,17 +42,4 @@ public class RequestUtil {
         return request;
     }
 
-    public static String getAgentIpByMask(Agent agent, String mask) {
-        if (agent != null) {
-            if (agent.getListIP() != null && !agent.getListIP().isEmpty()) {
-                for (String ip : agent.getListIP()) {
-                    if (ip.matches(mask)) {
-                        return ip;
-                    }
-                }
-            }
-            return agent.getHostname();
-        }
-        return null;
-    }
 }

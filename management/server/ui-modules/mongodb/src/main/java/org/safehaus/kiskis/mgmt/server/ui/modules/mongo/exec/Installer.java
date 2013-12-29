@@ -9,11 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.InstallerConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
@@ -32,7 +32,7 @@ public class Installer extends Operation {
         allClusterMembers.addAll(config.getShards());
 
         //UNINSTALL MONGO
-        Task uninstallMongoTask = RequestUtil.createTask(commandManager, Constants.MONGO_UNINSTALL_TASK_NAME);
+        Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         //uninstall it
         for (Agent agent : allClusterMembers) {
             Command cmd = Commands.getUninstallCommand();
@@ -42,9 +42,10 @@ public class Installer extends Operation {
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
+        uninstallMongoTask.setIgnoreExitCode(true);
         addTask(uninstallMongoTask);
         //INSTALL MONGO
-        Task installMongoTask = RequestUtil.createTask(commandManager, "Install Mongo");
+        Task installMongoTask = Util.createTask("Install Mongo");
         for (Agent agent : allClusterMembers) {
             Command cmd = Commands.getInstallCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -56,7 +57,7 @@ public class Installer extends Operation {
         addTask(installMongoTask);
 
         //START CONFIG SERVERS
-        Task startConfigServersTask = RequestUtil.createTask(commandManager, "Start config servers");
+        Task startConfigServersTask = Util.createTask("Start config servers");
         for (Agent agent : config.getConfigServers()) {
             Command cmd = Commands.getStartConfigServerCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -68,7 +69,7 @@ public class Installer extends Operation {
         addTask(startConfigServersTask);
 
         //START ROUTERS
-        Task startRoutersTask = RequestUtil.createTask(commandManager, "Start routers");
+        Task startRoutersTask = Util.createTask("Start routers");
         StringBuilder configServersArg = new StringBuilder();
         for (Agent agent : config.getConfigServers()) {
             configServersArg.append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
@@ -89,7 +90,7 @@ public class Installer extends Operation {
         addTask(startRoutersTask);
 
         //ADD REPLICA TO EACH OTHERS /ETC/HOSTS
-        Task setReplicaSetNameTask = RequestUtil.createTask(commandManager, "Set ReplicaSet name");
+        Task setReplicaSetNameTask = Util.createTask("Set ReplicaSet name");
         for (Agent agent : config.getShards()) {
             Command cmd = Commands.getSetReplicaSetNameCommand(config.getReplicaSetName());
             cmd.getRequest().setUuid(agent.getUuid());
@@ -101,12 +102,12 @@ public class Installer extends Operation {
         addTask(setReplicaSetNameTask);
 
         //ADD HOST NAME OF EACH SHARD TO OTHER SHARD'S /ETC/HOSTS FILE
-        Task addShardHostToOtherShardsTask = RequestUtil.createTask(commandManager, "Add Shard Host To Other Shards");
+        Task addShardHostToOtherShardsTask = Util.createTask("Add Shard Host To Other Shards");
         for (Agent agent : config.getShards()) {
             StringBuilder hosts = new StringBuilder();
             for (Agent otherAgent : config.getShards()) {
                 if (agent != otherAgent) {
-                    hosts.append("\n").append(RequestUtil.getAgentIpByMask(otherAgent, Common.IP_MASK))
+                    hosts.append("\n").append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK))
                             .append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN);
                 }
             }
@@ -121,7 +122,7 @@ public class Installer extends Operation {
         addTask(addShardHostToOtherShardsTask);
 
         //RESTART SHARDS
-        Task restartShards = RequestUtil.createTask(commandManager, "Restart shards");
+        Task restartShards = Util.createTask("Restart shards");
         for (Agent agent : config.getShards()) {
             Command cmd = Commands.getRestartShardCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -133,7 +134,7 @@ public class Installer extends Operation {
         addTask(restartShards);
 
         //REGISTER SECONDARY NODES ON PRIMARY
-        Task registerSecondaryNodesWithPrimaryTask = RequestUtil.createTask(commandManager, "Register secondary nodes with primary");
+        Task registerSecondaryNodesWithPrimaryTask = Util.createTask("Register secondary nodes with primary");
         //Make the first node as primary
         Agent primaryNode = config.getShards().iterator().next();
         StringBuilder secondaryStr = new StringBuilder();
@@ -153,7 +154,7 @@ public class Installer extends Operation {
         addTask(registerSecondaryNodesWithPrimaryTask);
 
         //REGISTER PRIMARY NODE WITH ONE OF THE ROUTERS
-        Task registerPrimaryWithRouterTask = RequestUtil.createTask(commandManager, "Register primary with router");
+        Task registerPrimaryWithRouterTask = Util.createTask("Register primary with router");
         Agent router = config.getRouterServers().iterator().next();
         cmd = Commands.getRegisterPrimaryWithRouterCommand(
                 config.getReplicaSetName(),
@@ -167,52 +168,4 @@ public class Installer extends Operation {
 
     }
 
-//    @Override
-//    public void onResponse(Response response) {
-//        clearOutput();
-//        if (getCurrentTask() != null && getCurrentTask().getTaskStatus() == TaskStatus.NEW && response != null
-//                && getCurrentTask().getUuid() != null && response.getTaskUuid() != null
-//                && getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
-//
-//            int count = commandManager.getResponseCount(getCurrentTask().getUuid());
-//            if (getCurrentTask().getCommands().size() == count) {
-//                int okCount = commandManager.getSuccessfullResponseCount(getCurrentTask().getUuid());
-//                //task completed
-//                if (count == okCount
-//                        || getCurrentTask().getDescription().equalsIgnoreCase(
-//                                Constants.MONGO_UNINSTALL_TASK_NAME)) {
-//                    //task succeeded
-//                    getCurrentTask().setTaskStatus(TaskStatus.SUCCESS);
-//                    commandManager.saveTask(getCurrentTask());
-//                    setOutput(MessageFormat.format(
-//                            "Task {0} succeeded.",
-//                            getCurrentTask().getDescription()));
-//                    if (hasMoreTasks()) {
-//                        if (!isStopped()) {
-//                            executeNextTask();
-//                            appendOutput(MessageFormat.format(
-//                                    "Running next task {0}...",
-//                                    getCurrentTask().getDescription()));
-//                        } else {
-//                            appendOutput(MessageFormat.format(
-//                                    "Stopped execution before task {0}.",
-//                                    getNextTask().getDescription()));
-//                        }
-//                    } else {
-//                        appendOutput(MessageFormat.format(
-//                                "Operation \"{0}\" completed successfully.",
-//                                getDescription()));
-//                    }
-//                } else {
-//                    //task failed
-//                    getCurrentTask().setTaskStatus(TaskStatus.FAIL);
-//                    commandManager.saveTask(getCurrentTask());
-//                    setOutput(MessageFormat.format(
-//                            "Task {0} failed.\n\nOperation \"{1}\" aborted.",
-//                            getCurrentTask().getDescription(),
-//                            getDescription()));
-//                }
-//            }
-//        }
-//    }
 }

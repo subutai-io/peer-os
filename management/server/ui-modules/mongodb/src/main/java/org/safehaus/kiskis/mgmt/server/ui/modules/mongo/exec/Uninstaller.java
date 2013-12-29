@@ -7,13 +7,12 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.InstallerConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
@@ -31,7 +30,7 @@ public class Uninstaller extends Operation {
         allClusterMembers.addAll(config.getShards());
 
         //UNINSTALL MONGO
-        Task uninstallMongoTask = RequestUtil.createTask(commandManager, Constants.MONGO_UNINSTALL_TASK_NAME);
+        Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         //uninstall it
         for (Agent agent : allClusterMembers) {
             Command cmd = Commands.getUninstallCommand();
@@ -41,15 +40,8 @@ public class Uninstaller extends Operation {
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
+        uninstallMongoTask.setIgnoreExitCode(true);
         addTask(uninstallMongoTask);
     }
 
-//    @Override
-//    public void onResponse(Response response) {
-//
-//    }
-//    @Override
-//    public String getOutput() {
-//        return output;
-//    }
 }

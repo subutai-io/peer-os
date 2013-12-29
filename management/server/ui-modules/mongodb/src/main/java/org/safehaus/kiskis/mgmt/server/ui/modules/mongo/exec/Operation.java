@@ -11,12 +11,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -34,6 +36,7 @@ public abstract class Operation implements ResponseListener {
     private volatile boolean stopped = true;
     private volatile boolean failed = false;
     private final StringBuilder output = new StringBuilder();
+    private int commandCount = 0, okCommandCount = 0;
 
     public Operation(final String description) {
         this.description = description;
@@ -105,7 +108,7 @@ public abstract class Operation implements ResponseListener {
 
     private void executeNextTask() {
         try {
-            if (stopped || !hasMoreTasks()) {
+            if (stopped || failed || !hasMoreTasks()) {
                 return;
             }
 
@@ -113,6 +116,8 @@ public abstract class Operation implements ResponseListener {
 
             if (currentTask != null && currentTask.getCommands() != null
                     && !currentTask.getCommands().isEmpty()) {
+                commandCount = 0;
+                okCommandCount = 0;
                 for (Command cmd : currentTask.getCommands()) {
                     commandManager.executeCommand(cmd);
                 }
@@ -150,61 +155,75 @@ public abstract class Operation implements ResponseListener {
         return timeout;
     }
 
+    protected TaskState getTaskState(Response response) {
+        TaskState taskState = new TaskState();
+        if (getCurrentTask() != null && response != null
+                && getCurrentTask().getTaskStatus() == TaskStatus.NEW && response.getType() != null
+                && getCurrentTask().getUuid() != null && response.getTaskUuid() != null
+                && getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
+            if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                    || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                commandCount++;
+                if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                        && (response.getExitCode() == 0 || getCurrentTask().isIgnoreExitCode())) {
+                    okCommandCount++;
+                }
+                taskState.setCompleted(commandCount == getCurrentTask().getCommands().size());
+                taskState.setSuccessfull(commandCount == okCommandCount);
+                if (taskState.isCompleted()) {
+                    if (taskState.isSuccessfull()) {
+                        Util.saveTask(getCurrentTask(), TaskStatus.SUCCESS);
+                    } else {
+                        Util.saveTask(getCurrentTask(), TaskStatus.FAIL);
+                        failed = true;
+                    }
+                }
+            }
+        }
+
+        return taskState;
+    }
+
     @Override
     public void onResponse(Response response) {
         try {
             clearOutput();
 
-            if (getCurrentTask() != null && getCurrentTask().getTaskStatus() == TaskStatus.NEW && response != null
-                    && getCurrentTask().getUuid() != null && response.getTaskUuid() != null
-                    && getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
-
-                int count = commandManager.getResponseCount(getCurrentTask().getUuid());
-                System.out.println("execute " + getCurrentTask().getCommands().size() + "   " + count);
-                if (getCurrentTask().getCommands().size() == count) {
-                    int okCount = commandManager.getSuccessfullResponseCount(getCurrentTask().getUuid());
-                    //task completed
-                    if (count == okCount
-                            || getCurrentTask().getDescription().equalsIgnoreCase(
-                                    Constants.MONGO_UNINSTALL_TASK_NAME)) {
-                        //task succeeded
-                        System.out.println("execute success");
-                        getCurrentTask().setTaskStatus(TaskStatus.SUCCESS);
-                        commandManager.saveTask(getCurrentTask());
-                        setOutput(MessageFormat.format(
-                                "Task {0} succeeded.",
-                                getCurrentTask().getDescription()));
-                        if (hasMoreTasks()) {
-                            System.out.println("execute has tasks");
-                            if (!isStopped()) {
-                                System.out.println("execute has next");
-                                executeNextTask();
-                                appendOutput(MessageFormat.format(
-                                        "Running next task {0}...",
-                                        getCurrentTask().getDescription()));
-                            } else {
-                                System.out.println("execute stopeed");
-                                appendOutput(MessageFormat.format(
-                                        "Stopped execution before task {0}.",
-                                        getNextTask().getDescription()));
-                            }
-                        } else {
-                            System.out.println("execute done");
+            TaskState taskState = getTaskState(response);
+            //task completed
+            if (taskState.isCompleted()) {
+                //task succeeded or task is uninstall (which can fail in case product is not found)
+                if (taskState.isSuccessfull()) {
+                    setOutput(MessageFormat.format(
+                            "Task {0} succeeded.",
+                            getCurrentTask().getDescription()));
+                    //operation is not done yet
+                    if (hasMoreTasks()) {
+                        //check if stopped by user
+                        if (!isStopped()) {
+                            //execute next task
+                            executeNextTask();
                             appendOutput(MessageFormat.format(
-                                    "Operation \"{0}\" completed successfully.",
-                                    getDescription()));
+                                    "Running next task {0}...",
+                                    getCurrentTask().getDescription()));
+                        } // operation is stopped by user
+                        else {
+                            appendOutput(MessageFormat.format(
+                                    "Stopped execution before task {0}.",
+                                    getNextTask().getDescription()));
                         }
+                        //operation is done
                     } else {
-                        System.out.println("execute failed");
-                        //task failed
-                        getCurrentTask().setTaskStatus(TaskStatus.FAIL);
-                        commandManager.saveTask(getCurrentTask());
-                        failed = true;
-                        setOutput(MessageFormat.format(
-                                "Task {0} failed.\n\nOperation \"{1}\" aborted.",
-                                getCurrentTask().getDescription(),
+                        appendOutput(MessageFormat.format(
+                                "Operation \"{0}\" completed successfully.",
                                 getDescription()));
                     }
+                } else {
+                    //task failed -> operation failed
+                    setOutput(MessageFormat.format(
+                            "Task {0} failed.\n\nOperation \"{1}\" aborted.",
+                            getCurrentTask().getDescription(),
+                            getDescription()));
                 }
             }
 
