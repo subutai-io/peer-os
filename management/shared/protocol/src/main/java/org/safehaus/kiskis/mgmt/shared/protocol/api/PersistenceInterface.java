@@ -91,4 +91,13 @@ public interface PersistenceInterface {
 
     public HadoopClusterInfo getHadoopClusterInfo(String clusterName);
 
+    //=========MONGO============================================================
+    public boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo);
+
+    public List<MongoClusterInfo> getMongoClustersInfo();
+
+    public MongoClusterInfo getMongoClusterInfo(String clusterName);
+
+    public boolean deleteMongoClusterInfo(String clusterName);
+
 }
