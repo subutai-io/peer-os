@@ -8,8 +8,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.Commands;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.InstallerConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
@@ -22,13 +23,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Installer extends Operation {
 
-    public Installer(Wizard wizard) {
-        super(wizard, "Mongo Installation");
+    public Installer(InstallerConfig config) {
+        super("Mongo Installation");
 
         Set<Agent> allClusterMembers = new HashSet<Agent>();
-        allClusterMembers.addAll(wizard.getConfig().getConfigServers());
-        allClusterMembers.addAll(wizard.getConfig().getRouterServers());
-        allClusterMembers.addAll(wizard.getConfig().getShards());
+        allClusterMembers.addAll(config.getConfigServers());
+        allClusterMembers.addAll(config.getRouterServers());
+        allClusterMembers.addAll(config.getShards());
 
         //UNINSTALL MONGO
         Task uninstallMongoTask = RequestUtil.createTask(commandManager, Constants.MONGO_UNINSTALL_TASK_NAME);
@@ -38,7 +39,7 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(wizard.getSource());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
         addTask(uninstallMongoTask);
@@ -49,19 +50,19 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(installMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(installMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(wizard.getSource());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             installMongoTask.addCommand(cmd);
         }
         addTask(installMongoTask);
 
         //START CONFIG SERVERS
         Task startConfigServersTask = RequestUtil.createTask(commandManager, "Start config servers");
-        for (Agent agent : wizard.getConfig().getConfigServers()) {
+        for (Agent agent : config.getConfigServers()) {
             Command cmd = Commands.getStartConfigServerCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startConfigServersTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startConfigServersTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(wizard.getSource());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startConfigServersTask.addCommand(cmd);
         }
         addTask(startConfigServersTask);
@@ -69,7 +70,7 @@ public class Installer extends Operation {
         //START ROUTERS
         Task startRoutersTask = RequestUtil.createTask(commandManager, "Start routers");
         StringBuilder configServersArg = new StringBuilder();
-        for (Agent agent : wizard.getConfig().getConfigServers()) {
+        for (Agent agent : config.getConfigServers()) {
             configServersArg.append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
                     append(":").append(Constants.MONGO_CONFIG_SERVER_PORT).append(",");
         }
@@ -77,33 +78,33 @@ public class Installer extends Operation {
         if (configServersArg.length() > 0) {
             configServersArg.setLength(configServersArg.length() - 1);
         }
-        for (Agent agent : wizard.getConfig().getRouterServers()) {
+        for (Agent agent : config.getRouterServers()) {
             Command cmd = Commands.getStartRouterCommand(configServersArg.toString());
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startRoutersTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startRoutersTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(wizard.getSource());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startRoutersTask.addCommand(cmd);
         }
         addTask(startRoutersTask);
 
         //ADD REPLICA TO EACH OTHERS /ETC/HOSTS
         Task setReplicaSetNameTask = RequestUtil.createTask(commandManager, "Set ReplicaSet name");
-        for (Agent agent : wizard.getConfig().getShards()) {
-            Command cmd = Commands.getSetReplicaSetNameCommand(wizard.getConfig().getReplicaSetName());
+        for (Agent agent : config.getShards()) {
+            Command cmd = Commands.getSetReplicaSetNameCommand(config.getReplicaSetName());
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(setReplicaSetNameTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(wizard.getSource());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             setReplicaSetNameTask.addCommand(cmd);
         }
         addTask(setReplicaSetNameTask);
 
         //ADD HOST NAME OF EACH SHARD TO OTHER SHARD'S /ETC/HOSTS FILE
         Task addShardHostToOtherShardsTask = RequestUtil.createTask(commandManager, "Add Shard Host To Other Shards");
-        for (Agent agent : wizard.getConfig().getShards()) {
+        for (Agent agent : config.getShards()) {
             StringBuilder hosts = new StringBuilder();
-            for (Agent otherAgent : wizard.getConfig().getShards()) {
+            for (Agent otherAgent : config.getShards()) {
                 if (agent != otherAgent) {
                     hosts.append("\n").append(RequestUtil.getAgentIpByMask(otherAgent, Common.IP_MASK))
                             .append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN);
@@ -114,19 +115,19 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(addShardHostToOtherShardsTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(addShardHostToOtherShardsTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(wizard.getSource());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             addShardHostToOtherShardsTask.addCommand(cmd);
         }
         addTask(addShardHostToOtherShardsTask);
 
         //RESTART SHARDS
         Task restartShards = RequestUtil.createTask(commandManager, "Restart shards");
-        for (Agent agent : wizard.getConfig().getShards()) {
+        for (Agent agent : config.getShards()) {
             Command cmd = Commands.getRestartShardCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(restartShards.getUuid());
             cmd.getRequest().setRequestSequenceNumber(restartShards.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(wizard.getSource());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             restartShards.addCommand(cmd);
         }
         addTask(restartShards);
@@ -134,9 +135,9 @@ public class Installer extends Operation {
         //REGISTER SECONDARY NODES ON PRIMARY
         Task registerSecondaryNodesWithPrimaryTask = RequestUtil.createTask(commandManager, "Register secondary nodes with primary");
         //Make the first node as primary
-        Agent primaryNode = wizard.getConfig().getShards().iterator().next();
+        Agent primaryNode = config.getShards().iterator().next();
         StringBuilder secondaryStr = new StringBuilder();
-        for (Agent agent : wizard.getConfig().getShards()) {
+        for (Agent agent : config.getShards()) {
             if (agent != primaryNode) {
                 secondaryStr.append("\n'rs.add(\"").
                         append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
@@ -147,23 +148,71 @@ public class Installer extends Operation {
         cmd.getRequest().setUuid(primaryNode.getUuid());
         cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
         cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
-        cmd.getRequest().setSource(wizard.getSource());
+        cmd.getRequest().setSource(MongoModule.MODULE_NAME);
         registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
         addTask(registerSecondaryNodesWithPrimaryTask);
 
         //REGISTER PRIMARY NODE WITH ONE OF THE ROUTERS
         Task registerPrimaryWithRouterTask = RequestUtil.createTask(commandManager, "Register primary with router");
-        Agent router = wizard.getConfig().getRouterServers().iterator().next();
+        Agent router = config.getRouterServers().iterator().next();
         cmd = Commands.getRegisterPrimaryWithRouterCommand(
-                wizard.getConfig().getReplicaSetName(),
+                config.getReplicaSetName(),
                 primaryNode.getHostname() + Constants.DOMAIN);//use hostname when fixed
         cmd.getRequest().setUuid(router.getUuid());
         cmd.getRequest().setTaskUuid(registerPrimaryWithRouterTask.getUuid());
         cmd.getRequest().setRequestSequenceNumber(registerPrimaryWithRouterTask.getIncrementedReqSeqNumber());
-        cmd.getRequest().setSource(wizard.getSource());
+        cmd.getRequest().setSource(MongoModule.MODULE_NAME);
         registerPrimaryWithRouterTask.addCommand(cmd);
         addTask(registerPrimaryWithRouterTask);
 
     }
 
+//    @Override
+//    public void onResponse(Response response) {
+//        clearOutput();
+//        if (getCurrentTask() != null && getCurrentTask().getTaskStatus() == TaskStatus.NEW && response != null
+//                && getCurrentTask().getUuid() != null && response.getTaskUuid() != null
+//                && getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
+//
+//            int count = commandManager.getResponseCount(getCurrentTask().getUuid());
+//            if (getCurrentTask().getCommands().size() == count) {
+//                int okCount = commandManager.getSuccessfullResponseCount(getCurrentTask().getUuid());
+//                //task completed
+//                if (count == okCount
+//                        || getCurrentTask().getDescription().equalsIgnoreCase(
+//                                Constants.MONGO_UNINSTALL_TASK_NAME)) {
+//                    //task succeeded
+//                    getCurrentTask().setTaskStatus(TaskStatus.SUCCESS);
+//                    commandManager.saveTask(getCurrentTask());
+//                    setOutput(MessageFormat.format(
+//                            "Task {0} succeeded.",
+//                            getCurrentTask().getDescription()));
+//                    if (hasMoreTasks()) {
+//                        if (!isStopped()) {
+//                            executeNextTask();
+//                            appendOutput(MessageFormat.format(
+//                                    "Running next task {0}...",
+//                                    getCurrentTask().getDescription()));
+//                        } else {
+//                            appendOutput(MessageFormat.format(
+//                                    "Stopped execution before task {0}.",
+//                                    getNextTask().getDescription()));
+//                        }
+//                    } else {
+//                        appendOutput(MessageFormat.format(
+//                                "Operation \"{0}\" completed successfully.",
+//                                getDescription()));
+//                    }
+//                } else {
+//                    //task failed
+//                    getCurrentTask().setTaskStatus(TaskStatus.FAIL);
+//                    commandManager.saveTask(getCurrentTask());
+//                    setOutput(MessageFormat.format(
+//                            "Task {0} failed.\n\nOperation \"{1}\" aborted.",
+//                            getCurrentTask().getDescription(),
+//                            getDescription()));
+//                }
+//            }
+//        }
+//    }
 }

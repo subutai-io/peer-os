@@ -15,38 +15,30 @@ import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
+import static org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util.createImage;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Installer;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Uninstaller;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
  * @author dilshat
  */
-public class Step4 extends Panel {
+public class Step4 extends Panel implements ResponseListener {
 
     private static final Logger LOG = Logger.getLogger(Step4.class.getName());
 
     private final TextArea outputTxtArea;
-    private Task currentTask = null;
     private Operation operation;
     private final Button ok;
     private final Button cancel;
     private final Label indicator;
-    private final CommandManagerInterface commandManager;
-    private boolean isInProgress = false;
     private Thread operationTimeoutThread;
 
     public Step4(final Wizard wizard) {
-        commandManager
-                = ServiceLocator.getService(CommandManagerInterface.class);
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -76,7 +68,8 @@ public class Step4 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cancel.setEnabled(false);
-                startOperation(wizard, Uninstaller.class);
+                stopRunningOperation();
+                startOperation(new Uninstaller(wizard.getConfig()));
             }
         });
 
@@ -85,27 +78,71 @@ public class Step4 extends Panel {
         footer.addComponent(cancel);
         content.addComponent(footer);
 
-        indicator = Util.createImage("indicator.gif", 50, 50);
+        indicator = createImage("indicator.gif", 50, 50);
         content.addComponent(indicator);
 
         addComponent(content);
 
-        startOperation(wizard, Installer.class);
+        startOperation(new Installer(wizard.getConfig()));
     }
 
-    private void startOperation(final Wizard wizard, Class operationClass) {
-        try {
-            currentTask = null;
-            operation = (Operation) operationClass.getConstructor(Wizard.class).newInstance(wizard);
-            currentTask = operation.executeNextTask();
-            outputTxtArea.setValue(MessageFormat.format(
-                    "{0}\n\nOperation \"{1}\" started.\n\nRunning task {2}...",
-                    outputTxtArea.getValue(),
-                    operation.getDescription(),
-                    currentTask.getDescription()));
-            showProgress();
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in startOperation", ex);
+    private void stopRunningOperation() {
+        if (this.operation != null) {
+            try {
+                this.operation.stop();
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, "Error in stopRunningOperation", e);
+            }
+        }
+    }
+
+    private void startOperation(final Operation operation) {
+        if (operation != null) {
+            try {
+                //stop any running operation
+                if (this.operation != null) {
+                    this.operation.stop();
+                }
+                this.operation = operation;
+                if (operation.start()) {
+                    showProgress();
+                    outputTxtArea.setValue(MessageFormat.format(
+                            "{0}\n\nOperation \"{1}\" started.\n\nRunning task {2}...",
+                            outputTxtArea.getValue(),
+                            operation.getDescription(),
+                            operation.getCurrentTask().getDescription()));
+                    if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
+                        operationTimeoutThread.interrupt();
+                    }
+                    operationTimeoutThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                //wait for overalltimeout + 5 sec just in case
+                                Thread.sleep(operation.getOverallTimeout() * 1000 + 5000);
+                                if (!operation.isStopped()
+                                        && !operation.isFailed() && operation.hasMoreTasks()) {
+                                    outputTxtArea.setValue(
+                                            MessageFormat.format("{0}\n\nOperation {1} timeouted!!!",
+                                                    outputTxtArea.getValue(),
+                                                    operation.getDescription()));
+                                    hideProgress();
+                                }
+                            } catch (InterruptedException ex) {
+                            }
+                        }
+                    });
+                    operationTimeoutThread.start();
+                } else {
+                    outputTxtArea.setValue(MessageFormat.format(
+                            "{0}\n\nOperation \"{1}\" could not be started: {2}.",
+                            outputTxtArea.getValue(),
+                            operation.getDescription(),
+                            operation.getOutput()));
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Error in startOperation", ex);
+            }
         }
     }
 
@@ -114,86 +151,42 @@ public class Step4 extends Panel {
     }
 
     private void showProgress() {
-        isInProgress = true;
-        final int operationTimeout = operation.getOverallTimeout();
-        if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-            operationTimeoutThread.interrupt();
-        }
-        operationTimeoutThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //wait for overalltimeout + 5 sec just in case
-                    Thread.sleep(operationTimeout * 1000 + 5000);
-                    if (isInProgress) {
-                        show("Operation timeouted!!!");
-                        hideProgress();
-                    }
-                } catch (InterruptedException ex) {
-                }
-            }
-        });
-        operationTimeoutThread.start();
         indicator.setVisible(true);
         ok.setEnabled(false);
     }
 
     private void hideProgress() {
-        isInProgress = false;
         indicator.setVisible(false);
         ok.setEnabled(true);
         cancel.setEnabled(true);
     }
 
-    protected void onResponse(Response response) {
-        if (currentTask != null && response != null
-                && currentTask.getUuid() != null && response.getTaskUuid() != null
-                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-
-            int count = commandManager.getResponseCount(currentTask.getUuid());
-            if (currentTask.getCommands().size() == count) {
-                int okCount = commandManager.getSuccessfullResponseCount(currentTask.getUuid());
-                //task completed
-                String prevTaskDescription = currentTask.getDescription();
-                if (count == okCount
-                        || currentTask.getDescription().equalsIgnoreCase(
-                                Constants.MONGO_UNINSTALL_TASK_NAME)) {
-                    //task succeeded
-                    currentTask.setTaskStatus(TaskStatus.SUCCESS);
-                    commandManager.saveTask(currentTask);
-                    currentTask = null;
-                    if (operation.hasMoreTasks()) {
-                        currentTask = operation.executeNextTask();
-                        outputTxtArea.setValue(
-                                MessageFormat.format(
-                                        "{0}\n\nTask {1} succeeded.\n\nRunning next task {2}...",
-                                        outputTxtArea.getValue(),
-                                        prevTaskDescription,
-                                        currentTask.getDescription()));
-                    } else {
-                        outputTxtArea.setValue(
-                                MessageFormat.format(
-                                        "{0}\n\nTask {1} succeeded.\n\nOperation \"{2}\" completed successfully.",
-                                        outputTxtArea.getValue(),
-                                        prevTaskDescription,
-                                        operation.getDescription()));
+    @Override
+    public void onResponse(Response response) {
+        if (operation != null) {
+            try {
+                operation.onResponse(response);
+                String output = operation.getOutput();
+                if (!Util.isStringEmpty(output)) {
+                    outputTxtArea.setValue(
+                            MessageFormat.format("{0}\n\n{1}",
+                                    outputTxtArea.getValue(),
+                                    output));
+                    outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+                    if (!operation.hasMoreTasks() || operation.isStopped() || operation.isFailed()) {
                         hideProgress();
                     }
-                } else {
-                    //task failed
-                    currentTask.setTaskStatus(TaskStatus.FAIL);
-                    commandManager.saveTask(currentTask);
-                    currentTask = null;
-                    outputTxtArea.setValue(
-                            MessageFormat.format("{0}\n\nTask {1} failed.\n\nOperation \"{2}\" aborted.",
-                                    outputTxtArea.getValue(),
-                                    prevTaskDescription,
-                                    operation.getDescription()));
-                    hideProgress();
                 }
-                outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, "Error in onResponse", e);
             }
         }
 
+    }
+
+    @Override
+    public String getSource() {
+        return getClass().getName();
     }
 }
