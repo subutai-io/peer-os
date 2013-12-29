@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class MongoConfig {
+public class InstallerConfig {
 
     private String clusterName = "";
     private String replicaSetName = "";

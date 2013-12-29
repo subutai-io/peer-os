@@ -27,7 +27,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step3 extends Panel {
 
-    public Step3(final MongoWizard mongoWizard) {
+    public Step3(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -85,7 +85,7 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.back();
+                wizard.back();
             }
         });
         Button next = new Button("Finish");
@@ -93,18 +93,18 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.getConfig().setReplicaSetName(replicaNameTxtFld.getValue().toString().trim());
-                mongoWizard.getConfig().setShards((Set<Agent>) shardsColSel.getValue());
+                wizard.getConfig().setReplicaSetName(replicaNameTxtFld.getValue().toString().trim());
+                wizard.getConfig().setShards((Set<Agent>) shardsColSel.getValue());
 
-                if (Util.isStringEmpty(mongoWizard.getConfig().getReplicaSetName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");
-                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getShards())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getShards())) {
                     show("Please add shards");
                 } else {
                     //disable back command
                     //save config to db 
                     //start installation
-                    mongoWizard.next();
+                    wizard.next();
                 }
             }
         });
@@ -120,11 +120,11 @@ public class Step3 extends Panel {
 
         shardsColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(
-                        Agent.class, mongoWizard.getConfig().getSelectedAgents()));
+                        Agent.class, wizard.getConfig().getSelectedAgents()));
 
         //set values if this is a second visit
-        replicaNameTxtFld.setValue(mongoWizard.getConfig().getReplicaSetName());
-        shardsColSel.setValue(Util.retainValues(mongoWizard.getConfig().getShards(), mongoWizard.getConfig().getSelectedAgents()));
+        replicaNameTxtFld.setValue(wizard.getConfig().getReplicaSetName());
+        shardsColSel.setValue(Util.retainValues(wizard.getConfig().getShards(), wizard.getConfig().getSelectedAgents()));
     }
 
     private void show(String notification) {

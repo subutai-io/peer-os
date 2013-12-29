@@ -20,19 +20,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
  *
  * @author dilshat
  */
-public class MongoWizard implements ResponseListener {
+public class Wizard implements ResponseListener {
 
-    private static final Logger LOG = Logger.getLogger(MongoWizard.class.getName());
+    private static final Logger LOG = Logger.getLogger(Wizard.class.getName());
 
     private static final int MAX_STEPS = 3;
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
-    private final MongoConfig mongoConfig = new MongoConfig();
+    private final InstallerConfig mongoConfig = new InstallerConfig();
     private final VerticalLayout contentRoot;
     private Step4 step4;
 
-    public MongoWizard() {
+    public Wizard() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -86,7 +86,7 @@ public class MongoWizard implements ResponseListener {
         putForm();
     }
 
-    public MongoConfig getConfig() {
+    public InstallerConfig getConfig() {
         return mongoConfig;
     }
 

@@ -17,7 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  *
  * @author dilshat
  */
-public class MongoCommands {
+public class Commands {
 
     // INSTALLATION COMMANDS ===================================================
     public static Command getTemplate() {
@@ -61,8 +61,13 @@ public class MongoCommands {
     public static Command getUninstallCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/apt-get");
+        req.setProgram("/usr/bin/pkill");
         req.setArgs(Arrays.asList(
+                "-9",
+                "-f",
+                "'mongod|ksks-mongo|mongos'",
+                ";",
+                "/usr/bin/apt-get",
                 "--force-yes",
                 "--assume-yes",
                 "purge",

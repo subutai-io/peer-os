@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.MongoWizard;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.management.MongoManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.management.Manager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -20,8 +20,8 @@ public class MongoModule implements Module {
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
-        private final MongoWizard mongoWizard;
-        private final MongoManager mongoManager;
+        private final Wizard wizard;
+        private final Manager mongoManager;
 
         public ModuleComponent() {
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -31,9 +31,9 @@ public class MongoModule implements Module {
             TabSheet mongoSheet = new TabSheet();
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
-            mongoWizard = new MongoWizard();
-            mongoManager = new MongoManager();
-            mongoSheet.addTab(mongoWizard.getContent(), "Install");
+            wizard = new Wizard();
+            mongoManager = new Manager();
+            mongoSheet.addTab(wizard.getContent(), "Install");
             mongoSheet.addTab(mongoManager.getContent(), "Manage");
 
             verticalLayout.addComponent(mongoSheet);
@@ -44,8 +44,8 @@ public class MongoModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            if (mongoWizard.getSource().equalsIgnoreCase(response.getSource())) {
-                mongoWizard.onResponse(response);
+            if (wizard.getSource().equalsIgnoreCase(response.getSource())) {
+                wizard.onResponse(response);
             } else if (mongoManager.getSource().equalsIgnoreCase(response.getSource())) {
                 mongoManager.onResponse(response);
             }

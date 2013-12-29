@@ -23,11 +23,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
  *
  * @author dilshat
  */
-public class MongoManager implements ResponseListener {
+public class Manager implements ResponseListener {
 
     private final VerticalLayout contentRoot;
 
-    public MongoManager() {
+    public Manager() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
