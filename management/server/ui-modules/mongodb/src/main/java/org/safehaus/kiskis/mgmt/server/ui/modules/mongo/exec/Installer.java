@@ -66,6 +66,9 @@ public class Installer extends Operation {
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startConfigServersTask.addCommand(cmd);
         }
+        //============process output of mongod========
+        startConfigServersTask.setIgnoreExitCode(true);
+        //============================================
         addTask(startConfigServersTask);
 
         //START ROUTERS
@@ -175,6 +178,9 @@ public class Installer extends Operation {
 
     @Override
     public void onTaskSucceeded(Task task) {
+        //PROCESS OUTPUT OF START CONFIG SERVERS HERE
+        //IF OK THEN NO-OP
+        //ELSE fail the task with custom output appended
         System.out.println("Task succeeded " + task);
     }
 

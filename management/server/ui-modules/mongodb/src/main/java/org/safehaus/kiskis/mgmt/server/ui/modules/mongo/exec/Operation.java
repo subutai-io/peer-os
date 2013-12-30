@@ -36,7 +36,6 @@ public abstract class Operation implements ResponseListener {
     private volatile boolean failed = false;
     private final StringBuilder output = new StringBuilder();
     private int commandCount = 0, okCommandCount = 0;
-    private final TaskState taskState = new TaskState();
 
     public Operation(final String description) {
         this.description = description;
@@ -107,28 +106,38 @@ public abstract class Operation implements ResponseListener {
         return task;
     }
 
-    private void executeNextTask() {
+    private boolean executeNextTask() {
         try {
-            if (stopped || failed || isCompleted()) {
-                return;
-            }
+            if (!(stopped || failed || isCompleted())) {
 
-            Task currentTask = tasks.get(++currentTaskIdx);
+                Task currentTask = tasks.get(++currentTaskIdx);
 
-            if (currentTask != null && currentTask.getCommands() != null
-                    && !currentTask.getCommands().isEmpty()) {
                 onBeforeTaskRun(currentTask);
-                commandCount = 0;
-                okCommandCount = 0;
-                for (Command cmd : currentTask.getCommands()) {
-                    commandManager.executeCommand(cmd);
+
+                if (currentTask != null && currentTask.getCommands() != null) {
+                    if (!currentTask.getCommands().isEmpty()) {
+                        commandCount = 0;
+                        okCommandCount = 0;
+                        for (Command cmd : currentTask.getCommands()) {
+                            commandManager.executeCommand(cmd);
+                        }
+                        return true;
+                    } else {
+                        appendOutput(MessageFormat.format(
+                                "Task {0} has no commands",
+                                getCurrentTask().getDescription()));
+                    }
+                } else {
+                    appendOutput("Malformed task");
                 }
+
                 onAfterTaskRun(currentTask);
             }
 
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in executeNextTask", e);
         }
+        return false;
     }
 
     public boolean isCompleted() {
@@ -140,7 +149,9 @@ public abstract class Operation implements ResponseListener {
     }
 
     protected void addTask(Task task) {
-        tasks.add(task);
+        if (task != null) {
+            tasks.add(task);
+        }
     }
 
     public int getOverallTimeout() {
@@ -159,26 +170,26 @@ public abstract class Operation implements ResponseListener {
     }
 
     protected void processResponse(Response response) {
-        taskState.setCompleted(false);
-        taskState.setSuccessfull(false);
-        if (getCurrentTask() != null && response != null
-                && getCurrentTask().getTaskStatus() == TaskStatus.NEW && response.getType() != null
-                && getCurrentTask().getUuid() != null && response.getTaskUuid() != null
-                && getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
+        Task task = getCurrentTask();
+        if (task != null && response != null
+                && task.getTaskStatus() == TaskStatus.NEW && response.getType() != null
+                && task.getUuid() != null && response.getTaskUuid() != null
+                && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
             if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
                     || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
                 commandCount++;
                 if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
-                        && (response.getExitCode() == 0 || getCurrentTask().isIgnoreExitCode())) {
+                        && (response.getExitCode() == 0 || task.isIgnoreExitCode())) {
                     okCommandCount++;
                 }
-                taskState.setCompleted(commandCount == getCurrentTask().getCommands().size());
-                taskState.setSuccessfull(commandCount == okCommandCount);
-                if (taskState.isCompleted()) {
-                    if (taskState.isSuccessfull()) {
-                        Util.saveTask(getCurrentTask(), TaskStatus.SUCCESS);
+                task.setCompleted(commandCount == task.getCommands().size());
+                if (task.isCompleted()) {
+                    if (commandCount == okCommandCount) {
+                        task.setTaskStatus(TaskStatus.SUCCESS);
+                        Util.saveTask(task);
                     } else {
-                        Util.saveTask(getCurrentTask(), TaskStatus.FAIL);
+                        task.setTaskStatus(TaskStatus.FAIL);
+                        Util.saveTask(task);
                         failed = true;
                     }
                 }
@@ -210,51 +221,72 @@ public abstract class Operation implements ResponseListener {
     public void onAfterTaskRun(Task task) {
     }
 
+    protected void fail() {
+        Task task = getCurrentTask();
+        if (task != null) {
+            task.setTaskStatus(TaskStatus.FAIL);
+            Util.saveTask(task);
+            failed = true;
+        }
+    }
+
     @Override
     public void onResponse(Response response) {
         try {
             processResponse(response);
             clearOutput();
             //task completed
-            if (taskState.isCompleted()) {
-                onTaskCompleted(getCurrentTask());
-                //task succeeded or task is uninstall (which can fail in case product is not found)
-                if (taskState.isSuccessfull()) {
-                    onTaskSucceeded(getCurrentTask());
-                    setOutput(MessageFormat.format(
-                            "Task {0} succeeded.",
-                            getCurrentTask().getDescription()));
-                    //operation is not done yet
-                    if (!isCompleted()) {
-                        //check if stopped by user
-                        if (!isStopped()) {
-                            //execute next task
-                            executeNextTask();
+            Task task = getCurrentTask();
+            if (task != null && task.isCompleted()) {
+                onTaskCompleted(task);
+                //task succeeded or ignoreExitCode is true
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                    onTaskSucceeded(task);
+                    //check in case user failed the task in onTaskSucceeded
+                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                        setOutput(MessageFormat.format(
+                                "Task {0} succeeded.",
+                                task.getDescription()));
+                        //operation is not done yet
+                        if (!isCompleted()) {
+                            //check if stopped by user
+                            if (!isStopped()) {
+                                //execute next task
+                                appendOutput(MessageFormat.format(
+                                        "Running next task {0}...",
+                                        getNextTask().getDescription()));
+                                executeNextTask();
+                            } // operation is stopped by user
+                            else {
+                                appendOutput(MessageFormat.format(
+                                        "Stopped execution before task {0}.",
+                                        getNextTask().getDescription()));
+                                onOperationStopped();
+                            }
+                            //operation is done
+                        } else {
                             appendOutput(MessageFormat.format(
-                                    "Running next task {0}...",
-                                    getCurrentTask().getDescription()));
-                        } // operation is stopped by user
-                        else {
-                            onOperationStopped();
-                            appendOutput(MessageFormat.format(
-                                    "Stopped execution before task {0}.",
-                                    getNextTask().getDescription()));
+                                    "Operation \"{0}\" completed successfully.",
+                                    getDescription()));
+                            onOperationEnded();
                         }
-                        //operation is done
                     } else {
-                        onOperationEnded();
+                        //task failed -> operation failed & ended
                         appendOutput(MessageFormat.format(
-                                "Operation \"{0}\" completed successfully.",
+                                "Task {0} failed.\n\nOperation \"{1}\" aborted.",
+                                task.getDescription(),
                                 getDescription()));
+                        onTaskFailed(task);
+                        onOperationEnded();
                     }
                 } else {
                     //task failed -> operation failed & ended
-                    onTaskFailed(getCurrentTask());
-                    onOperationEnded();
-                    setOutput(MessageFormat.format(
+                    appendOutput(MessageFormat.format(
                             "Task {0} failed.\n\nOperation \"{1}\" aborted.",
-                            getCurrentTask().getDescription(),
+                            task.getDescription(),
                             getDescription()));
+                    onTaskFailed(task);
+                    onOperationEnded();
                 }
             }
 

@@ -53,9 +53,8 @@ public class Util {
         return null;
     }
 
-    public static boolean saveTask(Task task, TaskStatus status) {
+    public static boolean saveTask(Task task) {
         try {
-            task.setTaskStatus(status);
             ServiceLocator.getService(CommandManagerInterface.class).saveTask(task);
             return true;
         } catch (Exception e) {

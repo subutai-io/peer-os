@@ -45,10 +45,8 @@ public class Step1 extends Panel {
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                //TODO                
-                //FILTER SELECTED AGENT AND SELECT ONLY LXC
-                Set<Agent> selectedAgents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
                 //take only lxc nodes
+                Set<Agent> selectedAgents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                 if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
