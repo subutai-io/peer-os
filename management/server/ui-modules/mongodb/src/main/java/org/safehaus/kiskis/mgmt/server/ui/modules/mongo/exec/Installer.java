@@ -84,6 +84,19 @@ public class Installer extends Operation {
         //============================================
         addTask(startConfigServersTask);
 
+        //STOP MONGODB ON ROUTERS
+        Task stopMongoDBOnRouters = Util.createTask("Stop MongoDB on routers");
+        for (Agent agent : config.getRouterServers()) {
+            Command cmd = Commands.getStopShardCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(stopMongoDBOnRouters.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(stopMongoDBOnRouters.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            stopMongoDBOnRouters.addCommand(cmd);
+        }
+        stopMongoDBOnRouters.setIgnoreExitCode(true);
+        addTask(stopMongoDBOnRouters);
+
         //START ROUTERS
         Task startRoutersTask = Util.createTask("Start routers");
         StringBuilder configServersArg = new StringBuilder();

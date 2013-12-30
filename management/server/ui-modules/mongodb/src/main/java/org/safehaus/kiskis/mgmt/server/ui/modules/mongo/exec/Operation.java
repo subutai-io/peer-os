@@ -107,6 +107,7 @@ public abstract class Operation implements ResponseListener {
     }
 
     private boolean executeNextTask() {
+        boolean result = false;
         try {
             if (!(stopped || failed || isCompleted())) {
 
@@ -121,7 +122,7 @@ public abstract class Operation implements ResponseListener {
                         for (Command cmd : currentTask.getCommands()) {
                             commandManager.executeCommand(cmd);
                         }
-                        return true;
+                        result = true;
                     } else {
                         appendOutput(MessageFormat.format(
                                 "Task {0} has no commands",
@@ -137,7 +138,7 @@ public abstract class Operation implements ResponseListener {
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in executeNextTask", e);
         }
-        return false;
+        return result;
     }
 
     public boolean isCompleted() {
