@@ -112,6 +112,10 @@ public class Step4 extends Panel implements ResponseListener {
                             outputTxtArea.getValue(),
                             operation.getDescription(),
                             operation.getCurrentTask().getDescription()));
+                    logTextArea.setValue(MessageFormat.format(
+                            "{0}\n\n======= Task {1} =======",
+                            logTextArea.getValue(),
+                            operation.getCurrentTask().getDescription()));
                     if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
                         operationTimeoutThread.interrupt();
                     }
