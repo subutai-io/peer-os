@@ -697,6 +697,31 @@ public class Persistence implements PersistenceInterface {
         return cassandraClusterInfo;
     }
 
+    public CassandraClusterInfo getCassandraClusterInfoByUUID(UUID uuid) {
+        CassandraClusterInfo cassandraClusterInfo = null;
+        try {
+            String cql = "select * from cassandra_cluster_info where uid = ? limit 1 allow filtering";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            Row row = rs.one();
+            if (row != null) {
+                cassandraClusterInfo = new CassandraClusterInfo();
+                cassandraClusterInfo.setUuid(row.getUUID("uid"));
+                cassandraClusterInfo.setName(row.getString("name"));
+                cassandraClusterInfo.setCommitLogDir(row.getString("commitlogdir"));
+                cassandraClusterInfo.setDataDir(row.getString("datadir"));
+                cassandraClusterInfo.setSavedCacheDir(row.getString("savedcachedir"));
+                cassandraClusterInfo.setNodes(row.getList("nodes", UUID.class));
+                cassandraClusterInfo.setSeeds(row.getList("seeds", UUID.class));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(uid)", ex);
+        }
+        return cassandraClusterInfo;
+    }
+
     /**
      * Hadoop
      */
@@ -782,7 +807,7 @@ public class Persistence implements PersistenceInterface {
             session.execute(boundStatement.bind(uuid));
             return true;
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+            LOG.log(Level.SEVERE, "Error in deleteCassandraClusterInfo(name)", ex);
         }
         return false;
     }

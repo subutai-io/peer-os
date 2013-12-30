@@ -43,6 +43,8 @@ public interface CommandManagerInterface {
 
     public List<CassandraClusterInfo> getCassandraClusterData();
 
+    public CassandraClusterInfo getCassandraClusterDataByUUID(UUID uuid);
+
     public List<HadoopClusterInfo> getHadoopClusterData();
 
     public HadoopClusterInfo getHadoopClusterData(String clusterName);

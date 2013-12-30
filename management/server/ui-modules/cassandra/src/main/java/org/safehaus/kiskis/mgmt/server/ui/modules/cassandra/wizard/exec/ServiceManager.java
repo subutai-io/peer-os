@@ -177,6 +177,7 @@ public class ServiceManager {
         startTask.addCommand(command);
         tasks.add(startTask);
         start();
+        
     }
 
     public void updateSeeds(List<UUID> seeds, List<UUID> nodes) {

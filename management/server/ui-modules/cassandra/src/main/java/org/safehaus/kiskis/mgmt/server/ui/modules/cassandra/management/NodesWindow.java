@@ -8,6 +8,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -16,6 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
@@ -107,25 +109,34 @@ public class NodesWindow extends Window {
             }
         });
 
-        Button seedButton = new Button("Set as seed");
+        Button setSeedsButton = new Button("Set as seed!");
         if (cci.getSeeds().contains(agent.getUuid())) {
-            seedButton.setCaption("Remove seed");
-            seedButton.addListener(new Button.ClickListener() {
+            setSeedsButton.setCaption("Remove seed!");
+            setSeedsButton.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    cci.getSeeds().remove(agent.getUuid());
+                    List<UUID> seeds = cci.getSeeds();
+                    seeds.remove(agent.getUuid());
                     manager.updateSeeds(cci);
+                    cci.setSeeds(seeds);
+                    if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                        System.out.println("updated");
+                    }
                 }
             });
         } else {
-            seedButton.addListener(new Button.ClickListener() {
+            setSeedsButton.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    cci.getSeeds().add(agent.getUuid());
+                    List<UUID> seeds = cci.getSeeds();
+                    seeds.add(agent.getUuid());
                     manager.updateSeeds(cci);
-                    
+                    cci.setSeeds(seeds);
+                    if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                        System.out.println("updated");
+                    }
                 }
             });
         }
@@ -136,11 +147,15 @@ public class NodesWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 manager.uninstallCassandraService(agent);
+                cci.getNodes().remove(agent.getUuid());
+                if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                    System.out.println("updated");
+                }
             }
         });
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
-        item.getItemProperty("Seed").setValue(seedButton);
+        item.getItemProperty("Seed").setValue(setSeedsButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
 

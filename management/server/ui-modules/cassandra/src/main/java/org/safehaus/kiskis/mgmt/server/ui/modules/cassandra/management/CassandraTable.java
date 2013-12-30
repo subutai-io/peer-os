@@ -82,13 +82,14 @@ public class CassandraTable extends Table {
                 manager.statusCassandraServices(cci.getNodes());
             }
         });
-        
+
         Button manageButton = new Button("Manage");
         manageButton.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                nodesWindow = new NodesWindow(cci.getName(), cci, manager);
+                CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
+                nodesWindow = new NodesWindow(cci.getName(), info, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
             }
         });
