@@ -11,12 +11,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import java.util.Iterator;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
 import static org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util.createImage;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import static org.safehaus.kiskis.mgmt.shared.protocol.Util.isCollectionEmpty;
 
 /**
  *
@@ -48,16 +48,10 @@ public class Step1 extends Panel {
             public void buttonClick(Button.ClickEvent event) {
                 //TODO                
                 //FILTER SELECTED AGENT AND SELECT ONLY LXC
-                Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
+                Set<Agent> selectedAgents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
                 //take only lxc nodes
-                for (Iterator<Agent> it = selectedAgents.iterator(); it.hasNext();) {
-                    Agent agent = it.next();
-                    if (!agent.isIsLXC()) {
-                        it.remove();
-                    }
-                }
 
-                if (Util.isCollectionEmpty(selectedAgents)) {
+                if (isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
                     wizard.getConfig().reset();

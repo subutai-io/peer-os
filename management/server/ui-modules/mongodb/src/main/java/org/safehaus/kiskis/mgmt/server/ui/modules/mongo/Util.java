@@ -7,6 +7,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Label;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -72,5 +74,17 @@ public class Util {
             return agent.getHostname();
         }
         return null;
+    }
+
+    public static Set<Agent> filterLxcAgents(Set<Agent> agents) {
+        if (agents != null) {
+            for (Iterator<Agent> it = agents.iterator(); it.hasNext();) {
+                Agent agent = it.next();
+                if (!agent.isIsLXC()) {
+                    it.remove();
+                }
+            }
+        }
+        return agents;
     }
 }
