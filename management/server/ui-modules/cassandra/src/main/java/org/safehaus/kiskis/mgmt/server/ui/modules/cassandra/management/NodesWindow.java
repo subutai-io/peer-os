@@ -50,7 +50,7 @@ public class NodesWindow extends Window {
         VerticalLayout verticalLayout = new VerticalLayout();
         HorizontalLayout buttons = new HorizontalLayout();
 
-        Button addNewNode = new Button("Add new seed");
+        Button addNewNode = new Button("Add new node");
         addNewNode.addListener(new Button.ClickListener() {
 
             @Override

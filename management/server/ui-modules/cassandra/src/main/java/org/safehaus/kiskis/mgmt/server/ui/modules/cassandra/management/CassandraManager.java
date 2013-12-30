@@ -61,7 +61,7 @@ public class CassandraManager {
             }
         });
         buttons.addComponent(getClustersBtn);
-        buttons.addComponent(new Button("Apply Changes"));
+//        buttons.addComponent(new Button("Apply Changes"));
 
         content.addComponent(buttons);
         content.addComponent(cassandraTable);
