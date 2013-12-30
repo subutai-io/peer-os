@@ -27,7 +27,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class StepSeeds extends Panel {
 
-
     public StepSeeds(final CassandraWizard wizard) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -39,7 +38,7 @@ public class StepSeeds extends Panel {
         grid.setSizeFull();
 
         Panel panel = new Panel();
-         Label menu = new Label("Cluster Installation Wizard");
+        Label menu = new Label("Cluster Installation Wizard");
 
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
@@ -55,7 +54,7 @@ public class StepSeeds extends Panel {
         domainNameTxtFld.setRequired(true);
         domainNameTxtFld.setMaxLength(20);
         verticalLayoutForm.addComponent(domainNameTxtFld);
-        
+
         final TextField clusterNameTxtFld = new TextField("Cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
         clusterNameTxtFld.setRequired(true);
@@ -91,7 +90,11 @@ public class StepSeeds extends Panel {
                 wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
                 wizard.getConfig().setSeeds((Set<Agent>) seedsColSel.getValue());
 
-                if (Util.isCollectionEmpty(wizard.getConfig().getSeeds())) {
+                if (wizard.getConfig().getDomainName().isEmpty()) {
+                    show("Please provide domain name");
+                } else if (wizard.getConfig().getClusterName().isEmpty()) {
+                    show("Please provide cluster name");
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getSeeds())) {
                     show("Please add seeds servers");
                 } else {
                     wizard.next();
