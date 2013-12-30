@@ -88,8 +88,8 @@ public class Step3 extends Panel {
                 wizard.back();
             }
         });
-        Button next = new Button("Finish");
-        next.addListener(new Button.ClickListener() {
+        Button install = new Button("Install");
+        install.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -113,7 +113,7 @@ public class Step3 extends Panel {
 
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
-        buttons.addComponent(next);
+        buttons.addComponent(install);
         content.addComponent(buttons);
 
         addComponent(content);

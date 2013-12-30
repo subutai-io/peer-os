@@ -8,10 +8,8 @@ import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms.LxcCloneForm;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms.LxcManageForm;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LxcModule implements Module {
@@ -69,22 +67,4 @@ public class LxcModule implements Module {
         return new ModuleComponent();
     }
 
-    public void setModuleService(ModuleService service) {
-        try {
-            LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
-            service.registerModule(this);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in setModuleService", e);
-        }
-
-    }
-
-    public void unsetModuleService(ModuleService service) {
-        try {
-            service.unregisterModule(this);
-            LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in unsetModuleService", e);
-        }
-    }
 }

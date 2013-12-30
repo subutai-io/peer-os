@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.agent;
 
-//import org.osgi.framework.BundleContext;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
@@ -103,7 +102,8 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
                     task.setDescription("Agent registration");
                     task.setTaskStatus(TaskStatus.NEW);
                     task.setReqSeqNumber(0);
-                    commandManager.saveTask(task);
+                    persistenceAgent.saveTask(task);
+                    //
                     response.setTaskUuid(task.getUuid());
                     response.setRequestSequenceNumber(task.getReqSeqNumber());
                     persistenceAgent.saveResponse(response);
