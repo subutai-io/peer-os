@@ -214,11 +214,6 @@ public class Installer extends Operation {
     }
 
     @Override
-    public void onTaskCompleted(Task task) {
-        System.out.println("Task completed " + task);
-    }
-
-    @Override
     public void onTaskSucceeded(Task task) {
         //PROCESS OUTPUT OF START CONFIG SERVERS HERE
         //IF OK THEN NO-OP
@@ -241,36 +236,6 @@ public class Installer extends Operation {
             }
         }
         System.out.println("Task succeeded " + task);
-    }
-
-    @Override
-    public void onTaskFailed(Task task) {
-        System.out.println("Task failed " + task);
-    }
-
-    @Override
-    public void onOperationEnded() {
-        System.out.println("Operation ended");
-    }
-
-    @Override
-    public void onOperationStarted() {
-        System.out.println("Operation started");
-    }
-
-    @Override
-    public void onOperationStopped() {
-        System.out.println("Operation stopped");
-    }
-
-    @Override
-    public void onBeforeTaskRun(Task task) {
-        System.out.println("Before running task" + task);
-    }
-
-    @Override
-    public void onAfterTaskRun(Task task) {
-//        System.out.println("After running task " + task);
     }
 
 }

@@ -49,8 +49,8 @@ public abstract class Operation implements ResponseListener {
                 if (stopped) {
                     if (!isCompleted()) {
                         stopped = false;
-                        executeNextTask();
                         onOperationStarted();
+                        executeNextTask();
                         return true;
                     } else {
                         setOutput("Operation completed. No more tasks to run.");
