@@ -252,7 +252,7 @@ public class Installer extends Operation {
 
     @Override
     public void onAfterTaskRun(Task task) {
-        System.out.println("After running task " + task);
+//        System.out.println("After running task " + task);
     }
 
 }

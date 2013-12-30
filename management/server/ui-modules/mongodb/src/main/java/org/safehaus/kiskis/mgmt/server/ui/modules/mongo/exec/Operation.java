@@ -35,6 +35,7 @@ public abstract class Operation implements ResponseListener {
     private volatile boolean stopped = true;
     private volatile boolean failed = false;
     private final StringBuilder output = new StringBuilder();
+    private final StringBuilder log = new StringBuilder();
     private int commandCount = 0, okCommandCount = 0;
 
     public Operation(final String description) {
@@ -222,6 +223,22 @@ public abstract class Operation implements ResponseListener {
     public void onAfterTaskRun(Task task) {
     }
 
+    public void beforeResponseProcessed(Response response) {
+        if (response != null) {
+            if (!Util.isStringEmpty(response.getStdOut())) {
+                appendLog("StdOut:");
+                appendLog(response.getStdOut());
+            }
+            if (!Util.isStringEmpty(response.getStdErr())) {
+                appendLog("StdErr:");
+                appendLog(response.getStdErr());
+            }
+        }
+    }
+
+    public void afterResponseProcessed(Response response) {
+    }
+
     protected void fail() {
         Task task = getCurrentTask();
         if (task != null) {
@@ -234,8 +251,14 @@ public abstract class Operation implements ResponseListener {
     @Override
     public void onResponse(Response response) {
         try {
-            processResponse(response);
             clearOutput();
+
+            clearLog();
+
+            beforeResponseProcessed(response);
+
+            processResponse(response);
+
             //task completed
             Task task = getCurrentTask();
             if (task != null && task.isCompleted()) {
@@ -291,6 +314,8 @@ public abstract class Operation implements ResponseListener {
                 }
             }
 
+            afterResponseProcessed(response);
+
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in onResponse", e);
         }
@@ -315,6 +340,27 @@ public abstract class Operation implements ResponseListener {
 
     public void clearOutput() {
         output.setLength(0);
+    }
+
+    public String getLog() {
+        return log.toString();
+    }
+
+    public void appendLog(String s) {
+        if (log.length() == 0) {
+            log.append(s);
+        } else {
+            log.append("\n\n").append(s);
+        }
+    }
+
+    public void setLog(String s) {
+        clearLog();
+        appendLog(s);
+    }
+
+    public void clearLog() {
+        log.setLength(0);
     }
 
     @Override

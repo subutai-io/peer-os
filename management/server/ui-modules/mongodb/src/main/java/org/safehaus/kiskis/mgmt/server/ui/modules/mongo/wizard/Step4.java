@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
@@ -32,6 +32,7 @@ public class Step4 extends Panel implements ResponseListener {
     private static final Logger LOG = Logger.getLogger(Step4.class.getName());
 
     private final TextArea outputTxtArea;
+    private final TextArea logTextArea;
     private Operation operation;
     private final Button ok;
     private final Button revert;
@@ -47,7 +48,7 @@ public class Step4 extends Panel implements ResponseListener {
 
         outputTxtArea = new TextArea("Installation output");
         outputTxtArea.setRows(20);
-        outputTxtArea.setColumns(100);
+        outputTxtArea.setColumns(50);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
@@ -72,13 +73,21 @@ public class Step4 extends Panel implements ResponseListener {
             }
         });
 
-        HorizontalLayout footer = new HorizontalLayout();
-        footer.addComponent(ok);
-        footer.addComponent(revert);
+        indicator = createImage("indicator.gif", 50, 50);
+
+        GridLayout footer = new GridLayout(10, 2);
+        footer.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        footer.addComponent(ok, 0, 0, 1, 1);
+        footer.addComponent(revert, 2, 0, 3, 1);
+        footer.addComponent(indicator, 8, 1, 9, 1);
         content.addComponent(footer);
 
-        indicator = createImage("indicator.gif", 50, 50);
-        content.addComponent(indicator);
+        logTextArea = new TextArea("Command output");
+        logTextArea.setRows(20);
+        logTextArea.setColumns(50);
+        logTextArea.setImmediate(true);
+        logTextArea.setWordwrap(true);
+        content.addComponent(logTextArea);
 
         addComponent(content);
 
@@ -163,9 +172,17 @@ public class Step4 extends Panel implements ResponseListener {
                                     outputTxtArea.getValue(),
                                     output));
                     outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-                    if (operation.isCompleted() || operation.isStopped() || operation.isFailed()) {
-                        hideProgress();
-                    }
+                }
+                String log = operation.getLog();
+                if (!Util.isStringEmpty(log)) {
+                    logTextArea.setValue(
+                            MessageFormat.format("{0}\n\n{1}",
+                                    logTextArea.getValue(),
+                                    log));
+                    logTextArea.setCursorPosition(logTextArea.getValue().toString().length() - 1);
+                }
+                if (operation.isCompleted() || operation.isStopped() || operation.isFailed()) {
+                    hideProgress();
                 }
 
             } catch (Exception e) {
