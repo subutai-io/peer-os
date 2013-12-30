@@ -167,7 +167,7 @@ public class ServiceInstaller {
     }
 
     public void start() {
-        terminal.setValue("Cassandra cluster installation started...");
+        terminal.setValue("Cassandra cluster installation started...\n");
         moveToNextTask();
         if (currentTask != null) {
             for (Command command : currentTask.getCommands()) {
@@ -188,15 +188,15 @@ public class ServiceInstaller {
             Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.");
+                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
                     moveToNextTask();
                     if (currentTask != null) {
-                        terminal.setValue(terminal.getValue().toString() + "\nRunning next step " + currentTask.getDescription());
+                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
                         for (Command command : currentTask.getCommands()) {
                             executeCommand(command);
                         }
                     } else {
-                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.\n");
+                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
 
                         CassandraClusterInfo cci = new CassandraClusterInfo();
                         cci.setName(config.getClusterName());
@@ -208,14 +208,14 @@ public class ServiceInstaller {
                         cci.setDomainName(config.getDomainName());
 
                         if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
-                            terminal.setValue(terminal.getValue().toString() + "\n" + cci.getUuid() + " cluster saved into keyspace.");
+                            terminal.setValue(terminal.getValue().toString()  + cci.getUuid() + " cluster saved into keyspace.\n");
                         }
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    terminal.setValue("\n" + task.getDescription() + " failed");
+                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
                 }
             }
-            terminal.setCursorPosition(terminal.getValue().toString().length() - 1);
+            terminal.setCursorPosition(terminal.getValue().toString().length());
 
         }
     }
