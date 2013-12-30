@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -37,6 +36,7 @@ public abstract class Operation implements ResponseListener {
     private volatile boolean failed = false;
     private final StringBuilder output = new StringBuilder();
     private int commandCount = 0, okCommandCount = 0;
+    private final TaskState taskState = new TaskState();
 
     public Operation(final String description) {
         this.description = description;
@@ -47,9 +47,10 @@ public abstract class Operation implements ResponseListener {
         try {
             if (!failed) {
                 if (stopped) {
-                    if (hasMoreTasks()) {
+                    if (!isCompleted()) {
                         stopped = false;
                         executeNextTask();
+                        onOperationStarted();
                         return true;
                     } else {
                         setOutput("Operation completed. No more tasks to run.");
@@ -108,7 +109,7 @@ public abstract class Operation implements ResponseListener {
 
     private void executeNextTask() {
         try {
-            if (stopped || failed || !hasMoreTasks()) {
+            if (stopped || failed || isCompleted()) {
                 return;
             }
 
@@ -116,11 +117,13 @@ public abstract class Operation implements ResponseListener {
 
             if (currentTask != null && currentTask.getCommands() != null
                     && !currentTask.getCommands().isEmpty()) {
+                onBeforeTaskRun(currentTask);
                 commandCount = 0;
                 okCommandCount = 0;
                 for (Command cmd : currentTask.getCommands()) {
                     commandManager.executeCommand(cmd);
                 }
+                onAfterTaskRun(currentTask);
             }
 
         } catch (Exception e) {
@@ -128,8 +131,8 @@ public abstract class Operation implements ResponseListener {
         }
     }
 
-    public boolean hasMoreTasks() {
-        return currentTaskIdx < tasks.size() - 1;
+    public boolean isCompleted() {
+        return currentTaskIdx >= tasks.size() - 1;
     }
 
     public String getDescription() {
@@ -155,8 +158,9 @@ public abstract class Operation implements ResponseListener {
         return timeout;
     }
 
-    protected TaskState getTaskState(Response response) {
-        TaskState taskState = new TaskState();
+    protected void processResponse(Response response) {
+        taskState.setCompleted(false);
+        taskState.setSuccessfull(false);
         if (getCurrentTask() != null && response != null
                 && getCurrentTask().getTaskStatus() == TaskStatus.NEW && response.getType() != null
                 && getCurrentTask().getUuid() != null && response.getTaskUuid() != null
@@ -180,25 +184,40 @@ public abstract class Operation implements ResponseListener {
                 }
             }
         }
-
-        return taskState;
     }
+
+    abstract void onTaskCompleted(Task task);
+
+    abstract void onTaskSucceeded(Task task);
+
+    abstract void onTaskFailed(Task task);
+
+    abstract void onOperationEnded();
+
+    abstract void onOperationStarted();
+
+    abstract void onOperationStopped();
+
+    abstract void onBeforeTaskRun(Task task);
+
+    abstract void onAfterTaskRun(Task task);
 
     @Override
     public void onResponse(Response response) {
         try {
+            processResponse(response);
             clearOutput();
-
-            TaskState taskState = getTaskState(response);
             //task completed
             if (taskState.isCompleted()) {
+                onTaskCompleted(getCurrentTask());
                 //task succeeded or task is uninstall (which can fail in case product is not found)
                 if (taskState.isSuccessfull()) {
+                    onTaskSucceeded(getCurrentTask());
                     setOutput(MessageFormat.format(
                             "Task {0} succeeded.",
                             getCurrentTask().getDescription()));
                     //operation is not done yet
-                    if (hasMoreTasks()) {
+                    if (!isCompleted()) {
                         //check if stopped by user
                         if (!isStopped()) {
                             //execute next task
@@ -208,18 +227,22 @@ public abstract class Operation implements ResponseListener {
                                     getCurrentTask().getDescription()));
                         } // operation is stopped by user
                         else {
+                            onOperationStopped();
                             appendOutput(MessageFormat.format(
                                     "Stopped execution before task {0}.",
                                     getNextTask().getDescription()));
                         }
                         //operation is done
                     } else {
+                        onOperationEnded();
                         appendOutput(MessageFormat.format(
                                 "Operation \"{0}\" completed successfully.",
                                 getDescription()));
                     }
                 } else {
-                    //task failed -> operation failed
+                    //task failed -> operation failed & ended
+                    onTaskFailed(getCurrentTask());
+                    onOperationEnded();
                     setOutput(MessageFormat.format(
                             "Task {0} failed.\n\nOperation \"{1}\" aborted.",
                             getCurrentTask().getDescription(),

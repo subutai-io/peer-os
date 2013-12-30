@@ -34,7 +34,7 @@ public class Step4 extends Panel implements ResponseListener {
     private final TextArea outputTxtArea;
     private Operation operation;
     private final Button ok;
-    private final Button cancel;
+    private final Button revert;
     private final Label indicator;
     private Thread operationTimeoutThread;
 
@@ -62,19 +62,19 @@ public class Step4 extends Panel implements ResponseListener {
                 wizard.init();
             }
         });
-        cancel = new Button("Cancel");
-        cancel.addListener(new Button.ClickListener() {
+        revert = new Button("Revert");
+        revert.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cancel.setEnabled(false);
+                revert.setEnabled(false);
                 startOperation(new Uninstaller(wizard.getConfig()));
             }
         });
 
         HorizontalLayout footer = new HorizontalLayout();
         footer.addComponent(ok);
-        footer.addComponent(cancel);
+        footer.addComponent(revert);
         content.addComponent(footer);
 
         indicator = createImage("indicator.gif", 50, 50);
@@ -110,7 +110,8 @@ public class Step4 extends Panel implements ResponseListener {
                                 //wait for overalltimeout + 5 sec just in case
                                 Thread.sleep(operation.getOverallTimeout() * 1000 + 5000);
                                 if (!operation.isStopped()
-                                        && !operation.isFailed() && operation.hasMoreTasks()) {
+                                        && !operation.isFailed()
+                                        && !operation.isCompleted()) {
                                     outputTxtArea.setValue(
                                             MessageFormat.format("{0}\n\nOperation {1} timeouted!!!",
                                                     outputTxtArea.getValue(),
@@ -147,7 +148,7 @@ public class Step4 extends Panel implements ResponseListener {
     private void hideProgress() {
         indicator.setVisible(false);
         ok.setEnabled(true);
-        cancel.setEnabled(true);
+        revert.setEnabled(true);
     }
 
     @Override
@@ -162,7 +163,7 @@ public class Step4 extends Panel implements ResponseListener {
                                     outputTxtArea.getValue(),
                                     output));
                     outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-                    if (!operation.hasMoreTasks() || operation.isStopped() || operation.isFailed()) {
+                    if (operation.isCompleted() || operation.isStopped() || operation.isFailed()) {
                         hideProgress();
                     }
                 }

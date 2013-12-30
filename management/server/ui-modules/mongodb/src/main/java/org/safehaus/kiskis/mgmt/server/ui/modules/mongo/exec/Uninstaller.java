@@ -44,4 +44,44 @@ public class Uninstaller extends Operation {
         addTask(uninstallMongoTask);
     }
 
+    @Override
+    void onTaskCompleted(Task task) {
+        System.out.println("Task completed " + task);
+    }
+
+    @Override
+    void onTaskSucceeded(Task task) {
+        System.out.println("Task succeeded " + task);
+    }
+
+    @Override
+    void onTaskFailed(Task task) {
+        System.out.println("Task failed " + task);
+    }
+
+    @Override
+    void onOperationEnded() {
+        System.out.println("Operation ended");
+    }
+
+    @Override
+    void onOperationStarted() {
+        System.out.println("Operation started");
+    }
+
+    @Override
+    void onOperationStopped() {
+        System.out.println("Operation stopped");
+    }
+
+    @Override
+    void onBeforeTaskRun(Task task) {
+        System.out.println("Before running task" + task);
+    }
+
+    @Override
+    void onAfterTaskRun(Task task) {
+        System.out.println("After running task " + task);
+    }
+
 }
