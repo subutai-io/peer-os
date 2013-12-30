@@ -50,15 +50,15 @@ public class NodesWindow extends Window {
         VerticalLayout verticalLayout = new VerticalLayout();
         HorizontalLayout buttons = new HorizontalLayout();
 
-        Button addNewNode = new Button("Add new node");
-        addNewNode.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-
-            }
-        });
-        buttons.addComponent(addNewNode);
+//        Button addNewNode = new Button("Add new node");
+//        addNewNode.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//
+//            }
+//        });
+//        buttons.addComponent(addNewNode);
 
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
