@@ -178,7 +178,8 @@ public abstract class Operation implements ResponseListener {
             if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
                     || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
                 commandCount++;
-                if (response.getExitCode() == 0 || task.isIgnoreExitCode()) {
+                if ((response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                        && response.getExitCode() == 0) || task.isIgnoreExitCode()) {
                     okCommandCount++;
                 }
                 task.setCompleted(commandCount == task.getCommands().size());
