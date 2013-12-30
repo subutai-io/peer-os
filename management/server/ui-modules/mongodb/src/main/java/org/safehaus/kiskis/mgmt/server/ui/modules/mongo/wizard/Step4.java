@@ -81,13 +81,13 @@ public class Step4 extends Panel implements ResponseListener {
         content.addComponent(ok, 0, 4, 0, 4);
         content.addComponent(revert, 1, 4, 1, 4);
         content.addComponent(indicator, 8, 4, 8, 4);
-        content.addComponent(content);
 
         logTextArea = new TextArea("Command output");
         logTextArea.setRows(20);
         logTextArea.setColumns(50);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
+        
         content.addComponent(logTextArea, 0, 5, 8, 8);
 
         addComponent(content);
