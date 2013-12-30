@@ -50,18 +50,18 @@ public class CassandraTable extends Table {
         return container;
     }
 
-    private void addClusterDataToContainer(final Container container, final CassandraClusterInfo cd) {
+    private void addClusterDataToContainer(final Container container, final CassandraClusterInfo cci) {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
-        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cd.getUuid());
-        item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cd.getName());
+        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getUuid());
+        item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cci.getName());
 
         Button startButton = new Button("Start");
         startButton.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.startCassandraServices(cd.getNodes());
+                manager.startCassandraServices(cci.getNodes());
             }
         });
 
@@ -70,7 +70,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.stopCassandraServices(cd.getNodes());
+                manager.stopCassandraServices(cci.getNodes());
             }
         });
 
@@ -79,7 +79,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.statusCassandraServices(cd.getNodes());
+                manager.statusCassandraServices(cci.getNodes());
             }
         });
         
@@ -88,7 +88,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                nodesWindow = new NodesWindow(cd.getName(), cd.getNodes(), manager);
+                nodesWindow = new NodesWindow(cci.getName(), cci, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
             }
         });
@@ -98,8 +98,8 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.purgeCassandraServices(cd.getNodes());
-                if (ServiceLocator.getService(CommandManagerInterface.class).deleteCassandraClusterData(cd.getUuid())) {
+                manager.purgeCassandraServices(cci.getNodes());
+                if (ServiceLocator.getService(CommandManagerInterface.class).deleteCassandraClusterData(cci.getUuid())) {
 //                    container.removeItem(itemId);
                     refreshDatasource();
                 }

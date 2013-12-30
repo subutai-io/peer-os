@@ -5,7 +5,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -15,7 +14,6 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
-import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 
@@ -26,17 +24,18 @@ public class NodesWindow extends Window {
 
     private final Table table;
     private IndexedContainer container;
-    private final List<UUID> list;
+//    private final List<UUID> nodes;
     ServiceManager manager;
+    CassandraClusterInfo cci;
 
     /**
      *
      * @param caption
-     * @param list
+     * @param cci
      * @param manager
      */
-    public NodesWindow(String caption, List<UUID> list, ServiceManager manager) {
-        this.list = list;
+    public NodesWindow(String caption, CassandraClusterInfo cci, ServiceManager manager) {
+        this.cci = cci;
         this.manager = manager;
 
         setCaption(caption);
@@ -53,11 +52,10 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                
+
             }
         });
         buttons.addComponent(addNewNode);
-        buttons.addComponent(new Button("Add new seed"));
 
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
@@ -76,9 +74,11 @@ public class NodesWindow extends Window {
         container.addContainerProperty("uuid", UUID.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
+        container.addContainerProperty("Seed", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
-        for (UUID uuid : list) {
-            addOrderToContainer(container, getAgentManager().getAgent(uuid));
+        for (UUID uuid : cci.getNodes()) {
+            Agent agent = getAgentManager().getAgent(uuid);
+            addOrderToContainer(container, agent);
             manager.statusCassandraService(uuid);
         }
         return container;
@@ -106,6 +106,30 @@ public class NodesWindow extends Window {
                 manager.stopCassandraService(agent);
             }
         });
+
+        Button seedButton = new Button("Set as seed");
+        if (cci.getSeeds().contains(agent.getUuid())) {
+            seedButton.setCaption("Remove seed");
+            seedButton.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    cci.getSeeds().remove(agent.getUuid());
+                    manager.updateSeeds(cci);
+                }
+            });
+        } else {
+            seedButton.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    cci.getSeeds().add(agent.getUuid());
+                    manager.updateSeeds(cci);
+                    
+                }
+            });
+        }
+
         Button destroyButton = new Button("Destroy");
         destroyButton.addListener(new Button.ClickListener() {
 
@@ -116,6 +140,7 @@ public class NodesWindow extends Window {
         });
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
+        item.getItemProperty("Seed").setValue(seedButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
 

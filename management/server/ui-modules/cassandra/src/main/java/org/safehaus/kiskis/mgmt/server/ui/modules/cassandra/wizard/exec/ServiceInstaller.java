@@ -82,9 +82,10 @@ public class ServiceInstaller {
 
         Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set seeds addresses");
         StringBuilder seedsSB = new StringBuilder();
-        for (Agent seed : config.getSeeds()) {
+        for (Agent agent : config.getSeeds()) {
 //            seedsSB.append(seed.getHostname()).append(".").append(config.getDomainName()).append(",");
-            seedsSB.append(seed.getListIP().get(0)).append(",");
+            seedsSB.append(agent.getListIP().get(0)).append(",");
+            
         }
         for (Agent agent : config.getSelectedAgents()) {
             Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));

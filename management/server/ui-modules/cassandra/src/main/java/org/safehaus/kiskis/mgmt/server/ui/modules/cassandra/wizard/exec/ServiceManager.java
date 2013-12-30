@@ -15,6 +15,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.NodesWindow;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 /**
  *
@@ -172,6 +177,41 @@ public class ServiceManager {
         startTask.addCommand(command);
         tasks.add(startTask);
         start();
+    }
+
+    public void updateSeeds(List<UUID> seeds, List<UUID> nodes) {
+
+    }
+
+    public void updateSeeds(CassandraClusterInfo cci) {
+        Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set seeds addresses");
+        StringBuilder seedsSB = new StringBuilder();
+        for (UUID seed : cci.getSeeds()) {
+            Agent agent = getAgentManager().getAgent(seed);
+            seedsSB.append(agent.getListIP().get(0)).append(",");
+        }
+        for (UUID agent : cci.getNodes()) {
+            Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
+            setSeedsCommand.getRequest().setUuid(agent);
+            setSeedsCommand.getRequest().setTaskUuid(setSeedsTask.getUuid());
+            setSeedsCommand.getRequest().setRequestSequenceNumber(setSeedsTask.getIncrementedReqSeqNumber());
+            setSeedsTask.addCommand(setSeedsCommand);
+        }
+        tasks.add(setSeedsTask);
+        start();
+    }
+
+    public static AgentManagerInterface getAgentManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(NodesWindow.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 
 }
