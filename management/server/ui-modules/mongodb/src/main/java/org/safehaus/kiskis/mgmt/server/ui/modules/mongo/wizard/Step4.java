@@ -81,9 +81,9 @@ public class Step4 extends Panel implements ResponseListener {
 
         content.addComponent(ok, 0, 1, 0, 2);
         content.addComponent(revert, 1, 1, 1, 2);
-        content.addComponent(indicator, 3, 1, 3, 2);
-        content.setComponentAlignment(ok, Alignment.BOTTOM_LEFT);
-        content.setComponentAlignment(revert, Alignment.BOTTOM_LEFT);
+        content.addComponent(indicator, 3, 2, 3, 2);
+        content.setComponentAlignment(ok, Alignment.TOP_LEFT);
+        content.setComponentAlignment(revert, Alignment.TOP_LEFT);
         content.setComponentAlignment(indicator, Alignment.BOTTOM_RIGHT);
 
         logTextArea = new TextArea("Command output");
