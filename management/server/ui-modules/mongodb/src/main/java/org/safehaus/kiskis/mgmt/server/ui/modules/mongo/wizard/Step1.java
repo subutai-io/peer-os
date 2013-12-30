@@ -13,10 +13,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
 import static org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util.createImage;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import static org.safehaus.kiskis.mgmt.shared.protocol.Util.isCollectionEmpty;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -51,7 +50,7 @@ public class Step1 extends Panel {
                 Set<Agent> selectedAgents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
                 //take only lxc nodes
 
-                if (isCollectionEmpty(selectedAgents)) {
+                if (Util.isCollectionEmpty(selectedAgents)) {
                     show("Select nodes in the tree on the left first");
                 } else {
                     wizard.getConfig().reset();
