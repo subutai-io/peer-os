@@ -50,19 +50,19 @@ public class StepSetDirectories extends Panel {
         final TextField dataDirTxtFld = new TextField("Enter Data directory");
         dataDirTxtFld.setInputPrompt("/var/lib/cassandra/data");
         dataDirTxtFld.setRequired(true);
-        dataDirTxtFld.setMaxLength(20);
+        dataDirTxtFld.setMaxLength(40);
         verticalLayoutForm.addComponent(dataDirTxtFld);
 
         final TextField commitLogTxtFld = new TextField("Enter Commitlog directory");
         commitLogTxtFld.setInputPrompt("/var/lib/cassandra/commitlog");
         commitLogTxtFld.setRequired(true);
-        commitLogTxtFld.setMaxLength(20);
+        commitLogTxtFld.setMaxLength(40);
         verticalLayoutForm.addComponent(commitLogTxtFld);
 
         final TextField savedCachesTxtFld = new TextField("Enter Saved Caches directory");
         savedCachesTxtFld.setInputPrompt("/var/lib/cassandra/saved_caches");
         savedCachesTxtFld.setRequired(true);
-        savedCachesTxtFld.setMaxLength(20);
+        savedCachesTxtFld.setMaxLength(40);
         verticalLayoutForm.addComponent(savedCachesTxtFld);
 
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
