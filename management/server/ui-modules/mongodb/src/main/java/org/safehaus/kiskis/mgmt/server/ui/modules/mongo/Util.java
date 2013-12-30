@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Label;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
@@ -77,14 +78,14 @@ public class Util {
     }
 
     public static Set<Agent> filterLxcAgents(Set<Agent> agents) {
+        Set<Agent> filteredAgents = new HashSet<Agent>();
         if (agents != null) {
-            for (Iterator<Agent> it = agents.iterator(); it.hasNext();) {
-                Agent agent = it.next();
-                if (!agent.isIsLXC()) {
-                    it.remove();
+            for (Agent agent : agents) {
+                if (agent.isIsLXC()) {
+                    filteredAgents.add(agent);
                 }
             }
         }
-        return agents;
+        return filteredAgents;
     }
 }
