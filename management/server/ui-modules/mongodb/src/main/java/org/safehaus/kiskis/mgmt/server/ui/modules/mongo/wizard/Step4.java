@@ -51,8 +51,8 @@ public class Step4 extends Panel implements ResponseListener {
         content.setMargin(true);
 
         outputTxtArea = new TextArea("Installation output");
-        outputTxtArea.setRows(20);
-        outputTxtArea.setColumns(50);
+        outputTxtArea.setRows(17);
+        outputTxtArea.setColumns(60);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
@@ -87,8 +87,8 @@ public class Step4 extends Panel implements ResponseListener {
         content.setComponentAlignment(indicator, Alignment.BOTTOM_RIGHT);
 
         logTextArea = new TextArea("Command output");
-        logTextArea.setRows(20);
-        logTextArea.setColumns(50);
+        logTextArea.setRows(17);
+        logTextArea.setColumns(60);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
