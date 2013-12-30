@@ -12,9 +12,7 @@
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <reference id="moduleService" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.server.ui.services.ModuleService"/>
-    <reference id="agentManagerService" availability="mandatory"
+    <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface"/>
 
 
@@ -23,8 +21,7 @@
             <entry key="alias" value="/mgmt-ui"/>
         </service-properties>
         <bean class="org.safehaus.kiskis.mgmt.server.ui.MgmtAppFactory">
-            <property name="moduleService" ref="moduleService"/>
-            <property name="agentManagerService" ref="agentManagerService"/>
+            <property name="agentManager" ref="agentManager"/>
             <argument value="${title}"/>
         </bean>
     </service>

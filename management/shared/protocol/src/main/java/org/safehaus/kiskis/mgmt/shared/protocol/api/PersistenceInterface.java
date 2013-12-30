@@ -51,6 +51,8 @@ public interface PersistenceInterface {
 
     public Integer getResponsesCount(UUID taskUuid);
 
+    public Integer getSuccessfullResponsesCount(UUID taskUuid);
+
     public List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber);
 
     public boolean saveResponse(Response response);
@@ -88,5 +90,14 @@ public interface PersistenceInterface {
     public List<HadoopClusterInfo> getHadoopClusterInfo();
 
     public HadoopClusterInfo getHadoopClusterInfo(String clusterName);
+
+    //=========MONGO============================================================
+    public boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo);
+
+    public List<MongoClusterInfo> getMongoClustersInfo();
+
+    public MongoClusterInfo getMongoClusterInfo(String clusterName);
+
+    public boolean deleteMongoClusterInfo(String clusterName);
 
 }

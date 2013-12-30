@@ -17,7 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  *
  * @author dilshat
  */
-public class MongoCommands {
+public class Commands {
 
     // INSTALLATION COMMANDS ===================================================
     public static Command getTemplate() {
@@ -45,6 +45,9 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
+                "update",
+                "&&",
+                "/usr/bin/apt-get",
                 "--force-yes",
                 "--assume-yes",
                 "install",
@@ -58,14 +61,55 @@ public class MongoCommands {
     public static Command getUninstallCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/apt-get");
+        req.setProgram("/usr/bin/pkill");
         req.setArgs(Arrays.asList(
+                "-9",
+                "-f",
+                "'mongod|ksks-mongo|mongos'",
+                ";",
+                "/usr/bin/apt-get",
                 "--force-yes",
                 "--assume-yes",
                 "purge",
                 "ksks-mongo"
         ));
         req.setTimeout(180);
+        return cmd;
+    }
+
+    //JOIN ALL CLEANUP COMMANDS INTO ONE
+    public static Command getRemoveDataDirCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/rm");
+        req.setArgs(Arrays.asList(
+                "-R",
+                "/var/lib/mongodb"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    public static Command getRemoveConfDirCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/rm");
+        req.setArgs(Arrays.asList(
+                "-R",
+                "/data/configdb"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    public static Command getRemoveReplicaConfFileCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/rm");
+        req.setArgs(Arrays.asList(
+                "/etc/mongodb.conf"
+        ));
+        req.setTimeout(30);
         return cmd;
     }
 
@@ -90,7 +134,7 @@ public class MongoCommands {
         req.setProgram("/bin/echo");
         req.setArgs(Arrays.asList(
                 "-e",
-                otherShardsHosts,
+                "\"" + otherShardsHosts + "\"",
                 //add [echo -e "\nIP HOST\nIP HOST\nIP HOST"] with each replica's data
                 //except the one to whom this command is aimed and replace placeholder
                 ">>",
@@ -194,6 +238,21 @@ public class MongoCommands {
         return cmd;
     }
 
+    //execute on any router member
+    public static Command getRegisterPrimaryWithRouterCommand(String replicaSetName, String primaryHost) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/echo");
+        req.setArgs(Arrays.asList(
+                String.format("'sh.addShard(\"%s/%s:%s\")'",
+                        replicaSetName, primaryHost, Constants.MONGO_SHARD_PORT),
+                "|",
+                "mongo"
+        ));
+        req.setTimeout(60);
+        return cmd;
+    }
+
     // LIFECYCLE COMMANDS =======================================================
     //execute on config server
     public static Command getStartConfigServerCommand() {
@@ -201,6 +260,7 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("/bin/mkdir");
         req.setArgs(Arrays.asList(
+                "-p",
                 "/data/configdb",
                 ";",
                 "mongod",
@@ -208,7 +268,11 @@ public class MongoCommands {
                 "--dbpath",
                 "/data/configdb",
                 "--port",
-                Constants.MONGO_CONFIG_SERVER_PORT + "" // this might be user-supplied
+                Constants.MONGO_CONFIG_SERVER_PORT + "", // this might be user-supplied
+                "--fork",
+                "--logpath",
+                "/var/log/mongodb.log"
+        //                        "--logappend"
         ));
         req.setTimeout(180);
         return cmd;
@@ -316,7 +380,7 @@ public class MongoCommands {
         req.setArgs(Arrays.asList(
                 "--shutdown"
         ));
-        req.setTimeout(30);
+        req.setTimeout(60);
         return cmd;
     }
 
@@ -326,10 +390,22 @@ public class MongoCommands {
         Request req = cmd.getRequest();
         req.setProgram("/bin/kill");
         req.setArgs(Arrays.asList(
-                " -2",
+                "-2",
                 "`pgrep -f mongod`"
         ));
         req.setTimeout(10);
+        return cmd;
+    }
+
+    public static Command getForceKillMongodCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/kill");
+        req.setArgs(Arrays.asList(
+                "-9",
+                "`pgrep -f mongod`"
+        ));
+        req.setTimeout(30);
         return cmd;
     }
 

@@ -15,6 +15,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
@@ -22,11 +23,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
  *
  * @author dilshat
  */
-public class MongoManager implements ResponseListener {
+public class Manager implements ResponseListener {
 
     private final VerticalLayout contentRoot;
 
-    public MongoManager() {
+    public Manager() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -137,7 +138,7 @@ public class MongoManager implements ResponseListener {
 
     @Override
     public String getSource() {
-        return getClass().getName();
+        return MongoModule.MODULE_NAME;
     }
 
 }
