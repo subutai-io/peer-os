@@ -218,6 +218,9 @@ public abstract class Operation implements ResponseListener {
     }
 
     public void onBeforeTaskRun(Task task) {
+        appendLog(MessageFormat.format(
+                "======= Task {0} =======",
+                task.getDescription()));
     }
 
     public void onAfterTaskRun(Task task) {
@@ -232,6 +235,12 @@ public abstract class Operation implements ResponseListener {
             if (!Util.isStringEmpty(response.getStdErr())) {
                 appendLog("StdErr:");
                 appendLog(response.getStdErr());
+            }
+            if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                appendLog("Exit Code: " + response.getExitCode());
+            }
+            if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                appendLog("Command timeouted");
             }
         }
     }
@@ -279,9 +288,7 @@ public abstract class Operation implements ResponseListener {
                                 appendOutput(MessageFormat.format(
                                         "Running next task {0}...",
                                         getNextTask().getDescription()));
-                                appendLog(MessageFormat.format(
-                                        "======= Task {0} =======",
-                                        getNextTask().getDescription()));
+
                                 executeNextTask();
                             } // operation is stopped by user
                             else {
