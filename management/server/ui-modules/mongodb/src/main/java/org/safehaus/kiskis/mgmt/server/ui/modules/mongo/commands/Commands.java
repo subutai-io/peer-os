@@ -186,15 +186,24 @@ public class Commands {
     }
 
     //execute on primary replica
-    public static Command getAddSecondaryReplicasToPrimaryCommand(String secondaryNodes) {
+    public static Command getSetPrimaryShardConfigCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongod");
         req.setArgs(Arrays.asList(
                 "--config",
-                "/etc/mongodb.conf",
-                "&&",
-                "/bin/echo",
+                "/etc/mongodb.conf"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    //execute on primary replica
+    public static Command getAddSecondaryReplicasToPrimaryCommand(String secondaryNodes) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/echo");
+        req.setArgs(Arrays.asList(
                 "-e",
                 String.format("\"'rs.initiate()'%s\"", secondaryNodes),
                 //add each secondary node newline-separated and replace placeholder

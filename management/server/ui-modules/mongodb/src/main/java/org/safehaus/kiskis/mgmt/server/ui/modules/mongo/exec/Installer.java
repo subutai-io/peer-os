@@ -167,10 +167,21 @@ public class Installer extends Operation {
         }
         addTask(restartShards);
 
-        //REGISTER SECONDARY NODES ON PRIMARY
-        Task registerSecondaryNodesWithPrimaryTask = Util.createTask("Register secondary nodes with primary");
         //Make the first node as primary
         Agent primaryNode = config.getShards().iterator().next();
+        //SET PRIMARY NODE CONFIG
+        Task setPrimaryNodeConfigTask = Util.createTask("Set replica set's primary node config");
+        Command cmd = Commands.getSetPrimaryShardConfigCommand();
+        cmd.getRequest().setUuid(primaryNode.getUuid());
+        cmd.getRequest().setTaskUuid(setPrimaryNodeConfigTask.getUuid());
+        cmd.getRequest().setRequestSequenceNumber(setPrimaryNodeConfigTask.getIncrementedReqSeqNumber());
+        cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+        setPrimaryNodeConfigTask.addCommand(cmd);
+        setPrimaryNodeConfigTask.setIgnoreExitCode(true);
+        addTask(setPrimaryNodeConfigTask);
+
+        //REGISTER SECONDARY NODES ON PRIMARY
+        Task registerSecondaryNodesWithPrimaryTask = Util.createTask("Register secondary nodes with primary");
         StringBuilder secondaryStr = new StringBuilder();
         for (Agent agent : config.getShards()) {
             if (agent != primaryNode) {
@@ -179,7 +190,7 @@ public class Installer extends Operation {
                         append("\\\")'");
             }
         }
-        Command cmd = Commands.getAddSecondaryReplicasToPrimaryCommand(secondaryStr.toString());
+        cmd = Commands.getAddSecondaryReplicasToPrimaryCommand(secondaryStr.toString());
         cmd.getRequest().setUuid(primaryNode.getUuid());
         cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
         cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
