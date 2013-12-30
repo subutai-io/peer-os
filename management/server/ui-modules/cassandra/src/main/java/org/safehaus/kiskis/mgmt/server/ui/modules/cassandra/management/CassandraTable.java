@@ -89,6 +89,7 @@ public class CassandraTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 nodesWindow = new NodesWindow(cd.getName(), cd.getNodes(), manager);
+                getApplication().getMainWindow().addWindow(nodesWindow);
             }
         });
 

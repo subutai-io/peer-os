@@ -5,17 +5,12 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,8 +24,7 @@ public class NodesWindow extends Window {
     private final Table table;
     private IndexedContainer container;
     private final List<UUID> list;
-    private Task task;
-    private final TextArea terminal;
+    ServiceManager manager;
 
     /**
      *
@@ -40,11 +34,14 @@ public class NodesWindow extends Window {
      */
     public NodesWindow(String caption, List<UUID> list, ServiceManager manager) {
         this.list = list;
-
+        this.manager = manager;
+        
         setCaption(caption);
         setSizeUndefined();
         setWidth("600px");
         setHeight("500px");
+        setModal(true);
+        center();
 
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
@@ -52,12 +49,6 @@ public class NodesWindow extends Window {
         table.setImmediate(true);
 
         addComponent(table);
-        terminal = new TextArea();
-        terminal.setRows(6);
-        terminal.setColumns(65);
-        terminal.setImmediate(true);
-        terminal.setWordwrap(true);
-        addComponent(terminal);
 
     }
 
@@ -84,25 +75,7 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                createTask();
-                int reqSeqNumber = task.getIncrementedReqSeqNumber();
-                Command command = (Command) CommandFactory.createRequest(
-                        RequestType.EXECUTE_REQUEST,
-                        agent.getUuid(),
-                        CassandraModule.MODULE_NAME,
-                        task.getUuid(),
-                        reqSeqNumber,
-                        "/",
-                        "service cassandra start",
-                        OutputRedirection.RETURN,
-                        OutputRedirection.RETURN,
-                        null,
-                        null,
-                        "root",
-                        null,
-                        null,
-                        null);
-                ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
+                manager.startCassandraService(agent);
             }
         });
         Button stopButton = new Button("Stop");
@@ -110,25 +83,7 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                createTask();
-                int reqSeqNumber = task.getIncrementedReqSeqNumber();
-                Command command = (Command) CommandFactory.createRequest(
-                        RequestType.EXECUTE_REQUEST,
-                        agent.getUuid(),
-                        CassandraModule.MODULE_NAME,
-                        task.getUuid(),
-                        reqSeqNumber,
-                        "/",
-                        "service cassandra stop",
-                        OutputRedirection.RETURN,
-                        OutputRedirection.RETURN,
-                        null,
-                        null,
-                        "root",
-                        null,
-                        null,
-                        null);
-                ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
+                manager.stopCassandraService(agent);
             }
         });
         item.getItemProperty("Start").setValue(startButton);
@@ -148,21 +103,14 @@ public class NodesWindow extends Window {
         return null;
     }
 
-    private void createTask() {
-        task = new Task();
-        task.setDescription("Nodes task");
-        task.setTaskStatus(TaskStatus.NEW);
-    }
 
     public void setOutput(Response response) {
-        System.out.println("setoutput" + response.getTaskUuid());
-        for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true)) {
-            terminal.setValue(pr.getResponse().getStdOut());
-        }
+//        System.out.println("setoutput" + response.getTaskUuid());
+//        for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true)) {
+//            terminal.setValue(pr.getResponse().getStdOut());
+//        }
+        manager.onResponse(response);
     }
 
-    public Task getTask() {
-        return task;
-    }
 
 }

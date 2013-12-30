@@ -129,4 +129,26 @@ public class ServiceManager {
         ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
     }
 
+    public void startCassandraService(Agent agent) {
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Start Cassandra Service");
+        Command command = CassandraCommands.getServiceCassandraStartCommand();
+        command.getRequest().setUuid(agent.getUuid());
+        command.getRequest().setTaskUuid(startTask.getUuid());
+        command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
+        startTask.addCommand(command);
+        tasks.add(startTask);
+        start();
+    }
+
+    public void stopCassandraService(Agent agent) {
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Stop Cassandra Service");
+        Command command = CassandraCommands.getServiceCassandraStopCommand();
+        command.getRequest().setUuid(agent.getUuid());
+        command.getRequest().setTaskUuid(startTask.getUuid());
+        command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
+        startTask.addCommand(command);
+        tasks.add(startTask);
+        start();
+    }
+
 }
