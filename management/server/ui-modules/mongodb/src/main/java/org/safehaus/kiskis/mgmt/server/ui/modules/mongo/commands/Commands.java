@@ -196,7 +196,7 @@ public class Commands {
                 "&&",
                 "/bin/echo",
                 "-e",
-                String.format("'rs.initiate()'%s", secondaryNodes),
+                String.format("\"'rs.initiate()'%s\"", secondaryNodes),
                 //add each secondary node newline-separated and replace placeholder
                 //e.g.: [\n'rs.add(\":NON_PRIMARY_REPLICA_HOST\")']
                 "|",

@@ -174,9 +174,9 @@ public class Installer extends Operation {
         StringBuilder secondaryStr = new StringBuilder();
         for (Agent agent : config.getShards()) {
             if (agent != primaryNode) {
-                secondaryStr.append("\n'rs.add(\"").
+                secondaryStr.append("\n'rs.add(\\\"").
                         append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
-                        append("\")'");
+                        append("\\\")'");
             }
         }
         Command cmd = Commands.getAddSecondaryReplicasToPrimaryCommand(secondaryStr.toString());
