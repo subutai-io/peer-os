@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
 
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
@@ -25,6 +26,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public class Installer extends Operation {
 
     private final Task startConfigServersTask;
+    private final Task startRoutersTask;
 
     public Installer(InstallerConfig config) {
         super("Mongo Installation");
@@ -98,7 +100,7 @@ public class Installer extends Operation {
         addTask(stopMongoDBOnRouters);
 
         //START ROUTERS
-        Task startRoutersTask = Util.createTask("Start routers");
+        startRoutersTask = Util.createTask("Start routers");
         StringBuilder configServersArg = new StringBuilder();
         for (Agent agent : config.getConfigServers()) {
             configServersArg.append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
@@ -116,6 +118,9 @@ public class Installer extends Operation {
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startRoutersTask.addCommand(cmd);
         }
+        //============process output of mongod========
+        startRoutersTask.setIgnoreExitCode(true);
+        //============================================
         addTask(startRoutersTask);
 
         //ADD REPLICA TO EACH OTHERS /ETC/HOSTS
@@ -207,7 +212,7 @@ public class Installer extends Operation {
         //PROCESS OUTPUT OF START CONFIG SERVERS HERE
         //IF OK THEN NO-OP
         //ELSE fail the task with custom output appended
-        if (task == startConfigServersTask) {
+        if (task == startConfigServersTask || task == startRoutersTask) {
             int j = 0;
             for (int i = 1; i <= task.getReqSeqNumber(); i++) {
                 Response response = commandManager.getResponse(task.getUuid(), i);
@@ -219,7 +224,9 @@ public class Installer extends Operation {
             }
             if (j != task.getReqSeqNumber()) {
                 fail();
-                appendOutput("Could not succesfully start config servers on all nodes.");
+                appendOutput(
+                        MessageFormat.format("Could not succesfully execute task {0}.",
+                                task.getDescription()));
             }
         }
         System.out.println("Task succeeded " + task);

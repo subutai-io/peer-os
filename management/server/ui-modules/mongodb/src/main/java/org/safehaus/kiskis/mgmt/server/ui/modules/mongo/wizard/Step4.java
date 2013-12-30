@@ -11,7 +11,6 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +40,11 @@ public class Step4 extends Panel implements ResponseListener {
 
     public Step4(final Wizard wizard) {
 
-        VerticalLayout content = new VerticalLayout();
+//        VerticalLayout content = new VerticalLayout();
+//        content.setSizeFull();
+//        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+//        content.setMargin(true);
+        GridLayout content = new GridLayout(9, 9);
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
@@ -52,7 +55,7 @@ public class Step4 extends Panel implements ResponseListener {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea);
+        content.addComponent(outputTxtArea, 0, 0, 8, 3);
 
         ok = new Button("OK");
         ok.setEnabled(false);
@@ -75,19 +78,17 @@ public class Step4 extends Panel implements ResponseListener {
 
         indicator = createImage("indicator.gif", 50, 50);
 
-        GridLayout footer = new GridLayout(10, 2);
-        footer.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        footer.addComponent(ok, 0, 0, 1, 1);
-        footer.addComponent(revert, 2, 0, 3, 1);
-        footer.addComponent(indicator, 8, 1, 9, 1);
-        content.addComponent(footer);
+        content.addComponent(ok, 0, 4, 0, 4);
+        content.addComponent(revert, 1, 4, 1, 4);
+        content.addComponent(indicator, 8, 4, 8, 4);
+        content.addComponent(content);
 
         logTextArea = new TextArea("Command output");
         logTextArea.setRows(20);
         logTextArea.setColumns(50);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
-        content.addComponent(logTextArea);
+        content.addComponent(logTextArea, 0, 5, 8, 8);
 
         addComponent(content);
 
