@@ -45,7 +45,7 @@ public class Step4 extends Panel implements ResponseListener {
 //        content.setSizeFull();
 //        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 //        content.setMargin(true);
-        GridLayout content = new GridLayout(20, 4);
+        GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
@@ -56,7 +56,7 @@ public class Step4 extends Panel implements ResponseListener {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea, 0, 0, 19, 0);
+        content.addComponent(outputTxtArea, 0, 0, 18, 0);
 
         ok = new Button("OK");
         ok.setEnabled(false);
@@ -79,9 +79,9 @@ public class Step4 extends Panel implements ResponseListener {
 
         indicator = createImage("indicator.gif", 50, 50);
 
-        content.addComponent(ok, 0, 1, 0, 2);
-        content.addComponent(revert, 1, 1, 1, 2);
-        content.addComponent(indicator, 3, 2, 3, 2);
+        content.addComponent(ok, 0, 1, 0, 1);
+        content.addComponent(revert, 1, 1, 1, 1);
+        content.addComponent(indicator, 19, 0, 19, 0);
         content.setComponentAlignment(ok, Alignment.TOP_LEFT);
         content.setComponentAlignment(revert, Alignment.TOP_LEFT);
         content.setComponentAlignment(indicator, Alignment.BOTTOM_RIGHT);
@@ -92,7 +92,7 @@ public class Step4 extends Panel implements ResponseListener {
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
-        content.addComponent(logTextArea, 0, 3, 19, 3);
+        content.addComponent(logTextArea, 0, 2, 18, 2);
 
         addComponent(content);
 
