@@ -51,14 +51,17 @@ public class StepSeeds extends Panel {
 
         final TextField domainNameTxtFld = new TextField("Domain name");
         domainNameTxtFld.setInputPrompt("Domain name");
+        domainNameTxtFld.setInputPrompt("intra.lan");
         domainNameTxtFld.setRequired(true);
-        domainNameTxtFld.setMaxLength(20);
+        domainNameTxtFld.setMaxLength(100);
+        domainNameTxtFld.setWidth("250px");
         verticalLayoutForm.addComponent(domainNameTxtFld);
 
         final TextField clusterNameTxtFld = new TextField("Cluster name");
-        clusterNameTxtFld.setInputPrompt("Cluster name");
+        clusterNameTxtFld.setInputPrompt("New cluster");
         clusterNameTxtFld.setRequired(true);
-        clusterNameTxtFld.setMaxLength(20);
+        clusterNameTxtFld.setMaxLength(40);
+        clusterNameTxtFld.setWidth("250px");
         verticalLayoutForm.addComponent(clusterNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as seeds");
