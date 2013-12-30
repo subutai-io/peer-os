@@ -195,7 +195,7 @@ public class ServiceInstaller {
                             executeCommand(command);
                         }
                     } else {
-                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.");
+                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.\n");
 
                         CassandraClusterInfo cci = new CassandraClusterInfo();
                         cci.setName(config.getClusterName());
@@ -214,6 +214,7 @@ public class ServiceInstaller {
                     terminal.setValue("\n" + task.getDescription() + " failed");
                 }
             }
+            terminal.setCursorPosition(terminal.getValue().toString().length() - 1);
 
         }
     }

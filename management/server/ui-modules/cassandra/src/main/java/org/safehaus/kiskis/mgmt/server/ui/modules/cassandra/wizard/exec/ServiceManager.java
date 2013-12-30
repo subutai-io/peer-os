@@ -83,7 +83,7 @@ public class ServiceManager {
     }
 
     public void start() {
-        terminal.setValue("");
+//        terminal.setValue("");
         moveToNextTask();
         if (currentTask != null) {
             for (Command command : currentTask.getCommands()) {
@@ -114,13 +114,14 @@ public class ServiceManager {
                             executeCommand(command);
                         }
                     } else {
-                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.");
+                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.\n");
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     terminal.setValue("\n" + task.getDescription() + " failed");
                 }
             }
 
+            terminal.setCursorPosition(terminal.getValue().toString().length() - 1);
         }
     }
 
@@ -143,6 +144,28 @@ public class ServiceManager {
     public void stopCassandraService(Agent agent) {
         Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Stop Cassandra Service");
         Command command = CassandraCommands.getServiceCassandraStopCommand();
+        command.getRequest().setUuid(agent.getUuid());
+        command.getRequest().setTaskUuid(startTask.getUuid());
+        command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
+        startTask.addCommand(command);
+        tasks.add(startTask);
+        start();
+    }
+
+    public void statusCassandraService(UUID uuid) {
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Status of Cassandra Service");
+        Command command = CassandraCommands.getServiceCassandraStatusCommand();
+        command.getRequest().setUuid(uuid);
+        command.getRequest().setTaskUuid(startTask.getUuid());
+        command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
+        startTask.addCommand(command);
+        tasks.add(startTask);
+        start();
+    }
+
+    public void uninstallCassandraService(Agent agent) {
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Unistall Cassandra Service");
+        Command command = CassandraCommands.getUninstallCommand();
         command.getRequest().setUuid(agent.getUuid());
         command.getRequest().setTaskUuid(startTask.getUuid());
         command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
