@@ -5,6 +5,7 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
+import java.util.Collections;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -161,11 +162,11 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         }
     }
 
-    public static MgmtApplication getInstance() {
+    private static MgmtApplication getInstance() {
         return threadLocal.get();
     }
 
-    public static void setInstance(MgmtApplication application) {
+    private static void setInstance(MgmtApplication application) {
         threadLocal.set(application);
     }
 
@@ -181,14 +182,20 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     public static Set<Agent> getSelectedAgents() {
         if (getInstance() != null) {
-            return getInstance().selectedAgents;
+            return Collections.unmodifiableSet(getInstance().selectedAgents);
         }
         return null;
     }
 
-    public static void setSelectedAgents(Set<Agent> agents) {
+    static void setSelectedAgents(Set<Agent> agents) {
         if (getInstance() != null && agents != null) {
             getInstance().selectedAgents = agents;
+        }
+    }
+
+    static void clearSelectedAgents() {
+        if (getInstance() != null) {
+            getInstance().selectedAgents.clear();
         }
     }
 

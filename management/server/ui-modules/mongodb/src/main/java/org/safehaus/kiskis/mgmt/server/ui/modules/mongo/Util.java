@@ -8,7 +8,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Label;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
