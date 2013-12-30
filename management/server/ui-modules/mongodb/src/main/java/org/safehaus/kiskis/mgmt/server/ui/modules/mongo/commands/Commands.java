@@ -302,7 +302,7 @@ public class Commands {
         //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
         //and replace placeholder
         ));
-        req.setTimeout(180);
+        req.setTimeout(60);
         return cmd;
     }
 
