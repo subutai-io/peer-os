@@ -13,6 +13,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.InstallerConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -22,6 +23,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * @author dilshat
  */
 public class Installer extends Operation {
+
+    private Task startConfigServersTask;
 
     public Installer(InstallerConfig config) {
         super("Mongo Installation");
@@ -57,7 +60,7 @@ public class Installer extends Operation {
         addTask(installMongoTask);
 
         //START CONFIG SERVERS
-        Task startConfigServersTask = Util.createTask("Start config servers");
+        startConfigServersTask = Util.createTask("Start config servers");
         for (Agent agent : config.getConfigServers()) {
             Command cmd = Commands.getStartConfigServerCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -181,6 +184,21 @@ public class Installer extends Operation {
         //PROCESS OUTPUT OF START CONFIG SERVERS HERE
         //IF OK THEN NO-OP
         //ELSE fail the task with custom output appended
+        if (task == startConfigServersTask) {
+            int j = 0;
+            for (int i = 1; i <= task.getReqSeqNumber(); i++) {
+                Response response = commandManager.getResponse(task.getUuid(), i);
+                if (response != null && response.getStdOut() != null) {
+                    if (response.getStdOut().contains("child process started successfully, parent exiting")) {
+                        j++;
+                    }
+                }
+            }
+            if (j != task.getReqSeqNumber()) {
+                fail();
+                appendOutput("Could not succesfully start config servers on all nodes.");
+            }
+        }
         System.out.println("Task succeeded " + task);
     }
 

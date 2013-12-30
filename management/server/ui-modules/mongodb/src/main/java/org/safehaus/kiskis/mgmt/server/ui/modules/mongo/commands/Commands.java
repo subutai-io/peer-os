@@ -61,13 +61,8 @@ public class Commands {
     public static Command getUninstallCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/pkill");
+        req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
-                "-9",
-                "-f",
-                "'mongod|ksks-mongo|mongos'",
-                ";",
-                "/usr/bin/apt-get",
                 "--force-yes",
                 "--assume-yes",
                 "purge",
@@ -274,7 +269,7 @@ public class Commands {
                 "/var/log/mongodb.log"
         //                        "--logappend"
         ));
-        req.setTimeout(180);
+        req.setTimeout(60);
         return cmd;
     }
 
