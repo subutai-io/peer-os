@@ -279,6 +279,9 @@ public abstract class Operation implements ResponseListener {
                                 appendOutput(MessageFormat.format(
                                         "Running next task {0}...",
                                         getNextTask().getDescription()));
+                                appendLog(MessageFormat.format(
+                                        "======= Task {0} =======",
+                                        getNextTask().getDescription()));
                                 executeNextTask();
                             } // operation is stopped by user
                             else {

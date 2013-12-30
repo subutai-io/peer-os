@@ -35,7 +35,7 @@ public class Step4 extends Panel implements ResponseListener {
     private final TextArea logTextArea;
     private Operation operation;
     private final Button ok;
-    private final Button revert;
+    private final Button cancel;
     private final Label indicator;
     private Thread operationTimeoutThread;
 
@@ -67,12 +67,12 @@ public class Step4 extends Panel implements ResponseListener {
                 wizard.init();
             }
         });
-        revert = new Button("Revert");
-        revert.addListener(new Button.ClickListener() {
+        cancel = new Button("Cancel");
+        cancel.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                revert.setEnabled(false);
+                cancel.setEnabled(false);
                 startOperation(new Uninstaller(wizard.getConfig()));
             }
         });
@@ -80,11 +80,9 @@ public class Step4 extends Panel implements ResponseListener {
         indicator = createImage("indicator.gif", 50, 50);
 
         content.addComponent(ok, 0, 1, 0, 1);
-        content.addComponent(revert, 1, 1, 1, 1);
+        content.addComponent(cancel, 1, 1, 1, 1);
         content.addComponent(indicator, 19, 0, 19, 0);
-        content.setComponentAlignment(ok, Alignment.TOP_LEFT);
-        content.setComponentAlignment(revert, Alignment.TOP_LEFT);
-        content.setComponentAlignment(indicator, Alignment.BOTTOM_RIGHT);
+        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
         logTextArea = new TextArea("Command output");
         logTextArea.setRows(17);
@@ -162,7 +160,7 @@ public class Step4 extends Panel implements ResponseListener {
     private void hideProgress() {
         indicator.setVisible(false);
         ok.setEnabled(true);
-        revert.setEnabled(true);
+        cancel.setEnabled(true);
     }
 
     @Override
