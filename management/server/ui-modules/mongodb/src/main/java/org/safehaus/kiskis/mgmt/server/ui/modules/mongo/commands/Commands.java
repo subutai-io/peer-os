@@ -293,9 +293,11 @@ public class Commands {
         Request req = cmd.getRequest();
         req.setProgram("mongos");
         req.setArgs(Arrays.asList(
-                "--fork",
                 "--configdb",
-                configServersArg
+                configServersArg,
+                "--fork",
+                "--logpath",
+                "/var/log/mongodb.log"
         //add config servers (with ports) based on user selection, comma-separated
         //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
         //and replace placeholder
