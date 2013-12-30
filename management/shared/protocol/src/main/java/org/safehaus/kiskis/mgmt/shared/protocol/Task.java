@@ -22,6 +22,7 @@ public class Task implements Serializable {
     private TaskStatus taskStatus;
     private Integer reqSeqNumber;
     private final List<Command> commands;
+    private boolean ignoreExitCode = false;
 
     public void addCommand(Command command) {
         commands.add(command);
@@ -31,6 +32,14 @@ public class Task implements Serializable {
         uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
         reqSeqNumber = 0;
         commands = new ArrayList<Command>();
+    }
+
+    public boolean isIgnoreExitCode() {
+        return ignoreExitCode;
+    }
+
+    public void setIgnoreExitCode(boolean ignoreExitCode) {
+        this.ignoreExitCode = ignoreExitCode;
     }
 
     public List<Command> getCommands() {

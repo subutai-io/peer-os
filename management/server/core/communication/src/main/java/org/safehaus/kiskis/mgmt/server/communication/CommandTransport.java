@@ -18,6 +18,7 @@ import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 //check branch
 
 public class CommandTransport implements CommandTransportInterface {
@@ -119,8 +120,9 @@ public class CommandTransport implements CommandTransportInterface {
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);
                 String json = CommandJson.getJson(command);
-                //LOG.info("Sending: " + json);
-                LOG.log(Level.INFO, "\nSending: {0}", json);
+                if (command.getRequest().getType() != RequestType.HEARTBEAT_REQUEST) {
+                    LOG.log(Level.INFO, "\nSending: {0}", json);
+                }
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
             } catch (JMSException ex) {

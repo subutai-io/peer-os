@@ -128,6 +128,11 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     }
 
     @Override
+    public Integer getSuccessfullResponseCount(UUID taskuuid) {
+        return persistenceCommand.getSuccessfullResponsesCount(taskuuid);
+    }
+
+    @Override
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber) {
         Response response = null;
         try {

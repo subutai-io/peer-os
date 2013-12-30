@@ -27,7 +27,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step2 extends Panel {
 
-    public Step2(final MongoWizard mongoWizard) {
+    public Step2(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -103,18 +103,18 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
-                mongoWizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
-                mongoWizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
+                wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
+                wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
+                wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
 
-                if (Util.isStringEmpty(mongoWizard.getConfig().getClusterName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
-                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getConfigServers())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getConfigServers())) {
                     show("Please add config servers");
-                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getRouterServers())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getRouterServers())) {
                     show("Please add routers");
                 } else {
-                    mongoWizard.next();
+                    wizard.next();
                 }
             }
         });
@@ -123,7 +123,7 @@ public class Step2 extends Panel {
         back.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.back();
+                wizard.back();
             }
         });
 
@@ -138,15 +138,15 @@ public class Step2 extends Panel {
 
         routersColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(
-                        Agent.class, mongoWizard.getConfig().getSelectedAgents()));
+                        Agent.class, wizard.getConfig().getSelectedAgents()));
         configServersColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(
-                        Agent.class, mongoWizard.getConfig().getSelectedAgents()));
+                        Agent.class, wizard.getConfig().getSelectedAgents()));
 
         //set values if this is a second visit
-        clusterNameTxtFld.setValue(mongoWizard.getConfig().getClusterName());
-        configServersColSel.setValue(Util.retainValues(mongoWizard.getConfig().getConfigServers(), mongoWizard.getConfig().getSelectedAgents()));
-        routersColSel.setValue(Util.retainValues(mongoWizard.getConfig().getRouterServers(), mongoWizard.getConfig().getSelectedAgents()));
+        clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
+        configServersColSel.setValue(Util.retainValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getSelectedAgents()));
+        routersColSel.setValue(Util.retainValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getSelectedAgents()));
     }
 
     private void show(String notification) {

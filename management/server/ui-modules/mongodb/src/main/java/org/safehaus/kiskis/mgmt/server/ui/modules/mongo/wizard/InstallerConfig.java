@@ -6,13 +6,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  *
  * @author dilshat
  */
-public class MongoConfig {
+public class InstallerConfig implements Config {
 
     private String clusterName = "";
     private String replicaSetName = "";

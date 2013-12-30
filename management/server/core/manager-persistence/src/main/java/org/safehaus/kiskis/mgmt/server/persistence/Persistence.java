@@ -433,6 +433,29 @@ public class Persistence implements PersistenceInterface {
     }
 
     @Override
+    public Integer getSuccessfullResponsesCount(UUID taskUuid) {
+        Integer count = 0;
+        try {
+            String cql = "select * from responses where taskuuid = ?;";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(taskUuid));
+            for (Row row : rs) {
+                String type = row.getString("responsetype");
+                int exitCode = row.getInt("exitcode");
+                if (ResponseType.EXECUTE_RESPONSE_DONE.equals(ResponseType.valueOf(type))
+                        && exitCode == 0) {
+                    ++count;
+                }
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getResponsesCount", ex);
+        }
+
+        return count;
+    }
+
+    @Override
     public List<Response> getResponses(UUID taskuuid, Integer requestSequenceNumber) {
         List<Response> list = new ArrayList<Response>();
         try {
@@ -756,10 +779,92 @@ public class Persistence implements PersistenceInterface {
             String cql = "delete from cassandra_cluster_info where uid = ?";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            session.executeAsync(boundStatement.bind(uuid));
+            session.execute(boundStatement.bind(uuid));
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+        }
+        return false;
+    }
+
+    public boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo) {
+        try {
+            String cql = String.format(
+                    "insert into %s"
+                    + "(%s, %s, %s, %s, %s) "
+                    + "values (?, ?, ?, ?, ?)",
+                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME,
+                    MongoClusterInfo.REPLICA_SET_NAME, MongoClusterInfo.CONFIG_SERVERS_NAME,
+                    MongoClusterInfo.ROUTERS_NAME, MongoClusterInfo.SHARDS_NAME);
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(clusterInfo.getClusterName(),
+                    clusterInfo.getReplicaSetName(), clusterInfo.getConfigServers(),
+                    clusterInfo.getRouters(), clusterInfo.getShards()));
+
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveMongoClusterInfo", ex);
+        }
+        return false;
+    }
+
+    public List<MongoClusterInfo> getMongoClustersInfo() {
+        List<MongoClusterInfo> list = new ArrayList<MongoClusterInfo>();
+        try {
+            String cql = String.format("select * from %s", MongoClusterInfo.TABLE_NAME);
+            ResultSet rs = session.execute(cql);
+            for (Row row : rs) {
+                MongoClusterInfo mongoClusterInfo = new MongoClusterInfo();
+                mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
+                mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
+                mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
+                mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
+                mongoClusterInfo.setShards(row.getList(MongoClusterInfo.SHARDS_NAME, UUID.class));
+                list.add(mongoClusterInfo);
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getMongoClustersInfo", ex);
+        }
+        return list;
+    }
+
+    public MongoClusterInfo getMongoClusterInfo(String clusterName) {
+        MongoClusterInfo clusterInfo = null;
+        try {
+            String cql = String.format(
+                    "select * from %s where %s = ? limit 1 allow filtering",
+                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME);
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(clusterName));
+            Row row = rs.one();
+            if (row != null) {
+                MongoClusterInfo mongoClusterInfo = new MongoClusterInfo();
+                mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
+                mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
+                mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
+                mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
+                mongoClusterInfo.setShards(row.getList(MongoClusterInfo.SHARDS_NAME, UUID.class));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getMongoClusterInfo", ex);
+        }
+        return clusterInfo;
+    }
+
+    public boolean deleteMongoClusterInfo(String clusterName) {
+        try {
+            String cql = String.format("delete from %s where %s = ?",
+                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME);
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            session.execute(boundStatement.bind(clusterName));
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in deleteMongoClusterInfo", ex);
         }
         return false;
     }

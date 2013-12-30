@@ -11,6 +11,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
@@ -18,17 +20,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
  *
  * @author dilshat
  */
-public class MongoWizard implements ResponseListener {
+public class Wizard implements ResponseListener {
+
+    private static final Logger LOG = Logger.getLogger(Wizard.class.getName());
 
     private static final int MAX_STEPS = 3;
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
-    private final MongoConfig mongoConfig = new MongoConfig();
+    private final InstallerConfig mongoConfig = new InstallerConfig();
     private final VerticalLayout contentRoot;
     private Step4 step4;
 
-    public MongoWizard() {
+    public Wizard() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -82,7 +86,7 @@ public class MongoWizard implements ResponseListener {
         putForm();
     }
 
-    public MongoConfig getConfig() {
+    public InstallerConfig getConfig() {
         return mongoConfig;
     }
 
@@ -126,7 +130,7 @@ public class MongoWizard implements ResponseListener {
 
     @Override
     public String getSource() {
-        return getClass().getName();
+        return MongoModule.MODULE_NAME;
     }
 
 }

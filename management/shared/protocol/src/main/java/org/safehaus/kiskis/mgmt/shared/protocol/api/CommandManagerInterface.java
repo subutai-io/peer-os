@@ -21,6 +21,8 @@ public interface CommandManagerInterface {
 
     public Integer getResponseCount(UUID taskuuid);
 
+    public Integer getSuccessfullResponseCount(UUID taskuuid);
+
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber);
 
     public List<ParseResult> parseTask(UUID taskUuid, boolean isResponseDone);
