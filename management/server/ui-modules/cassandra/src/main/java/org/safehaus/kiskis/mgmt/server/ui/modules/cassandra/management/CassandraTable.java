@@ -21,6 +21,7 @@ public class CassandraTable extends Table {
 
 //    private IndexedContainer container;
     ServiceManager manager;
+    NodesWindow nodesWindow;
 
     public CassandraTable(ServiceManager manager) {
         this.manager = manager;
@@ -40,6 +41,7 @@ public class CassandraTable extends Table {
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Status", Button.class, "");
+        container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
         List<CassandraClusterInfo> cdList = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterData();
         for (CassandraClusterInfo cluster : cdList) {
@@ -80,6 +82,15 @@ public class CassandraTable extends Table {
                 manager.statusCassandraServices(cd.getNodes());
             }
         });
+        
+        Button manageButton = new Button("Manage");
+        manageButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                nodesWindow = new NodesWindow(cd.getName(), cd.getNodes(), manager);
+            }
+        });
 
         Button destroyButton = new Button("Destroy");
         destroyButton.addListener(new Button.ClickListener() {
@@ -97,6 +108,7 @@ public class CassandraTable extends Table {
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
         item.getItemProperty("Status").setValue(statusButton);
+        item.getItemProperty("Manage").setValue(manageButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
 

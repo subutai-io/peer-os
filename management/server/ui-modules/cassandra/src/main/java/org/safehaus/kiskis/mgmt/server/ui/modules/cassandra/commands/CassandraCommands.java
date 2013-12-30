@@ -187,5 +187,13 @@ public class CassandraCommands {
         req.setTimeout(30);
         return cmd;
     }
+    
+    public static Command getAptGetUpdate() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("apt-get update");
+        req.setTimeout(30);
+        return cmd;
+    }
 
 }

@@ -31,6 +31,16 @@ public class ServiceInstaller {
         this.terminal = terminal;
         this.config = config;
 
+        Task updateApt = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "apt-get update");
+        for (Agent agent : config.getSelectedAgents()) {
+            Command command = CassandraCommands.getAptGetUpdate();
+            command.getRequest().setUuid(agent.getUuid());
+            command.getRequest().setTaskUuid(updateApt.getUuid());
+            command.getRequest().setRequestSequenceNumber(updateApt.getIncrementedReqSeqNumber());
+            updateApt.addCommand(command);
+        }
+        tasks.add(updateApt);
+        
         Task installTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Install Cassandra");
         for (Agent agent : config.getSelectedAgents()) {
             Command command = CassandraCommands.getInstallCommand();
@@ -177,7 +187,7 @@ public class ServiceInstaller {
             Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
+                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.");
                     moveToNextTask();
                     if (currentTask != null) {
                         terminal.setValue(terminal.getValue().toString() + "\nRunning next step " + currentTask.getDescription());

@@ -83,6 +83,7 @@ public class ServiceManager {
     }
 
     public void start() {
+        terminal.setValue("");
         moveToNextTask();
         if (currentTask != null) {
             for (Command command : currentTask.getCommands()) {
@@ -103,7 +104,7 @@ public class ServiceManager {
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(task.getUuid(), true)) {
-                        terminal.setValue(terminal.getValue().toString() + "\n" + pr.getResponse().getStdOut());
+                        terminal.setValue(terminal.getValue().toString() + pr.getResponse().getStdOut());
                     }
                     terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
                     moveToNextTask();

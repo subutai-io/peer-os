@@ -19,6 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
@@ -35,8 +36,9 @@ public class NodesWindow extends Window {
      *
      * @param caption
      * @param list
+     * @param manager
      */
-    public NodesWindow(String caption, List<UUID> list) {
+    public NodesWindow(String caption, List<UUID> list, ServiceManager manager) {
         this.list = list;
 
         setCaption(caption);
