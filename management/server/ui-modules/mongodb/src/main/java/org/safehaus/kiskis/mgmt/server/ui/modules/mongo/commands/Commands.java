@@ -68,7 +68,21 @@ public class Commands {
                 "purge",
                 "ksks-mongo"
         ));
-        req.setTimeout(180);
+        req.setTimeout(60);
+        return cmd;
+    }
+
+    //execute on each selected lxc node
+    public static Command getKillAllCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/pkill");
+        req.setArgs(Arrays.asList(
+                "-9",
+                "-f",
+                "'mongod|ksks-mongo|mongos'"
+        ));
+        req.setTimeout(10);
         return cmd;
     }
 

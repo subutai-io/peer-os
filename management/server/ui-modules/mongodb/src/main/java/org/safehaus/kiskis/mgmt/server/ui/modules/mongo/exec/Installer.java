@@ -24,7 +24,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Installer extends Operation {
 
-    private Task startConfigServersTask;
+    private final Task startConfigServersTask;
 
     public Installer(InstallerConfig config) {
         super("Mongo Installation");
@@ -34,9 +34,19 @@ public class Installer extends Operation {
         allClusterMembers.addAll(config.getRouterServers());
         allClusterMembers.addAll(config.getShards());
 
+        //KILL MONGO
+        //add here separate task ignore exit code
         //UNINSTALL MONGO
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         //uninstall it
+        for (Agent agent : allClusterMembers) {
+            Command cmd = Commands.getKillAllCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            uninstallMongoTask.addCommand(cmd);
+        }
         for (Agent agent : allClusterMembers) {
             Command cmd = Commands.getUninstallCommand();
             cmd.getRequest().setUuid(agent.getUuid());
