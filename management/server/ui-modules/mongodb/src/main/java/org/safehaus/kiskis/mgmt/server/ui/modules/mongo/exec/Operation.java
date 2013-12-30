@@ -186,21 +186,29 @@ public abstract class Operation implements ResponseListener {
         }
     }
 
-    abstract void onTaskCompleted(Task task);
+    public void onTaskCompleted(Task task) {
+    }
 
-    abstract void onTaskSucceeded(Task task);
+    public void onTaskSucceeded(Task task) {
+    }
 
-    abstract void onTaskFailed(Task task);
+    public void onTaskFailed(Task task) {
+    }
 
-    abstract void onOperationEnded();
+    public void onOperationEnded() {
+    }
 
-    abstract void onOperationStarted();
+    public void onOperationStarted() {
+    }
 
-    abstract void onOperationStopped();
+    public void onOperationStopped() {
+    }
 
-    abstract void onBeforeTaskRun(Task task);
+    public void onBeforeTaskRun(Task task) {
+    }
 
-    abstract void onAfterTaskRun(Task task);
+    public void onAfterTaskRun(Task task) {
+    }
 
     @Override
     public void onResponse(Response response) {

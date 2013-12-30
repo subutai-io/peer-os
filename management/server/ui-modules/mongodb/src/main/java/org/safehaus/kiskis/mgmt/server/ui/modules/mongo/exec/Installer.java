@@ -169,42 +169,42 @@ public class Installer extends Operation {
     }
 
     @Override
-    void onTaskCompleted(Task task) {
+    public void onTaskCompleted(Task task) {
         System.out.println("Task completed " + task);
     }
 
     @Override
-    void onTaskSucceeded(Task task) {
+    public void onTaskSucceeded(Task task) {
         System.out.println("Task succeeded " + task);
     }
 
     @Override
-    void onTaskFailed(Task task) {
+    public void onTaskFailed(Task task) {
         System.out.println("Task failed " + task);
     }
 
     @Override
-    void onOperationEnded() {
+    public void onOperationEnded() {
         System.out.println("Operation ended");
     }
 
     @Override
-    void onOperationStarted() {
+    public void onOperationStarted() {
         System.out.println("Operation started");
     }
 
     @Override
-    void onOperationStopped() {
+    public void onOperationStopped() {
         System.out.println("Operation stopped");
     }
 
     @Override
-    void onBeforeTaskRun(Task task) {
+    public void onBeforeTaskRun(Task task) {
         System.out.println("Before running task" + task);
     }
 
     @Override
-    void onAfterTaskRun(Task task) {
+    public void onAfterTaskRun(Task task) {
         System.out.println("After running task " + task);
     }
 
