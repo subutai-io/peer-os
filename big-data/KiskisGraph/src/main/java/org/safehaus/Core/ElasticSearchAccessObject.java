@@ -75,7 +75,7 @@ public class ElasticSearchAccessObject {
         //Create Client
         Settings settings = ImmutableSettings.settingsBuilder().put("elasticsearch", "localtestsearch").build();
         TransportClient client = new TransportClient(settings);
-        client = client.addTransportAddress(new InetSocketTransportAddress("172.16.9.237", 9300));
+        client = client.addTransportAddress(new InetSocketTransportAddress("10.0.3.168", 9300));
         this.setClient(client);
 
     }

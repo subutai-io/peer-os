@@ -28,7 +28,7 @@ import com.vaadin.ui.*;
  * @version $Rev$
  */
 public class MainWindow extends Window{
-//    private GridLayout grid = new GridLayout(2, 2);
+    //    private GridLayout grid = new GridLayout(2, 2);
     private HorizontalSplitPanel horiz;
     private Panel leftPanel;
     private MonitorTab monitorTab;
@@ -36,23 +36,17 @@ public class MainWindow extends Window{
     {
         monitorTab = new MonitorTab();
         horiz = new HorizontalSplitPanel();
-        getMonitorTab().setWidth("100%");
-        getMonitorTab().setHeight("100%");
 
-        horiz.setSplitPosition(20); // percent
         horiz.setWidth("100%");
-//        horiz.setHeight("1050");
-        leftPanel = new Panel();
+        horiz.setSplitPosition(20); // percent
+        setContent(horiz);
 
-//        leftPanel.addComponent(Host.getSampleHostTree());
+        leftPanel = new Panel();
         leftPanel.addComponent(Host.getRealHostTree());
 
-        horiz.addComponent(Host.getRealHostTree());
-//        horiz.addComponent(leftPanel);
+        horiz.setFirstComponent(leftPanel);
+        horiz.setSecondComponent(getMonitorTab());
 
-        horiz.addComponent(getMonitorTab());
-        setContent(horiz);
-//        addComponent(horiz);
     }
 
     public MonitorTab getMonitorTab() {

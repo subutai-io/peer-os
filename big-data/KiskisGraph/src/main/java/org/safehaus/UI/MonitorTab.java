@@ -74,12 +74,16 @@ public class MonitorTab extends VerticalLayout {
         addComponent(comboBox2);
         addComponent(update);
         addComponent(getChart());
-//        addComponent(chartPanel);
+
+        // addComponent(chartPanel);
         addComponent(logTable);
+
+
+
 
         update.addListener(new Button.ClickListener() {
             public void buttonClick(Button.ClickEvent event) {
-//                chart.requestRepaint();
+                // chart.requestRepaint();
                 hourCount++;
                 System.out.println("Hour count: " + hourCount);
                 int index = getComponentIndex(getChart());
@@ -96,7 +100,6 @@ public class MonitorTab extends VerticalLayout {
 
         addLogsRefresher(logResponses.size(), statisticUpdateInterval);
         addStatisticRefresher((int) statisticResponse.getHits().getTotalHits(), statisticUpdateInterval);
-
     }
 
 

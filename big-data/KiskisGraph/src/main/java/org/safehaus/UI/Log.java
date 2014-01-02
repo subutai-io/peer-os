@@ -40,7 +40,7 @@ import java.util.Date;
 /**
  * Created by skardan on 1/2/14.
  */
-public class Log extends VerticalLayout {
+public class Log extends TabSheet {
     private IndexedContainer indexedContainer;
     private FilterTable normalFilterTable;
     private PagedFilterTable<IndexedContainer> pagedFilterTable;
