@@ -167,6 +167,13 @@
             <version>0.9.1</version>
         </dependency>
 
+        <!--invient chart -->
+        <dependency>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>invient-charts</artifactId>
+            <version>0.8.6</version>
+        </dependency>
+
         <!--<dependency>-->
         <!--<groupId>com.vaadin</groupId>-->
         <!--<artifactId>vaadin-server</artifactId>-->

@@ -78,9 +78,6 @@ public class MonitorTab extends VerticalLayout {
         // addComponent(chartPanel);
         addComponent(logTable);
 
-
-
-
         update.addListener(new Button.ClickListener() {
             public void buttonClick(Button.ClickEvent event) {
                 // chart.requestRepaint();

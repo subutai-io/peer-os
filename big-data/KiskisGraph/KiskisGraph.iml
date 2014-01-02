@@ -51,6 +51,7 @@
     <orderEntry type="library" name="Maven: org.vaadin.addons:refresher:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:filteringtable:0.9.1" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:popupbutton:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.vaadin.addons:invient-charts:0.8.6" level="project" />
   </component>
 </module>
 

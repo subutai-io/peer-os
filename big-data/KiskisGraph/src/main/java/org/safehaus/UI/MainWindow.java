@@ -38,10 +38,11 @@ public class MainWindow extends Window{
         horiz = new HorizontalSplitPanel();
 
         horiz.setWidth("100%");
-        horiz.setSplitPosition(20); // percent
+        horiz.setSplitPosition(10); // percent
         setContent(horiz);
 
         leftPanel = new Panel();
+        leftPanel.setSizeFull();
         leftPanel.addComponent(Host.getRealHostTree());
 
         horiz.setFirstComponent(leftPanel);

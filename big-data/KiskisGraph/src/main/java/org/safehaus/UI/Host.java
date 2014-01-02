@@ -67,7 +67,7 @@ public class Host {
         ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
         ArrayList<String> hosts = ESAO.getHosts();
 
-        Tree nodes = new Tree("List of Hosts:");
+        Tree nodes = new Tree();
         nodes.addItem("List of Hosts:");
         for(int i=0; i<hosts.size(); i++){
             nodes.addItem(hosts.get(i));

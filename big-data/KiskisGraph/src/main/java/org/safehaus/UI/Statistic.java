@@ -25,7 +25,6 @@ import com.vaadin.addon.charts.model.style.GradientColor;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import org.elasticsearch.action.search.SearchResponse;
 import org.safehaus.Core.MemoryResponse;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,7 +47,7 @@ public class Statistic {
     public Chart getMemoryChart(SearchResponse response)
     {
         Chart chart = new Chart();
-        chart.setHeight("450px");
+        chart.setHeight("300px");
         chart.setWidth("100%");
 
         Configuration configuration = new Configuration();
@@ -61,7 +60,7 @@ public class Statistic {
         configuration.getSubTitle().setText(title);
 
         configuration.getxAxis().setType(AxisType.DATETIME);
-//        configuration.getxAxis().getLabels().setFormatter();
+        // configuration.getxAxis().getLabels().setFormatter();
         configuration.getxAxis().setTitle(new Title("Hour"));
 
         configuration.getLegend().setEnabled(false);

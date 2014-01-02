@@ -4,7 +4,7 @@
     <list default="true" id="f638aec0-edd9-4b7f-bea4-24c02cd18cab" name="Default" comment="" />
     <ignored path="KiskisGraph.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/pom.xml" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388130665508" ignored="false" />
+    <file path="/pom.xml" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388690584405" ignored="false" />
     <file path="/Demo.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1387780770085" ignored="false" />
     <file path="/*.regexp" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1387781025687" ignored="false" />
     <file path="/fragment.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388664955260" ignored="false" />
@@ -25,7 +25,7 @@
     <file path="$USER_HOME$/main/Kiskis Big Data/src/test/java/mongoDBTest/TestRemoteMongoDB.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1387960735488" ignored="false" />
     <file path="/Monitor.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388664990507" ignored="false" />
     <file path="/ElasticSearch.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1387979958297" ignored="false" />
-    <file path="/Statistic.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388498756584" ignored="false" />
+    <file path="/Statistic.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388691741701" ignored="false" />
     <file path="$PROJECT_DIR$/../Riemann/src/main/java/ElasticSearchQuery.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388474847543" ignored="false" />
     <file path="/LogUpdate.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388126339475" ignored="false" />
     <file path="/Host.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388669428980" ignored="false" />
@@ -37,7 +37,7 @@
     <file path="$PROJECT_DIR$/../vaadin-mvn-addon-master/src/main/resources/com/jorambarrez/CustomWidgetset.gwt.xml" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388130572028" ignored="false" />
     <file path="$PROJECT_DIR$/../vaadin-mvn-addon-master/src/main/webapp/VAADIN/widgetsets/com.jorambarrez.CustomWidgetset/hosted.html" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388130436690" ignored="false" />
     <file path="/MetricList.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388648729302" ignored="false" />
-    <file path="/MainWindow.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388685822470" ignored="false" />
+    <file path="/MainWindow.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388687033273" ignored="false" />
     <file path="/ElasticSearchRestApi.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388134897906" ignored="false" />
     <file path="/StatisticUpdateListener.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388384295198" ignored="false" />
     <file path="/StatisticResponse.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388403186182" ignored="false" />
@@ -53,7 +53,7 @@
     <file path="$PROJECT_DIR$/../Riemann/src/main/java/ElasticSearchAccessObject.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388646048489" ignored="false" />
     <file path="/ElasticSearchAccessObject.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388660218033" ignored="false" />
     <file path="/MonitorTab.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388685307900" ignored="false" />
-    <file path="/Log.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388683124244" ignored="false" />
+    <file path="/Log.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388687418204" ignored="false" />
     <file path="$USER_HOME$/main/Kiskis Big Data/src/test/java/mahoutTest/TestMahout.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388658112161" ignored="false" />
     <file path="/TestMahout.java" changelist="f638aec0-edd9-4b7f-bea4-24c02cd18cab" time="1388658095460" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -63,6 +63,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="Commander">
+    <leftPanel />
+    <rightPanel />
+    <splitter proportion="0.5" />
+  </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
@@ -70,7 +75,38 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Log.java" line="174" class="org.safehaus.UI.Log" package="org.safehaus.UI">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Log.java" line="166" class="org.safehaus.UI.Log" package="org.safehaus.UI">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -117,10 +153,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="MonitorTab.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="MonitorTab.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/MonitorTab.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="149" column="16" selection-start="5542" selection-end="5542" vertical-scroll-proportion="0.0">
+            <state line="76" column="41" selection-start="2997" selection-end="2997" vertical-scroll-proportion="0.375">
               <folding />
             </state>
           </provider>
@@ -129,10 +165,26 @@
       <file leaf-file-name="Statistic.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Statistic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="13" selection-start="1395" selection-end="1395" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="26" column="40" selection-start="1144" selection-end="1144" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="InvientCharts.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/vaadin/addons/invient-charts/0.8.6/invient-charts-0.8.6.jar!/com/invient/vaadin/charts/InvientCharts.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="99" column="52" selection-start="3762" selection-end="3762" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="172" column="28" selection-start="6446" selection-end="6446" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -140,19 +192,27 @@
       <file leaf-file-name="Log.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Log.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="54" column="38" selection-start="1845" selection-end="1845" vertical-scroll-proportion="0.0">
+            <state line="164" column="96" selection-start="6634" selection-end="6634" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Host.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Host.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="69" column="30" selection-start="2375" selection-end="2375" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#5198#5216#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MainWindow.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="MainWindow.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/MainWindow.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="41" column="77" selection-start="1422" selection-end="1422" vertical-scroll-proportion="0.3409091">
+            <state line="40" column="32" selection-start="1381" selection-end="1381" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -169,21 +229,21 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/Core/MemoryResponse.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/Statistic.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/Core/Timestamp.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/Core/ElasticSearchJavaApi.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/Core/LogSource.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/Monitor.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/Core/Threads/MemoryChartListener.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/MetricList.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/Core/Threads/LogUpdateListener.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/HistoryMetricList.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/Host.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/Core/ElasticSearchAccessObject.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/Log.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/MonitorTab.java" />
+        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/Host.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/MainWindow.java" />
+        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/Log.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/Statistic.java" />
+        <option value="$PROJECT_DIR$/src/main/java/org/safehaus/UI/MonitorTab.java" />
       </list>
     </option>
   </component>
@@ -195,6 +255,11 @@
     <option name="CUSTOM_FILTER" />
   </component>
   <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
     <option name="enabledProfiles">
       <list>
         <option value="compile-widgetset" />
@@ -470,10 +535,6 @@
               <option name="myItemId" value="safehaus" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
@@ -492,9 +553,9 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
+    <property name="options.searchVisible" value="true" />
     <property name="dynamic.classpath" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -546,6 +607,19 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -572,19 +646,6 @@
       <envs />
       <properties />
       <listeners />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -833,13 +894,12 @@
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2498615" sideWeight="0.6573577" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37486574" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41973245" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3426423" sideWeight="0.500277" order="9" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23446105" sideWeight="0.26923078" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.499723" order="11" side_tool="false" content_ui="tabs" />
@@ -847,14 +907,15 @@
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2498615" sideWeight="0.66272825" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20849724" sideWeight="0.5852843" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20849724" sideWeight="0.6187291" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22974037" sideWeight="0.632107" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.36789298" sideWeight="0.499723" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23446105" sideWeight="0.5117057" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4882943" sideWeight="0.499723" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975295" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -923,55 +984,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/Core/Threads/LogUpdateListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="18" selection-start="2309" selection-end="2309" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/Core/Timestamp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="13" selection-start="1079" selection-end="1079" vertical-scroll-proportion="0.33245382">
-          <folding>
-            <element signature="e#0#5936#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/Core/MemoryResponse.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="26" selection-start="1099" selection-end="1113" vertical-scroll-proportion="0.39848197">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/Core/LogResponse.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="13" selection-start="910" selection-end="910" vertical-scroll-proportion="0.19924098">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Monitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="0" selection-start="1150" selection-end="1150" vertical-scroll-proportion="0.4076087">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/Core/Threads/MemoryChartListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="23" selection-start="1886" selection-end="2003" vertical-scroll-proportion="0.43074003">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/MetricList.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="74" column="23" selection-start="2606" selection-end="2606" vertical-scroll-proportion="1.2880435">
@@ -985,22 +997,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="60" column="18" selection-start="2309" selection-end="2309" vertical-scroll-proportion="0.0">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="57" selection-start="482" selection-end="482" vertical-scroll-proportion="0.46551725">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Host.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="89" column="28" selection-start="3271" selection-end="3271" vertical-scroll-proportion="1.4790996">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1025,33 +1021,86 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Log.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="38" selection-start="1845" selection-end="1845" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#5198#5216#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Statistic.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="13" selection-start="1395" selection-end="1395" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/MonitorTab.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="149" column="16" selection-start="5542" selection-end="5542" vertical-scroll-proportion="0.0">
+        <state line="164" column="96" selection-start="6634" selection-end="6634" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Host.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="69" column="30" selection-start="2375" selection-end="2375" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/MainWindow.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="77" selection-start="1422" selection-end="1422" vertical-scroll-proportion="0.3409091">
+        <state line="40" column="32" selection-start="1381" selection-end="1381" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/vaadin/addon/vaadin-charts-vaadin6/1.1.4/vaadin-charts-vaadin6-1.1.4.jar!/com/vaadin/addon/charts/model/ZoomType.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="12" selection-start="171" selection-end="171" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/vaadin/addon/vaadin-charts-vaadin6/1.1.4/vaadin-charts-vaadin6-1.1.4-sources.jar!/com/vaadin/addon/charts/model/ChartEnum.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="17" selection-start="608" selection-end="608" vertical-scroll-proportion="0.5794392">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/vaadin/addon/vaadin-charts-vaadin6/1.1.4/vaadin-charts-vaadin6-1.1.4-sources.jar!/com/vaadin/addon/charts/model/ZoomType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="36" selection-start="568" selection-end="568" vertical-scroll-proportion="0.3800623">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/KiskisGraph.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="172" column="28" selection-start="6446" selection-end="6446" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/vaadin/addons/invient-charts/0.8.6/invient-charts-0.8.6.jar!/com/invient/vaadin/charts/InvientCharts.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="11" selection-start="3858" selection-end="3858" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/vaadin/addons/invient-charts/0.8.6/invient-charts-0.8.6.jar!/com/invient/vaadin/charts/InvientCharts.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="99" column="52" selection-start="3762" selection-end="3762" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/Statistic.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="40" selection-start="1144" selection-end="1144" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/safehaus/UI/MonitorTab.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="41" selection-start="2997" selection-end="2997" vertical-scroll-proportion="0.375">
           <folding />
         </state>
       </provider>

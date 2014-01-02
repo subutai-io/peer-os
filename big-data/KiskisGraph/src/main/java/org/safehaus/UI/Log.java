@@ -46,7 +46,6 @@ public class Log extends TabSheet {
     private PagedFilterTable<IndexedContainer> pagedFilterTable;
 
     public Log(){
-        TabSheet tabSheet = new TabSheet();
         indexedContainer =  new IndexedContainer();
 
         normalFilterTable = buildFilterTable();
@@ -55,9 +54,9 @@ public class Log extends TabSheet {
 
         Component tab1 = buildNormalTableTab(getNormalFilterTable());
         Component tab2 = buildPagedTableTab(getPagedFilterTable());
-        tabSheet.addTab(tab1,"Normal");
-        tabSheet.addTab(tab2,"Paged");
-        addComponent(tabSheet);
+
+        addTab(tab1,"Normal");
+        addTab(tab2,"Paged");
     }
 
     private Component buildNormalTableTab(final FilterTable normalFilterTable) {
