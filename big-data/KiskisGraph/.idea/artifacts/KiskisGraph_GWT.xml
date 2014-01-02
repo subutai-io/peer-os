@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact name="KiskisGraph:GWT">
+    <output-path>src/main/webapp/VAADIN/widgetsets</output-path>
+    <root id="root">
+      <element id="gwt-compiler-output" facet="KiskisGraph/gwt/GWT" />
+    </root>
+  </artifact>
+</component>

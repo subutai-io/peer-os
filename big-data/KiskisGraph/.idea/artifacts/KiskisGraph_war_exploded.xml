@@ -1,0 +1,37 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="KiskisGraph:war exploded">
+    <output-path>$PROJECT_DIR$/target/KiskisGraph-1.0-SNAPSHOT</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="KiskisGraph/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="KiskisGraph" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.elasticsearch:elasticsearch:0.90.3" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-core:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-analyzers-common:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-codecs:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-queries:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-memory:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-highlighter:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-queryparser:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-sandbox:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-suggest:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-misc:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-join:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-grouping:4.4.0" />
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-spatial:4.4.0" />
+          <element id="library" level="project" name="Maven: com.spatial4j:spatial4j:0.3" />
+          <element id="library" level="project" name="Maven: com.vaadin:vaadin:6.8.12" />
+          <element id="library" level="project" name="Maven: com.vaadin.addon:vaadin-charts-vaadin6:1.1.4" />
+          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.2" />
+          <element id="library" level="project" name="Maven: commons-io:commons-io:1.4" />
+          <element id="library" level="project" name="Maven: org.vaadin.addons:refresher:1.1.1" />
+          <element id="library" level="project" name="Maven: org.vaadin.addons:filteringtable:0.9.1" />
+          <element id="library" level="project" name="Maven: org.vaadin.addons:popupbutton:1.0.0" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
