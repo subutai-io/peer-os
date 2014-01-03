@@ -353,7 +353,7 @@ public class Commands {
     }
 
     //execute on shard
-    public static Command getStopShardCommand() {
+    public static Command getStopNodeCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/service");

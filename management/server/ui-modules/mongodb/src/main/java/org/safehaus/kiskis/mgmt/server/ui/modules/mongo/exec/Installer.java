@@ -71,17 +71,48 @@ public class Installer extends Operation {
         addTask(installMongoTask);
 
         //STOP MONGODB ON CONFIG SERVERS
-        Task stopMongoDBOnConfigServers = Util.createTask("Stop MongoDB on config servers");
-        for (Agent agent : config.getConfigServers()) {
-            Command cmd = Commands.getStopShardCommand();
+        Task stopMongoOnAllNodes = Util.createTask("Stop Mongo on all nodes");
+        for (Agent agent : allClusterMembers) {
+            Command cmd = Commands.getStopNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(stopMongoDBOnConfigServers.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(stopMongoDBOnConfigServers.getIncrementedReqSeqNumber());
+            cmd.getRequest().setTaskUuid(stopMongoOnAllNodes.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(stopMongoOnAllNodes.getIncrementedReqSeqNumber());
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            stopMongoDBOnConfigServers.addCommand(cmd);
+            stopMongoOnAllNodes.addCommand(cmd);
         }
-        stopMongoDBOnConfigServers.setIgnoreExitCode(true);
-        addTask(stopMongoDBOnConfigServers);
+        stopMongoOnAllNodes.setIgnoreExitCode(true);
+        addTask(stopMongoOnAllNodes);
+
+        //ADD HOST NAME OF EACH NODE TO OTHER NODE'S /ETC/HOSTS FILE
+        Task addShardHostToOtherShardsTask = Util.createTask("Register nodes's IP-Host with other nodes");
+        for (Agent agent : allClusterMembers) {
+            for (Agent otherAgent : allClusterMembers) {
+                if (agent != otherAgent) {
+                    StringBuilder hosts = new StringBuilder();
+                    hosts.append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK))
+                            .append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN);
+                    Command cmd = Commands.getAddShardHostToOtherShardsCommand(hosts.toString());
+                    cmd.getRequest().setUuid(agent.getUuid());
+                    cmd.getRequest().setTaskUuid(addShardHostToOtherShardsTask.getUuid());
+                    cmd.getRequest().setRequestSequenceNumber(addShardHostToOtherShardsTask.getIncrementedReqSeqNumber());
+                    cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+                    addShardHostToOtherShardsTask.addCommand(cmd);
+                }
+            }
+        }
+        addTask(addShardHostToOtherShardsTask);
+
+        //ADD REPLICA SET NAME TO CONFIG OF EACH SHARD
+        Task setReplicaSetNameTask = Util.createTask("Set Replica Set name");
+        for (Agent agent : config.getShards()) {
+            Command cmd = Commands.getSetReplicaSetNameCommand(config.getReplicaSetName());
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(setReplicaSetNameTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            setReplicaSetNameTask.addCommand(cmd);
+        }
+        addTask(setReplicaSetNameTask);
 
         //START CONFIG SERVERS
         startConfigServersTask = Util.createTask("Start config servers");
@@ -99,17 +130,17 @@ public class Installer extends Operation {
         addTask(startConfigServersTask);
 
         //STOP MONGODB ON ROUTERS
-        Task stopMongoDBOnRouters = Util.createTask("Stop MongoDB on routers");
-        for (Agent agent : config.getRouterServers()) {
-            Command cmd = Commands.getStopShardCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(stopMongoDBOnRouters.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(stopMongoDBOnRouters.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            stopMongoDBOnRouters.addCommand(cmd);
-        }
-        stopMongoDBOnRouters.setIgnoreExitCode(true);
-        addTask(stopMongoDBOnRouters);
+//        Task stopMongoDBOnRouters = Util.createTask("Stop MongoDB on routers");
+//        for (Agent agent : config.getRouterServers()) {
+//            Command cmd = Commands.getStopNodeCommand();
+//            cmd.getRequest().setUuid(agent.getUuid());
+//            cmd.getRequest().setTaskUuid(stopMongoDBOnRouters.getUuid());
+//            cmd.getRequest().setRequestSequenceNumber(stopMongoDBOnRouters.getIncrementedReqSeqNumber());
+//            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+//            stopMongoDBOnRouters.addCommand(cmd);
+//        }
+//        stopMongoDBOnRouters.setIgnoreExitCode(true);
+//        addTask(stopMongoDBOnRouters);
 
         //START ROUTERS
         startRoutersTask = Util.createTask("Start routers");
@@ -135,49 +166,17 @@ public class Installer extends Operation {
         //============================================
         addTask(startRoutersTask);
 
-        //ADD REPLICA SET NAME TO CONFIG OF EACH MEMBER
-        Task setReplicaSetNameTask = Util.createTask("Set Replica Set name");
-        for (Agent agent : config.getShards()) {
-            Command cmd = Commands.getSetReplicaSetNameCommand(config.getReplicaSetName());
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(setReplicaSetNameTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            setReplicaSetNameTask.addCommand(cmd);
-        }
-        addTask(setReplicaSetNameTask);
-
-        //ADD HOST NAME OF EACH NODE TO OTHER NODE'S /ETC/HOSTS FILE
-        //check if ip-host pair laready exists
-        Task addShardHostToOtherShardsTask = Util.createTask("Register nodes's IP-Host with the other nodes");
-        for (Agent agent : allClusterMembers) {
-            for (Agent otherAgent : allClusterMembers) {
-                if (agent != otherAgent) {
-                    StringBuilder hosts = new StringBuilder();
-                    hosts.append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK))
-                            .append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN);
-                    Command cmd = Commands.getAddShardHostToOtherShardsCommand(hosts.toString());
-                    cmd.getRequest().setUuid(agent.getUuid());
-                    cmd.getRequest().setTaskUuid(addShardHostToOtherShardsTask.getUuid());
-                    cmd.getRequest().setRequestSequenceNumber(addShardHostToOtherShardsTask.getIncrementedReqSeqNumber());
-                    cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-                    addShardHostToOtherShardsTask.addCommand(cmd);
-                }
-            }
-        }
-        addTask(addShardHostToOtherShardsTask);
-
         //RESTART NODES
-        Task restartShards = Util.createTask("Restart shards");
-        for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getRestartNodeCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(restartShards.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(restartShards.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            restartShards.addCommand(cmd);
-        }
-        addTask(restartShards);
+//        Task restartShards = Util.createTask("Restart shards");
+//        for (Agent agent : allClusterMembers) {
+//            Command cmd = Commands.getRestartNodeCommand();
+//            cmd.getRequest().setUuid(agent.getUuid());
+//            cmd.getRequest().setTaskUuid(restartShards.getUuid());
+//            cmd.getRequest().setRequestSequenceNumber(restartShards.getIncrementedReqSeqNumber());
+//            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+//            restartShards.addCommand(cmd);
+//        }
+//        addTask(restartShards);
 
         //Make the first node as primary
         Agent primaryNode = config.getShards().iterator().next();
