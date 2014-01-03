@@ -265,16 +265,14 @@ public abstract class Operation implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
+        clearOutput();
+        clearLog();
         try {
             Task task = getCurrentTask();
             if (task != null && response != null
                     && task.getTaskStatus() == TaskStatus.NEW && response.getType() != null
                     && task.getUuid() != null && response.getTaskUuid() != null
                     && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
-
-                clearOutput();
-
-                clearLog();
 
                 beforeResponseProcessed(response);
 
