@@ -86,19 +86,24 @@ public class Installer extends Operation {
         //ADD HOST NAME OF EACH NODE TO OTHER NODE'S /ETC/HOSTS FILE
         Task addShardHostToOtherShardsTask = Util.createTask("Register nodes's IP-Host with other nodes");
         for (Agent agent : allClusterMembers) {
+            StringBuilder hosts = new StringBuilder();
             for (Agent otherAgent : allClusterMembers) {
                 if (agent != otherAgent) {
-                    StringBuilder hosts = new StringBuilder();
-                    hosts.append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK))
-                            .append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN);
-                    Command cmd = Commands.getAddShardHostToOtherShardsCommand(hosts.toString());
-                    cmd.getRequest().setUuid(agent.getUuid());
-                    cmd.getRequest().setTaskUuid(addShardHostToOtherShardsTask.getUuid());
-                    cmd.getRequest().setRequestSequenceNumber(addShardHostToOtherShardsTask.getIncrementedReqSeqNumber());
-                    cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-                    addShardHostToOtherShardsTask.addCommand(cmd);
+                    hosts.append("if ! /bin/grep -q '").
+                            append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK)).
+                            append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN).
+                            append("' '/etc/hosts'; then /bin/echo '").
+                            append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK)).
+                            append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN).
+                            append("' >> '/etc/hosts'; fi ;");
                 }
             }
+            Command cmd = Commands.getAddShardHostToOtherShardsCommand(hosts.toString());
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(addShardHostToOtherShardsTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(addShardHostToOtherShardsTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            addShardHostToOtherShardsTask.addCommand(cmd);
         }
         addTask(addShardHostToOtherShardsTask);
 
