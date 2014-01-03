@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
 
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
@@ -95,7 +94,7 @@ public class Installer extends Operation {
             startConfigServersTask.addCommand(cmd);
         }
         //============process output of mongod========
-        startConfigServersTask.setIgnoreExitCode(true);
+//        startConfigServersTask.setIgnoreExitCode(true);
         //============================================
         addTask(startConfigServersTask);
 
@@ -132,7 +131,7 @@ public class Installer extends Operation {
             startRoutersTask.addCommand(cmd);
         }
         //============process output of mongod========
-        startRoutersTask.setIgnoreExitCode(true);
+//        startRoutersTask.setIgnoreExitCode(true);
         //============================================
         addTask(startRoutersTask);
 
