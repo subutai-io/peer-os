@@ -41,10 +41,6 @@ public class Step4 extends Panel implements ResponseListener {
 
     public Step4(final Wizard wizard) {
 
-//        VerticalLayout content = new VerticalLayout();
-//        content.setSizeFull();
-//        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-//        content.setMargin(true);
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
@@ -107,15 +103,8 @@ public class Step4 extends Panel implements ResponseListener {
                 this.operation = operation;
                 if (operation.start()) {
                     showProgress();
-                    outputTxtArea.setValue(MessageFormat.format(
-                            "{0}\n\nOperation \"{1}\" started.\n\nRunning task {2}...",
-                            outputTxtArea.getValue(),
-                            operation.getDescription(),
-                            operation.getCurrentTask().getDescription()));
-                    logTextArea.setValue(MessageFormat.format(
-                            "{0}\n\n======= Task {1} =======",
-                            logTextArea.getValue(),
-                            operation.getCurrentTask().getDescription()));
+                    addOutput(operation.getOutput());
+                    addLog(operation.getLog());
                     if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
                         operationTimeoutThread.interrupt();
                     }
@@ -128,10 +117,7 @@ public class Step4 extends Panel implements ResponseListener {
                                 if (!operation.isStopped()
                                         && !operation.isFailed()
                                         && !operation.isCompleted()) {
-                                    outputTxtArea.setValue(
-                                            MessageFormat.format("{0}\n\nOperation {1} timeouted!!!",
-                                                    outputTxtArea.getValue(),
-                                                    operation.getDescription()));
+                                    addOutput("Operation {1} timeouted!!!");
                                     hideProgress();
                                 }
                             } catch (InterruptedException ex) {
@@ -140,9 +126,8 @@ public class Step4 extends Panel implements ResponseListener {
                     });
                     operationTimeoutThread.start();
                 } else {
-                    outputTxtArea.setValue(MessageFormat.format(
-                            "{0}\n\nOperation \"{1}\" could not be started: {2}.",
-                            outputTxtArea.getValue(),
+                    addOutput(MessageFormat.format(
+                            "Operation \"{0}\" could not be started: {1}.",
                             operation.getDescription(),
                             operation.getOutput()));
                 }
@@ -172,31 +157,36 @@ public class Step4 extends Panel implements ResponseListener {
         if (operation != null) {
             try {
                 operation.onResponse(response);
-                String output = operation.getOutput();
-                if (!Util.isStringEmpty(output)) {
-                    outputTxtArea.setValue(
-                            MessageFormat.format("{0}\n\n{1}",
-                                    outputTxtArea.getValue(),
-                                    output));
-                    outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-                }
-                String log = operation.getLog();
-                if (!Util.isStringEmpty(log)) {
-                    logTextArea.setValue(
-                            MessageFormat.format("{0}\n\n{1}",
-                                    logTextArea.getValue(),
-                                    log));
-                    logTextArea.setCursorPosition(logTextArea.getValue().toString().length() - 1);
-                }
+                addOutput(operation.getOutput());
+                addLog(operation.getLog());
                 if (operation.isCompleted() || operation.isStopped() || operation.isFailed()) {
                     hideProgress();
                 }
-
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Error in onResponse", e);
             }
         }
 
+    }
+
+    private void addOutput(String output) {
+        if (!Util.isStringEmpty(output)) {
+            outputTxtArea.setValue(
+                    MessageFormat.format("{0}\n\n{1}",
+                            outputTxtArea.getValue(),
+                            output));
+            outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+        }
+    }
+
+    private void addLog(String log) {
+        if (!Util.isStringEmpty(log)) {
+            logTextArea.setValue(
+                    MessageFormat.format("{0}\n\n{1}",
+                            logTextArea.getValue(),
+                            log));
+            logTextArea.setCursorPosition(logTextArea.getValue().toString().length() - 1);
+        }
     }
 
     @Override

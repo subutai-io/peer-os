@@ -33,6 +33,14 @@ public class Uninstaller extends Operation {
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         //uninstall it
         for (Agent agent : allClusterMembers) {
+            Command cmd = Commands.getKillAllCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            uninstallMongoTask.addCommand(cmd);
+        }        
+        for (Agent agent : allClusterMembers) {
             Command cmd = Commands.getUninstallCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());

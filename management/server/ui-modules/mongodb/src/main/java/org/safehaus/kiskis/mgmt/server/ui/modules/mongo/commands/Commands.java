@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -68,7 +69,7 @@ public class Commands {
                 "purge",
                 "ksks-mongo"
         ));
-        req.setTimeout(60);
+        req.setTimeout(90);
         return cmd;
     }
 
@@ -80,7 +81,8 @@ public class Commands {
         req.setArgs(Arrays.asList(
                 "-9",
                 "-f",
-                "'mongod|ksks-mongo|mongos'"
+//                "'mongod|ksks-mongo|mongos'"
+                "'mongod|mongos'"
         ));
         req.setTimeout(10);
         return cmd;
@@ -122,6 +124,17 @@ public class Commands {
         return cmd;
     }
 
+    public static Command getRemoveLogFileCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/rm");
+        req.setArgs(Arrays.asList(
+                "/var/log/mongodb/mongodb.log"
+        ));
+        req.setTimeout(30);
+        return cmd;
+    }
+
     //execute on each replica
     public static Command getSetReplicaSetNameCommand(String replicaSetName) {
         Command cmd = getTemplate();
@@ -137,18 +150,14 @@ public class Commands {
     }
 
     //execute for each replica adding info about each of the other replicas
-    public static Command getAddShardHostToOtherShardsCommand(String otherShardsHosts) {
+    public static Command getAddShardHostToOtherShardsCommand(String ipHostPair) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/bin/echo");
-        req.setArgs(Arrays.asList(
-                "-e",
-                "\"" + otherShardsHosts + "\"",
-                //add [echo -e "\nIP HOST\nIP HOST\nIP HOST"] with each replica's data
-                //except the one to whom this command is aimed and replace placeholder
-                ">>",
-                "/etc/hosts"
-        ));
+        req.setProgram(
+                MessageFormat.format(
+                        "if ! /bin/grep -q \"{0}\" \"/etc/hosts\";"
+                        + " then /bin/echo \"{1}\" >> \"/etc/hosts\"; fi ",
+                        ipHostPair, ipHostPair));
         req.setTimeout(30);
         return cmd;
     }
@@ -216,6 +225,19 @@ public class Commands {
     }
 
     //execute on primary replica
+    public static Command getAddSecondaryReplicasToPrimaryCommand2(String secondaryNodes) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("mongo");
+        req.setArgs(Arrays.asList(
+                "--eval",
+                String.format("\"rs.initiate();%s\"", secondaryNodes)
+        ));
+        req.setTimeout(60);
+        return cmd;
+    }
+
+    //execute on primary replica
     //used for adding shard to existing cluster
     public static Command getAddSecondaryReplicasToPrimaryExistCommand() {
         Command cmd = getTemplate();
@@ -257,15 +279,17 @@ public class Commands {
     }
 
     //execute on any router member
-    public static Command getRegisterPrimaryWithRouterCommand(String replicaSetName, String primaryHost) {
+    public static Command getRegisterShardWithRouterCommand(String routerHost, String shards) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/bin/echo");
+        req.setProgram("mongo");
         req.setArgs(Arrays.asList(
-                String.format("'sh.addShard(\"%s/%s:%s\")'",
-                        replicaSetName, primaryHost, Constants.MONGO_SHARD_PORT),
-                "|",
-                "mongo"
+                "--host",
+                routerHost, //supply any one router host
+                "--port",
+                Constants.MONGO_ROUTER_PORT + "", //supply router port                
+                "--eval",
+                String.format("\"%s\"", shards)
         ));
         req.setTimeout(60);
         return cmd;
@@ -289,10 +313,10 @@ public class Commands {
                 Constants.MONGO_CONFIG_SERVER_PORT + "", // this might be user-supplied
                 "--fork",
                 "--logpath",
-                "/var/log/mongodb.log"
+                "/var/log/mongodb/mongodb.log"
         //                        "--logappend"
         ));
-        req.setTimeout(60);
+        req.setTimeout(70);
         return cmd;
     }
 
@@ -306,17 +330,17 @@ public class Commands {
                 configServersArg,
                 "--fork",
                 "--logpath",
-                "/var/log/mongodb.log"
+                "/var/log/mongodb/mongodb.log"
         //add config servers (with ports) based on user selection, comma-separated
         //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
         //and replace placeholder
         ));
-        req.setTimeout(60);
+        req.setTimeout(70);
         return cmd;
     }
 
     //execute on shard
-    public static Command getStartShardCommand() {
+    public static Command getStartNodeCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/service");
@@ -342,7 +366,7 @@ public class Commands {
     }
 
     //execute on shard
-    public static Command getRestartShardCommand() {
+    public static Command getRestartNodeCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/service");
@@ -355,7 +379,7 @@ public class Commands {
     }
 
     //execute on shard
-    public static Command getShardStatusCommand() {
+    public static Command getNodeStatusCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/service");
