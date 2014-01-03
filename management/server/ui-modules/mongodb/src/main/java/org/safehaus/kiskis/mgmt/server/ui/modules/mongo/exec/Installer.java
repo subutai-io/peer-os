@@ -103,7 +103,7 @@ public class Installer extends Operation {
         addTask(addShardHostToOtherShardsTask);
 
         //ADD REPLICA SET NAME TO CONFIG OF EACH SHARD
-        Task setReplicaSetNameTask = Util.createTask("Set Replica Set name");
+        Task setReplicaSetNameTask = Util.createTask(String.format("Set Replica Set name to %s", config.getReplicaSetName()));
         for (Agent agent : config.getShards()) {
             Command cmd = Commands.getSetReplicaSetNameCommand(config.getReplicaSetName());
             cmd.getRequest().setUuid(agent.getUuid());

@@ -201,9 +201,10 @@ public class Commands {
         req.setProgram("mongod");
         req.setArgs(Arrays.asList(
                 "--config",
-                "/etc/mongodb.conf"
+                "/etc/mongodb.conf",
+                ";sleep 10"
         ));
-        req.setTimeout(30);
+        req.setTimeout(60);
         return cmd;
     }
 
