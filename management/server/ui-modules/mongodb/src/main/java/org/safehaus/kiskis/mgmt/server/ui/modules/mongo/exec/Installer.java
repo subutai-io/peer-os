@@ -141,7 +141,6 @@ public class Installer extends Operation {
 //        }
 //        stopMongoDBOnRouters.setIgnoreExitCode(true);
 //        addTask(stopMongoDBOnRouters);
-
         //START ROUTERS
         startRoutersTask = Util.createTask("Start routers");
         StringBuilder configServersArg = new StringBuilder();
@@ -166,17 +165,17 @@ public class Installer extends Operation {
         //============================================
         addTask(startRoutersTask);
 
-        //RESTART NODES
-//        Task restartShards = Util.createTask("Restart shards");
-//        for (Agent agent : allClusterMembers) {
-//            Command cmd = Commands.getRestartNodeCommand();
-//            cmd.getRequest().setUuid(agent.getUuid());
-//            cmd.getRequest().setTaskUuid(restartShards.getUuid());
-//            cmd.getRequest().setRequestSequenceNumber(restartShards.getIncrementedReqSeqNumber());
-//            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-//            restartShards.addCommand(cmd);
-//        }
-//        addTask(restartShards);
+        //START SHARDS
+        Task startShards = Util.createTask("Start shards");
+        for (Agent agent : config.getShards()) {
+            Command cmd = Commands.getStartNodeCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(startShards.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(startShards.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            startShards.addCommand(cmd);
+        }
+        addTask(startShards);
 
         //Make the first node as primary
         Agent primaryNode = config.getShards().iterator().next();
@@ -263,7 +262,7 @@ public class Installer extends Operation {
         if (task == startConfigServersTask || task == startRoutersTask) {
             Response wholeResponse = commandManager.getResponse(task.getUuid(), response.getRequestSequenceNumber());
             if (wholeResponse != null && wholeResponse.getStdOut() != null) {
-                if (response.getStdOut().contains("child process started successfully, parent exiting")) {
+                if (wholeResponse.getStdOut().contains("child process started successfully, parent exiting")) {
                     response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
                     response.setExitCode(0);
                 }
