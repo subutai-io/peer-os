@@ -98,7 +98,9 @@ public class Step4 extends Panel implements ResponseListener {
             try {
                 //stop any running operation
                 if (this.operation != null) {
-                    this.operation.stop();
+                    Operation tmp = this.operation;
+                    this.operation = null;
+                    tmp.stop();
                 }
                 this.operation = operation;
                 if (operation.start()) {
@@ -112,8 +114,8 @@ public class Step4 extends Panel implements ResponseListener {
                         @Override
                         public void run() {
                             try {
-                                //wait for overalltimeout + 5 sec just in case
-                                Thread.sleep(operation.getOverallTimeout() * 1000 + 5000);
+                                //wait for overalltimeout + 15 sec just in case
+                                Thread.sleep(operation.getOverallTimeout() * 1000 + 15000);
                                 if (!operation.isStopped()
                                         && !operation.isFailed()
                                         && !operation.isCompleted()) {

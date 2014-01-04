@@ -197,8 +197,7 @@ public class Commands {
         req.setProgram("mongod");
         req.setArgs(Arrays.asList(
                 "--config",
-                "/etc/mongodb.conf",
-                ";sleep 20"
+                "/etc/mongodb.conf"
         ));
         req.setTimeout(60);
         return cmd;
@@ -292,6 +291,19 @@ public class Commands {
         return cmd;
     }
 
+    //execute on any router member
+    public static Command getRegisterShardWithRouterCommand2(String shards) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("mongo");
+        req.setArgs(Arrays.asList(
+                "--eval",
+                String.format("\"%s\"", shards)
+        ));
+        req.setTimeout(60);
+        return cmd;
+    }
+
     // LIFECYCLE COMMANDS =======================================================
     //execute on config server
     public static Command getStartConfigServerCommand() {
@@ -313,7 +325,7 @@ public class Commands {
                 "/var/log/mongodb/mongodb.log"
         //                        "--logappend"
         ));
-        req.setTimeout(70);
+        req.setTimeout(90);
         return cmd;
     }
 
@@ -332,7 +344,7 @@ public class Commands {
         //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
         //and replace placeholder
         ));
-        req.setTimeout(70);
+        req.setTimeout(90);
         return cmd;
     }
 
@@ -346,6 +358,23 @@ public class Commands {
                 "start"
         ));
         req.setTimeout(180);
+        return cmd;
+    }
+
+    //execute on shard
+    public static Command getStartNodeCommand2() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("mongod");
+        req.setArgs(Arrays.asList(
+                "--config",
+                "/etc/mongodb.conf",
+                "--fork",
+                "--logpath",
+                "/var/log/mongodb/mongodb.log"
+                , ";sleep 20"
+        ));
+        req.setTimeout(90);
         return cmd;
     }
 
