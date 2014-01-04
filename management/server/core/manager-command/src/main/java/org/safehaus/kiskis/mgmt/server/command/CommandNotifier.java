@@ -5,7 +5,6 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
 import com.google.common.collect.EvictingQueue;
-import com.google.common.collect.Queues;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -21,12 +20,18 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public class CommandNotifier implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(CommandNotifier.class.getName());
-    private final EvictingQueue<Response> queue = EvictingQueue.create(Common.MAX_PENDING_MESSAGE_QUEUE_LENGTH);
-    protected final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
+    private final EvictingQueue<Response> messagesQueue = EvictingQueue.create(Common.MAX_PENDING_MESSAGE_QUEUE_LENGTH);
+//    protected final Queue<Response> messagesQueue = Queues.synchronizedQueue(queue);
     private final Queue<CommandListener> listeners;
 
     public CommandNotifier(Queue<CommandListener> listeners) {
         this.listeners = listeners;
+    }
+
+    public void addResponse(Response response) {
+        synchronized (messagesQueue) {
+            messagesQueue.add(response);
+        }
     }
 
     public void run() {
@@ -56,8 +61,15 @@ public class CommandNotifier implements Runnable {
             for (Iterator<CommandListener> it = listeners.iterator(); it.hasNext();) {
                 CommandListener listener = it.next();
                 if (listener != null && listener.getName() != null) {
-                    if (response != null && response.getSource() != null && listener.getName().equals(response.getSource())) {
-                        listener.onCommand(response);
+                    if (response != null && response.getSource() != null
+                            && listener.getName().equalsIgnoreCase(response.getSource())) {
+                        try {
+
+                            listener.onCommand(response);
+                        } catch (Exception e) {
+                            it.remove();
+                            LOG.log(Level.SEVERE, "Error notifying response listeners, removing faulting listener", e);
+                        }
                     }
                 } else {
                     it.remove();

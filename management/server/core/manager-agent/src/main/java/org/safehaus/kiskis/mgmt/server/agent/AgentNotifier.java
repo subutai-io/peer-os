@@ -37,10 +37,11 @@ public class AgentNotifier implements Runnable {
                     List<Agent> allFreshAgents = agentManager.getRegisteredAgents();
                     for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
                         AgentListener listener = it.next();
-                        if (listener != null) {
+                        try {
                             listener.onAgent(allFreshAgents);
-                        } else {
+                        } catch (Exception e) {
                             it.remove();
+                            LOG.log(Level.SEVERE, "Error notifying agent listeners, removing faulting listener", e);
                         }
                     }
                 }

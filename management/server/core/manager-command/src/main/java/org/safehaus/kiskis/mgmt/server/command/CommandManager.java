@@ -49,12 +49,12 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE: {
                 persistenceCommand.saveResponse(response);
-                commandNotifier.messagesQueue.add(response);
+                commandNotifier.addResponse(response);
                 break;
             }
             case EXECUTE_RESPONSE_DONE: {
                 persistenceCommand.saveResponse(response);
-                commandNotifier.messagesQueue.add(response);
+                commandNotifier.addResponse(response);
                 break;
             }
             default: {

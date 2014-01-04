@@ -84,7 +84,7 @@ public class Commands {
                 //                "'mongod|ksks-mongo|mongos'"
                 "'mongod|mongos'"
         ));
-        req.setTimeout(10);
+        req.setTimeout(20);
         return cmd;
     }
 
@@ -231,7 +231,7 @@ public class Commands {
                 "--eval",
                 String.format("\"rs.initiate();%s\"", secondaryNodes)
         ));
-        req.setTimeout(60);
+        req.setTimeout(90);
         return cmd;
     }
 
@@ -327,7 +327,7 @@ public class Commands {
                 "/var/log/mongodb/mongodb.log"
         //                        "--logappend"
         ));
-        req.setTimeout(90);
+        req.setTimeout(120);
         return cmd;
     }
 
@@ -346,7 +346,7 @@ public class Commands {
         //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
         //and replace placeholder
         ));
-        req.setTimeout(90);
+        req.setTimeout(120);
         return cmd;
     }
 
@@ -375,7 +375,7 @@ public class Commands {
                 "--logpath",
                 "/var/log/mongodb/mongodb.log"
         ));
-        req.setTimeout(90);
+        req.setTimeout(120);
         return cmd;
     }
 
