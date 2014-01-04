@@ -81,7 +81,7 @@ public class Commands {
         req.setArgs(Arrays.asList(
                 "-9",
                 "-f",
-//                "'mongod|ksks-mongo|mongos'"
+                //                "'mongod|ksks-mongo|mongos'"
                 "'mongod|mongos'"
         ));
         req.setTimeout(10);
@@ -150,14 +150,10 @@ public class Commands {
     }
 
     //execute for each replica adding info about each of the other replicas
-    public static Command getAddShardHostToOtherShardsCommand(String ipHostPair) {
+    public static Command getAddNodesIpHostToOtherNodesCommand(String ipHostPair) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram(
-                MessageFormat.format(
-                        "if ! /bin/grep -q \"{0}\" \"/etc/hosts\";"
-                        + " then /bin/echo \"{1}\" >> \"/etc/hosts\"; fi ",
-                        ipHostPair, ipHostPair));
+        req.setProgram(ipHostPair);
         req.setTimeout(30);
         return cmd;
     }

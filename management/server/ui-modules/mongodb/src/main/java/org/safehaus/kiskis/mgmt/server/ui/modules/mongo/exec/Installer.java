@@ -84,7 +84,7 @@ public class Installer extends Operation {
         addTask(stopMongoOnAllNodes);
 
         //ADD HOST NAME OF EACH NODE TO OTHER NODE'S /ETC/HOSTS FILE
-        Task addShardHostToOtherShardsTask = Util.createTask("Register nodes's IP-Host with other nodes");
+        Task addNodesIpHostToOtherNodesTask = Util.createTask("Register nodes's IP-Host with other nodes");
         for (Agent agent : allClusterMembers) {
             StringBuilder hosts = new StringBuilder();
             for (Agent otherAgent : allClusterMembers) {
@@ -98,14 +98,14 @@ public class Installer extends Operation {
                             append("' >> '/etc/hosts'; fi ;");
                 }
             }
-            Command cmd = Commands.getAddShardHostToOtherShardsCommand(hosts.toString());
+            Command cmd = Commands.getAddNodesIpHostToOtherNodesCommand(hosts.toString());
             cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(addShardHostToOtherShardsTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(addShardHostToOtherShardsTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setTaskUuid(addNodesIpHostToOtherNodesTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(addNodesIpHostToOtherNodesTask.getIncrementedReqSeqNumber());
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            addShardHostToOtherShardsTask.addCommand(cmd);
+            addNodesIpHostToOtherNodesTask.addCommand(cmd);
         }
-        addTask(addShardHostToOtherShardsTask);
+        addTask(addNodesIpHostToOtherNodesTask);
 
         //ADD REPLICA SET NAME TO CONFIG OF EACH SHARD
         Task setReplicaSetNameTask = Util.createTask(String.format("Set Replica Set name to %s", config.getReplicaSetName()));
