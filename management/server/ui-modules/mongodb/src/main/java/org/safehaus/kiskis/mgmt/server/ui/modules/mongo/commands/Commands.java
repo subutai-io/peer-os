@@ -224,8 +224,10 @@ public class Commands {
     public static Command getAddSecondaryReplicasToPrimaryCommand2(String secondaryNodes) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("mongo");
+        req.setProgram("sleep 20");
         req.setArgs(Arrays.asList(
+                ";",
+                "mongo",
                 "--eval",
                 String.format("\"rs.initiate();%s\"", secondaryNodes)
         ));
@@ -372,7 +374,6 @@ public class Commands {
                 "--fork",
                 "--logpath",
                 "/var/log/mongodb/mongodb.log"
-                , ";sleep 20"
         ));
         req.setTimeout(90);
         return cmd;
