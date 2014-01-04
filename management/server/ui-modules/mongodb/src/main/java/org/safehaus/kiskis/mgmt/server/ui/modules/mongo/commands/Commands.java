@@ -224,7 +224,7 @@ public class Commands {
     public static Command getAddSecondaryReplicasToPrimaryCommand2(String secondaryNodes) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sleep 20");
+        req.setProgram("sleep 30");
         req.setArgs(Arrays.asList(
                 ";",
                 "mongo",
