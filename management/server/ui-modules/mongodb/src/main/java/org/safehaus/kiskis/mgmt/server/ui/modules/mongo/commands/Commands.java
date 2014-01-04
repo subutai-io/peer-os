@@ -221,21 +221,6 @@ public class Commands {
     }
 
     //execute on primary replica
-    public static Command getAddSecondaryReplicasToPrimaryCommand2(String secondaryNodes) {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("sleep 30");
-        req.setArgs(Arrays.asList(
-                ";",
-                "mongo",
-                "--eval",
-                String.format("\"rs.initiate();%s\"", secondaryNodes)
-        ));
-        req.setTimeout(90);
-        return cmd;
-    }
-
-    //execute on primary replica
     //used for adding shard to existing cluster
     public static Command getAddSecondaryReplicasToPrimaryExistCommand() {
         Command cmd = getTemplate();
@@ -293,8 +278,23 @@ public class Commands {
         return cmd;
     }
 
+    //execute on primary replica
+    public static Command getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("sleep 150");
+        req.setArgs(Arrays.asList(
+                ";",
+                "mongo",
+                "--eval",
+                String.format("\"rs.initiate();%s\"", secondaryNodes)
+        ));
+        req.setTimeout(180);
+        return cmd;
+    }
+
     //execute on any router member
-    public static Command getRegisterShardWithRouterCommand2(String shards) {
+    public static Command getRegisterShardsWithRouterCommand(String shards) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");
@@ -302,7 +302,7 @@ public class Commands {
                 "--eval",
                 String.format("\"%s\"", shards)
         ));
-        req.setTimeout(60);
+        req.setTimeout(180);
         return cmd;
     }
 
@@ -388,7 +388,7 @@ public class Commands {
                 "mongodb",
                 "stop"
         ));
-        req.setTimeout(60);
+        req.setTimeout(90);
         return cmd;
     }
 

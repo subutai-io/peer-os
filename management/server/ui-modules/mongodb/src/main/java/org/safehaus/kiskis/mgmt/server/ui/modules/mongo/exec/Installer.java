@@ -42,7 +42,6 @@ public class Installer extends Operation {
 
         //KILL && UNINSTALL MONGO
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
-        //uninstall it
         for (Agent agent : allClusterMembers) {
             Command cmd = Commands.getKillAllCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -74,17 +73,18 @@ public class Installer extends Operation {
         }
         addTask(installMongoTask);
 
-        //STOP MONGODB ON CONFIG SERVERS
+        //STOP MONGODB ON ALL NODES
         Task stopMongoOnAllNodes = Util.createTask("Stop Mongo on all nodes");
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getStopNodeCommand();
+//            Command cmd = Commands.getStopNodeCommand();
+            Command cmd = Commands.getKillAllCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(stopMongoOnAllNodes.getUuid());
             cmd.getRequest().setRequestSequenceNumber(stopMongoOnAllNodes.getIncrementedReqSeqNumber());
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             stopMongoOnAllNodes.addCommand(cmd);
         }
-//        stopMongoOnAllNodes.setIgnoreExitCode(true);
+        stopMongoOnAllNodes.setIgnoreExitCode(true);
         addTask(stopMongoOnAllNodes);
 
         //ADD HOST NAME OF EACH NODE TO OTHER NODE'S /ETC/HOSTS FILE
@@ -133,23 +133,8 @@ public class Installer extends Operation {
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startConfigServersTask.addCommand(cmd);
         }
-        //============process output of mongod========
-//        startConfigServersTask.setIgnoreExitCode(true);
-        //============================================
         addTask(startConfigServersTask);
 
-        //STOP MONGODB ON ROUTERS
-//        Task stopMongoDBOnRouters = Util.createTask("Stop MongoDB on routers");
-//        for (Agent agent : config.getRouterServers()) {
-//            Command cmd = Commands.getStopNodeCommand();
-//            cmd.getRequest().setUuid(agent.getUuid());
-//            cmd.getRequest().setTaskUuid(stopMongoDBOnRouters.getUuid());
-//            cmd.getRequest().setRequestSequenceNumber(stopMongoDBOnRouters.getIncrementedReqSeqNumber());
-//            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-//            stopMongoDBOnRouters.addCommand(cmd);
-//        }
-//        stopMongoDBOnRouters.setIgnoreExitCode(true);
-//        addTask(stopMongoDBOnRouters);
         //START ROUTERS
         startRoutersTask = Util.createTask("Start routers");
         StringBuilder configServersArg = new StringBuilder();
@@ -169,9 +154,6 @@ public class Installer extends Operation {
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startRoutersTask.addCommand(cmd);
         }
-        //============process output of mongod========
-//        startRoutersTask.setIgnoreExitCode(true);
-        //============================================
         addTask(startRoutersTask);
 
         //START SHARDS
@@ -184,21 +166,11 @@ public class Installer extends Operation {
             cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startShardsTask.addCommand(cmd);
         }
-//        startShardsTask.setIgnoreExitCode(true);
         addTask(startShardsTask);
 
-        //Make the first node as primary
+        //choose the first shard as primary node
         Agent primaryNode = config.getShards().iterator().next();
-        //SET PRIMARY NODE CONFIG
-//        Task setPrimaryNodeConfigTask = Util.createTask("Set replica set's primary node config");
-//        Command cmd = Commands.getSetPrimaryShardConfigCommand();
-//        cmd.getRequest().setUuid(primaryNode.getUuid());
-//        cmd.getRequest().setTaskUuid(setPrimaryNodeConfigTask.getUuid());
-//        cmd.getRequest().setRequestSequenceNumber(setPrimaryNodeConfigTask.getIncrementedReqSeqNumber());
-//        cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-//        setPrimaryNodeConfigTask.addCommand(cmd);
-//        setPrimaryNodeConfigTask.setIgnoreExitCode(true);
-//        addTask(setPrimaryNodeConfigTask);
+        Command cmd;
 
         //REGISTER SECONDARY NODES WITH PRIMARY
         Task registerSecondaryNodesWithPrimaryTask = Util.createTask("Register secondary nodes with primary");
@@ -210,7 +182,7 @@ public class Installer extends Operation {
                         append("');");
             }
         }
-        Command cmd = Commands.getAddSecondaryReplicasToPrimaryCommand2(secondaryStr.toString());
+        cmd = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString());
         cmd.getRequest().setUuid(primaryNode.getUuid());
         cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
         cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
@@ -227,7 +199,7 @@ public class Installer extends Operation {
                     append("/").append(shard.getHostname()).append(Constants.DOMAIN).
                     append(":").append(Constants.MONGO_SHARD_PORT).append("');");
         }
-        cmd = Commands.getRegisterShardWithRouterCommand2(
+        cmd = Commands.getRegisterShardsWithRouterCommand(
                 shards.toString());
         cmd.getRequest().setUuid(router.getUuid());
         cmd.getRequest().setTaskUuid(registerShardsWithRouterTask.getUuid());
@@ -235,6 +207,7 @@ public class Installer extends Operation {
         cmd.getRequest().setSource(MongoModule.MODULE_NAME);
         registerShardsWithRouterTask.addCommand(cmd);
         addTask(registerShardsWithRouterTask);
+
     }
 
     @Override

@@ -118,7 +118,9 @@ public class Step4 extends Panel implements ResponseListener {
                                 if (!operation.isStopped()
                                         && !operation.isFailed()
                                         && !operation.isSucceeded()) {
-                                    addOutput("Operation {1} timeouted!!!");
+                                    addOutput(MessageFormat.format(
+                                            "Operation \"{0}\" timeouted!!!",
+                                            operation.getDescription()));
                                     hideProgress();
                                 }
                             } catch (InterruptedException ex) {
