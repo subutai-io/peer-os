@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -83,6 +82,28 @@ public class Commands {
                 "-f",
                 //                "'mongod|ksks-mongo|mongos'"
                 "'mongod|mongos'"
+        ));
+        req.setTimeout(20);
+        return cmd;
+    }
+    //execute on each selected lxc node
+    public static Command getKillNCleanCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/pkill");
+        req.setArgs(Arrays.asList(
+                "-9",
+                "-f",
+                //                "'mongod|ksks-mongo|mongos'"
+                "'mongod|mongos'",
+                ";",
+                "/bin/rm -R /var/lib/mongodb",
+                "&",
+                "/bin/rm -R /data/configdb",
+                "&",
+                "/bin/rm /etc/mongodb.conf",
+                "&",
+                "/bin/rm /var/log/mongodb/mongodb.log"
         ));
         req.setTimeout(20);
         return cmd;
@@ -282,14 +303,14 @@ public class Commands {
     public static Command getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sleep 150");
+        req.setProgram("sleep 300");
         req.setArgs(Arrays.asList(
                 ";",
                 "mongo",
                 "--eval",
                 String.format("\"rs.initiate();%s\"", secondaryNodes)
         ));
-        req.setTimeout(180);
+        req.setTimeout(360);
         return cmd;
     }
 
