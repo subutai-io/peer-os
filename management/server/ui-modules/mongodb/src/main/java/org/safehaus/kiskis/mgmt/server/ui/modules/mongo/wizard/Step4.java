@@ -98,12 +98,11 @@ public class Step4 extends Panel implements ResponseListener {
             try {
                 //stop any running operation
                 if (this.operation != null) {
-                    Operation tmp = this.operation;
+                    this.operation.stop();
                     this.operation = null;
-                    tmp.stop();
                 }
-                this.operation = operation;
                 if (operation.start()) {
+                    this.operation = operation;
                     showProgress();
                     addOutput(operation.getOutput());
                     addLog(operation.getLog());
@@ -118,7 +117,7 @@ public class Step4 extends Panel implements ResponseListener {
                                 Thread.sleep(operation.getOverallTimeout() * 1000 + 15000);
                                 if (!operation.isStopped()
                                         && !operation.isFailed()
-                                        && !operation.isCompleted()) {
+                                        && !operation.isSucceeded()) {
                                     addOutput("Operation {1} timeouted!!!");
                                     hideProgress();
                                 }
@@ -161,7 +160,7 @@ public class Step4 extends Panel implements ResponseListener {
                 operation.onResponse(response);
                 addOutput(operation.getOutput());
                 addLog(operation.getLog());
-                if (operation.isCompleted() || operation.isStopped() || operation.isFailed()) {
+                if (operation.isSucceeded() || operation.isStopped() || operation.isFailed()) {
                     hideProgress();
                 }
             } catch (Exception e) {

@@ -34,6 +34,7 @@ public abstract class Operation implements ResponseListener {
     private volatile int currentTaskIdx = -1;
     private volatile boolean stopped = true;
     private volatile boolean failed = false;
+    private volatile boolean succeeded = false;
     private final StringBuilder output = new StringBuilder();
     private final StringBuilder log = new StringBuilder();
     private int commandCount = 0, okCommandCount = 0;
@@ -43,23 +44,39 @@ public abstract class Operation implements ResponseListener {
         this.commandManager = ServiceLocator.getService(CommandManagerInterface.class);
     }
 
+    public boolean isStopped() {
+        return stopped;
+    }
+
+    public boolean isFailed() {
+        return failed;
+    }
+
+    public boolean isSucceeded() {
+        return succeeded;
+    }
+
+    public boolean isCompleted() {
+        return currentTaskIdx >= tasks.size() - 1;
+    }
+
     public boolean start() {
         try {
-            if (!failed) {
-                if (stopped) {
-                    if (!isCompleted()) {
+            if (!(succeeded || isCompleted())) {
+                if (!failed) {
+                    if (stopped) {
                         stopped = false;
                         onOperationStarted();
                         executeNextTask();
                         return true;
                     } else {
-                        setOutput("Operation completed. No more tasks to run.");
+                        appendOutput("Operation is already running");
                     }
                 } else {
-                    setOutput("Operation is already running");
+                    appendOutput("Operation failed. Please start from the beginning.");
                 }
             } else {
-                setOutput("Operation failed. Please start from the beginning.");
+                appendOutput("Operation completed. No more tasks to run.");
             }
 
         } catch (Exception e) {
@@ -72,45 +89,10 @@ public abstract class Operation implements ResponseListener {
         stopped = true;
     }
 
-    public boolean isStopped() {
-        return stopped;
-    }
-
-    public boolean isFailed() {
-        return failed;
-    }
-
-    public Task getCurrentTask() {
-        Task task = null;
-        if (currentTaskIdx > -1 && currentTaskIdx < tasks.size()) {
-            task = tasks.get(currentTaskIdx);
-        }
-
-        return task;
-    }
-
-    public Task getPreviousTask() {
-        Task task = null;
-        if (currentTaskIdx > 0) {
-            task = tasks.get(currentTaskIdx - 1);
-        }
-
-        return task;
-    }
-
-    public Task getNextTask() {
-        Task task = null;
-        if (currentTaskIdx < tasks.size() - 1) {
-            task = tasks.get(currentTaskIdx + 1);
-        }
-
-        return task;
-    }
-
     private boolean executeNextTask() {
         boolean result = false;
         try {
-            if (!(stopped || failed || isCompleted())) {
+            if (!(stopped || failed || succeeded || isCompleted())) {
 
                 Task currentTask = tasks.get(++currentTaskIdx);
 
@@ -142,18 +124,41 @@ public abstract class Operation implements ResponseListener {
         return result;
     }
 
-    public boolean isCompleted() {
-        return currentTaskIdx >= tasks.size() - 1;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
     protected void addTask(Task task) {
         if (task != null) {
             tasks.add(task);
         }
+    }
+
+    public Task getCurrentTask() {
+        Task task = null;
+        if (currentTaskIdx > -1 && currentTaskIdx < tasks.size()) {
+            task = tasks.get(currentTaskIdx);
+        }
+
+        return task;
+    }
+
+    public Task getPreviousTask() {
+        Task task = null;
+        if (currentTaskIdx > 0) {
+            task = tasks.get(currentTaskIdx - 1);
+        }
+
+        return task;
+    }
+
+    public Task getNextTask() {
+        Task task = null;
+        if (currentTaskIdx < tasks.size() - 1) {
+            task = tasks.get(currentTaskIdx + 1);
+        }
+
+        return task;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public int getOverallTimeout() {
@@ -174,68 +179,6 @@ public abstract class Operation implements ResponseListener {
         return timeout;
     }
 
-    protected void processResponse(Response response) {
-        Task task = getCurrentTask();
-//        if (task != null && response != null
-//                && task.getTaskStatus() == TaskStatus.NEW && response.getType() != null
-//                && task.getUuid() != null && response.getTaskUuid() != null
-//                && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
-        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
-                || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
-            commandCount++;
-            if ((response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
-                    && response.getExitCode() == 0) || task.isIgnoreExitCode()) {
-                okCommandCount++;
-            }
-            task.setCompleted(commandCount == task.getCommands().size());
-            if (task.isCompleted()) {
-                if (commandCount == okCommandCount) {
-                    task.setTaskStatus(TaskStatus.SUCCESS);
-                    Util.saveTask(task);
-                } else {
-                    task.setTaskStatus(TaskStatus.FAIL);
-                    Util.saveTask(task);
-                    failed = true;
-                }
-            }
-        }
-//        }
-    }
-
-    protected void onTaskCompleted(Task task) {
-    }
-
-    protected void onTaskSucceeded(Task task) {
-    }
-
-    protected void onTaskFailed(Task task) {
-    }
-
-    protected void onOperationEnded() {
-    }
-
-    protected void onOperationStarted() {
-        appendOutput(MessageFormat.format("Operation \"{0}\" started.", getDescription()));
-    }
-
-    protected void onOperationStopped() {
-    }
-
-    protected void onBeforeTaskRun(Task task) {
-        appendOutput(MessageFormat.format(
-                "Running task {0}...",
-                task.getDescription()));
-        appendLog(MessageFormat.format(
-                "======= Task {0} =======",
-                task.getDescription()));
-        if (task.isIgnoreExitCode()) {
-            appendLog("======= Ignore ExitCode = TRUE =======");
-        }
-    }
-
-    protected void onAfterTaskRun(Task task) {
-    }
-
     protected void beforeResponseProcessed(Response response) {
 
         if (!Util.isStringEmpty(response.getStdOut())) {
@@ -254,15 +197,25 @@ public abstract class Operation implements ResponseListener {
         }
     }
 
-    protected void afterResponseProcessed(Response response) {
-    }
-
-    protected void fail() {
+    protected void processResponse(Response response) {
         Task task = getCurrentTask();
-        if (task != null) {
-            task.setTaskStatus(TaskStatus.FAIL);
-            Util.saveTask(task);
-            failed = true;
+        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+            commandCount++;
+            if ((response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                    && response.getExitCode() == 0) || task.isIgnoreExitCode()) {
+                okCommandCount++;
+            }
+            task.setCompleted(commandCount == task.getCommands().size());
+            if (task.isCompleted()) {
+                if (commandCount == okCommandCount) {
+                    task.setTaskStatus(TaskStatus.SUCCESS);
+                    Util.saveTask(task);
+                } else {
+                    task.setTaskStatus(TaskStatus.FAIL);
+                    Util.saveTask(task);
+                }
+            }
         }
     }
 
@@ -281,64 +234,97 @@ public abstract class Operation implements ResponseListener {
 
                 processResponse(response);
 
-                //task completed
                 if (task.isCompleted()) {
+                    //task completed
                     onTaskCompleted(task);
-                    //task succeeded or ignoreExitCode is true
-                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                        onTaskSucceeded(task);
-                        //check in case user failed the task in onTaskSucceeded
-                        if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                            setOutput(MessageFormat.format(
-                                    "Task {0} succeeded.",
-                                    task.getDescription()));
-                            //operation is not done yet
-                            if (!isCompleted()) {
-                                //check if stopped by user
-                                if (!isStopped()) {
-                                    //execute next task
 
-                                    executeNextTask();
-                                } // operation is stopped by user
-                                else {
-                                    appendOutput(MessageFormat.format(
-                                            "Stopped execution before task {0}.",
-                                            getNextTask().getDescription()));
-                                    onOperationStopped();
-                                }
-                                //operation is done
+                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                        //task succeeded or ignoreExitCode is true
+                        onTaskSucceeded(task);
+
+                        if (!isCompleted()) {
+                            //operation is not done yet
+                            if (!isStopped()) {
+                                //execute next task
+                                executeNextTask();
                             } else {
-                                appendOutput(MessageFormat.format(
-                                        "Operation \"{0}\" completed successfully.",
-                                        getDescription()));
-                                onOperationEnded();
+                                // operation is stopped by use
+                                onOperationStopped();
                             }
                         } else {
-                            //task failed -> operation failed & ended
-                            appendOutput(MessageFormat.format(
-                                    "Task {0} failed.\n\nOperation \"{1}\" aborted.",
-                                    task.getDescription(),
-                                    getDescription()));
-                            onTaskFailed(task);
+                            //operation is done
+                            succeeded = true;
                             onOperationEnded();
                         }
                     } else {
-                        //task failed -> operation failed & ended
-                        appendOutput(MessageFormat.format(
-                                "Task {0} failed.\n\nOperation \"{1}\" aborted.",
-                                task.getDescription(),
-                                getDescription()));
+                        //task failed -> operation failed
+                        failed = true;
                         onTaskFailed(task);
-                        onOperationEnded();
+                        onOperationFailed();
                     }
                 }
-
-                afterResponseProcessed(response);
 
             }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in onResponse", e);
         }
+    }
+
+    protected void onTaskCompleted(Task task) {
+    }
+
+    protected void onTaskSucceeded(Task task) {
+        appendOutput(MessageFormat.format(
+                "Task {0} succeeded.",
+                task.getDescription()));
+    }
+
+    protected void onTaskFailed(Task task) {
+        appendOutput(MessageFormat.format(
+                "Task {0} failed.",
+                task.getDescription()));
+    }
+
+    protected void onOperationEnded() {
+        appendOutput(MessageFormat.format(
+                "Operation \"{0}\" completed successfully.",
+                getDescription()));
+    }
+
+    protected void onOperationStarted() {
+        appendOutput(MessageFormat.format(
+                "Operation \"{0}\" started.",
+                getDescription()));
+    }
+
+    protected void onOperationStopped() {
+        appendOutput(MessageFormat.format(
+                "Stopped execution before task {0}.",
+                getNextTask().getDescription()));
+        appendOutput(MessageFormat.format(
+                "Operation \"{0}\" stopped.",
+                getDescription()));
+    }
+
+    protected void onOperationFailed() {
+        appendOutput(MessageFormat.format(
+                "Operation \"{0}\" aborted.",
+                getDescription()));
+    }
+
+    protected void onBeforeTaskRun(Task task) {
+        appendOutput(MessageFormat.format(
+                "Running task {0}...",
+                task.getDescription()));
+        appendLog(MessageFormat.format(
+                "======= Task {0} =======",
+                task.getDescription()));
+        if (task.isIgnoreExitCode()) {
+            appendLog("======= Ignore ExitCode = TRUE =======");
+        }
+    }
+
+    protected void onAfterTaskRun(Task task) {
     }
 
     public String getOutput() {
@@ -353,11 +339,11 @@ public abstract class Operation implements ResponseListener {
         }
     }
 
-    public void setOutput(String s) {
-        clearOutput();
-        appendOutput(s);
-    }
-
+//    public void setOutput(String s) {
+//        clearOutput();
+//        appendOutput(s);
+//    }
+//
     public void clearOutput() {
         output.setLength(0);
     }
@@ -374,11 +360,11 @@ public abstract class Operation implements ResponseListener {
         }
     }
 
-    public void setLog(String s) {
-        clearLog();
-        appendLog(s);
-    }
-
+//    public void setLog(String s) {
+//        clearLog();
+//        appendLog(s);
+//    }
+//
     public void clearLog() {
         log.setLength(0);
     }
