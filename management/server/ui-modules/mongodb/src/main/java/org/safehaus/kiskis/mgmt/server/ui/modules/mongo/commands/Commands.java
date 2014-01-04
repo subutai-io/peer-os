@@ -86,24 +86,19 @@ public class Commands {
         req.setTimeout(20);
         return cmd;
     }
+
     //execute on each selected lxc node
-    public static Command getKillNCleanCommand() {
+    public static Command getCleanCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/pkill");
+        req.setProgram("/bin/rm -R /var/lib/mongodb");
         req.setArgs(Arrays.asList(
-                "-9",
-                "-f",
-                //                "'mongod|ksks-mongo|mongos'"
-                "'mongod|mongos'",
-                ";",
-                "/bin/rm -R /var/lib/mongodb",
                 "&",
                 "/bin/rm -R /data/configdb",
                 "&",
                 "/bin/rm /etc/mongodb.conf",
                 "&",
-                "/bin/rm /var/log/mongodb/mongodb.log"
+                "/bin/rm -R /var/log/mongodb"
         ));
         req.setTimeout(20);
         return cmd;
