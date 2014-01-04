@@ -198,7 +198,7 @@ public class Commands {
         req.setArgs(Arrays.asList(
                 "--config",
                 "/etc/mongodb.conf",
-                ";sleep 10"
+                ";sleep 20"
         ));
         req.setTimeout(60);
         return cmd;

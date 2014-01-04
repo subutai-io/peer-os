@@ -27,6 +27,8 @@ public class Installer extends Operation {
 
     private final Task startConfigServersTask;
     private final Task startRoutersTask;
+    private final StringBuilder startConfigServersTaskOutput = new StringBuilder();
+    private final StringBuilder startRoutersTaskOutput = new StringBuilder();
 
     public Installer(InstallerConfig config) {
         super("Mongo Installation");
@@ -234,43 +236,21 @@ public class Installer extends Operation {
     }
 
     @Override
-    public void onTaskSucceeded(Task task) {
-        //PROCESS OUTPUT OF START CONFIG SERVERS HERE
-        //IF OK THEN NO-OP
-        //ELSE fail the task with custom output appended
-//        if (task == startConfigServersTask || task == startRoutersTask) {
-//            int j = 0;
-//            for (int i = 1; i <= task.getReqSeqNumber(); i++) {
-//                Response response = commandManager.getResponse(task.getUuid(), i);
-//                if (response != null && response.getStdOut() != null) {
-//                    if (response.getStdOut().contains("child process started successfully, parent exiting")) {
-//                        j++;
-//                    }
-//                }
-//            }
-//            if (j != task.getReqSeqNumber()) {
-//                fail();
-//                appendOutput(
-//                        MessageFormat.format("Could not succesfully execute task {0}.",
-//                                task.getDescription()));
-//            }
-//        }
-//        System.out.println("Task succeeded " + task);
-    }
-
-    /*
-     TODO:join responses in memory instead of polling db
-     */
-    @Override
     protected void beforeResponseProcessed(Response response) {
         Task task = getCurrentTask();
-        if (task == startConfigServersTask || task == startRoutersTask) {
-            Response wholeResponse = commandManager.getResponse(task.getUuid(), response.getRequestSequenceNumber());
-            if (wholeResponse != null && wholeResponse.getStdOut() != null) {
-                if (wholeResponse.getStdOut().contains("child process started successfully, parent exiting")) {
-                    response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
-                    response.setExitCode(0);
-                }
+        if ((task == startConfigServersTask || task == startRoutersTask) && response.getStdOut() != null) {
+            boolean isOk = false;
+            if (task == startConfigServersTask) {
+                startConfigServersTaskOutput.append(response.getStdOut());
+                isOk = startConfigServersTaskOutput.toString().contains("child process started successfully, parent exiting");
+            }
+            if (task == startRoutersTask) {
+                startRoutersTaskOutput.append(response.getStdOut());
+                isOk = startRoutersTaskOutput.toString().contains("child process started successfully, parent exiting");
+            }
+            if (isOk) {
+                response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
+                response.setExitCode(0);
             }
         }
 

@@ -32,9 +32,14 @@ public class CommandNotifier implements Runnable {
     public void run() {
         while (!Thread.interrupted()) {
             try {
-                if (!messagesQueue.isEmpty()) {
-                    Response[] responses = messagesQueue.toArray(new Response[messagesQueue.size()]);
-                    messagesQueue.clear();
+                Response[] responses = null;
+                synchronized (messagesQueue) {
+                    if (!messagesQueue.isEmpty()) {
+                        responses = messagesQueue.toArray(new Response[messagesQueue.size()]);
+                        messagesQueue.clear();
+                    }
+                }
+                if (responses != null) {
                     for (Response response : responses) {
                         notifyListeners(response);
                     }
