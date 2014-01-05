@@ -162,7 +162,7 @@ public class Installer extends Operation {
         StringBuilder configServersArg = new StringBuilder();
         for (Agent agent : config.getConfigServers()) {
             configServersArg.append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
-                    append(":").append(Constants.MONGO_CONFIG_SERVER_PORT).append(",");
+                    append(":").append(Constants.CONFIG_SRV_PORT).append(",");
         }
         //drop comma
         if (configServersArg.length() > 0) {
@@ -200,7 +200,7 @@ public class Installer extends Operation {
             if (agent != primaryNode) {
                 secondaryStr.append("rs.add('").
                         append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
-                        append(":").append(Constants.MONGO_RS_PORT).append("');");
+                        append(":").append(Constants.DATA_NODE_PORT).append("');");
             }
         }
         {
@@ -220,7 +220,7 @@ public class Installer extends Operation {
         for (Agent rs : config.getDataNodes()) {
             shards.append("sh.addShard('").append(config.getReplicaSetName()).
                     append("/").append(rs.getHostname()).append(Constants.DOMAIN).
-                    append(":").append(Constants.MONGO_RS_PORT).append("');");
+                    append(":").append(Constants.DATA_NODE_PORT).append("');");
         }
         {
             Command cmd = Commands.getRegisterShardsWithRouterCommand(

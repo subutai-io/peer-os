@@ -91,14 +91,18 @@ public class Commands {
     public static Command getCleanCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/bin/rm -R /var/lib/mongodb");
+        req.setProgram("/bin/rm -R");
         req.setArgs(Arrays.asList(
+                Constants.MONGO_DIR,
                 "&",
-                "/bin/rm -R /data/configdb",
+                "/bin/rm -R",
+                Constants.CONFIG_DIR,
                 "&",
-                "/bin/rm /etc/mongodb.conf",
+                "/bin/rm",
+                Constants.DATA_NODE_CONF_FILE,
                 "&",
-                "/bin/rm -R /var/log/mongodb"
+                "/bin/rm -R",
+                Constants.LOG_DIR
         ));
         req.setTimeout(20);
         return cmd;
@@ -112,7 +116,7 @@ public class Commands {
         req.setArgs(Arrays.asList(
                 "-i",
                 String.format("'s/# replSet = setname/replSet = %s/1'", replicaSetName),//replace placeholder with actual data
-                "'/etc/mongodb.conf'"
+                String.format("'%s'", Constants.DATA_NODE_CONF_FILE)
         ));
         req.setTimeout(30);
         return cmd;
@@ -168,7 +172,7 @@ public class Commands {
                 "--host",
                 routerHost, //supply any one router host
                 "--port",
-                Constants.MONGO_ROUTER_PORT + "", //supply router port                
+                Constants.ROUTER_PORT + "", //supply router port                
                 "--eval",
                 String.format("\"%s\"", shards)
         ));
@@ -183,13 +187,13 @@ public class Commands {
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--port",
-                Constants.MONGO_RS_PORT + "",
+                Constants.DATA_NODE_PORT + "",
                 "--eval",
                 "\"rs.initiate();\"",
                 ";sleep 120;",
                 "mongo",
                 "--port",
-                Constants.MONGO_RS_PORT + "",
+                Constants.DATA_NODE_PORT + "",
                 "--eval",
                 String.format("\"%s\"", secondaryNodes)
         ));
@@ -204,7 +208,7 @@ public class Commands {
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--port",
-                Constants.MONGO_ROUTER_PORT + "",
+                Constants.ROUTER_PORT + "",
                 "--eval",
                 String.format("\"%s\"", shards)
         ));
@@ -220,17 +224,17 @@ public class Commands {
         req.setProgram("/bin/mkdir");
         req.setArgs(Arrays.asList(
                 "-p",
-                "/data/configdb",
+                Constants.CONFIG_DIR,
                 ";",
                 "mongod",
                 "--configsvr",
                 "--dbpath",
-                "/data/configdb",
+                Constants.CONFIG_DIR,
                 "--port",
-                Constants.MONGO_CONFIG_SERVER_PORT + "", // this might be user-supplied
+                Constants.CONFIG_SRV_PORT + "", // this might be user-supplied
                 "--fork",
                 "--logpath",
-                "/var/log/mongodb/mongodb.log"
+                String.format("%s/mongodb.log", Constants.LOG_DIR)
         //                        "--logappend"
         ));
         req.setTimeout(120);
@@ -246,10 +250,10 @@ public class Commands {
                 "--configdb",
                 configServersArg,
                 "--port",
-                Constants.MONGO_ROUTER_PORT + "",
+                Constants.ROUTER_PORT + "",
                 "--fork",
                 "--logpath",
-                "/var/log/mongodb/mongodb.log"
+                String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
         req.setTimeout(120);
         return cmd;
@@ -262,12 +266,12 @@ public class Commands {
         req.setProgram("mongod");
         req.setArgs(Arrays.asList(
                 "--config",
-                "/etc/mongodb.conf",
+                Constants.DATA_NODE_CONF_FILE,
                 "--port",
-                Constants.MONGO_RS_PORT + "",
+                Constants.DATA_NODE_PORT + "",
                 "--fork",
                 "--logpath",
-                "/var/log/mongodb/mongodb.log"
+                String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
         req.setTimeout(180);
         return cmd;
