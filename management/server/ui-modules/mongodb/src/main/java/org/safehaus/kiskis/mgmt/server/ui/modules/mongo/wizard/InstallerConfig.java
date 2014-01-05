@@ -19,7 +19,7 @@ public class InstallerConfig implements Config {
     private String replicaSetName = "";
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
-    private Set<Agent> shards;
+    private Set<Agent> dataNodes;
     private Set<Agent> selectedAgents;
 
     public String getReplicaSetName() {
@@ -54,12 +54,12 @@ public class InstallerConfig implements Config {
         this.routerServers = routerServers;
     }
 
-    public Set<Agent> getShards() {
-        return shards;
+    public Set<Agent> getDataNodes() {
+        return dataNodes;
     }
 
-    public void setShards(Set<Agent> shards) {
-        this.shards = shards;
+    public void setDataNodes(Set<Agent> dataNodes) {
+        this.dataNodes = dataNodes;
     }
 
     public Set<Agent> getSelectedAgents() {
@@ -72,7 +72,7 @@ public class InstallerConfig implements Config {
 
     @Override
     public String toString() {
-        return "MongoConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routerServers=" + routerServers + ", shards=" + shards + ", selectedAgents=" + selectedAgents + '}';
+        return "MongoConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + ", selectedAgents=" + selectedAgents + '}';
     }
 
     public void reset() {
@@ -80,7 +80,7 @@ public class InstallerConfig implements Config {
         replicaSetName = "";
         configServers = null;
         routerServers = null;
-        shards = null;
+        dataNodes = null;
         selectedAgents = null;
     }
 

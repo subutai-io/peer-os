@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -17,6 +18,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -56,6 +59,12 @@ public class Step2 extends Panel {
         clusterNameTxtFld.setInputPrompt("Cluster name");
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength(20);
+        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
+            }
+        });
 
         mainContent.addComponent(clusterNameTxtFld);
 
@@ -64,7 +73,9 @@ public class Step2 extends Panel {
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         mainContent.addComponent(configServersLabel);
 
+        final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
+
         configServersColSel.setItemCaptionPropertyId("hostname");
         configServersColSel.setRows(7);
         configServersColSel.setNullSelectionAllowed(true);
@@ -74,6 +85,17 @@ public class Step2 extends Panel {
         configServersColSel.setRightColumnCaption("Config Servers");
         configServersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         configServersColSel.setRequired(true);
+        configServersColSel.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                wizard.getConfig().setConfigServers(agentList);
+                //clean 
+//                Set<Agent> routers = new HashSet<Agent>((Set< Agent>) routersColSel.getValue());
+//                routers.removeAll(agentList);
+//                routersColSel.setValue(routers);
+            }
+        });
 
         mainContent.addComponent(configServersColSel);
 
@@ -82,7 +104,6 @@ public class Step2 extends Panel {
         routersLabel.setContentMode(Label.CONTENT_XHTML);
         mainContent.addComponent(routersLabel);
 
-        final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         routersColSel.setItemCaptionPropertyId("hostname");
         routersColSel.setRows(7);
         routersColSel.setNullSelectionAllowed(true);
@@ -92,6 +113,13 @@ public class Step2 extends Panel {
         routersColSel.setRightColumnCaption("Routers");
         routersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         routersColSel.setRequired(true);
+        routersColSel.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                wizard.getConfig().setRouterServers(agentList);
+            }
+        });
 
         mainContent.addComponent(routersColSel);
 

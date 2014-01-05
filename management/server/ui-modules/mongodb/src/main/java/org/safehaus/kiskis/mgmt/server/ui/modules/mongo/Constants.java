@@ -12,8 +12,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 public class Constants {
 
     public static final int MONGO_CONFIG_SERVER_PORT = 27019;
-    public static final int MONGO_ROUTER_PORT = 27017;
-    public static final int MONGO_SHARD_PORT = 27017;
+    public static final int MONGO_ROUTER_PORT = 27018;
+    public static final int MONGO_RS_PORT = 27017;
     public static final String DOMAIN = ".intra.lan";
 
 }

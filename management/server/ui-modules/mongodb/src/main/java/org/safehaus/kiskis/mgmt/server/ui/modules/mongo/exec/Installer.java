@@ -41,7 +41,7 @@ public class Installer extends Operation {
         Set<Agent> allClusterMembers = new HashSet<Agent>();
         allClusterMembers.addAll(config.getConfigServers());
         allClusterMembers.addAll(config.getRouterServers());
-        allClusterMembers.addAll(config.getShards());
+        allClusterMembers.addAll(config.getDataNodes());
 
         //KILL && UNINSTALL MONGO
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
@@ -101,19 +101,30 @@ public class Installer extends Operation {
         //ADD HOST NAME OF EACH NODE TO OTHER NODE'S /ETC/HOSTS FILE
         Task addNodesIpHostToOtherNodesTask = Util.createTask("Register nodes's IP-Host with other nodes");
         for (Agent agent : allClusterMembers) {
-            StringBuilder hosts = new StringBuilder();
+            StringBuilder cleanHosts = new StringBuilder();
+            StringBuilder appendHosts = new StringBuilder();
             for (Agent otherAgent : allClusterMembers) {
                 if (agent != otherAgent) {
-                    hosts.append("if ! /bin/grep -q '").
-                            append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK)).
-                            append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN).
+                    String ip = Util.getAgentIpByMask(otherAgent, Common.IP_MASK);
+                    String hostname = otherAgent.getHostname();
+                    cleanHosts.append(ip).append("|").append(hostname).append("|");
+                    appendHosts.append("if ! /bin/grep -q '").
+                            append(ip).
+                            append(" ").append(hostname).append(Constants.DOMAIN).
                             append("' '/etc/hosts'; then /bin/echo '").
-                            append(Util.getAgentIpByMask(otherAgent, Common.IP_MASK)).
-                            append(" ").append(otherAgent.getHostname()).append(Constants.DOMAIN).
+                            append(ip).
+                            append(" ").append(hostname).append(Constants.DOMAIN).
                             append("' >> '/etc/hosts'; fi ;");
                 }
             }
-            Command cmd = Commands.getAddNodesIpHostToOtherNodesCommand(hosts.toString());
+            if (cleanHosts.length() > 0) {
+                //drop pipe | symbol
+                cleanHosts.setLength(cleanHosts.length() - 1);
+                cleanHosts.insert(0, "egrep -v '");
+                cleanHosts.append("' /etc/hosts > tmp; mv tmp /etc/hosts;");
+                appendHosts.insert(0, cleanHosts);
+            }
+            Command cmd = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(addNodesIpHostToOtherNodesTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(addNodesIpHostToOtherNodesTask.getIncrementedReqSeqNumber());
@@ -122,9 +133,9 @@ public class Installer extends Operation {
         }
         addTask(addNodesIpHostToOtherNodesTask);
 
-        //ADD REPLICA SET NAME TO CONFIG OF EACH SHARD
-        Task setReplicaSetNameTask = Util.createTask(String.format("Set Replica Set name to %s", config.getReplicaSetName()));
-        for (Agent agent : config.getShards()) {
+        //ADD REPLICA SET NAME TO CONFIG OF EACH RS
+        Task setReplicaSetNameTask = Util.createTask(String.format("Set replica set name to %s", config.getReplicaSetName()));
+        for (Agent agent : config.getDataNodes()) {
             Command cmd = Commands.getSetReplicaSetNameCommand(config.getReplicaSetName());
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
@@ -168,9 +179,9 @@ public class Installer extends Operation {
         addTask(startRoutersTask);
 
         //START SHARDS
-        startShardsTask = Util.createTask("Start shards");
-        for (Agent agent : config.getShards()) {
-            Command cmd = Commands.getStartNodeCommand2();
+        startShardsTask = Util.createTask("Start replica set");
+        for (Agent agent : config.getDataNodes()) {
+            Command cmd = Commands.getStartNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startShardsTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startShardsTask.getIncrementedReqSeqNumber());
@@ -179,14 +190,37 @@ public class Installer extends Operation {
         }
         addTask(startShardsTask);
 
-        //REGISTER SHARDS WITH ONE OF THE ROUTERS
-        Task registerShardsWithRouterTask = Util.createTask("Register shards with router");
+        //choose the first shard as primary node
+        Agent primaryNode = config.getDataNodes().iterator().next();
+
+        //REGISTER SECONDARY NODES WITH PRIMARY
+        Task registerSecondaryNodesWithPrimaryTask = Util.createTask("Register secondary nodes with primary");
+        StringBuilder secondaryStr = new StringBuilder();
+        for (Agent agent : config.getDataNodes()) {
+            if (agent != primaryNode) {
+                secondaryStr.append("rs.add('").
+                        append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
+                        append(":").append(Constants.MONGO_RS_PORT).append("');");
+            }
+        }
+        {
+            Command cmd = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString());
+            cmd.getRequest().setUuid(primaryNode.getUuid());
+            cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
+        }
+        addTask(registerSecondaryNodesWithPrimaryTask);
+
+        //REGISTER PRIMARY NODE OF REPLICA SET AS SHARD WITH ONE OF THE ROUTERS
+        Task registerShardsWithRouterTask = Util.createTask("Register shard with router");
         Agent router = config.getRouterServers().iterator().next();
         StringBuilder shards = new StringBuilder();
-        for (Agent shard : config.getShards()) {
+        for (Agent rs : config.getDataNodes()) {
             shards.append("sh.addShard('").append(config.getReplicaSetName()).
-                    append("/").append(shard.getHostname()).append(Constants.DOMAIN).
-                    append(":").append(Constants.MONGO_SHARD_PORT).append("');");
+                    append("/").append(rs.getHostname()).append(Constants.DOMAIN).
+                    append(":").append(Constants.MONGO_RS_PORT).append("');");
         }
         {
             Command cmd = Commands.getRegisterShardsWithRouterCommand(
@@ -199,32 +233,6 @@ public class Installer extends Operation {
         }
         addTask(registerShardsWithRouterTask);
 
-        /*
-
-         //choose the first shard as primary node
-         Agent primaryNode = config.getShards().iterator().next();
-
-         //REGISTER SECONDARY NODES WITH PRIMARY
-         Task registerSecondaryNodesWithPrimaryTask = Util.createTask("Register secondary nodes with primary");
-         StringBuilder secondaryStr = new StringBuilder();
-         for (Agent agent : config.getShards()) {
-         if (agent != primaryNode) {
-         secondaryStr.append("rs.add('").
-         append(agent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
-         append("');");
-         }
-         }
-         cmd = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString());
-         cmd.getRequest().setUuid(primaryNode.getUuid());
-         cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
-         cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
-         cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-         registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
-         addTask(registerSecondaryNodesWithPrimaryTask);
-
-
-
-         */
     }
 
     @Override

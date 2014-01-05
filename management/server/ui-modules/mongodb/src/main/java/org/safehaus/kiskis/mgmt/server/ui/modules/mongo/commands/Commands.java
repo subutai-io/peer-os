@@ -104,53 +104,6 @@ public class Commands {
         return cmd;
     }
 
-    //JOIN ALL CLEANUP COMMANDS INTO ONE
-    public static Command getRemoveDataDirCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/rm");
-        req.setArgs(Arrays.asList(
-                "-R",
-                "/var/lib/mongodb"
-        ));
-        req.setTimeout(30);
-        return cmd;
-    }
-
-    public static Command getRemoveConfDirCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/rm");
-        req.setArgs(Arrays.asList(
-                "-R",
-                "/data/configdb"
-        ));
-        req.setTimeout(30);
-        return cmd;
-    }
-
-    public static Command getRemoveReplicaConfFileCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/rm");
-        req.setArgs(Arrays.asList(
-                "/etc/mongodb.conf"
-        ));
-        req.setTimeout(30);
-        return cmd;
-    }
-
-    public static Command getRemoveLogFileCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/rm");
-        req.setArgs(Arrays.asList(
-                "/var/log/mongodb/mongodb.log"
-        ));
-        req.setTimeout(30);
-        return cmd;
-    }
-
     //execute on each replica
     public static Command getSetReplicaSetNameCommand(String replicaSetName) {
         Command cmd = getTemplate();
@@ -206,79 +159,8 @@ public class Commands {
         return cmd;
     }
 
-    //execute on primary replica
-    public static Command getSetPrimaryShardConfigCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("mongod");
-        req.setArgs(Arrays.asList(
-                "--config",
-                "/etc/mongodb.conf"
-        ));
-        req.setTimeout(60);
-        return cmd;
-    }
-
-    //execute on primary replica
-    public static Command getAddSecondaryReplicasToPrimaryCommand(String secondaryNodes) {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/echo");
-        req.setArgs(Arrays.asList(
-                "-e",
-                String.format("\"'rs.initiate()'%s\"", secondaryNodes),
-                //add each secondary node newline-separated and replace placeholder
-                //e.g.: [\n'rs.add(\":NON_PRIMARY_REPLICA_HOST\")']
-                "|",
-                "mongo"
-        ));
-        req.setTimeout(30);
-        return cmd;
-    }
-
-    //execute on primary replica
-    //used for adding shard to existing cluster
-    public static Command getAddSecondaryReplicasToPrimaryExistCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("mongod");
-        req.setArgs(Arrays.asList(
-                "--config",
-                "/etc/mongodb.conf",
-                "&&",
-                "/bin/echo",
-                "-e",
-                ":SECONDARY_REPLICAS",
-                //add each secondary node newline-separated and replace placeholder
-                //e.g.: [\n'rs.add(\":NON_PRIMARY_REPLICA_HOST\")']
-                "|",
-                "mongo"
-        ));
-        req.setTimeout(30);
-        return cmd;
-    }
-
-    //execute on any cluster member
-    public static Command getRegisterPrimaryOnRouterCommand(String replicaSetName, String primaryHost, String routerHost) {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/echo");
-        req.setArgs(Arrays.asList(
-                String.format("'sh.addShard(\"%s/%s:%s\")'",
-                        replicaSetName, primaryHost, Constants.MONGO_SHARD_PORT),
-                "|",
-                "mongo",
-                "--host",
-                routerHost, //supply any one router host
-                "--port",
-                Constants.MONGO_ROUTER_PORT + "" //supply router port
-        ));
-        req.setTimeout(60);
-        return cmd;
-    }
-
     //execute on any router member
-    public static Command getRegisterShardWithRouterCommand(String routerHost, String shards) {
+    public static Command getRegisterShardWithRouterCommand2(String routerHost, String shards) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");
@@ -298,14 +180,20 @@ public class Commands {
     public static Command getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("sleep 300");
+        req.setProgram("mongo");
         req.setArgs(Arrays.asList(
-                ";",
-                "mongo",
+                "--port",
+                Constants.MONGO_RS_PORT + "",
                 "--eval",
-                String.format("\"rs.initiate();%s\"", secondaryNodes)
+                "\"rs.initiate();\"",
+                ";sleep 120;",
+                "mongo",
+                "--port",
+                Constants.MONGO_RS_PORT + "",
+                "--eval",
+                String.format("\"%s\"", secondaryNodes)
         ));
-        req.setTimeout(360);
+        req.setTimeout(180);
         return cmd;
     }
 
@@ -315,6 +203,8 @@ public class Commands {
         Request req = cmd.getRequest();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
+                "--port",
+                Constants.MONGO_ROUTER_PORT + "",
                 "--eval",
                 String.format("\"%s\"", shards)
         ));
@@ -355,12 +245,11 @@ public class Commands {
         req.setArgs(Arrays.asList(
                 "--configdb",
                 configServersArg,
+                "--port",
+                Constants.MONGO_ROUTER_PORT + "",
                 "--fork",
                 "--logpath",
                 "/var/log/mongodb/mongodb.log"
-        //add config servers (with ports) based on user selection, comma-separated
-        //e.g.: cfg0.example.net:27019,cfg1.example.net:27019,cfg2.example.net:27019
-        //and replace placeholder
         ));
         req.setTimeout(120);
         return cmd;
@@ -370,79 +259,17 @@ public class Commands {
     public static Command getStartNodeCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/service");
-        req.setArgs(Arrays.asList(
-                "mongodb",
-                "start"
-        ));
-        req.setTimeout(180);
-        return cmd;
-    }
-
-    //execute on shard
-    public static Command getStartNodeCommand2() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
         req.setProgram("mongod");
         req.setArgs(Arrays.asList(
                 "--config",
                 "/etc/mongodb.conf",
+                "--port",
+                Constants.MONGO_RS_PORT + "",
                 "--fork",
                 "--logpath",
                 "/var/log/mongodb/mongodb.log"
         ));
-        req.setTimeout(120);
-        return cmd;
-    }
-
-    //execute on shard
-    public static Command getStopNodeCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/service");
-        req.setArgs(Arrays.asList(
-                "mongodb",
-                "stop"
-        ));
-        req.setTimeout(90);
-        return cmd;
-    }
-
-    //execute on shard
-    public static Command getRestartNodeCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/service");
-        req.setArgs(Arrays.asList(
-                "mongodb",
-                "restart"
-        ));
         req.setTimeout(180);
-        return cmd;
-    }
-
-    //execute on shard
-    public static Command getNodeStatusCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/service");
-        req.setArgs(Arrays.asList(
-                "mongodb",
-                "status"//output shall contain [mongodb start/running] or [mongodb stop/waiting]
-        ));
-        req.setTimeout(10);
-        return cmd;
-    }
-
-    //execute on any cluster member
-    public static Command getCheckVersionCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("mongo");
-        req.setArgs(Arrays.asList(
-                "--version"//output shall contain [MongoDB shell version]
-        ));
-        req.setTimeout(10);
         return cmd;
     }
 
@@ -456,43 +283,6 @@ public class Commands {
                 ":MONGO_HOST", //supply host of node under examination
                 "--port",
                 ":MONGO_PORT" //supply port of node under examination
-        ));
-        req.setTimeout(30);
-        return cmd;
-    }
-
-    //execute on any cluster member
-    public static Command getShutdownMongodCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("mongod");
-        req.setArgs(Arrays.asList(
-                "--shutdown"
-        ));
-        req.setTimeout(60);
-        return cmd;
-    }
-
-    //execute on any cluster member
-    public static Command getShutdownMongod2Command() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/kill");
-        req.setArgs(Arrays.asList(
-                "-2",
-                "`pgrep -f mongod`"
-        ));
-        req.setTimeout(10);
-        return cmd;
-    }
-
-    public static Command getForceKillMongodCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/bin/kill");
-        req.setArgs(Arrays.asList(
-                "-9",
-                "`pgrep -f mongod`"
         ));
         req.setTimeout(30);
         return cmd;

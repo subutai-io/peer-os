@@ -27,7 +27,7 @@ public class Uninstaller extends Operation {
         Set<Agent> allClusterMembers = new HashSet<Agent>();
         allClusterMembers.addAll(config.getConfigServers());
         allClusterMembers.addAll(config.getRouterServers());
-        allClusterMembers.addAll(config.getShards());
+        allClusterMembers.addAll(config.getDataNodes());
 
         //UNINSTALL MONGO
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");

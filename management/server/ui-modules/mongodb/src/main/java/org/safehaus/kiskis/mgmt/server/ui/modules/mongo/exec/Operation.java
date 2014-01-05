@@ -317,7 +317,7 @@ public abstract class Operation implements ResponseListener {
                 "Running task {0}...",
                 task.getDescription()));
         appendLog(MessageFormat.format(
-                "======= Task {0} =======",
+                "======= {0} =======",
                 task.getDescription()));
         if (task.isIgnoreExitCode()) {
             appendLog("======= Ignore ExitCode = TRUE =======");
