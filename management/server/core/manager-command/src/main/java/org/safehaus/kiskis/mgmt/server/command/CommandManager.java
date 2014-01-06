@@ -113,7 +113,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
                     final ReentrantLock lock = listenerEntry.getValue();
                     if (response != null && response.getSource() != null
                             && listener.getName().equalsIgnoreCase(response.getSource())) {
-                        notifierExecService.submit(new ResponseNotifier(lock, listener, response));
+                        notifierExecService.execute(new ResponseNotifier(lock, listener, response));
                     }
                 } else {
                     it.remove();
