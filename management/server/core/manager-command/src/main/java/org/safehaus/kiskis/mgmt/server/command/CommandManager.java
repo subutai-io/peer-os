@@ -108,8 +108,8 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             for (final Iterator<Entry<CommandListener, ReentrantLock>> it = listeners.entrySet().iterator(); it.hasNext();) {
                 Entry<CommandListener, ReentrantLock> listenerEntry = it.next();
                 System.out.println("Iterating listener " + listenerEntry.getKey().getName());
-                if (listenerEntry != null && listenerEntry.getKey() != null
-                        && listenerEntry.getValue() != null && listenerEntry.getKey().getName() != null) {
+                if (listenerEntry.getKey() != null && listenerEntry.getValue() != null
+                        && listenerEntry.getKey().getName() != null) {
                     final CommandListener listener = listenerEntry.getKey();
                     final ReentrantLock lock = listenerEntry.getValue();
                     System.out.println("Trying to notify listener " + listener.getName());

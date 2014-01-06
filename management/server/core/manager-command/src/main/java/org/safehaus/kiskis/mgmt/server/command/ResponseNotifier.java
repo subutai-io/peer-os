@@ -30,13 +30,16 @@ public class ResponseNotifier implements Runnable {
     }
 
     public void run() {
+        System.out.println("Reponse notifier before lock");
         lock.lock();
         try {
+            System.out.println("Reponse notifier inside lock");
             listener.onCommand(response);
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error notifying response listener", e);
         } finally {
             lock.unlock();
+            System.out.println("Reponse notifier after lock");
         }
     }
 
