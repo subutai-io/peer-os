@@ -32,9 +32,6 @@ public class Installer extends Operation {
     private final StringBuilder startRoutersTaskOutput = new StringBuilder();
     private final StringBuilder startShardsTaskOutput = new StringBuilder();
 
-    /*
-     TODO: separate tasks for kill, clean and uninstall commands
-     */
     public Installer(InstallerConfig config) {
         super("Mongo Installation");
 
@@ -87,7 +84,6 @@ public class Installer extends Operation {
         //STOP MONGODB ON ALL NODES
         Task stopMongoOnAllNodes = Util.createTask("Stop Mongo on all nodes");
         for (Agent agent : allClusterMembers) {
-//            Command cmd = Commands.getStopNodeCommand();
             Command cmd = Commands.getKillAllCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(stopMongoOnAllNodes.getUuid());
@@ -121,7 +117,7 @@ public class Installer extends Operation {
                 //drop pipe | symbol
                 cleanHosts.setLength(cleanHosts.length() - 1);
                 cleanHosts.insert(0, "egrep -v '");
-                cleanHosts.append("' /etc/hosts > tmp; mv tmp /etc/hosts;");
+                cleanHosts.append("' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;");
                 appendHosts.insert(0, cleanHosts);
             }
             Command cmd = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
