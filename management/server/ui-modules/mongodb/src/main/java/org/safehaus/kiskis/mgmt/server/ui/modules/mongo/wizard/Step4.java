@@ -101,8 +101,8 @@ public class Step4 extends Panel implements ResponseListener {
                     this.operation.stop();
                     this.operation = null;
                 }
+                this.operation = operation;
                 if (operation.start()) {
-                    this.operation = operation;
                     showProgress();
                     addOutput(operation.getOutput());
                     addLog(operation.getLog());
@@ -129,6 +129,7 @@ public class Step4 extends Panel implements ResponseListener {
                     });
                     operationTimeoutThread.start();
                 } else {
+                    this.operation = null;
                     addOutput(MessageFormat.format(
                             "Operation \"{0}\" could not be started: {1}.",
                             operation.getDescription(),
