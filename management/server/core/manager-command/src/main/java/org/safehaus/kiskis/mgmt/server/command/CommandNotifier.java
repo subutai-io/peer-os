@@ -68,24 +68,24 @@ public class CommandNotifier implements Runnable {
                     final ReentrantLock lock = listenerEntry.getValue();
                     if (response != null && response.getSource() != null
                             && listener.getName().equals(response.getSource())) {
-                        try {
-                            Thread exec = new Thread(new Runnable() {
+//                        try {
+                        Thread exec = new Thread(new Runnable() {
 
-                                public void run() {
-                                    lock.lock();
-                                    try {
-                                        listener.onCommand(response);
-                                    } finally {
-                                        lock.unlock();
-                                    }
+                            public void run() {
+                                lock.lock();
+                                try {
+                                    listener.onCommand(response);
+                                } finally {
+                                    lock.unlock();
                                 }
-                            });
-                            exec.start();
+                            }
+                        });
+                        exec.start();
 //                            listener.onCommand(response);
-                        } catch (Exception e) {
-                            it.remove();
-                            LOG.log(Level.SEVERE, "Error notifying response listeners, removing faulting listener", e);
-                        }
+//                        } catch (Exception e) {
+//                            it.remove();
+//                            LOG.log(Level.SEVERE, "Error notifying response listeners, removing faulting listener", e);
+//                        }
                     }
                 } else {
                     it.remove();
