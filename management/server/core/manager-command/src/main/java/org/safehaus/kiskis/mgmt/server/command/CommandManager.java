@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -30,7 +29,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
     private final Map<CommandListener, ReentrantLock> listeners = new ConcurrentHashMap<CommandListener, ReentrantLock>();
-    private ExecutorService notifierExecService;
+    private SerialExecutor notifierExecService;
 //    private CommandNotifier commandNotifier;
 
     @Override
@@ -89,7 +88,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void init() {
         try {
             if (communicationService != null) {
-                notifierExecService = Executors.newCachedThreadPool();
+                notifierExecService = new SerialExecutor(Executors.newCachedThreadPool());
 //                exec = Executors.newSingleThreadExecutor();
 //                commandNotifier = new CommandNotifier(listeners);
 //                exec.execute(commandNotifier);
