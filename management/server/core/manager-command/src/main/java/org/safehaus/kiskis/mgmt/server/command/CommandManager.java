@@ -15,7 +15,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +27,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
 //    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
-    private final Map<CommandListener, ReentrantLock> listeners = new ConcurrentHashMap<CommandListener, ReentrantLock>();
+    private final Map<CommandListener, ExecutorService> listeners = new ConcurrentHashMap<CommandListener, ExecutorService>();
     private ExecutorService notifierExecService;
     private CommandNotifier commandNotifier;
 
@@ -63,7 +62,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void addListener(CommandListener listener) {
         try {
             LOG.log(Level.INFO, "Adding module listener : {0}", listener.getName());
-            listeners.put(listener, new ReentrantLock(true));
+            listeners.put(listener, Executors.newSingleThreadExecutor());
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
         }
@@ -73,7 +72,8 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void removeListener(CommandListener listener) {
         try {
             LOG.log(Level.INFO, "Removing module listener : {0}", listener.getName());
-            listeners.remove(listener);
+            ExecutorService exec = listeners.remove(listener);
+            exec.shutdown();
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in removeListener", ex);
         }
@@ -97,6 +97,11 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void destroy() {
         try {
             notifierExecService.shutdown();
+
+            for (Map.Entry<CommandListener, ExecutorService> entry : listeners.entrySet()) {
+                entry.getValue().shutdown();
+            }
+
             if (communicationService != null) {
                 communicationService.removeListener(this);
             }
