@@ -7,7 +7,9 @@ package org.safehaus.kiskis.mgmt.server.command;
 
 import com.google.common.collect.EvictingQueue;
 import java.util.Iterator;
-import java.util.Queue;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -22,9 +24,9 @@ public class CommandNotifier implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(CommandNotifier.class.getName());
     private final EvictingQueue<Response> messagesQueue = EvictingQueue.create(Common.MAX_PENDING_MESSAGE_QUEUE_LENGTH);
-    private final Queue<CommandListener> listeners;
+    private final Map<CommandListener, ReentrantLock> listeners;
 
-    public CommandNotifier(Queue<CommandListener> listeners) {
+    public CommandNotifier(Map<CommandListener, ReentrantLock> listeners) {
         this.listeners = listeners;
     }
 
@@ -56,14 +58,30 @@ public class CommandNotifier implements Runnable {
         }
     }
 
-    private void notifyListeners(Response response) {
+    private void notifyListeners(final Response response) {
         try {
-            for (Iterator<CommandListener> it = listeners.iterator(); it.hasNext();) {
-                CommandListener listener = it.next();
-                if (listener != null && listener.getName() != null) {
-                    if (response != null && response.getSource() != null && listener.getName().equals(response.getSource())) {
+            for (Iterator<Entry<CommandListener, ReentrantLock>> it = listeners.entrySet().iterator(); it.hasNext();) {
+                Entry<CommandListener, ReentrantLock> listenerEntry = it.next();
+                if (listenerEntry != null && listenerEntry.getKey() != null
+                        && listenerEntry.getValue() != null && listenerEntry.getKey().getName() != null) {
+                    final CommandListener listener = listenerEntry.getKey();
+                    final ReentrantLock lock = listenerEntry.getValue();
+                    if (response != null && response.getSource() != null
+                            && listener.getName().equals(response.getSource())) {
                         try {
-                            listener.onCommand(response);
+                            Thread exec = new Thread(new Runnable() {
+
+                                public void run() {
+                                    lock.lock();
+                                    try {
+                                        listener.onCommand(response);
+                                    } finally {
+                                        lock.unlock();
+                                    }
+                                }
+                            });
+                            exec.start();
+//                            listener.onCommand(response);
                         } catch (Exception e) {
                             it.remove();
                             LOG.log(Level.SEVERE, "Error notifying response listeners, removing faulting listener", e);

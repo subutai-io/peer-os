@@ -10,11 +10,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +27,8 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
+//    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
+    private final Map<CommandListener, ReentrantLock> listeners = new ConcurrentHashMap<CommandListener, ReentrantLock>();
     private ExecutorService notifierExecService;
     private CommandNotifier commandNotifier;
 
@@ -61,7 +63,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void addListener(CommandListener listener) {
         try {
             LOG.log(Level.INFO, "Adding module listener : {0}", listener.getName());
-            listeners.add(listener);
+            listeners.put(listener, new ReentrantLock(true));
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
         }
