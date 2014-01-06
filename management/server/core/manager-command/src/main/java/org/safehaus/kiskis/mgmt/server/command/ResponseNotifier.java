@@ -31,12 +31,15 @@ public class ResponseNotifier implements Runnable {
 
     public void run() {
         lock.lock();
+        System.out.println("BEFORE LOCK");
         try {
+            System.out.println("INSIDE LOCK " + response);
             listener.onCommand(response);
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error notifying response listener", e);
         } finally {
             lock.unlock();
+            System.out.println("AFTER LOCK");
         }
     }
 
