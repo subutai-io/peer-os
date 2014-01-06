@@ -158,11 +158,8 @@ public class Step4 extends Panel implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        System.out.println("PROCESSING RESPONSE 1");
-
         if (operation != null) {
             try {
-                System.out.println("PROCESSING RESPONSE 2");
                 operation.onResponse(response);
                 addOutput(operation.getOutput());
                 addLog(operation.getLog());

@@ -153,7 +153,6 @@ public class NodesWindow extends Window {
     }
 
     public void setOutput(Response response) {
-        System.out.println("setoutput" + response.getTaskUuid());
         for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true)) {
             terminal.setValue(pr.getResponse().getStdOut());
         }
