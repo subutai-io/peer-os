@@ -32,6 +32,8 @@ public class ResponseNotifier implements Runnable {
     public void run() {
         lock.lock();
         try {
+            System.out.println("PROCESSING RESPONSE 0 " + response);
+
             listener.onCommand(response);
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error notifying response listener", e);
