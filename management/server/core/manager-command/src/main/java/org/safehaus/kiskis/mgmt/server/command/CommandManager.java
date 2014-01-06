@@ -113,24 +113,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
                     final ReentrantLock lock = listenerEntry.getValue();
                     if (response != null && response.getSource() != null
                             && listener.getName().equalsIgnoreCase(response.getSource())) {
-                        try {
-                            notifierExecService.submit(new Runnable() {
-
-                                public void run() {
-                                    lock.lock();
-                                    try {
-                                        listener.onCommand(response);
-                                    } catch (Exception e) {
-                                        it.remove();
-                                        LOG.log(Level.SEVERE, "Error notifying response listener, removing faulting listener", e);
-                                    } finally {
-                                        lock.unlock();
-                                    }
-                                }
-                            });
-                        } catch (Exception e) {
-                            LOG.log(Level.SEVERE, "Error notifying response listener", e);
-                        }
+                        notifierExecService.submit(new ResponseNotifier(lock, listener, response));
                     }
                 } else {
                     it.remove();
