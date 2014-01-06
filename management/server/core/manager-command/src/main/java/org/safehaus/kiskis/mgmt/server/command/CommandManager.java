@@ -90,7 +90,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void init() {
         try {
             if (communicationService != null) {
-                notifierExecService = Executors.newFixedThreadPool(100);
+                notifierExecService = Executors.newCachedThreadPool();
 //                exec = Executors.newSingleThreadExecutor();
 //                commandNotifier = new CommandNotifier(listeners);
 //                exec.execute(commandNotifier);
