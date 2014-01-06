@@ -61,7 +61,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.startCassandraServices(cci.getNodes());
+                manager.runCommand(cci.getNodes(), CassandraCommandEnum.START);
             }
         });
 
@@ -70,7 +70,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.stopCassandraServices(cci.getNodes());
+                manager.runCommand(cci.getNodes(), CassandraCommandEnum.STOP);
             }
         });
 
@@ -79,7 +79,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.statusCassandraServices(cci.getNodes());
+                manager.runCommand(cci.getNodes(), CassandraCommandEnum.STATUS);
             }
         });
 
@@ -99,7 +99,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.purgeCassandraServices(cci.getNodes());
+                manager.runCommand(cci.getNodes(), CassandraCommandEnum.PURGE);
                 if (ServiceLocator.getService(CommandManagerInterface.class).deleteCassandraClusterData(cci.getUuid())) {
 //                    container.removeItem(itemId);
                     refreshDatasource();
@@ -116,6 +116,10 @@ public class CassandraTable extends Table {
 
     public void refreshDatasource() {
         this.setContainerDataSource(getCassandraContainer());
+    }
+
+    public NodesWindow getNodesWindow() {
+        return nodesWindow;
     }
 
 }

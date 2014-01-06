@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraCommandEnum;
 
 /**
  *
@@ -43,7 +44,7 @@ public class ServiceInstaller {
 
         Task installTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Install Cassandra");
         for (Agent agent : config.getSelectedAgents()) {
-            Command command = CassandraCommands.getInstallCommand();
+            Command command = new CassandraCommands().getCommand(CassandraCommandEnum.INSTALL);
             command.getRequest().setUuid(agent.getUuid());
             command.getRequest().setTaskUuid(installTask.getUuid());
             command.getRequest().setRequestSequenceNumber(installTask.getIncrementedReqSeqNumber());
@@ -64,14 +65,12 @@ public class ServiceInstaller {
         Task setListenAddressTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set listen addresses");
         for (Agent agent : config.getSelectedAgents()) {
             Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getHostname() + "." + config.getDomainName());
-//            Command setListenAddressCommand = CassandraCommands.getSetListenAddressCommand(agent.getListIP().get(0));
             setListenAddressCommand.getRequest().setUuid(agent.getUuid());
             setListenAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setListenAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
             setListenAddressTask.addCommand(setListenAddressCommand);
 
             Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getHostname() + "." + config.getDomainName());
-//            Command setRpcAddressCommand = CassandraCommands.getSetRpcAddressCommand(agent.getListIP().get(0));
             setRpcAddressCommand.getRequest().setUuid(agent.getUuid());
             setRpcAddressCommand.getRequest().setTaskUuid(setListenAddressTask.getUuid());
             setRpcAddressCommand.getRequest().setRequestSequenceNumber(setListenAddressTask.getIncrementedReqSeqNumber());
@@ -84,7 +83,6 @@ public class ServiceInstaller {
         StringBuilder seedsSB = new StringBuilder();
         for (Agent agent : config.getSeeds()) {
             seedsSB.append(agent.getHostname()).append(".").append(config.getDomainName()).append(",");
-//            seedsSB.append(agent.getListIP().get(0)).append(",");
 
         }
         for (Agent agent : config.getSelectedAgents()) {
@@ -197,19 +195,7 @@ public class ServiceInstaller {
                         }
                     } else {
                         terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-
-                        CassandraClusterInfo cci = new CassandraClusterInfo();
-                        cci.setName(config.getClusterName());
-                        cci.setDataDir(config.getDataDirectory());
-                        cci.setCommitLogDir(config.getCommitLogDirectory());
-                        cci.setSavedCacheDir(config.getSavedCachesDirectory());
-                        cci.setSeeds(config.getSeedsUUIDList());
-                        cci.setNodes(config.getAgentsUUIDList());
-                        cci.setDomainName(config.getDomainName());
-
-                        if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
-                            terminal.setValue(terminal.getValue().toString()  + cci.getUuid() + " cluster saved into keyspace.\n");
-                        }
+                        saveCCI();
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
@@ -217,6 +203,21 @@ public class ServiceInstaller {
             }
             terminal.setCursorPosition(terminal.getValue().toString().length());
 
+        }
+    }
+
+    private void saveCCI() {
+        CassandraClusterInfo cci = new CassandraClusterInfo();
+        cci.setName(config.getClusterName());
+        cci.setDataDir(config.getDataDirectory());
+        cci.setCommitLogDir(config.getCommitLogDirectory());
+        cci.setSavedCacheDir(config.getSavedCachesDirectory());
+        cci.setSeeds(config.getSeedsUUIDList());
+        cci.setNodes(config.getAgentsUUIDList());
+        cci.setDomainName(config.getDomainName());
+
+        if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+            terminal.setValue(terminal.getValue().toString() + cci.getUuid() + " cluster saved into keyspace.\n");
         }
     }
 

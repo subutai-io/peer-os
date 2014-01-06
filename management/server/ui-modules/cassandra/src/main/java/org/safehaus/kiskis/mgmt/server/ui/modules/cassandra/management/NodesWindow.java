@@ -18,6 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
+import static org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager.getAgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
 /**
@@ -28,7 +29,7 @@ public class NodesWindow extends Window {
     private final Table table;
     private IndexedContainer container;
 //    private final List<UUID> nodes;
-    ServiceManager manager;
+    ServiceManager serviceManager;
     CassandraClusterInfo cci;
 
     /**
@@ -39,7 +40,7 @@ public class NodesWindow extends Window {
      */
     public NodesWindow(String caption, CassandraClusterInfo cci, ServiceManager manager) {
         this.cci = cci;
-        this.manager = manager;
+        this.serviceManager = manager;
 
         setCaption(caption);
         setSizeUndefined();
@@ -59,7 +60,6 @@ public class NodesWindow extends Window {
 //            }
 //        });
 //        buttons.addComponent(addNewNode);
-
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
         table.setPageLength(6);
@@ -78,11 +78,11 @@ public class NodesWindow extends Window {
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Seed", Button.class, "");
-        container.addContainerProperty("Destroy", Button.class, "");
+//        container.addContainerProperty("Destroy", Button.class, "");
         for (UUID uuid : cci.getNodes()) {
             Agent agent = getAgentManager().getAgent(uuid);
             addOrderToContainer(container, agent);
-            manager.statusCassandraService(uuid);
+//            serviceManager.statusCassandraService(uuid);
         }
         return container;
     }
@@ -98,7 +98,7 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.startCassandraService(agent);
+                serviceManager.runCommand(agent.getUuid(), CassandraCommandEnum.START);
             }
         });
         Button stopButton = new Button("Stop");
@@ -106,7 +106,7 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.stopCassandraService(agent);
+                serviceManager.runCommand(agent.getUuid(), CassandraCommandEnum.STOP);
             }
         });
 
@@ -117,10 +117,17 @@ public class NodesWindow extends Window {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                   List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
+                    List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
                     seeds.remove(agent.getUuid());
                     cci.setSeeds(seeds);
-                    manager.updateSeeds(cci);
+
+                    StringBuilder seedsSB = new StringBuilder();
+                    for (UUID seed : cci.getSeeds()) {
+                        Agent agent = getAgentManager().getAgent(seed);
+                        seedsSB.append(agent.getListIP().get(0)).append(",");
+                    }
+
+                    serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
                     if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
                         System.out.println("updated");
                     }
@@ -134,7 +141,13 @@ public class NodesWindow extends Window {
                     List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
                     seeds.add(agent.getUuid());
                     cci.setSeeds(seeds);
-                    manager.updateSeeds(cci);
+                    StringBuilder seedsSB = new StringBuilder();
+                    for (UUID seed : cci.getSeeds()) {
+                        Agent agent = getAgentManager().getAgent(seed);
+                        seedsSB.append(agent.getListIP().get(0)).append(",");
+                    }
+
+                    serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
                     if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
                         System.out.println("updated");
                     }
@@ -142,22 +155,24 @@ public class NodesWindow extends Window {
             });
         }
 
-        Button destroyButton = new Button("Destroy");
-        destroyButton.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                manager.uninstallCassandraService(agent);
-                cci.getNodes().remove(agent.getUuid());
-                if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
-                    System.out.println("updated");
-                }
-            }
-        });
+//        Button destroyButton = new Button("Destroy");
+//        destroyButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+////                serviceManager.uninstallCassandraService(agent);
+//
+////                cci.getNodes().remove(agent.getUuid());
+//                serviceManager.runCommand(agent.getUuid(), CassandraCommandEnum.PURGE);
+//                if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+//                    System.out.println("updated");
+//                }
+//            }
+//        });
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
         item.getItemProperty("Seed").setValue(setSeedsButton);
-        item.getItemProperty("Destroy").setValue(destroyButton);
+//        item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
     public static AgentManagerInterface getAgentManager() {
@@ -173,11 +188,7 @@ public class NodesWindow extends Window {
         return null;
     }
 
-//    public void setOutput(Response response) {
-//        System.out.println("setoutput" + response.getTaskUuid());
-//        for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true)) {
-//            terminal.setValue(pr.getResponse().getStdOut());
-//        }
-//        manager.onResponse(response);
-//    }
+    public void setOutput(Response response) {
+        
+    }
 }
