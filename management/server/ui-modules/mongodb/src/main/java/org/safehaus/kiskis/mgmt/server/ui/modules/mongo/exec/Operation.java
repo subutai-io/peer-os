@@ -221,6 +221,7 @@ public abstract class Operation implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
+        System.out.println("PROCESSING RESPONSE " + response);
         clearOutput();
         clearLog();
         try {
