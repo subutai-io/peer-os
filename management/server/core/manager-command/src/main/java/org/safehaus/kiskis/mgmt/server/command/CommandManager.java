@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
-import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
@@ -170,10 +169,10 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             String stdOut = "", stdErr = "";
             for (Response r : list) {
                 response = r;
-                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdOut())) {
+                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Util.isStringEmpty(r.getStdOut())) {
                     stdOut += r.getStdOut();
                 }
-                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdErr())) {
+                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Util.isStringEmpty(r.getStdErr())) {
                     stdErr += r.getStdErr();
                 }
             }
