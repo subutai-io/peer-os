@@ -9,14 +9,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,9 +26,9 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-    private final Map<CommandListener, ReentrantLock> listeners = new ConcurrentHashMap<CommandListener, ReentrantLock>();
-    private SerialExecutor notifierExecService;
-//    private CommandNotifier commandNotifier;
+    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
+    private ExecutorService notifierExecService;
+    private CommandNotifier commandNotifier;
 
     @Override
     public void executeCommand(Command command) {
@@ -47,16 +45,10 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void onResponse(Response response) {
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
-            case EXECUTE_RESPONSE: {
-                persistenceCommand.saveResponse(response);
-//                commandNotifier.addResponse(response);
-                notify(response);
-                break;
-            }
+            case EXECUTE_RESPONSE:
             case EXECUTE_RESPONSE_DONE: {
                 persistenceCommand.saveResponse(response);
-//                commandNotifier.addResponse(response);
-                notify(response);
+                commandNotifier.addResponse(response);
                 break;
             }
             default: {
@@ -69,7 +61,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void addListener(CommandListener listener) {
         try {
             LOG.log(Level.INFO, "Adding module listener : {0}", listener.getName());
-            listeners.put(listener, new ReentrantLock(true));
+            listeners.add(listener);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
         }
@@ -88,37 +80,15 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void init() {
         try {
             if (communicationService != null) {
-                notifierExecService = new SerialExecutor(Executors.newCachedThreadPool());
-//                exec = Executors.newSingleThreadExecutor();
-//                commandNotifier = new CommandNotifier(listeners);
-//                exec.execute(commandNotifier);
+                notifierExecService = Executors.newSingleThreadExecutor();
+                commandNotifier = new CommandNotifier(listeners);
+                notifierExecService.execute(commandNotifier);
                 communicationService.addListener(this);
             } else {
                 throw new Exception("Missing communication service");
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
-        }
-    }
-
-    private void notify(Response response) {
-        try {
-            for (Iterator<Entry<CommandListener, ReentrantLock>> it = listeners.entrySet().iterator(); it.hasNext();) {
-                Entry<CommandListener, ReentrantLock> listenerEntry = it.next();
-                if (listenerEntry.getKey() != null && listenerEntry.getValue() != null
-                        && listenerEntry.getKey().getName() != null) {
-                    CommandListener listener = listenerEntry.getKey();
-                    ReentrantLock lock = listenerEntry.getValue();
-                    if (response != null && response.getSource() != null
-                            && listener.getName().equalsIgnoreCase(response.getSource())) {
-                        notifierExecService.execute(new ResponseNotifier(lock, listener, response));
-                    }
-                } else {
-                    it.remove();
-                }
-            }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in notify", ex);
         }
     }
 
