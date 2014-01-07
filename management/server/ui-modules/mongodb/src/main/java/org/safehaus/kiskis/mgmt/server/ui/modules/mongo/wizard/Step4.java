@@ -42,45 +42,12 @@ public class Step4 extends Panel {
         cfgView.addAgentSetCfg("Routers", wizard.getConfig().getRouterServers());
         cfgView.addAgentSetCfg("Data Nodes", wizard.getConfig().getDataNodes());
 
-//        TreeTable summaryTable = new TreeTable();
-//        summaryTable.setWidth("100%");
-//        summaryTable.addContainerProperty("Installation configuration", String.class, "");
-//        summaryTable.addItem(new Object[]{"Cluster Name"}, "clust");
-//        summaryTable.addItem(new Object[]{wizard.getConfig().getClusterName()}, "clustname");
-//        summaryTable.setParent("clustname", "clust");
-//        summaryTable.setChildrenAllowed("clustname", false);
-//        summaryTable.addItem(new Object[]{"Replica Set Name"}, "repl");
-//        summaryTable.addItem(new Object[]{wizard.getConfig().getReplicaSetName()}, "replname");
-//        summaryTable.setParent("replname", "repl");
-//        summaryTable.setChildrenAllowed("replname", false);
-//        summaryTable.addItem(new Object[]{"Configuration servers"}, "cfg");
-//        for (Agent configServer : wizard.getConfig().getConfigServers()) {
-//            summaryTable.addItem(new Object[]{configServer.getHostname()}, "cfg_" + configServer.getHostname());
-//            summaryTable.setParent("cfg_" + configServer.getHostname(), "cfg");
-//            summaryTable.setChildrenAllowed("cfg_" + configServer.getHostname(), false);
-//        }
-//        summaryTable.addItem(new Object[]{"Routers servers"}, "rtr");
-//        for (Agent routerServer : wizard.getConfig().getRouterServers()) {
-//            summaryTable.addItem(new Object[]{routerServer.getHostname()}, "rtr_" + routerServer.getHostname());
-//            summaryTable.setParent("rtr_" + routerServer.getHostname(), "rtr");
-//            summaryTable.setChildrenAllowed("rtr_" + routerServer.getHostname(), false);
-//        }
-//        summaryTable.addItem(new Object[]{"Data nodes"}, "data");
-//        for (Agent dataNode : wizard.getConfig().getDataNodes()) {
-//            summaryTable.addItem(new Object[]{dataNode.getHostname()}, "data_" + dataNode.getHostname());
-//            summaryTable.setParent("data_" + dataNode.getHostname(), "data");
-//            summaryTable.setChildrenAllowed("data_" + dataNode.getHostname(), false);
-//        }
-//        summaryTable.setCollapsed("clust", false);
-//        summaryTable.setCollapsed("repl", false);
-//        summaryTable.setCollapsed("cfg", false);
-//        summaryTable.setCollapsed("rtr", false);
-//        summaryTable.setCollapsed("data", false);
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                //save config to db here
                 wizard.next();
             }
         });

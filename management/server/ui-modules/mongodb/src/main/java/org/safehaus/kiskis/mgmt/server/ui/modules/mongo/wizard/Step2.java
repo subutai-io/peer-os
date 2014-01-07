@@ -129,6 +129,8 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                //check if cluster with the same name already exists
+                
                 wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
                 wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
                 wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
