@@ -152,7 +152,8 @@ public class CassandraTable extends Table {
 //                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
                     if (nodesWindow != null && nodesWindow.isVisible()) {
                         nodesWindow.updateUI();
-                    } else {
+                    }
+                    if (cce != null) {
                         switch (cce) {
                             case START: {
                                 switchState(false);
