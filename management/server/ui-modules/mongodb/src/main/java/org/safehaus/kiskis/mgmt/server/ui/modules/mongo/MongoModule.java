@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.management.Manager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage.Manager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;

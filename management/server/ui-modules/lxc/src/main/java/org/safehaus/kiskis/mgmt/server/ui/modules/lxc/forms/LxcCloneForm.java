@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms;
 
-import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 //import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
-
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
  */
@@ -104,7 +102,7 @@ public class LxcCloneForm extends VerticalLayout implements
 
             if (physicalAgents.isEmpty()) {
                 getWindow().showNotification("Select at least one physical agent");
-            } else if (Strings.isNullOrEmpty(textFieldLxcName.getValue().toString())) {
+            } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
                 getWindow().showNotification("Enter lxc hostname");
             } else {
                 outputPanel.removeAllComponents();
