@@ -831,8 +831,7 @@ public class Persistence implements PersistenceInterface {
     }
 
     public MongoClusterInfo getMongoClusterInfo(String clusterName) {
-        System.out.println("Selecting |" + clusterName + "|");
-        MongoClusterInfo clusterInfo = null;
+        MongoClusterInfo mongoClusterInfo = null;
         try {
             String cql = String.format(
                     "select * from %s where %s = ? limit 1 allow filtering",
@@ -842,8 +841,7 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute(boundStatement.bind(clusterName));
             Row row = rs.one();
             if (row != null) {
-                System.out.println("Selected  |" + row.getString(MongoClusterInfo.CLUSTER_NAME) + "|");
-                MongoClusterInfo mongoClusterInfo = new MongoClusterInfo();
+                mongoClusterInfo = new MongoClusterInfo();
                 mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
                 mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
                 mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
@@ -854,7 +852,7 @@ public class Persistence implements PersistenceInterface {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClusterInfo", ex);
         }
-        return clusterInfo;
+        return mongoClusterInfo;
     }
 
     public boolean deleteMongoClusterInfo(String clusterName) {
