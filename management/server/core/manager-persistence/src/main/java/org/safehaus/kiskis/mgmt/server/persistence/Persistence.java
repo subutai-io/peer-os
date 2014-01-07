@@ -831,6 +831,7 @@ public class Persistence implements PersistenceInterface {
     }
 
     public MongoClusterInfo getMongoClusterInfo(String clusterName) {
+        System.out.println("Selecting |" + clusterName + "|");
         MongoClusterInfo clusterInfo = null;
         try {
             String cql = String.format(
@@ -841,6 +842,7 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute(boundStatement.bind(clusterName));
             Row row = rs.one();
             if (row != null) {
+                System.out.println("Selected  |" + row.getString(MongoClusterInfo.CLUSTER_NAME) + "|");
                 MongoClusterInfo mongoClusterInfo = new MongoClusterInfo();
                 mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
                 mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
