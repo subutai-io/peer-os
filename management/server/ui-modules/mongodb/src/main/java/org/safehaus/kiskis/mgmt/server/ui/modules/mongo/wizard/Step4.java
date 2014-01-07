@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -25,6 +26,9 @@ public class Step4 extends Panel {
     public Step4(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
+        content.setSizeFull();
+        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        content.setMargin(true);        
 
         Label confirmationLbl = new Label("<strong>Please verify the installation configuration,"
                 + "<br/>you can change it by clicking on Back button</strong>");
@@ -53,7 +57,7 @@ public class Step4 extends Panel {
         summaryTable.setCollapsed("cfg", false);
         summaryTable.setCollapsed("rtr", false);
         summaryTable.setCollapsed("data", false);
-
+        
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
 
