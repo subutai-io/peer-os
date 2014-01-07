@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
-import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -34,7 +33,7 @@ public class ServiceManager {
     }
 
     public void runCommand(List<UUID> list, CassandraCommandEnum cce) {
-        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Start Cassandra");
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Run command");
         for (UUID uuid : list) {
             Command command = new CassandraCommands().getCommand(cce);
             command.getRequest().setUuid(uuid);
@@ -47,7 +46,7 @@ public class ServiceManager {
     }
 
     public void runCommand(UUID agentUuid, CassandraCommandEnum cce) {
-        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Start Cassandra");
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Run command");
         Command command = new CassandraCommands().getCommand(cce);
         command.getRequest().setUuid(agentUuid);
         command.getRequest().setTaskUuid(startTask.getUuid());
@@ -58,7 +57,6 @@ public class ServiceManager {
     }
 
     public void start() {
-//        terminal.setValue("");
         moveToNextTask();
         if (currentTask != null) {
             for (Command command : currentTask.getCommands()) {
@@ -75,38 +73,12 @@ public class ServiceManager {
         return currentTask;
     }
 
-//    public void onResponse(Response response) {
-//        if (currentTask != null && response.getTaskUuid() != null
-//                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-//            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true);
-//            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
-//            if (!list.isEmpty() && terminal != null) {
-//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
-//                    moveToNextTask();
-//                    if (currentTask != null) {
-//                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
-//                        for (Command command : currentTask.getCommands()) {
-//                            executeCommand(command);
-//                        }
-//                    } else {
-//                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-//                    }
-//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
-//                }
-//            }
-//            terminal.setCursorPosition(terminal.getValue().toString().length());
-//        }
-//    }
-
     public void executeCommand(Command command) {
-//        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
         ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
     }
 
     public void updateSeeds(List<UUID> nodes, String seeds) {
-        Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Set seeds addresses");
+        Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Update seeds");
         for (UUID agent : nodes) {
             Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seeds);
             setSeedsCommand.getRequest().setUuid(agent);

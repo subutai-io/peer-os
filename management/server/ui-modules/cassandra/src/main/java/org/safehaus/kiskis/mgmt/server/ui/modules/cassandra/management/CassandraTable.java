@@ -44,11 +44,11 @@ public class CassandraTable extends Table {
 
     private IndexedContainer getCassandraContainer() {
         IndexedContainer container = new IndexedContainer();
-        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, UUID.class, "");
+//        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, UUID.class, "");
         container.addContainerProperty(CassandraClusterInfo.NAME_LABEL, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
-        container.addContainerProperty("Status", Button.class, "");
+//        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
         List<CassandraClusterInfo> cdList = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterData();
@@ -61,7 +61,7 @@ public class CassandraTable extends Table {
     private void addClusterDataToContainer(final Container container, final CassandraClusterInfo cci) {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
-        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getUuid());
+//        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getUuid());
         item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cci.getName());
 
         Button startButton = new Button("Start");
@@ -86,16 +86,15 @@ public class CassandraTable extends Table {
             }
         });
 
-        Button statusButton = new Button("Status");
-        statusButton.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                cce = CassandraCommandEnum.STATUS;
-                manager.runCommand(cci.getNodes(), cce);
-            }
-        });
-
+//        Button statusButton = new Button("Status");
+//        statusButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                cce = CassandraCommandEnum.STATUS;
+//                manager.runCommand(cci.getNodes(), cce);
+//            }
+//        });
         Button manageButton = new Button("Manage");
         manageButton.addListener(new Button.ClickListener() {
 
@@ -122,7 +121,7 @@ public class CassandraTable extends Table {
 
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
-        item.getItemProperty("Status").setValue(statusButton);
+//        item.getItemProperty("Status").setValue(statusButton);
         item.getItemProperty("Manage").setValue(manageButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
@@ -149,7 +148,6 @@ public class CassandraTable extends Table {
             Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
                     if (nodesWindow != null && nodesWindow.isVisible()) {
                         nodesWindow.updateUI();
                     }
@@ -168,17 +166,13 @@ public class CassandraTable extends Table {
                 }
                 manager.moveToNextTask();
                 if (manager.getCurrentTask() != null) {
-//                        terminal.setValue(terminal.getValue().toString() + "Running next step " + manager.getCurrentTask().getDescription() + "\n");
                     for (Command command : manager.getCurrentTask().getCommands()) {
                         manager.executeCommand(command);
                     }
                 } else {
-//                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
                 }
             } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
             }
         }
-//            terminal.setCursorPosition(terminal.getValue().toString().length());
     }
 }

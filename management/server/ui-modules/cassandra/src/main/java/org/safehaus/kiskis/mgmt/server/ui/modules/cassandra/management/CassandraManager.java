@@ -22,7 +22,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class CassandraManager {
 
     private final VerticalLayout contentRoot;
-//    private final ServiceManager serviceManager;
 //    private final TextArea terminal;
     private final CassandraTable cassandraTable;
 
