@@ -32,7 +32,7 @@ public class NodesWindow extends Window {
     CassandraClusterInfo cci;
 //    Button selectedStartButton;
 //    Button selectedStopButton;
-    Button selectedSetSeedsButton;
+//    Button selectedSetSeedsButton;
     CassandraCommandEnum cce;
     Item selectedItem;
 
@@ -104,6 +104,7 @@ public class NodesWindow extends Window {
             public void buttonClick(Button.ClickEvent event) {
                 cce = CassandraCommandEnum.START;
 //                selectedStartButton = event.getButton();
+                selectedItem = item;
                 serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
@@ -126,7 +127,7 @@ public class NodesWindow extends Window {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    selectedSetSeedsButton = event.getButton();
+                    selectedItem = item;
                     cce = CassandraCommandEnum.REMOVE_SEED;
                     List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
                     seeds.remove(agent.getUuid());
@@ -149,6 +150,7 @@ public class NodesWindow extends Window {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    selectedItem = item;
                     cce = CassandraCommandEnum.SET_SEED;
                     List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
                     seeds.add(agent.getUuid());
@@ -211,11 +213,13 @@ public class NodesWindow extends Window {
                 break;
             }
             case SET_SEED: {
-                selectedSetSeedsButton.setCaption("Seed");
+                Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                seed.setCaption("Remove seed");
                 break;
             }
             case REMOVE_SEED: {
-                selectedSetSeedsButton.setCaption("Set as seed");
+                Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                seed.setCaption("Set as seed");
                 break;
             }
         }
