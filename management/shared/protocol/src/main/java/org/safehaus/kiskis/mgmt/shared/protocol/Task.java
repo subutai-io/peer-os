@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,9 +24,12 @@ public class Task implements Serializable {
     private Integer reqSeqNumber;
     private final List<Command> commands;
     private boolean ignoreExitCode = false;
+    private boolean completed = false;
 
     public void addCommand(Command command) {
-        commands.add(command);
+        if (command != null) {
+            commands.add(command);
+        }
     }
 
     public Task() {
@@ -42,8 +46,16 @@ public class Task implements Serializable {
         this.ignoreExitCode = ignoreExitCode;
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
     public List<Command> getCommands() {
-        return commands;
+        return Collections.unmodifiableList(commands);
     }
 
     public Integer getIncrementedReqSeqNumber() {

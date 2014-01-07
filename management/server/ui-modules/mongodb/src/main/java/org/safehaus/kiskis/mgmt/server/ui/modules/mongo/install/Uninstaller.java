@@ -3,17 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.Commands;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.InstallerConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -27,11 +27,27 @@ public class Uninstaller extends Operation {
         Set<Agent> allClusterMembers = new HashSet<Agent>();
         allClusterMembers.addAll(config.getConfigServers());
         allClusterMembers.addAll(config.getRouterServers());
-        allClusterMembers.addAll(config.getShards());
+        allClusterMembers.addAll(config.getDataNodes());
 
         //UNINSTALL MONGO
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         //uninstall it
+        for (Agent agent : allClusterMembers) {
+            Command cmd = Commands.getKillAllCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            uninstallMongoTask.addCommand(cmd);
+        }
+        for (Agent agent : allClusterMembers) {
+            Command cmd = Commands.getCleanCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
+            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
+            uninstallMongoTask.addCommand(cmd);
+        }
         for (Agent agent : allClusterMembers) {
             Command cmd = Commands.getUninstallCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -42,46 +58,6 @@ public class Uninstaller extends Operation {
         }
         uninstallMongoTask.setIgnoreExitCode(true);
         addTask(uninstallMongoTask);
-    }
-
-    @Override
-    public void onTaskCompleted(Task task) {
-        System.out.println("Task completed " + task);
-    }
-
-    @Override
-    public void onTaskSucceeded(Task task) {
-        System.out.println("Task succeeded " + task);
-    }
-
-    @Override
-    public void onTaskFailed(Task task) {
-        System.out.println("Task failed " + task);
-    }
-
-    @Override
-    public void onOperationEnded() {
-        System.out.println("Operation ended");
-    }
-
-    @Override
-    public void onOperationStarted() {
-        System.out.println("Operation started");
-    }
-
-    @Override
-    public void onOperationStopped() {
-        System.out.println("Operation stopped");
-    }
-
-    @Override
-    public void onBeforeTaskRun(Task task) {
-        System.out.println("Before running task" + task);
-    }
-
-    @Override
-    public void onAfterTaskRun(Task task) {
-        System.out.println("After running task " + task);
     }
 
 }

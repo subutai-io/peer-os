@@ -108,9 +108,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 tree.setValue(null);
-                if (MgmtApplication.getSelectedAgents() != null) {
-                    MgmtApplication.getSelectedAgents().clear();
-                }
+                MgmtApplication.clearSelectedAgents();
                 refreshAgents(agentManagerInterface.getRegisteredAgents());
             }
         });

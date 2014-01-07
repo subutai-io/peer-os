@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallerConfig;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -24,13 +25,13 @@ public class Wizard implements ResponseListener {
 
     private static final Logger LOG = Logger.getLogger(Wizard.class.getName());
 
-    private static final int MAX_STEPS = 3;
+    private static final int MAX_STEPS = 4;
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
     private final InstallerConfig mongoConfig = new InstallerConfig();
     private final VerticalLayout contentRoot;
-    private Step4 step4;
+    private Step5 step5;
 
     public Wizard() {
         contentRoot = new VerticalLayout();
@@ -110,8 +111,14 @@ public class Wizard implements ResponseListener {
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step4 = new Step4(this);
-                verticalLayout.addComponent(step4);
+                verticalLayout.addComponent(new Step4(this));
+                break;
+            }
+            case 5: {
+                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                step5 = new Step5(this);
+                verticalLayout.addComponent(step5);
+                step5.startInstallation();
                 break;
             }
             default: {
@@ -122,8 +129,8 @@ public class Wizard implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        if (step == 4 && step4 != null) {
-            step4.onResponse(response);
+        if (step == 5 && step5 != null) {
+            step5.onResponse(response);
         }
 
     }

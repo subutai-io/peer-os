@@ -5,16 +5,17 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
-import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * @author bahadyr
  */
 public class Step3 extends Panel {
+
     private TextArea terminal;
     HadoopWizard parent;
     Button next;
@@ -82,7 +83,7 @@ public class Step3 extends Panel {
 
     public void addOutput(Task task, String stdResult) {
         if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-            if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
+            if (!Util.isStringEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
                 str.append(terminal.getValue());
                 str.append("\n");
@@ -91,7 +92,7 @@ public class Step3 extends Panel {
                 terminal.setValue(str);
             }
         } else {
-            if (!Strings.isNullOrEmpty(stdResult) && !stdResult.equals("null")) {
+            if (!Util.isStringEmpty(stdResult) && !stdResult.equals("null")) {
                 StringBuffer str = new StringBuffer();
                 str.append(terminal.getValue());
                 str.append("\n");
@@ -102,7 +103,7 @@ public class Step3 extends Panel {
         }
     }
 
-    public void setCloseable(){
+    public void setCloseable() {
         next.setEnabled(true);
     }
 }

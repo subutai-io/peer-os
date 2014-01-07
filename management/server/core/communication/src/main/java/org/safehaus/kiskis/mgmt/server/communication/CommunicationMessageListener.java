@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.communication;
 
+import java.util.Iterator;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
@@ -62,11 +63,13 @@ public class CommunicationMessageListener implements MessageListener {
 
     private void notifyListeners(Response response) {
         try {
-            for (ResponseListener ai : listeners) {
-                if (ai != null) {
+            for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext();) {
+                ResponseListener ai = it.next();
+                try {
                     ai.onResponse(response);
-                } else {
-                    listeners.remove(ai);
+                } catch (Exception e) {
+                    it.remove();
+                    LOG.log(Level.SEVERE, "Error notifying message listeners, removing faulting listener", e);
                 }
             }
         } catch (Exception ex) {
