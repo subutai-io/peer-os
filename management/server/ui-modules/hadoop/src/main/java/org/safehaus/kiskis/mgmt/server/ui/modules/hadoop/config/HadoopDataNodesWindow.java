@@ -86,16 +86,17 @@ public final class HadoopDataNodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Agent agent = (Agent) agentsComboBox.getValue();
                 cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
+                Agent agent = (Agent) agentsComboBox.getValue();
 
                 List<UUID> list = new ArrayList<UUID>();
                 list.addAll(cluster.getDataNodes());
+                list.add(agent.getUuid());
 
                 cluster.setDataNodes(list);
                 addButton.setEnabled(false);
 
-                configureNode(agent);
+                configureNode();
             }
         });
 
@@ -109,22 +110,14 @@ public final class HadoopDataNodesWindow extends Window {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", master.getUuid().toString());
-        map.put(":command", "status");
 
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.STATUS_NAME_NODE, statusTask, map);
+        RequestUtil.createRequest(getCommandManager(), HadoopCommands.STATUS_DATA_NODE, statusTask, map);
     }
 
-    private void configureNode(Agent agent) {
-        this.currentAgent = agent;
-
+    private void configureNode() {
         configureTask = RequestUtil.createTask(getCommandManager(), "Configuring new node on Hadoop Cluster");
 
         HashMap<String, String> map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", agent.getUuid().toString());
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.INSTALL_DEB, configureTask, map);
-
-        map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", cluster.getNameNode().toString());
         RequestUtil.createRequest(getCommandManager(), HadoopCommands.COPY_MASTER_KEY, configureTask, map);
@@ -145,7 +138,7 @@ public final class HadoopDataNodesWindow extends Window {
     }
 
     private void addNode() {
-        Agent agent = this.currentAgent;
+        Agent agent = (Agent) agentsComboBox.getValue();
         addTask = RequestUtil.createTask(getCommandManager(), "Adding data node to Hadoop Cluster");
 
         for (String key : keys) {
@@ -159,6 +152,11 @@ public final class HadoopDataNodesWindow extends Window {
         }
 
         HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", agent.getUuid().toString());
+        RequestUtil.createRequest(getCommandManager(), HadoopCommands.INSTALL_DEB, addTask, map);
+
+        map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
         map.put(":slave-hostname", agent.getListIP().get(0));
@@ -204,6 +202,7 @@ public final class HadoopDataNodesWindow extends Window {
 
         if (configureTask != null) {
             if (!list.isEmpty() && task.equals(configureTask)) {
+                print_r(list);
                 if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                     keys = new ArrayList<String>();
                     for (ParseResult pr : list) {
@@ -220,6 +219,7 @@ public final class HadoopDataNodesWindow extends Window {
         if (addTask != null) {
             if (!list.isEmpty()) {
                 if (task.equals(addTask)) {
+                    print_r(list);
                     if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                         getCommandManager().saveHadoopClusterData(cluster);
 
@@ -239,14 +239,35 @@ public final class HadoopDataNodesWindow extends Window {
 
         if (statusTask != null) {
             if (task.equals(statusTask)) {
+                print_r(list);
                 for (ParseResult pr : list) {
-                    statusLabel.setValue(pr.getResponse().getStdOut());
+                    statusLabel.setValue(parseNameNodeStatus(pr.getResponse().getStdOut()));
                 }
                 statusTask = null;
             }
         }
 
         dataNodesTable.onCommand(response);
+    }
+
+    private String parseNameNodeStatus(String response) {
+        String[] array = response.split("\n");
+        if (array.length == 4) {
+            return array[0]
+                    .replaceAll(" (SecondaryNameNode is NOT Running on this machine)", "");
+        }
+
+        return "";
+    }
+
+    private void print_r(List<ParseResult> list) {
+        for (ParseResult p : list) {
+            System.out.println("\n");
+            System.out.println(p.getRequest());
+            System.out.println("\n");
+            System.out.println(p.getResponse());
+            System.out.println("\n");
+        }
     }
 
     public CommandManagerInterface getCommandManager() {

@@ -159,9 +159,20 @@ public class DataNodesTable extends Table {
             String name = (String) item.getItemProperty(HOSTNAME).getValue();
 
             if (name.equals(agent.getHostname())) {
-                item.getItemProperty(STATUS).setValue(parseResult.getResponse().getStdOut());
+                item.getItemProperty(STATUS).setValue(parseDataNodeStatus(parseResult.getResponse().getStdOut()));
             }
         }
+    }
+
+    private String parseDataNodeStatus(String response) {
+        String[] array = response.split("\n");
+        System.out.println(array.length);
+        System.out.println(array[3]);
+        if (array.length == 4) {
+            return array[3].replaceAll("DataNode is ", "");
+        }
+
+        return "";
     }
 
     public CommandManagerInterface getCommandManager() {
