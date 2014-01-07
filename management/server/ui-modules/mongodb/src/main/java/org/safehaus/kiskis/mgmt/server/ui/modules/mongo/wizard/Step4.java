@@ -26,32 +26,33 @@ public class Step4 extends Panel {
 
         VerticalLayout content = new VerticalLayout();
 
-        Label confirmationLbl = new Label("<strong>Please verify the installation configuration,<br/>you can change it by clicking on Back buton</strong>");
+        Label confirmationLbl = new Label("<strong>Please verify the installation configuration,"
+                + "<br/>you can change it by clicking on Back button</strong>");
         confirmationLbl.setContentMode(Label.CONTENT_XHTML);
 
         TreeTable summaryTable = new TreeTable();
         summaryTable.addContainerProperty("Installation configuration", String.class, "");
-        Object configServers = summaryTable.addItem("Configuration servers");
+        summaryTable.addItem(new Object[]{"Configuration servers"}, "cfg");
         for (Agent configServer : wizard.getConfig().getConfigServers()) {
-            Object item = summaryTable.addItem(configServer.getHostname());
-            summaryTable.setParent(item, configServers);
-            summaryTable.setChildrenAllowed(item, false);
+            summaryTable.addItem(new Object[]{configServer.getHostname()}, "cfg_" + configServer.getHostname());
+            summaryTable.setParent("cfg_" + configServer.getHostname(), "cfg");
+            summaryTable.setChildrenAllowed("cfg_" + configServer.getHostname(), false);
         }
-        Object routerServers = summaryTable.addItem("Routers servers");
+        summaryTable.addItem(new Object[]{"Routers servers"}, "rtr");
         for (Agent routerServer : wizard.getConfig().getRouterServers()) {
-            Object item = summaryTable.addItem(routerServer.getHostname());
-            summaryTable.setParent(item, routerServers);
-            summaryTable.setChildrenAllowed(item, false);
+            summaryTable.addItem(new Object[]{routerServer.getHostname()}, "rtr_" + routerServer.getHostname());
+            summaryTable.setParent("rtr_" + routerServer.getHostname(), "rtr");
+            summaryTable.setChildrenAllowed("rtr_" + routerServer.getHostname(), false);
         }
-        Object dataNodes = summaryTable.addItem("Data nodes");
+        summaryTable.addItem(new Object[]{"Data nodes"}, "data");
         for (Agent dataNode : wizard.getConfig().getDataNodes()) {
-            Object item = summaryTable.addItem(dataNode.getHostname());
-            summaryTable.setParent(item, dataNodes);
-            summaryTable.setChildrenAllowed(item, false);
+            summaryTable.addItem(new Object[]{dataNode.getHostname()}, "data_" + dataNode.getHostname());
+            summaryTable.setParent("data_" + dataNode.getHostname(), "data");
+            summaryTable.setChildrenAllowed("data_" + dataNode.getHostname(), false);
         }
-        summaryTable.setCollapsed(configServers, false);
-        summaryTable.setCollapsed(routerServers, false);
-        summaryTable.setCollapsed(dataNodes, false);
+        summaryTable.setCollapsed("cfg", false);
+        summaryTable.setCollapsed("rtr", false);
+        summaryTable.setCollapsed("data", false);
 
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
@@ -71,8 +72,8 @@ public class Step4 extends Panel {
         });
 
         HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(install);
         buttons.addComponent(back);
+        buttons.addComponent(install);
 
         content.addComponent(confirmationLbl);
 
