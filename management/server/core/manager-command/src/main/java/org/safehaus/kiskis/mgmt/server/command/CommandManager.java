@@ -26,7 +26,6 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-//    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
     private final Map<CommandListener, ExecutorService> listeners = new ConcurrentHashMap<CommandListener, ExecutorService>();
     private ExecutorService notifierExecService;
     private CommandNotifier commandNotifier;

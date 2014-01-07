@@ -17,6 +17,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -129,8 +130,7 @@ public class Step2 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                //check if cluster with the same name already exists
-                
+
                 wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
                 wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
                 wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
@@ -141,6 +141,8 @@ public class Step2 extends Panel {
                     show("Please add config servers");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getRouterServers())) {
                     show("Please add routers");
+                } else if (wizard.getDbManager().getMongoClusterInfo(wizard.getConfig().getClusterName()) != null) {
+                    show(MessageFormat.format("Cluster with name {0} already exists", wizard.getConfig().getClusterName()));
                 } else {
                     wizard.next();
                 }

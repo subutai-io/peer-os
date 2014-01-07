@@ -10,11 +10,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ConfigView;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 
 /**
  *
@@ -47,8 +46,18 @@ public class Step4 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                //save config to db here
-                wizard.next();
+                MongoClusterInfo mongoClusterInfo
+                        = new MongoClusterInfo(
+                                wizard.getConfig().getClusterName(),
+                                wizard.getConfig().getReplicaSetName(),
+                                wizard.getConfig().getConfigServers(),
+                                wizard.getConfig().getRouterServers(),
+                                wizard.getConfig().getDataNodes());
+                if (wizard.getDbManager().saveMongoClusterInfo(mongoClusterInfo)) {
+                    wizard.next();
+                } else {
+                    show("Could not save new cluster configuration! Please see logs.");
+                }
             }
         });
 
@@ -74,4 +83,7 @@ public class Step4 extends Panel {
 
     }
 
+    private void show(String notification) {
+        getWindow().showNotification(notification);
+    }
 }

@@ -38,7 +38,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     public MgmtApplication(String title, AgentManagerInterface agentManager) {
         this.agentManager = agentManager;
         this.moduleNotifier = ServiceLocator.getService(ModuleNotifier.class);
-//        this.agentManager = ServiceLocator.getService(AgentManagerInterface.class);
         this.commandManager = ServiceLocator.getService(CommandManagerInterface.class);
         this.title = title;
     }
