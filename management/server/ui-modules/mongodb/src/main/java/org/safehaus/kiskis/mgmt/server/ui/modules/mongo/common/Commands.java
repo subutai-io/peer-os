@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
 import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
@@ -190,7 +189,7 @@ public class Commands {
                 Constants.DATA_NODE_PORT + "",
                 "--eval",
                 "\"rs.initiate();\"",
-                ";sleep 120;",
+                ";sleep 30;",
                 "mongo",
                 "--port",
                 Constants.DATA_NODE_PORT + "",

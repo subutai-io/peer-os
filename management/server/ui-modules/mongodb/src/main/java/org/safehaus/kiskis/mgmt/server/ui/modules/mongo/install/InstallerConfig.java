@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Config;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**

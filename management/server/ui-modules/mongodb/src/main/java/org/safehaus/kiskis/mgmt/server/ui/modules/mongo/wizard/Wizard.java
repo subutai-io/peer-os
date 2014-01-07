@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallerConfig;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -24,7 +25,7 @@ public class Wizard implements ResponseListener {
 
     private static final Logger LOG = Logger.getLogger(Wizard.class.getName());
 
-    private static final int MAX_STEPS = 5;
+    private static final int MAX_STEPS = 4;
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;

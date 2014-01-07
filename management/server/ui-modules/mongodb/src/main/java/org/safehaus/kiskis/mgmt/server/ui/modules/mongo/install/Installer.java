@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
 import java.util.HashSet;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Constants;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.commands.Commands;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.InstallerConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;

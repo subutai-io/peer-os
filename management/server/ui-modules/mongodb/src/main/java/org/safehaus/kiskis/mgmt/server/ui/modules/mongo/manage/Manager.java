@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.management;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;

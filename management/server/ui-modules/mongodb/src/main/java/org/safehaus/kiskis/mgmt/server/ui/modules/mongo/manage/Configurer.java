@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
 /**
  *

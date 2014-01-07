@@ -13,7 +13,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.mongo.Util.createImage;
+import static org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Util.createImage;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
