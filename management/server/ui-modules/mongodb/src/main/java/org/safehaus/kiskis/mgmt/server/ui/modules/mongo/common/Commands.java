@@ -204,8 +204,9 @@ public class Commands {
     public static Command getRegisterShardsWithRouterCommand(String shards) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram("mongo");
+        req.setProgram("sleep 30;");
         req.setArgs(Arrays.asList(
+                "mongo",
                 "--port",
                 Constants.ROUTER_PORT + "",
                 "--eval",
@@ -272,7 +273,7 @@ public class Commands {
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(180);
+        req.setTimeout(300);
         return cmd;
     }
 

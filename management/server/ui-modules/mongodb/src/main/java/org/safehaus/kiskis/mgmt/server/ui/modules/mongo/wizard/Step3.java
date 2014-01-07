@@ -107,6 +107,9 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                
+                //check that number of nodes is not more than 7
+                
                 wizard.getConfig().setReplicaSetName(replicaNameTxtFld.getValue().toString().trim());
                 wizard.getConfig().setDataNodes((Set<Agent>) shardsColSel.getValue());
 

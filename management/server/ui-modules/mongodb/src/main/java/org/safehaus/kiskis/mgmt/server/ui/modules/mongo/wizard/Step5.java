@@ -30,7 +30,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 public class Step5 extends Panel implements ResponseListener {
 
     private static final Logger LOG = Logger.getLogger(Step5.class.getName());
-
+    private final Wizard wizard;
     private final TextArea outputTxtArea;
     private final TextArea logTextArea;
     private Operation operation;
@@ -40,6 +40,7 @@ public class Step5 extends Panel implements ResponseListener {
     private Thread operationTimeoutThread;
 
     public Step5(final Wizard wizard) {
+        this.wizard = wizard;
 
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
@@ -90,6 +91,9 @@ public class Step5 extends Panel implements ResponseListener {
 
         addComponent(content);
 
+    }
+
+    public void startInstallation() {
         startOperation(new Installer(wizard.getConfig()));
     }
 
@@ -101,8 +105,8 @@ public class Step5 extends Panel implements ResponseListener {
                     this.operation.stop();
                     this.operation = null;
                 }
+                this.operation = operation;
                 if (operation.start()) {
-                    this.operation = operation;
                     showProgress();
                     addOutput(operation.getOutput());
                     addLog(operation.getLog());
@@ -129,7 +133,7 @@ public class Step5 extends Panel implements ResponseListener {
                     });
                     operationTimeoutThread.start();
                 } else {
-//                    this.operation = null;
+                    this.operation = null;
                     addOutput(MessageFormat.format(
                             "Operation \"{0}\" could not be started: {1}.",
                             operation.getDescription(),
