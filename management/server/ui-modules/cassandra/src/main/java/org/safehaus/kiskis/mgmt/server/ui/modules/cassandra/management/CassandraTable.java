@@ -135,6 +135,13 @@ public class CassandraTable extends Table {
         return nodesWindow;
     }
 
+    private void switchState(Boolean state) {
+        Button start = (Button) selectedItem.getItemProperty("Start").getValue();
+        start.setEnabled(state);
+        Button stop = (Button) selectedItem.getItemProperty("Stop").getValue();
+        stop.setEnabled(!state);
+    }
+
     public void onResponse(Response response) {
         if (manager.getCurrentTask() != null && response.getTaskUuid() != null
                 && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
@@ -148,15 +155,11 @@ public class CassandraTable extends Table {
                     } else {
                         switch (cce) {
                             case START: {
-                                selectedStartButton.setEnabled(false);
-                                selectedStopButton = (Button) selectedItem.getItemProperty("Stop").getValue();
-                                selectedStopButton.setEnabled(true);
+                                switchState(false);
                                 break;
                             }
                             case STOP: {
-                                selectedStopButton.setEnabled(false);
-                                selectedStartButton = (Button) selectedItem.getItemProperty("Start").getValue();
-                                selectedStartButton.setEnabled(true);
+                                switchState(true);
                                 break;
                             }
                         }

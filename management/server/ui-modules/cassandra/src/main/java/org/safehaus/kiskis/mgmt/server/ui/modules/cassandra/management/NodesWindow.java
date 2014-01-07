@@ -30,8 +30,8 @@ public class NodesWindow extends Window {
     private IndexedContainer container;
     ServiceManager serviceManager;
     CassandraClusterInfo cci;
-    Button selectedStartButton;
-    Button selectedStopButton;
+//    Button selectedStartButton;
+//    Button selectedStopButton;
     Button selectedSetSeedsButton;
     CassandraCommandEnum cce;
     Item selectedItem;
@@ -103,7 +103,7 @@ public class NodesWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cce = CassandraCommandEnum.START;
-                selectedStartButton = event.getButton();
+//                selectedStartButton = event.getButton();
                 serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
@@ -113,7 +113,7 @@ public class NodesWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cce = CassandraCommandEnum.STOP;
-                selectedStopButton = event.getButton();
+//                selectedStopButton = event.getButton();
                 selectedItem = item;
                 serviceManager.runCommand(agent.getUuid(), cce);
             }
@@ -203,15 +203,11 @@ public class NodesWindow extends Window {
     public void updateUI() {
         switch (cce) {
             case START: {
-                selectedStartButton.setEnabled(false);
-                selectedStopButton = (Button) selectedItem.getItemProperty("Stop").getValue();
-                selectedStopButton.setEnabled(true);
+                switchState(false);
                 break;
             }
             case STOP: {
-                selectedStopButton.setEnabled(false);
-                selectedStartButton = (Button) selectedItem.getItemProperty("Start").getValue();
-                selectedStartButton.setEnabled(true);
+                switchState(true);
                 break;
             }
             case SET_SEED: {
@@ -223,5 +219,12 @@ public class NodesWindow extends Window {
                 break;
             }
         }
+    }
+
+    private void switchState(Boolean state) {
+        Button start = (Button) selectedItem.getItemProperty("Start").getValue();
+        start.setEnabled(state);
+        Button stop = (Button) selectedItem.getItemProperty("Stop").getValue();
+        stop.setEnabled(!state);
     }
 }
