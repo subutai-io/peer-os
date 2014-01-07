@@ -28,9 +28,13 @@ public class NodesWindow extends Window {
 
     private final Table table;
     private IndexedContainer container;
-//    private final List<UUID> nodes;
     ServiceManager serviceManager;
     CassandraClusterInfo cci;
+    Button selectedStartButton;
+    Button selectedStopButton;
+    Button selectedSetSeedsButton;
+    CassandraCommandEnum cce;
+    Item selectedItem;
 
     /**
      *
@@ -89,7 +93,7 @@ public class NodesWindow extends Window {
 
     private void addOrderToContainer(Container container, final Agent agent) {
         Object itemId = container.addItem();
-        Item item = container.getItem(itemId);
+        final Item item = container.getItem(itemId);
         item.getItemProperty("hostname").setValue(agent.getHostname());
         item.getItemProperty("uuid").setValue(agent.getUuid());
 
@@ -98,7 +102,9 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                serviceManager.runCommand(agent.getUuid(), CassandraCommandEnum.START);
+                cce = CassandraCommandEnum.START;
+                selectedStartButton = event.getButton();
+                serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
         Button stopButton = new Button("Stop");
@@ -106,7 +112,10 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                serviceManager.runCommand(agent.getUuid(), CassandraCommandEnum.STOP);
+                cce = CassandraCommandEnum.STOP;
+                selectedStopButton = event.getButton();
+                selectedItem = item;
+                serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
 
@@ -117,6 +126,8 @@ public class NodesWindow extends Window {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    selectedSetSeedsButton = event.getButton();
+                    cce = CassandraCommandEnum.REMOVE_SEED;
                     List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
                     seeds.remove(agent.getUuid());
                     cci.setSeeds(seeds);
@@ -138,6 +149,7 @@ public class NodesWindow extends Window {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    cce = CassandraCommandEnum.SET_SEED;
                     List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
                     seeds.add(agent.getUuid());
                     cci.setSeeds(seeds);
@@ -188,7 +200,28 @@ public class NodesWindow extends Window {
         return null;
     }
 
-    public void setOutput(Response response) {
-        
+    public void updateUI() {
+        switch (cce) {
+            case START: {
+                selectedStartButton.setEnabled(false);
+                selectedStopButton = (Button) selectedItem.getItemProperty("Stop").getValue();
+                selectedStopButton.setEnabled(true);
+                break;
+            }
+            case STOP: {
+                selectedStopButton.setEnabled(false);
+                selectedStartButton = (Button) selectedItem.getItemProperty("Start").getValue();
+                selectedStartButton.setEnabled(true);
+                break;
+            }
+            case SET_SEED: {
+                selectedSetSeedsButton.setCaption("Seed");
+                break;
+            }
+            case REMOVE_SEED: {
+                selectedSetSeedsButton.setCaption("Set as seed");
+                break;
+            }
+        }
     }
 }

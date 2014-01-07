@@ -11,8 +11,13 @@ import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
@@ -20,13 +25,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 public class CassandraTable extends Table {
 
 //    private IndexedContainer container;
-    ServiceManager manager;
-    NodesWindow nodesWindow;
+    private final ServiceManager manager;
+    private NodesWindow nodesWindow;
+    CassandraCommandEnum cce;
+    Button selectedStartButton;
+    Button selectedStopButton;
+    Item selectedItem;
 
-    public CassandraTable(ServiceManager manager) {
-        this.manager = manager;
+    public CassandraTable() {
+        this.manager = new ServiceManager();
         this.setCaption("Cassandra clusters");
-//        this.setContainerDataSource(getCassandraContainer());
         this.setWidth("100%");
         this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         this.setPageLength(10);
@@ -61,7 +69,9 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.runCommand(cci.getNodes(), CassandraCommandEnum.START);
+                cce = CassandraCommandEnum.START;
+                selectedItem = item;
+                manager.runCommand(cci.getNodes(), cce);
             }
         });
 
@@ -70,7 +80,9 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.runCommand(cci.getNodes(), CassandraCommandEnum.STOP);
+                cce = CassandraCommandEnum.STOP;
+                selectedItem = item;
+                manager.runCommand(cci.getNodes(), cce);
             }
         });
 
@@ -79,7 +91,8 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.runCommand(cci.getNodes(), CassandraCommandEnum.STATUS);
+                cce = CassandraCommandEnum.STATUS;
+                manager.runCommand(cci.getNodes(), cce);
             }
         });
 
@@ -122,4 +135,46 @@ public class CassandraTable extends Table {
         return nodesWindow;
     }
 
+    public void onResponse(Response response) {
+        if (manager.getCurrentTask() != null && response.getTaskUuid() != null
+                && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
+            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true);
+            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
+            if (!list.isEmpty()) {
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
+                    if (nodesWindow != null && nodesWindow.isVisible()) {
+                        nodesWindow.updateUI();
+                    } else {
+                        switch (cce) {
+                            case START: {
+                                selectedStartButton.setEnabled(false);
+                                selectedStopButton = (Button) selectedItem.getItemProperty("Stop").getValue();
+                                selectedStopButton.setEnabled(true);
+                                break;
+                            }
+                            case STOP: {
+                                selectedStopButton.setEnabled(false);
+                                selectedStartButton = (Button) selectedItem.getItemProperty("Start").getValue();
+                                selectedStartButton.setEnabled(true);
+                                break;
+                            }
+                        }
+                    }
+                }
+                manager.moveToNextTask();
+                if (manager.getCurrentTask() != null) {
+//                        terminal.setValue(terminal.getValue().toString() + "Running next step " + manager.getCurrentTask().getDescription() + "\n");
+                    for (Command command : manager.getCurrentTask().getCommands()) {
+                        manager.executeCommand(command);
+                    }
+                } else {
+//                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+                }
+            } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+            }
+        }
+//            terminal.setCursorPosition(terminal.getValue().toString().length());
+    }
 }

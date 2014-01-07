@@ -15,7 +15,8 @@ public enum CassandraCommandEnum {
     STOP("service cassandra stop", 30),
     STATUS("service cassandra status", 30),
     INSTALL("apt-get --assume-yes --force-yes install ksks-cassandra", 30),
-    SET_SEED("apt-get --assume-yes --force-yes install ksks-cassandra", 30),
+    SET_SEED("", 30),
+    REMOVE_SEED("", 30),
     PURGE("apt-get --assume-yes --force-yes purge ksks-cassandra", 30);
 
     String program;

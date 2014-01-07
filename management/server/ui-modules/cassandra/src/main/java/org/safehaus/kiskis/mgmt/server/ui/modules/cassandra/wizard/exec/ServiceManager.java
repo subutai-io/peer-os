@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
+import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -31,6 +32,10 @@ public class ServiceManager {
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
     private final TextArea terminal;
+
+    public ServiceManager() {
+        this.terminal = null;
+    }
 
     public ServiceManager(TextArea textArea) {
         this.terminal = textArea;
@@ -70,8 +75,12 @@ public class ServiceManager {
         }
     }
 
-    private void moveToNextTask() {
+    public void moveToNextTask() {
         currentTask = tasks.poll();
+    }
+
+    public Task getCurrentTask() {
+        return currentTask;
     }
 
     public void onResponse(Response response) {
@@ -99,7 +108,7 @@ public class ServiceManager {
         }
     }
 
-    private void executeCommand(Command command) {
+    public void executeCommand(Command command) {
 //        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
         ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
     }
