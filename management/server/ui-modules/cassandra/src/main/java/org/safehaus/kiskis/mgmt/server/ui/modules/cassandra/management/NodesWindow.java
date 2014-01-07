@@ -26,13 +26,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
  */
 public class NodesWindow extends Window {
 
-    private final Table table;
+//    private final Table table;
     private IndexedContainer container;
     ServiceManager serviceManager;
     CassandraClusterInfo cci;
-//    Button selectedStartButton;
-//    Button selectedStopButton;
-//    Button selectedSetSeedsButton;
     CassandraCommandEnum cce;
     Item selectedItem;
 
@@ -64,13 +61,13 @@ public class NodesWindow extends Window {
 //            }
 //        });
 //        buttons.addComponent(addNewNode);
-        table = new Table("", getCassandraContainer());
-        table.setSizeFull();
-        table.setPageLength(6);
-        table.setImmediate(true);
+//        table = new Table("", getCassandraContainer());
+//        table.setSizeFull();
+//        table.setPageLength(6);
+//        table.setImmediate(true);
 
         verticalLayout.addComponent(buttons);
-        verticalLayout.addComponent(table);
+//        verticalLayout.addComponent(table);
         addComponent(verticalLayout);
 
     }

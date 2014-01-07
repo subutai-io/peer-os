@@ -5,12 +5,10 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,14 +29,8 @@ public class ServiceManager {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
-    private final TextArea terminal;
 
     public ServiceManager() {
-        this.terminal = null;
-    }
-
-    public ServiceManager(TextArea textArea) {
-        this.terminal = textArea;
     }
 
     public void runCommand(List<UUID> list, CassandraCommandEnum cce) {
@@ -83,30 +75,30 @@ public class ServiceManager {
         return currentTask;
     }
 
-    public void onResponse(Response response) {
-        if (currentTask != null && response.getTaskUuid() != null
-                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true);
-            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
-            if (!list.isEmpty() && terminal != null) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
-                    moveToNextTask();
-                    if (currentTask != null) {
-                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
-                        for (Command command : currentTask.getCommands()) {
-                            executeCommand(command);
-                        }
-                    } else {
-                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-                    }
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
-                }
-            }
-            terminal.setCursorPosition(terminal.getValue().toString().length());
-        }
-    }
+//    public void onResponse(Response response) {
+//        if (currentTask != null && response.getTaskUuid() != null
+//                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
+//            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true);
+//            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
+//            if (!list.isEmpty() && terminal != null) {
+//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
+//                    moveToNextTask();
+//                    if (currentTask != null) {
+//                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
+//                        for (Command command : currentTask.getCommands()) {
+//                            executeCommand(command);
+//                        }
+//                    } else {
+//                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+//                    }
+//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+//                }
+//            }
+//            terminal.setCursorPosition(terminal.getValue().toString().length());
+//        }
+//    }
 
     public void executeCommand(Command command) {
 //        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
