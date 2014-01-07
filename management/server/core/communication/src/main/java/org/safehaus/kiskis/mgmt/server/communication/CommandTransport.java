@@ -185,9 +185,9 @@ public class CommandTransport implements CommandTransportInterface {
             deadLetterStrategy.setProcessExpired(false);
             allDestinationsPolicyEntry.setDeadLetterStrategy(deadLetterStrategy);
             //drop queues inactive fo this period of time
-//            allDestinationsPolicyEntry.setGcInactiveDestinations(true);
-//            allDestinationsPolicyEntry.setInactiveTimoutBeforeGC(amqInactiveQueuesDropTimeoutSec * 1000);
-//            broker.setSchedulePeriodForDestinationPurge(30000);
+            allDestinationsPolicyEntry.setGcInactiveDestinations(true);
+            allDestinationsPolicyEntry.setInactiveTimoutBeforeGC(amqInactiveQueuesDropTimeoutSec * 1000);
+            broker.setSchedulePeriodForDestinationPurge(30000);
             //
             policy.setDefaultEntry(allDestinationsPolicyEntry);
             //unsubscribe durable subscribers that are offline for this amount of time

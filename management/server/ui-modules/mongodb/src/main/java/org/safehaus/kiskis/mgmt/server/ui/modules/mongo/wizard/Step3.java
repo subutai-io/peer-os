@@ -102,8 +102,8 @@ public class Step3 extends Panel {
                 wizard.back();
             }
         });
-        Button install = new Button("Install");
-        install.addListener(new Button.ClickListener() {
+        Button next = new Button("Next");
+        next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -117,9 +117,6 @@ public class Step3 extends Panel {
                 } else if (wizard.getConfig().getDataNodes().size() % 2 == 0) {
                     show("Please add odd number of data nodes");
                 } else {
-                    //disable back command
-                    //save config to db 
-                    //start installation
                     wizard.next();
                 }
             }
@@ -129,7 +126,7 @@ public class Step3 extends Panel {
 
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
-        buttons.addComponent(install);
+        buttons.addComponent(next);
         content.addComponent(buttons);
 
         addComponent(content);
