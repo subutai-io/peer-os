@@ -23,7 +23,7 @@ public class CassandraManager {
 
     private final VerticalLayout contentRoot;
 //    private final ServiceManager serviceManager;
-    private final TextArea terminal;
+//    private final TextArea terminal;
     private final CassandraTable cassandraTable;
 
     public CassandraManager() {
@@ -46,9 +46,9 @@ public class CassandraManager {
 
         Label clusterNameLabel = new Label("Select the cluster");
         content.addComponent(clusterNameLabel);
-        terminal = new TextArea();
-        terminal.setRows(10);
-        terminal.setColumns(60);
+//        terminal = new TextArea();
+//        terminal.setRows(10);
+//        terminal.setColumns(60);
 
         cassandraTable = new CassandraTable();
         Button getClustersBtn = new Button("Get clusters");
@@ -63,7 +63,7 @@ public class CassandraManager {
 
         content.addComponent(buttons);
         content.addComponent(cassandraTable);
-        content.addComponent(terminal);
+//        content.addComponent(terminal);
 
     }
 

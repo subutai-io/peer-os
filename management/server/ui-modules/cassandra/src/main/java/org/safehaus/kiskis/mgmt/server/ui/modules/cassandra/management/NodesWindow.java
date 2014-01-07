@@ -26,7 +26,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
  */
 public class NodesWindow extends Window {
 
-//    private final Table table;
+    private final Table table;
     private IndexedContainer container;
     ServiceManager serviceManager;
     CassandraClusterInfo cci;
@@ -61,13 +61,12 @@ public class NodesWindow extends Window {
 //            }
 //        });
 //        buttons.addComponent(addNewNode);
-//        table = new Table("", getCassandraContainer());
-//        table.setSizeFull();
-//        table.setPageLength(6);
-//        table.setImmediate(true);
-
+        table = new Table("", getCassandraContainer());
+        table.setSizeFull();
+        table.setPageLength(6);
+        table.setImmediate(true);
         verticalLayout.addComponent(buttons);
-//        verticalLayout.addComponent(table);
+        verticalLayout.addComponent(table);
         addComponent(verticalLayout);
 
     }
@@ -200,24 +199,26 @@ public class NodesWindow extends Window {
     }
 
     public void updateUI() {
-        switch (cce) {
-            case START: {
-                switchState(false);
-                break;
-            }
-            case STOP: {
-                switchState(true);
-                break;
-            }
-            case SET_SEED: {
-                Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
-                seed.setCaption("Remove seed");
-                break;
-            }
-            case REMOVE_SEED: {
-                Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
-                seed.setCaption("Set as seed");
-                break;
+        if (cce != null) {
+            switch (cce) {
+                case START: {
+                    switchState(false);
+                    break;
+                }
+                case STOP: {
+                    switchState(true);
+                    break;
+                }
+                case SET_SEED: {
+                    Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                    seed.setCaption("Remove seed");
+                    break;
+                }
+                case REMOVE_SEED: {
+                    Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                    seed.setCaption("Set as seed");
+                    break;
+                }
             }
         }
     }
