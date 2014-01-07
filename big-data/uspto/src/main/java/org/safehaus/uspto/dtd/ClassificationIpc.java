@@ -1,5 +1,7 @@
 package org.safehaus.uspto.dtd;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.jdom2.Attribute;
@@ -14,30 +16,35 @@ import org.w3c.dom.NodeList;
 
 import com.mongodb.BasicDBObject;
 
-public class MainCpc implements Converter{
+public class ClassificationIpc implements Converter{
 
-	private static final String title = "MainCpc";
+	private static final String title = "ClassificationIpc";
 	
 	protected Logger logger;
 	
 	private String id;
-	private ClassificationCpc classificationCpc;
+	private String edition;
+	private String mainClassification;
+	private Collection<String> furtherClassifications;
+	private String text;
 	
-	public MainCpc(Logger logger) {
+	public ClassificationIpc(Logger logger) {
 		this.logger = logger;
+		furtherClassifications = new ArrayList<String>();
 	}
 	
-	public MainCpc(Element element, Logger logger)
+	public ClassificationIpc(Element element, Logger logger)
 	{
 		this.logger = logger;
+		furtherClassifications = new ArrayList<String>();
 		
-		NamedNodeMap nodeMap = element.getAttributes();
-		for (int i=0; i < nodeMap.getLength(); i++)
+		NamedNodeMap nodemap = element.getAttributes();
+		for (int i=0; i < nodemap.getLength(); i++)
 		{
-			Node node = nodeMap.item(i);
+			Node childNode = nodemap.item(i);
 			
-			if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
-				Attr attribute = (Attr) node;
+			if (childNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+				Attr attribute = (Attr) childNode;
 				if (attribute.getNodeName().equals("id")) {
 					id = attribute.getNodeValue();
 				}
@@ -53,8 +60,17 @@ public class MainCpc implements Converter{
 			Node node = nodeList.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element childElement = (Element) node;
-				if (childElement.getNodeName().equals("classification-cpc")) {
-					classificationCpc = new ClassificationCpc(childElement, logger);
+				if (childElement.getNodeName().equals("edition")) {
+					edition = childElement.getTextContent();
+				}
+				else if (childElement.getNodeName().equals("main-classification")) {
+					mainClassification = childElement.getTextContent();
+				}
+				else if (childElement.getNodeName().equals("further-classification")) {
+					furtherClassifications.add(childElement.getTextContent());
+				}
+				else if (childElement.getNodeName().equals("text")) {
+					text = childElement.getTextContent();
 				}
 				else
 				{
@@ -75,9 +91,10 @@ public class MainCpc implements Converter{
 
 	}
 
-	public MainCpc(org.jdom2.Element element, Logger logger)
+	public ClassificationIpc(org.jdom2.Element element, Logger logger)
 	{
 		this.logger = logger;
+		furtherClassifications = new ArrayList<String>();
 		
 		List<Attribute> attributes = element.getAttributes();
 		for (int i=0; i < attributes.size(); i++)
@@ -98,8 +115,17 @@ public class MainCpc implements Converter{
 			Content node = nodes.get(i);
 			if (node.getCType() == Content.CType.Element) {
 				org.jdom2.Element childElement = (org.jdom2.Element) node;
-				if (childElement.getName().equals("classification-cpc")) {
-					classificationCpc = new ClassificationCpc(childElement, logger);
+				if (childElement.getName().equals("edition")) {
+					edition = childElement.getValue();
+				}
+				else if (childElement.getName().equals("main-classification")) {
+					mainClassification = childElement.getValue();
+				}
+				else if (childElement.getName().equals("further-classification")) {
+					furtherClassifications.add(childElement.getValue());
+				}
+				else if (childElement.getName().equals("text")) {
+					text = childElement.getValue();
 				}
 				else
 				{
@@ -120,13 +146,6 @@ public class MainCpc implements Converter{
 
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public ClassificationCpc getClassificationCpc() {
-		return classificationCpc;
-	}
 
 	@Override
 	public String toString() {
@@ -136,10 +155,25 @@ public class MainCpc implements Converter{
 			toStringBuffer.append(" Id: ");
 			toStringBuffer.append(id);
 		}
-		if (classificationCpc != null)
+		if (edition != null)
 		{
-			toStringBuffer.append(" ");
-			toStringBuffer.append(classificationCpc);
+			toStringBuffer.append(" Edition: ");
+			toStringBuffer.append(edition);
+		}
+		if (mainClassification != null)
+		{
+			toStringBuffer.append(" MainClassification: ");
+			toStringBuffer.append(mainClassification);
+		}
+		if (furtherClassifications != null)
+		{
+			toStringBuffer.append(" FurtherClassification: ");
+			toStringBuffer.append(furtherClassifications);
+		}
+		if (text != null)
+		{
+			toStringBuffer.append(" Text: ");
+			toStringBuffer.append(text);
 		}
 		return toStringBuffer.toString();
 	}
@@ -150,9 +184,17 @@ public class MainCpc implements Converter{
 		{
 			jsonObject.put("Id", id);
 		}
-		if (classificationCpc != null)
+		if (edition != null)
 		{
-			jsonObject.put(classificationCpc.getTitle(), classificationCpc.toJSon());
+			jsonObject.put("Edition", edition);
+		}
+		if (mainClassification != null)
+		{
+			jsonObject.put("MainClassification", mainClassification);
+		}
+		if (furtherClassifications != null)
+		{
+			jsonObject.put("FurtherClassification", furtherClassifications);
 		}
 		return jsonObject;
 	}
@@ -163,9 +205,17 @@ public class MainCpc implements Converter{
 		{
 			basicDBObject.put("Id", id);
 		}
-		if (classificationCpc != null)
+		if (edition != null)
 		{
-			basicDBObject.put(classificationCpc.getTitle(), classificationCpc.toBasicDBObject());
+			basicDBObject.put("Edition", edition);
+		}
+		if (mainClassification != null)
+		{
+			basicDBObject.put("MainClassification", mainClassification);
+		}
+		if (furtherClassifications != null)
+		{
+			basicDBObject.put("FurtherClassification", furtherClassifications);
 		}
 		return basicDBObject;
 	}

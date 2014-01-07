@@ -1,5 +1,9 @@
 package org.safehaus.uspto.dtd;
 
+import java.util.List;
+
+import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;
@@ -112,6 +116,95 @@ public class ListItem extends SingleCollection<Converter>{
 			else
 			{
 				logger.warn("Unknown Node {} in {} node", node.getNodeName(), title);
+			}
+		}
+
+	}
+
+	public ListItem(org.jdom2.Element element, Logger logger)
+	{
+		super(element);
+		this.logger = logger;
+		
+		List<Attribute> attributes = element.getAttributes();
+		for (int i=0; i < attributes.size(); i++)
+		{
+			Attribute attribute = attributes.get(i);
+			if (attribute.getName().equals("id")) {
+				id = attribute.getValue();
+			}
+			else if (attribute.getName().equals("num")) {
+				number = attribute.getValue();
+			}
+			else
+			{
+				logger.warn("Unknown Attribute {} in {} node", attribute.getName(), title);
+			}
+		}
+
+		List<Content> nodes = element.getContent();
+		for (int i=0; i < nodes.size(); i++)
+		{
+			Content node = nodes.get(i);
+			if (node.getCType() == Content.CType.Element) {
+				org.jdom2.Element childElement = (org.jdom2.Element) node;
+				if (childElement.getName().equals("b")) {
+					elements.add(new Bold(childElement, logger));
+				}
+				else if (childElement.getName().equals("i")) {
+					elements.add(new Italic(childElement, logger));
+				}
+				else if (childElement.getName().equals("o")) {
+					elements.add(new Overscore(childElement, logger));
+				}
+				else if (childElement.getName().equals("u")) {
+					elements.add(new Underscore(childElement, logger));
+				}
+				else if (childElement.getName().equals("sup")) {
+					elements.add(new Superscript(childElement, logger));
+				}
+				else if (childElement.getName().equals("sub")) {
+					elements.add(new Subscript(childElement, logger));
+				}
+				else if (childElement.getName().equals("smallcaps")) {
+					elements.add(new Smallcaps(childElement, logger));
+				}
+				else if (childElement.getName().equals("figref")) {
+					elements.add(new FigRef(childElement, logger));
+				}
+				else if (childElement.getName().equals("img")) {
+					elements.add(new Image(childElement, logger));
+				}
+				else if (childElement.getName().equals("ul")) {
+					elements.add(new UnorderedList(childElement, logger));
+				}
+				else if (childElement.getName().equals("ol")) {
+					elements.add(new OrderedList(childElement, logger));
+				}
+				else if (childElement.getName().equals("chemistry")) {
+					elements.add(new Chemistry(childElement, logger));
+				}
+				else if (childElement.getName().equals("maths")) {
+					elements.add(new Maths(childElement, logger));
+				}
+				else if (childElement.getName().equals("br")) {
+					//ignore
+				}
+				else
+				{
+					logger.warn("Unknown Element {} in {} node", childElement.getName(), title);
+				}
+			}
+			else if (node.getCType() == Content.CType.Text) {
+				org.jdom2.Text text = (org.jdom2.Text)node;
+				elements.add(new TextNode(text));
+			}
+			else if (node.getCType() == Content.CType.ProcessingInstruction) {
+				//ignore
+			}
+			else
+			{
+				logger.warn("Unknown Node {} in {} node", node.getCType(), title);
 			}
 		}
 

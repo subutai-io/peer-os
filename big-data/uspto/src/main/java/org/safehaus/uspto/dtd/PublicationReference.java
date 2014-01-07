@@ -17,6 +17,11 @@ public class PublicationReference extends BaseReference {
 		super(element, BaseReference.ReferenceType.PUBLICATION, logger);
 	}
 
+	public PublicationReference(org.jdom2.Element element, Logger logger)
+	{
+		super(element, BaseReference.ReferenceType.PUBLICATION, logger);
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer toStringBuffer = new StringBuffer(title+":");

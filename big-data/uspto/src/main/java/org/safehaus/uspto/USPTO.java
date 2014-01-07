@@ -16,7 +16,7 @@ import org.safehaus.mongodb.MongoDBClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class USPTO {
+public class Uspto {
 
 	ArrayList<File> patentFiles = new ArrayList<File>();
 	Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -25,15 +25,15 @@ public class USPTO {
 	public final String mongoDbHost = "172.16.9.13";
 	DocumentBuilderFactory dbFactory;
 	DocumentBuilder dBuilder;
-	USPTOEntityResolver entityResolver;
+	UsptoEntityResolver entityResolver;
 	CassandraClient cassandraClient;
 	MongoDBClient mongoDbClient;
-	USPTOV44Parser usptov40Writer;
+	UsptoDomParser usptov40Writer;
 
-	public USPTO()
+	public Uspto()
 	{
 		dbFactory = DocumentBuilderFactory.newInstance();
-		entityResolver = new USPTOEntityResolver();
+		entityResolver = new UsptoEntityResolver();
 		dbFactory.setExpandEntityReferences(false);
 		dbFactory.setValidating(false);
 		try {
@@ -43,7 +43,7 @@ public class USPTO {
 			e.printStackTrace();
 		}
 		dBuilder.setEntityResolver(entityResolver);
-		usptov40Writer = new USPTOV44Parser();
+		usptov40Writer = new UsptoDomParser();
 		cassandraClient = new CassandraClient();
 		mongoDbClient = new MongoDBClient();
 
@@ -56,14 +56,18 @@ public class USPTO {
 		System.setProperty("entityExpansionLimit","200000");
 		
 //		addFiles("/home/selcuk/share/uspto");
-//		addFiles("/home/selcuk/tmp");
+		addFiles("/home/selcuk/tmp");
 //		addFiles("/home/selcuk/workspace/USPTO/src/main/resources/samples");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2013");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2012");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2011");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2010");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2009");
-		addFiles("/data/trunk/uspto/products/full_text_grants/2008");
+//		addFiles("/data/trunk/uspto/products/full_text_grants/2008");
+//		addFiles("/data/trunk/uspto/products/full_text_grants/2007");
+//		addFiles("/data/trunk/uspto/products/full_text_grants/2006");
+//		addFiles("/data/trunk/uspto/products/full_text_grants/2005");
+///		addFiles("/data/trunk/uspto/products/full_text_grants/2004");
 		
 		cassandraClient.connect(cassandraHost);
 //		cassandraClient.dropSchema("uspto");
@@ -84,12 +88,12 @@ public class USPTO {
 		ConcurrentLinkedQueue<File> patentFilesQueue = new ConcurrentLinkedQueue<File>();
 		patentFilesQueue.addAll(patentFiles);
 		
-		int maxThreadCount = 5;
+		int maxThreadCount = 3;
 		
 		Thread[] threads = new Thread[maxThreadCount];
 		for (int i=0; i<maxThreadCount; i++)
 		{
-			USPTOThread usptoThread = new USPTOThread(patentFilesQueue, cassandraClient, mongoDbClient, xmlDelimeter);
+			UsptoThread usptoThread = new UsptoThread(patentFilesQueue, cassandraClient, mongoDbClient, xmlDelimeter);
 			Thread thread = new Thread(usptoThread);
 			threads[i] = thread;
 			thread.start();

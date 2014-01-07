@@ -11,35 +11,45 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import com.mongodb.BasicDBObject;
 
-public class MainCpc implements Converter{
+public class SequenceListDoc extends SingleCollection<Converter>{
 
-	private static final String title = "MainCpc";
+	private static final String title = "SequenceListDoc";
 	
 	protected Logger logger;
 	
 	private String id;
-	private ClassificationCpc classificationCpc;
+	private String lang;
+	private String status;
 	
-	public MainCpc(Logger logger) {
+	public SequenceListDoc(Logger logger) {
+		super();
 		this.logger = logger;
 	}
 	
-	public MainCpc(Element element, Logger logger)
+	public SequenceListDoc(Element element, Logger logger)
 	{
+		super();
 		this.logger = logger;
 		
-		NamedNodeMap nodeMap = element.getAttributes();
-		for (int i=0; i < nodeMap.getLength(); i++)
+		NamedNodeMap nodemap = element.getAttributes();
+		for (int i=0; i < nodemap.getLength(); i++)
 		{
-			Node node = nodeMap.item(i);
+			Node childNode = nodemap.item(i);
 			
-			if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
-				Attr attribute = (Attr) node;
+			if (childNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+				Attr attribute = (Attr) childNode;
 				if (attribute.getNodeName().equals("id")) {
 					id = attribute.getNodeValue();
+				}
+				else if (attribute.getNodeName().equals("lang")) {
+					lang = attribute.getNodeValue();
+				}
+				else if (attribute.getNodeName().equals("status")) {
+					status = attribute.getNodeValue();
 				}
 				else
 				{
@@ -53,8 +63,8 @@ public class MainCpc implements Converter{
 			Node node = nodeList.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element childElement = (Element) node;
-				if (childElement.getNodeName().equals("classification-cpc")) {
-					classificationCpc = new ClassificationCpc(childElement, logger);
+				if (childElement.getNodeName().equals("sequence-list")) {
+					elements.add(new SequenceList(childElement, logger));
 				}
 				else
 				{
@@ -62,7 +72,8 @@ public class MainCpc implements Converter{
 				}
 			}
 			else if (node.getNodeType() == Node.TEXT_NODE) {
-				//ignore
+				Text text = (Text)node;
+				elements.add(new TextNode(text));
 			}
 			else if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
 				//ignore
@@ -75,8 +86,9 @@ public class MainCpc implements Converter{
 
 	}
 
-	public MainCpc(org.jdom2.Element element, Logger logger)
+	public SequenceListDoc(org.jdom2.Element element, Logger logger)
 	{
+		super();
 		this.logger = logger;
 		
 		List<Attribute> attributes = element.getAttributes();
@@ -85,6 +97,12 @@ public class MainCpc implements Converter{
 			Attribute attribute = attributes.get(i);
 			if (attribute.getName().equals("id")) {
 				id = attribute.getValue();
+			}
+			else if (attribute.getName().equals("lang")) {
+				lang = attribute.getValue();
+			}
+			else if (attribute.getName().equals("status")) {
+				status = attribute.getValue();
 			}
 			else
 			{
@@ -98,8 +116,8 @@ public class MainCpc implements Converter{
 			Content node = nodes.get(i);
 			if (node.getCType() == Content.CType.Element) {
 				org.jdom2.Element childElement = (org.jdom2.Element) node;
-				if (childElement.getName().equals("classification-cpc")) {
-					classificationCpc = new ClassificationCpc(childElement, logger);
+				if (childElement.getName().equals("sequence-list")) {
+					elements.add(new SequenceList(childElement, logger));
 				}
 				else
 				{
@@ -107,7 +125,8 @@ public class MainCpc implements Converter{
 				}
 			}
 			else if (node.getCType() == Content.CType.Text) {
-				//ignore
+				org.jdom2.Text text = (org.jdom2.Text)node;
+				elements.add(new TextNode(text));
 			}
 			else if (node.getCType() == Content.CType.ProcessingInstruction) {
 				//ignore
@@ -124,8 +143,12 @@ public class MainCpc implements Converter{
 		return id;
 	}
 
-	public ClassificationCpc getClassificationCpc() {
-		return classificationCpc;
+	public String getLang() {
+		return lang;
+	}
+
+	public String getStatus() {
+		return status;
 	}
 
 	@Override
@@ -136,36 +159,58 @@ public class MainCpc implements Converter{
 			toStringBuffer.append(" Id: ");
 			toStringBuffer.append(id);
 		}
-		if (classificationCpc != null)
+		if (lang != null)
 		{
-			toStringBuffer.append(" ");
-			toStringBuffer.append(classificationCpc);
+			toStringBuffer.append(" Lang: ");
+			toStringBuffer.append(lang);
 		}
+		if (status != null)
+		{
+			toStringBuffer.append(" Status: ");
+			toStringBuffer.append(status);
+		}
+		toStringBuffer.append(super.toString());
 		return toStringBuffer.toString();
 	}
 
 	public JSONObject toJSon() {
-		JSONObject jsonObject = new JSONObject();
+		JSONObject jsonObject = super.toJSon();
+		if (jsonObject == null)
+		{
+			jsonObject = new JSONObject();
+		}
 		if (id != null)
 		{
 			jsonObject.put("Id", id);
 		}
-		if (classificationCpc != null)
+		if (lang != null)
 		{
-			jsonObject.put(classificationCpc.getTitle(), classificationCpc.toJSon());
+			jsonObject.put("Lang", lang);
+		}
+		if (status != null)
+		{
+			jsonObject.put("Status", status);
 		}
 		return jsonObject;
 	}
 
 	public BasicDBObject toBasicDBObject() {
-		BasicDBObject basicDBObject = new BasicDBObject();
+		BasicDBObject basicDBObject = super.toBasicDBObject();
+		if (basicDBObject == null)
+		{
+			basicDBObject = new BasicDBObject();
+		}
 		if (id != null)
 		{
 			basicDBObject.put("Id", id);
 		}
-		if (classificationCpc != null)
+		if (lang != null)
 		{
-			basicDBObject.put(classificationCpc.getTitle(), classificationCpc.toBasicDBObject());
+			basicDBObject.put("Lang", lang);
+		}
+		if (status != null)
+		{
+			basicDBObject.put("Status", status);
 		}
 		return basicDBObject;
 	}

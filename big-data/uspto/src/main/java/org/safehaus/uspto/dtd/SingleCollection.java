@@ -23,6 +23,11 @@ public abstract class SingleCollection<Type extends Converter> implements Conver
 		elements = new ArrayList<Type>();
 	}
 
+	public SingleCollection(org.jdom2.Element element)
+	{
+		elements = new ArrayList<Type>();
+	}
+
 	public Collection<Type> getElements() {
 		return elements;
 	}

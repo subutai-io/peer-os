@@ -1,5 +1,8 @@
 package org.safehaus.uspto.dtd;
 
+import java.util.List;
+
+import org.jdom2.Content;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.w3c.dom.Element;
@@ -17,6 +20,7 @@ public class Citation  implements Converter{
 	private PatentCitation patentCitation;
 	private NplCitation nplCitation;
 	private String category;
+	private ClassificationIpc classificationIpc;
 	private ClassificationNational classificationNational;
 	
 	public Citation(Logger logger) {
@@ -37,6 +41,9 @@ public class Citation  implements Converter{
 				}
 				else if (childElement.getNodeName().equals("category")) {
 					category = childElement.getTextContent();
+				}
+				else if (childElement.getNodeName().equals("classification-ipc")) {
+					classificationIpc = new ClassificationIpc(childElement, logger);
 				}
 				else if (childElement.getNodeName().equals("classification-national")) {
 					classificationNational = new ClassificationNational(childElement, logger);
@@ -62,7 +69,51 @@ public class Citation  implements Converter{
 		}
 
 	}
-	
+
+	public Citation(org.jdom2.Element element, Logger logger)
+	{
+		this.logger = logger;
+		
+		List<Content> nodes = element.getContent();
+		for (int i=0; i < nodes.size(); i++)
+		{
+			Content node = nodes.get(i);
+			if (node.getCType() == Content.CType.Element) {
+				org.jdom2.Element childElement = (org.jdom2.Element) node;
+				if (childElement.getName().equals("patcit")) {
+					patentCitation = new PatentCitation(childElement, logger);
+				}
+				else if (childElement.getName().equals("category")) {
+					category = childElement.getValue();
+				}
+				else if (childElement.getName().equals("classification-ipc")) {
+					classificationIpc = new ClassificationIpc(childElement, logger);
+				}
+				else if (childElement.getName().equals("classification-national")) {
+					classificationNational = new ClassificationNational(childElement, logger);
+				}
+				else if (childElement.getName().equals("nplcit")) {
+					nplCitation = new NplCitation(childElement, logger);
+				}
+				else
+				{
+					logger.warn("Unknown Element {} in {} node", childElement.getName(), title);
+				}
+			}
+			else if (node.getCType() == Content.CType.Text) {
+				//ignore
+			}
+			else if (node.getCType() == Content.CType.ProcessingInstruction) {
+				//ignore
+			}
+			else
+			{
+				logger.warn("Unknown Node {} in {} node", node.getCType(), title);
+			}
+		}
+
+	}
+
 	public PatentCitation getPatentCitation() {
 		return patentCitation;
 	}
@@ -75,6 +126,10 @@ public class Citation  implements Converter{
 		return category;
 	}
 
+	public ClassificationIpc getClassificationIpc() {
+		return classificationIpc;
+	}
+	
 	public ClassificationNational getClassificationNational() {
 		return classificationNational;
 	}
@@ -96,6 +151,11 @@ public class Citation  implements Converter{
 		{
 			toStringBuffer.append(" Category: ");
 			toStringBuffer.append(category);
+		}
+		if (classificationIpc != null)
+		{
+			toStringBuffer.append(" ");
+			toStringBuffer.append(classificationIpc);
 		}
 		if (classificationNational != null)
 		{
@@ -119,6 +179,10 @@ public class Citation  implements Converter{
 		{
 			jsonObject.put(nplCitation.getTitle(), nplCitation.toJSon());
 		}
+		if (classificationIpc != null)
+		{
+			jsonObject.put(classificationIpc.getTitle(), classificationIpc.toJSon());
+		}
 		if (classificationNational != null)
 		{
 			jsonObject.put(classificationNational.getTitle(), classificationNational.toJSon());
@@ -139,6 +203,10 @@ public class Citation  implements Converter{
 		if (nplCitation != null)
 		{
 			basicDBObject.put(nplCitation.getTitle(), nplCitation.toBasicDBObject());
+		}
+		if (classificationIpc != null)
+		{
+			basicDBObject.put(classificationIpc.getTitle(), classificationIpc.toBasicDBObject());
 		}
 		if (classificationNational != null)
 		{

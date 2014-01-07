@@ -1,5 +1,8 @@
 package org.safehaus.uspto.dtd;
 
+import java.util.List;
+
+import org.jdom2.Attribute;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;
@@ -39,6 +42,24 @@ public class UsIssuedOnContinuedProsecutionApplication implements Converter{
 				{
 					logger.warn("Unknown Attribute {} in {} node", attribute.getNodeName(), title);
 				}
+			}
+		}
+	}
+
+	public UsIssuedOnContinuedProsecutionApplication(org.jdom2.Element element, Logger logger)
+	{
+		this.logger = logger;
+		
+		List<Attribute> attributes = element.getAttributes();
+		for (int i=0; i < attributes.size(); i++)
+		{
+			Attribute attribute = attributes.get(i);
+			if (attribute.getName().equals("grant-cpa-text")) {
+				grantCpaText = attribute.getValue();
+			}
+			else
+			{
+				logger.warn("Unknown Attribute {} in {} node", attribute.getName(), title);
 			}
 		}
 	}

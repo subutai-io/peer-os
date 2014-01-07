@@ -1,5 +1,8 @@
 package org.safehaus.uspto.dtd;
 
+import java.util.List;
+
+import org.jdom2.Content;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.w3c.dom.Element;
@@ -19,6 +22,7 @@ public class Address implements Converter{
 	private String state;
 	private String postcode;
 	private String street;
+	private String mailcode;
 	
 	public Address(Logger logger) {
 		this.logger = logger;
@@ -48,6 +52,9 @@ public class Address implements Converter{
 				else if (childElement.getNodeName().equals("street")) {
 					street = childElement.getTextContent();
 				}
+				else if (childElement.getNodeName().equals("mailcode")) {
+					mailcode = childElement.getTextContent();
+				}
 				else
 				{
 					logger.warn("Unknown Element {} in {} node", childElement.getNodeName(), title);
@@ -62,6 +69,52 @@ public class Address implements Converter{
 			else
 			{
 				logger.warn("Unknown Node {} in {} node", node.getNodeName(), title);
+			}
+		}
+	}
+
+	public Address(org.jdom2.Element element, Logger logger)
+	{
+		this.logger = logger;
+		
+		List<Content> nodes = element.getContent();
+		for (int i=0; i < nodes.size(); i++)
+		{
+			Content node = nodes.get(i);
+			if (node.getCType() == Content.CType.Element) {
+				org.jdom2.Element childElement = (org.jdom2.Element) node;
+				if (childElement.getName().equals("city")) {
+					city = childElement.getValue();
+				}
+				else if (childElement.getName().equals("country")) {
+					country = childElement.getValue();
+				}
+				else if (childElement.getName().equals("state")) {
+					state = childElement.getValue();
+				}
+				else if (childElement.getName().equals("postcode")) {
+					postcode = childElement.getValue();
+				}
+				else if (childElement.getName().equals("street")) {
+					street = childElement.getValue();
+				}
+				else if (childElement.getName().equals("mailcode")) {
+					mailcode = childElement.getValue();
+				}
+				else
+				{
+					logger.warn("Unknown Element {} in {} node", childElement.getName(), title);
+				}
+			}
+			else if (node.getCType() == Content.CType.Text) {
+				//ignore
+			}
+			else if (node.getCType() == Content.CType.ProcessingInstruction) {
+				//ignore
+			}
+			else
+			{
+				logger.warn("Unknown Node {} in {} node", node.getCType(), title);
 			}
 		}
 	}
@@ -84,6 +137,10 @@ public class Address implements Converter{
 
 	public String getStreet() {
 		return street;
+	}
+	
+	public String getMailcode() {
+		return mailcode;
 	}
 	
 	@Override
@@ -114,6 +171,11 @@ public class Address implements Converter{
 			toStringBuffer.append(" Street: ");
 			toStringBuffer.append(street);
 		}
+		if (mailcode != null)
+		{
+			toStringBuffer.append(" Mailcode: ");
+			toStringBuffer.append(mailcode);
+		}
 		return toStringBuffer.toString();
 	}
 	
@@ -139,6 +201,10 @@ public class Address implements Converter{
 		{
 			jsonObject.put("Street", street);
 		}
+		if (mailcode != null)
+		{
+			jsonObject.put("Mailcode", mailcode);
+		}
 		return jsonObject;
 	}
 
@@ -163,6 +229,10 @@ public class Address implements Converter{
 		if (street != null)
 		{
 			basicDBObject.put("Street", street);
+		}
+		if (mailcode != null)
+		{
+			basicDBObject.put("Mailcode", mailcode);
 		}
 		return basicDBObject;
 	}

@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,9 +12,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.safehaus.cassandra.CassandraClient;
 import org.safehaus.mongodb.MongoDBClient;
@@ -24,13 +24,11 @@ import org.safehaus.uspto.dtd.PublicationReference;
 import org.safehaus.uspto.dtd.UsPatentGrant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.mongodb.BasicDBObject;
 
-public class USPTOThread implements Runnable {
+public class UsptoThread implements Runnable {
 
 	ConcurrentLinkedQueue<File> patentFilesQueue;
 	CassandraClient cassandraClient;
@@ -38,28 +36,35 @@ public class USPTOThread implements Runnable {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	public final String xmlDelimeter;
 	DocumentBuilderFactory dbFactory;
-	DocumentBuilder dBuilder;
-	USPTOEntityResolver entityResolver;
-	USPTOV44Parser usptov40Writer;
+//	DocumentBuilder dBuilder;
+	SAXParserFactory saxParserFactory;
+	SAXParser saxParser;
+	UsptoEntityResolver entityResolver;
+	UsptoDomParser usptoDomParser;
+	UsptoJDomParser usptoJDomParser;
 
-	public USPTOThread(ConcurrentLinkedQueue<File> patentFilesQueue, CassandraClient cassandraClient, MongoDBClient mongoDbClient, final String xmlDelimeter)
+	public UsptoThread(ConcurrentLinkedQueue<File> patentFilesQueue, CassandraClient cassandraClient, MongoDBClient mongoDbClient, final String xmlDelimeter)
 	{
 		this.patentFilesQueue = patentFilesQueue;
 		this.cassandraClient = cassandraClient;
 		this.mongoDbClient = mongoDbClient;
 		this.xmlDelimeter = xmlDelimeter;
 		dbFactory = DocumentBuilderFactory.newInstance();
-		entityResolver = new USPTOEntityResolver();
+		saxParserFactory = SAXParserFactory.newInstance();
+		entityResolver = new UsptoEntityResolver();
 		dbFactory.setExpandEntityReferences(false);
 		dbFactory.setValidating(false);
 		try {
-			dBuilder = dbFactory.newDocumentBuilder();
+//			dBuilder = dbFactory.newDocumentBuilder();
+			saxParser = saxParserFactory.newSAXParser();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unable to get DOMBuilder",e);
+		} catch (SAXException e) {
+			logger.error("Unable to get SAXParser",e);
 		}
-		dBuilder.setEntityResolver(entityResolver);
-		usptov40Writer = new USPTOV44Parser();
+//		dBuilder.setEntityResolver(entityResolver);
+		usptoDomParser = new UsptoDomParser();
+		usptoJDomParser = new UsptoJDomParser();
 	}
 
 	public void run() {
@@ -84,41 +89,23 @@ public class USPTOThread implements Runnable {
 	
 	public void handleXMLString(String xmlString)
 	{
-		Document doc = null;
-		try {
-			DocumentBuilder myBuilder = dbFactory.newDocumentBuilder();
-			myBuilder.setEntityResolver(entityResolver);
-			doc = myBuilder.parse(new InputSource(new StringReader(xmlString)));
-			//cassandraClient.insertXML("Deneme1", xmlString);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();}
-		 catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		
-//		System.out.println(doc.getDoctype());
-		UsPatentGrant usPatentGrant = usptov40Writer.parseDocument(doc);
-		if (usPatentGrant != null)
-		{
-			// Cassandra cql does not allow single quote in queries.
-			String xmlStringEscaped = xmlString.replaceAll("'", "''");
-			String jsonString = usPatentGrant.toJSon().toString();
-			String jsonStringEscaped = jsonString.replaceAll("'", "''");
-			PublicationReference publicationReference = usPatentGrant.getUsBibliographicDataGrant().getPublicationReference();
-			ApplicationReference applicationReference = usPatentGrant.getUsBibliographicDataGrant().getApplicationReference();
-			cassandraClient.insertXML(publicationReference.getDocumentId().documentNumber,
-					publicationReference.getDocumentId().date,
-					applicationReference.getDocumentId().documentNumber,
-					applicationReference.getDocumentId().date,
-					xmlStringEscaped, jsonStringEscaped);
-			mongoDbClient.insert(new BasicDBObject(publicationReference.getDocumentId().documentNumber,usPatentGrant.toBasicDBObject()));
-		}
+		UsPatentGrant usPatentGrant = usptoDomParser.parseXMLString(xmlString, dbFactory, entityResolver);
+//		UsPatentGrant usPatentGrant = usptoJDomParser.parseXMLString(xmlString, dbFactory, entityResolver);
+//		if (usPatentGrant != null)
+//		{
+//			// Cassandra cql does not allow single quote in queries.
+//			String xmlStringEscaped = xmlString.replaceAll("'", "''");
+//			String jsonString = usPatentGrant.toJSon().toString();
+//			String jsonStringEscaped = jsonString.replaceAll("'", "''");
+//			PublicationReference publicationReference = usPatentGrant.getUsBibliographicDataGrant().getPublicationReference();
+//			ApplicationReference applicationReference = usPatentGrant.getUsBibliographicDataGrant().getApplicationReference();
+//			cassandraClient.insertXML(publicationReference.getDocumentId().documentNumber,
+//					publicationReference.getDocumentId().date,
+//					applicationReference.getDocumentId().documentNumber,
+//					applicationReference.getDocumentId().date,
+//					xmlStringEscaped, jsonStringEscaped);
+//			mongoDbClient.insert(new BasicDBObject(publicationReference.getDocumentId().documentNumber,usPatentGrant.toBasicDBObject()));
+//		}
 	}
 	 
 	public int handleMultipleXMLDocuments(InputStream fileStream)

@@ -22,6 +22,13 @@ public class UsClassificationsIpcr implements Converter{
 		text = element.getTextContent();
 	}
 
+	public UsClassificationsIpcr(org.jdom2.Element element, Logger logger)
+	{
+		this.logger = logger;
+		
+		text = element.getValue();
+	}
+
 	public String getText() {
 		return text;
 	}

@@ -3,28 +3,26 @@ package org.safehaus.uspto.dtd;
 import java.util.List;
 
 import org.jdom2.Content;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.mongodb.BasicDBObject;
+public class FieldOfSearch extends SingleCollection<Converter>{
 
-public class Nationality implements Converter{
-
-	private static final String title = "Nationality";
+	private static final String title = "FieldOfSearch";
 	
 	protected Logger logger;
 	
-	private String country;
 	
-	public Nationality(Logger logger) {
+	public FieldOfSearch(Logger logger) {
+		super();
 		this.logger = logger;
 	}
-
-	public Nationality(Element element, Logger logger)
+	
+	public FieldOfSearch(Element element, Logger logger)
 	{
+		super();
 		this.logger = logger;
 		
 		NodeList nodeList = element.getChildNodes();
@@ -32,9 +30,14 @@ public class Nationality implements Converter{
 			Node node = nodeList.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element childElement = (Element) node;
-				if (childElement.getNodeName().equals("country"))
-				{
-					country = childElement.getTextContent();
+				if (childElement.getNodeName().equals("classification-ipc")) {
+					elements.add(new ClassificationIpc(childElement, logger));
+				}
+				else if (childElement.getNodeName().equals("classifications-ipcr")) {
+					elements.add(new ClassificationsIpcr(childElement, logger));
+				}
+				else if (childElement.getNodeName().equals("classification-national")) {
+					elements.add(new ClassificationNational(childElement, logger));
 				}
 				else
 				{
@@ -55,8 +58,9 @@ public class Nationality implements Converter{
 
 	}
 
-	public Nationality(org.jdom2.Element element, Logger logger)
+	public FieldOfSearch(org.jdom2.Element element, Logger logger)
 	{
+		super();
 		this.logger = logger;
 		
 		List<Content> nodes = element.getContent();
@@ -65,9 +69,14 @@ public class Nationality implements Converter{
 			Content node = nodes.get(i);
 			if (node.getCType() == Content.CType.Element) {
 				org.jdom2.Element childElement = (org.jdom2.Element) node;
-				if (childElement.getName().equals("country"))
-				{
-					country = childElement.getValue();
+				if (childElement.getName().equals("classification-ipc")) {
+					elements.add(new ClassificationIpc(childElement, logger));
+				}
+				else if (childElement.getName().equals("classifications-ipcr")) {
+					elements.add(new ClassificationsIpcr(childElement, logger));
+				}
+				else if (childElement.getName().equals("classification-national")) {
+					elements.add(new ClassificationNational(childElement, logger));
 				}
 				else
 				{
@@ -88,41 +97,16 @@ public class Nationality implements Converter{
 
 	}
 
-	public String getCountry() {
-		return country;
-	}
-
 	@Override
 	public String toString() {
 		StringBuffer toStringBuffer = new StringBuffer(title+":");
-		if (country != null)
-		{
-			toStringBuffer.append(" Country: ");
-			toStringBuffer.append(country);
-		}
+		toStringBuffer.append(super.toString());
 		return toStringBuffer.toString();
 	}
 	
-	public JSONObject toJSon() {
-		JSONObject jsonObject = new JSONObject();
-		if (country != null)
-		{
-			jsonObject.put("Country", country);
-		}
-		return jsonObject;
-	}
-
-	public BasicDBObject toBasicDBObject() {
-		BasicDBObject basicDBObject = new BasicDBObject();
-		if (country != null)
-		{
-			basicDBObject.put("Country", country);
-		}
-		return basicDBObject;
-	}
-	
+	@Override
 	public String getTitle() {
 		return title;
 	}
-	
+
 }

@@ -2,7 +2,9 @@ package org.safehaus.uspto.dtd;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.jdom2.Content;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -27,7 +29,8 @@ public class UsBibliographicDataGrant implements Converter{
 	private UsIssuedOnContinuedProsecutionApplication usIssuedOnContinuedProsecutionApplication;
 	private Boolean rule47Flag;
 	private GrantTerms grantTerms;
-	private ClassificationIpcrs classificationIpcrs;
+	private ClassificationIpc classificationIpc;
+	private ClassificationsIpcr classificationsIpcr;
 	private ClassificationsCpc classificationsCpc;
 	private ClassificationLocarno classificationLocarno;
 	private ClassificationNational classificationNational;
@@ -38,6 +41,7 @@ public class UsBibliographicDataGrant implements Converter{
 	private String numberOfClaims;
 	private Collection<String> usExamplaryClaims;
 	private UsFieldOfClassificationSearch usFieldOfClassificationSearch;
+	private FieldOfSearch fieldOfSearch;
 	private Figures figures;
 	private String usMicroformQuantity;
 	private UsRelatedDocuments usRelatedDocuments;
@@ -99,9 +103,13 @@ public class UsBibliographicDataGrant implements Converter{
 				{
 					grantTerms = new GrantTerms(childElement, logger);
 				}
+				else if (childElement.getNodeName().equals("classification-ipc"))
+				{
+					classificationIpc = new ClassificationIpc(childElement, logger);
+				}	
 				else if (childElement.getNodeName().equals("classifications-ipcr"))
 				{
-					classificationIpcrs = new ClassificationIpcrs(childElement, logger);
+					classificationsIpcr = new ClassificationsIpcr(childElement, logger);
 				}	
 				else if (childElement.getNodeName().equals("classifications-cpc"))
 				{
@@ -142,6 +150,10 @@ public class UsBibliographicDataGrant implements Converter{
 				else if (childElement.getNodeName().equals("us-field-of-classification-search"))
 				{
 					usFieldOfClassificationSearch = new UsFieldOfClassificationSearch(childElement, logger);
+				}
+				else if (childElement.getNodeName().equals("field-of-search"))
+				{
+					fieldOfSearch = new FieldOfSearch(childElement, logger);
 				}
 				else if (childElement.getNodeName().equals("figures"))
 				{
@@ -201,7 +213,162 @@ public class UsBibliographicDataGrant implements Converter{
 		}
 
 	}
-	
+
+	public UsBibliographicDataGrant(org.jdom2.Element element, Logger logger)
+	{
+		this.logger = logger;
+		usExamplaryClaims = new ArrayList<String>();
+		usDeceasedInventors = new ArrayList<UsDeceasedInventor>();
+		
+		List<Content> nodes = element.getContent();
+		for (int i=0; i < nodes.size(); i++)
+		{
+			Content node = nodes.get(i);
+			if (node.getCType() == Content.CType.Element) {
+				org.jdom2.Element childElement = (org.jdom2.Element) node;
+				if (childElement.getName().equals("publication-reference"))
+				{
+					publicationReference = new PublicationReference(childElement, logger);			
+				}
+				else if (childElement.getName().equals("us-sir-flag"))
+				{
+					usSirFlag = new UsSirFlag(childElement, logger);
+				}
+				else if (childElement.getName().equals("application-reference"))
+				{
+					applicationReference = new ApplicationReference(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-application-series-code"))
+				{
+					applicationSeriesCode = childElement.getValue();
+				}
+				else if (childElement.getName().equals("priority-claims"))
+				{
+					priorityClaims = new PriorityClaims(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-issued-on-continued-prosecution-application"))
+				{
+					usIssuedOnContinuedProsecutionApplication = new UsIssuedOnContinuedProsecutionApplication(childElement, logger);
+				}
+				else if (childElement.getName().equals("rule-47-flag"))
+				{
+					rule47Flag = new Boolean(true);
+				}
+				else if (childElement.getName().equals("us-term-of-grant"))
+				{
+					grantTerms = new GrantTerms(childElement, logger);
+				}
+				else if (childElement.getName().equals("classification-ipc"))
+				{
+					classificationIpc = new ClassificationIpc(childElement, logger);
+				}	
+				else if (childElement.getName().equals("classifications-ipcr"))
+				{
+					classificationsIpcr = new ClassificationsIpcr(childElement, logger);
+				}	
+				else if (childElement.getName().equals("classifications-cpc"))
+				{
+					classificationsCpc = new ClassificationsCpc(childElement, logger);
+				}	
+				else if (childElement.getName().equals("classification-locarno"))
+				{
+					classificationLocarno = new ClassificationLocarno(childElement, logger);
+				}				
+				else if (childElement.getName().equals("classification-national"))
+				{
+					classificationNational = new ClassificationNational(childElement, logger);
+				}	
+				else if (childElement.getName().equals("invention-title"))
+				{
+					inventionTitle = new InventionTitle(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-botanic"))
+				{
+					usBotanic = new UsBotanic(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-references-cited"))
+				{
+					usReferencesCited = new UsReferencesCited(childElement, logger);
+				}
+				else if (childElement.getName().equals("references-cited"))
+				{
+					referencesCited = new ReferencesCited(childElement, logger);
+				}
+				else if (childElement.getName().equals("number-of-claims"))
+				{
+					numberOfClaims = childElement.getValue();
+				}
+				else if (childElement.getName().equals("us-exemplary-claim"))
+				{
+					usExamplaryClaims.add(childElement.getValue());
+				}
+				else if (childElement.getName().equals("us-field-of-classification-search"))
+				{
+					usFieldOfClassificationSearch = new UsFieldOfClassificationSearch(childElement, logger);
+				}
+				else if (childElement.getName().equals("field-of-search"))
+				{
+					fieldOfSearch = new FieldOfSearch(childElement, logger);
+				}
+				else if (childElement.getName().equals("figures"))
+				{
+					figures = new Figures(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-microform-quantity"))
+				{
+					usMicroformQuantity = childElement.getValue();
+				}
+				else if (childElement.getName().equals("us-related-documents"))
+				{
+					usRelatedDocuments = new UsRelatedDocuments(childElement, logger);
+				}
+				else if (childElement.getName().equals("examiners"))
+				{
+					examiners = new Examiners(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-parties"))
+				{
+					usParties = new UsParties(childElement, logger);
+				}
+				else if (childElement.getName().equals("parties"))
+				{
+					parties = new Parties(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-deceased-inventor"))
+				{
+					usDeceasedInventors.add(new UsDeceasedInventor(childElement, logger));
+				}
+				else if (childElement.getName().equals("assignees"))
+				{
+					assignees = new Assignees(childElement, logger);
+				}
+				else if (childElement.getName().equals("pct-or-regional-filing-data"))
+				{
+					pctRegionalFilingData = new PctRegionalFilingData(childElement, logger);
+				}
+				else if (childElement.getName().equals("pct-or-regional-publishing-data"))
+				{
+					pctRegionalPublishingData = new PctRegionalPublishingData(childElement, logger);
+				}
+				else
+				{
+					logger.warn("Unknown Element {} in {} node", childElement.getName(), title);
+				}
+			}
+			else if (node.getCType() == Content.CType.Text) {
+				//ignore
+			}
+			else if (node.getCType() == Content.CType.ProcessingInstruction) {
+				//ignore
+			}
+			else
+			{
+				logger.warn("Unknown Node {} in {} node", node.getCType(), title);
+			}
+		}
+
+	}
+
 	public PublicationReference getPublicationReference() {
 		return publicationReference;
 	}
@@ -234,8 +401,12 @@ public class UsBibliographicDataGrant implements Converter{
 		return grantTerms;
 	}
 
-	public ClassificationIpcrs getClassificationIpcrs() {
-		return classificationIpcrs;
+	public ClassificationIpc getClassificationIpc() {
+		return classificationIpc;
+	}
+	
+	public ClassificationsIpcr getClassificationIpcrs() {
+		return classificationsIpcr;
 	}
 
 	public ClassificationsCpc getClassificationsCpc() {
@@ -278,6 +449,10 @@ public class UsBibliographicDataGrant implements Converter{
 		return usFieldOfClassificationSearch;
 	}
 
+	public FieldOfSearch getFieldOfSearch() {
+		return fieldOfSearch;
+	}
+	
 	public Figures getFigures() {
 		return figures;
 	}
@@ -361,10 +536,15 @@ public class UsBibliographicDataGrant implements Converter{
 			toStringBuffer.append("\n");
 			toStringBuffer.append(grantTerms);
 		}
-		if (classificationIpcrs != null)
+		if (classificationIpc != null)
+		{
+			toStringBuffer.append(" ");
+			toStringBuffer.append(classificationIpc);
+		}
+		if (classificationsIpcr != null)
 		{
 			toStringBuffer.append("\n");
-			toStringBuffer.append(classificationIpcrs);
+			toStringBuffer.append(classificationsIpcr);
 		}
 		if (classificationsCpc != null)
 		{
@@ -415,6 +595,11 @@ public class UsBibliographicDataGrant implements Converter{
 		{
 			toStringBuffer.append("\n");
 			toStringBuffer.append(usFieldOfClassificationSearch);
+		}
+		if (fieldOfSearch != null)
+		{
+			toStringBuffer.append("\n");
+			toStringBuffer.append(fieldOfSearch);
 		}
 		if (figures != null)
 		{
@@ -503,9 +688,13 @@ public class UsBibliographicDataGrant implements Converter{
 		{
 			jsonObject.put(grantTerms.getTitle(), grantTerms.toJSon());
 		}
-		if (classificationIpcrs != null)
+		if (classificationIpc != null)
 		{
-			jsonObject.put(classificationIpcrs.getTitle(), classificationIpcrs.toJSon());
+			jsonObject.put(classificationIpc.getTitle(), classificationIpc.toJSon());
+		}
+		if (classificationsIpcr != null)
+		{
+			jsonObject.put(classificationsIpcr.getTitle(), classificationsIpcr.toJSon());
 		}
 		if (classificationsCpc != null)
 		{
@@ -553,6 +742,10 @@ public class UsBibliographicDataGrant implements Converter{
 		if (usFieldOfClassificationSearch != null)
 		{
 			jsonObject.put(usFieldOfClassificationSearch.getTitle(), usFieldOfClassificationSearch.toJSon());
+		}
+		if (fieldOfSearch != null)
+		{
+			jsonObject.put(fieldOfSearch.getTitle(), fieldOfSearch.toJSon());
 		}
 		if (figures != null)
 		{
@@ -638,9 +831,13 @@ public class UsBibliographicDataGrant implements Converter{
 		{
 			basicDBObject.put(grantTerms.getTitle(), grantTerms.toBasicDBObject());
 		}
-		if (classificationIpcrs != null)
+		if (classificationIpc != null)
 		{
-			basicDBObject.put(classificationIpcrs.getTitle(), classificationIpcrs.toBasicDBObject());
+			basicDBObject.put(classificationIpc.getTitle(), classificationIpc.toBasicDBObject());
+		}
+		if (classificationsIpcr != null)
+		{
+			basicDBObject.put(classificationsIpcr.getTitle(), classificationsIpcr.toBasicDBObject());
 		}
 		if (classificationsCpc != null)
 		{
@@ -688,6 +885,10 @@ public class UsBibliographicDataGrant implements Converter{
 		if (usFieldOfClassificationSearch != null)
 		{
 			basicDBObject.put(usFieldOfClassificationSearch.getTitle(), usFieldOfClassificationSearch.toBasicDBObject());
+		}
+		if (fieldOfSearch != null)
+		{
+			basicDBObject.put(fieldOfSearch.getTitle(), fieldOfSearch.toBasicDBObject());
 		}
 		if (figures != null)
 		{

@@ -16,6 +16,11 @@ public class TextNode implements Converter{
 		text = element.getTextContent();
 	}
 
+	public TextNode(org.jdom2.Text element)
+	{		
+		text = element.getTextNormalize();
+	}
+	
 	public TextNode(Text element)
 	{		
 		text = element.getNodeValue();

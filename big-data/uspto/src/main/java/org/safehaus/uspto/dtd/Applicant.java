@@ -2,7 +2,10 @@ package org.safehaus.uspto.dtd;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -100,6 +103,67 @@ public class Applicant implements Converter{
 		
 	}
 
+	public Applicant(org.jdom2.Element element, Logger logger)
+	{
+		this.logger = logger;
+		addressBooks = new ArrayList<AddressBook>();
+		usRightss = new ArrayList<UsRights>();
+
+		List<Attribute> attributes = element.getAttributes();
+		for (int i=0; i < attributes.size(); i++)
+		{
+			Attribute attribute = attributes.get(i);
+			if (attribute.getName().equals("sequence")) {
+				sequence = attribute.getValue();
+			}
+			else if (attribute.getName().equals("app-type")) {
+				applicantType = attribute.getValue();
+			}
+			else if (attribute.getName().equals("designation")) {
+				designation = attribute.getValue();
+			}
+			else
+			{
+				logger.warn("Unknown Attribute {} in {} node", attribute.getName(), title);
+			}
+		}
+		
+		List<Content> nodes = element.getContent();
+		for (int i=0; i < nodes.size(); i++)
+		{
+			Content node = nodes.get(i);
+			if (node.getCType() == Content.CType.Element) {
+				org.jdom2.Element childElement = (org.jdom2.Element) node;
+				if (childElement.getName().equals("addressbook")) {
+					addressBooks.add(new AddressBook(childElement, logger));
+				}
+				else if (childElement.getName().equals("nationality")) {
+					nationality = new Nationality(childElement, logger);
+				}
+				else if (childElement.getName().equals("residence")) {
+					residence = new Residence(childElement, logger);
+				}
+				else if (childElement.getName().equals("us-rights")) {
+					usRightss.add(new UsRights(childElement, logger));
+				}
+				else
+				{
+					logger.warn("Unknown Element {} in {} node", childElement.getName(), title);
+				}
+			}
+			else if (node.getCType() == Content.CType.Text) {
+				//ignore
+			}
+			else if (node.getCType() == Content.CType.ProcessingInstruction) {
+				//ignore
+			}
+			else
+			{
+				logger.warn("Unknown Node {} in {} node", node.getCType(), title);
+			}
+		}
+		
+	}
 
 	public String getSequence() {
 		return sequence;

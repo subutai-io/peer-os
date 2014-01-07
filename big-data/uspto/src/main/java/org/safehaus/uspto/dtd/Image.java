@@ -1,5 +1,8 @@
 package org.safehaus.uspto.dtd;
 
+import java.util.List;
+
+import org.jdom2.Attribute;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;
@@ -71,6 +74,48 @@ public class Image implements Converter{
 				{
 					logger.warn("Unknown Attribute {} in {} node", attribute.getNodeName(), title);
 				}
+			}
+		}
+	}
+
+	public Image(org.jdom2.Element element, Logger logger)
+	{
+		this.logger = logger;
+		
+		List<Attribute> attributes = element.getAttributes();
+		for (int i=0; i < attributes.size(); i++)
+		{
+			Attribute attribute = attributes.get(i);
+			if (attribute.getName().equals("id")) {
+				imageId = attribute.getValue();
+			}
+			else if (attribute.getName().equals("he")) {
+				imageHeight = attribute.getValue();
+			}
+			else if (attribute.getName().equals("wi")) {
+				imageWidth = attribute.getValue();
+			}
+			else if (attribute.getName().equals("file")) {
+				imageFileName = attribute.getValue();
+			}
+			else if (attribute.getName().equals("alt")) {
+				imageAlt = attribute.getValue();
+			}
+			else if (attribute.getName().equals("img-content")) {
+				imageContent = attribute.getValue();
+			}
+			else if (attribute.getName().equals("img-format")) {
+				imageFormat = attribute.getValue();
+			}
+			else if (attribute.getName().equals("inline")) {
+				imageInline = attribute.getValue();
+			}
+			else if (attribute.getName().equals("orientation")) {
+				imageOrientation = attribute.getValue();
+			}
+			else
+			{
+				logger.warn("Unknown Attribute {} in {} node", attribute.getName(), title);
 			}
 		}
 	}

@@ -1,5 +1,8 @@
 package org.safehaus.uspto.dtd;
 
+import java.util.List;
+
+import org.jdom2.Attribute;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;
@@ -40,6 +43,25 @@ public class ApplicationReference extends BaseReference {
 				{
 					logger.warn("Unknown Attribute {} in {} node", attribute.getNodeName(), title);
 				}
+			}
+		}
+	}
+
+	public ApplicationReference(org.jdom2.Element element, Logger logger)
+	{
+		super(element, BaseReference.ReferenceType.APPLICATION, logger);
+		this.logger = logger;
+
+		List<Attribute> attributes = element.getAttributes();
+		for (int i=0; i < attributes.size(); i++)
+		{
+			Attribute attribute = attributes.get(i);
+			if (attribute.getName().equals("appl-type")) {
+				applicationType = attribute.getValue();
+			}
+			else
+			{
+				logger.warn("Unknown Attribute {} in {} node", attribute.getName(), title);
 			}
 		}
 	}

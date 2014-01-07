@@ -13,7 +13,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.EntityResolver2;
 
-public class USPTOEntityResolver implements EntityResolver2 {
+public class UsptoEntityResolver implements EntityResolver2 {
 	
 
 	public enum Version {
@@ -46,7 +46,7 @@ public class USPTOEntityResolver implements EntityResolver2 {
 	
 	private ArrayList<Hashtable<String, CachedInputStream>> streamCache;
 	
-	public USPTOEntityResolver()
+	public UsptoEntityResolver()
 	{
 		streamCache = new ArrayList<Hashtable<String,CachedInputStream>>(8);
 		for (int i=0; i<8; i++)
@@ -119,7 +119,7 @@ public class USPTOEntityResolver implements EntityResolver2 {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V40
 	    			|| !lastFileName.equals(fileName))
 	    	{
-	    		logger.info("Found {}", fileName);
+//	    		logger.info("Found {}", fileName);
 	    		lastFileName = fileName;
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V40;
@@ -128,7 +128,7 @@ public class USPTOEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V41)
 	    	{
-	    		logger.info("Found {}", fileName);
+//	    		logger.info("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V41;
 	    }
