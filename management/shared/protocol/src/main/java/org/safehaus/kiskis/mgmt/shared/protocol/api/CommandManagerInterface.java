@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 public interface CommandManagerInterface {
 
-    void executeCommand(Command command);
+    boolean executeCommand(Command command);
 
     void addListener(CommandListener listener);
 

@@ -31,14 +31,16 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private CommandNotifier commandNotifier;
 
     @Override
-    public void executeCommand(Command command) {
+    public boolean executeCommand(Command command) {
         try {
             if (persistenceCommand.saveCommand(command)) {
                 communicationService.sendCommand(command);
+                return true;
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in executeCommand", ex);
         }
+        return false;
     }
 
     @Override
