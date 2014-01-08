@@ -661,6 +661,7 @@ public class Persistence implements PersistenceInterface {
                 cd.setDataDir(row.getString("datadir"));
                 cd.setSavedCacheDir(row.getString("savedcachedir"));
                 cd.setCommitLogDir(row.getString("commitlogdir"));
+                cd.setDomainName(row.getString("domainname"));
                 cd.setNodes(row.getList("nodes", UUID.class));
                 cd.setSeeds(row.getList("seeds", UUID.class));
                 list.add(cd);

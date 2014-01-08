@@ -149,7 +149,7 @@ public class NodesWindow extends Window {
                     StringBuilder seedsSB = new StringBuilder();
                     for (UUID seed : cci.getSeeds()) {
                         Agent agent = getAgentManager().getAgent(seed);
-                        seedsSB.append(agent.getListIP().get(0)).append(",");
+                        seedsSB.append(agent.getHostname()).append(".").append(cci.getDomainName()).append(",");
                     }
 
                     serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
@@ -172,7 +172,7 @@ public class NodesWindow extends Window {
                     StringBuilder seedsSB = new StringBuilder();
                     for (UUID seed : cci.getSeeds()) {
                         Agent agent = getAgentManager().getAgent(seed);
-                        seedsSB.append(agent.getListIP().get(0)).append(",");
+                        seedsSB.append(agent.getHostname()).append(".").append(cci.getDomainName()).append(",");
                     }
 
                     serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));

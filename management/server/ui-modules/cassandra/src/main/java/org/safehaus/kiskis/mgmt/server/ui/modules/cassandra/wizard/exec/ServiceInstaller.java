@@ -83,7 +83,6 @@ public class ServiceInstaller {
         StringBuilder seedsSB = new StringBuilder();
         for (Agent agent : config.getSeeds()) {
             seedsSB.append(agent.getHostname()).append(".").append(config.getDomainName()).append(",");
-
         }
         for (Agent agent : config.getSelectedAgents()) {
             Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seedsSB.substring(0, seedsSB.length() - 1));
