@@ -5,7 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
-import com.vaadin.ui.Button;
+import com.vaadin.data.Item;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -16,15 +16,24 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 public class ManagerAction {
 
     private final Task task;
-    private final Button startButton;
-    private final Button stopButton;
+//    private final Table table;
+//    private final Object tableRowId;
+    private final Item row;
+//    private final Button startButton;
+//    private final Button stopButton;
+//    private final Button destroyButton;
     private final ManagerActionType managerActionType;
     private final StringBuilder output = new StringBuilder();
 
-    public ManagerAction(Task task, Button startButton, Button stopButton, ManagerActionType managerActionType) {
+//    public ManagerAction(Task task, Button startButton, Button stopButton, Button destroyButton, ManagerActionType managerActionType) {
+    public ManagerAction(Task task, ManagerActionType managerActionType, Item row) {
         this.task = task;
-        this.startButton = startButton;
-        this.stopButton = stopButton;
+//        this.table = table;
+//        this.tableRowId = tableRowId;
+        this.row = row;
+//        this.startButton = startButton;
+//        this.stopButton = stopButton;
+//        this.destroyButton = destroyButton;
         this.managerActionType = managerActionType;
     }
 
@@ -32,14 +41,28 @@ public class ManagerAction {
         return task;
     }
 
-    public Button getStartButton() {
-        return startButton;
+//    public Table getTable() {
+//        return table;
+//    }
+//
+//    public Object getTableRowId() {
+//        return tableRowId;
+//    }
+    public <T> T getItemPropertyValue(Object itemPropertyId) {
+        return (T) row.getItemProperty(itemPropertyId).getValue();
     }
 
-    public Button getStopButton() {
-        return stopButton;
-    }
-
+//    public Button getStartButton() {
+//        return startButton;
+//    }
+//
+//    public Button getStopButton() {
+//        return stopButton;
+//    }
+//
+//    public Button getDestroyButton() {
+//        return destroyButton;
+//    }
     public ManagerActionType getManagerActionType() {
         return managerActionType;
     }
@@ -52,11 +75,6 @@ public class ManagerAction {
 
     public String getOutput() {
         return output.toString();
-    }
-
-    @Override
-    public String toString() {
-        return "ManagerAction{" + "task=" + task + ", startButton=" + startButton + ", stopButton=" + stopButton + ", managerActionType=" + managerActionType + ", output=" + output + '}';
     }
 
 }

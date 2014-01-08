@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
+import com.vaadin.data.Item;
 import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
@@ -142,17 +143,24 @@ public class Manager implements ResponseListener {
                 if (managerAction != null) {
                     if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
                         managerAction.addOutput(response.getStdOut());
+                        Button startBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
+                        Button stopBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
+                        Button destroyBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
                         if (managerAction.getOutput().
                                 contains("connecting to")) {
-                            managerAction.getStartButton().setEnabled(false);
-                            managerAction.getStopButton().setEnabled(true);
+                            startBtn.setEnabled(false);
+                            stopBtn.setEnabled(true);
+                            destroyBtn.setEnabled(true);
                             actionsCache.remove(managerAction.getTask().getUuid());
                         } else if (managerAction.getOutput().contains("couldn't connect to server")) {
-                            managerAction.getStartButton().setEnabled(true);
-                            managerAction.getStopButton().setEnabled(false);
+                            stopBtn.setEnabled(false);
+                            startBtn.setEnabled(true);
+                            destroyBtn.setEnabled(true);
                             actionsCache.remove(managerAction.getTask().getUuid());
                         } else if (managerAction.getOutput().contains("mongo: not found")) {
-                            //disable destroy button
+                            //remove this row
+                            Table parentTable = (Table) startBtn.getParent();
+                            parentTable.removeItem(managerAction.getItemPropertyValue(Constants.TABLE_ROWID_PROPERTY));
                             actionsCache.remove(managerAction.getTask().getUuid());
                         }
                     }
@@ -178,14 +186,54 @@ public class Manager implements ResponseListener {
         contentRoot.getWindow().showNotification(notification);
     }
 
-    private void populateTable(Table table, List<UUID> agentUUIDs, final NodeType nodeType) {
+    private void populateTable(final Table table, List<UUID> agentUUIDs, final NodeType nodeType) {
+
         table.removeAllItems();
+
         for (UUID agentUUID : agentUUIDs) {
+
             final Agent agent = agentManager.getAgent(agentUUID);
-            final Button checkBtn = new Button("Check");
-            final Button startBtn = new Button("Start");
-            final Button stopBtn = new Button("Stop");
-            final Button destroyBtn = new Button("Destroy");
+            Button checkBtn = new Button("Check");
+            Button startBtn = new Button("Start");
+            Button stopBtn = new Button("Stop");
+            Button destroyBtn = new Button("Destroy");
+            stopBtn.setEnabled(false);
+            startBtn.setEnabled(false);
+            destroyBtn.setEnabled(false);
+
+            Object rowId = table.addItem(new Object[]{
+                agent.getHostname(),
+                checkBtn,
+                startBtn,
+                stopBtn,
+                destroyBtn},
+                    null);
+
+            final Item row = table.getItem(rowId);
+            row.getItemProperty(Constants.TABLE_START_PROPERTY).setValue(startBtn);
+            row.getItemProperty(Constants.TABLE_STOP_PROPERTY).setValue(stopBtn);
+            row.getItemProperty(Constants.TABLE_DESTROY_PROPERTY).setValue(destroyBtn);
+            row.getItemProperty(Constants.TABLE_ROWID_PROPERTY).setValue(rowId);
+
+            startBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                }
+            });
+            stopBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                }
+            });
+            destroyBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                }
+            });
+
             checkBtn.addListener(new Button.ClickListener() {
 
                 @Override
@@ -199,49 +247,22 @@ public class Manager implements ResponseListener {
                     checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
                     if (commandManager.executeCommand(checkCommand)) {
                         actionsCache.put(checkTask.getUuid(),
-                                new ManagerAction(checkTask, startBtn, stopBtn,
-                                        ManagerActionType.CHECK_NODE_STATUS),
+                                new ManagerAction(checkTask,
+                                        ManagerActionType.CHECK_NODE_STATUS, row),
                                 checkCommand.getRequest().getTimeout() * 1000 + 2000);
                     }
                 }
             });
-            startBtn.setEnabled(false);
-            startBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                }
-            });
-            stopBtn.setEnabled(false);
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                }
-            });
-            destroyBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                }
-            });
-            table.addItem(new Object[]{
-                agent.getHostname(),
-                checkBtn,
-                startBtn,
-                stopBtn,
-                destroyBtn},
-                    agent);
         }
     }
 
     private Table createTableTemplate(String caption) {
         Table table = new Table(caption);
-        table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
+        table.addContainerProperty(Constants.TABLE_HOST_PROPERTY, String.class, null);
+        table.addContainerProperty(Constants.TABLE_CHECK_PROPERTY, Button.class, null);
+        table.addContainerProperty(Constants.TABLE_START_PROPERTY, Button.class, null);
+        table.addContainerProperty(Constants.TABLE_STOP_PROPERTY, Button.class, null);
+        table.addContainerProperty(Constants.TABLE_DESTROY_PROPERTY, Button.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(250, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);
