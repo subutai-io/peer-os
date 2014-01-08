@@ -152,18 +152,7 @@ public class CassandraTable extends Table {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
                         nodesWindow.updateUI(task.getTaskStatus());
                     }
-                    if (cce != null) {
-                        switch (cce) {
-                            case START: {
-                                switchState(false);
-                                break;
-                            }
-                            case STOP: {
-                                switchState(true);
-                                break;
-                            }
-                        }
-                    }
+                    manageUI();
                     manager.moveToNextTask();
                     if (manager.getCurrentTask() != null) {
                         for (Command command : manager.getCurrentTask().getCommands()) {
@@ -175,6 +164,21 @@ public class CassandraTable extends Table {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
                         nodesWindow.updateUI(task.getTaskStatus());
                     }
+                }
+            }
+        }
+    }
+
+    private void manageUI() {
+        if (cce != null) {
+            switch (cce) {
+                case START: {
+                    switchState(false);
+                    break;
+                }
+                case STOP: {
+                    switchState(true);
+                    break;
                 }
             }
         }

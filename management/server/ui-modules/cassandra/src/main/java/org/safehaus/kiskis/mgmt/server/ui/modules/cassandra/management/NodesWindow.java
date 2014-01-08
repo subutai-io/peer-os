@@ -229,9 +229,18 @@ public class NodesWindow extends Window {
                     break;
                 }
                 case STATUS: {
+                    switch (ts) {
+                        case SUCCESS: {
+                            switchState(false);
+                            break;
+                        }
+                        case FAIL: {
+                            switchState(true);
+                            break;
+                        }
+                    }
 //                    Button statusBtn = (Button) selectedItem.getItemProperty("Status").getValue();
 //                    statusBtn.setCaption("Running");
-                    switchState(false);
                     break;
                 }
                 case SET_SEED: {
