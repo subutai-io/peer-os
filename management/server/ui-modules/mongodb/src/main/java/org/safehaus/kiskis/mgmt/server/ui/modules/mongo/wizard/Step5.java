@@ -15,7 +15,7 @@ import com.vaadin.ui.TextArea;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Util.createImage;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Installer;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Uninstaller;
@@ -74,7 +74,7 @@ public class Step5 extends Panel implements ResponseListener {
             }
         });
 
-        indicator = createImage("indicator.gif", 50, 50);
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
 
         content.addComponent(ok, 0, 1, 0, 1);
         content.addComponent(cancel, 1, 1, 1, 1);

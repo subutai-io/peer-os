@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
+package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
@@ -15,9 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ExpiringCache<KeyType, ValueType> {
 
-    private final long evictionRunIntervalMs = 7000;
+    private final long evictionRunIntervalMs = 10000;
     private final Map<KeyType, CacheEntry<ValueType>> entries = new ConcurrentHashMap<KeyType, CacheEntry<ValueType>>();
     private volatile long lastEvictionRun = System.currentTimeMillis();
+    private final AtomicBoolean lock = new AtomicBoolean(true);
 
     public ValueType get(KeyType key) {
         try {
@@ -55,8 +57,13 @@ public class ExpiringCache<KeyType, ValueType> {
         return null;
     }
 
+    public void clear() {
+        entries.clear();
+    }
+
     private void runEviction() {
-        if (System.currentTimeMillis() - lastEvictionRun > evictionRunIntervalMs) {
+        if (System.currentTimeMillis() - lastEvictionRun > evictionRunIntervalMs
+                && lock.compareAndSet(true, false)) {
             lastEvictionRun = System.currentTimeMillis();
             Thread evictor = new Thread(new Runnable() {
 
@@ -71,6 +78,8 @@ public class ExpiringCache<KeyType, ValueType> {
                             }
                         }
                     } catch (Exception ignore) {
+                    } finally {
+                        lock.set(true);
                     }
                 }
             });

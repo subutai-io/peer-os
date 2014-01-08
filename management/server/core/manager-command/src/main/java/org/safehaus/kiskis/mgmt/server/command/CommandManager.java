@@ -259,4 +259,21 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public String getSource() {
         return getClass().getName();
     }
+
+    //=========MONGO============================================================
+    public boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo) {
+        return persistenceCommand.saveMongoClusterInfo(clusterInfo);
+    }
+
+    public List<MongoClusterInfo> getMongoClustersInfo() {
+        return persistenceCommand.getMongoClustersInfo();
+    }
+
+    public MongoClusterInfo getMongoClusterInfo(String clusterName) {
+        return persistenceCommand.getMongoClusterInfo(clusterName);
+    }
+
+    public boolean deleteMongoClusterInfo(String clusterName) {
+        return persistenceCommand.deleteMongoClusterInfo(clusterName);
+    }
 }

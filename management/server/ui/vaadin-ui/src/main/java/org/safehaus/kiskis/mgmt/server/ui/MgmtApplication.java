@@ -198,4 +198,13 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         }
     }
 
+    public static Label createImage(String imageName, int imageWidth, int imageHeight) {
+        Label image = new Label(
+                String.format("<img src='http://%s:%s/%s' />", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT, imageName));
+        image.setContentMode(Label.CONTENT_XHTML);
+        image.setHeight(imageWidth, Sizeable.UNITS_PIXELS);
+        image.setWidth(imageHeight, Sizeable.UNITS_PIXELS);
+        return image;
+    }
+
 }

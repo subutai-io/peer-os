@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -30,8 +31,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -45,14 +46,14 @@ public class Manager implements ResponseListener {
     private static final Logger LOG = Logger.getLogger(Manager.class.getName());
 
     private final VerticalLayout contentRoot;
-    private final PersistenceInterface persistenceManager;
     private final CommandManagerInterface commandManager;
+    private final AgentManagerInterface agentManager;
     private final ComboBox clusterCombo;
     private final ExpiringCache<UUID, ManagerAction> actionsCache = new ExpiringCache<UUID, ManagerAction>();
 
     public Manager() {
         //get db and transport managers
-        persistenceManager = ServiceLocator.getService(PersistenceInterface.class);
+        agentManager = ServiceLocator.getService(AgentManagerInterface.class);
         commandManager = ServiceLocator.getService(CommandManagerInterface.class);
 
         contentRoot = new VerticalLayout();
@@ -84,6 +85,7 @@ public class Manager implements ResponseListener {
         clusterCombo = new ComboBox();
         clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
+        clusterCombo.setTextInputAllowed(false);
         clusterCombo.addListener(new Property.ValueChangeListener() {
 
             @Override
@@ -93,6 +95,7 @@ public class Manager implements ResponseListener {
                     populateTable(configServersTable, clusterInfo.getConfigServers(), NodeType.CONFIG_NODE);
                     populateTable(routersTable, clusterInfo.getRouters(), NodeType.ROUTER_NODE);
                     populateTable(dataNodesTable, clusterInfo.getDataNodes(), NodeType.DATA_NODE);
+                    actionsCache.clear();
                 }
             }
         });
@@ -175,14 +178,10 @@ public class Manager implements ResponseListener {
         contentRoot.getWindow().showNotification(notification);
     }
 
-    public PersistenceInterface getDbManager() {
-        return persistenceManager;
-    }
-
     private void populateTable(Table table, List<UUID> agentUUIDs, final NodeType nodeType) {
         table.removeAllItems();
         for (UUID agentUUID : agentUUIDs) {
-            final Agent agent = persistenceManager.getAgent(agentUUID);
+            final Agent agent = agentManager.getAgent(agentUUID);
             final Button checkBtn = new Button("Check");
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
@@ -252,7 +251,7 @@ public class Manager implements ResponseListener {
     }
 
     private void refreshClustersInfo() {
-        List<MongoClusterInfo> mongoClusterInfos = persistenceManager.getMongoClustersInfo();
+        List<MongoClusterInfo> mongoClusterInfos = commandManager.getMongoClustersInfo();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null) {
             for (MongoClusterInfo clusterInfo : mongoClusterInfos) {

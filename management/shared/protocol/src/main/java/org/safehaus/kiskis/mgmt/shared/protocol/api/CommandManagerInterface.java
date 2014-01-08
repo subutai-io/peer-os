@@ -48,4 +48,13 @@ public interface CommandManagerInterface {
     public HadoopClusterInfo getHadoopClusterData(String clusterName);
 
     public boolean saveHadoopClusterData(HadoopClusterInfo cluster);
+
+    //=========MONGO============================================================
+    public boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo);
+
+    public List<MongoClusterInfo> getMongoClustersInfo();
+
+    public MongoClusterInfo getMongoClusterInfo(String clusterName);
+
+    public boolean deleteMongoClusterInfo(String clusterName);
 }
