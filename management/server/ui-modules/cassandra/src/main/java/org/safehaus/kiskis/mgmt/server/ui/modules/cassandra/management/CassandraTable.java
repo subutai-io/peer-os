@@ -8,7 +8,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 
 import java.util.List;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -83,6 +82,7 @@ public class CassandraTable extends Table {
                 cce = CassandraCommandEnum.STOP;
                 selectedItem = item;
                 manager.runCommand(cci.getNodes(), cce);
+
             }
         });
 
@@ -103,6 +103,7 @@ public class CassandraTable extends Table {
                 CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
                 nodesWindow = new NodesWindow(cci.getName(), info, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
+
             }
         });
 
@@ -149,7 +150,7 @@ public class CassandraTable extends Table {
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
-                        nodesWindow.updateUI();
+                        nodesWindow.updateUI(task.getTaskStatus());
                     }
                     if (cce != null) {
                         switch (cce) {
@@ -163,15 +164,18 @@ public class CassandraTable extends Table {
                             }
                         }
                     }
-                }
-                manager.moveToNextTask();
-                if (manager.getCurrentTask() != null) {
-                    for (Command command : manager.getCurrentTask().getCommands()) {
-                        manager.executeCommand(command);
+                    manager.moveToNextTask();
+                    if (manager.getCurrentTask() != null) {
+                        for (Command command : manager.getCurrentTask().getCommands()) {
+                            manager.executeCommand(command);
+                        }
+                    } else {
                     }
-                } else {
+                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                    if (nodesWindow != null && nodesWindow.isVisible()) {
+                        nodesWindow.updateUI(task.getTaskStatus());
+                    }
                 }
-            } else if (task.getTaskStatus() == TaskStatus.FAIL) {
             }
         }
     }
