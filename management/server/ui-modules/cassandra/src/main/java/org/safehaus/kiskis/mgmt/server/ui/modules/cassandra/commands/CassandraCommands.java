@@ -5,8 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands;
 
-import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraCommandEnum;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class CassandraCommands {
 
-    private static final String conf = "/opt/cassandra-2.0.0/conf/cassandra.yaml";
+    private static final String conf = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
 
     // INSTALLATION COMMANDS ===================================================
     public static Command getTemplate() {
@@ -41,33 +41,33 @@ public class CassandraCommands {
                 30); //                        timeout (sec)
     }
 
-    public static Command getInstallCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/apt-get");
-        req.setArgs(Arrays.asList(
-                "--force-yes",
-                "--assume-yes",
-                "install",
-                "ksks-cassandra"
-        ));
-        req.setTimeout(180);
-        return cmd;
-    }
+//    public static Command getInstallCommand() {
+//        Command cmd = getTemplate();
+//        Request req = cmd.getRequest();
+//        req.setProgram("/usr/bin/apt-get");
+//        req.setArgs(Arrays.asList(
+//                "--force-yes",
+//                "--assume-yes",
+//                "install",
+//                "ksks-cassandra"
+//        ));
+//        req.setTimeout(180);
+//        return cmd;
+//    }
 
-    public static Command getUninstallCommand() {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("/usr/bin/apt-get");
-        req.setArgs(Arrays.asList(
-                "--force-yes",
-                "--assume-yes",
-                "purge",
-                "ksks-cassandra"
-        ));
-        req.setTimeout(180);
-        return cmd;
-    }
+//    public static Command getUninstallCommand() {
+//        Command cmd = getTemplate();
+//        Request req = cmd.getRequest();
+//        req.setProgram("/usr/bin/apt-get");
+//        req.setArgs(Arrays.asList(
+//                "--force-yes",
+//                "--assume-yes",
+//                "purge",
+//                "ksks-cassandra"
+//        ));
+//        req.setTimeout(180);
+//        return cmd;
+//    }
 
     public static Command getSetListenAddressCommand(String listenAddress) {
         Command cmd = getTemplate();
@@ -91,7 +91,7 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seedsIps!'";
-        req.setProgram(program.replace("%seedsIps", seeds));
+        req.setProgram(program.replace("%seedsIps", '"' + seeds + '"'));
         req.setTimeout(30);
         return cmd;
     }
@@ -184,6 +184,22 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("service cassandra status");
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    public static Command getAptGetUpdate() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("apt-get update");
+        req.setTimeout(30);
+        return cmd;
+    }
+
+    public Command getCommand(CassandraCommandEnum cce) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram(cce.getProgram());
         req.setTimeout(30);
         return cmd;
     }
