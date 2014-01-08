@@ -169,6 +169,7 @@ public class Manager implements ResponseListener {
                         Task task = managerAction.getTask();
                         task.setTaskStatus(TaskStatus.SUCCESS);
                         Util.saveTask(task);
+                        actionsCache.remove(managerAction.getTask().getUuid());
                     }
                 }
             }
