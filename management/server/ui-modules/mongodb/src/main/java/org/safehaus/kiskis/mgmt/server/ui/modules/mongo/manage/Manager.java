@@ -144,8 +144,8 @@ public class Manager implements ResponseListener {
                     if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
                         managerAction.addOutput(response.getStdOut());
                         Button startBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
-                        Button stopBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
-                        Button destroyBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
+                        Button stopBtn = managerAction.getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
+                        Button destroyBtn = managerAction.getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
                         if (managerAction.getOutput().
                                 contains("connecting to")) {
                             startBtn.setEnabled(false);
@@ -160,7 +160,7 @@ public class Manager implements ResponseListener {
                         } else if (managerAction.getOutput().contains("mongo: not found")) {
                             //remove this row
                             Table parentTable = (Table) startBtn.getParent();
-                            parentTable.removeItem(managerAction.getItemPropertyValue(Constants.TABLE_ROWID_PROPERTY));
+                            parentTable.removeItem(managerAction.getRowId());
                             actionsCache.remove(managerAction.getTask().getUuid());
                         }
                     }
@@ -202,7 +202,7 @@ public class Manager implements ResponseListener {
             startBtn.setEnabled(false);
             destroyBtn.setEnabled(false);
 
-            Object rowId = table.addItem(new Object[]{
+            final Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
                 checkBtn,
                 startBtn,
@@ -211,10 +211,10 @@ public class Manager implements ResponseListener {
                     null);
 
             final Item row = table.getItem(rowId);
-            row.getItemProperty(Constants.TABLE_START_PROPERTY).setValue(startBtn);
-            row.getItemProperty(Constants.TABLE_STOP_PROPERTY).setValue(stopBtn);
-            row.getItemProperty(Constants.TABLE_DESTROY_PROPERTY).setValue(destroyBtn);
-            row.getItemProperty(Constants.TABLE_ROWID_PROPERTY).setValue(rowId);
+//            row.getItemProperty(Constants.TABLE_START_PROPERTY).setValue(startBtn);
+//            row.getItemProperty(Constants.TABLE_STOP_PROPERTY).setValue(stopBtn);
+//            row.getItemProperty(Constants.TABLE_DESTROY_PROPERTY).setValue(destroyBtn);
+//            table.setItemCaption(rowId, agent.getHostname());
 
             startBtn.addListener(new Button.ClickListener() {
 
@@ -249,7 +249,8 @@ public class Manager implements ResponseListener {
                     if (commandManager.executeCommand(checkCommand)) {
                         actionsCache.put(checkTask.getUuid(),
                                 new ManagerAction(checkTask,
-                                        ManagerActionType.CHECK_NODE_STATUS, row),
+                                        ManagerActionType.CHECK_NODE_STATUS,
+                                        row, rowId),
                                 checkCommand.getRequest().getTimeout() * 1000 + 2000);
                     }
                 }

@@ -16,24 +16,15 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 public class ManagerAction {
 
     private final Task task;
-//    private final Table table;
-//    private final Object tableRowId;
     private final Item row;
-//    private final Button startButton;
-//    private final Button stopButton;
-//    private final Button destroyButton;
+    private final Object rowId;
     private final ManagerActionType managerActionType;
     private final StringBuilder output = new StringBuilder();
 
-//    public ManagerAction(Task task, Button startButton, Button stopButton, Button destroyButton, ManagerActionType managerActionType) {
-    public ManagerAction(Task task, ManagerActionType managerActionType, Item row) {
+    public ManagerAction(Task task, ManagerActionType managerActionType, Item row, Object rowId) {
         this.task = task;
-//        this.table = table;
-//        this.tableRowId = tableRowId;
         this.row = row;
-//        this.startButton = startButton;
-//        this.stopButton = stopButton;
-//        this.destroyButton = destroyButton;
+        this.rowId = rowId;
         this.managerActionType = managerActionType;
     }
 
@@ -41,28 +32,14 @@ public class ManagerAction {
         return task;
     }
 
-//    public Table getTable() {
-//        return table;
-//    }
-//
-//    public Object getTableRowId() {
-//        return tableRowId;
-//    }
+    public Object getRowId() {
+        return rowId;
+    }
+
     public <T> T getItemPropertyValue(Object itemPropertyId) {
         return (T) row.getItemProperty(itemPropertyId).getValue();
     }
 
-//    public Button getStartButton() {
-//        return startButton;
-//    }
-//
-//    public Button getStopButton() {
-//        return stopButton;
-//    }
-//
-//    public Button getDestroyButton() {
-//        return destroyButton;
-//    }
     public ManagerActionType getManagerActionType() {
         return managerActionType;
     }
