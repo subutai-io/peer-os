@@ -20,7 +20,8 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import static org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager.getAgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
@@ -53,16 +54,16 @@ public class NodesWindow extends Window {
         VerticalLayout verticalLayout = new VerticalLayout();
         HorizontalLayout buttons = new HorizontalLayout();
 
-        Button checkStatusBtn = new Button("Check status");
-        checkStatusBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                cce = CassandraCommandEnum.STATUS;
-                serviceManager.runCommand(cci.getNodes(), cce);
-            }
-        });
-        buttons.addComponent(checkStatusBtn);
+//        Button checkStatusBtn = new Button("Check status");
+//        checkStatusBtn.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                cce = CassandraCommandEnum.STATUS;
+//                serviceManager.runCommand(cci.getNodes(), cce);
+//            }
+//        });
+//        buttons.addComponent(checkStatusBtn);
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
         table.setPageLength(6);
@@ -76,7 +77,7 @@ public class NodesWindow extends Window {
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
         container.addContainerProperty("hostname", String.class, "");
-//        container.addContainerProperty("uuid", UUID.class, "");
+        container.addContainerProperty("uuid", UUID.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Status", Button.class, "");
@@ -94,7 +95,7 @@ public class NodesWindow extends Window {
         Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
         item.getItemProperty("hostname").setValue(agent.getHostname());
-//        item.getItemProperty("uuid").setValue(agent.getUuid());
+        item.getItemProperty("uuid").setValue(agent.getUuid());
 
         Button startButton = new Button("Start");
         startButton.addListener(new Button.ClickListener() {
@@ -102,10 +103,9 @@ public class NodesWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cce = CassandraCommandEnum.START;
-//                selectedStartButton = event.getButton();
                 selectedItem = item;
-                serviceManager.runCommand(agent.getUuid(), cce);
                 table.setEnabled(false);
+                serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
         Button stopButton = new Button("Stop");
@@ -114,10 +114,9 @@ public class NodesWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cce = CassandraCommandEnum.STOP;
-//                selectedStopButton = event.getButton();
                 selectedItem = item;
-                serviceManager.runCommand(agent.getUuid(), cce);
                 table.setEnabled(false);
+                serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
 
@@ -127,10 +126,9 @@ public class NodesWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cce = CassandraCommandEnum.STATUS;
-//                selectedStopButton = event.getButton();
                 selectedItem = item;
-                serviceManager.runCommand(agent.getUuid(), cce);
                 table.setEnabled(false);
+                serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
 
@@ -141,6 +139,7 @@ public class NodesWindow extends Window {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    table.setEnabled(false);
                     selectedItem = item;
                     cce = CassandraCommandEnum.REMOVE_SEED;
                     List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
@@ -164,6 +163,7 @@ public class NodesWindow extends Window {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    table.setEnabled(false);
                     selectedItem = item;
                     cce = CassandraCommandEnum.SET_SEED;
                     List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
@@ -217,7 +217,7 @@ public class NodesWindow extends Window {
         return null;
     }
 
-    public void updateUI(TaskStatus ts) {
+    public void updateUI(Task ts) {
         if (cce != null) {
             switch (cce) {
                 case START: {
@@ -229,7 +229,7 @@ public class NodesWindow extends Window {
                     break;
                 }
                 case STATUS: {
-                    switch (ts) {
+                    switch (ts.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(false);
                             break;
@@ -244,13 +244,21 @@ public class NodesWindow extends Window {
                     break;
                 }
                 case SET_SEED: {
-                    Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
-                    seed.setCaption("Remove seed");
+                    switch (ts.getTaskStatus()) {
+                        case SUCCESS: {
+                            Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                            seed.setCaption("Remove seed");
+                        }
+                    }
                     break;
                 }
                 case REMOVE_SEED: {
-                    Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
-                    seed.setCaption("Set as seed");
+                    switch (ts.getTaskStatus()) {
+                        case SUCCESS: {
+                            Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                            seed.setCaption("Set as seed");
+                        }
+                    }
                     break;
                 }
             }

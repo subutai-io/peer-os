@@ -150,7 +150,7 @@ public class CassandraTable extends Table {
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
-                        nodesWindow.updateUI(task.getTaskStatus());
+                        nodesWindow.updateUI(task);
                     }
                     manageUI();
                     manager.moveToNextTask();
@@ -162,7 +162,7 @@ public class CassandraTable extends Table {
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
-                        nodesWindow.updateUI(task.getTaskStatus());
+                        nodesWindow.updateUI(task);
                     }
                 }
             }
