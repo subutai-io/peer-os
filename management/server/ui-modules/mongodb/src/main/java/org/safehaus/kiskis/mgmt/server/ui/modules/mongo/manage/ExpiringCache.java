@@ -45,6 +45,16 @@ public class ExpiringCache<KeyType, ValueType> {
         return false;
     }
 
+    public ValueType remove(KeyType key) {
+        try {
+            return entries.remove(key).getValue();
+        } catch (Exception ignore) {
+        } finally {
+            runEviction();
+        }
+        return null;
+    }
+
     private void runEviction() {
         if (System.currentTimeMillis() - lastEvictionRun > evictionRunIntervalMs) {
             lastEvictionRun = System.currentTimeMillis();

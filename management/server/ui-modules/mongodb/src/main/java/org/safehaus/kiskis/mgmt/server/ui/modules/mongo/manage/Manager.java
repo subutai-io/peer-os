@@ -18,6 +18,8 @@ import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
@@ -31,12 +33,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author dilshat
  */
 public class Manager implements ResponseListener {
+
+    private static final Logger LOG = Logger.getLogger(Manager.class.getName());
 
     private final VerticalLayout contentRoot;
     private final PersistenceInterface persistenceManager;
@@ -126,23 +132,37 @@ public class Manager implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        if (response != null && response.getTaskUuid() != null) {
-            ManagerAction managerAction = actionsCache.get(response.getTaskUuid());
-            if (managerAction != null) {
-                if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
-                    managerAction.addOutput(response.getStdOut());
-                    if (managerAction.getOutput().
-                            matches("connecting to: .*/test")) {
-                        managerAction.getStartButton().setEnabled(false);
-                        managerAction.getStopButton().setEnabled(true);
-                    } else if (managerAction.getOutput().contains("Error: couldn't connect to server ")) {
-                        managerAction.getStartButton().setEnabled(true);
-                        managerAction.getStopButton().setEnabled(false);
-                    } else if (managerAction.getOutput().contains("mongo: not found")) {
-                        //disable destroy button
+        try {
+
+            if (response != null && response.getTaskUuid() != null) {
+                ManagerAction managerAction = actionsCache.get(response.getTaskUuid());
+                if (managerAction != null) {
+                    if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
+                        managerAction.addOutput(response.getStdOut());
+                        if (managerAction.getOutput().
+                                contains("connecting to")) {
+                            managerAction.getStartButton().setEnabled(false);
+                            managerAction.getStopButton().setEnabled(true);
+                            actionsCache.remove(managerAction.getTask().getUuid());
+                        } else if (managerAction.getOutput().contains("couldn't connect to server")) {
+                            managerAction.getStartButton().setEnabled(true);
+                            managerAction.getStopButton().setEnabled(false);
+                            actionsCache.remove(managerAction.getTask().getUuid());
+                        } else if (managerAction.getOutput().contains("mongo: not found")) {
+                            //disable destroy button
+                            actionsCache.remove(managerAction.getTask().getUuid());
+                        }
+                    }
+                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                            || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                        Task task = managerAction.getTask();
+                        task.setTaskStatus(TaskStatus.SUCCESS);
+                        Util.saveTask(task);
                     }
                 }
             }
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in onResponse", e);
         }
     }
 
@@ -159,7 +179,7 @@ public class Manager implements ResponseListener {
         return persistenceManager;
     }
 
-    private void populateTable(Table table, List<UUID> agentUUIDs, NodeType nodeType) {
+    private void populateTable(Table table, List<UUID> agentUUIDs, final NodeType nodeType) {
         table.removeAllItems();
         for (UUID agentUUID : agentUUIDs) {
             final Agent agent = persistenceManager.getAgent(agentUUID);
@@ -174,12 +194,15 @@ public class Manager implements ResponseListener {
                     Task checkTask = Util.createTask("Check mongo node status");
                     Command checkCommand = Commands.getCheckInstanceRunningCommand(
                             MessageFormat.format("{0}{1}", agent.getHostname(), Constants.DOMAIN),
-                            Constants.CONFIG_SRV_PORT + "");
+                            getNodePort(nodeType));
+                    checkCommand.getRequest().setUuid(agent.getUuid());
+                    checkCommand.getRequest().setTaskUuid(checkTask.getUuid());
+                    checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
                     if (commandManager.executeCommand(checkCommand)) {
                         actionsCache.put(checkTask.getUuid(),
                                 new ManagerAction(checkTask, startBtn, stopBtn,
                                         ManagerActionType.CHECK_NODE_STATUS),
-                                checkCommand.getRequest().getTimeout() + 1000);
+                                checkCommand.getRequest().getTimeout() * 1000 + 2000);
                     }
                 }
             });
@@ -237,6 +260,16 @@ public class Manager implements ResponseListener {
                 clusterCombo.setItemCaption(clusterInfo,
                         String.format("Name: %s RS: %s", clusterInfo.getClusterName(), clusterInfo.getReplicaSetName()));
             }
+        }
+    }
+
+    private String getNodePort(NodeType nodeType) {
+        if (nodeType == NodeType.CONFIG_NODE) {
+            return Constants.CONFIG_SRV_PORT + "";
+        } else if (nodeType == NodeType.ROUTER_NODE) {
+            return Constants.ROUTER_PORT + "";
+        } else {
+            return Constants.DATA_NODE_PORT + "";
         }
     }
 

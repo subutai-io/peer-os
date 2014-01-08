@@ -54,4 +54,9 @@ public class ManagerAction {
         return output.toString();
     }
 
+    @Override
+    public String toString() {
+        return "ManagerAction{" + "task=" + task + ", startButton=" + startButton + ", stopButton=" + stopButton + ", managerActionType=" + managerActionType + ", output=" + output + '}';
+    }
+
 }

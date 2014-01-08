@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
 import java.util.Arrays;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
@@ -288,7 +289,8 @@ public class Commands {
                 "--port",
                 port
         ));
-        req.setTimeout(10);
+        req.setTimeout(3);
+        req.setSource(MongoModule.MODULE_NAME);
         return cmd;
     }
 
