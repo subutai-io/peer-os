@@ -211,10 +211,6 @@ public class Manager implements ResponseListener {
                     null);
 
             final Item row = table.getItem(rowId);
-//            row.getItemProperty(Constants.TABLE_START_PROPERTY).setValue(startBtn);
-//            row.getItemProperty(Constants.TABLE_STOP_PROPERTY).setValue(stopBtn);
-//            row.getItemProperty(Constants.TABLE_DESTROY_PROPERTY).setValue(destroyBtn);
-//            table.setItemCaption(rowId, agent.getHostname());
 
             startBtn.addListener(new Button.ClickListener() {
 
