@@ -17,10 +17,12 @@
  *  under the License. 
  *  
  */
-package org.safehaus.UI;
+package org.safehaus.core;
 
-import com.vaadin.Application;
-//import org.safehaus.Backend.Threads.LogUpdate;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * ...
@@ -28,20 +30,22 @@ import com.vaadin.Application;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class Monitor extends Application {
+public class Configuration {
+    public Configuration()
+    {
 
-    // Main window is the primary browser window
-    private static MainWindow main = new MainWindow();
-
-    @Override
-    public void init() {
-        setMainWindow(main);
     }
-    public static MainWindow getMain() {
-        return main;
-    }
-
-    public static void setMain(MainWindow main) {
-        Monitor.main = main;
+    public static String getConfiguration(String path, String key)
+    {
+        Logger logger = Logger.getLogger("Configuration Loader");
+        Properties prop = new Properties();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        InputStream stream = loader.getResourceAsStream("/"+path);
+        try {
+            prop.load(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return prop.getProperty(key);
     }
 }

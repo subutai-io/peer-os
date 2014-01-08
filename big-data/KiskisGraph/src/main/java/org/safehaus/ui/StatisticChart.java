@@ -17,18 +17,21 @@
  *  under the License. 
  *  
  */
-package org.safehaus.UI;
+package org.safehaus.ui;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.*;
 import com.vaadin.addon.charts.model.style.GradientColor;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import org.elasticsearch.action.search.SearchResponse;
-import org.safehaus.Core.MemoryResponse;
+import org.safehaus.core.StatisticResponse;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * ...
@@ -36,37 +39,49 @@ import java.util.*;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class Statistic {
-    private DataSeries memoryChartDataSeries;
-
-    public Statistic()
+public class StatisticChart extends Chart {
+    private DataSeries dataSeries;
+    private Configuration configuration;
+    StatisticResponse statisticResponse;
+    String yAxisTitle= "";
+    String yAxisTitleWithUnit = "";
+    public StatisticChart(SearchResponse response)
     {
-        memoryChartDataSeries = new DataSeries();
+        dataSeries = new DataSeries();
+        configuration = this.getConfiguration();
+        if(Monitor.getMain() != null)
+        {
+            statisticResponse =  new StatisticResponse(response, Monitor.getMain().getMonitorTab().getMetricList().getMetricValue());
+            yAxisTitle = Monitor.getMain().getMonitorTab().getMetricList().getMetricType();
+            yAxisTitleWithUnit = yAxisTitle + "( " +  statisticResponse.getUnits() +" )";
+        }
+        else
+            statisticResponse = null;
+        if(statisticResponse != null)
+            addData(statisticResponse);
+        configuration.setSeries(dataSeries);
     }
-
-    public Chart getMemoryChart(SearchResponse response)
+    public StatisticChart getDefaultChart()
     {
-        Chart chart = new Chart();
-        chart.setHeight("300px");
-        chart.setWidth("100%");
+        setHeight("450px");
+        setWidth("100%");
 
-        Configuration configuration = new Configuration();
         configuration.getChart().setZoomType(ZoomType.X);
         configuration.getChart().setSpacingRight(20);
 
-        configuration.getTitle().setText("Last Hour Memory Free");
+        configuration.getTitle().setText(yAxisTitle);
 
         String title = "Click and drag in the plot area to zoom in";
         configuration.getSubTitle().setText(title);
 
         configuration.getxAxis().setType(AxisType.DATETIME);
-        // configuration.getxAxis().getLabels().setFormatter();
-        configuration.getxAxis().setTitle(new Title("Hour"));
+//        configuration.getxAxis().getLabels().setFormatter();
+        configuration.getxAxis().setTitle(new Title("Time"));
 
         configuration.getLegend().setEnabled(false);
 
         Axis yAxis = configuration.getyAxis();
-        yAxis.setTitle(new Title("Memory Free"));
+        yAxis.setTitle(new Title(yAxisTitleWithUnit));
         yAxis.setStartOnTick(false);
         yAxis.setShowFirstLabel(false);
 
@@ -99,23 +114,14 @@ public class Statistic {
 
 
         PlotOptionsArea options = new PlotOptionsArea();
-        memoryChartDataSeries.setPlotOptions(options);
-        memoryChartDataSeries.setName("Memory Free");
+        dataSeries.setPlotOptions(options);
+        dataSeries.setName(yAxisTitle);
 
-//        try {
-//            options.setPointStart(df.parse("2006/01/02").getTime());
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
+        simpleReduce(dataSeries, 1000);
 
-        MemoryResponse memoryResponse = new MemoryResponse(response);
+        this.drawChart(configuration);
 
-        addData(memoryResponse);
-        configuration.setSeries(memoryChartDataSeries);
-
-        chart.drawChart(configuration);
-
-        return chart;
+        return this;
     }
     public static Date d(String dateString) {
         final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -126,20 +132,54 @@ public class Statistic {
             throw new RuntimeException(e);
         }
     }
-    public void addData(MemoryResponse memoryResponse)
+    public void addData(StatisticResponse memoryResponse)
     {
         for (int i = 0; i < memoryResponse.getValues().length; i++) {
             DataSeriesItem item = new DataSeriesItem(d(memoryResponse.getTimestamps()[i].toString().replace("T"," ")),
                     memoryResponse.getValues()[i]);
-            memoryChartDataSeries.add(item);
+            dataSeries.add(item);
         }
 
     }
+    public static void simpleReduce(DataSeries series, int pixels) {
+        if(series.size() < 500)
+            return;
+        DataSeriesItem first = series.get(0);
+        DataSeriesItem last = series.get(series.size() - 1);
+        ArrayList reducedDataSet = new ArrayList();
+        if (first.getX() != null) {
+            // xy pairs
+            double startX = first.getX().doubleValue();
+            double endX = last.getX().doubleValue();
+            double minDistance = (endX - startX) / pixels;
+            reducedDataSet.add(first);
+            double lastPoint = first.getX().doubleValue();
+            for (int i = 0; i < series.size(); i++) {
+                DataSeriesItem item = series.get(i);
+                if (item.getX().doubleValue() - lastPoint > minDistance) {
+                    reducedDataSet.add(item);
+                    lastPoint = item.getX().doubleValue();
+                }
+            }
+            series.setData(reducedDataSet);
+        } else {
+            // interval data
+            int k = series.size() / pixels;
+            if (k > 1) {
+                for (int i = 0; i < series.size(); i++) {
+                    if (i % k == 0) {
+                        DataSeriesItem item = series.get(i);
+                        reducedDataSet.add(item);
+                    }
+                }
+                series.setData(reducedDataSet);
+            }
+        }
+    }
     public void clearData()
     {
-        memoryChartDataSeries.clear();
-        System.out.println("Cleared Data:" + memoryChartDataSeries.getData());
+        dataSeries.clear();
+        System.out.println("Cleared Data:" + dataSeries.getData());
     }
-
 
 }

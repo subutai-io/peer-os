@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.safehaus.Core;
+package org.safehaus.core;
 
 import org.elasticsearch.action.search.SearchResponse;
 
@@ -29,26 +29,37 @@ import java.util.Map;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class MemoryResponse {
+public class StatisticResponse {
     private SearchResponse searchResponse;
     private int responseCount;
     private Timestamp [] timestamps;
     private Number [] values;
+    private String units;
 
-    public MemoryResponse(SearchResponse searchResponse)
+    public StatisticResponse(SearchResponse searchResponse, String value)
     {
         this.setSearchResponse(searchResponse);
         setResponseCount(searchResponse.getHits().getHits().length);
         setTimestamps(new Timestamp[responseCount]);
         values = new Number[responseCount];
+
+        Object temp = null;
+        if(searchResponse.getHits().getHits().length != 0)
+            temp = searchResponse.getHits().getHits()[0].getSource().get("units");
+        if( temp != null)
+            units = temp.toString();
+        else
+            units = "";
         for(int i = 0; i < responseCount; i++)
         {
             Map map = searchResponse.getHits().getHits()[i].getSource();
             getTimestamps()[i] = new Timestamp(map.get("@timestamp").toString());
-            Double deneme = (Double.parseDouble(map.get("value").toString()));
-            getValues()[i] = Double.valueOf(deneme).longValue();
+            if(map.get(value)!=null)
+            {
+                Double deneme = (Double.parseDouble(map.get(value).toString()));
+                getValues()[i] = Double.valueOf(deneme).longValue();
+            }
         }
-
     }
 
     public SearchResponse getSearchResponse() {
@@ -81,5 +92,13 @@ public class MemoryResponse {
 
     public void setTimestamps(Timestamp[] timestamps) {
         this.timestamps = timestamps;
+    }
+
+    public String getUnits() {
+        return units;
+    }
+
+    public void setUnits(String units) {
+        this.units = units;
     }
 }

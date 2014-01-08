@@ -30,7 +30,6 @@
           <element id="library" level="project" name="Maven: org.vaadin.addons:refresher:1.1.1" />
           <element id="library" level="project" name="Maven: org.vaadin.addons:filteringtable:0.9.1" />
           <element id="library" level="project" name="Maven: org.vaadin.addons:popupbutton:1.0.0" />
-          <element id="library" level="project" name="Maven: org.vaadin.addons:invient-charts:0.8.6" />
         </element>
       </element>
     </root>

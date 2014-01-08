@@ -18,16 +18,14 @@
  *
  */
 
-package org.safehaus.UI;
+package org.safehaus.ui;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Reindeer;
-import org.safehaus.Core.ElasticSearchAccessObject;
-import org.safehaus.Core.LogResponse;
-import org.safehaus.Core.Timestamp;
+import org.safehaus.core.LogResponse;
 import org.tepi.filtertable.FilterTable;
 import org.tepi.filtertable.paged.PagedFilterTable;
 
@@ -36,16 +34,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Logger;
 
 /**
  * Created by skardan on 1/2/14.
  */
-public class Log extends TabSheet {
+public class Log extends VerticalLayout {
     private IndexedContainer indexedContainer;
     private FilterTable normalFilterTable;
     private PagedFilterTable<IndexedContainer> pagedFilterTable;
+    private Logger logger = Logger.getLogger("LogLogger");
 
     public Log(){
+        TabSheet tabSheet = new TabSheet();
         indexedContainer =  new IndexedContainer();
 
         normalFilterTable = buildFilterTable();
@@ -54,9 +55,9 @@ public class Log extends TabSheet {
 
         Component tab1 = buildNormalTableTab(getNormalFilterTable());
         Component tab2 = buildPagedTableTab(getPagedFilterTable());
-
-        addTab(tab1,"Normal");
-        addTab(tab2,"Paged");
+        tabSheet.addTab(tab1,"Normal");
+        tabSheet.addTab(tab2,"Paged");
+        addComponent(tabSheet);
     }
 
     private Component buildNormalTableTab(final FilterTable normalFilterTable) {
@@ -157,21 +158,25 @@ public class Log extends TabSheet {
     public void fillTable(ArrayList<LogResponse> tableData, int lastIndex){
         if(lastIndex == -1)
             lastIndex = 0;
-
-        System.out.println("Last Index of Log in fillTable: " + lastIndex);
+        System.out.println("New log data size: " + tableData.size());
         for(int i=0; i<tableData.size(); i++){
             try{
                 //System.out.println("new item id is : " + cont.addItem(lastIndex+i));
                 indexedContainer.addItemAt((lastIndex + i), (lastIndex + i));
                 if(indexedContainer.getItem((lastIndex+i)) == null){
                     System.out.println("item is null ");
+                    indexedContainer.removeItem(lastIndex+i);
                 }
-                indexedContainer.getContainerProperty((lastIndex+i), "message").setValue(tableData.get(i).getMessage());
-                indexedContainer.getContainerProperty((lastIndex+i), "path").setValue(tableData.get(i).getPath());
-                indexedContainer.getContainerProperty((lastIndex+i), "version").setValue(tableData.get(i).getVersion());
-                indexedContainer.getContainerProperty((lastIndex+i), "type").setValue(tableData.get(i).getType());
-                indexedContainer.getContainerProperty((lastIndex+i), "date").setValue(new java.sql.Timestamp(strDateToUnixTimestamp(convertTimestamp(tableData.get(i).getTimestamp()))));
-                indexedContainer.getContainerProperty((lastIndex+i), "host").setValue(tableData.get(i).getHost());
+                else
+                {
+                    indexedContainer.getContainerProperty((lastIndex+i), "message").setValue(tableData.get(i).getMessage());
+                    indexedContainer.getContainerProperty((lastIndex+i), "path").setValue(tableData.get(i).getPath());
+                    indexedContainer.getContainerProperty((lastIndex+i), "version").setValue(tableData.get(i).getVersion());
+                    indexedContainer.getContainerProperty((lastIndex+i), "type").setValue(tableData.get(i).getType());
+                    indexedContainer.getContainerProperty((lastIndex+i), "date").setValue(new java.sql.Timestamp(strDateToUnixTimestamp(convertTimestamp(tableData.get(i).getTimestamp()))));
+                    indexedContainer.getContainerProperty((lastIndex+i), "host").setValue(tableData.get(i).getHost());
+                }
+
             }catch (Exception ex){
                 ex.printStackTrace();
                 //System.err.println("Message field does not exists !!!");

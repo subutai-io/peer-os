@@ -18,7 +18,7 @@
  *
  */
 
-package org.safehaus.Core;
+package org.safehaus.core;
 
 /**
  * Created by skardan on 12/27/13.

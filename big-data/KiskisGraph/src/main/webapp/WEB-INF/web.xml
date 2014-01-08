@@ -12,7 +12,7 @@
         <init-param>
             <description>Vaadin application class to start</description>
             <param-name>application</param-name>
-            <param-value>org.safehaus.UI.Monitor</param-value>
+            <param-value>org.safehaus.ui.Monitor</param-value>
         </init-param>
         <init-param>
             <param-name>widgetset</param-name>

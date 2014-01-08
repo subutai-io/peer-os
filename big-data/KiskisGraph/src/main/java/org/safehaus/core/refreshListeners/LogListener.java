@@ -17,19 +17,19 @@
  *  under the License. 
  *  
  */
-package org.safehaus.Core.Threads;
+package org.safehaus.core.refreshListeners;
 
 import com.github.wolfie.refresher.Refresher;
-import com.vaadin.ui.Label;
-import org.safehaus.Core.ElasticSearchAccessObject;
-import org.safehaus.Core.LogResponse;
-import org.safehaus.Core.Timestamp;
-import org.safehaus.UI.Log;
-import org.safehaus.UI.Monitor;
-import org.safehaus.UI.MonitorTab;
-import org.safehaus.UI.Statistic;
+import org.safehaus.core.ElasticSearchAccessObject;
+import org.safehaus.core.LogResponse;
+import org.safehaus.core.Timestamp;
+import org.safehaus.ui.Log;
+import org.safehaus.ui.Monitor;
+import org.safehaus.ui.MonitorTab;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * ...
@@ -37,17 +37,20 @@ import java.util.ArrayList;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class LogUpdateListener implements Refresher.RefreshListener {
+public class LogListener implements Refresher.RefreshListener {
     //Represents the lastIndex of the previous query result
     static int lastIndex;
     private static Timestamp beginTime;
     private Log log;
+    private Logger logger = Logger.getLogger("LogUpdateLogger");
+    private ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
+
     /**
      *
      * @param lastIndex represents the lastIndex get from the query to Elasticsearch
      * @param lastHour  represents the time that we want to start from
      */
-    public LogUpdateListener(Log log, int lastIndex, Timestamp lastHour)
+    public LogListener(Log log, int lastIndex, Timestamp lastHour)
     {
         this.lastIndex = lastIndex;
         beginTime = lastHour;
@@ -55,10 +58,27 @@ public class LogUpdateListener implements Refresher.RefreshListener {
 
     }
     public void refresh(Refresher refresher) {
-        System.out.println("Log is being refreshed! LastIndex: " + lastIndex +", beginTime: " + beginTime);
+        logger.log(Level.INFO, "Log is being refreshed! LastIndex: " + lastIndex +", beginTime: " + beginTime);
         MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
-        ArrayList<LogResponse> logResponses = monitorTab.getElasticSearchAccessObject().getLogs(lastIndex, beginTime, Timestamp.getCurrentTimestamp());
-        monitorTab.getLogTable().fillTable(logResponses,lastIndex);
+        ArrayList<LogResponse> logResponses = ESAO.getLogs(lastIndex, beginTime, Timestamp.getCurrentTimestamp());
+        monitorTab.getLogTable().fillTable(logResponses, lastIndex);
         lastIndex += logResponses.size();
+
+        if(logResponses.size() == 0)
+        {
+            System.out.println("Added: No data!");
+
+        }
+        else if(logResponses.size() < 10)
+        {
+            for(int i = 0; i< logResponses.size(); i++)
+            {
+                LogResponse logResponse = logResponses.get(i);
+                System.out.println("Added: Timestamp: " + logResponse.getTimestamp() + "; host: " + logResponse.getHost() + "; path: " + logResponse.getPath());
+            }
+        }
+        else
+            System.out.println("Added: More than 10 points!" );
+
     }
 }

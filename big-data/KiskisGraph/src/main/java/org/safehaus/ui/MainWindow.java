@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.safehaus.UI;
+package org.safehaus.ui;
 
 import com.vaadin.ui.*;
 
@@ -28,26 +28,24 @@ import com.vaadin.ui.*;
  * @version $Rev$
  */
 public class MainWindow extends Window{
-    //    private GridLayout grid = new GridLayout(2, 2);
     private HorizontalSplitPanel horiz;
-    private Panel leftPanel;
+    private Host hosts;
     private MonitorTab monitorTab;
     public MainWindow()
     {
         monitorTab = new MonitorTab();
         horiz = new HorizontalSplitPanel();
+        getMonitorTab().setWidth("100%");
 
-        horiz.setWidth("100%");
         horiz.setSplitPosition(10); // percent
+        horiz.setWidth("100%");
+
+        setHosts(new Host());
+
+        horiz.addComponent(getHosts().getRealHostTree());
+
+        horiz.addComponent(getMonitorTab());
         setContent(horiz);
-
-        leftPanel = new Panel();
-        leftPanel.setSizeFull();
-        leftPanel.addComponent(Host.getRealHostTree());
-
-        horiz.setFirstComponent(leftPanel);
-        horiz.setSecondComponent(getMonitorTab());
-
     }
 
     public MonitorTab getMonitorTab() {
@@ -56,5 +54,13 @@ public class MainWindow extends Window{
 
     public void setMonitorTab(MonitorTab monitorTab) {
         this.monitorTab = monitorTab;
+    }
+
+    public Host getHosts() {
+        return hosts;
+    }
+
+    public void setHosts(Host hosts) {
+        this.hosts = hosts;
     }
 }

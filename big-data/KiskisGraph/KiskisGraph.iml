@@ -11,7 +11,14 @@
         <webroots>
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
         </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/src/main/java" />
+          <root url="file://$MODULE_DIR$/src/main/resources" />
+        </sourceRoots>
       </configuration>
+      <facet type="Vaadin" name="Vaadin Application">
+        <configuration vaadinUsedWebRootPathUrl="" vaadinGWTLocationPath="" vaadinVMOptions="-Xss8M -Xmx512M -XX:MaxPermSize=512M" vaadinJavaScriptStyle="Obfuscated" vaadinCompilerThreads="" />
+      </facet>
     </facet>
     <facet type="gwt" name="GWT">
       <configuration>
@@ -25,6 +32,8 @@
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -51,7 +60,6 @@
     <orderEntry type="library" name="Maven: org.vaadin.addons:refresher:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:filteringtable:0.9.1" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:popupbutton:1.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.vaadin.addons:invient-charts:0.8.6" level="project" />
   </component>
 </module>
 

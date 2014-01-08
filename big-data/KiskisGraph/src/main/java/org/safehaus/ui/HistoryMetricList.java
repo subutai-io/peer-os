@@ -17,18 +17,14 @@
  *  under the License. 
  *  
  */
-package org.safehaus.UI;
+package org.safehaus.ui;
 
-import com.vaadin.addon.charts.Chart;
 import com.vaadin.data.Property;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.VerticalLayout;
-import org.elasticsearch.action.search.SearchResponse;
-import org.safehaus.Core.LogResponse;
-import org.safehaus.Core.Timestamp;
-
-import java.util.ArrayList;
+import org.safehaus.core.ElasticSearchAccessObject;
+import org.safehaus.core.Timestamp;
 
 /**
  * ...
@@ -38,6 +34,10 @@ import java.util.ArrayList;
  */
 public class HistoryMetricList extends VerticalLayout implements
         Property.ValueChangeListener {
+    ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
+    Timestamp currentTime = Timestamp.getCurrentTimestamp();
+    private Timestamp lastHour = Timestamp.getHoursEarlier(currentTime,1);
+
     public ComboBox getSampleMetricList()
     {
 
@@ -46,62 +46,79 @@ public class HistoryMetricList extends VerticalLayout implements
         l.addItem(2);
         l.addItem(3);
         l.addItem(4);
+        l.addItem(5);
+        l.addItem(6);
+        l.addItem(7);
+        l.addItem(8);
         l.setItemCaption(1, "1 hour");
         l.setItemCaption(2, "2 hours");
-        l.setItemCaption(3, "12 hours");
+        l.setItemCaption(3, "6 hours");
         l.setItemCaption(4, "1 day");
+        l.setItemCaption(5, "2 days");
+        l.setItemCaption(6, "5 days");
+        l.setItemCaption(7, "1 week");
+        l.setItemCaption(8, "2 weeks");
 
         l.setFilteringMode(AbstractSelect.Filtering.FILTERINGMODE_CONTAINS);
         l.setImmediate(true);
         l.setNullSelectionAllowed(false);
         l.addListener(this);
 
-
         return l;
 
     }
     public void valueChange(Property.ValueChangeEvent event) {
-        Timestamp currentTime = Timestamp.getCurrentTimestamp();
-        Timestamp lastHour = Timestamp.getHoursEarlier(currentTime,1);
+        currentTime = Timestamp.getCurrentTimestamp();
+        setLastHour(Timestamp.getHoursEarlier(currentTime,1));
         MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
         if(event.getProperty().toString().equalsIgnoreCase("1"))
         {
-            lastHour = Timestamp.getHoursEarlier(currentTime,1);
+            setLastHour(Timestamp.getHoursEarlier(currentTime,1));
         }
         else if(event.getProperty().toString().equalsIgnoreCase("2"))
         {
-            lastHour = Timestamp.getHoursEarlier(currentTime,2);
+            setLastHour(Timestamp.getHoursEarlier(currentTime,2));
         }
         else if(event.getProperty().toString().equalsIgnoreCase("3"))
         {
-            lastHour = Timestamp.getHoursEarlier(currentTime,12);
+            setLastHour(Timestamp.getHoursEarlier(currentTime,6));
         }
         else if(event.getProperty().toString().equalsIgnoreCase("4"))
         {
-            lastHour = Timestamp.getHoursEarlier(currentTime,24);
+            setLastHour(Timestamp.getHoursEarlier(currentTime,24));
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("5"))
+        {
+            setLastHour(Timestamp.getHoursEarlier(currentTime,48));
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("6"))
+        {
+            setLastHour(Timestamp.getHoursEarlier(currentTime,120));
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("7"))
+        {
+            setLastHour(Timestamp.getHoursEarlier(currentTime,168));
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("8"))
+        {
+            setLastHour(Timestamp.getHoursEarlier(currentTime,168*2));
         }
         else
         {
         }
         // Update Chart according to the history metric
-        int chartIndex = monitorTab.getComponentIndex(monitorTab.getChart());
-        monitorTab.removeComponent(monitorTab.getChart());
-        SearchResponse response = monitorTab.getElasticSearchAccessObject().executeMemoryQuery(-1, lastHour, currentTime);
-        Statistic memoryStatistic = new Statistic();
-        monitorTab.setChart(memoryStatistic.getMemoryChart(response));
-        monitorTab.addComponent(monitorTab.getChart(), chartIndex);
-        monitorTab.addStatisticRefresher((int) response.getHits().getTotalHits(), monitorTab.getStatisticUpdateInterval());
-
+        monitorTab.updateChart();
 
         // Update Log according to the history metric
-        int logIndex = monitorTab.getComponentIndex(monitorTab.getLogTable());
-        monitorTab.removeComponent(monitorTab.getLogTable());
-        ArrayList<LogResponse> logResponses = monitorTab.getElasticSearchAccessObject().getLogs(-1, lastHour, currentTime);
-        Log logTable  = new Log();
-        logTable.fillTable(logResponses, -1);
-        monitorTab.setLogTable(logTable);
-        monitorTab.addComponent(monitorTab.getLogTable(), logIndex);
-        monitorTab.addLogsRefresher(logResponses.size(), monitorTab.getStatisticUpdateInterval());
+        monitorTab.updateLog();
 
+    }
+
+    public Timestamp getLastHour() {
+        return lastHour;
+    }
+
+    public void setLastHour(Timestamp lastHour) {
+        this.lastHour = lastHour;
     }
 }

@@ -17,10 +17,11 @@
  *  under the License. 
  *  
  */
-package org.safehaus.Core;
+package org.safehaus.core;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -38,17 +39,69 @@ public class Timestamp{
     private int second;
     private int millisecond=-1;
 
+    public Timestamp(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
+        this.millisecond = millisecond;
+    }
+    public Timestamp(int year, int month, int day, int hour, int minute, int second) {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
+    }
+
     public Timestamp(String timestamp)
     {
         if(timestamp.contains("Z"))
             parseTimeStamp(timestamp);
         else
+
         {
             millisecond = -1;
             parseTimeStampInSystemMode(timestamp);
         }
     }
 
+
+    public static Timestamp getCurrentTimestamp()
+    {
+        //Get current time in date format
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        String current = dateFormat.format(date);
+        current = current.replaceAll(" ","T");
+
+//        System.out.println(current);
+
+        //Calculate current time in England
+        //The reason is in our lxc's which send the data, the local time is set to England
+        //which will be changed.
+        //TO-DO
+        Timestamp currentTimestamp = new Timestamp(current);
+        currentTimestamp.setHour(currentTimestamp.getHour()-2);
+        return currentTimestamp;
+
+    }
+    public static Timestamp getHoursEarlier(Timestamp timestamp, int hour)
+    {
+        Timestamp lastHour;
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(timestamp.getYear(), timestamp.getMonth()-1, timestamp.getDay(), timestamp.getHour(),timestamp.getMinute(), timestamp.getSecond());
+        calendar.add(Calendar.HOUR, hour*-1);
+        lastHour = new Timestamp(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),calendar.get(Calendar.SECOND));
+
+        return lastHour;
+
+
+    }
     private void parseTimeStamp(String timestamp)
     {
         year = Integer.parseInt(timestamp.substring(0,timestamp.indexOf("-")));
@@ -70,44 +123,6 @@ public class Timestamp{
         timestamp = timestamp.substring(timestamp.indexOf(".")+1);
 
         millisecond = Integer.parseInt(timestamp.substring(0,timestamp.indexOf("Z")));
-    }
-    public static Timestamp getCurrentTimestamp()
-    {
-        //Get current time in date format
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        String current = dateFormat.format(date);
-        current = current.replaceAll(" ","T");
-//        System.out.println(current);
-
-        //Calculate current time in England
-        //The reason is in our lxc's which send the data, the local time is set to England
-        //which will be changed.
-        //TO-DO
-        Timestamp currentTimestamp = new Timestamp(current);
-        currentTimestamp.setHour(currentTimestamp.getHour()-2);
-        return currentTimestamp;
-
-    }
-    public static Timestamp getHoursEarlier(Timestamp timestamp, int hour)
-    {
-        Timestamp lastHour;
-        lastHour = new Timestamp(timestamp.toString());
-        if(lastHour.getHour() < hour)
-        {
-            lastHour.setDay(lastHour.getDay()-(int)(Math.ceil(hour/24.0)));
-            if((hour%24) > lastHour.getHour())
-                lastHour.setHour(lastHour.getHour()+24-(hour%24));
-            else
-                lastHour.setHour(lastHour.getHour()-(hour%24));
-        }
-        else
-        {
-            lastHour.setHour(lastHour.getHour()-hour);
-        }
-        return lastHour;
-
-
     }
     private void parseTimeStampInSystemMode(String timestamp)
     {
