@@ -9,7 +9,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
  *
  * @author dilshat
  */
-public class CacheEntry<ValueType> {
+class CacheEntry<ValueType> {
 
     private final ValueType value;
     private final long createTimestamp;
