@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -14,9 +15,14 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
@@ -26,8 +32,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 public class Manager implements ResponseListener {
 
     private final VerticalLayout contentRoot;
+    private final PersistenceInterface persistenceManager;
 
     public Manager() {
+        persistenceManager = ServiceLocator.getService(PersistenceInterface.class);
+
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -41,20 +50,63 @@ public class Manager implements ResponseListener {
         contentRoot.addComponent(content);
         contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
         contentRoot.setMargin(true);
+        //tables go here
+        final Table routersTable = new Table("Query Routers");
 
         Label clusterNameLabel = new Label("Select the cluster");
         content.addComponent(clusterNameLabel);
 
-        ComboBox clusterCombo = new ComboBox("Cluster", new ArrayList<Object>());
+        HorizontalLayout hl = new HorizontalLayout();
+
+        final ComboBox clusterCombo = new ComboBox();
         clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
-        clusterCombo.setItemCaptionPropertyId("cluster name");
-        content.addComponent(clusterCombo);
+        clusterCombo.addListener(new Property.ValueChangeListener() {
 
-        Table routersTable = new Table("Query Routers");
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() instanceof MongoClusterInfo) {
+                    MongoClusterInfo clusterInfo = (MongoClusterInfo) event.getProperty().getValue();
+                    routersTable.removeAllItems();
+                    for (UUID routerUUID : clusterInfo.getRouters()) {
+                        Agent router = persistenceManager.getAgent(routerUUID);
+                        routersTable.addItem(new Object[]{
+                            router.getHostname(),
+                            new Button("Check"),
+                            new Button("Start"),
+                            new Button("Stop"),
+                            new Button("Destroy")},
+                                router);
+                    }
+                }
+            }
+        });
+
+        hl.addComponent(clusterCombo);
+
+        Button refreshClustersBtn = new Button("Get clusters");
+        refreshClustersBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                List<MongoClusterInfo> clusters = persistenceManager.getMongoClustersInfo();
+                clusterCombo.removeAllItems();
+                for (MongoClusterInfo clusterInfo : clusters) {
+                    clusterCombo.addItem(clusterInfo);
+                    clusterCombo.setItemCaption(clusterInfo, clusterInfo.getClusterName());
+                }
+            }
+        });
+
+        hl.addComponent(refreshClustersBtn);
+
+        content.addComponent(hl);
+
         routersTable.addContainerProperty("Host", String.class, null);
+        routersTable.addContainerProperty("Check", Button.class, null);
         routersTable.addContainerProperty("Start", Button.class, null);
         routersTable.addContainerProperty("Stop", Button.class, null);
+        routersTable.addContainerProperty("Destroy", Button.class, null);
 
         routersTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         routersTable.setHeight(100, Sizeable.UNITS_PIXELS);
@@ -62,13 +114,6 @@ public class Manager implements ResponseListener {
         routersTable.setPageLength(10);
         routersTable.setSelectable(true);
         routersTable.setImmediate(true);
-
-        //sample data for UI test=============================
-        routersTable.addItem(new Object[]{
-            "Router-1", new Button("Start"), new Button("Stop")}, new Integer(1));
-        routersTable.addItem(new Object[]{
-            "Router-2", new Button("Start"), new Button("Stop")}, new Integer(2));
-        //====================================================
 
         content.addComponent(routersTable);
 
@@ -92,9 +137,6 @@ public class Manager implements ResponseListener {
         //====================================================
 
         content.addComponent(configServersTable);
-
-        Label replicaSetLabel = new Label("Select the replica set");
-        content.addComponent(replicaSetLabel);
 
         Label replicaNameLabel = new Label("Replica: rs0");
         content.addComponent(replicaNameLabel);
@@ -139,6 +181,10 @@ public class Manager implements ResponseListener {
     @Override
     public String getSource() {
         return MongoModule.MODULE_NAME;
+    }
+
+    private void show(String notification) {
+        contentRoot.getWindow().showNotification(notification);
     }
 
 }

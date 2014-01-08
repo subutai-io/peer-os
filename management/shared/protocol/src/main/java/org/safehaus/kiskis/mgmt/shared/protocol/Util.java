@@ -89,4 +89,13 @@ public class Util {
         }
         return filteredAgents;
     }
+
+    public static String removeAllWhitespace(String str) {
+        if (!isStringEmpty(str)) {
+            return str.replaceAll("\\s+", "");
+        } else if (str != null) {
+            return "";
+        }
+        return null;
+    }
 }

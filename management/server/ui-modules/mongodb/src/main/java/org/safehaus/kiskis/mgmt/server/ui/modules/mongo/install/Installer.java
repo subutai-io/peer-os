@@ -209,7 +209,7 @@ public class Installer extends Operation {
         }
         addTask(registerSecondaryNodesWithPrimaryTask);
 
-        //REGISTER PRIMARY NODE OF REPLICA SET AS SHARD WITH ONE OF THE ROUTERS
+        //REGISTER NODES OF REPLICA SET AS SHARD WITH ONE OF THE ROUTERS
         Task registerShardsWithRouterTask = Util.createTask("Register shard with router");
         Agent router = config.getRouterServers().iterator().next();
         StringBuilder shards = new StringBuilder();
