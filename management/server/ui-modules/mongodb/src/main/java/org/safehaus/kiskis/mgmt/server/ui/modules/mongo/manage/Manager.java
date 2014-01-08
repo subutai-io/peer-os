@@ -15,13 +15,20 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
@@ -33,9 +40,14 @@ public class Manager implements ResponseListener {
 
     private final VerticalLayout contentRoot;
     private final PersistenceInterface persistenceManager;
+    private final CommandManagerInterface commandManager;
+    private final ComboBox clusterCombo;
+    private final ExpiringCache<UUID, ManagerAction> actionsCache = new ExpiringCache<UUID, ManagerAction>();
 
     public Manager() {
+        //get db and transport managers
         persistenceManager = ServiceLocator.getService(PersistenceInterface.class);
+        commandManager = ServiceLocator.getService(CommandManagerInterface.class);
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
@@ -50,15 +62,20 @@ public class Manager implements ResponseListener {
         contentRoot.addComponent(content);
         contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
         contentRoot.setMargin(true);
+
         //tables go here
-        final Table routersTable = new Table("Query Routers");
+        final Table configServersTable = createTableTemplate("Config Servers");
+        final Table routersTable = createTableTemplate("Query Routers");
+        final Table dataNodesTable = createTableTemplate("Data Nodes");
+        //tables go here
 
         Label clusterNameLabel = new Label("Select the cluster");
         content.addComponent(clusterNameLabel);
 
-        HorizontalLayout hl = new HorizontalLayout();
+        HorizontalLayout topContent = new HorizontalLayout();
+        topContent.setSpacing(true);
 
-        final ComboBox clusterCombo = new ComboBox();
+        clusterCombo = new ComboBox();
         clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.addListener(new Property.ValueChangeListener() {
@@ -67,107 +84,40 @@ public class Manager implements ResponseListener {
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() instanceof MongoClusterInfo) {
                     MongoClusterInfo clusterInfo = (MongoClusterInfo) event.getProperty().getValue();
-                    routersTable.removeAllItems();
-                    for (UUID routerUUID : clusterInfo.getRouters()) {
-                        Agent router = persistenceManager.getAgent(routerUUID);
-                        routersTable.addItem(new Object[]{
-                            router.getHostname(),
-                            new Button("Check"),
-                            new Button("Start"),
-                            new Button("Stop"),
-                            new Button("Destroy")},
-                                router);
-                    }
+                    populateTable(configServersTable, clusterInfo.getConfigServers(), NodeType.CONFIG_NODE);
+                    populateTable(routersTable, clusterInfo.getRouters(), NodeType.ROUTER_NODE);
+                    populateTable(dataNodesTable, clusterInfo.getDataNodes(), NodeType.DATA_NODE);
                 }
             }
         });
 
-        hl.addComponent(clusterCombo);
+        topContent.addComponent(clusterCombo);
 
-        Button refreshClustersBtn = new Button("Get clusters");
+        Button refreshClustersBtn = new Button("Refresh clusters");
         refreshClustersBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                List<MongoClusterInfo> clusters = persistenceManager.getMongoClustersInfo();
-                clusterCombo.removeAllItems();
-                for (MongoClusterInfo clusterInfo : clusters) {
-                    clusterCombo.addItem(clusterInfo);
-                    clusterCombo.setItemCaption(clusterInfo, clusterInfo.getClusterName());
-                }
+                refreshClustersInfo();
             }
         });
 
-        hl.addComponent(refreshClustersBtn);
+        topContent.addComponent(refreshClustersBtn);
 
-        content.addComponent(hl);
+        content.addComponent(topContent);
 
-        routersTable.addContainerProperty("Host", String.class, null);
-        routersTable.addContainerProperty("Check", Button.class, null);
-        routersTable.addContainerProperty("Start", Button.class, null);
-        routersTable.addContainerProperty("Stop", Button.class, null);
-        routersTable.addContainerProperty("Destroy", Button.class, null);
+        HorizontalLayout midContent = new HorizontalLayout();
+        midContent.setWidth(100, Sizeable.UNITS_PERCENTAGE);
 
-        routersTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        routersTable.setHeight(100, Sizeable.UNITS_PIXELS);
+        midContent.addComponent(configServersTable);
 
-        routersTable.setPageLength(10);
-        routersTable.setSelectable(true);
-        routersTable.setImmediate(true);
+        midContent.addComponent(routersTable);
 
-        content.addComponent(routersTable);
+        content.addComponent(midContent);
 
-        Table configServersTable = new Table("Config Servers");
-        configServersTable.addContainerProperty("Host", String.class, null);
-        configServersTable.addContainerProperty("Start", Button.class, null);
-        configServersTable.addContainerProperty("Stop", Button.class, null);
+        content.addComponent(dataNodesTable);
 
-        configServersTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        configServersTable.setHeight(100, Sizeable.UNITS_PIXELS);
-
-        configServersTable.setPageLength(10);
-        configServersTable.setSelectable(true);
-        configServersTable.setImmediate(true);
-
-        //sample data for UI test=============================
-        configServersTable.addItem(new Object[]{
-            "Config-1", new Button("Start"), new Button("Stop")}, new Integer(1));
-        configServersTable.addItem(new Object[]{
-            "Config-2", new Button("Start"), new Button("Stop")}, new Integer(2));
-        //====================================================
-
-        content.addComponent(configServersTable);
-
-        Label replicaNameLabel = new Label("Replica: rs0");
-        content.addComponent(replicaNameLabel);
-
-        Table shardsTable = new Table("Shards");
-        shardsTable.addContainerProperty("Host", String.class, null);
-        shardsTable.addContainerProperty("Start", Button.class, null);
-        shardsTable.addContainerProperty("Stop", Button.class, null);
-
-        shardsTable.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        shardsTable.setHeight(100, Sizeable.UNITS_PIXELS);
-
-        shardsTable.setPageLength(10);
-        shardsTable.setSelectable(true);
-        shardsTable.setImmediate(true);
-
-        //sample data for UI test=============================
-        shardsTable.addItem(new Object[]{
-            "Shard-1", new Button("Start"), new Button("Stop")}, new Integer(1));
-        shardsTable.addItem(new Object[]{
-            "Shard-2", new Button("Start"), new Button("Stop")}, new Integer(2));
-        //====================================================
-
-        content.addComponent(shardsTable);
-
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(new Button("Cancel"));
-        buttons.addComponent(new Button("Apply Changes"));
-
-        content.addComponent(buttons);
-
+        refreshClustersInfo();
     }
 
     public Component getContent() {
@@ -176,6 +126,24 @@ public class Manager implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
+        if (response != null && response.getTaskUuid() != null) {
+            ManagerAction managerAction = actionsCache.get(response.getTaskUuid());
+            if (managerAction != null) {
+                if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
+                    managerAction.addOutput(response.getStdOut());
+                    if (managerAction.getOutput().
+                            matches("connecting to: .*/test")) {
+                        managerAction.getStartButton().setEnabled(false);
+                        managerAction.getStopButton().setEnabled(true);
+                    } else if (managerAction.getOutput().contains("Error: couldn't connect to server ")) {
+                        managerAction.getStartButton().setEnabled(true);
+                        managerAction.getStopButton().setEnabled(false);
+                    } else if (managerAction.getOutput().contains("mongo: not found")) {
+                        //disable destroy button
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -185,6 +153,91 @@ public class Manager implements ResponseListener {
 
     private void show(String notification) {
         contentRoot.getWindow().showNotification(notification);
+    }
+
+    public PersistenceInterface getDbManager() {
+        return persistenceManager;
+    }
+
+    private void populateTable(Table table, List<UUID> agentUUIDs, NodeType nodeType) {
+        table.removeAllItems();
+        for (UUID agentUUID : agentUUIDs) {
+            final Agent agent = persistenceManager.getAgent(agentUUID);
+            final Button checkBtn = new Button("Check");
+            final Button startBtn = new Button("Start");
+            final Button stopBtn = new Button("Stop");
+            final Button destroyBtn = new Button("Destroy");
+            checkBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Task checkTask = Util.createTask("Check mongo node status");
+                    Command checkCommand = Commands.getCheckInstanceRunningCommand(
+                            MessageFormat.format("{0}{1}", agent.getHostname(), Constants.DOMAIN),
+                            Constants.CONFIG_SRV_PORT + "");
+                    if (commandManager.executeCommand(checkCommand)) {
+                        actionsCache.put(checkTask.getUuid(),
+                                new ManagerAction(checkTask, startBtn, stopBtn,
+                                        ManagerActionType.CHECK_NODE_STATUS),
+                                checkCommand.getRequest().getTimeout() + 1000);
+                    }
+                }
+            });
+            startBtn.setEnabled(false);
+            startBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                }
+            });
+            stopBtn.setEnabled(false);
+            stopBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                }
+            });
+            destroyBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                }
+            });
+            table.addItem(new Object[]{
+                agent.getHostname(),
+                checkBtn,
+                startBtn,
+                stopBtn,
+                destroyBtn},
+                    agent);
+        }
+    }
+
+    private Table createTableTemplate(String caption) {
+        Table table = new Table(caption);
+        table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Start", Button.class, null);
+        table.addContainerProperty("Stop", Button.class, null);
+        table.addContainerProperty("Destroy", Button.class, null);
+        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        table.setHeight(250, Sizeable.UNITS_PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(true);
+        table.setImmediate(true);
+        return table;
+    }
+
+    private void refreshClustersInfo() {
+        List<MongoClusterInfo> mongoClusterInfos = persistenceManager.getMongoClustersInfo();
+        clusterCombo.removeAllItems();
+        if (mongoClusterInfos != null) {
+            for (MongoClusterInfo clusterInfo : mongoClusterInfos) {
+                clusterCombo.addItem(clusterInfo);
+                clusterCombo.setItemCaption(clusterInfo,
+                        String.format("Name: %s RS: %s", clusterInfo.getClusterName(), clusterInfo.getReplicaSetName()));
+            }
+        }
     }
 
 }

@@ -278,17 +278,17 @@ public class Commands {
     }
 
     //execute on any cluster member
-    public static Command getCheckInstanceRunningCommand() {
+    public static Command getCheckInstanceRunningCommand(String host, String port) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--host",
-                ":MONGO_HOST", //supply host of node under examination
+                host,
                 "--port",
-                ":MONGO_PORT" //supply port of node under examination
+                port
         ));
-        req.setTimeout(30);
+        req.setTimeout(10);
         return cmd;
     }
 
