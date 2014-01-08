@@ -77,7 +77,7 @@ public class NodesWindow extends Window {
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
         container.addContainerProperty("hostname", String.class, "");
-        container.addContainerProperty("uuid", UUID.class, "");
+//        container.addContainerProperty("uuid", UUID.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Status", Button.class, "");
@@ -95,7 +95,7 @@ public class NodesWindow extends Window {
         Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
         item.getItemProperty("hostname").setValue(agent.getHostname());
-        item.getItemProperty("uuid").setValue(agent.getUuid());
+//        item.getItemProperty("uuid").setValue(agent.getUuid());
 
         Button startButton = new Button("Start");
         startButton.addListener(new Button.ClickListener() {
