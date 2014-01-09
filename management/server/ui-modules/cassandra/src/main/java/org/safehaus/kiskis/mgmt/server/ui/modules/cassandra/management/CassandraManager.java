@@ -11,9 +11,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
@@ -23,9 +21,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class CassandraManager {
 
     private final VerticalLayout contentRoot;
-    CassandraTable cassandraTable;
-    ServiceManager manager;
-    private final TextArea terminal;
+//    private final TextArea terminal;
+    private final CassandraTable cassandraTable;
 
     public CassandraManager() {
 
@@ -47,11 +44,11 @@ public class CassandraManager {
 
         Label clusterNameLabel = new Label("Select the cluster");
         content.addComponent(clusterNameLabel);
-        terminal = new TextArea();
-        terminal.setRows(10);
-        terminal.setColumns(60);
-        manager = new ServiceManager(terminal);
-        cassandraTable = new CassandraTable(manager);
+//        terminal = new TextArea();
+//        terminal.setRows(10);
+//        terminal.setColumns(60);
+
+        cassandraTable = new CassandraTable();
         Button getClustersBtn = new Button("Get clusters");
         getClustersBtn.addListener(new Button.ClickListener() {
 
@@ -61,11 +58,10 @@ public class CassandraManager {
             }
         });
         buttons.addComponent(getClustersBtn);
-        buttons.addComponent(new Button("Apply Changes"));
 
         content.addComponent(buttons);
         content.addComponent(cassandraTable);
-        content.addComponent(terminal);
+//        content.addComponent(terminal);
 
     }
 
@@ -74,9 +70,7 @@ public class CassandraManager {
     }
 
     public void setOutput(Response response) {
-        if (manager != null) {
-            manager.onResponse(response);
-        }
+        cassandraTable.onResponse(response);
     }
 
 }

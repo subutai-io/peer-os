@@ -82,6 +82,8 @@ public interface PersistenceInterface {
 
     public boolean deleteCassandraClusterInfo(UUID uuid);
 
+    public CassandraClusterInfo getCassandraClusterInfoByUUID(UUID uuid);
+
     /**
      *
      */

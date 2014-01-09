@@ -192,6 +192,11 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     }
 
     @Override
+    public CassandraClusterInfo getCassandraClusterDataByUUID(UUID uuid) {
+        return persistenceCommand.getCassandraClusterInfoByUUID(uuid);
+    }
+
+    @Override
     public List<HadoopClusterInfo> getHadoopClusterData() {
         return persistenceCommand.getHadoopClusterInfo();
     }
