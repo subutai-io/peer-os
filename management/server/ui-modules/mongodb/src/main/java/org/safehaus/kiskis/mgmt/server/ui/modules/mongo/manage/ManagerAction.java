@@ -27,6 +27,7 @@ public final class ManagerAction {
     private final Agent agent;
     private final NodeType nodeType;
     private final StringBuilder output = new StringBuilder();
+    private int instructionCount = 0;
 
     public ManagerAction(Task task, ManagerActionType managerActionType, Item row, Agent agent, NodeType nodeType) {
         this.task = task;
@@ -41,15 +42,25 @@ public final class ManagerAction {
         return task;
     }
 
+    public void incrementInstructionCount() {
+        instructionCount++;
+    }
+
+    public int getInstructionCount() {
+        return instructionCount;
+    }
+
     private <T> T getItemPropertyValue(Object itemPropertyId) {
         return (T) row.getItemProperty(itemPropertyId).getValue();
     }
 
-    public void disableStartStopButtons() {
+    public void disableButtons() {
         Button startBtn = getItemPropertyValue(Constants.TABLE_START_PROPERTY);
         Button stopBtn = getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
+        Button destroyBtn = getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
         startBtn.setEnabled(false);
         stopBtn.setEnabled(false);
+        destroyBtn.setEnabled(false);
     }
 
     public void enableStartButton() {
@@ -57,6 +68,11 @@ public final class ManagerAction {
         Button stopBtn = getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
         startBtn.setEnabled(true);
         stopBtn.setEnabled(false);
+    }
+
+    public void enableDestroyButton() {
+        Button destroyBtn = getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
+        destroyBtn.setEnabled(true);
     }
 
     public void enableStopButton() {

@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -198,6 +199,21 @@ public class Commands {
                 String.format("\"%s\"", secondaryNodes)
         ));
         req.setTimeout(180);
+        return cmd;
+    }
+
+    //execute on primary data node
+    public static Command getUnregisterSecondaryNodeWithPrimaryCommand(String host) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("mongo");
+        req.setArgs(Arrays.asList(
+                "--port",
+                Constants.DATA_NODE_PORT + "",
+                "--eval",
+                MessageFormat.format("\"rs.remove({0}:{1});\"", host, Constants.DATA_NODE_PORT)
+        ));
+        req.setTimeout(30);
         return cmd;
     }
 

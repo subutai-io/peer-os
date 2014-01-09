@@ -148,10 +148,10 @@ public class Manager implements ResponseListener {
             checkCommand.getRequest().setTaskUuid(checkTask.getUuid());
             checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
             if (commandManager.executeCommand(checkCommand)) {
-                actionsCache.put(checkTask.getUuid(),
-                        new ManagerAction(
-                                checkTask, managerActionType,
-                                row, agent, nodeType),
+                ManagerAction managerAction = new ManagerAction(
+                        checkTask, managerActionType,
+                        row, agent, nodeType);
+                actionsCache.put(checkTask.getUuid(), managerAction,
                         checkCommand.getRequest().getTimeout() * 1000 + 2000);
             }
         } else if (managerActionType == ManagerActionType.STOP_NODE) {
@@ -165,9 +165,8 @@ public class Manager implements ResponseListener {
                 ManagerAction managerAction = new ManagerAction(
                         stopTask, managerActionType,
                         row, agent, nodeType);
-                managerAction.disableStartStopButtons();
-                actionsCache.put(stopTask.getUuid(),
-                        managerAction,
+                managerAction.disableButtons();
+                actionsCache.put(stopTask.getUuid(), managerAction,
                         stopCommand.getRequest().getTimeout() * 1000 + 2000);
 
             }
@@ -184,7 +183,7 @@ public class Manager implements ResponseListener {
                             startDataNodeTask,
                             managerActionType,
                             row, agent, nodeType);
-                    managerAction.disableStartStopButtons();
+                    managerAction.disableButtons();
                     actionsCache.put(startDataNodeTask.getUuid(),
                             managerAction,
                             startDataNodeCommand.getRequest().getTimeout() * 1000 + 2000);
@@ -201,7 +200,7 @@ public class Manager implements ResponseListener {
                             startConfigSvrTask,
                             managerActionType,
                             row, agent, nodeType);
-                    managerAction.disableStartStopButtons();
+                    managerAction.disableButtons();
                     actionsCache.put(startConfigSvrTask.getUuid(),
                             managerAction,
                             startConfigSvrCommand.getRequest().getTimeout() * 1000 + 2000);
@@ -230,7 +229,7 @@ public class Manager implements ResponseListener {
                                 startRouterTask,
                                 managerActionType,
                                 row, agent, nodeType);
-                        managerAction.disableStartStopButtons();
+                        managerAction.disableButtons();
                         actionsCache.put(startRouterTask.getUuid(),
                                 managerAction,
                                 startRouterCommand.getRequest().getTimeout() * 1000 + 2000);
@@ -239,6 +238,53 @@ public class Manager implements ResponseListener {
                     show("Please select cluster!");
                 }
             }
+        } else if (managerActionType == ManagerActionType.DESTROY_NODE) {
+            /*
+             Task destroyTask = Util.createTask("Destroy Node");
+             //find the primary node in rs
+             Agent primaryNode = null;
+             //OR we can unregister from primary node on CHECK-STATUS response?
+            
+             //uninstall mongo
+             Command killCmd = Commands.getKillAllCommand();
+             killCmd.getRequest().setUuid(agent.getUuid());
+             killCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+             killCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+             Command cleanCmd = Commands.getCleanCommand();
+             cleanCmd.getRequest().setUuid(agent.getUuid());
+             cleanCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+             cleanCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+             Command uninstallCmd = Commands.getUninstallCommand();
+             uninstallCmd.getRequest().setUuid(agent.getUuid());
+             uninstallCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+             uninstallCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+
+             //unregister the node from primary
+             Command unregisterFromPrimaryCmd = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(agent.getHostname());
+             unregisterFromPrimaryCmd.getRequest().setUuid(primaryNode.getUuid());
+             unregisterFromPrimaryCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+             unregisterFromPrimaryCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+
+            
+             commandManager.executeCommand(killCmd);
+             commandManager.executeCommand(cleanCmd);
+             commandManager.executeCommand(uninstallCmd);
+             commandManager.executeCommand(unregisterFromPrimaryCmd);
+
+             ManagerAction managerAction = new ManagerAction(
+             destroyTask,
+             managerActionType,
+             row, agent, nodeType);
+             managerAction.disableButtons();
+
+             int totalTimeout = killCmd.getRequest().getTimeout()
+             + cleanCmd.getRequest().getTimeout() + uninstallCmd.getRequest().getTimeout();
+
+             actionsCache.put(destroyTask.getUuid(),
+             managerAction,
+             totalTimeout * 1000 + 2000);
+             */
+        } else if (managerActionType == ManagerActionType.ADD_NODE) {
         }
     }
 
@@ -260,6 +306,11 @@ public class Manager implements ResponseListener {
                             managerAction.enableStopButton();
                             actionCompleted = true;
                         } else if (managerAction.getOutput().contains("mongo: not found")) {
+                            /*TODO
+                             1) delete from mongo_cluster_info
+                             2) delete from UI table
+                             3) possibly unregister from primary node here? 
+                             */
                             actionCompleted = true;
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.START_NODE) {
@@ -279,16 +330,25 @@ public class Manager implements ResponseListener {
                                     managerAction.getRow());
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.DESTROY_NODE) {
+
+                        processDestroyCommandResponse(response);
+                    } else if (managerAction.getManagerActionType() == ManagerActionType.ADD_NODE) {
+
+                        processAddCommandResponse(response);
                     }
                     if (actionCompleted || Util.isFinalResponse(response)) {
-
-                        Task task = managerAction.getTask();
-                        task.setTaskStatus(actionCompleted ? TaskStatus.SUCCESS : TaskStatus.FAIL);
-                        Util.saveTask(task);
-                        actionsCache.remove(managerAction.getTask().getUuid());
+                        if (managerAction.getManagerActionType() != ManagerActionType.DESTROY_NODE
+                                && managerAction.getManagerActionType() != ManagerActionType.ADD_NODE) {
+                            Task task = managerAction.getTask();
+                            task.setTaskStatus(actionCompleted ? TaskStatus.SUCCESS : TaskStatus.FAIL);
+                            Util.saveTask(task);
+                            actionsCache.remove(managerAction.getTask().getUuid());
+                        }
                         //since we launch check-status command after any action command 
                         //then action commands shud not hide progress indicator
+                        //also destroy button will be reenabled after check-status completion 
                         if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
+                            managerAction.enableDestroyButton();
                             managerAction.hideProgress();
                         }
                     }
@@ -297,6 +357,14 @@ public class Manager implements ResponseListener {
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in onResponse", e);
         }
+    }
+
+    private void processDestroyCommandResponse(Response response) {
+        //save task upon completion && launch check-status task 
+    }
+
+    private void processAddCommandResponse(Response response) {
+        //save task upon completion && launch check-status task 
     }
 
     @Override
@@ -351,6 +419,7 @@ public class Manager implements ResponseListener {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    executeManagerAction(ManagerActionType.DESTROY_NODE, agent, nodeType, row);
                 }
             });
 
