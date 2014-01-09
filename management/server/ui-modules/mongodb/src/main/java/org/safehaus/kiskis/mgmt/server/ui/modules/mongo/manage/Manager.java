@@ -341,10 +341,10 @@ public class Manager implements ResponseListener {
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.DESTROY_NODE) {
 
-                        processDestroyCommandResponse(response);
+                        processDestroyCommandResponse(managerAction, response);
                     } else if (managerAction.getManagerActionType() == ManagerActionType.ADD_NODE) {
 
-                        processAddCommandResponse(response);
+                        processAddCommandResponse(managerAction, response);
                     }
                     if (actionCompleted || Util.isFinalResponse(response)) {
                         if (managerAction.getManagerActionType() != ManagerActionType.DESTROY_NODE
@@ -369,11 +369,11 @@ public class Manager implements ResponseListener {
         }
     }
 
-    private void processDestroyCommandResponse(Response response) {
+    private void processDestroyCommandResponse(ManagerAction managerAction, Response response) {
         //save task upon completion && launch check-status task 
     }
 
-    private void processAddCommandResponse(Response response) {
+    private void processAddCommandResponse(ManagerAction managerAction, Response response) {
         //save task upon completion && launch check-status task 
     }
 
