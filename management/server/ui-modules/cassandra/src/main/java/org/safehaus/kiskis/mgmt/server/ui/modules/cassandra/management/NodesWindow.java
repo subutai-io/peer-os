@@ -37,15 +37,14 @@ public class NodesWindow extends Window {
 
     /**
      *
-     * @param caption
      * @param cci
      * @param manager
      */
-    public NodesWindow(String caption, final CassandraClusterInfo cci, ServiceManager manager) {
+    public NodesWindow(CassandraClusterInfo cci, ServiceManager manager) {
         this.cci = cci;
         this.serviceManager = manager;
 
-        setCaption(caption);
+        setCaption(cci.getName());
         setSizeUndefined();
         setWidth("800px");
         setHeight("500px");
@@ -183,20 +182,6 @@ public class NodesWindow extends Window {
             });
         }
 
-//        Button destroyButton = new Button("Destroy");
-//        destroyButton.addListener(new Button.ClickListener() {
-//
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-////                serviceManager.uninstallCassandraService(agent);
-//
-////                cci.getNodes().remove(agent.getUuid());
-//                serviceManager.runCommand(agent.getUuid(), CassandraCommandEnum.PURGE);
-//                if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
-//                    System.out.println("updated");
-//                }
-//            }
-//        });
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
         item.getItemProperty("Status").setValue(statusButton);

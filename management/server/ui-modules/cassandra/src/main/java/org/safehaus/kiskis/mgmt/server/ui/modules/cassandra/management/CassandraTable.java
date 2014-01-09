@@ -100,8 +100,8 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
-                nodesWindow = new NodesWindow(cci.getName(), info, manager);
+//                CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
+                nodesWindow = new NodesWindow(cci, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
 
             }
