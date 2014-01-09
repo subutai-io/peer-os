@@ -13,6 +13,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -87,6 +88,7 @@ public class Manager implements ResponseListener {
         clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.setTextInputAllowed(false);
+        clusterCombo.setWidth(300, Sizeable.UNITS_PIXELS);
         clusterCombo.addListener(new Property.ValueChangeListener() {
 
             @Override
@@ -141,35 +143,32 @@ public class Manager implements ResponseListener {
             if (response != null && response.getTaskUuid() != null) {
                 ManagerAction managerAction = actionsCache.get(response.getTaskUuid());
                 if (managerAction != null) {
+                    boolean actionCompleted = false;
                     if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
                         managerAction.addOutput(response.getStdOut());
                         Button startBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
                         Button stopBtn = managerAction.getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
-//                        Button destroyBtn = managerAction.getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
                         if (managerAction.getOutput().
                                 contains("connecting to")) {
                             startBtn.setEnabled(false);
                             stopBtn.setEnabled(true);
-//                            destroyBtn.setEnabled(true);
-                            actionsCache.remove(managerAction.getTask().getUuid());
+                            actionCompleted = true;
                         } else if (managerAction.getOutput().contains("couldn't connect to server")) {
                             stopBtn.setEnabled(false);
                             startBtn.setEnabled(true);
-//                            destroyBtn.setEnabled(true);
-                            actionsCache.remove(managerAction.getTask().getUuid());
+                            actionCompleted = true;
                         } else if (managerAction.getOutput().contains("mongo: not found")) {
-                            //remove this row
-//                            Table parentTable = (Table) startBtn.getParent();
-//                            parentTable.removeItem(managerAction.getRowId());
-                            actionsCache.remove(managerAction.getTask().getUuid());
+                            actionCompleted = true;
                         }
                     }
-                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                    if (actionCompleted
+                            || response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
                             || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
                         Task task = managerAction.getTask();
                         task.setTaskStatus(TaskStatus.SUCCESS);
                         Util.saveTask(task);
                         actionsCache.remove(managerAction.getTask().getUuid());
+                        managerAction.hideProgress();
                     }
                 }
             }
@@ -200,14 +199,14 @@ public class Manager implements ResponseListener {
             Button destroyBtn = new Button("Destroy");
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
-//            destroyBtn.setEnabled(false);
 
-            final Object rowId = table.addItem(new Object[]{
+            Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
                 checkBtn,
                 startBtn,
                 stopBtn,
-                destroyBtn},
+                destroyBtn,
+                null},
                     null);
 
             final Item row = table.getItem(rowId);
@@ -235,23 +234,29 @@ public class Manager implements ResponseListener {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Task checkTask = Util.createTask("Check mongo node status");
-                    Command checkCommand = Commands.getCheckInstanceRunningCommand(
-                            MessageFormat.format("{0}{1}", agent.getHostname(), Constants.DOMAIN),
-                            getNodePort(nodeType));
-                    checkCommand.getRequest().setUuid(agent.getUuid());
-                    checkCommand.getRequest().setTaskUuid(checkTask.getUuid());
-                    checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
-                    if (commandManager.executeCommand(checkCommand)) {
-                        actionsCache.put(checkTask.getUuid(),
-                                new ManagerAction(
-                                        checkTask,
-                                        ManagerActionType.CHECK_NODE_STATUS,
-                                        row),
-                                checkCommand.getRequest().getTimeout() * 1000 + 2000);
-                    }
+                    executeManagerAction(ManagerActionType.CHECK_NODE_STATUS, agent, nodeType, row);
                 }
             });
+        }
+    }
+
+    private void executeManagerAction(ManagerActionType managerActionType, Agent agent, NodeType nodeType, Item row) {
+        if (managerActionType == ManagerActionType.CHECK_NODE_STATUS) {
+            Task checkTask = Util.createTask("Check mongo node status");
+            Command checkCommand = Commands.getCheckInstanceRunningCommand(
+                    MessageFormat.format("{0}{1}", agent.getHostname(), Constants.DOMAIN),
+                    getNodePort(nodeType));
+            checkCommand.getRequest().setUuid(agent.getUuid());
+            checkCommand.getRequest().setTaskUuid(checkTask.getUuid());
+            checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
+            if (commandManager.executeCommand(checkCommand)) {
+                actionsCache.put(checkTask.getUuid(),
+                        new ManagerAction(
+                                checkTask,
+                                managerActionType,
+                                row),
+                        checkCommand.getRequest().getTimeout() * 1000 + 2000);
+            }
         }
     }
 
@@ -262,6 +267,7 @@ public class Manager implements ResponseListener {
         table.addContainerProperty(Constants.TABLE_START_PROPERTY, Button.class, null);
         table.addContainerProperty(Constants.TABLE_STOP_PROPERTY, Button.class, null);
         table.addContainerProperty(Constants.TABLE_DESTROY_PROPERTY, Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(250, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);

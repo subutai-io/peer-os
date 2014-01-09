@@ -24,5 +24,6 @@ public class Constants {
     public static final String TABLE_START_PROPERTY = "Start";
     public static final String TABLE_STOP_PROPERTY = "Stop";
     public static final String TABLE_DESTROY_PROPERTY = "Destroy";
+    public static final String TABLE_STATUS_PROPERTY = "Status";
 
 }
