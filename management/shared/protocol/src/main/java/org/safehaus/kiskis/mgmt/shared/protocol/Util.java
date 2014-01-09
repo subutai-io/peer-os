@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -62,6 +63,14 @@ public class Util {
         }
         return false;
 
+    }
+
+    public static boolean isFinalResponse(Response response) {
+        if (response != null && response.getType() != null) {
+            return response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                    || response.getType() == ResponseType.EXECUTE_TIMEOUTED;
+        }
+        return false;
     }
 
     public static String getAgentIpByMask(Agent agent, String mask) {

@@ -24,7 +24,7 @@ public class Commands {
         return (Command) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
-                null, //                        !! source
+                MongoModule.MODULE_NAME, //     source
                 null, //                        !! task uuid 
                 1, //                           !! request sequence number
                 "/", //                         cwd
@@ -36,7 +36,7 @@ public class Commands {
                 "root", //                      runas
                 null, //                        arg
                 null, //                        env vars
-                30); //                        timeout (sec)
+                30); //                         timeout (sec)
     }
 
     //execute on each selected lxc node
@@ -290,9 +290,19 @@ public class Commands {
                 port
         ));
         req.setTimeout(3);
-        req.setSource(MongoModule.MODULE_NAME);
         return cmd;
     }
 
     // RECONFIGURATION COMMANDS
+    public static Command getStopNodeCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/pkill");
+        req.setArgs(Arrays.asList(
+                "-2",
+                "mongo"
+        ));
+        req.setTimeout(20);
+        return cmd;
+    }
 }

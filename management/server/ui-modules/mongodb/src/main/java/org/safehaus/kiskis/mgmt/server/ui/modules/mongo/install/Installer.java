@@ -47,7 +47,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
         for (Agent agent : allClusterMembers) {
@@ -55,7 +54,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
         for (Agent agent : allClusterMembers) {
@@ -63,7 +61,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
         uninstallMongoTask.setIgnoreExitCode(true);
@@ -76,7 +73,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(installMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(installMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             installMongoTask.addCommand(cmd);
         }
         addTask(installMongoTask);
@@ -88,7 +84,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(stopMongoOnAllNodes.getUuid());
             cmd.getRequest().setRequestSequenceNumber(stopMongoOnAllNodes.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             stopMongoOnAllNodes.addCommand(cmd);
         }
         stopMongoOnAllNodes.setIgnoreExitCode(true);
@@ -124,7 +119,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(addNodesIpHostToOtherNodesTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(addNodesIpHostToOtherNodesTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             addNodesIpHostToOtherNodesTask.addCommand(cmd);
         }
         addTask(addNodesIpHostToOtherNodesTask);
@@ -136,7 +130,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(setReplicaSetNameTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             setReplicaSetNameTask.addCommand(cmd);
         }
         addTask(setReplicaSetNameTask);
@@ -148,7 +141,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startConfigServersTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startConfigServersTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startConfigServersTask.addCommand(cmd);
         }
         addTask(startConfigServersTask);
@@ -169,7 +161,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startRoutersTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startRoutersTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startRoutersTask.addCommand(cmd);
         }
         addTask(startRoutersTask);
@@ -181,7 +172,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startShardsTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startShardsTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startShardsTask.addCommand(cmd);
         }
         addTask(startShardsTask);
@@ -204,7 +194,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(primaryNode.getUuid());
             cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
         }
         addTask(registerSecondaryNodesWithPrimaryTask);
@@ -224,7 +213,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(router.getUuid());
             cmd.getRequest().setTaskUuid(registerShardsWithRouterTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(registerShardsWithRouterTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             registerShardsWithRouterTask.addCommand(cmd);
         }
         addTask(registerShardsWithRouterTask);

@@ -36,7 +36,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -136,6 +135,67 @@ public class Manager implements ResponseListener {
         return contentRoot;
     }
 
+    private void executeManagerAction(ManagerActionType managerActionType, Agent agent, NodeType nodeType, Item row) {
+
+        if (managerActionType == ManagerActionType.CHECK_NODE_STATUS) {
+
+            Task checkTask = Util.createTask("Check mongo node status");
+            Command checkCommand = Commands.getCheckInstanceRunningCommand(
+                    MessageFormat.format("{0}{1}", agent.getHostname(), Constants.DOMAIN),
+                    getNodePort(nodeType));
+            checkCommand.getRequest().setUuid(agent.getUuid());
+            checkCommand.getRequest().setTaskUuid(checkTask.getUuid());
+            checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
+            if (commandManager.executeCommand(checkCommand)) {
+                actionsCache.put(checkTask.getUuid(),
+                        new ManagerAction(
+                                checkTask, managerActionType,
+                                row, agent, nodeType),
+                        checkCommand.getRequest().getTimeout() * 1000 + 2000);
+            }
+        } else if (managerActionType == ManagerActionType.STOP_NODE) {
+
+            Task stopTask = Util.createTask("Stop mongo node");
+            Command stopCommand = Commands.getStopNodeCommand();
+            stopCommand.getRequest().setUuid(agent.getUuid());
+            stopCommand.getRequest().setTaskUuid(stopTask.getUuid());
+            stopCommand.getRequest().setRequestSequenceNumber(stopTask.getIncrementedReqSeqNumber());
+            if (commandManager.executeCommand(stopCommand)) {
+                ManagerAction managerAction = new ManagerAction(
+                        stopTask, managerActionType,
+                        row, agent, nodeType);
+                managerAction.disableStartStopButtons();
+                actionsCache.put(stopTask.getUuid(),
+                        managerAction,
+                        stopCommand.getRequest().getTimeout() * 1000 + 2000);
+
+            }
+        } else if (managerActionType == ManagerActionType.START_NODE) {
+
+            if (nodeType == NodeType.DATA_NODE) {
+
+            } else if (nodeType == NodeType.CONFIG_NODE) {
+                Task startConfigSvrTask = Util.createTask("Start config server");
+                Command startConfigSvrCommand = Commands.getStartConfigServerCommand();
+                startConfigSvrCommand.getRequest().setUuid(agent.getUuid());
+                startConfigSvrCommand.getRequest().setTaskUuid(startConfigSvrTask.getUuid());
+                startConfigSvrCommand.getRequest().setRequestSequenceNumber(startConfigSvrTask.getIncrementedReqSeqNumber());
+                if (commandManager.executeCommand(startConfigSvrCommand)) {
+                    ManagerAction managerAction = new ManagerAction(
+                            startConfigSvrTask,
+                            managerActionType,
+                            row, agent, nodeType);
+                    managerAction.disableStartStopButtons();
+                    actionsCache.put(startConfigSvrTask.getUuid(),
+                            managerAction,
+                            startConfigSvrCommand.getRequest().getTimeout() * 1000 + 2000);
+                }
+            } else if (nodeType == NodeType.ROUTER_NODE) {
+
+            }
+        }
+    }
+
     @Override
     public void onResponse(Response response) {
         try {
@@ -144,28 +204,39 @@ public class Manager implements ResponseListener {
                 ManagerAction managerAction = actionsCache.get(response.getTaskUuid());
                 if (managerAction != null) {
                     boolean actionCompleted = false;
+                    managerAction.addOutput(response.getStdOut());
                     if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
-                        managerAction.addOutput(response.getStdOut());
-                        Button startBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
-                        Button stopBtn = managerAction.getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
-                        if (managerAction.getOutput().
-                                contains("connecting to")) {
-                            startBtn.setEnabled(false);
-                            stopBtn.setEnabled(true);
+                        if (managerAction.getOutput().contains("couldn't connect to server")) {
+                            managerAction.enableStartButton();
                             actionCompleted = true;
-                        } else if (managerAction.getOutput().contains("couldn't connect to server")) {
-                            stopBtn.setEnabled(false);
-                            startBtn.setEnabled(true);
+                        } else if (managerAction.getOutput().
+                                contains("connecting to")) {
+                            managerAction.enableStopButton();
                             actionCompleted = true;
                         } else if (managerAction.getOutput().contains("mongo: not found")) {
                             actionCompleted = true;
                         }
+                    } else if (managerAction.getManagerActionType() == ManagerActionType.START_NODE) {
+                        if (managerAction.getOutput().contains("child process started successfully, parent exiting")) {
+                            actionCompleted = true;
+                            //add check command to actualize buttons
+                            executeManagerAction(ManagerActionType.CHECK_NODE_STATUS,
+                                    managerAction.getAgent(), managerAction.getNodeType(),
+                                    managerAction.getRow());
+                        }
+                    } else if (managerAction.getManagerActionType() == ManagerActionType.STOP_NODE) {
+                        if (Util.isFinalResponse(response)) {
+                            //add check command to actualize buttons
+                            executeManagerAction(ManagerActionType.CHECK_NODE_STATUS,
+                                    managerAction.getAgent(), managerAction.getNodeType(),
+                                    managerAction.getRow());
+                        }
+                    } else if (managerAction.getManagerActionType() == ManagerActionType.DESTROY_NODE) {
                     }
-                    if (actionCompleted
-                            || response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
-                            || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                    if (actionCompleted || Util.isFinalResponse(response)) {
+
                         Task task = managerAction.getTask();
-                        task.setTaskStatus(TaskStatus.SUCCESS);
+                        task.setTaskStatus(actionCompleted ? TaskStatus.SUCCESS : TaskStatus.FAIL);
                         Util.saveTask(task);
                         actionsCache.remove(managerAction.getTask().getUuid());
                         managerAction.hideProgress();
@@ -215,12 +286,14 @@ public class Manager implements ResponseListener {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    executeManagerAction(ManagerActionType.START_NODE, agent, nodeType, row);
                 }
             });
             stopBtn.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    executeManagerAction(ManagerActionType.STOP_NODE, agent, nodeType, row);
                 }
             });
             destroyBtn.addListener(new Button.ClickListener() {
@@ -240,26 +313,6 @@ public class Manager implements ResponseListener {
         }
     }
 
-    private void executeManagerAction(ManagerActionType managerActionType, Agent agent, NodeType nodeType, Item row) {
-        if (managerActionType == ManagerActionType.CHECK_NODE_STATUS) {
-            Task checkTask = Util.createTask("Check mongo node status");
-            Command checkCommand = Commands.getCheckInstanceRunningCommand(
-                    MessageFormat.format("{0}{1}", agent.getHostname(), Constants.DOMAIN),
-                    getNodePort(nodeType));
-            checkCommand.getRequest().setUuid(agent.getUuid());
-            checkCommand.getRequest().setTaskUuid(checkTask.getUuid());
-            checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
-            if (commandManager.executeCommand(checkCommand)) {
-                actionsCache.put(checkTask.getUuid(),
-                        new ManagerAction(
-                                checkTask,
-                                managerActionType,
-                                row),
-                        checkCommand.getRequest().getTimeout() * 1000 + 2000);
-            }
-        }
-    }
-
     private Table createTableTemplate(String caption) {
         Table table = new Table(caption);
         table.addContainerProperty(Constants.TABLE_HOST_PROPERTY, String.class, null);
@@ -271,7 +324,7 @@ public class Manager implements ResponseListener {
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(250, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);
-        table.setSelectable(true);
+        table.setSelectable(false);
         table.setImmediate(true);
         return table;
     }
