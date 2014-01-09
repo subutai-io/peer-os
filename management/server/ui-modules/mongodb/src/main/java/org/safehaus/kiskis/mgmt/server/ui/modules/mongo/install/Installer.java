@@ -27,7 +27,7 @@ public class Installer extends Operation {
 
     private final Task startConfigServersTask;
     private final Task startRoutersTask;
-    private final Task startShardsTask;
+    private final Task startReplicaSet;
     private final StringBuilder startConfigServersTaskOutput = new StringBuilder();
     private final StringBuilder startRoutersTaskOutput = new StringBuilder();
     private final StringBuilder startShardsTaskOutput = new StringBuilder();
@@ -165,16 +165,16 @@ public class Installer extends Operation {
         }
         addTask(startRoutersTask);
 
-        //START SHARDS
-        startShardsTask = Util.createTask("Start replica set");
+        //START RS
+        startReplicaSet = Util.createTask("Start replica set");
         for (Agent agent : config.getDataNodes()) {
             Command cmd = Commands.getStartNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(startShardsTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(startShardsTask.getIncrementedReqSeqNumber());
-            startShardsTask.addCommand(cmd);
+            cmd.getRequest().setTaskUuid(startReplicaSet.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(startReplicaSet.getIncrementedReqSeqNumber());
+            startReplicaSet.addCommand(cmd);
         }
-        addTask(startShardsTask);
+        addTask(startReplicaSet);
 
         //choose the first shard as primary node
         Agent primaryNode = config.getDataNodes().iterator().next();
@@ -222,7 +222,7 @@ public class Installer extends Operation {
     @Override
     protected void beforeResponseProcessed(Response response) {
         Task task = getCurrentTask();
-        if ((task == startConfigServersTask || task == startRoutersTask || task == startShardsTask)
+        if ((task == startConfigServersTask || task == startRoutersTask || task == startReplicaSet)
                 && response.getStdOut() != null) {
             boolean isOk = false;
             if (task == startConfigServersTask) {
@@ -233,7 +233,7 @@ public class Installer extends Operation {
                 startRoutersTaskOutput.append(response.getStdOut());
                 isOk = startRoutersTaskOutput.toString().contains("child process started successfully, parent exiting");
             }
-            if (task == startShardsTask) {
+            if (task == startReplicaSet) {
                 startShardsTaskOutput.append(response.getStdOut());
                 isOk = startShardsTaskOutput.toString().contains("child process started successfully, parent exiting");
             }

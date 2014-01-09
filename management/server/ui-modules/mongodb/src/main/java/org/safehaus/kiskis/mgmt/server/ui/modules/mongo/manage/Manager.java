@@ -51,6 +51,7 @@ public class Manager implements ResponseListener {
     private final AgentManagerInterface agentManager;
     private final ComboBox clusterCombo;
     private final ExpiringCache<UUID, ManagerAction> actionsCache = new ExpiringCache<UUID, ManagerAction>();
+    private MongoClusterInfo clusterInfo;
 
     public Manager() {
         //get db and transport managers
@@ -93,7 +94,7 @@ public class Manager implements ResponseListener {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() instanceof MongoClusterInfo) {
-                    MongoClusterInfo clusterInfo = (MongoClusterInfo) event.getProperty().getValue();
+                    clusterInfo = (MongoClusterInfo) event.getProperty().getValue();
                     populateTable(configServersTable, clusterInfo.getConfigServers(), NodeType.CONFIG_NODE);
                     populateTable(routersTable, clusterInfo.getRouters(), NodeType.ROUTER_NODE);
                     populateTable(dataNodesTable, clusterInfo.getDataNodes(), NodeType.DATA_NODE);
@@ -173,6 +174,21 @@ public class Manager implements ResponseListener {
         } else if (managerActionType == ManagerActionType.START_NODE) {
 
             if (nodeType == NodeType.DATA_NODE) {
+                Task startDataNodeTask = Util.createTask("Start data node");
+                Command startDataNodeCommand = Commands.getStartNodeCommand();
+                startDataNodeCommand.getRequest().setUuid(agent.getUuid());
+                startDataNodeCommand.getRequest().setTaskUuid(startDataNodeTask.getUuid());
+                startDataNodeCommand.getRequest().setRequestSequenceNumber(startDataNodeTask.getIncrementedReqSeqNumber());
+                if (commandManager.executeCommand(startDataNodeCommand)) {
+                    ManagerAction managerAction = new ManagerAction(
+                            startDataNodeTask,
+                            managerActionType,
+                            row, agent, nodeType);
+                    managerAction.disableStartStopButtons();
+                    actionsCache.put(startDataNodeTask.getUuid(),
+                            managerAction,
+                            startDataNodeCommand.getRequest().getTimeout() * 1000 + 2000);
+                }
 
             } else if (nodeType == NodeType.CONFIG_NODE) {
                 Task startConfigSvrTask = Util.createTask("Start config server");
@@ -191,7 +207,37 @@ public class Manager implements ResponseListener {
                             startConfigSvrCommand.getRequest().getTimeout() * 1000 + 2000);
                 }
             } else if (nodeType == NodeType.ROUTER_NODE) {
-
+                if (clusterInfo != null) {
+                    Task startRouterTask = Util.createTask("Start router");
+                    StringBuilder configServersArg = new StringBuilder();
+                    for (UUID agentUUID : clusterInfo.getConfigServers()) {
+                        Agent cfgSrvAgent = agentManager.getAgent(agentUUID);
+                        if (cfgSrvAgent != null) {
+                            configServersArg.append(cfgSrvAgent.getHostname()).append(Constants.DOMAIN).//use hostname when fixed
+                                    append(":").append(Constants.CONFIG_SRV_PORT).append(",");
+                        }
+                    }
+                    //drop comma
+                    if (configServersArg.length() > 0) {
+                        configServersArg.setLength(configServersArg.length() - 1);
+                    }
+                    Command startRouterCommand = Commands.getStartRouterCommand(configServersArg.toString());
+                    startRouterCommand.getRequest().setUuid(agent.getUuid());
+                    startRouterCommand.getRequest().setTaskUuid(startRouterTask.getUuid());
+                    startRouterCommand.getRequest().setRequestSequenceNumber(startRouterTask.getIncrementedReqSeqNumber());
+                    if (commandManager.executeCommand(startRouterCommand)) {
+                        ManagerAction managerAction = new ManagerAction(
+                                startRouterTask,
+                                managerActionType,
+                                row, agent, nodeType);
+                        managerAction.disableStartStopButtons();
+                        actionsCache.put(startRouterTask.getUuid(),
+                                managerAction,
+                                startRouterCommand.getRequest().getTimeout() * 1000 + 2000);
+                    }
+                } else {
+                    show("Please select cluster!");
+                }
             }
         }
     }
@@ -226,6 +272,7 @@ public class Manager implements ResponseListener {
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.STOP_NODE) {
                         if (Util.isFinalResponse(response)) {
+                            actionCompleted = true;//possibly check exit code here
                             //add check command to actualize buttons
                             executeManagerAction(ManagerActionType.CHECK_NODE_STATUS,
                                     managerAction.getAgent(), managerAction.getNodeType(),
@@ -239,7 +286,11 @@ public class Manager implements ResponseListener {
                         task.setTaskStatus(actionCompleted ? TaskStatus.SUCCESS : TaskStatus.FAIL);
                         Util.saveTask(task);
                         actionsCache.remove(managerAction.getTask().getUuid());
-                        managerAction.hideProgress();
+                        //since we launch check-status command after any action command 
+                        //then action commands shud not hide progress indicator
+                        if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
+                            managerAction.hideProgress();
+                        }
                     }
                 }
             }
@@ -333,10 +384,10 @@ public class Manager implements ResponseListener {
         List<MongoClusterInfo> mongoClusterInfos = commandManager.getMongoClustersInfo();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null) {
-            for (MongoClusterInfo clusterInfo : mongoClusterInfos) {
-                clusterCombo.addItem(clusterInfo);
-                clusterCombo.setItemCaption(clusterInfo,
-                        String.format("Name: %s RS: %s", clusterInfo.getClusterName(), clusterInfo.getReplicaSetName()));
+            for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
+                clusterCombo.addItem(mongoClusterInfo);
+                clusterCombo.setItemCaption(mongoClusterInfo,
+                        String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
             }
         }
     }

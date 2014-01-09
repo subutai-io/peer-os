@@ -71,7 +71,9 @@ public final class ManagerAction {
     }
 
     public void showProgress() {
-        row.getItemProperty(Constants.TABLE_STATUS_PROPERTY).setValue(progressIcon);
+        if (row.getItemProperty(Constants.TABLE_STATUS_PROPERTY).getValue() == null) {
+            row.getItemProperty(Constants.TABLE_STATUS_PROPERTY).setValue(progressIcon);
+        }
     }
 
     public Item getRow() {
