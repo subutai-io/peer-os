@@ -17,14 +17,14 @@ public class ManagerAction {
 
     private final Task task;
     private final Item row;
-    private final Object rowId;
+//    private final Object rowId;
     private final ManagerActionType managerActionType;
     private final StringBuilder output = new StringBuilder();
 
-    public ManagerAction(Task task, ManagerActionType managerActionType, Item row, Object rowId) {
+    public ManagerAction(Task task, ManagerActionType managerActionType, Item row) {
         this.task = task;
         this.row = row;
-        this.rowId = rowId;
+//        this.rowId = rowId;
         this.managerActionType = managerActionType;
     }
 
@@ -32,9 +32,9 @@ public class ManagerAction {
         return task;
     }
 
-    public Object getRowId() {
-        return rowId;
-    }
+//    public Object getRowId() {
+//        return rowId;
+//    }
 
     public <T> T getItemPropertyValue(Object itemPropertyId) {
         return (T) row.getItemProperty(itemPropertyId).getValue();

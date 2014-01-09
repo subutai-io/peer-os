@@ -145,22 +145,22 @@ public class Manager implements ResponseListener {
                         managerAction.addOutput(response.getStdOut());
                         Button startBtn = managerAction.getItemPropertyValue(Constants.TABLE_START_PROPERTY);
                         Button stopBtn = managerAction.getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
-                        Button destroyBtn = managerAction.getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
+//                        Button destroyBtn = managerAction.getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
                         if (managerAction.getOutput().
                                 contains("connecting to")) {
                             startBtn.setEnabled(false);
                             stopBtn.setEnabled(true);
-                            destroyBtn.setEnabled(true);
+//                            destroyBtn.setEnabled(true);
                             actionsCache.remove(managerAction.getTask().getUuid());
                         } else if (managerAction.getOutput().contains("couldn't connect to server")) {
                             stopBtn.setEnabled(false);
                             startBtn.setEnabled(true);
-                            destroyBtn.setEnabled(true);
+//                            destroyBtn.setEnabled(true);
                             actionsCache.remove(managerAction.getTask().getUuid());
                         } else if (managerAction.getOutput().contains("mongo: not found")) {
                             //remove this row
-                            Table parentTable = (Table) startBtn.getParent();
-                            parentTable.removeItem(managerAction.getRowId());
+//                            Table parentTable = (Table) startBtn.getParent();
+//                            parentTable.removeItem(managerAction.getRowId());
                             actionsCache.remove(managerAction.getTask().getUuid());
                         }
                     }
@@ -200,7 +200,7 @@ public class Manager implements ResponseListener {
             Button destroyBtn = new Button("Destroy");
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
-            destroyBtn.setEnabled(false);
+//            destroyBtn.setEnabled(false);
 
             final Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
@@ -244,9 +244,10 @@ public class Manager implements ResponseListener {
                     checkCommand.getRequest().setRequestSequenceNumber(checkTask.getIncrementedReqSeqNumber());
                     if (commandManager.executeCommand(checkCommand)) {
                         actionsCache.put(checkTask.getUuid(),
-                                new ManagerAction(checkTask,
+                                new ManagerAction(
+                                        checkTask,
                                         ManagerActionType.CHECK_NODE_STATUS,
-                                        row, rowId),
+                                        row),
                                 checkCommand.getRequest().getTimeout() * 1000 + 2000);
                     }
                 }
