@@ -41,8 +41,18 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 /**
  *
  * @author dilshat
+ *
  */
 public class Manager implements ResponseListener {
+    /*
+     TODO:
+     1) find primary node 
+     2) destroy node (either unregister from primary after check status command and clean data and ui or do it in destroy task)
+     3) add node
+     4) overall cluster check status
+     5) destroy cluster
+    
+     */
 
     private static final Logger LOG = Logger.getLogger(Manager.class.getName());
 
