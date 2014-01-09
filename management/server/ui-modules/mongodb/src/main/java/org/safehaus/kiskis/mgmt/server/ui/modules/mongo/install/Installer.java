@@ -27,7 +27,7 @@ public class Installer extends Operation {
 
     private final Task startConfigServersTask;
     private final Task startRoutersTask;
-    private final Task startShardsTask;
+    private final Task startReplicaSet;
     private final StringBuilder startConfigServersTaskOutput = new StringBuilder();
     private final StringBuilder startRoutersTaskOutput = new StringBuilder();
     private final StringBuilder startShardsTaskOutput = new StringBuilder();
@@ -47,7 +47,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
         for (Agent agent : allClusterMembers) {
@@ -55,7 +54,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
         for (Agent agent : allClusterMembers) {
@@ -63,7 +61,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             uninstallMongoTask.addCommand(cmd);
         }
         uninstallMongoTask.setIgnoreExitCode(true);
@@ -76,7 +73,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(installMongoTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(installMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             installMongoTask.addCommand(cmd);
         }
         addTask(installMongoTask);
@@ -88,7 +84,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(stopMongoOnAllNodes.getUuid());
             cmd.getRequest().setRequestSequenceNumber(stopMongoOnAllNodes.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             stopMongoOnAllNodes.addCommand(cmd);
         }
         stopMongoOnAllNodes.setIgnoreExitCode(true);
@@ -124,7 +119,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(addNodesIpHostToOtherNodesTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(addNodesIpHostToOtherNodesTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             addNodesIpHostToOtherNodesTask.addCommand(cmd);
         }
         addTask(addNodesIpHostToOtherNodesTask);
@@ -136,7 +130,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(setReplicaSetNameTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             setReplicaSetNameTask.addCommand(cmd);
         }
         addTask(setReplicaSetNameTask);
@@ -148,7 +141,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startConfigServersTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startConfigServersTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startConfigServersTask.addCommand(cmd);
         }
         addTask(startConfigServersTask);
@@ -169,22 +161,20 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(agent.getUuid());
             cmd.getRequest().setTaskUuid(startRoutersTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(startRoutersTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             startRoutersTask.addCommand(cmd);
         }
         addTask(startRoutersTask);
 
-        //START SHARDS
-        startShardsTask = Util.createTask("Start replica set");
+        //START RS
+        startReplicaSet = Util.createTask("Start replica set");
         for (Agent agent : config.getDataNodes()) {
             Command cmd = Commands.getStartNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(startShardsTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(startShardsTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            startShardsTask.addCommand(cmd);
+            cmd.getRequest().setTaskUuid(startReplicaSet.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(startReplicaSet.getIncrementedReqSeqNumber());
+            startReplicaSet.addCommand(cmd);
         }
-        addTask(startShardsTask);
+        addTask(startReplicaSet);
 
         //choose the first shard as primary node
         Agent primaryNode = config.getDataNodes().iterator().next();
@@ -204,12 +194,11 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(primaryNode.getUuid());
             cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
         }
         addTask(registerSecondaryNodesWithPrimaryTask);
 
-        //REGISTER PRIMARY NODE OF REPLICA SET AS SHARD WITH ONE OF THE ROUTERS
+        //REGISTER NODES OF REPLICA SET AS SHARD WITH ONE OF THE ROUTERS
         Task registerShardsWithRouterTask = Util.createTask("Register shard with router");
         Agent router = config.getRouterServers().iterator().next();
         StringBuilder shards = new StringBuilder();
@@ -224,7 +213,6 @@ public class Installer extends Operation {
             cmd.getRequest().setUuid(router.getUuid());
             cmd.getRequest().setTaskUuid(registerShardsWithRouterTask.getUuid());
             cmd.getRequest().setRequestSequenceNumber(registerShardsWithRouterTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
             registerShardsWithRouterTask.addCommand(cmd);
         }
         addTask(registerShardsWithRouterTask);
@@ -234,7 +222,7 @@ public class Installer extends Operation {
     @Override
     protected void beforeResponseProcessed(Response response) {
         Task task = getCurrentTask();
-        if ((task == startConfigServersTask || task == startRoutersTask || task == startShardsTask)
+        if ((task == startConfigServersTask || task == startRoutersTask || task == startReplicaSet)
                 && response.getStdOut() != null) {
             boolean isOk = false;
             if (task == startConfigServersTask) {
@@ -245,7 +233,7 @@ public class Installer extends Operation {
                 startRoutersTaskOutput.append(response.getStdOut());
                 isOk = startRoutersTaskOutput.toString().contains("child process started successfully, parent exiting");
             }
-            if (task == startShardsTask) {
+            if (task == startReplicaSet) {
                 startShardsTaskOutput.append(response.getStdOut());
                 isOk = startShardsTaskOutput.toString().contains("child process started successfully, parent exiting");
             }

@@ -820,12 +820,12 @@ public class Persistence implements PersistenceInterface {
                     + "values (?, ?, ?, ?, ?)",
                     MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME,
                     MongoClusterInfo.REPLICA_SET_NAME, MongoClusterInfo.CONFIG_SERVERS_NAME,
-                    MongoClusterInfo.ROUTERS_NAME, MongoClusterInfo.SHARDS_NAME);
+                    MongoClusterInfo.ROUTERS_NAME, MongoClusterInfo.DATA_NODES_NAME);
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(clusterInfo.getClusterName(),
                     clusterInfo.getReplicaSetName(), clusterInfo.getConfigServers(),
-                    clusterInfo.getRouters(), clusterInfo.getShards()));
+                    clusterInfo.getRouters(), clusterInfo.getDataNodes()));
 
             return true;
         } catch (Exception ex) {
@@ -845,7 +845,7 @@ public class Persistence implements PersistenceInterface {
                 mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
                 mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
                 mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
-                mongoClusterInfo.setShards(row.getList(MongoClusterInfo.SHARDS_NAME, UUID.class));
+                mongoClusterInfo.setDataNodes(row.getList(MongoClusterInfo.DATA_NODES_NAME, UUID.class));
                 list.add(mongoClusterInfo);
             }
 
@@ -856,7 +856,7 @@ public class Persistence implements PersistenceInterface {
     }
 
     public MongoClusterInfo getMongoClusterInfo(String clusterName) {
-        MongoClusterInfo clusterInfo = null;
+        MongoClusterInfo mongoClusterInfo = null;
         try {
             String cql = String.format(
                     "select * from %s where %s = ? limit 1 allow filtering",
@@ -866,18 +866,18 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute(boundStatement.bind(clusterName));
             Row row = rs.one();
             if (row != null) {
-                MongoClusterInfo mongoClusterInfo = new MongoClusterInfo();
+                mongoClusterInfo = new MongoClusterInfo();
                 mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
                 mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
                 mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
                 mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
-                mongoClusterInfo.setShards(row.getList(MongoClusterInfo.SHARDS_NAME, UUID.class));
+                mongoClusterInfo.setDataNodes(row.getList(MongoClusterInfo.DATA_NODES_NAME, UUID.class));
             }
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClusterInfo", ex);
         }
-        return clusterInfo;
+        return mongoClusterInfo;
     }
 
     public boolean deleteMongoClusterInfo(String clusterName) {

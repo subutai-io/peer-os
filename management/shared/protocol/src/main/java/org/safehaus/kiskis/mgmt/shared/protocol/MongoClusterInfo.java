@@ -5,7 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -19,13 +21,35 @@ public class MongoClusterInfo {
             REPLICA_SET_NAME = "replica_set_name",
             CONFIG_SERVERS_NAME = "config_servers",
             ROUTERS_NAME = "routers",
-            SHARDS_NAME = "shards";
+            DATA_NODES_NAME = "data_nodes";
 
     private String clusterName;
     private String replicaSetName;
     private List<UUID> configServers;
     private List<UUID> routers;
-    private List<UUID> shards;
+    private List<UUID> dataNodes;
+
+    public MongoClusterInfo() {
+    }
+
+    public MongoClusterInfo(String clusterName, String replicaSetName,
+            Set<Agent> configServerAgents, Set<Agent> routerAgents, Set<Agent> dataNodeAgents) {
+        this.clusterName = clusterName;
+        this.replicaSetName = replicaSetName;
+
+        configServers = new ArrayList<UUID>();
+        for (Agent configAgent : configServerAgents) {
+            configServers.add(configAgent.getUuid());
+        }
+        routers = new ArrayList<UUID>();
+        for (Agent routerAgent : routerAgents) {
+            routers.add(routerAgent.getUuid());
+        }
+        dataNodes = new ArrayList<UUID>();
+        for (Agent dataNodeAgent : dataNodeAgents) {
+            dataNodes.add(dataNodeAgent.getUuid());
+        }
+    }
 
     public String getClusterName() {
         return clusterName;
@@ -59,17 +83,17 @@ public class MongoClusterInfo {
         this.routers = routers;
     }
 
-    public List<UUID> getShards() {
-        return shards;
+    public List<UUID> getDataNodes() {
+        return dataNodes;
     }
 
-    public void setShards(List<UUID> shards) {
-        this.shards = shards;
+    public void setDataNodes(List<UUID> shards) {
+        this.dataNodes = shards;
     }
 
     @Override
     public String toString() {
-        return "MongoClusterInfo{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routers=" + routers + ", shards=" + shards + '}';
+        return "MongoClusterInfo{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routers=" + routers + ", dataNodes=" + dataNodes + '}';
     }
 
 }

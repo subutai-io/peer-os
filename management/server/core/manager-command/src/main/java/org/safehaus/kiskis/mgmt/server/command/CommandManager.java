@@ -26,20 +26,21 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-//    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
     private final Map<CommandListener, ExecutorService> listeners = new ConcurrentHashMap<CommandListener, ExecutorService>();
     private ExecutorService notifierExecService;
     private CommandNotifier commandNotifier;
 
     @Override
-    public void executeCommand(Command command) {
+    public boolean executeCommand(Command command) {
         try {
             if (persistenceCommand.saveCommand(command)) {
                 communicationService.sendCommand(command);
+                return true;
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in executeCommand", ex);
         }
+        return false;
     }
 
     @Override
@@ -262,5 +263,22 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
 
     public String getSource() {
         return getClass().getName();
+    }
+
+    //=========MONGO============================================================
+    public boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo) {
+        return persistenceCommand.saveMongoClusterInfo(clusterInfo);
+    }
+
+    public List<MongoClusterInfo> getMongoClustersInfo() {
+        return persistenceCommand.getMongoClustersInfo();
+    }
+
+    public MongoClusterInfo getMongoClusterInfo(String clusterName) {
+        return persistenceCommand.getMongoClusterInfo(clusterName);
+    }
+
+    public boolean deleteMongoClusterInfo(String clusterName) {
+        return persistenceCommand.deleteMongoClusterInfo(clusterName);
     }
 }

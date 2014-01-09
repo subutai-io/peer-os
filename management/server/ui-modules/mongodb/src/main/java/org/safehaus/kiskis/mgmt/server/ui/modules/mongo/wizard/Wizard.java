@@ -15,6 +15,8 @@ import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
@@ -32,8 +34,10 @@ public class Wizard implements ResponseListener {
     private final InstallerConfig mongoConfig = new InstallerConfig();
     private final VerticalLayout contentRoot;
     private Step5 step5;
+    private final PersistenceInterface persistenceManager;
 
     public Wizard() {
+        persistenceManager = ServiceLocator.getService(PersistenceInterface.class);
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -66,6 +70,10 @@ public class Wizard implements ResponseListener {
 
         putForm();
 
+    }
+
+    public PersistenceInterface getDbManager() {
+        return persistenceManager;
     }
 
     public Component getContent() {

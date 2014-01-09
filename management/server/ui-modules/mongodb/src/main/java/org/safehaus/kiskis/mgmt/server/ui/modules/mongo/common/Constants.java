@@ -19,5 +19,11 @@ public class Constants {
     public static final String LOG_DIR = "/var/log/mongodb";
     public static final String CONFIG_DIR = "/data/configdb";
     public static final String MONGO_DIR = "/var/lib/mongodb";
+    public static final String TABLE_HOST_PROPERTY = "Host";
+    public static final String TABLE_CHECK_PROPERTY = "Check";
+    public static final String TABLE_START_PROPERTY = "Start";
+    public static final String TABLE_STOP_PROPERTY = "Stop";
+    public static final String TABLE_DESTROY_PROPERTY = "Destroy";
+    public static final String TABLE_STATUS_PROPERTY = "Status";
 
 }

@@ -13,7 +13,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Util.createImage;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -34,7 +33,7 @@ public class Step1 extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-        Label logoImg = createImage("mongodb.png", 150, 150);
+        Label logoImg = MgmtApplication.createImage("mongodb.png", 150, 150);
         grid.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Start");

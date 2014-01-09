@@ -107,10 +107,8 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                
-                //check that number of nodes is not more than 7
-                
-                wizard.getConfig().setReplicaSetName(replicaNameTxtFld.getValue().toString().trim());
+
+                wizard.getConfig().setReplicaSetName(Util.removeAllWhitespace(replicaNameTxtFld.getValue().toString().trim()));
                 wizard.getConfig().setDataNodes((Set<Agent>) shardsColSel.getValue());
 
                 if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
@@ -119,6 +117,8 @@ public class Step3 extends Panel {
                     show("Please add data nodes");
                 } else if (wizard.getConfig().getDataNodes().size() % 2 == 0) {
                     show("Please add odd number of data nodes");
+                } else if (wizard.getConfig().getDataNodes().size() > 7) {
+                    show("Please add no more than 7 data nodes");
                 } else {
                     wizard.next();
                 }

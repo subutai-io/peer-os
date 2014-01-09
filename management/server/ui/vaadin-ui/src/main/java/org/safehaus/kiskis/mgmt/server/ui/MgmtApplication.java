@@ -38,7 +38,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     public MgmtApplication(String title, AgentManagerInterface agentManager) {
         this.agentManager = agentManager;
         this.moduleNotifier = ServiceLocator.getService(ModuleNotifier.class);
-//        this.agentManager = ServiceLocator.getService(AgentManagerInterface.class);
         this.commandManager = ServiceLocator.getService(CommandManagerInterface.class);
         this.title = title;
     }
@@ -197,6 +196,15 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         if (getInstance() != null) {
             getInstance().selectedAgents.clear();
         }
+    }
+
+    public static Label createImage(String imageName, int imageWidth, int imageHeight) {
+        Label image = new Label(
+                String.format("<img src='http://%s:%s/%s' />", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT, imageName));
+        image.setContentMode(Label.CONTENT_XHTML);
+        image.setHeight(imageWidth, Sizeable.UNITS_PIXELS);
+        image.setWidth(imageHeight, Sizeable.UNITS_PIXELS);
+        return image;
     }
 
 }
