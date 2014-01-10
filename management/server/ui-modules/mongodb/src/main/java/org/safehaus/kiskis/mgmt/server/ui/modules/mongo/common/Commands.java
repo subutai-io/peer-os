@@ -321,4 +321,19 @@ public class Commands {
         req.setTimeout(20);
         return cmd;
     }
+
+    public static Command getFindPrimaryNodeCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/echo");
+        req.setArgs(Arrays.asList(
+                "'db.isMaster()'",
+                "|",
+                "mongo",
+                "--port",
+                Constants.DATA_NODE_PORT + ""
+        ));
+        req.setTimeout(20);
+        return cmd;
+    }
 }

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
@@ -46,6 +48,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public class Manager implements ResponseListener {
     /*
      TODO:
+     0) dont't let using the same nodes for diff node types (e.g. routers as data nodes)
      1) find primary node 
      2) destroy node (either unregister from primary after check status command and clean data and ui or do it in destroy task)
      3) add node
@@ -249,6 +252,35 @@ public class Manager implements ResponseListener {
                 }
             }
         } else if (managerActionType == ManagerActionType.DESTROY_NODE) {
+            if (nodeType == NodeType.CONFIG_NODE) {
+                //uninstall mongo
+                //restart routers passing the rest of config servers
+            } else if (nodeType == NodeType.ROUTER_NODE) {
+                //uninstall mongo
+            } else if (nodeType == NodeType.DATA_NODE) {
+                //uninstall mongo
+                //unregister from primary node if this node is not primary otherwise no-op
+
+                Task destroyTask = Util.createTask("Destroy Node");
+                //find primary node
+                Command findPrimaryNodeCmd = Commands.getFindPrimaryNodeCommand();
+                findPrimaryNodeCmd.getRequest().setUuid(agent.getUuid());
+                findPrimaryNodeCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+                findPrimaryNodeCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+                destroyTask.addCommand(findPrimaryNodeCmd);
+                //add other commands
+
+                if (commandManager.executeCommand(destroyTask.getNextCommand())) {
+                    ManagerAction managerAction = new ManagerAction(
+                            destroyTask,
+                            managerActionType,
+                            row, agent, nodeType);
+                    managerAction.disableButtons();
+                    actionsCache.put(destroyTask.getUuid(),
+                            managerAction,
+                            findPrimaryNodeCmd.getRequest().getTimeout() * 1000 + 2000);
+                }
+            }
             /*
              Task destroyTask = Util.createTask("Destroy Node");
              //find the primary node in rs
@@ -371,6 +403,19 @@ public class Manager implements ResponseListener {
 
     private void processDestroyCommandResponse(ManagerAction managerAction, Response response) {
         //save task upon completion && launch check-status task 
+        if (Util.isFinalResponse(response)) {
+            //this is the first command -> findPrimaryNode
+            if (managerAction.getTask().getCurrentCommandIdx() == 1) {
+                Pattern p = Pattern.compile("primary\" : \"(.*)\"");
+                Matcher m = p.matcher(managerAction.getOutput());
+                if (m.find()) {
+                    System.out.println("Primary is " + m.group(1));
+                } else {
+                    System.out.println("Primary not found");
+                }
+                managerAction.enableDestroyButton();
+            }
+        }
     }
 
     private void processAddCommandResponse(ManagerAction managerAction, Response response) {
