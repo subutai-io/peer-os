@@ -86,14 +86,7 @@ public class LogListener implements Refresher.RefreshListener {
 
     public BoolQueryBuilder getAllMetricsQuery() {
 
-        // CHANGE THIS CONTENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        //------------------------------------------------------------------
-        //------------------------------------------------------------------
-        //------------------------------------------------------------------
-        //------------------------------------------------------------------
-        //------------------------------------------------------------------
         BoolQueryBuilder queryBuilder =  QueryBuilders.boolQuery();
-        MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
         Host host = Monitor.getMain().getHosts();
 
         if(host != null && host.getHostTermQueryBuilder() != null)
