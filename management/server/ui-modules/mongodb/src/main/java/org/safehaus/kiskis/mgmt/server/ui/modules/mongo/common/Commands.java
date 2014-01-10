@@ -203,7 +203,7 @@ public class Commands {
     }
 
     //execute on primary data node
-    public static Command getUnregisterSecondaryNodeWithPrimaryCommand(String host) {
+    public static Command getUnregisterSecondaryNodeFromPrimaryCommand(String host) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");

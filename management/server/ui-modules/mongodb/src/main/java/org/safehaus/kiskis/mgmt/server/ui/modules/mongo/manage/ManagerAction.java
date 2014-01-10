@@ -27,7 +27,7 @@ public final class ManagerAction {
     private final Agent agent;
     private final NodeType nodeType;
     private final StringBuilder output = new StringBuilder();
-    private int instructionCount = 0;
+    private int responseCount = 0;
 
     public ManagerAction(Task task, ManagerActionType managerActionType, Item row, Agent agent, NodeType nodeType) {
         this.task = task;
@@ -42,12 +42,12 @@ public final class ManagerAction {
         return task;
     }
 
-    public void incrementInstructionCount() {
-        instructionCount++;
+    public void incrementResponseCount() {
+        responseCount++;
     }
 
-    public int getInstructionCount() {
-        return instructionCount;
+    public int getResponseCount() {
+        return responseCount;
     }
 
     private <T> T getItemPropertyValue(Object itemPropertyId) {

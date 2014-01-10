@@ -13,6 +13,8 @@ public interface AgentManagerInterface {
 
     public Agent getAgent(UUID uuid);
 
+    public Agent getAgentByHostname(String hostname);
+
     public List<Agent> getRegisteredAgents();
 
     public List<Agent> getRegisteredLxcAgents();

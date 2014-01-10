@@ -243,4 +243,8 @@ public class AgentManager implements AgentManagerInterface, ResponseListener {
     public String getSource() {
         return getClass().getName();
     }
+
+    public Agent getAgentByHostname(String hostname) {
+        return persistenceAgent.getRegisteredLxcAgentByHostname(hostname, agentFreshnessMin);
+    }
 }
