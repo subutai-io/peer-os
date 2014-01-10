@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -27,7 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step3 extends Panel {
 
-    public Step3(final MongoWizard mongoWizard) {
+    public Step3(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -56,11 +57,17 @@ public class Step3 extends Panel {
         replicaNameTxtFld.setInputPrompt("Replica Set name");
         replicaNameTxtFld.setRequired(true);
         replicaNameTxtFld.setMaxLength(20);
+        replicaNameTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
+            }
+        });
 
         mainContent.addComponent(replicaNameTxtFld);
 
-        Label configServersLabel = new Label("<strong>Choose hosts that will act as shards<br>"
-                + "(Recommended odd number of servers, provide at least 1)</strong>");
+        Label configServersLabel = new Label("<strong>Choose hosts that will act as data nodes<br>"
+                + "(Choose odd number of servers, provide at least 1)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         mainContent.addComponent(configServersLabel);
 
@@ -72,8 +79,15 @@ public class Step3 extends Panel {
         shardsColSel.setImmediate(true);
         shardsColSel.setRequired(true);
         shardsColSel.setLeftColumnCaption("Available Nodes");
-        shardsColSel.setRightColumnCaption("Shards");
+        shardsColSel.setRightColumnCaption("Data Nodes");
         shardsColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        shardsColSel.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
+                wizard.getConfig().setDataNodes(agentList);
+            }
+        });
 
         mainContent.addComponent(shardsColSel);
 
@@ -85,26 +99,28 @@ public class Step3 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.back();
+                wizard.back();
             }
         });
-        Button next = new Button("Finish");
+        Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.getConfig().setReplicaSetName(replicaNameTxtFld.getValue().toString().trim());
-                mongoWizard.getConfig().setShards((Set<Agent>) shardsColSel.getValue());
+                
+                //check that number of nodes is not more than 7
+                
+                wizard.getConfig().setReplicaSetName(replicaNameTxtFld.getValue().toString().trim());
+                wizard.getConfig().setDataNodes((Set<Agent>) shardsColSel.getValue());
 
-                if (Util.isStringEmpty(mongoWizard.getConfig().getReplicaSetName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");
-                } else if (Util.isCollectionEmpty(mongoWizard.getConfig().getShards())) {
-                    show("Please add shards");
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getDataNodes())) {
+                    show("Please add data nodes");
+                } else if (wizard.getConfig().getDataNodes().size() % 2 == 0) {
+                    show("Please add odd number of data nodes");
                 } else {
-                    //disable back command
-                    //save config to db 
-                    //start installation
-                    mongoWizard.next();
+                    wizard.next();
                 }
             }
         });
@@ -120,11 +136,11 @@ public class Step3 extends Panel {
 
         shardsColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(
-                        Agent.class, mongoWizard.getConfig().getSelectedAgents()));
+                        Agent.class, wizard.getConfig().getSelectedAgents()));
 
         //set values if this is a second visit
-        replicaNameTxtFld.setValue(mongoWizard.getConfig().getReplicaSetName());
-        shardsColSel.setValue(Util.retainValues(mongoWizard.getConfig().getShards(), mongoWizard.getConfig().getSelectedAgents()));
+        replicaNameTxtFld.setValue(wizard.getConfig().getReplicaSetName());
+        shardsColSel.setValue(Util.retainValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getSelectedAgents()));
     }
 
     private void show(String notification) {

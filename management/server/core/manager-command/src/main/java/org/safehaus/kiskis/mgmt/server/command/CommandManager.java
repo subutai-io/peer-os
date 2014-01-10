@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.command;
 
-import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
@@ -9,12 +8,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -28,8 +26,9 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
     private PersistenceInterface persistenceCommand;
     private CommandTransportInterface communicationService;
-    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
-    private ExecutorService exec;
+//    private final Queue<CommandListener> listeners = new ConcurrentLinkedQueue<CommandListener>();
+    private final Map<CommandListener, ExecutorService> listeners = new ConcurrentHashMap<CommandListener, ExecutorService>();
+    private ExecutorService notifierExecService;
     private CommandNotifier commandNotifier;
 
     @Override
@@ -47,14 +46,10 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void onResponse(Response response) {
         switch (response.getType()) {
             case EXECUTE_TIMEOUTED:
-            case EXECUTE_RESPONSE: {
-                persistenceCommand.saveResponse(response);
-                commandNotifier.messagesQueue.add(response);
-                break;
-            }
+            case EXECUTE_RESPONSE:
             case EXECUTE_RESPONSE_DONE: {
                 persistenceCommand.saveResponse(response);
-                commandNotifier.messagesQueue.add(response);
+                commandNotifier.addResponse(response);
                 break;
             }
             default: {
@@ -67,7 +62,7 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void addListener(CommandListener listener) {
         try {
             LOG.log(Level.INFO, "Adding module listener : {0}", listener.getName());
-            listeners.add(listener);
+            listeners.put(listener, Executors.newSingleThreadExecutor());
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
         }
@@ -77,7 +72,8 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void removeListener(CommandListener listener) {
         try {
             LOG.log(Level.INFO, "Removing module listener : {0}", listener.getName());
-            listeners.remove(listener);
+            ExecutorService exec = listeners.remove(listener);
+            exec.shutdown();
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in removeListener", ex);
         }
@@ -86,9 +82,9 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     public void init() {
         try {
             if (communicationService != null) {
-                exec = Executors.newSingleThreadExecutor();
+                notifierExecService = Executors.newSingleThreadExecutor();
                 commandNotifier = new CommandNotifier(listeners);
-                exec.execute(commandNotifier);
+                notifierExecService.execute(commandNotifier);
                 communicationService.addListener(this);
             } else {
                 throw new Exception("Missing communication service");
@@ -100,7 +96,12 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
 
     public void destroy() {
         try {
-            exec.shutdown();
+            notifierExecService.shutdown();
+
+            for (Map.Entry<CommandListener, ExecutorService> entry : listeners.entrySet()) {
+                entry.getValue().shutdown();
+            }
+
             if (communicationService != null) {
                 communicationService.removeListener(this);
             }
@@ -128,6 +129,11 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
     }
 
     @Override
+    public Integer getSuccessfullResponseCount(UUID taskuuid) {
+        return persistenceCommand.getSuccessfullResponsesCount(taskuuid);
+    }
+
+    @Override
     public Response getResponse(UUID taskuuid, Integer requestSequenceNumber) {
         Response response = null;
         try {
@@ -136,10 +142,10 @@ public class CommandManager implements CommandManagerInterface, ResponseListener
             String stdOut = "", stdErr = "";
             for (Response r : list) {
                 response = r;
-                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdOut())) {
+                if (r.getStdOut() != null && !r.getStdOut().equalsIgnoreCase("null") && !Util.isStringEmpty(r.getStdOut())) {
                     stdOut += r.getStdOut();
                 }
-                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Strings.isNullOrEmpty(r.getStdErr())) {
+                if (r.getStdErr() != null && !r.getStdErr().equalsIgnoreCase("null") && !Util.isStringEmpty(r.getStdErr())) {
                     stdErr += r.getStdErr();
                 }
             }

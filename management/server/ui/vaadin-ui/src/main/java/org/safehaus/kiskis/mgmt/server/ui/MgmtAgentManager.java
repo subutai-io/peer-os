@@ -18,6 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
@@ -33,8 +34,8 @@ public final class MgmtAgentManager extends ConcurrentComponent
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
     private List<Agent> currentAgents = new ArrayList<Agent>();
 
-    public MgmtAgentManager(AgentManagerInterface agentManagerService) {
-        this.agentManagerInterface = agentManagerService;
+    public MgmtAgentManager() {
+        this.agentManagerInterface = ServiceLocator.getService(AgentManagerInterface.class);
         setSizeFull();
         setMargin(true);
         tree = new Tree("List of nodes");
@@ -107,9 +108,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 tree.setValue(null);
-                if (MgmtApplication.getSelectedAgents() != null) {
-                    MgmtApplication.getSelectedAgents().clear();
-                }
+                MgmtApplication.clearSelectedAgents();
                 refreshAgents(agentManagerInterface.getRegisteredAgents());
             }
         });

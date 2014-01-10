@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util;
 
-import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -10,12 +9,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 12/7/13
- * Time: 5:55 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 12/7/13 Time: 5:55 PM
  */
 public class HadoopInstallation {
+
     private Task hadoopInstallationTask;
     private Task hadoopConfigureTask;
     private Task hadoopSNameNodeTask;
@@ -324,8 +321,8 @@ public class HadoopInstallation {
                     panel.setCloseable();
                 }
             } else if (task.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
-                panel.addOutput(task, " failed.\n" +
-                        "Details: " + getResponseError(list));
+                panel.addOutput(task, " failed.\n"
+                        + "Details: " + getResponseError(list));
                 panel.setCloseable();
             }
         }
@@ -360,7 +357,7 @@ public class HadoopInstallation {
     private String getResponseError(List<ParseResult> list) {
         StringBuilder stringBuilder = new StringBuilder();
         for (ParseResult pr : list) {
-            if (!Strings.isNullOrEmpty(pr.getResponse().getStdErr())) {
+            if (!Util.isStringEmpty(pr.getResponse().getStdErr())) {
                 stringBuilder.append(pr.getRequest());
                 stringBuilder.append("\n");
                 stringBuilder.append(pr.getResponse());

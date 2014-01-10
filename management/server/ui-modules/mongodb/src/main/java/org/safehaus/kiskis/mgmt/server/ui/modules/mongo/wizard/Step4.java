@@ -7,13 +7,14 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.exec.Installer;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ConfigView;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  *
@@ -21,48 +22,56 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  */
 public class Step4 extends Panel {
 
-    private final TextArea outputTxtArea;
+    private static final Logger LOG = Logger.getLogger(Step4.class.getName());
 
-    public Step4(final MongoWizard mongoWizard) {
+    public Step4(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Installation output");
-        outputTxtArea.setRows(20);
-        outputTxtArea.setColumns(100);
-        outputTxtArea.setImmediate(true);
-        outputTxtArea.setWordwrap(true);
+        Label confirmationLbl = new Label("<strong>Please verify the installation configuration "
+                + "(you may change it by clicking on Back button)</strong><br/>");
+        confirmationLbl.setContentMode(Label.CONTENT_XHTML);
 
-        content.addComponent(outputTxtArea);
+        ConfigView cfgView = new ConfigView("Installation configuration");
+        cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
+        cfgView.addStringCfg("Replica Set Name", wizard.getConfig().getReplicaSetName());
+        cfgView.addAgentSetCfg("Configuration servers", wizard.getConfig().getConfigServers());
+        cfgView.addAgentSetCfg("Routers", wizard.getConfig().getRouterServers());
+        cfgView.addAgentSetCfg("Data Nodes", wizard.getConfig().getDataNodes());
 
-        Button ok = new Button("OK");
-        ok.addListener(new Button.ClickListener() {
+        Button install = new Button("Install");
+        install.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                mongoWizard.init();
+                //save config to db here
+                wizard.next();
             }
         });
 
-        content.addComponent(ok);
+        Button back = new Button("Back");
+        back.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                wizard.back();
+            }
+        });
+
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(back);
+        buttons.addComponent(install);
+
+        content.addComponent(confirmationLbl);
+
+        content.addComponent(cfgView.getCfgTable());
+
+        content.addComponent(buttons);
+
         addComponent(content);
 
-        Installer installer = new Installer(mongoWizard);
-        installer.start();
-    }
-
-    private void show(String notification) {
-        getWindow().showNotification(notification);
-    }
-
-    protected void onResponse(Response response) {
-        String output = outputTxtArea.getValue() + "\n"
-                + CommandJson.getJson(new Command(response));
-        outputTxtArea.setValue(output);
-        outputTxtArea.setCursorPosition(output.length() - 1);
     }
 
 }

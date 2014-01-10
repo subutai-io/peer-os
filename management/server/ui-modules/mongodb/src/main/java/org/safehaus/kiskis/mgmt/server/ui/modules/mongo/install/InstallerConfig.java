@@ -3,22 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  *
  * @author dilshat
  */
-public class MongoConfig {
+public class InstallerConfig implements Config {
 
     private String clusterName = "";
     private String replicaSetName = "";
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
-    private Set<Agent> shards;
+    private Set<Agent> dataNodes;
     private Set<Agent> selectedAgents;
 
     public String getReplicaSetName() {
@@ -53,12 +54,12 @@ public class MongoConfig {
         this.routerServers = routerServers;
     }
 
-    public Set<Agent> getShards() {
-        return shards;
+    public Set<Agent> getDataNodes() {
+        return dataNodes;
     }
 
-    public void setShards(Set<Agent> shards) {
-        this.shards = shards;
+    public void setDataNodes(Set<Agent> dataNodes) {
+        this.dataNodes = dataNodes;
     }
 
     public Set<Agent> getSelectedAgents() {
@@ -71,7 +72,7 @@ public class MongoConfig {
 
     @Override
     public String toString() {
-        return "MongoConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routerServers=" + routerServers + ", shards=" + shards + ", selectedAgents=" + selectedAgents + '}';
+        return "MongoConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + ", selectedAgents=" + selectedAgents + '}';
     }
 
     public void reset() {
@@ -79,7 +80,7 @@ public class MongoConfig {
         replicaSetName = "";
         configServers = null;
         routerServers = null;
-        shards = null;
+        dataNodes = null;
         selectedAgents = null;
     }
 

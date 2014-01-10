@@ -1,11 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
-import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.server.ui.services.ModuleService;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -203,7 +201,7 @@ public class Terminal implements Module {
                             task.setTaskStatus(TaskStatus.NEW);
                             commandManagerInterface.saveTask(task);
                             for (Agent agent : agents) {
-                                if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
+                                if (!Util.isStringEmpty(textAreaCommand.getValue().toString())) {
                                     String json = textAreaCommand.getValue().toString().trim();
 
                                     Request r = CommandJson.getRequest(json);
@@ -275,7 +273,7 @@ public class Terminal implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     List<Request> listofrequest;
-                    if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString().trim())) {
+                    if (!Util.isStringEmpty(textAreaCommand.getValue().toString().trim())) {
                         listofrequest = commandManagerInterface.getCommands(UUID.fromString(textAreaCommand.getValue().toString().trim()));
                         StringBuilder sb = new StringBuilder();
                         for (Request request : listofrequest) {
@@ -297,7 +295,7 @@ public class Terminal implements Module {
             button.addListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    if (!Strings.isNullOrEmpty(textAreaCommand.getValue().toString())) {
+                    if (!Util.isStringEmpty(textAreaCommand.getValue().toString())) {
                         String[] attr = textAreaCommand.getValue().toString().trim().split(" ");
 
                         if (attr.length == 2) {
@@ -375,25 +373,5 @@ public class Terminal implements Module {
     public Component createComponent() {
         return new ModuleComponent();
     }
-
-    public void setModuleService(ModuleService service) {
-        try {
-            LOG.log(Level.INFO, "{0}: registering with ModuleService", MODULE_NAME);
-            service.registerModule(this);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in setModuleService", e);
-        }
-
-    }
-
-    public void unsetModuleService(ModuleService service) {
-        try {
-            service.unregisterModule(this);
-            LOG.log(Level.INFO, "{0}: Unregistering with ModuleService", MODULE_NAME);
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in unsetModuleService", e);
-        }
-    }
-
 
 }
