@@ -164,23 +164,6 @@ public class Commands {
         return cmd;
     }
 
-    //execute on any router member
-    public static Command getRegisterShardWithRouterCommand2(String routerHost, String shards) {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("mongo");
-        req.setArgs(Arrays.asList(
-                "--host",
-                routerHost, //supply any one router host
-                "--port",
-                Constants.ROUTER_PORT + "", //supply router port                
-                "--eval",
-                String.format("\"%s\"", shards)
-        ));
-        req.setTimeout(60);
-        return cmd;
-    }
-
     //execute on primary replica
     public static Command getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
         Command cmd = getTemplate();
@@ -211,7 +194,7 @@ public class Commands {
                 "--port",
                 Constants.DATA_NODE_PORT + "",
                 "--eval",
-                MessageFormat.format("\"rs.remove({0}:{1});\"", host, Constants.DATA_NODE_PORT)
+                String.format("\"rs.remove('%s:%s');\"", host, Constants.DATA_NODE_PORT)
         ));
         req.setTimeout(30);
         return cmd;

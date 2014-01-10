@@ -221,8 +221,8 @@ public abstract class Operation implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        clearOutput();
-        clearLog();
+//        clearOutput();
+//        clearLog();
         try {
             Task task = getCurrentTask();
             if (task != null && response != null
@@ -328,7 +328,9 @@ public abstract class Operation implements ResponseListener {
     }
 
     public String getOutput() {
-        return output.toString();
+        String outStr = output.toString();
+        clearOutput();
+        return outStr;
     }
 
     public void appendOutput(String s) {
@@ -349,7 +351,9 @@ public abstract class Operation implements ResponseListener {
     }
 
     public String getLog() {
-        return log.toString();
+        String logStr = log.toString();
+        clearLog();
+        return logStr;
     }
 
     public void appendLog(String s) {

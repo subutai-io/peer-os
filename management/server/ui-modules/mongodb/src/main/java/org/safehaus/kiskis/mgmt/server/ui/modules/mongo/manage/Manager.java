@@ -19,6 +19,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -65,6 +66,9 @@ public class Manager implements ResponseListener {
     private final ComboBox clusterCombo;
     private final ExpiringCache<UUID, ManagerAction> actionsCache = new ExpiringCache<UUID, ManagerAction>();
     private MongoClusterInfo clusterInfo;
+    private final Table configServersTable;
+    private final Table routersTable;
+    private final Table dataNodesTable;
 
     public Manager() {
         //get db and transport managers
@@ -86,9 +90,9 @@ public class Manager implements ResponseListener {
         contentRoot.setMargin(true);
 
         //tables go here
-        final Table configServersTable = createTableTemplate("Config Servers");
-        final Table routersTable = createTableTemplate("Query Routers");
-        final Table dataNodesTable = createTableTemplate("Data Nodes");
+        configServersTable = createTableTemplate("Config Servers");
+        routersTable = createTableTemplate("Query Routers");
+        dataNodesTable = createTableTemplate("Data Nodes");
         //tables go here
 
         Label clusterNameLabel = new Label("Select the cluster");
@@ -284,7 +288,9 @@ public class Manager implements ResponseListener {
                 uninstallCmd.getRequest().setTaskUuid(destroyTask.getUuid());
                 uninstallCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
                 destroyTask.addCommand(uninstallCmd);
-                Command unregisterFromPrimaryCmd = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(agent.getHostname());
+                Command unregisterFromPrimaryCmd
+                        = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
+                                String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
                 //on response set UUID with primary node agent uuid
                 unregisterFromPrimaryCmd.getRequest().setTaskUuid(destroyTask.getUuid());
                 unregisterFromPrimaryCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
@@ -313,38 +319,29 @@ public class Manager implements ResponseListener {
                 ManagerAction managerAction = actionsCache.get(response.getTaskUuid());
                 if (managerAction != null) {
                     boolean actionCompleted = false;
-                    managerAction.addOutput(response.getStdOut());
+                    managerAction.addStdOutput(response.getStdOut());
+                    managerAction.addErrOutput(response.getStdErr());
                     if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
-                        if (managerAction.getOutput().contains("couldn't connect to server")) {
+                        if (managerAction.getStdOutput().contains("couldn't connect to server")) {
                             managerAction.enableStartButton();
                             actionCompleted = true;
-                        } else if (managerAction.getOutput().
+                        } else if (managerAction.getStdOutput().
                                 contains("connecting to")) {
                             managerAction.enableStopButton();
                             actionCompleted = true;
-                        } else if (managerAction.getOutput().contains("mongo: not found")) {
-                            /*TODO
-                             1) delete from mongo_cluster_info
-                             2) delete from UI table
-                             */
-                            System.out.println("DELETING NODE FROM UI " + managerAction.getAgent().getHostname());
+                        } else if (managerAction.getErrOutput().contains("mongo: not found")) {
+                            removeNode(managerAction);
                             actionCompleted = true;
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.START_NODE) {
-                        if (managerAction.getOutput().contains("child process started successfully, parent exiting")) {
+                        if (managerAction.getStdOutput().contains("child process started successfully, parent exiting")) {
                             actionCompleted = true;
-                            //add check command to actualize buttons
-                            executeManagerAction(ManagerActionType.CHECK_NODE_STATUS,
-                                    managerAction.getAgent(), managerAction.getNodeType(),
-                                    managerAction.getRow());
+                            checkNodeStatus(managerAction);
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.STOP_NODE) {
                         if (Util.isFinalResponse(response)) {
                             actionCompleted = true;//possibly check exit code here
-                            //add check command to actualize buttons
-                            executeManagerAction(ManagerActionType.CHECK_NODE_STATUS,
-                                    managerAction.getAgent(), managerAction.getNodeType(),
-                                    managerAction.getRow());
+                            checkNodeStatus(managerAction);
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.DESTROY_NODE) {
 
@@ -365,8 +362,11 @@ public class Manager implements ResponseListener {
                         //then action commands shud not hide progress indicator
                         //also destroy button will be reenabled after check-status completion 
                         if (managerAction.getManagerActionType() == ManagerActionType.CHECK_NODE_STATUS) {
-                            managerAction.enableDestroyButton();
-                            managerAction.hideProgress();
+                            try {
+                                managerAction.enableDestroyButton();
+                                managerAction.hideProgress();
+                            } catch (Exception e) {
+                            }
                         }
                     }
                 }
@@ -376,64 +376,101 @@ public class Manager implements ResponseListener {
         }
     }
 
+    private void checkNodeStatus(ManagerAction managerAction) {
+        //add check command to actualize buttons
+        executeManagerAction(ManagerActionType.CHECK_NODE_STATUS,
+                managerAction.getAgent(), managerAction.getNodeType(),
+                managerAction.getRow());
+    }
+
+    private void removeNode(ManagerAction managerAction) {
+        if (managerAction.getNodeType() == NodeType.CONFIG_NODE) {
+            configServersTable.removeItem(managerAction.getRowId());
+            List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getConfigServers());
+            nodes.remove(managerAction.getAgent().getUuid());
+            clusterInfo.setConfigServers(nodes);
+            commandManager.saveMongoClusterInfo(clusterInfo);
+        } else if (managerAction.getNodeType() == NodeType.ROUTER_NODE) {
+            routersTable.removeItem(managerAction.getRowId());
+            List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getRouters());
+            nodes.remove(managerAction.getAgent().getUuid());
+            clusterInfo.setRouters(nodes);
+            commandManager.saveMongoClusterInfo(clusterInfo);
+        } else if (managerAction.getNodeType() == NodeType.DATA_NODE) {
+            dataNodesTable.removeItem(managerAction.getRowId());
+            List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
+            nodes.remove(managerAction.getAgent().getUuid());
+            clusterInfo.setDataNodes(nodes);
+            commandManager.saveMongoClusterInfo(clusterInfo);
+        }
+    }
+
     private void processDestroyCommandResponse(ManagerAction managerAction, Response response) {
         //save task upon completion && launch check-status task 
         if (Util.isFinalResponse(response)) {
-            managerAction.incrementResponseCount();
-            //this is the first command -> findPrimaryNode
-            if (managerAction.getResponseCount() == 1) {
-                Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                Matcher m = p.matcher(managerAction.getOutput());
-                Agent primaryNodeAgent = null;
-                if (m.find()) {
-                    String primaryNodeHost = m.group(1);
-                    if (!Util.isStringEmpty(primaryNodeHost)) {
-                        String hostname = primaryNodeHost.split(":")[0];
-                        primaryNodeAgent = agentManager.getAgentByHostname(hostname);
-                    }
-                }
-                if (primaryNodeAgent != null) {
-                    Command killCmd = managerAction.getTask().getNextCommand();
-                    Command cleanCmd = managerAction.getTask().getNextCommand();
-                    Command uninstallCmd = managerAction.getTask().getNextCommand();
-                    int totalTimeout = killCmd.getRequest().getTimeout();
-                    totalTimeout += cleanCmd.getRequest().getTimeout();
-                    totalTimeout += uninstallCmd.getRequest().getTimeout();
-                    commandManager.executeCommand(killCmd);
-                    commandManager.executeCommand(cleanCmd);
-                    commandManager.executeCommand(uninstallCmd);
-                    //unregister the node from primary node if this node is not primary itself
-                    if (primaryNodeAgent.getUuid().compareTo(managerAction.getAgent().getUuid()) != 0) {
-                        Command unregisterFromPrimaryCmd = managerAction.getTask().getNextCommand();
-                        unregisterFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
-                        totalTimeout += unregisterFromPrimaryCmd.getRequest().getTimeout();
-                        commandManager.executeCommand(unregisterFromPrimaryCmd);
-                    }
-                    actionsCache.put(managerAction.getTask().getUuid(),
-                            managerAction,
-                            totalTimeout * 1000 + 2000);
-
-                } else {
-                    //abort operation
-                    show("Could not determine primary node!");
-                    Task task = managerAction.getTask();
-                    task.setTaskStatus(TaskStatus.FAIL);
-                    Util.saveTask(task);
-                    actionsCache.remove(managerAction.getTask().getUuid());
-                    managerAction.enableDestroyButton();
-                    managerAction.hideProgress();
-                }
+            if (managerAction.getErrOutput().contains("mongo: not found")) {
+                Task task = managerAction.getTask();
+                task.setTaskStatus(TaskStatus.FAIL);
+                Util.saveTask(task);
+                actionsCache.remove(managerAction.getTask().getUuid());
+                removeNode(managerAction);
             } else {
-                //this is the last command
-                if (managerAction.getResponseCount() == managerAction.getTask().getCurrentCommandOrderId()) {
-                    Task task = managerAction.getTask();
-                    task.setTaskStatus(TaskStatus.SUCCESS);
-                    Util.saveTask(task);
-                    actionsCache.remove(managerAction.getTask().getUuid());
-                    //add check command to actualize buttons
-                    executeManagerAction(ManagerActionType.CHECK_NODE_STATUS,
-                            managerAction.getAgent(), managerAction.getNodeType(),
-                            managerAction.getRow());
+                managerAction.incrementResponseCount();
+                //this is the first command of destroy data node action -> findPrimaryNode
+                if (managerAction.getResponseCount() == 1
+                        && managerAction.getNodeType() == NodeType.DATA_NODE) {
+                    Pattern p = Pattern.compile("primary\" : \"(.*)\"");
+                    Matcher m = p.matcher(managerAction.getStdOutput());
+                    Agent primaryNodeAgent = null;
+                    if (m.find()) {
+                        String primaryNodeHost = m.group(1);
+                        if (!Util.isStringEmpty(primaryNodeHost)) {
+                            String hostname = primaryNodeHost.split(":")[0].replace(Constants.DOMAIN, "");
+                            primaryNodeAgent = agentManager.getAgentByHostname(hostname);
+                        }
+                    }
+                    if (primaryNodeAgent != null) {
+                        //!!!!MAY BE UNREGISTER FIRST THEN UNINSTALL, need more tests
+                        Command killCmd = managerAction.getTask().getNextCommand();
+                        Command cleanCmd = managerAction.getTask().getNextCommand();
+                        Command uninstallCmd = managerAction.getTask().getNextCommand();
+                        int totalTimeout = killCmd.getRequest().getTimeout();
+                        totalTimeout += cleanCmd.getRequest().getTimeout();
+                        totalTimeout += uninstallCmd.getRequest().getTimeout();
+                        commandManager.executeCommand(killCmd);
+                        commandManager.executeCommand(cleanCmd);
+                        commandManager.executeCommand(uninstallCmd);
+                        //unregister the node from primary node if this node is not primary itself
+                        if (primaryNodeAgent.getUuid().compareTo(managerAction.getAgent().getUuid()) != 0) {
+                            Command unregisterFromPrimaryCmd = managerAction.getTask().getNextCommand();
+                            unregisterFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
+                            totalTimeout += unregisterFromPrimaryCmd.getRequest().getTimeout();
+                            commandManager.executeCommand(unregisterFromPrimaryCmd);
+                        }
+                        actionsCache.put(managerAction.getTask().getUuid(),
+                                managerAction,
+                                totalTimeout * 1000 + 2000);
+
+                    } else {
+                        //abort operation
+                        show("Could not determine primary node!");
+                        Task task = managerAction.getTask();
+                        task.setTaskStatus(TaskStatus.FAIL);
+                        Util.saveTask(task);
+                        actionsCache.remove(managerAction.getTask().getUuid());
+                        managerAction.enableDestroyButton();
+                        managerAction.hideProgress();
+                    }
+                } else {
+                    //this is the last command
+                    if (managerAction.getResponseCount() == managerAction.getTask().getCurrentCommandOrderId()) {
+                        Task task = managerAction.getTask();
+                        task.setTaskStatus(TaskStatus.SUCCESS);
+                        Util.saveTask(task);
+                        actionsCache.remove(managerAction.getTask().getUuid());
+                        //add check command to actualize buttons
+                        checkNodeStatus(managerAction);
+                    }
                 }
             }
         }
@@ -476,6 +513,7 @@ public class Manager implements ResponseListener {
                     null);
 
             final Item row = table.getItem(rowId);
+            destroyBtn.setData(rowId);
 
             startBtn.addListener(new Button.ClickListener() {
 

@@ -26,7 +26,8 @@ public final class ManagerAction {
     private final ManagerActionType managerActionType;
     private final Agent agent;
     private final NodeType nodeType;
-    private final StringBuilder output = new StringBuilder();
+    private final StringBuilder stdOutput = new StringBuilder();
+    private final StringBuilder errOutput = new StringBuilder();
     private int responseCount = 0;
 
     public ManagerAction(Task task, ManagerActionType managerActionType, Item row, Agent agent, NodeType nodeType) {
@@ -104,18 +105,33 @@ public final class ManagerAction {
         return nodeType;
     }
 
+    public Object getRowId() {
+        Button destroyBtn = getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
+        return destroyBtn.getData();
+    }
+
     public ManagerActionType getManagerActionType() {
         return managerActionType;
     }
 
-    public void addOutput(String out) {
+    public void addStdOutput(String out) {
         if (!Util.isStringEmpty(out)) {
-            output.append(out);
+            stdOutput.append(out);
         }
     }
 
-    public String getOutput() {
-        return output.toString();
+    public void addErrOutput(String out) {
+        if (!Util.isStringEmpty(out)) {
+            errOutput.append(out);
+        }
+    }
+
+    public String getStdOutput() {
+        return stdOutput.toString();
+    }
+
+    public String getErrOutput() {
+        return errOutput.toString();
     }
 
 }
