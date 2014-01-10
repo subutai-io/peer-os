@@ -43,7 +43,7 @@ public class CassandraTable extends Table {
 
     private IndexedContainer getCassandraContainer() {
         IndexedContainer container = new IndexedContainer();
-//        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, UUID.class, "");
+        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, String.class, "");
         container.addContainerProperty(CassandraClusterInfo.NAME_LABEL, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
@@ -60,7 +60,7 @@ public class CassandraTable extends Table {
     private void addClusterDataToContainer(final Container container, final CassandraClusterInfo cci) {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
-//        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getUuid());
+        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getDomainName());
         item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cci.getName());
 
         Button startButton = new Button("Start");
@@ -100,8 +100,8 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
-                nodesWindow = new NodesWindow(cci.getName(), info, manager);
+//                CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
+                nodesWindow = new NodesWindow(cci, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
 
             }
