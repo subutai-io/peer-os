@@ -747,13 +747,14 @@ public class Persistence implements PersistenceInterface {
         return list;
     }
 
+    @Override
     public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
             String cql = "select * from hadoop_cluster_info where cluster_name = ? limit 1 allow filtering";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(clusterName));
+            ResultSet rs = session.execute(boundStatement.bind(clusterName.trim()));
             Row row = rs.one();
             if (row != null) {
                 hadoopClusterInfo = new HadoopClusterInfo();

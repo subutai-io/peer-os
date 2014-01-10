@@ -166,10 +166,11 @@ public class DataNodesTable extends Table {
 
     private String parseDataNodeStatus(String response) {
         String[] array = response.split("\n");
-        System.out.println(array.length);
-        System.out.println(array[3]);
-        if (array.length == 4) {
-            return array[3].replaceAll("DataNode is ", "");
+
+        for(String status : array){
+            if(status.contains("DataNode is")){
+                return status.replaceAll("DataNode is ", "");
+            }
         }
 
         return "";

@@ -364,7 +364,7 @@ public class HadoopCommands {
             "\t  }\n" +
             "\t}";
 
-    public static final String STATUS_NAME_NODE = "{\n" +
+    public static final String COMMAND_NAME_NODE = "{\n" +
             "\t  \"command\": {\n" +
             "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
             "\t    \"source\": :source,\n" +

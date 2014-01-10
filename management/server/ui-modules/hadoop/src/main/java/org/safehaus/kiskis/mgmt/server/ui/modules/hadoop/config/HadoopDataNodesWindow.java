@@ -27,6 +27,7 @@ public final class HadoopDataNodesWindow extends Window {
     private List<String> keys;
     private HadoopClusterInfo cluster;
     private Task addTask, statusTask, configureTask;
+    private Task startTask, stopTask, restartTask;
     private Agent currentAgent;
 
     public HadoopDataNodesWindow(String clusterName) {
@@ -64,20 +65,90 @@ public final class HadoopDataNodesWindow extends Window {
 
     private Button getStartButton() {
         startButton = new Button("Start");
+        startButton.setEnabled(false);
+
+        startButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                startTask = RequestUtil.createTask(getCommandManager(), "Start Hadoop Cluster");
+                Agent master = getAgentManager().getAgent(cluster.getNameNode());
+
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", master.getUuid().toString());
+                map.put(":command", "start");
+
+                RequestUtil.createRequest(getCommandManager(), HadoopCommands.COMMAND_NAME_NODE, startTask, map);
+                disableButtons(0);
+            }
+        });
 
         return startButton;
     }
 
     private Button getStopButton() {
         stopButton = new Button("Stop");
+        stopButton.setEnabled(false);
+
+        stopButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                stopTask = RequestUtil.createTask(getCommandManager(), "Stop Hadoop Cluster");
+                Agent master = getAgentManager().getAgent(cluster.getNameNode());
+
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", master.getUuid().toString());
+                map.put(":command", "stop");
+
+                RequestUtil.createRequest(getCommandManager(), HadoopCommands.COMMAND_NAME_NODE, stopTask, map);
+                disableButtons(0);
+            }
+        });
+
 
         return stopButton;
     }
 
     private Button getRestartButton() {
         restartButton = new Button("Restart");
+        restartButton.setEnabled(false);
+
+        restartButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                restartTask = RequestUtil.createTask(getCommandManager(), "Start Hadoop Cluster");
+                Agent master = getAgentManager().getAgent(cluster.getNameNode());
+
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", master.getUuid().toString());
+                map.put(":command", "restart");
+
+                RequestUtil.createRequest(getCommandManager(), HadoopCommands.COMMAND_NAME_NODE, restartTask, map);
+                disableButtons(0);
+            }
+        });
 
         return restartButton;
+    }
+
+    private void disableButtons(int status) {
+        startButton.setEnabled(false);
+        stopButton.setEnabled(false);
+        restartButton.setEnabled(false);
+
+        if (status == 1) {
+            stopButton.setEnabled(true);
+            restartButton.setEnabled(true);
+        }
+
+        if (status == 2) {
+            startButton.setEnabled(true);
+        }
     }
 
     private Button getAddButton() {
@@ -112,6 +183,8 @@ public final class HadoopDataNodesWindow extends Window {
         map.put(":uuid", master.getUuid().toString());
 
         RequestUtil.createRequest(getCommandManager(), HadoopCommands.STATUS_DATA_NODE, statusTask, map);
+
+        dataNodesTable.refreshDataSource();
     }
 
     private void configureNode() {
@@ -202,7 +275,6 @@ public final class HadoopDataNodesWindow extends Window {
 
         if (configureTask != null) {
             if (!list.isEmpty() && task.equals(configureTask)) {
-                print_r(list);
                 if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                     keys = new ArrayList<String>();
                     for (ParseResult pr : list) {
@@ -219,7 +291,6 @@ public final class HadoopDataNodesWindow extends Window {
         if (addTask != null) {
             if (!list.isEmpty()) {
                 if (task.equals(addTask)) {
-                    print_r(list);
                     if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                         getCommandManager().saveHadoopClusterData(cluster);
 
@@ -239,11 +310,37 @@ public final class HadoopDataNodesWindow extends Window {
 
         if (statusTask != null) {
             if (task.equals(statusTask)) {
-                print_r(list);
                 for (ParseResult pr : list) {
-                    statusLabel.setValue(parseNameNodeStatus(pr.getResponse().getStdOut()));
+                    String status = parseNameNodeStatus(pr.getResponse().getStdOut());
+                    statusLabel.setValue(status);
+                    if (status.trim().equalsIgnoreCase("Running")) {
+                        disableButtons(1);
+                    } else {
+                        disableButtons(2);
+                    }
                 }
                 statusTask = null;
+            }
+        }
+
+        if (startTask != null) {
+            if (task.equals(startTask)) {
+                getStatus();
+                startTask = null;
+            }
+        }
+
+        if (stopTask != null) {
+            if (task.equals(stopTask)) {
+                getStatus();
+                stopTask = null;
+            }
+        }
+
+        if (restartTask != null) {
+            if (task.equals(restartTask)) {
+                getStatus();
+                restartTask = null;
             }
         }
 
@@ -252,22 +349,15 @@ public final class HadoopDataNodesWindow extends Window {
 
     private String parseNameNodeStatus(String response) {
         String[] array = response.split("\n");
-        if (array.length == 4) {
-            return array[0]
-                    .replaceAll(" (SecondaryNameNode is NOT Running on this machine)", "");
+
+        for (String status : array) {
+            if (status.contains("NameNode")) {
+                return status.replaceAll("NameNode is ", "")
+                        .replaceAll("\\(SecondaryNOT Running on this machine\\)", "");
+            }
         }
 
         return "";
-    }
-
-    private void print_r(List<ParseResult> list) {
-        for (ParseResult p : list) {
-            System.out.println("\n");
-            System.out.println(p.getRequest());
-            System.out.println("\n");
-            System.out.println(p.getResponse());
-            System.out.println("\n");
-        }
     }
 
     public CommandManagerInterface getCommandManager() {

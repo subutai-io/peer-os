@@ -25,7 +25,7 @@ public class HadoopInstallation {
     private Task hadoopFormatMaster;
 
     private HadoopClusterInfo cluster;
-    private String clusterName;
+    private String clusterName, domainName;
     private Agent nameNode, jobTracker, sNameNode;
     private List<Agent> dataNodes, taskTrackers;
     private Integer replicationFactor;
@@ -438,5 +438,13 @@ public class HadoopInstallation {
 
     public void setReplicationFactor(Integer replicationFactor) {
         this.replicationFactor = replicationFactor;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
     }
 }

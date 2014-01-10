@@ -212,7 +212,7 @@ public class LxcManageForm extends VerticalLayout {
                 stopTask = null;
             }
         } else if (destroyTask != null && task.equals(destroyTask)) {
-            if (!output.isEmpty() && task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
+            if (!output.isEmpty()) {
                 refreshTable();
                 destroyTask = null;
             }
