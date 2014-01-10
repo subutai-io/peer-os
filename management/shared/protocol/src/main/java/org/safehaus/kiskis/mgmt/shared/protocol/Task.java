@@ -42,7 +42,7 @@ public class Task implements Serializable {
         return null;
     }
 
-    public int getCurrentCommandIdx() {
+    public int getCurrentCommandOrderId() {
         if (commandIterator != null) {
             return commandIterator.previousIndex() + 1;
         }

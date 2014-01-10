@@ -405,7 +405,7 @@ public class Manager implements ResponseListener {
         //save task upon completion && launch check-status task 
         if (Util.isFinalResponse(response)) {
             //this is the first command -> findPrimaryNode
-            if (managerAction.getTask().getCurrentCommandIdx() == 1) {
+            if (managerAction.getTask().getCurrentCommandOrderId() == 1) {
                 Pattern p = Pattern.compile("primary\" : \"(.*)\"");
                 Matcher m = p.matcher(managerAction.getOutput());
                 if (m.find()) {
