@@ -78,24 +78,6 @@ public class CommandNotifier implements Runnable {
                                 }
                             }
                         });
-//                        try {
-//                        Thread exec = new Thread(new Runnable() {
-//
-//                            public void run() {
-//                                lock.lock();
-//                                try {
-//                                    listener.onCommand(response);
-//                                } finally {
-//                                    lock.unlock();
-//                                }
-//                            }
-//                        });
-//                        exec.start();
-//                            listener.onCommand(response);
-//                        } catch (Exception e) {
-//                            it.remove();
-//                            LOG.log(Level.SEVERE, "Error notifying response listeners, removing faulting listener", e);
-//                        }
                     }
                 } else {
                     try {

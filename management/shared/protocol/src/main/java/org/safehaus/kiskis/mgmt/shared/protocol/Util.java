@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -64,6 +65,14 @@ public class Util {
 
     }
 
+    public static boolean isFinalResponse(Response response) {
+        if (response != null && response.getType() != null) {
+            return response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                    || response.getType() == ResponseType.EXECUTE_TIMEOUTED;
+        }
+        return false;
+    }
+
     public static String getAgentIpByMask(Agent agent, String mask) {
         if (agent != null) {
             if (agent.getListIP() != null && !agent.getListIP().isEmpty()) {
@@ -88,5 +97,14 @@ public class Util {
             }
         }
         return filteredAgents;
+    }
+
+    public static String removeAllWhitespace(String str) {
+        if (!isStringEmpty(str)) {
+            return str.replaceAll("\\s+", "");
+        } else if (str != null) {
+            return "";
+        }
+        return null;
     }
 }

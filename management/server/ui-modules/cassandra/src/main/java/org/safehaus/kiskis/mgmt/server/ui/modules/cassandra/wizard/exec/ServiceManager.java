@@ -5,16 +5,20 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
-import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraCommandEnum;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.NodesWindow;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 
 /**
  *
@@ -24,16 +28,14 @@ public class ServiceManager {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
-    private final TextArea terminal;
 
-    public ServiceManager(TextArea textArea) {
-        this.terminal = textArea;
+    public ServiceManager() {
     }
 
-    public void startCassandraServices(List<UUID> list) {
-        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Start Cassandra");
+    public void runCommand(List<UUID> list, CassandraCommandEnum cce) {
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Run command");
         for (UUID uuid : list) {
-            Command command = CassandraCommands.getServiceCassandraStartCommand();
+            Command command = new CassandraCommands().getCommand(cce);
             command.getRequest().setUuid(uuid);
             command.getRequest().setTaskUuid(startTask.getUuid());
             command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
@@ -43,42 +45,14 @@ public class ServiceManager {
         start();
     }
 
-    public void stopCassandraServices(List<UUID> list) {
-        Task stopTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Stop Cassandra");
-        for (UUID uuid : list) {
-            Command command = CassandraCommands.getServiceCassandraStopCommand();
-            command.getRequest().setUuid(uuid);
-            command.getRequest().setTaskUuid(stopTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(stopTask.getIncrementedReqSeqNumber());
-            stopTask.addCommand(command);
-        }
-        tasks.add(stopTask);
-        start();
-    }
-
-    public void statusCassandraServices(List<UUID> list) {
-        Task statusTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Cassandra service status check");
-        for (UUID uuid : list) {
-            Command command = CassandraCommands.getServiceCassandraStatusCommand();
-            command.getRequest().setUuid(uuid);
-            command.getRequest().setTaskUuid(statusTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(statusTask.getIncrementedReqSeqNumber());
-            statusTask.addCommand(command);
-        }
-        tasks.add(statusTask);
-        start();
-    }
-
-    public void purgeCassandraServices(List<UUID> list) {
-        Task purgeTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Purge Cassandra");
-        for (UUID uuid : list) {
-            Command command = CassandraCommands.getUninstallCommand();
-            command.getRequest().setUuid(uuid);
-            command.getRequest().setTaskUuid(purgeTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(purgeTask.getIncrementedReqSeqNumber());
-            purgeTask.addCommand(command);
-        }
-        tasks.add(purgeTask);
+    public void runCommand(UUID agentUuid, CassandraCommandEnum cce) {
+        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Run command");
+        Command command = new CassandraCommands().getCommand(cce);
+        command.getRequest().setUuid(agentUuid);
+        command.getRequest().setTaskUuid(startTask.getUuid());
+        command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
+        startTask.addCommand(command);
+        tasks.add(startTask);
         start();
     }
 
@@ -91,41 +65,42 @@ public class ServiceManager {
         }
     }
 
-    private void moveToNextTask() {
+    public void moveToNextTask() {
         currentTask = tasks.poll();
     }
 
-    public void onResponse(Response response) {
-        if (currentTask != null && response.getTaskUuid() != null
-                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true);
-            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
-            if (!list.isEmpty()) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(task.getUuid(), true)) {
-                        terminal.setValue(terminal.getValue().toString() + "\n" + pr.getResponse().getStdOut());
-                    }
-                    terminal.setValue(terminal.getValue().toString() + "\n" + task.getDescription() + " successfully finished.");
-                    moveToNextTask();
-                    if (currentTask != null) {
-                        terminal.setValue(terminal.getValue().toString() + "\nRunning next step " + currentTask.getDescription());
-                        for (Command command : currentTask.getCommands()) {
-                            executeCommand(command);
-                        }
-                    } else {
-                        terminal.setValue(terminal.getValue().toString() + "\nTasks complete.");
-                    }
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    terminal.setValue("\n" + task.getDescription() + " failed");
-                }
-            }
-
-        }
+    public Task getCurrentTask() {
+        return currentTask;
     }
 
-    private void executeCommand(Command command) {
-        terminal.setValue(terminal.getValue() + "\n" + command.getRequest().getProgram());
+    public void executeCommand(Command command) {
         ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
+    }
+
+    public void updateSeeds(List<UUID> nodes, String seeds) {
+        Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Update seeds");
+        for (UUID agent : nodes) {
+            Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seeds);
+            setSeedsCommand.getRequest().setUuid(agent);
+            setSeedsCommand.getRequest().setTaskUuid(setSeedsTask.getUuid());
+            setSeedsCommand.getRequest().setRequestSequenceNumber(setSeedsTask.getIncrementedReqSeqNumber());
+            setSeedsTask.addCommand(setSeedsCommand);
+        }
+        tasks.add(setSeedsTask);
+        start();
+    }
+
+    public static AgentManagerInterface getAgentManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(NodesWindow.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 
 }

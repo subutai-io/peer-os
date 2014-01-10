@@ -37,7 +37,7 @@ public class StepSetDirectories extends Panel {
 
         Panel panel = new Panel();
         Label menu = new Label("Cluster Installation Wizard");
-        
+
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
         grid.addComponent(menu, 0, 0, 2, 1);
@@ -50,19 +50,22 @@ public class StepSetDirectories extends Panel {
         final TextField dataDirTxtFld = new TextField("Enter Data directory");
         dataDirTxtFld.setInputPrompt("/var/lib/cassandra/data");
         dataDirTxtFld.setRequired(true);
-        dataDirTxtFld.setMaxLength(20);
+        dataDirTxtFld.setMaxLength(40);
+        dataDirTxtFld.setWidth("250px");
         verticalLayoutForm.addComponent(dataDirTxtFld);
 
         final TextField commitLogTxtFld = new TextField("Enter Commitlog directory");
         commitLogTxtFld.setInputPrompt("/var/lib/cassandra/commitlog");
         commitLogTxtFld.setRequired(true);
-        commitLogTxtFld.setMaxLength(20);
+        commitLogTxtFld.setMaxLength(40);
+        commitLogTxtFld.setWidth("250px");
         verticalLayoutForm.addComponent(commitLogTxtFld);
 
         final TextField savedCachesTxtFld = new TextField("Enter Saved Caches directory");
         savedCachesTxtFld.setInputPrompt("/var/lib/cassandra/saved_caches");
         savedCachesTxtFld.setRequired(true);
-        savedCachesTxtFld.setMaxLength(20);
+        savedCachesTxtFld.setMaxLength(40);
+        savedCachesTxtFld.setWidth("250px");
         verticalLayoutForm.addComponent(savedCachesTxtFld);
 
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
@@ -73,11 +76,9 @@ public class StepSetDirectories extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-
                 wizard.getConfig().setCommitLogDirectory(commitLogTxtFld.getValue().toString().trim());
                 wizard.getConfig().setDataDirectory(dataDirTxtFld.getValue().toString().trim());
                 wizard.getConfig().setSavedCachesDirectory(savedCachesTxtFld.getValue().toString().trim());
-
                 wizard.next();
             }
         });

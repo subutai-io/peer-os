@@ -661,6 +661,7 @@ public class Persistence implements PersistenceInterface {
                 cd.setDataDir(row.getString("datadir"));
                 cd.setSavedCacheDir(row.getString("savedcachedir"));
                 cd.setCommitLogDir(row.getString("commitlogdir"));
+                cd.setDomainName(row.getString("domainname"));
                 cd.setNodes(row.getList("nodes", UUID.class));
                 cd.setSeeds(row.getList("seeds", UUID.class));
                 list.add(cd);
@@ -693,6 +694,31 @@ public class Persistence implements PersistenceInterface {
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+        }
+        return cassandraClusterInfo;
+    }
+
+    public CassandraClusterInfo getCassandraClusterInfoByUUID(UUID uuid) {
+        CassandraClusterInfo cassandraClusterInfo = null;
+        try {
+            String cql = "select * from cassandra_cluster_info where uid = ? limit 1 allow filtering";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            ResultSet rs = session.execute(boundStatement.bind(uuid));
+            Row row = rs.one();
+            if (row != null) {
+                cassandraClusterInfo = new CassandraClusterInfo();
+                cassandraClusterInfo.setUuid(row.getUUID("uid"));
+                cassandraClusterInfo.setName(row.getString("name"));
+                cassandraClusterInfo.setCommitLogDir(row.getString("commitlogdir"));
+                cassandraClusterInfo.setDataDir(row.getString("datadir"));
+                cassandraClusterInfo.setSavedCacheDir(row.getString("savedcachedir"));
+                cassandraClusterInfo.setNodes(row.getList("nodes", UUID.class));
+                cassandraClusterInfo.setSeeds(row.getList("seeds", UUID.class));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(uid)", ex);
         }
         return cassandraClusterInfo;
     }
@@ -783,7 +809,7 @@ public class Persistence implements PersistenceInterface {
             session.execute(boundStatement.bind(uuid));
             return true;
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getCassandraClusterInfo(name)", ex);
+            LOG.log(Level.SEVERE, "Error in deleteCassandraClusterInfo(name)", ex);
         }
         return false;
     }
@@ -796,12 +822,12 @@ public class Persistence implements PersistenceInterface {
                     + "values (?, ?, ?, ?, ?)",
                     MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME,
                     MongoClusterInfo.REPLICA_SET_NAME, MongoClusterInfo.CONFIG_SERVERS_NAME,
-                    MongoClusterInfo.ROUTERS_NAME, MongoClusterInfo.SHARDS_NAME);
+                    MongoClusterInfo.ROUTERS_NAME, MongoClusterInfo.DATA_NODES_NAME);
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
             ResultSet rs = session.execute(boundStatement.bind(clusterInfo.getClusterName(),
                     clusterInfo.getReplicaSetName(), clusterInfo.getConfigServers(),
-                    clusterInfo.getRouters(), clusterInfo.getShards()));
+                    clusterInfo.getRouters(), clusterInfo.getDataNodes()));
 
             return true;
         } catch (Exception ex) {
@@ -821,7 +847,7 @@ public class Persistence implements PersistenceInterface {
                 mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
                 mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
                 mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
-                mongoClusterInfo.setShards(row.getList(MongoClusterInfo.SHARDS_NAME, UUID.class));
+                mongoClusterInfo.setDataNodes(row.getList(MongoClusterInfo.DATA_NODES_NAME, UUID.class));
                 list.add(mongoClusterInfo);
             }
 
@@ -832,7 +858,7 @@ public class Persistence implements PersistenceInterface {
     }
 
     public MongoClusterInfo getMongoClusterInfo(String clusterName) {
-        MongoClusterInfo clusterInfo = null;
+        MongoClusterInfo mongoClusterInfo = null;
         try {
             String cql = String.format(
                     "select * from %s where %s = ? limit 1 allow filtering",
@@ -842,18 +868,18 @@ public class Persistence implements PersistenceInterface {
             ResultSet rs = session.execute(boundStatement.bind(clusterName));
             Row row = rs.one();
             if (row != null) {
-                MongoClusterInfo mongoClusterInfo = new MongoClusterInfo();
+                mongoClusterInfo = new MongoClusterInfo();
                 mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
                 mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
                 mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
                 mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
-                mongoClusterInfo.setShards(row.getList(MongoClusterInfo.SHARDS_NAME, UUID.class));
+                mongoClusterInfo.setDataNodes(row.getList(MongoClusterInfo.DATA_NODES_NAME, UUID.class));
             }
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClusterInfo", ex);
         }
-        return clusterInfo;
+        return mongoClusterInfo;
     }
 
     public boolean deleteMongoClusterInfo(String clusterName) {

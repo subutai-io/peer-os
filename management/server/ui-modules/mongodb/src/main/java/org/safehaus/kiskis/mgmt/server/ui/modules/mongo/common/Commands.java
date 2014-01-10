@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
 import java.util.Arrays;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
@@ -23,7 +24,7 @@ public class Commands {
         return (Command) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
-                null, //                        !! source
+                MongoModule.MODULE_NAME, //     source
                 null, //                        !! task uuid 
                 1, //                           !! request sequence number
                 "/", //                         cwd
@@ -35,7 +36,7 @@ public class Commands {
                 "root", //                      runas
                 null, //                        arg
                 null, //                        env vars
-                30); //                        timeout (sec)
+                30); //                         timeout (sec)
     }
 
     //execute on each selected lxc node
@@ -278,19 +279,30 @@ public class Commands {
     }
 
     //execute on any cluster member
-    public static Command getCheckInstanceRunningCommand() {
+    public static Command getCheckInstanceRunningCommand(String host, String port) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--host",
-                ":MONGO_HOST", //supply host of node under examination
+                host,
                 "--port",
-                ":MONGO_PORT" //supply port of node under examination
+                port
         ));
-        req.setTimeout(30);
+        req.setTimeout(3);
         return cmd;
     }
 
     // RECONFIGURATION COMMANDS
+    public static Command getStopNodeCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/pkill");
+        req.setArgs(Arrays.asList(
+                "-2",
+                "mongo"
+        ));
+        req.setTimeout(20);
+        return cmd;
+    }
 }

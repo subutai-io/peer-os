@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
 /**
  *
- * @author bahadyr
+ * @author dilshat
  */
-public enum ResponseDestinationEnum {
-    
-    CASSANDRA_WIZARD, CASSANDRA_MANAGER;
-    
+public enum NodeType {
+
+    CONFIG_NODE, ROUTER_NODE, DATA_NODE
 }

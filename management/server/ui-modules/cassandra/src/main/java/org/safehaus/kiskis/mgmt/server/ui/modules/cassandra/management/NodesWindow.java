@@ -4,21 +4,24 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.ArrayList;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
-import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
+import static org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager.getAgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
@@ -27,80 +30,81 @@ public class NodesWindow extends Window {
 
     private final Table table;
     private IndexedContainer container;
-    private final List<UUID> list;
-    private Task task;
-    private final TextArea terminal;
+    ServiceManager serviceManager;
+    CassandraClusterInfo cci;
+    CassandraCommandEnum cce;
+    Item selectedItem;
 
     /**
      *
-     * @param caption
-     * @param list
+     * @param cci
+     * @param manager
      */
-    public NodesWindow(String caption, List<UUID> list) {
-        this.list = list;
+    public NodesWindow(CassandraClusterInfo cci, ServiceManager manager) {
+        this.cci = cci;
+        this.serviceManager = manager;
 
-        setCaption(caption);
+        setCaption(cci.getName());
         setSizeUndefined();
-        setWidth("600px");
+        setWidth("800px");
         setHeight("500px");
+        setModal(true);
+        center();
+        VerticalLayout verticalLayout = new VerticalLayout();
+        HorizontalLayout buttons = new HorizontalLayout();
 
+//        Button checkStatusBtn = new Button("Check status");
+//        checkStatusBtn.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                cce = CassandraCommandEnum.STATUS;
+//                serviceManager.runCommand(cci.getNodes(), cce);
+//            }
+//        });
+//        buttons.addComponent(checkStatusBtn);
         table = new Table("", getCassandraContainer());
         table.setSizeFull();
         table.setPageLength(6);
         table.setImmediate(true);
-
-        addComponent(table);
-        terminal = new TextArea();
-        terminal.setRows(6);
-        terminal.setColumns(65);
-        terminal.setImmediate(true);
-        terminal.setWordwrap(true);
-        addComponent(terminal);
+        verticalLayout.addComponent(buttons);
+        verticalLayout.addComponent(table);
+        addComponent(verticalLayout);
 
     }
 
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
         container.addContainerProperty("hostname", String.class, "");
-        container.addContainerProperty("uuid", UUID.class, "");
+//        container.addContainerProperty("uuid", UUID.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
-        for (UUID uuid : list) {
-            addOrderToContainer(container, getAgentManager().getAgent(uuid));
+        container.addContainerProperty("Status", Button.class, "");
+        container.addContainerProperty("Seed", Button.class, "");
+//        container.addContainerProperty("Destroy", Button.class, "");
+        for (UUID uuid : cci.getNodes()) {
+            Agent agent = getAgentManager().getAgent(uuid);
+            addOrderToContainer(container, agent);
+//            serviceManager.statusCassandraService(uuid);
         }
         return container;
     }
 
     private void addOrderToContainer(Container container, final Agent agent) {
         Object itemId = container.addItem();
-        Item item = container.getItem(itemId);
+        final Item item = container.getItem(itemId);
         item.getItemProperty("hostname").setValue(agent.getHostname());
-        item.getItemProperty("uuid").setValue(agent.getUuid());
+//        item.getItemProperty("uuid").setValue(agent.getUuid());
 
         Button startButton = new Button("Start");
         startButton.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                createTask();
-                int reqSeqNumber = task.getIncrementedReqSeqNumber();
-                Command command = (Command) CommandFactory.createRequest(
-                        RequestType.EXECUTE_REQUEST,
-                        agent.getUuid(),
-                        CassandraModule.MODULE_NAME,
-                        task.getUuid(),
-                        reqSeqNumber,
-                        "/",
-                        "service cassandra start",
-                        OutputRedirection.RETURN,
-                        OutputRedirection.RETURN,
-                        null,
-                        null,
-                        "root",
-                        null,
-                        null,
-                        null);
-                ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
+                cce = CassandraCommandEnum.START;
+                selectedItem = item;
+                table.setEnabled(false);
+                serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
         Button stopButton = new Button("Stop");
@@ -108,29 +112,81 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                createTask();
-                int reqSeqNumber = task.getIncrementedReqSeqNumber();
-                Command command = (Command) CommandFactory.createRequest(
-                        RequestType.EXECUTE_REQUEST,
-                        agent.getUuid(),
-                        CassandraModule.MODULE_NAME,
-                        task.getUuid(),
-                        reqSeqNumber,
-                        "/",
-                        "service cassandra stop",
-                        OutputRedirection.RETURN,
-                        OutputRedirection.RETURN,
-                        null,
-                        null,
-                        "root",
-                        null,
-                        null,
-                        null);
-                ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
+                cce = CassandraCommandEnum.STOP;
+                selectedItem = item;
+                table.setEnabled(false);
+                serviceManager.runCommand(agent.getUuid(), cce);
             }
         });
+
+        Button statusButton = new Button("Status");
+        statusButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                cce = CassandraCommandEnum.STATUS;
+                selectedItem = item;
+                table.setEnabled(false);
+                serviceManager.runCommand(agent.getUuid(), cce);
+            }
+        });
+
+        Button setSeedsButton = new Button("Set as seed");
+        if (cci.getSeeds().contains(agent.getUuid())) {
+            setSeedsButton.setCaption("Remove seed");
+            setSeedsButton.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    table.setEnabled(false);
+                    selectedItem = item;
+                    cce = CassandraCommandEnum.REMOVE_SEED;
+                    List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
+                    seeds.remove(agent.getUuid());
+                    cci.setSeeds(seeds);
+
+                    StringBuilder seedsSB = new StringBuilder();
+                    for (UUID seed : cci.getSeeds()) {
+                        Agent agent = getAgentManager().getAgent(seed);
+                        seedsSB.append(agent.getHostname()).append(".").append(cci.getDomainName()).append(",");
+                    }
+
+                    serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
+                    if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                        System.out.println("updated");
+                    }
+                }
+            });
+        } else {
+            setSeedsButton.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    table.setEnabled(false);
+                    selectedItem = item;
+                    cce = CassandraCommandEnum.SET_SEED;
+                    List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
+                    seeds.add(agent.getUuid());
+                    cci.setSeeds(seeds);
+                    StringBuilder seedsSB = new StringBuilder();
+                    for (UUID seed : cci.getSeeds()) {
+                        Agent agent = getAgentManager().getAgent(seed);
+                        seedsSB.append(agent.getHostname()).append(".").append(cci.getDomainName()).append(",");
+                    }
+
+                    serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
+                    if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                        System.out.println("updated");
+                    }
+                }
+            });
+        }
+
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
+        item.getItemProperty("Status").setValue(statusButton);
+        item.getItemProperty("Seed").setValue(setSeedsButton);
+//        item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
     public static AgentManagerInterface getAgentManager() {
@@ -146,20 +202,59 @@ public class NodesWindow extends Window {
         return null;
     }
 
-    private void createTask() {
-        task = new Task();
-        task.setDescription("Nodes task");
-        task.setTaskStatus(TaskStatus.NEW);
-    }
-
-    public void setOutput(Response response) {
-        for (ParseResult pr : ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true)) {
-            terminal.setValue(pr.getResponse().getStdOut());
+    public void updateUI(Task ts) {
+        if (cce != null) {
+            switch (cce) {
+                case START: {
+                    switchState(false);
+                    break;
+                }
+                case STOP: {
+                    switchState(true);
+                    break;
+                }
+                case STATUS: {
+                    switch (ts.getTaskStatus()) {
+                        case SUCCESS: {
+                            switchState(false);
+                            break;
+                        }
+                        case FAIL: {
+                            switchState(true);
+                            break;
+                        }
+                    }
+//                    Button statusBtn = (Button) selectedItem.getItemProperty("Status").getValue();
+//                    statusBtn.setCaption("Running");
+                    break;
+                }
+                case SET_SEED: {
+                    switch (ts.getTaskStatus()) {
+                        case SUCCESS: {
+                            Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                            seed.setCaption("Remove seed");
+                        }
+                    }
+                    break;
+                }
+                case REMOVE_SEED: {
+                    switch (ts.getTaskStatus()) {
+                        case SUCCESS: {
+                            Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
+                            seed.setCaption("Set as seed");
+                        }
+                    }
+                    break;
+                }
+            }
         }
+        table.setEnabled(true);
     }
 
-    public Task getTask() {
-        return task;
+    private void switchState(Boolean state) {
+        Button start = (Button) selectedItem.getItemProperty("Start").getValue();
+        start.setEnabled(state);
+        Button stop = (Button) selectedItem.getItemProperty("Stop").getValue();
+        stop.setEnabled(!state);
     }
-
 }

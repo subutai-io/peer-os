@@ -54,6 +54,7 @@ public class StepFinish extends Panel {
                 installer = new ServiceInstaller(wizard.getConfig(), terminal);
 //                wizard.registerResponseListener(installer);
                 installer.start();
+                next.setCaption("Installing...");
                 next.setEnabled(false);
             }
         });
