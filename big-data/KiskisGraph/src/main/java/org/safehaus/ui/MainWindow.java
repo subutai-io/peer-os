@@ -21,6 +21,9 @@ package org.safehaus.ui;
 
 import com.vaadin.ui.*;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * ...
  *
@@ -30,22 +33,73 @@ import com.vaadin.ui.*;
 public class MainWindow extends Window{
     private HorizontalSplitPanel horiz;
     private Host hosts;
+    GridLayout layout;
+    int temp = 0;
+    Tree hostTree;
+    final Button refreshHostsButton;
+    final Button refreshButton;
     private MonitorTab monitorTab;
+    private Logger logger = Logger.getLogger("MainWindowLogger");
+
     public MainWindow()
     {
-        monitorTab = new MonitorTab();
-        horiz = new HorizontalSplitPanel();
-        getMonitorTab().setWidth("100%");
 
-        horiz.setSplitPosition(10); // percent
+        refreshHostsButton = new Button("Refresh Hosts");
+        refreshButton = new Button("Refresh UI");
+
+        horiz = new HorizontalSplitPanel();
+        horiz.setSplitPosition(15); // percent
         horiz.setWidth("100%");
 
-        setHosts(new Host());
-
-        horiz.addComponent(getHosts().getRealHostTree());
-
-        horiz.addComponent(getMonitorTab());
+       addInitalUIComponents();
         setContent(horiz);
+
+        refreshHostsButton.addListener(new Button.ClickListener() {
+            public void buttonClick(Button.ClickEvent event) {
+                logger.log(Level.INFO, "Updating host list!");
+                layout.removeComponent(hostTree);
+                refreshHostsButton.setEnabled(false);
+                updateHosts();
+                refreshHostsButton.setEnabled(true);
+            }
+        });
+        refreshButton.addListener(new Button.ClickListener() {
+            public void buttonClick(Button.ClickEvent event) {
+                horiz.removeAllComponents();
+                refreshButton.setEnabled(false);
+                addInitalUIComponents();
+                refreshButton.setEnabled(true);
+                requestRepaintAll();
+            }
+        });
+
+    }
+    public void addInitalUIComponents()
+    {
+        monitorTab = new MonitorTab();
+        getMonitorTab().setWidth("100%");
+        layout = new GridLayout(2,2);
+        layout.setHeight("100%");
+        setHosts(new Host());
+        updateHosts();
+        layout.addComponent(refreshHostsButton, 0 , 1);
+        layout.addComponent(refreshButton, 1 , 1);
+        layout.setComponentAlignment(refreshHostsButton, Alignment.BOTTOM_CENTER);
+        layout.setComponentAlignment(refreshButton, Alignment.BOTTOM_CENTER);
+
+        horiz.addComponent(layout);
+        horiz.addComponent(getMonitorTab());
+
+    }
+    private void updateHosts()
+    {
+        hostTree = getHosts().getRealHostTree();
+        layout.addComponent(hostTree, 0,0);
+    }
+    private void updateSampleHosts()
+    {
+        hostTree = getHosts().getSampleHosts();
+        layout.addComponent(hostTree);
     }
 
     public MonitorTab getMonitorTab() {

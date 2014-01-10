@@ -81,7 +81,7 @@ public class ElasticSearchAccessObject {
         SearchRequestBuilder requestBuilder = client.prepareSearch("logstash*");
         requestBuilder.setFilter(FilterBuilders.rangeFilter("@timestamp").from(beginTime).to(endTime));
         requestBuilder.addSort(fieldSort("@timestamp"));
-        requestBuilder.setFrom(lastIndex).setSize(999999);
+        requestBuilder.setFrom(lastIndex).setSize(200000);
         requestBuilder.setQuery(queryBuilders);
        logger.log(Level.INFO, "Full Query: " + requestBuilder.toString());
 
@@ -94,18 +94,25 @@ public class ElasticSearchAccessObject {
     public ArrayList<String> getHosts(){
         ArrayList<String> hosts = new ArrayList<String>();
 
+        int size = 50000;
+        int hour = 5;
         client = connect();
-        CountResponse countResponse = client.prepareCount("logstash*")
-                .setQuery(QueryBuilders.boolQuery()
-                        .must(queryString("log_host:*")))
-                .execute().actionGet();
+        Timestamp currentTimestamp = Timestamp.getCurrentTimestamp();
+        Timestamp hoursEarlier = Timestamp.getHoursEarlier(currentTimestamp, hour);
 
+        SearchRequestBuilder requestBuilder = client.prepareSearch("logstash*");
 
-        SearchResponse searchResponse = client.prepareSearch("logstash*")
-                .setQuery(QueryBuilders.boolQuery()
-                        .must(queryString("log_host:*")))
-                .setFrom(0).setSize((int) countResponse.getCount())
-                .execute().actionGet();
+        BoolQueryBuilder queryBuilders =  QueryBuilders.boolQuery()
+                .must(queryString("log_host:*"));
+
+        requestBuilder.setQuery(queryBuilders);
+        requestBuilder.setFilter(FilterBuilders.rangeFilter("@timestamp").from(hoursEarlier).to(currentTimestamp));
+        requestBuilder.setFrom(0).setSize(size);
+
+        SearchResponse searchResponse= requestBuilder.execute().actionGet();
+
+        logger.log(Level.INFO, "Full Query: " + requestBuilder.toString());
+        logger.log(Level.INFO, "Result Count: " + searchResponse.getHits().getHits().length);
 
         for(int i = 0; i<searchResponse.getHits().getHits().length; i++)
         {
@@ -116,10 +123,13 @@ public class ElasticSearchAccessObject {
             }
         }
         client.close();
+        logger.log(Level.INFO, "Updated host list: ");
+        for(int i = 0; i < hosts.size(); i++)
+            System.out.println(hosts.get(i));
         return hosts;
     }
 
-    public ArrayList<LogResponse> getLogs(int lastIndex, Timestamp beginTime, Timestamp endTime){
+    public ArrayList<LogResponse> getLogs(BoolQueryBuilder queryBuilders, int lastIndex, Timestamp beginTime, Timestamp endTime){
         if(lastIndex == -1)
         {
             lastIndex = 0;
@@ -127,9 +137,9 @@ public class ElasticSearchAccessObject {
         client = connect();
         ArrayList<LogResponse> list = new ArrayList<LogResponse>();
 
-        BoolQueryBuilder queryBuilders =  QueryBuilders.boolQuery()
-                                            .must(queryString("path:*log"))
-                                            .must(queryString("host:*"));
+//        BoolQueryBuilder queryBuilders =  QueryBuilders.boolQuery()
+//                                            .must(queryString("path:*log"))
+//                                            .must(queryString("host:*"));
 
         SearchRequestBuilder requestBuilder = client.prepareSearch("logstash*");
         requestBuilder.setFilter(FilterBuilders.rangeFilter("@timestamp").from(beginTime).to(endTime));

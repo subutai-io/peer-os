@@ -124,6 +124,7 @@ public class Log extends VerticalLayout {
         filterTable.setColumnReorderingAllowed(true);
         filterTable.setContainerDataSource(buildContainer());
         filterTable.setVisibleColumns(new String[] { "message", "path", "version", "type", "date", "host" });
+        filterTable.setColumnWidth("message", 800);
         return filterTable;
     }
 
@@ -158,6 +159,8 @@ public class Log extends VerticalLayout {
     public void fillTable(ArrayList<LogResponse> tableData, int lastIndex){
         if(lastIndex == -1)
             lastIndex = 0;
+        if(tableData == null | tableData.size() == 0)
+            return;
         System.out.println("New log data size: " + tableData.size());
         for(int i=0; i<tableData.size(); i++){
             try{

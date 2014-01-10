@@ -46,17 +46,31 @@ public class MetricList extends VerticalLayout implements Property.ValueChangeLi
 
     public ComboBox getMetricList()
     {
-        l.addItem(1);
-        l.addItem(2);
-        l.addItem(3);
-        l.addItem(4);
-        l.addItem(5);
+        int size = 21;
+        for(int i = 1 ; i < size+1; i++)
+            l.addItem(i);
 
-        l.setItemCaption(1, "Memory Buffers");
-        l.setItemCaption(2, "Memory Free");
-        l.setItemCaption(3, "Memory Cached");
-        l.setItemCaption(4, "CPU_System");
-        l.setItemCaption(5, "CPU_Idle");
+        l.setItemCaption(1, "Bytes In");
+        l.setItemCaption(2, "Bytes Out");
+        l.setItemCaption(3, "CPU Aidle");
+        l.setItemCaption(4, "CPU Idle");
+        l.setItemCaption(5, "CPU Nice");
+        l.setItemCaption(6, "CPU System");
+        l.setItemCaption(7, "CPU User");
+        l.setItemCaption(8, "CPU Wio");
+        l.setItemCaption(9, "Load One");
+        l.setItemCaption(10, "Load Five");
+        l.setItemCaption(11, "Load Fifteen");
+        l.setItemCaption(12, "Memory Buffers");
+        l.setItemCaption(13, "Memory Cached");
+        l.setItemCaption(14, "Memory Free");
+        l.setItemCaption(15, "Memory Shared");
+        l.setItemCaption(16, "Memory Total");
+        l.setItemCaption(17, "Part Max Used");
+        l.setItemCaption(18, "Packets In");
+        l.setItemCaption(19, "Packets Out");
+        l.setItemCaption(20, "Swap Free");
+        l.setItemCaption(21, "Swap Total");
 
         l.setFilteringMode(Filtering.FILTERINGMODE_CONTAINS);
         l.setImmediate(true);
@@ -74,33 +88,107 @@ public class MetricList extends VerticalLayout implements Property.ValueChangeLi
 
         if(event.getProperty().toString().equalsIgnoreCase("1"))
         {
-            termQueryBuilderList.add(termQuery("name", "mem_buffers"));
-//            termQueryBuilderList.add(termQuery("collectd_type", "memory"));
-//            termQueryBuilderList.add(termQuery("type_instance", "used"));
+            termQueryBuilderList.add(termQuery("name", "bytes_in"));
             metricValue = "val";
         }
         else if(event.getProperty().toString().equalsIgnoreCase("2"))
         {
-            termQueryBuilderList.add(termQuery("name", "mem_free"));
-//            termQueryBuilderList.add(termQuery("collectd_type", "memory"));
-//            termQueryBuilderList.add(termQuery("type_instance", "free"));
+            termQueryBuilderList.add(termQuery("name", "bytes_out"));
             metricValue = "val";
         }
         else if(event.getProperty().toString().equalsIgnoreCase("3"))
         {
-            termQueryBuilderList.add(termQuery("name", "mem_cached"));
-//            termQueryBuilderList.add(termQuery("collectd_type", "memory"));
-//            termQueryBuilderList.add(termQuery("type_instance", "cached"));
+            termQueryBuilderList.add(termQuery("name", "cpu_aidle"));
             metricValue = "val";
         }
         else if(event.getProperty().toString().equalsIgnoreCase("4"))
         {
-            termQueryBuilderList.add(termQuery("name", "cpu_system"));
+            termQueryBuilderList.add(termQuery("name", "cpu_idle"));
             metricValue = "val";
         }
         else if(event.getProperty().toString().equalsIgnoreCase("5"))
         {
-            termQueryBuilderList.add(termQuery("name", "cpu_idle"));
+            termQueryBuilderList.add(termQuery("name", "cpu_nice"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("6"))
+        {
+            termQueryBuilderList.add(termQuery("name", "cpu_system"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("7"))
+        {
+            termQueryBuilderList.add(termQuery("name", "cpu_user"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("8"))
+        {
+            termQueryBuilderList.add(termQuery("name", "cpu_wio"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("9"))
+        {
+            termQueryBuilderList.add(termQuery("name", "load_one"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("10"))
+        {
+            termQueryBuilderList.add(termQuery("name", "load_five"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("11"))
+        {
+            termQueryBuilderList.add(termQuery("name", "load_fifteen"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("12"))
+        {
+            termQueryBuilderList.add(termQuery("name", "mem_buffers"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("13"))
+        {
+            termQueryBuilderList.add(termQuery("name", "mem_cached"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("14"))
+        {
+            termQueryBuilderList.add(termQuery("name", "mem_free"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("15"))
+        {
+            termQueryBuilderList.add(termQuery("name", "mem_shared"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("16"))
+        {
+            termQueryBuilderList.add(termQuery("name", "mem_total"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("17"))
+        {
+            termQueryBuilderList.add(termQuery("name", "part_max_used"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("18"))
+        {
+            termQueryBuilderList.add(termQuery("name", "pkts_in"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("19"))
+        {
+            termQueryBuilderList.add(termQuery("name", "pkts_out"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("20"))
+        {
+            termQueryBuilderList.add(termQuery("name", "swap_free"));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("21"))
+        {
+            termQueryBuilderList.add(termQuery("name", "swap_total"));
             metricValue = "val";
         }
         else

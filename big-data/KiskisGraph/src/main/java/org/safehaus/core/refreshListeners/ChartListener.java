@@ -109,11 +109,15 @@ public class ChartListener implements Refresher.RefreshListener {
         MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
         Host host = Monitor.getMain().getHosts();
         MetricList metricList = monitorTab.getMetricList();
-        for(int i = 0; i < metricList.getTermQueryBuilderList().size(); i++)
+        if(metricList != null)
         {
-            queryBuilder = queryBuilder.must(metricList.getTermQueryBuilderList().get(i));
+            for(int i = 0; i < metricList.getTermQueryBuilderList().size(); i++)
+            {
+                queryBuilder = queryBuilder.must(metricList.getTermQueryBuilderList().get(i));
+            }
         }
-        if(host.getTermQueryBuilder() != null)
+
+        if(host != null && host.getTermQueryBuilder() != null)
         {
             queryBuilder = queryBuilder.must(host.getTermQueryBuilder());
         }

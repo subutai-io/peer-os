@@ -20,9 +20,7 @@
 package org.safehaus.ui;
 
 import com.github.wolfie.refresher.Refresher;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -46,6 +44,7 @@ public class MonitorTab extends VerticalLayout {
     private int statisticUpdateInterval = 10000;
     private MetricList metricList;
     Timestamp lastHour;
+    Linker linker;
     private Refresher memoryChartRefresher;
     private Refresher logRefresher;
     private ChartListener memoryChartListener;
@@ -60,32 +59,39 @@ public class MonitorTab extends VerticalLayout {
     private Logger logger;
     public MonitorTab()
     {
+        HorizontalLayout metricLayout = new HorizontalLayout();
+        linker = new Linker();
         logger = Logger.getLogger("MonitorTabLogger");
 
         setMetricList((new MetricList()));
         setHistoryMetricList(new HistoryMetricList());
 
+
         Timestamp currentTime = Timestamp.getCurrentTimestamp();
         lastHour = Timestamp.getHoursEarlier(currentTime,1);
         ESAO = new ElasticSearchAccessObject();
-        SearchResponse statisticResponse = ESAO.executeQuery(queryBuilder,-1, lastHour, currentTime);
-        ArrayList<LogResponse> logResponses = ESAO.getLogs(-1, lastHour, currentTime);
-        statisticChart = new StatisticChart(statisticResponse);
+        ArrayList<LogResponse> logResponses = new ArrayList<LogResponse>();
+        statisticChart = new StatisticChart(null);
         logTable = new Log();
         setStatisticChart((getStatisticChart().getDefaultChart()));
         logTable.fillTable(logResponses, -1);
 
 
+
         final ComboBox comboBox = getMetricList().getMetricList();
         final ComboBox comboBox2 = getHistoryMetricList().getSampleMetricList();
-        addComponent(comboBox);
-        addComponent(comboBox2);
-        addComponent(getStatisticChart());
-//        addComponent(chartPanel);
+//        addComponent(linker);
+        metricLayout.addComponent(comboBox);
+        metricLayout.addComponent(comboBox2);
+        metricLayout.setComponentAlignment(comboBox2, Alignment.MIDDLE_RIGHT);
+
+        addComponent(linker);
+        addComponent(metricLayout);
+        addComponent(statisticChart);
         addComponent(logTable);
 
-        addLogsRefresher(logResponses.size(), statisticUpdateInterval);
-        addStatisticRefresher((int) statisticResponse.getHits().getTotalHits(), statisticUpdateInterval, queryBuilder);
+        addLogsRefresher(logResponses.size(), statisticUpdateInterval,queryBuilder);
+        addStatisticRefresher(0, statisticUpdateInterval, queryBuilder);
 
     }
 
@@ -103,6 +109,7 @@ public class MonitorTab extends VerticalLayout {
         memoryChartListener = new ChartListener(queryBuilder, getStatisticChart(), lastIndex, getHistoryMetricList().getLastHour());
         memoryChartRefresher.addListener(memoryChartListener);
         this.addComponent(memoryChartRefresher);
+        this.requestRepaint();
     }
 
     public void updateChart()
@@ -126,6 +133,7 @@ public class MonitorTab extends VerticalLayout {
             addComponent(getStatisticChart(), chartIndex);
         else
             addComponent(getStatisticChart());
+        requestRepaintAll();
     }
 
     public void updateLog() {
@@ -133,27 +141,29 @@ public class MonitorTab extends VerticalLayout {
         int logIndex = getComponentIndex(getLogTable());
         if(logIndex != -1)
             removeComponent(getLogTable());
-        ArrayList<LogResponse> logResponses = ESAO.getLogs(-1, getHistoryMetricList().getLastHour(), currentTime);
+        ArrayList<LogResponse> logResponses = ESAO.getLogs(logUpdateListener.getAllMetricsQuery(), -1, getHistoryMetricList().getLastHour(), currentTime);
         Log logTable  = new Log();
         logTable.fillTable(logResponses, -1);
-        addLogsRefresher(logResponses.size(), getStatisticUpdateInterval());
+        addLogsRefresher(logResponses.size(), getStatisticUpdateInterval(),logUpdateListener.getAllMetricsQuery());
         setLogTable(logTable);
         if(logIndex != -1)
             addComponent(getLogTable(), logIndex);
         else
             addComponent(getLogTable());
+        requestRepaintAll();
     }
 
-    public void addLogsRefresher(int lastIndex, int interval) {
+    public void addLogsRefresher(int lastIndex, int interval, BoolQueryBuilder queryBuilder) {
         if(logRefresher != null)
         {
             removeComponent(logRefresher);
         }
         logRefresher = new Refresher();
-        logUpdateListener = new LogListener(logTable, lastIndex, getHistoryMetricList().getLastHour());
+        logUpdateListener = new LogListener(queryBuilder, logTable, lastIndex, getHistoryMetricList().getLastHour());
         logRefresher.setRefreshInterval(interval);
         logRefresher.addListener(logUpdateListener);
         this.addComponent(logRefresher);
+        this.requestRepaint();
     }
 
 

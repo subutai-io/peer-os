@@ -19,7 +19,10 @@
  */
 package org.safehaus.ui;
 
-import com.vaadin.Application;
+import com.vaadin.terminal.ExternalResource;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Link;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * ...
@@ -27,20 +30,21 @@ import com.vaadin.Application;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class Monitor extends Application {
+public class Linker extends VerticalLayout{
+    private static final String CAPTION = "Management UI";
+    private static final String TOOLTIP = "Management UI";
+    private static final ThemeResource ICON = new ThemeResource(
+            "../sampler/icons/icon_world.gif");
 
-    // Main window is the primary browser window
-    private static MainWindow main = new MainWindow();
+    public Linker() {
+        setSpacing(true);
 
-    @Override
-    public void init() {
-        setMainWindow(main);
-    }
-    public static MainWindow getMain() {
-        return main;
+        // Link w/ text and tooltip
+        Link l = new Link(CAPTION,
+                new ExternalResource("http://10.10.10.1:8181/mgmt-ui"));
+        l.setDescription(TOOLTIP);
+        addComponent(l);
+
     }
 
-    public static void setMain(MainWindow main) {
-        Monitor.main = main;
-    }
 }

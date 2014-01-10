@@ -39,12 +39,15 @@ public class StatisticResponse {
     public StatisticResponse(SearchResponse searchResponse, String value)
     {
         this.setSearchResponse(searchResponse);
-        setResponseCount(searchResponse.getHits().getHits().length);
+        if(searchResponse != null)
+            setResponseCount(searchResponse.getHits().getHits().length);
+        else
+            responseCount = 0;
         setTimestamps(new Timestamp[responseCount]);
         values = new Number[responseCount];
 
         Object temp = null;
-        if(searchResponse.getHits().getHits().length != 0)
+        if(responseCount != 0)
             temp = searchResponse.getHits().getHits()[0].getSource().get("units");
         if( temp != null)
             units = temp.toString();

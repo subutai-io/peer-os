@@ -22,6 +22,7 @@ package org.safehaus.ui;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Tree;
 import org.elasticsearch.index.query.BaseQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.safehaus.core.ElasticSearchAccessObject;
 
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
  * @version $Rev$
  */
 public class Host {
-    private BaseQueryBuilder termQueryBuilder = null;
+    private BaseQueryBuilder termQueryBuilder = termQuery("log_host", "");
+    private BaseQueryBuilder hostTermQueryBuilder = termQuery("host", "");
     private String listofHosts = "List of Hosts:";
 
     public Tree getRealHostTree()
@@ -44,10 +46,9 @@ public class Host {
         ArrayList<String> hosts = ESAO.getHosts();
 
         Tree nodes = new Tree(listofHosts);
-        nodes.addItem(listofHosts);
         for(int i=0; i<hosts.size(); i++){
             nodes.addItem(hosts.get(i));
-            nodes.setParent(hosts.get(i), listofHosts);
+            nodes.setParent(hosts.get(i), nodes);
             nodes.setChildrenAllowed(hosts.get(i), false);
         }
 
@@ -56,13 +57,11 @@ public class Host {
                 MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
                 String hostName = event.getItemId().toString().toLowerCase();
                 String hostNameforLog = event.getItemId().toString();
-                if(event.getItemId().toString().equalsIgnoreCase(listofHosts))
-                {
-                    hostNameforLog = "";
-                }
                 showLogTableByHost(Monitor.getMain().getMonitorTab().getLogTable(), hostNameforLog);
                 setTermQueryBuilder(termQuery("log_host", hostName));
+                setHostTermQueryBuilder(termQuery("host", hostName));
                 monitorTab.updateChart();
+                monitorTab.updateLog();
             }
         });
         return nodes;
@@ -79,5 +78,30 @@ public class Host {
 
     public void setTermQueryBuilder(BaseQueryBuilder termQueryBuilder) {
         this.termQueryBuilder = termQueryBuilder;
+    }
+
+    public Tree getSampleHosts() {
+        Tree nodes = new Tree(listofHosts);
+        nodes.addItem("Node1");
+        nodes.addItem("Node2");
+        nodes.addItem("Node3");
+        nodes.addItem("Node4");
+        nodes.setParent("Node1", listofHosts);
+        nodes.setParent("Node2", listofHosts);
+        nodes.setParent("Node3", listofHosts);
+        nodes.setParent("Node4", listofHosts);
+        nodes.setChildrenAllowed("Node1", false);
+        nodes.setChildrenAllowed("Node2", false);
+        nodes.setChildrenAllowed("Node3", false);
+        nodes.setChildrenAllowed("Node4", false);
+        return nodes;
+    }
+
+    public BaseQueryBuilder getHostTermQueryBuilder() {
+        return hostTermQueryBuilder;
+    }
+
+    public void setHostTermQueryBuilder(BaseQueryBuilder hostTermQueryBuilder) {
+        this.hostTermQueryBuilder = hostTermQueryBuilder;
     }
 }

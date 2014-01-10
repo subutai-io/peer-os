@@ -20,12 +20,12 @@
 package org.safehaus.core.refreshListeners;
 
 import com.github.wolfie.refresher.Refresher;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.safehaus.core.ElasticSearchAccessObject;
 import org.safehaus.core.LogResponse;
 import org.safehaus.core.Timestamp;
-import org.safehaus.ui.Log;
-import org.safehaus.ui.Monitor;
-import org.safehaus.ui.MonitorTab;
+import org.safehaus.ui.*;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -44,24 +44,26 @@ public class LogListener implements Refresher.RefreshListener {
     private Log log;
     private Logger logger = Logger.getLogger("LogUpdateLogger");
     private ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
+    private BoolQueryBuilder queryBuilder;
+
 
     /**
      *
      * @param lastIndex represents the lastIndex get from the query to Elasticsearch
      * @param lastHour  represents the time that we want to start from
      */
-    public LogListener(Log log, int lastIndex, Timestamp lastHour)
+    public LogListener(BoolQueryBuilder queryBuilder, Log log, int lastIndex, Timestamp lastHour)
     {
         this.lastIndex = lastIndex;
         beginTime = lastHour;
         this.log = log;
+        this.queryBuilder = queryBuilder;
 
     }
     public void refresh(Refresher refresher) {
         logger.log(Level.INFO, "Log is being refreshed! LastIndex: " + lastIndex +", beginTime: " + beginTime);
-        MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
-        ArrayList<LogResponse> logResponses = ESAO.getLogs(lastIndex, beginTime, Timestamp.getCurrentTimestamp());
-        monitorTab.getLogTable().fillTable(logResponses, lastIndex);
+        ArrayList<LogResponse> logResponses = ESAO.getLogs(queryBuilder, lastIndex, beginTime, Timestamp.getCurrentTimestamp());
+        log.fillTable(logResponses, lastIndex);
         lastIndex += logResponses.size();
 
         if(logResponses.size() == 0)
@@ -80,5 +82,25 @@ public class LogListener implements Refresher.RefreshListener {
         else
             System.out.println("Added: More than 10 points!" );
 
+    }
+
+    public BoolQueryBuilder getAllMetricsQuery() {
+
+        // CHANGE THIS CONTENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+        //------------------------------------------------------------------
+        //------------------------------------------------------------------
+        //------------------------------------------------------------------
+        //------------------------------------------------------------------
+        //------------------------------------------------------------------
+        BoolQueryBuilder queryBuilder =  QueryBuilders.boolQuery();
+        MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
+        Host host = Monitor.getMain().getHosts();
+
+        if(host != null && host.getHostTermQueryBuilder() != null)
+        {
+            queryBuilder = queryBuilder.must(host.getHostTermQueryBuilder());
+        }
+
+        return queryBuilder;
     }
 }

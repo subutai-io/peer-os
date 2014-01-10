@@ -49,11 +49,13 @@ public class StatisticChart extends Chart {
     {
         dataSeries = new DataSeries();
         configuration = this.getConfiguration();
+        MonitorTab monitorTab;
         if(Monitor.getMain() != null)
         {
-            statisticResponse =  new StatisticResponse(response, Monitor.getMain().getMonitorTab().getMetricList().getMetricValue());
-            yAxisTitle = Monitor.getMain().getMonitorTab().getMetricList().getMetricType();
-            yAxisTitleWithUnit = yAxisTitle + "( " +  statisticResponse.getUnits() +" )";
+            monitorTab = Monitor.getMain().getMonitorTab();
+            statisticResponse =  new StatisticResponse(response, monitorTab.getMetricList().getMetricValue());
+            yAxisTitle = monitorTab.getMetricList().getMetricType();
+            yAxisTitleWithUnit = yAxisTitle + " (" +  statisticResponse.getUnits() +")";
         }
         else
             statisticResponse = null;
@@ -63,7 +65,7 @@ public class StatisticChart extends Chart {
     }
     public StatisticChart getDefaultChart()
     {
-        setHeight("450px");
+        setHeight("400px");
         setWidth("100%");
 
         configuration.getChart().setZoomType(ZoomType.X);
@@ -75,7 +77,6 @@ public class StatisticChart extends Chart {
         configuration.getSubTitle().setText(title);
 
         configuration.getxAxis().setType(AxisType.DATETIME);
-//        configuration.getxAxis().getLabels().setFormatter();
         configuration.getxAxis().setTitle(new Title("Time"));
 
         configuration.getLegend().setEnabled(false);

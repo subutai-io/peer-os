@@ -6,7 +6,7 @@
     <groupId>org.safehaus</groupId>
     <artifactId>KiskisGraph</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Kiskis Graph Project</name>
     <!--<url>http://172.16.9.5/graph</url>-->
     <!--<repositories>-->
@@ -23,6 +23,7 @@
     </properties>
 
     <build>
+        <finalName>graph</finalName>
         <plugins>
             <!-- Compile custom GWT components or widget dependencies with the GWT
                 compiler -->
