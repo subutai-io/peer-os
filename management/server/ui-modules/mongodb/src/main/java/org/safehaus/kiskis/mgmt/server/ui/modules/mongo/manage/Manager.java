@@ -327,6 +327,7 @@ public class Manager implements ResponseListener {
                              1) delete from mongo_cluster_info
                              2) delete from UI table
                              */
+                            System.out.println("DELETING NODE FROM UI " + managerAction.getAgent().getHostname());
                             actionCompleted = true;
                         }
                     } else if (managerAction.getManagerActionType() == ManagerActionType.START_NODE) {
