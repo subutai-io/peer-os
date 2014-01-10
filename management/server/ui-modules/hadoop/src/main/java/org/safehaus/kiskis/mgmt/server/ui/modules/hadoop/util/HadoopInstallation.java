@@ -1,8 +1,12 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -23,6 +27,8 @@ public class HadoopInstallation {
     private Task hadoopCopySSHSlaves;
     private Task hadoopConfigMasterSSH;
     private Task hadoopFormatMaster;
+    private Task hadoopReadHosts;
+    private Task hadoopWriteHosts;
 
     private HadoopClusterInfo cluster;
     private String clusterName, domainName;
@@ -138,7 +144,6 @@ public class HadoopInstallation {
                 }
             }
         }
-
     }
 
     public void setSlaveJobTracker() {
@@ -165,7 +170,6 @@ public class HadoopInstallation {
                 }
             }
         }
-
     }
 
     public void setSSH() {
@@ -243,7 +247,6 @@ public class HadoopInstallation {
                 }
             }
         }
-
     }
 
     public void configSSHMaster() {
@@ -283,10 +286,76 @@ public class HadoopInstallation {
             map.put(":uuid", nameNode.getUuid().toString());
             RequestUtil.createRequest(commandManager, HadoopCommands.FORMAT_NAME_NODE, hadoopFormatMaster, map);
 
-            System.out.println(cluster);
             commandManager.saveHadoopClusterData(cluster);
         }
+    }
 
+    public void readHosts() {
+        if (hadoopReadHosts == null) {
+            hadoopReadHosts = RequestUtil.createTask(commandManager, "Read /etc/hosts file");
+            panel.addOutput(hadoopReadHosts, " started...");
+
+            for (Agent agent : allNodes) {
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                RequestUtil.createRequest(commandManager, HadoopCommands.READ_HOSTNAME, hadoopReadHosts, map);
+            }
+        }
+    }
+
+    public void writeHosts(List<ParseResult> list) {
+        if (hadoopWriteHosts == null) {
+            hadoopWriteHosts = RequestUtil.createTask(commandManager, "Write /etc/hosts file");
+            panel.addOutput(hadoopWriteHosts, " started...");
+
+            for (ParseResult pr : list) {
+                Agent agent = getAgentManager().getAgent(pr.getRequest().getUuid());
+                String hosts = editHosts(pr.getResponse().getStdOut(), agent);
+
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                map.put(":hosts", hosts);
+                RequestUtil.createRequest(commandManager, HadoopCommands.WRITE_HOSTNAME, hadoopWriteHosts, map);
+            }
+        }
+    }
+
+    private String editHosts(String input, Agent localAgent) {
+        StringBuilder result = new StringBuilder();
+
+        String[] hosts = input.split("\n");
+        for (String host : hosts) {
+            host = host.trim();
+            boolean isContains = false;
+            for (Agent agent : allNodes) {
+                if (host.contains(agent.getHostname()) ||
+                        host.contains("localhost") ||
+                        host.contains(localAgent.getHostname()) ||
+                        host.contains(localAgent.getListIP().get(0))) {
+                    isContains = true;
+                }
+            }
+
+            if (!isContains) {
+                result.append(host);
+                result.append("\n");
+            }
+        }
+
+        for (Agent agent : allNodes) {
+            if (!localAgent.equals(agent)) {
+                result.append(agent.getListIP().get(0));
+                result.append(" ");
+                result.append(agent.getHostname());
+                result.append("\n");
+            }
+        }
+
+        result.append("127.0.0.1 localhost");
+
+        return result.toString();
     }
 
     public void onCommand(Response response, Step3 panel) {
@@ -318,6 +387,10 @@ public class HadoopInstallation {
                 } else if (task.equals(hadoopConfigMasterSSH)) {
                     formatMaster();
                 } else if (task.equals(hadoopFormatMaster)) {
+                    readHosts();
+                } else if (task.equals(hadoopReadHosts)) {
+                    writeHosts(list);
+                } else if (task.equals(hadoopWriteHosts)) {
                     panel.setCloseable();
                 }
             } else if (task.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
@@ -446,5 +519,18 @@ public class HadoopInstallation {
 
     public void setDomainName(String domainName) {
         this.domainName = domainName;
+    }
+
+    public AgentManagerInterface getAgentManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 }
