@@ -245,10 +245,10 @@ public class Persistence implements PersistenceInterface {
     public Agent getRegisteredLxcAgentByHostname(String hostname, long freshness) {
         Agent agent = null;
         try {
-            String cql = "select * from agents where islxc = true and hostname = ? LIMIT 1 ALLOW FILTERING";
+            String cql = "select * from agents where islxc = true and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(Common.UNKNOWN_LXC_PARENT_NAME,
+            ResultSet rs = session.execute(boundStatement.bind(hostname,
                     new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
             Row row = rs.one();
             if (row != null) {
@@ -271,10 +271,10 @@ public class Persistence implements PersistenceInterface {
     public Agent getRegisteredPhysicalAgentByHostname(String hostname, long freshness) {
         Agent agent = null;
         try {
-            String cql = "select * from agents where islxc = false and hostname = ? LIMIT 1 ALLOW FILTERING";
+            String cql = "select * from agents where islxc = false and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
             PreparedStatement stmt = session.prepare(cql);
             BoundStatement boundStatement = new BoundStatement(stmt);
-            ResultSet rs = session.execute(boundStatement.bind(Common.UNKNOWN_LXC_PARENT_NAME,
+            ResultSet rs = session.execute(boundStatement.bind(hostname,
                     new Date(System.currentTimeMillis() - freshness * 60 * 1000)));
             Row row = rs.one();
             if (row != null) {
@@ -607,6 +607,7 @@ public class Persistence implements PersistenceInterface {
             session.execute("truncate responses");
             session.execute("truncate cassandra_cluster_info");
             session.execute("truncate hadoop_cluster_info");
+            session.execute("truncate mongo_cluster_info");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getTasks", ex);
             return false;
