@@ -662,6 +662,7 @@ public class Persistence implements PersistenceInterface {
                 cd.setDataDir(row.getString("datadir"));
                 cd.setSavedCacheDir(row.getString("savedcachedir"));
                 cd.setCommitLogDir(row.getString("commitlogdir"));
+                cd.setDomainName(row.getString("domainname"));
                 cd.setNodes(row.getList("nodes", UUID.class));
                 cd.setSeeds(row.getList("seeds", UUID.class));
                 list.add(cd);
@@ -713,6 +714,7 @@ public class Persistence implements PersistenceInterface {
                 cassandraClusterInfo.setCommitLogDir(row.getString("commitlogdir"));
                 cassandraClusterInfo.setDataDir(row.getString("datadir"));
                 cassandraClusterInfo.setSavedCacheDir(row.getString("savedcachedir"));
+                cassandraClusterInfo.setDomainName(row.getString("domainname"));
                 cassandraClusterInfo.setNodes(row.getList("nodes", UUID.class));
                 cassandraClusterInfo.setSeeds(row.getList("seeds", UUID.class));
             }

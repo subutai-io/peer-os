@@ -30,6 +30,7 @@ public class CassandraTable extends Table {
     Button selectedStartButton;
     Button selectedStopButton;
     Item selectedItem;
+    CassandraClusterInfo selectedCci;
 
     public CassandraTable() {
         this.manager = new ServiceManager();
@@ -43,7 +44,7 @@ public class CassandraTable extends Table {
 
     private IndexedContainer getCassandraContainer() {
         IndexedContainer container = new IndexedContainer();
-//        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, UUID.class, "");
+        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, String.class, "");
         container.addContainerProperty(CassandraClusterInfo.NAME_LABEL, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
@@ -60,7 +61,7 @@ public class CassandraTable extends Table {
     private void addClusterDataToContainer(final Container container, final CassandraClusterInfo cci) {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
-//        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getUuid());
+        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getDomainName());
         item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cci.getName());
 
         Button startButton = new Button("Start");
@@ -68,6 +69,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Starting cassandra cluster: " + cci.getName());
                 cce = CassandraCommandEnum.START;
                 selectedItem = item;
                 manager.runCommand(cci.getNodes(), cce);
@@ -79,6 +81,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Stopping cassandra cluster: " + cci.getName());
                 cce = CassandraCommandEnum.STOP;
                 selectedItem = item;
                 manager.runCommand(cci.getNodes(), cce);
@@ -101,7 +104,7 @@ public class CassandraTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
-                nodesWindow = new NodesWindow(cci.getName(), info, manager);
+                nodesWindow = new NodesWindow(cci, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
 
             }
@@ -112,11 +115,11 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                manager.runCommand(cci.getNodes(), CassandraCommandEnum.PURGE);
-                if (ServiceLocator.getService(CommandManagerInterface.class).deleteCassandraClusterData(cci.getUuid())) {
-//                    container.removeItem(itemId);
-                    refreshDatasource();
-                }
+                selectedCci = cci;
+                getWindow().showNotification("Destroying cassandra cluster: " + cci.getName());
+                cce = CassandraCommandEnum.PURGE;
+                manager.runCommand(cci.getNodes(), cce);
+
             }
         });
 
@@ -149,38 +152,80 @@ public class CassandraTable extends Table {
             Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    if (nodesWindow != null && nodesWindow.isVisible()) {
-                        nodesWindow.updateUI(task.getTaskStatus());
-                    }
-                    manageUI();
                     manager.moveToNextTask();
                     if (manager.getCurrentTask() != null) {
                         for (Command command : manager.getCurrentTask().getCommands()) {
                             manager.executeCommand(command);
                         }
                     } else {
+                        if (nodesWindow != null && nodesWindow.isVisible()) {
+                            nodesWindow.updateUI(task);
+                        }
+                        manageUI(task.getTaskStatus());
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
-                        nodesWindow.updateUI(task.getTaskStatus());
+                        nodesWindow.updateUI(task);
                     }
                 }
             }
         }
     }
 
-    private void manageUI() {
+    private void manageUI(TaskStatus ts) {
         if (cce != null) {
             switch (cce) {
                 case START: {
-                    switchState(false);
+
+                    switch (ts) {
+                        case SUCCESS: {
+                            getWindow().showNotification("Start success");
+                            switchState(false);
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Start failed. Please use Terminal to check the problem");
+                            break;
+                        }
+                    }
                     break;
+
                 }
                 case STOP: {
-                    switchState(true);
+
+                    switch (ts) {
+                        case SUCCESS: {
+                            getWindow().showNotification("Stop success");
+                            switchState(true);
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Stop failed. Please use Terminal to check the problem");
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case PURGE: {
+                    switch (ts) {
+                        case SUCCESS: {
+                            getWindow().showNotification("Purge success");
+                            if (ServiceLocator.getService(CommandManagerInterface.class)
+                                    .deleteCassandraClusterData(selectedCci.getUuid())) {
+//                    container.removeItem(itemId);
+                                refreshDatasource();
+                            }
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Purge failed. Please remove using Terminal");
+                            break;
+                        }
+                    }
                     break;
                 }
             }
         }
+        cce = null;
     }
 }
