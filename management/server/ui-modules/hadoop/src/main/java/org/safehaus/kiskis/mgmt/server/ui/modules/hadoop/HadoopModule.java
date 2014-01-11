@@ -5,7 +5,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.HadoopClusterTable;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClusterTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -25,7 +25,7 @@ public class HadoopModule implements Module {
             CommandListener {
 
         private HadoopWizard subwindow;
-        private HadoopClusterTable table;
+        private ClusterTable table;
 
         public ModuleComponent() {
 
@@ -39,8 +39,8 @@ public class HadoopModule implements Module {
             setCompositionRoot(verticalLayout);
         }
 
-        private HadoopClusterTable getHadoopClusterTable() {
-            table = new HadoopClusterTable();
+        private ClusterTable getHadoopClusterTable() {
+            table = new ClusterTable();
             return table;
         }
 

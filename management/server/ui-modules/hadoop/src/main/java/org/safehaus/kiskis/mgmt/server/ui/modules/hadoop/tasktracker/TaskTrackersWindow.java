@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
@@ -6,7 +6,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util.HadoopCommands;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode.AgentsComboBox;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -17,28 +18,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public final class HadoopDataNodesWindow extends Window {
+public final class TaskTrackersWindow extends Window {
 
     private Button startButton, stopButton, restartButton, addButton;
     private Label statusLabel;
     private AgentsComboBox agentsComboBox;
-    private DataNodesTable dataNodesTable;
+    private TaskTrackersTable taskTrackersTable;
 
     private List<String> keys;
     private HadoopClusterInfo cluster;
     private Task addTask, statusTask, configureTask;
     private Task startTask, stopTask, restartTask;
+    private Task readHostsTask, writeHostsTask;
     private Agent currentAgent;
 
-    public HadoopDataNodesWindow(String clusterName) {
+    public TaskTrackersWindow(String clusterName) {
         setModal(true);
-        setCaption("Hadoop Data Node Configuration");
+        setCaption("Hadoop Job Tracker Configuration");
 
         this.cluster = getCommandManager().getHadoopClusterData(clusterName);
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setWidth(900, Sizeable.UNITS_PIXELS);
-        verticalLayout.setHeight(500, Sizeable.UNITS_PIXELS);
+        verticalLayout.setHeight(450, Sizeable.UNITS_PIXELS);
+        verticalLayout.setSpacing(true);
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
@@ -48,16 +51,20 @@ public final class HadoopDataNodesWindow extends Window {
         buttonLayout.addComponent(getRestartButton());
         buttonLayout.addComponent(getStatusLabel());
 
-        HorizontalLayout agentsLayout = new HorizontalLayout();
+        /*HorizontalLayout agentsLayout = new HorizontalLayout();
         agentsLayout.setSpacing(true);
 
         agentsComboBox = new AgentsComboBox(clusterName);
         agentsLayout.addComponent(agentsComboBox);
-        agentsLayout.addComponent(getAddButton());
+        agentsLayout.addComponent(getAddButton());*/
 
-        verticalLayout.addComponent(buttonLayout);
-        verticalLayout.addComponent(agentsLayout);
-        verticalLayout.addComponent(getTable());
+        Panel panel = new Panel();
+        panel.setSizeFull();
+        panel.addComponent(buttonLayout);
+//        panel.addComponent(agentsLayout);
+        panel.addComponent(getTable());
+
+        verticalLayout.addComponent(panel);
         setContent(verticalLayout);
 
         getStatus();
@@ -71,15 +78,15 @@ public final class HadoopDataNodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                startTask = RequestUtil.createTask(getCommandManager(), "Start Hadoop Cluster");
-                Agent master = getAgentManager().getAgent(cluster.getNameNode());
+                startTask = RequestUtil.createTask(getCommandManager(), "Start Hadoop Cluster Job Tracker");
+                Agent master = getAgentManager().getAgent(cluster.getJobTracker());
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", master.getUuid().toString());
                 map.put(":command", "start");
 
-                RequestUtil.createRequest(getCommandManager(), HadoopCommands.COMMAND_NAME_NODE, startTask, map);
+                RequestUtil.createRequest(getCommandManager(), Commands.COMMAND_JOB_TRACKER, startTask, map);
                 disableButtons(0);
             }
         });
@@ -95,15 +102,15 @@ public final class HadoopDataNodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                stopTask = RequestUtil.createTask(getCommandManager(), "Stop Hadoop Cluster");
-                Agent master = getAgentManager().getAgent(cluster.getNameNode());
+                stopTask = RequestUtil.createTask(getCommandManager(), "Stop Hadoop Cluster Job Tracker");
+                Agent master = getAgentManager().getAgent(cluster.getJobTracker());
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", master.getUuid().toString());
                 map.put(":command", "stop");
 
-                RequestUtil.createRequest(getCommandManager(), HadoopCommands.COMMAND_NAME_NODE, stopTask, map);
+                RequestUtil.createRequest(getCommandManager(), Commands.COMMAND_JOB_TRACKER, stopTask, map);
                 disableButtons(0);
             }
         });
@@ -120,15 +127,15 @@ public final class HadoopDataNodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                restartTask = RequestUtil.createTask(getCommandManager(), "Start Hadoop Cluster");
-                Agent master = getAgentManager().getAgent(cluster.getNameNode());
+                restartTask = RequestUtil.createTask(getCommandManager(), "Restart Hadoop Cluster Job Tracker");
+                Agent master = getAgentManager().getAgent(cluster.getJobTracker());
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", master.getUuid().toString());
                 map.put(":command", "restart");
 
-                RequestUtil.createRequest(getCommandManager(), HadoopCommands.COMMAND_NAME_NODE, restartTask, map);
+                RequestUtil.createRequest(getCommandManager(), Commands.COMMAND_JOB_TRACKER, restartTask, map);
                 disableButtons(0);
             }
         });
@@ -157,17 +164,19 @@ public final class HadoopDataNodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
-                Agent agent = (Agent) agentsComboBox.getValue();
+                if (configureTask == null) {
+                    cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
+                    Agent agent = (Agent) agentsComboBox.getValue();
 
-                List<UUID> list = new ArrayList<UUID>();
-                list.addAll(cluster.getDataNodes());
-                list.add(agent.getUuid());
+                    List<UUID> list = new ArrayList<UUID>();
+                    list.addAll(cluster.getDataNodes());
+                    list.add(agent.getUuid());
 
-                cluster.setDataNodes(list);
-                addButton.setEnabled(false);
+                    cluster.setDataNodes(list);
+                    addButton.setEnabled(false);
 
-                configureNode();
+                    configureNode();
+                }
             }
         });
 
@@ -175,16 +184,16 @@ public final class HadoopDataNodesWindow extends Window {
     }
 
     private void getStatus() {
-        statusTask = RequestUtil.createTask(getCommandManager(), "Get status for Hadoop Data Node");
-        Agent master = getAgentManager().getAgent(cluster.getNameNode());
+        statusTask = RequestUtil.createTask(getCommandManager(), "Get status for Hadoop Task Tracker");
+        Agent master = getAgentManager().getAgent(cluster.getJobTracker());
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", master.getUuid().toString());
 
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.STATUS_DATA_NODE, statusTask, map);
+        RequestUtil.createRequest(getCommandManager(), Commands.STATUS_DATA_NODE, statusTask, map);
 
-        dataNodesTable.refreshDataSource();
+        taskTrackersTable.refreshDataSource();
     }
 
     private void configureNode() {
@@ -193,20 +202,20 @@ public final class HadoopDataNodesWindow extends Window {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", cluster.getNameNode().toString());
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.COPY_MASTER_KEY, configureTask, map);
+        RequestUtil.createRequest(getCommandManager(), Commands.COPY_MASTER_KEY, configureTask, map);
 
         if (!cluster.getNameNode().equals(cluster.getSecondaryNameNode())) {
             map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", cluster.getSecondaryNameNode().toString());
-            RequestUtil.createRequest(getCommandManager(), HadoopCommands.COPY_MASTER_KEY, configureTask, map);
+            RequestUtil.createRequest(getCommandManager(), Commands.COPY_MASTER_KEY, configureTask, map);
         }
 
         if (!cluster.getJobTracker().equals(cluster.getNameNode()) && !cluster.getJobTracker().equals(cluster.getSecondaryNameNode())) {
             map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", cluster.getJobTracker().toString());
-            RequestUtil.createRequest(getCommandManager(), HadoopCommands.COPY_MASTER_KEY, configureTask, map);
+            RequestUtil.createRequest(getCommandManager(), Commands.COPY_MASTER_KEY, configureTask, map);
         }
     }
 
@@ -221,38 +230,110 @@ public final class HadoopDataNodesWindow extends Window {
 
             map.put(":PUB_KEY", key);
 
-            RequestUtil.createRequest(getCommandManager(), HadoopCommands.PASTE_MASTER_KEY, addTask, map);
+            RequestUtil.createRequest(getCommandManager(), Commands.PASTE_MASTER_KEY, addTask, map);
         }
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", agent.getUuid().toString());
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.INSTALL_DEB, addTask, map);
+        RequestUtil.createRequest(getCommandManager(), Commands.INSTALL_DEB, addTask, map);
 
         map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
-        map.put(":slave-hostname", agent.getListIP().get(0));
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.ADD_DATA_NODE, addTask, map);
+        map.put(":slave-hostname", agent.getHostname());
+        RequestUtil.createRequest(getCommandManager(), Commands.ADD_DATA_NODE, addTask, map);
 
-        map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", agent.getUuid().toString());
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.START_DATA_NODE, addTask, map);
-
-
-        if (!agent.getListIP().isEmpty()) {
+        for (UUID uuid : cluster.getDataNodes()) {
+            Agent agentDataNode = getAgentManager().getAgent(uuid);
             map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
-            map.put(":IP", agent.getListIP().get(0));
-            RequestUtil.createRequest(getCommandManager(), HadoopCommands.INCLUDE_DATA_NODE, addTask, map);
+            map.put(":IP", agentDataNode.getHostname());
+            RequestUtil.createRequest(getCommandManager(), Commands.INCLUDE_DATA_NODE, addTask, map);
         }
 
-        map = new HashMap<String, String>();
+        /*map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
-        RequestUtil.createRequest(getCommandManager(), HadoopCommands.REFRESH_DATA_NODES, addTask, map);
+        map.put(":uuid", agent.getUuid().toString());
+//        map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+        RequestUtil.createRequest(getCommandManager(), Commands.START_DATA_NODE, addTask, map);*/
+    }
+
+    public void readHosts() {
+        if (readHostsTask == null) {
+            readHostsTask = RequestUtil.createTask(getCommandManager(), "Read /etc/hosts file");
+
+            for (UUID uuid : getAllNodes()) {
+                Agent agent = getAgentManager().getAgent(uuid);
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                RequestUtil.createRequest(getCommandManager(), Commands.READ_HOSTNAME, readHostsTask, map);
+            }
+        }
+    }
+
+    public void writeHosts(List<ParseResult> list) {
+        if (writeHostsTask == null) {
+            writeHostsTask = RequestUtil.createTask(getCommandManager(), "Write /etc/hosts file");
+
+            for (ParseResult pr : list) {
+                Agent agent = getAgentManager().getAgent(pr.getRequest().getUuid());
+                String hosts = editHosts(pr.getResponse().getStdOut(), agent);
+
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                map.put(":hosts", hosts);
+                RequestUtil.createRequest(getCommandManager(), Commands.WRITE_HOSTNAME, writeHostsTask, map);
+            }
+
+            /*HashMap<String, String> map = new HashMap<String, String>();
+            map.put(":source", HadoopModule.MODULE_NAME);
+            map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+            RequestUtil.createRequest(getCommandManager(), Commands.REFRESH_DATA_NODES, writeHostsTask, map);*/
+        }
+    }
+
+    private String editHosts(String input, Agent localAgent) {
+        StringBuilder result = new StringBuilder();
+
+        String[] hosts = input.split("\n");
+        for (String host : hosts) {
+            host = host.trim();
+            boolean isContains = false;
+            for (UUID uuid : getAllNodes()) {
+                Agent agent = getAgentManager().getAgent(uuid);
+                if (host.contains(agent.getHostname()) ||
+                        host.contains("localhost") ||
+                        host.contains(localAgent.getHostname()) ||
+                        host.contains(localAgent.getListIP().get(0))) {
+                    isContains = true;
+                }
+            }
+
+            if (!isContains) {
+                result.append(host);
+                result.append("\n");
+            }
+        }
+
+        for (UUID uuid : getAllNodes()) {
+            Agent agent = getAgentManager().getAgent(uuid);
+            result.append(agent.getListIP().get(0));
+            result.append("\t");
+            result.append(agent.getHostname());
+            result.append(".");
+            result.append(cluster.getIpMask());
+            result.append("\t");
+            result.append(agent.getHostname());
+            result.append("\n");
+        }
+
+        result.append("127.0.0.1\tlocalhost");
+
+        return result.toString();
     }
 
     private Label getStatusLabel() {
@@ -262,10 +343,21 @@ public final class HadoopDataNodesWindow extends Window {
         return statusLabel;
     }
 
-    private DataNodesTable getTable() {
-        dataNodesTable = new DataNodesTable(cluster.getClusterName());
+    private List<UUID> getAllNodes() {
+        List<UUID> list = new ArrayList<UUID>();
+        list.addAll(cluster.getDataNodes());
+        list.addAll(cluster.getTaskTrackers());
+        list.add(cluster.getNameNode());
+        list.add(cluster.getJobTracker());
+        list.add(cluster.getSecondaryNameNode());
 
-        return dataNodesTable;
+        return list;
+    }
+
+    private TaskTrackersTable getTable() {
+        taskTrackersTable = new TaskTrackersTable(cluster.getClusterName());
+
+        return taskTrackersTable;
     }
 
     public void onCommand(Response response) {
@@ -292,18 +384,10 @@ public final class HadoopDataNodesWindow extends Window {
             if (!list.isEmpty()) {
                 if (task.equals(addTask)) {
                     if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-                        getCommandManager().saveHadoopClusterData(cluster);
-
-                        agentsComboBox.refreshDataSource();
-                        dataNodesTable.refreshDataSource();
-                    } else {
-                        cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
-                        agentsComboBox.refreshDataSource();
+                        readHosts();
                     }
                     currentAgent = null;
                     addTask = null;
-
-                    addButton.setEnabled(true);
                 }
             }
         }
@@ -344,16 +428,37 @@ public final class HadoopDataNodesWindow extends Window {
             }
         }
 
-        dataNodesTable.onCommand(response);
+        if (readHostsTask != null) {
+            if (task.equals(readHostsTask)) {
+                if (task.getTaskStatus().equals(TaskStatus.SUCCESS)) {
+                    writeHosts(list);
+                    readHostsTask = null;
+                }
+            }
+        }
+
+        if (writeHostsTask != null && task.equals(writeHostsTask)) {
+            if (task.getTaskStatus().equals(TaskStatus.SUCCESS)) {
+                getCommandManager().saveHadoopClusterData(cluster);
+                agentsComboBox.refreshDataSource();
+                taskTrackersTable.refreshDataSource();
+            } else {
+                agentsComboBox.refreshDataSource();
+            }
+
+            writeHostsTask = null;
+            addButton.setEnabled(true);
+        }
+
+        taskTrackersTable.onCommand(response);
     }
 
     private String parseNameNodeStatus(String response) {
         String[] array = response.split("\n");
 
         for (String status : array) {
-            if (status.contains("NameNode")) {
-                return status.replaceAll("NameNode is ", "")
-                        .replaceAll("\\(SecondaryNOT Running on this machine\\)", "");
+            if (status.contains("JobTracker")) {
+                return status.replaceAll("JobTracker is ", "");
             }
         }
 

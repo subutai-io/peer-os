@@ -6,7 +6,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util.HadoopInstallation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Installation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
@@ -16,7 +16,7 @@ import java.util.List;
 public final class HadoopWizard extends Window {
 
     private final VerticalLayout verticalLayout;
-    HadoopInstallation hadoopInstallation;
+    Installation hadoopInstallation;
     private List<Agent> lxcList;
 
     private final ProgressIndicator progressBar;
@@ -29,7 +29,7 @@ public final class HadoopWizard extends Window {
 
     public HadoopWizard(List<Agent> lxcList) {
         setModal(true);
-        hadoopInstallation = new HadoopInstallation(getCommandManager());
+        hadoopInstallation = new Installation(getCommandManager());
 
         this.lxcList = lxcList;
         setCaption("HadoopModule Wizard");
@@ -104,7 +104,7 @@ public final class HadoopWizard extends Window {
         hadoopInstallation.onCommand(response, step3);
     }
 
-    public HadoopInstallation getHadoopInstallation() {
+    public Installation getHadoopInstallation() {
         return hadoopInstallation;
     }
 

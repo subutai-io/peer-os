@@ -8,12 +8,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -767,6 +762,13 @@ public class Persistence implements PersistenceInterface {
                 list.add(cd);
             }
 
+            for (HadoopClusterInfo item : list) {
+                Agent master = getAgent(item.getNameNode());
+                if (master.getUuid() == null) {
+                    deleteHadoopClusterInfo(item.getUid());
+                    list.remove(item);
+                }
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
@@ -801,6 +803,19 @@ public class Persistence implements PersistenceInterface {
         return hadoopClusterInfo;
     }
 
+    public boolean deleteHadoopClusterInfo(UUID uuid) {
+        try {
+            String cql = "delete from hadoop_cluster_info where uid = ?";
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            session.execute(boundStatement.bind(uuid));
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in deleteHadoopClusterInfo(uuid)", ex);
+        }
+        return false;
+    }
+
     public boolean deleteCassandraClusterInfo(UUID uuid) {
         try {
             String cql = "delete from cassandra_cluster_info where uid = ?";
@@ -818,8 +833,8 @@ public class Persistence implements PersistenceInterface {
         try {
             String cql = String.format(
                     "insert into %s"
-                    + "(%s, %s, %s, %s, %s) "
-                    + "values (?, ?, ?, ?, ?)",
+                            + "(%s, %s, %s, %s, %s) "
+                            + "values (?, ?, ?, ?, ?)",
                     MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME,
                     MongoClusterInfo.REPLICA_SET_NAME, MongoClusterInfo.CONFIG_SERVERS_NAME,
                     MongoClusterInfo.ROUTERS_NAME, MongoClusterInfo.DATA_NODES_NAME);

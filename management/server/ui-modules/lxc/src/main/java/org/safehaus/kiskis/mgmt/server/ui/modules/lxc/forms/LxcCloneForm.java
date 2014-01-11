@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.install.AppData;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
