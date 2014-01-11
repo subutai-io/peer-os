@@ -30,6 +30,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Step2 extends Panel {
 
+    Property.ValueChangeListener configChangeListener = null;
+    Property.ValueChangeListener routersChangeListener = null;
+
     public Step2(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
@@ -76,6 +79,37 @@ public class Step2 extends Panel {
         final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
 
+        configChangeListener = new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
+                    wizard.getConfig().setConfigServers(agentList);
+                    //clean 
+                    Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getConfigServers());
+                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getConfigServers());
+                    routersColSel.removeListener(routersChangeListener);
+                    routersColSel.setValue(wizard.getConfig().getRouterServers());
+                    routersColSel.addListener(routersChangeListener);
+                }
+            }
+        };
+        routersChangeListener = new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
+                    wizard.getConfig().setRouterServers(agentList);
+                    //clean 
+                    Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getRouterServers());
+                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getRouterServers());
+                    configServersColSel.removeListener(configChangeListener);
+                    configServersColSel.setValue(wizard.getConfig().getConfigServers());
+                    configServersColSel.addListener(configChangeListener);
+                }
+            }
+        };
+
         configServersColSel.setItemCaptionPropertyId("hostname");
         configServersColSel.setRows(7);
         configServersColSel.setNullSelectionAllowed(true);
@@ -85,18 +119,7 @@ public class Step2 extends Panel {
         configServersColSel.setRightColumnCaption("Config Servers");
         configServersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         configServersColSel.setRequired(true);
-        configServersColSel.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (event.getProperty().getValue() != null) {
-                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
-                    wizard.getConfig().setConfigServers(agentList);
-                    //clean 
-                    Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getConfigServers());
-                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getConfigServers());
-                }
-            }
-        });
+        configServersColSel.addListener(configChangeListener);
 
         mainContent.addComponent(configServersColSel);
 
@@ -114,18 +137,7 @@ public class Step2 extends Panel {
         routersColSel.setRightColumnCaption("Routers");
         routersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         routersColSel.setRequired(true);
-        routersColSel.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (event.getProperty().getValue() != null) {
-                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
-                    wizard.getConfig().setRouterServers(agentList);
-                    //clean 
-                    Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getRouterServers());
-                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getRouterServers());
-                }
-            }
-        });
+        routersColSel.addListener(routersChangeListener);
 
         mainContent.addComponent(routersColSel);
 
