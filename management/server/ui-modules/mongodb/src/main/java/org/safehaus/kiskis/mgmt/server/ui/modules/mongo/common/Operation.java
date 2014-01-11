@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
@@ -89,6 +90,15 @@ public abstract class Operation implements ResponseListener {
         stopped = true;
     }
 
+    protected final void bindCmdToAgentNTask(Command cmd, Agent agent, Task task) {
+        if (cmd != null && agent != null && task != null) {
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(task.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+            task.addCommand(cmd);
+        }
+    }
+
     private boolean executeNextTask() {
         boolean result = false;
         try {
@@ -161,16 +171,11 @@ public abstract class Operation implements ResponseListener {
         return description;
     }
 
-    public int getOverallTimeout() {
+    public int getTotalTimeout() {
         int timeout = 0;
         try {
             for (Task task : tasks) {
-                int taskTimeout = 0;
-                for (Command command : task.getCommands()) {
-                    taskTimeout += command.getRequest().getTimeout();
-                }
-                taskTimeout /= task.getCommands().size();
-                timeout += taskTimeout;
+                timeout += task.getTotalTimeout();
             }
 
         } catch (Exception e) {
@@ -197,7 +202,7 @@ public abstract class Operation implements ResponseListener {
         }
     }
 
-    protected void processResponse(Response response) {
+    protected final void processResponse(Response response) {
         Task task = getCurrentTask();
         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
                 || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
@@ -221,8 +226,8 @@ public abstract class Operation implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        clearOutput();
-        clearLog();
+//        clearOutput();
+//        clearLog();
         try {
             Task task = getCurrentTask();
             if (task != null && response != null
@@ -328,7 +333,9 @@ public abstract class Operation implements ResponseListener {
     }
 
     public String getOutput() {
-        return output.toString();
+        String outStr = output.toString();
+        clearOutput();
+        return outStr;
     }
 
     public void appendOutput(String s) {
@@ -349,7 +356,9 @@ public abstract class Operation implements ResponseListener {
     }
 
     public String getLog() {
-        return log.toString();
+        String logStr = log.toString();
+        clearLog();
+        return logStr;
     }
 
     public void appendLog(String s) {
