@@ -253,8 +253,19 @@ public class Manager implements ResponseListener {
                 if (configServersArg.length() > 0) {
                     configServersArg.setLength(configServersArg.length() - 1);
                 }
-                bindCmdToAgentNTask(Commands.getStartRouterCommand(configServersArg.toString()),
-                        agent, destroyTask);
+
+                //select routers
+                List<Agent> routers = new ArrayList<Agent>();
+                for (UUID agentUUID : clusterInfo.getRouters()) {
+                    Agent router = agentManager.getAgent(agentUUID);
+                    if (router != null) {
+                        routers.add(router);
+                    }
+                }
+                for (Agent router : routers) {
+                    bindCmdToAgentNTask(Commands.getRestartRouterCommand(configServersArg.toString()),
+                            router, destroyTask);
+                }
 
                 //kill
                 commandManager.executeCommand(destroyTask.getNextCommand());
@@ -263,7 +274,9 @@ public class Manager implements ResponseListener {
                 //uninstall
                 commandManager.executeCommand(destroyTask.getNextCommand());
                 //restart routers
-                commandManager.executeCommand(destroyTask.getNextCommand());
+                for (Agent router : routers) {
+                    commandManager.executeCommand(destroyTask.getNextCommand());
+                }
 
                 Action action = new Action(
                         destroyTask,
@@ -329,29 +342,30 @@ public class Manager implements ResponseListener {
             if (response != null && response.getTaskUuid() != null) {
                 Action action = actionsCache.get(response.getTaskUuid());
                 if (action != null) {
-                    boolean actionCompleted = false;
+                    boolean succeeded = false;
                     action.addStdOutput(response.getStdOut());
                     action.addErrOutput(response.getStdErr());
                     if (action.getActionType() == ActionType.CHECK_NODE_STATUS) {
                         if (action.getStdOutput().contains("couldn't connect to server")) {
                             action.enableStartButton();
-                            actionCompleted = true;
+                            succeeded = true;
                         } else if (action.getStdOutput().
                                 contains("connecting to")) {
                             action.enableStopButton();
-                            actionCompleted = true;
+                            succeeded = true;
                         } else if (action.getErrOutput().contains("mongo: not found")) {
                             removeNode(action);
-                            actionCompleted = true;
                         }
                     } else if (action.getActionType() == ActionType.START_NODE) {
                         if (action.getStdOutput().contains("child process started successfully, parent exiting")) {
-                            actionCompleted = true;
+                            succeeded = true;
+                            checkNodeStatus(action);
+                        } else if (Util.isFinalResponse(response)) {
                             checkNodeStatus(action);
                         }
                     } else if (action.getActionType() == ActionType.STOP_NODE) {
                         if (Util.isFinalResponse(response)) {
-                            actionCompleted = true;//possibly check exit code here
+                            succeeded = response.getExitCode() != null && response.getExitCode() == 0;
                             checkNodeStatus(action);
                         }
                     } else if (action.getActionType() == ActionType.DESTROY_NODE) {
@@ -361,13 +375,16 @@ public class Manager implements ResponseListener {
 
                         processAddCommandResponse(action, response);
                     }
-                    if (actionCompleted || Util.isFinalResponse(response)) {
+                    if (succeeded || Util.isFinalResponse(response)) {
                         if (action.getActionType() != ActionType.DESTROY_NODE
                                 && action.getActionType() != ActionType.ADD_NODE) {
                             Task task = action.getTask();
-                            task.setTaskStatus(actionCompleted ? TaskStatus.SUCCESS : TaskStatus.FAIL);
+                            task.setTaskStatus(succeeded ? TaskStatus.SUCCESS : TaskStatus.FAIL);
                             Util.saveTask(task);
                             actionsCache.remove(action.getTask().getUuid());
+                            if (!succeeded) {
+                                show(String.format("Failed:\n%s\n%s", action.getStdOutput(), action.getErrOutput()));
+                            }
                         }
                         //since we launch check-status command after any action command 
                         //then action commands shud not hide progress indicator
@@ -395,24 +412,27 @@ public class Manager implements ResponseListener {
     }
 
     private void removeNode(Action action) {
-        if (action.getNodeType() == NodeType.CONFIG_NODE) {
-            configServersTable.removeItem(action.getRowId());
-            List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getConfigServers());
-            nodes.remove(action.getAgent().getUuid());
-            clusterInfo.setConfigServers(nodes);
-            commandManager.saveMongoClusterInfo(clusterInfo);
-        } else if (action.getNodeType() == NodeType.ROUTER_NODE) {
-            routersTable.removeItem(action.getRowId());
-            List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getRouters());
-            nodes.remove(action.getAgent().getUuid());
-            clusterInfo.setRouters(nodes);
-            commandManager.saveMongoClusterInfo(clusterInfo);
-        } else if (action.getNodeType() == NodeType.DATA_NODE) {
-            dataNodesTable.removeItem(action.getRowId());
-            List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
-            nodes.remove(action.getAgent().getUuid());
-            clusterInfo.setDataNodes(nodes);
-            commandManager.saveMongoClusterInfo(clusterInfo);
+        try {
+            if (action.getNodeType() == NodeType.CONFIG_NODE) {
+                configServersTable.removeItem(action.getRowId());
+                List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getConfigServers());
+                nodes.remove(action.getAgent().getUuid());
+                clusterInfo.setConfigServers(nodes);
+                commandManager.saveMongoClusterInfo(clusterInfo);
+            } else if (action.getNodeType() == NodeType.ROUTER_NODE) {
+                routersTable.removeItem(action.getRowId());
+                List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getRouters());
+                nodes.remove(action.getAgent().getUuid());
+                clusterInfo.setRouters(nodes);
+                commandManager.saveMongoClusterInfo(clusterInfo);
+            } else if (action.getNodeType() == NodeType.DATA_NODE) {
+                dataNodesTable.removeItem(action.getRowId());
+                List<UUID> nodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
+                nodes.remove(action.getAgent().getUuid());
+                clusterInfo.setDataNodes(nodes);
+                commandManager.saveMongoClusterInfo(clusterInfo);
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -425,6 +445,7 @@ public class Manager implements ResponseListener {
                 Util.saveTask(task);
                 actionsCache.remove(action.getTask().getUuid());
                 removeNode(action);
+                show(String.format("Failed:\n%s\n%s", action.getStdOutput(), action.getErrOutput()));
             } else {
                 action.incrementResponseCount();
                 //this is the first command of destroy data node action -> findPrimaryNode

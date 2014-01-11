@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -247,6 +246,28 @@ public class Commands {
         Request req = cmd.getRequest();
         req.setProgram("mongos");
         req.setArgs(Arrays.asList(
+                "--configdb",
+                configServersArg,
+                "--port",
+                Constants.ROUTER_PORT + "",
+                "--fork",
+                "--logpath",
+                String.format("%s/mongodb.log", Constants.LOG_DIR)
+        ));
+        req.setTimeout(120);
+        return cmd;
+    }
+
+    //execute on router
+    public static Command getRestartRouterCommand(String configServersArg) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/pkill");
+        req.setArgs(Arrays.asList(
+                "-2",
+                "mongo",
+                ";",
+                "mongos",
                 "--configdb",
                 configServersArg,
                 "--port",
