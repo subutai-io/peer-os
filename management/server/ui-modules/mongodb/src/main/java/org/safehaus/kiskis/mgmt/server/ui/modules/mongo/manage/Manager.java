@@ -53,10 +53,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public class Manager implements ResponseListener {
     /*
      TODO:
-     1) dont't let using the same nodes for diff node types (e.g. routers as data nodes)
-     2) add node
-     3) overall cluster check status
-     4) destroy cluster
+     1) add node
+     2) destroy cluster
     
      */
 
@@ -135,8 +133,8 @@ public class Manager implements ResponseListener {
 
         topContent.addComponent(refreshClustersBtn);
 
-        Button checkOverallStatusBtn = new Button("Check overall status");
-        checkOverallStatusBtn.addListener(new Button.ClickListener() {
+        Button checkAllBtn = new Button("Check all");
+        checkAllBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -151,7 +149,7 @@ public class Manager implements ResponseListener {
 
         });
 
-        topContent.addComponent(checkOverallStatusBtn);
+        topContent.addComponent(checkAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -429,7 +427,7 @@ public class Manager implements ResponseListener {
                             action.enableStopButton();
                             succeeded = true;
                         } else if (action.getErrOutput().contains("mongo: not found")) {
-                            removeNode(action);
+//                            removeNode(action);
                         }
                     } else if (action.getActionType() == ActionType.START_NODE) {
                         if (action.getStdOutput().contains("child process started successfully, parent exiting")) {
@@ -571,7 +569,8 @@ public class Manager implements ResponseListener {
                         Util.saveTask(task);
                         actionsCache.remove(action.getTask().getUuid());
                         //add check command to actualize buttons
-                        checkNodeStatus(action);
+//                        checkNodeStatus(action);
+                        removeNode(action);
                     }
                 }
             }
