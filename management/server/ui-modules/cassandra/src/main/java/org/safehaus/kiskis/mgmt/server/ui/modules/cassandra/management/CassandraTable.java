@@ -30,6 +30,7 @@ public class CassandraTable extends Table {
     Button selectedStartButton;
     Button selectedStopButton;
     Item selectedItem;
+    CassandraClusterInfo selectedCci;
 
     public CassandraTable() {
         this.manager = new ServiceManager();
@@ -68,6 +69,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Starting cassandra cluster: " + cci.getName());
                 cce = CassandraCommandEnum.START;
                 selectedItem = item;
                 manager.runCommand(cci.getNodes(), cce);
@@ -79,6 +81,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Stopping cassandra cluster: " + cci.getName());
                 cce = CassandraCommandEnum.STOP;
                 selectedItem = item;
                 manager.runCommand(cci.getNodes(), cce);
@@ -112,11 +115,9 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                selectedCci = cci;
+                getWindow().showNotification("Destroying cassandra cluster: " + cci.getName());
                 manager.runCommand(cci.getNodes(), CassandraCommandEnum.PURGE);
-                if (ServiceLocator.getService(CommandManagerInterface.class).deleteCassandraClusterData(cci.getUuid())) {
-//                    container.removeItem(itemId);
-                    refreshDatasource();
-                }
             }
         });
 
@@ -149,16 +150,17 @@ public class CassandraTable extends Table {
             Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    if (nodesWindow != null && nodesWindow.isVisible()) {
-                        nodesWindow.updateUI(task);
-                    }
-                    manageUI();
                     manager.moveToNextTask();
                     if (manager.getCurrentTask() != null) {
                         for (Command command : manager.getCurrentTask().getCommands()) {
                             manager.executeCommand(command);
                         }
                     } else {
+                        if (nodesWindow != null && nodesWindow.isVisible()) {
+                            nodesWindow.updateUI(task);
+                        } else {
+                            manageUI(task.getTaskStatus());
+                        }
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
@@ -169,7 +171,7 @@ public class CassandraTable extends Table {
         }
     }
 
-    private void manageUI() {
+    private void manageUI(TaskStatus ts) {
         if (cce != null) {
             switch (cce) {
                 case START: {
@@ -179,6 +181,17 @@ public class CassandraTable extends Table {
                 case STOP: {
                     switchState(true);
                     break;
+                }
+                case PURGE: {
+                    switch (ts) {
+                        case SUCCESS: {
+                            if (ServiceLocator.getService(CommandManagerInterface.class)
+                                    .deleteCassandraClusterData(selectedCci.getUuid())) {
+//                    container.removeItem(itemId);
+                                refreshDatasource();
+                            }
+                        }
+                    }
                 }
             }
         }
