@@ -18,6 +18,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -84,11 +85,13 @@ public class Step3 extends Panel {
         shardsColSel.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                wizard.getConfig().setDataNodes(agentList);
-                //clean 
-                Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getDataNodes());
-                Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getDataNodes());
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
+                    wizard.getConfig().setDataNodes(agentList);
+                    //clean 
+                    Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getDataNodes());
+                    Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getDataNodes());
+                }
             }
         });
 
@@ -113,7 +116,6 @@ public class Step3 extends Panel {
 
 //                wizard.getConfig().setReplicaSetName(Util.removeAllWhitespace(replicaNameTxtFld.getValue().toString().trim()));
 //                wizard.getConfig().setDataNodes((Set<Agent>) shardsColSel.getValue());
-
                 if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getDataNodes())) {

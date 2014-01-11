@@ -88,11 +88,13 @@ public class Step2 extends Panel {
         configServersColSel.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                wizard.getConfig().setConfigServers(agentList);
-                //clean 
-                Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getConfigServers());
-                Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getConfigServers());
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
+                    wizard.getConfig().setConfigServers(agentList);
+                    //clean 
+                    Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getConfigServers());
+                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getConfigServers());
+                }
             }
         });
 
@@ -115,11 +117,13 @@ public class Step2 extends Panel {
         routersColSel.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                wizard.getConfig().setRouterServers(agentList);
-                //clean 
-                Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getRouterServers());
-                Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getRouterServers());
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
+                    wizard.getConfig().setRouterServers(agentList);
+                    //clean 
+                    Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getRouterServers());
+                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getRouterServers());
+                }
             }
         });
 
@@ -137,7 +141,6 @@ public class Step2 extends Panel {
 //                wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
 //                wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
 //                wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
-
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getConfigServers())) {
