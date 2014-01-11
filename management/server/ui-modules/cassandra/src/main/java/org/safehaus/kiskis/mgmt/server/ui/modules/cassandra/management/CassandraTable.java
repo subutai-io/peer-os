@@ -117,12 +117,9 @@ public class CassandraTable extends Table {
             public void buttonClick(Button.ClickEvent event) {
                 selectedCci = cci;
                 getWindow().showNotification("Destroying cassandra cluster: " + cci.getName());
-                manager.runCommand(cci.getNodes(), CassandraCommandEnum.PURGE);
-                if (ServiceLocator.getService(CommandManagerInterface.class)
-                        .deleteCassandraClusterData(cci.getUuid())) {
-//                    container.removeItem(itemId);
-                    refreshDatasource();
-                }
+                cce = CassandraCommandEnum.PURGE;
+                manager.runCommand(cci.getNodes(), cce);
+
             }
         });
 
@@ -163,7 +160,6 @@ public class CassandraTable extends Table {
                     } else {
                         if (nodesWindow != null && nodesWindow.isVisible()) {
                             nodesWindow.updateUI(task);
-                        } else {
                         }
                         manageUI(task.getTaskStatus());
                     }
@@ -180,25 +176,56 @@ public class CassandraTable extends Table {
         if (cce != null) {
             switch (cce) {
                 case START: {
-                    getWindow().showNotification("Start success");
-                    switchState(false);
+
+                    switch (ts) {
+                        case SUCCESS: {
+                            getWindow().showNotification("Start success");
+                            switchState(false);
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Start failed. Please use Terminal to check the problem");
+                            break;
+                        }
+                    }
                     break;
+
                 }
                 case STOP: {
-                    getWindow().showNotification("Stop success");
-                    switchState(true);
+
+                    switch (ts) {
+                        case SUCCESS: {
+                            getWindow().showNotification("Stop success");
+                            switchState(true);
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Stop failed. Please use Terminal to check the problem");
+                            break;
+                        }
+                    }
                     break;
                 }
                 case PURGE: {
-                    getWindow().showNotification("Purge success");
-//                    switch (ts) {
-//                        case SUCCESS: {
-
-//                        }
-//                    }
+                    switch (ts) {
+                        case SUCCESS: {
+                            getWindow().showNotification("Purge success");
+                            if (ServiceLocator.getService(CommandManagerInterface.class)
+                                    .deleteCassandraClusterData(selectedCci.getUuid())) {
+//                    container.removeItem(itemId);
+                                refreshDatasource();
+                            }
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Purge failed. Please remove using Terminal");
+                            break;
+                        }
+                    }
                     break;
                 }
             }
         }
+        cce = null;
     }
 }
