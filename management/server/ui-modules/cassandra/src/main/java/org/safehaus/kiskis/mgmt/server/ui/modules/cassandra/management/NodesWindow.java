@@ -148,17 +148,20 @@ public class NodesWindow extends Window {
             public void buttonClick(Button.ClickEvent event) {
                 table.setEnabled(false);
                 selectedItem = item;
-                List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
+//                List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
+//                List<UUID> seeds = cci.getSeeds();
                 if (event.getButton().getCaption().equals("Set as seed")) {
                     cce = CassandraCommandEnum.SET_SEED;
                     getWindow().showNotification("Adding instance to seeds list: " + agent.getHostname());
-                    seeds.remove(agent.getUuid());
+//                    seeds.remove(agent.getUuid());
+                    cci.getSeeds().remove(agent.getUuid());
                 } else {
                     cce = CassandraCommandEnum.REMOVE_SEED;
                     getWindow().showNotification("Removing instance from seeds list: " + agent.getHostname());
-                    seeds.add(agent.getUuid());
+//                    seeds.add(agent.getUuid());
+                    cci.getSeeds().add(agent.getUuid());
                 }
-                cci.setSeeds(seeds);
+//                cci.setSeeds(seeds);
                 StringBuilder seedsSB = new StringBuilder();
                 for (UUID seed : cci.getSeeds()) {
                     Agent agent = getAgentManager().getAgent(seed);
@@ -218,12 +221,29 @@ public class NodesWindow extends Window {
         if (cce != null) {
             switch (cce) {
                 case START: {
-                    switchState(false);
-                    break;
+                    switch (ts.getTaskStatus()) {
+                        case SUCCESS: {
+                            switchState(false);
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Start failed. Please use Terminal to check the problem");
+                            break;
+                        }
+                    }
+
                 }
                 case STOP: {
-                    switchState(true);
-                    break;
+                    switch (ts.getTaskStatus()) {
+                        case SUCCESS: {
+                            switchState(true);
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Stop failed. Please use Terminal to check the problem");
+                            break;
+                        }
+                    }
                 }
                 case STATUS: {
                     switch (ts.getTaskStatus()) {
@@ -236,8 +256,6 @@ public class NodesWindow extends Window {
                             break;
                         }
                     }
-//                    Button statusBtn = (Button) selectedItem.getItemProperty("Status").getValue();
-//                    statusBtn.setCaption("Running");
                     break;
                 }
                 case SET_SEED: {
