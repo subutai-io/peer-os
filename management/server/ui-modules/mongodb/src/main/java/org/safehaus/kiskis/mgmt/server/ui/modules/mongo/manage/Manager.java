@@ -429,7 +429,7 @@ public class Manager implements ResponseListener {
                             action.enableStopButton();
                             succeeded = true;
                         } else if (action.getErrOutput().contains("mongo: not found")) {
-                            removeNode(action);
+//                            removeNode(action);
                         }
                     } else if (action.getActionType() == ActionType.START_NODE) {
                         if (action.getStdOutput().contains("child process started successfully, parent exiting")) {
@@ -571,7 +571,8 @@ public class Manager implements ResponseListener {
                         Util.saveTask(task);
                         actionsCache.remove(action.getTask().getUuid());
                         //add check command to actualize buttons
-                        checkNodeStatus(action);
+//                        checkNodeStatus(action);
+                        removeNode(action);
                     }
                 }
             }
