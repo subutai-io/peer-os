@@ -129,7 +129,7 @@ public class StepSeeds extends Panel {
         //set values if this is a second visit
         domainNameTxtFld.setValue(wizard.getConfig().getDomainName());
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        seedsColSel.setValue(Util.retainValues(wizard.getConfig().getSeeds(), wizard.getConfig().getSelectedAgents()));
+        seedsColSel.setValue(wizard.getConfig().getSeeds());
     }
 
     private void show(String notification) {

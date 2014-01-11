@@ -87,8 +87,8 @@ public class Step3 extends Panel {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 wizard.getConfig().setDataNodes(agentList);
                 //clean 
-                wizard.getConfig().getConfigServers().removeAll(wizard.getConfig().getDataNodes());
-                wizard.getConfig().getRouterServers().removeAll(wizard.getConfig().getDataNodes());
+                Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getDataNodes());
+                Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getDataNodes());
             }
         });
 
@@ -111,8 +111,8 @@ public class Step3 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                wizard.getConfig().setReplicaSetName(Util.removeAllWhitespace(replicaNameTxtFld.getValue().toString().trim()));
-                wizard.getConfig().setDataNodes((Set<Agent>) shardsColSel.getValue());
+//                wizard.getConfig().setReplicaSetName(Util.removeAllWhitespace(replicaNameTxtFld.getValue().toString().trim()));
+//                wizard.getConfig().setDataNodes((Set<Agent>) shardsColSel.getValue());
 
                 if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");

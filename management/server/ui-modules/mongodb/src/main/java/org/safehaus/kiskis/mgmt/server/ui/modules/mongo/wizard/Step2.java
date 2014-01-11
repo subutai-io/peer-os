@@ -91,8 +91,8 @@ public class Step2 extends Panel {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 wizard.getConfig().setConfigServers(agentList);
                 //clean 
-                wizard.getConfig().getRouterServers().removeAll(wizard.getConfig().getConfigServers());
-                wizard.getConfig().getDataNodes().removeAll(wizard.getConfig().getConfigServers());
+                Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getConfigServers());
+                Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getConfigServers());
             }
         });
 
@@ -118,8 +118,8 @@ public class Step2 extends Panel {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 wizard.getConfig().setRouterServers(agentList);
                 //clean 
-                wizard.getConfig().getConfigServers().removeAll(wizard.getConfig().getRouterServers());
-                wizard.getConfig().getDataNodes().removeAll(wizard.getConfig().getRouterServers());
+                Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getRouterServers());
+                Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getRouterServers());
             }
         });
 
@@ -134,9 +134,9 @@ public class Step2 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
-                wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
-                wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
+//                wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
+//                wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
+//                wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
