@@ -118,6 +118,11 @@ public class CassandraTable extends Table {
                 selectedCci = cci;
                 getWindow().showNotification("Destroying cassandra cluster: " + cci.getName());
                 manager.runCommand(cci.getNodes(), CassandraCommandEnum.PURGE);
+                if (ServiceLocator.getService(CommandManagerInterface.class)
+                        .deleteCassandraClusterData(cci.getUuid())) {
+//                    container.removeItem(itemId);
+                    refreshDatasource();
+                }
             }
         });
 
@@ -159,8 +164,8 @@ public class CassandraTable extends Table {
                         if (nodesWindow != null && nodesWindow.isVisible()) {
                             nodesWindow.updateUI(task);
                         } else {
-                            manageUI(task.getTaskStatus());
                         }
+                        manageUI(task.getTaskStatus());
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     if (nodesWindow != null && nodesWindow.isVisible()) {
@@ -175,23 +180,23 @@ public class CassandraTable extends Table {
         if (cce != null) {
             switch (cce) {
                 case START: {
+                    getWindow().showNotification("Start success");
                     switchState(false);
                     break;
                 }
                 case STOP: {
+                    getWindow().showNotification("Stop success");
                     switchState(true);
                     break;
                 }
                 case PURGE: {
-                    switch (ts) {
-                        case SUCCESS: {
-                            if (ServiceLocator.getService(CommandManagerInterface.class)
-                                    .deleteCassandraClusterData(selectedCci.getUuid())) {
-//                    container.removeItem(itemId);
-                                refreshDatasource();
-                            }
-                        }
-                    }
+                    getWindow().showNotification("Purge success");
+//                    switch (ts) {
+//                        case SUCCESS: {
+
+//                        }
+//                    }
+                    break;
                 }
             }
         }

@@ -73,6 +73,11 @@ public class NodesWindow extends Window {
 
     }
 
+    @Override
+    public void addListener(CloseListener listener) {
+        getWindow().getParent().removeWindow(this);
+    }
+
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
         container.addContainerProperty("Hostname", String.class, "");
@@ -154,17 +159,13 @@ public class NodesWindow extends Window {
                     seeds.add(agent.getUuid());
                 }
                 cci.setSeeds(seeds);
-
                 StringBuilder seedsSB = new StringBuilder();
                 for (UUID seed : cci.getSeeds()) {
                     Agent agent = getAgentManager().getAgent(seed);
                     seedsSB.append(agent.getHostname()).append(".").append(cci.getDomainName()).append(",");
                 }
-
                 serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
-                if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
-                    System.out.println("updated");
-                }
+
             }
         });
 //        } else {
@@ -244,6 +245,9 @@ public class NodesWindow extends Window {
                         case SUCCESS: {
                             Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
                             seed.setCaption("Remove seed");
+                            if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                                System.out.println("updated");
+                            }
                         }
                     }
                     break;
