@@ -200,21 +200,29 @@ public class LxcManageForm extends VerticalLayout {
                     parseResult(pr);
                 }
                 listTask = null;
+
+                getWindow().showNotification(task.getDescription() + " finished.");
             }
         } else if (startTask != null && task.equals(startTask)) {
             if (!output.isEmpty() && task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                 refreshTable();
                 startTask = null;
+
+                getWindow().showNotification(task.getDescription() + " finished.");
             }
         } else if (stopTask != null && task.equals(stopTask)) {
             if (!output.isEmpty() && task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                 refreshTable();
                 stopTask = null;
+
+                getWindow().showNotification(task.getDescription() + " finished.");
             }
         } else if (destroyTask != null && task.equals(destroyTask)) {
             if (!output.isEmpty()) {
                 refreshTable();
                 destroyTask = null;
+
+                getWindow().showNotification(task.getDescription() + " finished.");
             }
         } else {
             table.outputResponse(response);

@@ -5,60 +5,60 @@ import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Installation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public final class HadoopWizard extends Window {
+public final class HadoopWizard {
 
+    private static final int MAX_STEPS = 4;
+    private final GridLayout contentRoot;
     private final VerticalLayout verticalLayout;
-    Installation hadoopInstallation;
-    private List<Agent> lxcList;
-
     private final ProgressIndicator progressBar;
-    private static final int MAX_STEPS = 3;
-
+    Installation hadoopInstallation;
+    Step0 step0;
     Step1 step1;
     Step2 step2;
     Step3 step3;
-    int step = 1;
+    int step = 0;
+    private List<Agent> lxcList;
 
-    public HadoopWizard(List<Agent> lxcList) {
-        setModal(true);
+    public HadoopWizard() {
         hadoopInstallation = new Installation(getCommandManager());
 
-        this.lxcList = lxcList;
-        setCaption("HadoopModule Wizard");
-
-        GridLayout gridLayout = new GridLayout(1, 15);
-        gridLayout.setSpacing(true);
-        gridLayout.setMargin(false, true, false, true);
-        gridLayout.setHeight(600, Sizeable.UNITS_PIXELS);
-        gridLayout.setWidth(900, Sizeable.UNITS_PIXELS);
+        contentRoot = new GridLayout(1, 15);
+        contentRoot.setSpacing(true);
+        contentRoot.setMargin(false, true, false, true);
+        contentRoot.setHeight(600, Sizeable.UNITS_PIXELS);
+        contentRoot.setWidth(900, Sizeable.UNITS_PIXELS);
 
         progressBar = new ProgressIndicator();
         progressBar.setIndeterminate(false);
-        progressBar.setEnabled(false);
+        progressBar.setEnabled(true);
         progressBar.setPollingInterval(30000);
         progressBar.setValue(0f);
         progressBar.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        gridLayout.addComponent(progressBar, 0, 0);
-        gridLayout.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
+        contentRoot.addComponent(progressBar, 0, 0);
+        contentRoot.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
 
         verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);
         verticalLayout.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        gridLayout.addComponent(verticalLayout, 0, 1, 0, 14);
-        gridLayout.setComponentAlignment(verticalLayout, Alignment.MIDDLE_CENTER);
+        contentRoot.addComponent(verticalLayout, 0, 1, 0, 14);
+        contentRoot.setComponentAlignment(verticalLayout, Alignment.MIDDLE_CENTER);
 
         putForm();
+    }
 
-        setContent(gridLayout);
+    public Component getContent() {
+        return contentRoot;
     }
 
     public void showNext() {
@@ -74,27 +74,35 @@ public final class HadoopWizard extends Window {
     private void putForm() {
         verticalLayout.removeAllComponents();
         switch (step) {
+            case 0: {
+                progressBar.setValue((float) step / MAX_STEPS);
+                step0 = new Step0(this);
+                verticalLayout.addComponent(step0);
+                break;
+            }
             case 1: {
-                progressBar.setValue(0f);
+                progressBar.setValue((float) step / MAX_STEPS);
                 step1 = new Step1(this);
                 verticalLayout.addComponent(step1);
                 break;
             }
             case 2: {
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                progressBar.setValue((float) step / MAX_STEPS);
                 step2 = new Step2(this);
                 verticalLayout.addComponent(step2);
                 break;
             }
             case 3: {
-                this.setClosable(false);
-                progressBar.setValue((float) (step - 1) / MAX_STEPS);
+                progressBar.setValue((float) step / MAX_STEPS);
                 step3 = new Step3(this);
                 verticalLayout.addComponent(step3);
                 break;
             }
             default: {
-                this.close();
+                step = 0;
+                progressBar.setValue((float) step / MAX_STEPS);
+                step0 = new Step0(this);
+                verticalLayout.addComponent(step0);
                 break;
             }
         }
@@ -109,7 +117,17 @@ public final class HadoopWizard extends Window {
     }
 
     public List<Agent> getLxcList() {
-        return lxcList;
+        List<Agent> list = new ArrayList<Agent>();
+        if (MgmtApplication.getSelectedAgents() != null && !MgmtApplication.getSelectedAgents().isEmpty()) {
+            for (Agent agent : MgmtApplication.getSelectedAgents()) {
+                if (agent.isIsLXC()) {
+                    list.add(agent);
+                }
+            }
+        }
+
+        lxcList = list;
+        return list;
     }
 
     public CommandManagerInterface getCommandManager() {

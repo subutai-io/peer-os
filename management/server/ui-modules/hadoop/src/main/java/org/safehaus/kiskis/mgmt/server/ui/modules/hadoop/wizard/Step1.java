@@ -60,7 +60,7 @@ public class Step1 extends Panel {
         verticalLayoutForm.addComponent(textFieldClusterName);
 
         final TextField textFieldDomainName = new TextField("Enter your domain name");
-        textFieldDomainName.setInputPrompt("Cluster name");
+        textFieldDomainName.setInputPrompt("intra.lan");
         textFieldDomainName.setRequired(true);
         textFieldDomainName.setRequiredError("Must have a name");
         verticalLayoutForm.addComponent(textFieldDomainName);

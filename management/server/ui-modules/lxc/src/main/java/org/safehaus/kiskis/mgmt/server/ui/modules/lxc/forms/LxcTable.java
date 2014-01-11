@@ -252,6 +252,7 @@ public class LxcTable extends Table {
                     findRow(pr);
                 }
 
+                getWindow().showNotification(destroyTask.getDescription() + " finished.");
                 parent.refreshTable();
             }
         } else if (startTask != null && response.getTaskUuid().compareTo(startTask.getUuid()) == 0) {
@@ -261,6 +262,7 @@ public class LxcTable extends Table {
                     findRow(pr);
                 }
 
+                getWindow().showNotification(startTask.getDescription() + " finished.");
                 parent.refreshTable();
             }
         } else if (stopTask != null && response.getTaskUuid().compareTo(stopTask.getUuid()) == 0) {
@@ -270,6 +272,7 @@ public class LxcTable extends Table {
                     findRow(pr);
                 }
 
+                getWindow().showNotification(stopTask.getDescription() + " finished.");
                 parent.refreshTable();
             }
 
