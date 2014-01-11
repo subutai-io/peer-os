@@ -35,6 +35,14 @@ public class Task implements Serializable {
         }
     }
 
+    public int getTotalTimeout() {
+        int timeout = 0;
+        for (Command cmd : commands) {
+            timeout += cmd.getRequest().getTimeout();
+        }
+        return timeout;
+    }
+
     public Command getNextCommand() {
         if (commandIterator != null && commandIterator.hasNext()) {
             return (Command) commandIterator.next();

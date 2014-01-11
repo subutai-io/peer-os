@@ -259,13 +259,40 @@ public class Manager implements ResponseListener {
             if (nodeType == NodeType.CONFIG_NODE) {
                 //uninstall mongo
                 //restart routers passing the rest of config servers
+                Task destroyTask = Util.createTask("Destroy config node");
+                Command killCmd = Commands.getKillAllCommand();
+                killCmd.getRequest().setUuid(agent.getUuid());
+                killCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+                killCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+                destroyTask.addCommand(killCmd);
+                Command cleanCmd = Commands.getCleanCommand();
+                cleanCmd.getRequest().setUuid(agent.getUuid());
+                cleanCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+                cleanCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+                destroyTask.addCommand(cleanCmd);
+                Command uninstallCmd = Commands.getUninstallCommand();
+                uninstallCmd.getRequest().setUuid(agent.getUuid());
+                uninstallCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+                uninstallCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+                destroyTask.addCommand(uninstallCmd);
+
+                if (commandManager.executeCommand(destroyTask.getNextCommand())) {
+                    ManagerAction managerAction = new ManagerAction(
+                            destroyTask,
+                            managerActionType,
+                            row, agent, nodeType);
+                    managerAction.disableButtons();
+                    actionsCache.put(destroyTask.getUuid(),
+                            managerAction,
+                            destroyTask.getTotalTimeout() * 1000 + 2000);
+                }
             } else if (nodeType == NodeType.ROUTER_NODE) {
                 //uninstall mongo
             } else if (nodeType == NodeType.DATA_NODE) {
                 //uninstall mongo
                 //unregister from primary node if this node is not primary otherwise no-op
 
-                Task destroyTask = Util.createTask("Destroy Node");
+                Task destroyTask = Util.createTask("Destroy data node");
                 //find primary node
                 Command findPrimaryNodeCmd = Commands.getFindPrimaryNodeCommand();
                 findPrimaryNodeCmd.getRequest().setUuid(agent.getUuid());
@@ -431,12 +458,10 @@ public class Manager implements ResponseListener {
                     }
                     if (primaryNodeAgent != null) {
                         //!!!!MAY BE UNREGISTER FIRST THEN UNINSTALL, need more tests
-                        int totalTimeout = 0;
                         //unregister the node from primary node if this node is not primary itself
                         Command unregisterFromPrimaryCmd = managerAction.getTask().getNextCommand();
                         unregisterFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
                         if (primaryNodeAgent.getUuid().compareTo(managerAction.getAgent().getUuid()) != 0) {
-                            totalTimeout += unregisterFromPrimaryCmd.getRequest().getTimeout();
                             commandManager.executeCommand(unregisterFromPrimaryCmd);
                         }
                         //sleep to let the node complete unregistration
@@ -445,15 +470,12 @@ public class Manager implements ResponseListener {
                         Command killCmd = managerAction.getTask().getNextCommand();
                         Command cleanCmd = managerAction.getTask().getNextCommand();
                         Command uninstallCmd = managerAction.getTask().getNextCommand();
-                        totalTimeout = killCmd.getRequest().getTimeout();
-                        totalTimeout += cleanCmd.getRequest().getTimeout();
-                        totalTimeout += uninstallCmd.getRequest().getTimeout();
                         commandManager.executeCommand(killCmd);
                         commandManager.executeCommand(cleanCmd);
                         commandManager.executeCommand(uninstallCmd);
                         actionsCache.put(managerAction.getTask().getUuid(),
                                 managerAction,
-                                totalTimeout * 1000 + 2000);
+                                managerAction.getTask().getTotalTimeout() * 1000 + 2000);
 
                     } else {
                         //abort operation

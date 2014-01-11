@@ -161,16 +161,11 @@ public abstract class Operation implements ResponseListener {
         return description;
     }
 
-    public int getOverallTimeout() {
+    public int getTotalTimeout() {
         int timeout = 0;
         try {
             for (Task task : tasks) {
-                int taskTimeout = 0;
-                for (Command command : task.getCommands()) {
-                    taskTimeout += command.getRequest().getTimeout();
-                }
-                taskTimeout /= task.getCommands().size();
-                timeout += taskTimeout;
+                timeout += task.getTotalTimeout();
             }
 
         } catch (Exception e) {

@@ -118,7 +118,7 @@ public class Step5 extends Panel implements ResponseListener {
                         public void run() {
                             try {
                                 //wait for overalltimeout + 15 sec just in case
-                                Thread.sleep(operation.getOverallTimeout() * 1000 + 15000);
+                                Thread.sleep(operation.getTotalTimeout() * 1000 + 15000);
                                 if (!operation.isStopped()
                                         && !operation.isFailed()
                                         && !operation.isSucceeded()) {
