@@ -30,7 +30,7 @@ public class MongoModule implements Module {
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
             wizard = new Wizard();
-            mongoManager = new Manager();
+            mongoManager = new Manager(this);
             mongoSheet.addTab(wizard.getContent(), "Install");
             mongoSheet.addTab(mongoManager.getContent(), "Manage");
 

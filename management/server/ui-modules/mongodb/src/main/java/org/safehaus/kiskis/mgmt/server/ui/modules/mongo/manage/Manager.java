@@ -13,6 +13,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -29,6 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
+import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
@@ -69,7 +72,7 @@ public class Manager implements ResponseListener {
     private final Table routersTable;
     private final Table dataNodesTable;
 
-    public Manager() {
+    public Manager(final CustomComponent component) {
         //get db and transport managers
         agentManager = ServiceLocator.getService(AgentManagerInterface.class);
         commandManager = ServiceLocator.getService(CommandManagerInterface.class);
@@ -149,6 +152,31 @@ public class Manager implements ResponseListener {
         });
 
         topContent.addComponent(checkOverallStatusBtn);
+
+        Button destroyClusterBtn = new Button("Destroy cluster");
+        destroyClusterBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (clusterInfo != null) {
+                    MgmtApplication.showConfirmationDialog(
+                            "Cluster destruction confirmation",
+                            String.format("Do you want to destroy the %s cluster?", clusterInfo.getClusterName()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
+
+                                @Override
+                                public void response(boolean ok) {
+                                    show("" + ok);
+                                }
+                            });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+
+        });
+
+        topContent.addComponent(destroyClusterBtn);
 
         content.addComponent(topContent);
 
