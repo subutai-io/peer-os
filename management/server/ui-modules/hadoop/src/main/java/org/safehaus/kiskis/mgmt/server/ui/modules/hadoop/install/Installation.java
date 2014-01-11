@@ -1,8 +1,12 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.util;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -11,7 +15,7 @@ import java.util.*;
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/7/13 Time: 5:55 PM
  */
-public class HadoopInstallation {
+public class Installation {
 
     private Task hadoopInstallationTask;
     private Task hadoopConfigureTask;
@@ -23,9 +27,11 @@ public class HadoopInstallation {
     private Task hadoopCopySSHSlaves;
     private Task hadoopConfigMasterSSH;
     private Task hadoopFormatMaster;
+    private Task hadoopReadHosts;
+    private Task hadoopWriteHosts;
 
     private HadoopClusterInfo cluster;
-    private String clusterName;
+    private String clusterName, domainName;
     private Agent nameNode, jobTracker, sNameNode;
     private List<Agent> dataNodes, taskTrackers;
     private Integer replicationFactor;
@@ -36,7 +42,7 @@ public class HadoopInstallation {
     private CommandManagerInterface commandManager;
     private Step3 panel;
 
-    public HadoopInstallation(CommandManagerInterface commandManagerInterface) {
+    public Installation(CommandManagerInterface commandManagerInterface) {
         this.commandManager = commandManagerInterface;
 
         hadoopInstallationTask = null;
@@ -67,7 +73,7 @@ public class HadoopInstallation {
                     map.put(":source", HadoopModule.MODULE_NAME);
                     map.put(":uuid", agent.getUuid().toString());
 
-                    RequestUtil.createRequest(commandManager, HadoopCommands.INSTALL_DEB, hadoopInstallationTask, map);
+                    RequestUtil.createRequest(commandManager, Commands.INSTALL_DEB, hadoopInstallationTask, map);
                 }
             }
         }
@@ -84,11 +90,11 @@ public class HadoopInstallation {
                     map.put(":source", HadoopModule.MODULE_NAME);
                     map.put(":uuid", agent.getUuid().toString());
 
-                    map.put(":namenode", nameNode.getListIP().get(0));
-                    map.put(":jobtracker", jobTracker.getListIP().get(0));
+                    map.put(":namenode", nameNode.getHostname());
+                    map.put(":jobtracker", jobTracker.getHostname());
                     map.put(":replicationfactor", replicationFactor.toString());
 
-                    RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTERS, hadoopConfigureTask, map);
+                    RequestUtil.createRequest(commandManager, Commands.SET_MASTERS, hadoopConfigureTask, map);
                 }
             }
         }
@@ -103,15 +109,15 @@ public class HadoopInstallation {
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", nameNode.getUuid().toString());
 
-            RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_MASTER, hadoopSNameNodeTask, map);
+            RequestUtil.createRequest(commandManager, Commands.CLEAR_MASTER, hadoopSNameNodeTask, map);
 
             map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", nameNode.getUuid().toString());
 
-            map.put(":secondarynamenode", sNameNode.getListIP().get(0));
+            map.put(":secondarynamenode", sNameNode.getHostname());
 
-            RequestUtil.createRequest(commandManager, HadoopCommands.SET_SECONDARY_NAME_NODE, hadoopSNameNodeTask, map);
+            RequestUtil.createRequest(commandManager, Commands.SET_SECONDARY_NAME_NODE, hadoopSNameNodeTask, map);
         }
     }
 
@@ -124,7 +130,7 @@ public class HadoopInstallation {
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", nameNode.getUuid().toString());
 
-            RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_SLAVES, hadoopSlaveNameNode, map);
+            RequestUtil.createRequest(commandManager, Commands.CLEAR_SLAVES, hadoopSlaveNameNode, map);
 
             for (Agent agent : dataNodes) {
                 if (agent != null) {
@@ -132,13 +138,12 @@ public class HadoopInstallation {
                     map.put(":source", HadoopModule.MODULE_NAME);
                     map.put(":uuid", nameNode.getUuid().toString());
 
-                    map.put(":slave-hostname", agent.getListIP().get(0));
+                    map.put(":slave-hostname", agent.getHostname());
 
-                    RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES, hadoopSlaveNameNode, map);
+                    RequestUtil.createRequest(commandManager, Commands.SET_SLAVES, hadoopSlaveNameNode, map);
                 }
             }
         }
-
     }
 
     public void setSlaveJobTracker() {
@@ -150,7 +155,7 @@ public class HadoopInstallation {
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", jobTracker.getUuid().toString());
 
-            RequestUtil.createRequest(commandManager, HadoopCommands.CLEAR_SLAVES, hadoopSlaveJobTracker, map);
+            RequestUtil.createRequest(commandManager, Commands.CLEAR_SLAVES, hadoopSlaveJobTracker, map);
 
             for (Agent agent : taskTrackers) {
                 if (agent != null) {
@@ -159,13 +164,12 @@ public class HadoopInstallation {
                     map.put(":source", HadoopModule.MODULE_NAME);
                     map.put(":uuid", jobTracker.getUuid().toString());
 
-                    map.put(":slave-hostname", agent.getListIP().get(0));
+                    map.put(":slave-hostname", agent.getHostname());
 
-                    RequestUtil.createRequest(commandManager, HadoopCommands.SET_SLAVES, hadoopSlaveJobTracker, map);
+                    RequestUtil.createRequest(commandManager, Commands.SET_SLAVES, hadoopSlaveJobTracker, map);
                 }
             }
         }
-
     }
 
     public void setSSH() {
@@ -176,20 +180,20 @@ public class HadoopInstallation {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", nameNode.getUuid().toString());
-            RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_KEY, hadoopSetSSH, map);
+            RequestUtil.createRequest(commandManager, Commands.SET_MASTER_KEY, hadoopSetSSH, map);
 
             if (!nameNode.equals(sNameNode)) {
                 map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", sNameNode.getUuid().toString());
-                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_KEY, hadoopSetSSH, map);
+                RequestUtil.createRequest(commandManager, Commands.SET_MASTER_KEY, hadoopSetSSH, map);
             }
 
             if (!jobTracker.equals(nameNode) && !jobTracker.equals(sNameNode)) {
                 map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", jobTracker.getUuid().toString());
-                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_KEY, hadoopSetSSH, map);
+                RequestUtil.createRequest(commandManager, Commands.SET_MASTER_KEY, hadoopSetSSH, map);
             }
         }
 
@@ -203,20 +207,20 @@ public class HadoopInstallation {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", nameNode.getUuid().toString());
-            RequestUtil.createRequest(commandManager, HadoopCommands.COPY_MASTER_KEY, hadoopSSHMaster, map);
+            RequestUtil.createRequest(commandManager, Commands.COPY_MASTER_KEY, hadoopSSHMaster, map);
 
             if (!nameNode.equals(sNameNode)) {
                 map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", sNameNode.getUuid().toString());
-                RequestUtil.createRequest(commandManager, HadoopCommands.COPY_MASTER_KEY, hadoopSSHMaster, map);
+                RequestUtil.createRequest(commandManager, Commands.COPY_MASTER_KEY, hadoopSSHMaster, map);
             }
 
             if (!jobTracker.equals(nameNode) && !jobTracker.equals(sNameNode)) {
                 map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", jobTracker.getUuid().toString());
-                RequestUtil.createRequest(commandManager, HadoopCommands.COPY_MASTER_KEY, hadoopSSHMaster, map);
+                RequestUtil.createRequest(commandManager, Commands.COPY_MASTER_KEY, hadoopSSHMaster, map);
             }
         }
 
@@ -237,13 +241,12 @@ public class HadoopInstallation {
 
                             map.put(":PUB_KEY", key);
 
-                            RequestUtil.createRequest(commandManager, HadoopCommands.PASTE_MASTER_KEY, hadoopCopySSHSlaves, map);
+                            RequestUtil.createRequest(commandManager, Commands.PASTE_MASTER_KEY, hadoopCopySSHSlaves, map);
                         }
                     }
                 }
             }
         }
-
     }
 
     public void configSSHMaster() {
@@ -254,20 +257,20 @@ public class HadoopInstallation {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", nameNode.getUuid().toString());
-            RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
+            RequestUtil.createRequest(commandManager, Commands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
 
             if (!nameNode.equals(sNameNode)) {
                 map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", sNameNode.getUuid().toString());
-                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
+                RequestUtil.createRequest(commandManager, Commands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
             }
 
             if (!jobTracker.equals(nameNode) && !jobTracker.equals(sNameNode)) {
                 map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", jobTracker.getUuid().toString());
-                RequestUtil.createRequest(commandManager, HadoopCommands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
+                RequestUtil.createRequest(commandManager, Commands.SET_MASTER_CONFIG, hadoopConfigMasterSSH, map);
             }
         }
 
@@ -281,12 +284,80 @@ public class HadoopInstallation {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", nameNode.getUuid().toString());
-            RequestUtil.createRequest(commandManager, HadoopCommands.FORMAT_NAME_NODE, hadoopFormatMaster, map);
+            RequestUtil.createRequest(commandManager, Commands.FORMAT_NAME_NODE, hadoopFormatMaster, map);
 
-            System.out.println(cluster);
             commandManager.saveHadoopClusterData(cluster);
         }
+    }
 
+    public void readHosts() {
+        if (hadoopReadHosts == null) {
+            hadoopReadHosts = RequestUtil.createTask(commandManager, "Read /etc/hosts file");
+            panel.addOutput(hadoopReadHosts, " started...");
+
+            for (Agent agent : allNodes) {
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                RequestUtil.createRequest(commandManager, Commands.READ_HOSTNAME, hadoopReadHosts, map);
+            }
+        }
+    }
+
+    public void writeHosts(List<ParseResult> list) {
+        if (hadoopWriteHosts == null) {
+            hadoopWriteHosts = RequestUtil.createTask(commandManager, "Write /etc/hosts file");
+            panel.addOutput(hadoopWriteHosts, " started...");
+
+            for (ParseResult pr : list) {
+                Agent agent = getAgentManager().getAgent(pr.getRequest().getUuid());
+                String hosts = editHosts(pr.getResponse().getStdOut(), agent);
+
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+                map.put(":hosts", hosts);
+                RequestUtil.createRequest(commandManager, Commands.WRITE_HOSTNAME, hadoopWriteHosts, map);
+            }
+        }
+    }
+
+    private String editHosts(String input, Agent localAgent) {
+        StringBuilder result = new StringBuilder();
+
+        String[] hosts = input.split("\n");
+        for (String host : hosts) {
+            host = host.trim();
+            boolean isContains = false;
+            for (Agent agent : allNodes) {
+                if (host.contains(agent.getHostname()) ||
+                        host.contains("localhost") ||
+                        host.contains(localAgent.getHostname()) ||
+                        host.contains(localAgent.getListIP().get(0))) {
+                    isContains = true;
+                }
+            }
+
+            if (!isContains) {
+                result.append(host);
+                result.append("\n");
+            }
+        }
+
+        for (Agent agent : allNodes) {
+            result.append(agent.getListIP().get(0));
+            result.append("\t");
+            result.append(agent.getHostname());
+            result.append(".");
+            result.append(domainName);
+            result.append("\t");
+            result.append(agent.getHostname());
+            result.append("\n");
+        }
+
+        result.append("127.0.0.1\tlocalhost");
+
+        return result.toString();
     }
 
     public void onCommand(Response response, Step3 panel) {
@@ -318,6 +389,10 @@ public class HadoopInstallation {
                 } else if (task.equals(hadoopConfigMasterSSH)) {
                     formatMaster();
                 } else if (task.equals(hadoopFormatMaster)) {
+                    readHosts();
+                } else if (task.equals(hadoopReadHosts)) {
+                    writeHosts(list);
+                } else if (task.equals(hadoopWriteHosts)) {
                     panel.setCloseable();
                 }
             } else if (task.getTaskStatus().compareTo(TaskStatus.FAIL) == 0) {
@@ -373,6 +448,7 @@ public class HadoopInstallation {
         cluster = new HadoopClusterInfo();
 
         cluster.setClusterName(clusterName);
+        cluster.setIpMask(domainName);
         cluster.setReplicationFactor(replicationFactor);
 
         cluster.setNameNode(nameNode.getUuid());
@@ -438,5 +514,26 @@ public class HadoopInstallation {
 
     public void setReplicationFactor(Integer replicationFactor) {
         this.replicationFactor = replicationFactor;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public AgentManagerInterface getAgentManager() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
+        if (ctx != null) {
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            if (serviceReference != null) {
+                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+            }
+        }
+
+        return null;
     }
 }

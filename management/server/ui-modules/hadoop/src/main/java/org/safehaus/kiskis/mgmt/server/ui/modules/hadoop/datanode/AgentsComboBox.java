@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.FieldEvents;
@@ -24,14 +24,15 @@ import java.util.UUID;
 public class AgentsComboBox extends ComboBox {
 
     private HadoopClusterInfo cluster;
+    private String clusterName;
 
     public AgentsComboBox(String clusterName) {
-        this.cluster = getCommandManager().getHadoopClusterData(clusterName);
+        this.clusterName = clusterName;
 
         refreshDataSource();
         setItemCaptionPropertyId("hostname");
 
-        addListener(new FieldEvents.FocusListener(){
+        addListener(new FieldEvents.FocusListener() {
 
             @Override
             public void focus(FieldEvents.FocusEvent focusEvent) {
@@ -41,23 +42,25 @@ public class AgentsComboBox extends ComboBox {
     }
 
     public void refreshDataSource() {
-        this.cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
+        this.cluster = getCommandManager().getHadoopClusterData(clusterName);
         setContainerDataSource(getDataSourceMasters());
     }
 
     private BeanItemContainer getDataSourceMasters() {
         List<Agent> list = getAgentManager().getRegisteredLxcAgents();
 
-        list.remove(getAgentManager().getAgent(cluster.getNameNode()));
-        list.remove(getAgentManager().getAgent(cluster.getSecondaryNameNode()));
-        list.remove(getAgentManager().getAgent(cluster.getJobTracker()));
+        if (cluster != null) {
+            list.remove(getAgentManager().getAgent(cluster.getNameNode()));
+            list.remove(getAgentManager().getAgent(cluster.getSecondaryNameNode()));
+            list.remove(getAgentManager().getAgent(cluster.getJobTracker()));
 
-        for (UUID uuid : cluster.getDataNodes()) {
-            list.remove(getAgentManager().getAgent(uuid));
-        }
+            for (UUID uuid : cluster.getDataNodes()) {
+                list.remove(getAgentManager().getAgent(uuid));
+            }
 
-        for (UUID uuid : cluster.getTaskTrackers()) {
-            list.remove(getAgentManager().getAgent(uuid));
+            for (UUID uuid : cluster.getTaskTrackers()) {
+                list.remove(getAgentManager().getAgent(uuid));
+            }
         }
 
         return new BeanItemContainer<Agent>(Agent.class, list);

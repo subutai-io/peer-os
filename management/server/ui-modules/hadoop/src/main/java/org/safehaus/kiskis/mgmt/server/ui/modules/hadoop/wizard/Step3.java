@@ -106,4 +106,8 @@ public class Step3 extends Panel {
     public void setCloseable() {
         next.setEnabled(true);
     }
+
+    public void show(String notification){
+        getWindow().showNotification(notification);
+    }
 }

@@ -5,12 +5,9 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -18,7 +15,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
@@ -38,6 +34,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
         this.agentManagerInterface = ServiceLocator.getService(AgentManagerInterface.class);
         setSizeFull();
         setMargin(true);
+
         tree = new Tree("List of nodes");
         tree.setContainerDataSource(getNodeContainer());
         tree.setItemIconPropertyId("icon");
