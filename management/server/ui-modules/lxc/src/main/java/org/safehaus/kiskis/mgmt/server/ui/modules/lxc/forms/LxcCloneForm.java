@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms;
 
+import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
@@ -18,13 +19,36 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-//import org.safehaus.kiskis.mgmt.server.ui.util.AppData;
+//import org.safehaus.kiskis.mgmt.server.ui.install.AppData;
+
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
  */
 @SuppressWarnings("serial")
 public class LxcCloneForm extends VerticalLayout implements
         Button.ClickListener {
+
+    /*private static final String CLONE_LXC = ""
+            + "{\n"
+            + "\t  \"command\": {\n"
+            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+            + "\t    \"source\": \":source\",\n"
+            + "\t    \"uuid\": \":uuid\",\n"
+            + "\t    \"taskUuid\": \":task\",\n"
+            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+            + "\t    \"workingDirectory\": \"/\",\n"
+            + "\t    \"program\": \"/usr/bin/lxc-clone\",\n"
+            + "\t    \"stdOut\": \"RETURN\",\n"
+            + "\t    \"stdErr\": \"RETURN\",\n"
+            + "\t    \"runAs\": \"root\",\n"
+            + "\t    \"args\": [\n"
+            + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name;\","
+            + "\"  cat /dev/null > /etc/resolvconf/resolv.conf.d/original && "
+            + " cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original"
+            + "\t    ],\n"
+            + "\t    \"timeout\": 360\n"
+            + "\t  }\n"
+            + "\t}";*/
 
     private static final String CLONE_LXC = ""
             + "{\n"
@@ -40,9 +64,7 @@ public class LxcCloneForm extends VerticalLayout implements
             + "\t    \"stdErr\": \"RETURN\",\n"
             + "\t    \"runAs\": \"root\",\n"
             + "\t    \"args\": [\n"
-            + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name\","
-            + "\" && cat /dev/null > /etc/resolvconf/resolv.conf.d/original "
-            + "&& cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original\"\n"
+            + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name\""
             + "\t    ],\n"
             + "\t    \"timeout\": 360\n"
             + "\t  }\n"
@@ -102,7 +124,7 @@ public class LxcCloneForm extends VerticalLayout implements
 
             if (physicalAgents.isEmpty()) {
                 getWindow().showNotification("Select at least one physical agent");
-            } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
+            } else if (Strings.isNullOrEmpty(textFieldLxcName.getValue().toString())) {
                 getWindow().showNotification("Enter lxc hostname");
             } else {
                 outputPanel.removeAllComponents();

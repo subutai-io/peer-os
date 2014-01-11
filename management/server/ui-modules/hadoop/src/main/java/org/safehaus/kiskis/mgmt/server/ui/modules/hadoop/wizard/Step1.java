@@ -59,6 +59,12 @@ public class Step1 extends Panel {
         textFieldClusterName.setRequiredError("Must have a name");
         verticalLayoutForm.addComponent(textFieldClusterName);
 
+        final TextField textFieldDomainName = new TextField("Enter your domain name");
+        textFieldDomainName.setInputPrompt("intra.lan");
+        textFieldDomainName.setRequired(true);
+        textFieldDomainName.setRequiredError("Must have a name");
+        verticalLayoutForm.addComponent(textFieldDomainName);
+
         Label labelNameNode = new Label("Choose the host that will run Name Node:");
         verticalLayoutForm.addComponent(labelNameNode);
 
@@ -131,6 +137,7 @@ public class Step1 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 parent.getHadoopInstallation().setClusterName(textFieldClusterName.getValue().toString());
+                parent.getHadoopInstallation().setDomainName(textFieldDomainName.getValue().toString());
                 hadoopWizard.showNext();
 
             }

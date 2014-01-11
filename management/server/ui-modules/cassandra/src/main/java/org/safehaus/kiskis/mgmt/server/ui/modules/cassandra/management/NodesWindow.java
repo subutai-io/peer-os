@@ -131,7 +131,7 @@ public class NodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Checking the status of cassandra instance: " + agent.getHostname());
+                getWindow().showNotification("Checking the status: " + agent.getHostname());
                 cce = CassandraCommandEnum.STATUS;
                 selectedItem = item;
                 table.setEnabled(false);
@@ -148,20 +148,20 @@ public class NodesWindow extends Window {
             public void buttonClick(Button.ClickEvent event) {
                 table.setEnabled(false);
                 selectedItem = item;
-//                List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
+                List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
 //                List<UUID> seeds = cci.getSeeds();
-                if (event.getButton().getCaption().equals("Set as seed")) {
+                if (event.getButton().getCaption().toString().equals("Set as seed")) {
                     cce = CassandraCommandEnum.SET_SEED;
                     getWindow().showNotification("Adding instance to seeds list: " + agent.getHostname());
-//                    seeds.remove(agent.getUuid());
-                    cci.getSeeds().remove(agent.getUuid());
+                    seeds.add(agent.getUuid());
+//                    cci.getSeeds().add(agent.getUuid());
                 } else {
                     cce = CassandraCommandEnum.REMOVE_SEED;
                     getWindow().showNotification("Removing instance from seeds list: " + agent.getHostname());
-//                    seeds.add(agent.getUuid());
-                    cci.getSeeds().add(agent.getUuid());
+//                    cci.getSeeds().remove(agent.getUuid());
+                    seeds.remove(agent.getUuid());
                 }
-//                cci.setSeeds(seeds);
+                cci.setSeeds(seeds);
                 StringBuilder seedsSB = new StringBuilder();
                 for (UUID seed : cci.getSeeds()) {
                     Agent agent = getAgentManager().getAgent(seed);
@@ -171,31 +171,6 @@ public class NodesWindow extends Window {
 
             }
         });
-//        } else {
-//            setSeedsButton.addListener(new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//                    getWindow().showNotification("Adding instance to a seeds list: " + agent.getHostname());
-//                    table.setEnabled(false);
-//                    selectedItem = item;
-//                    cce = CassandraCommandEnum.SET_SEED;
-//                    List<UUID> seeds = new ArrayList<UUID>(cci.getSeeds());
-//                    seeds.add(agent.getUuid());
-//                    cci.setSeeds(seeds);
-//                    StringBuilder seedsSB = new StringBuilder();
-//                    for (UUID seed : cci.getSeeds()) {
-//                        Agent agent = getAgentManager().getAgent(seed);
-//                        seedsSB.append(agent.getHostname()).append(".").append(cci.getDomainName()).append(",");
-//                    }
-//
-//                    serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
-//                    if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
-//                        System.out.println("updated");
-//                    }
-//                }
-//            });
-//        }
 
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
@@ -263,9 +238,9 @@ public class NodesWindow extends Window {
                         case SUCCESS: {
                             Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
                             seed.setCaption("Remove seed");
-                            if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
-                                System.out.println("updated");
-                            }
+                        }
+                        if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                            System.out.println("updated");
                         }
                     }
                     break;
@@ -275,6 +250,9 @@ public class NodesWindow extends Window {
                         case SUCCESS: {
                             Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
                             seed.setCaption("Set as seed");
+                        }
+                        if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                            System.out.println("updated");
                         }
                     }
                     break;

@@ -10,6 +10,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode.DataNodesWindow;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker.TaskTrackersWindow;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
@@ -23,16 +25,17 @@ import java.util.List;
  * Date: 11/30/13
  * Time: 6:56 PM
  */
-public class HadoopClusterTable extends Table {
+public class ClusterTable extends Table {
 
     static final Action ACTION_NAME_NODE = new Action("Edit name node and data trackers");
     static final Action ACTION_JOB_TRACKER = new Action("Edit job tracker and task trackers");
     static final Action[] ACTIONS = new Action[]{ACTION_NAME_NODE,
             ACTION_JOB_TRACKER};
 
-    private HadoopDataNodesWindow hadoopDataNodesWindow;
+    private DataNodesWindow dataNodesWindow;
+    private TaskTrackersWindow taskTrackersWindow;
 
-    public HadoopClusterTable() {
+    public ClusterTable() {
         this.setCaption(" Hadoop Clusters");
         this.setContainerDataSource(getContainer());
 
@@ -54,12 +57,11 @@ public class HadoopClusterTable extends Table {
             public void handleAction(Action action, Object sender, Object target) {
                 Item item = getItem(target);
                 if (ACTION_NAME_NODE == action) {
-                    hadoopDataNodesWindow = new HadoopDataNodesWindow((String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
-                    getApplication().getMainWindow().addWindow(hadoopDataNodesWindow);
+                    dataNodesWindow = new DataNodesWindow((String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
+                    getApplication().getMainWindow().addWindow(dataNodesWindow);
                 } else if (ACTION_JOB_TRACKER == action) {
-                    getWindow().showNotification(
-                            "Selected cluster JB",
-                            (String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
+                    taskTrackersWindow = new TaskTrackersWindow((String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
+                    getApplication().getMainWindow().addWindow(taskTrackersWindow);
                 }
             }
 
@@ -111,9 +113,13 @@ public class HadoopClusterTable extends Table {
     }
 
     public void onCommand(Response response){
-         if(hadoopDataNodesWindow != null && hadoopDataNodesWindow.isVisible()){
-             hadoopDataNodesWindow.onCommand(response);
+         if(dataNodesWindow != null && dataNodesWindow.isVisible()){
+             dataNodesWindow.onCommand(response);
          }
+
+        if(taskTrackersWindow != null && taskTrackersWindow.isVisible()){
+            taskTrackersWindow.onCommand(response);
+        }
     }
 
     public CommandManagerInterface getCommandManager() {
