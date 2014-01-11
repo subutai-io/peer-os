@@ -207,4 +207,32 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         return image;
     }
 
+    public static void showConfirmationDialog(final String caption, final String question,
+            final String okLabel, final String cancelLabel, final ConfirmationDialogCallback callback) {
+        try {
+            if (getInstance() != null) {
+                final ConfirmationDialog cd = new ConfirmationDialog(
+                        caption,
+                        question,
+                        okLabel, cancelLabel, callback);
+                getInstance().getMainWindow().addWindow(cd);
+                cd.bringToFront();
+            }
+
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in showConfirmationDialog", e);
+        }
+    }
+
+    public static void addCustomWindow(Window window) {
+        try {
+            if (getInstance() != null && window != null) {
+                getInstance().getMainWindow().addWindow(window);
+                window.bringToFront();
+            }
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in addCustomWindow", e);
+        }
+    }
+
 }
