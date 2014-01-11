@@ -138,9 +138,6 @@ public class Step2 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-//                wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
-//                wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
-//                wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getConfigServers())) {

@@ -14,6 +14,7 @@ import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ConfigView;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -46,17 +47,33 @@ public class Step4 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                MongoClusterInfo mongoClusterInfo
-                        = new MongoClusterInfo(
-                                wizard.getConfig().getClusterName(),
-                                wizard.getConfig().getReplicaSetName(),
-                                wizard.getConfig().getConfigServers(),
-                                wizard.getConfig().getRouterServers(),
-                                wizard.getConfig().getDataNodes());
-                if (wizard.getDbManager().saveMongoClusterInfo(mongoClusterInfo)) {
-                    wizard.next();
+                //check once again
+                if (Util.isCollectionEmpty(wizard.getConfig().getConfigServers())) {
+                    show("Please add config servers");
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getRouterServers())) {
+                    show("Please add routers");
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getDataNodes())) {
+                    show("Please add data nodes");
+                } else if (wizard.getConfig().getConfigServers().size() != 1
+                        && wizard.getConfig().getConfigServers().size() != 3) {
+                    show("Please, select 1 or 3 nodes as config servers");
+                } else if (wizard.getConfig().getDataNodes().size() % 2 == 0) {
+                    show("Please add odd number of data nodes");
+                } else if (wizard.getConfig().getDataNodes().size() > 7) {
+                    show("Please add no more than 7 data nodes");
                 } else {
-                    show("Could not save new cluster configuration! Please see logs.");
+                    MongoClusterInfo mongoClusterInfo
+                            = new MongoClusterInfo(
+                                    wizard.getConfig().getClusterName(),
+                                    wizard.getConfig().getReplicaSetName(),
+                                    wizard.getConfig().getConfigServers(),
+                                    wizard.getConfig().getRouterServers(),
+                                    wizard.getConfig().getDataNodes());
+                    if (wizard.getDbManager().saveMongoClusterInfo(mongoClusterInfo)) {
+                        wizard.next();
+                    } else {
+                        show("Could not save new cluster configuration! Please see logs.");
+                    }
                 }
             }
         });

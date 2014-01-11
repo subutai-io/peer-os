@@ -114,8 +114,6 @@ public class Step3 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-//                wizard.getConfig().setReplicaSetName(Util.removeAllWhitespace(replicaNameTxtFld.getValue().toString().trim()));
-//                wizard.getConfig().setDataNodes((Set<Agent>) shardsColSel.getValue());
                 if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
                     show("Please provide replica set name");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getDataNodes())) {
