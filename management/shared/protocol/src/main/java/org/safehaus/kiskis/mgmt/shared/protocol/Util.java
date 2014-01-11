@@ -30,13 +30,15 @@ public class Util {
         return col == null || col.isEmpty();
     }
 
-    public static Set retainValues(Set col1, Set col2) {
-        if (col1 == null || col2 == null) {
-            return null;
-        } else {
-            Set tmp = new HashSet(col1);
-            tmp.retainAll(col2);
-            return tmp;
+    public static void retainValues(Set col1, Set col2) {
+        if (col1 != null && col2 != null) {
+            col1.retainAll(col2);
+        }
+    }
+
+    public static void removeValues(Set col1, Set col2) {
+        if (col1 != null && col2 != null) {
+            col1.removeAll(col2);
         }
     }
 

@@ -19,6 +19,7 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -28,6 +29,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  * @author dilshat
  */
 public class Step2 extends Panel {
+
+    Property.ValueChangeListener configChangeListener = null;
+    Property.ValueChangeListener routersChangeListener = null;
 
     public Step2(final Wizard wizard) {
 
@@ -68,12 +72,43 @@ public class Step2 extends Panel {
         mainContent.addComponent(clusterNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as config servers<br>"
-                + "(Recommended 3 servers)</strong>");
+                + "(Recommended 3 nodes, choose 1 or 3 nodes)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         mainContent.addComponent(configServersLabel);
 
         final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
+
+        configChangeListener = new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
+                    wizard.getConfig().setConfigServers(agentList);
+                    //clean 
+                    Util.removeValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getConfigServers());
+                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getConfigServers());
+                    routersColSel.removeListener(routersChangeListener);
+                    routersColSel.setValue(wizard.getConfig().getRouterServers());
+                    routersColSel.addListener(routersChangeListener);
+                }
+            }
+        };
+        routersChangeListener = new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Set<Agent>) event.getProperty().getValue());
+                    wizard.getConfig().setRouterServers(agentList);
+                    //clean 
+                    Util.removeValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getRouterServers());
+                    Util.removeValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getRouterServers());
+                    configServersColSel.removeListener(configChangeListener);
+                    configServersColSel.setValue(wizard.getConfig().getConfigServers());
+                    configServersColSel.addListener(configChangeListener);
+                }
+            }
+        };
 
         configServersColSel.setItemCaptionPropertyId("hostname");
         configServersColSel.setRows(7);
@@ -84,17 +119,7 @@ public class Step2 extends Panel {
         configServersColSel.setRightColumnCaption("Config Servers");
         configServersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         configServersColSel.setRequired(true);
-        configServersColSel.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                wizard.getConfig().setConfigServers(agentList);
-                //clean 
-//                Set<Agent> routers = new HashSet<Agent>((Set< Agent>) routersColSel.getValue());
-//                routers.removeAll(agentList);
-//                routersColSel.setValue(routers);
-            }
-        });
+        configServersColSel.addListener(configChangeListener);
 
         mainContent.addComponent(configServersColSel);
 
@@ -112,13 +137,7 @@ public class Step2 extends Panel {
         routersColSel.setRightColumnCaption("Routers");
         routersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         routersColSel.setRequired(true);
-        routersColSel.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
-                wizard.getConfig().setRouterServers(agentList);
-            }
-        });
+        routersColSel.addListener(routersChangeListener);
 
         mainContent.addComponent(routersColSel);
 
@@ -131,10 +150,6 @@ public class Step2 extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                wizard.getConfig().setClusterName(clusterNameTxtFld.getValue().toString().trim());
-                wizard.getConfig().setConfigServers((Set<Agent>) configServersColSel.getValue());
-                wizard.getConfig().setRouterServers((Set<Agent>) routersColSel.getValue());
-
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getConfigServers())) {
@@ -143,6 +158,9 @@ public class Step2 extends Panel {
                     show("Please add routers");
                 } else if (wizard.getDbManager().getMongoClusterInfo(wizard.getConfig().getClusterName()) != null) {
                     show(MessageFormat.format("Cluster with name {0} already exists", wizard.getConfig().getClusterName()));
+                } else if (wizard.getConfig().getConfigServers().size() != 1
+                        && wizard.getConfig().getConfigServers().size() != 3) {
+                    show("Please, select 1 or 3 nodes as config servers");
                 } else {
                     wizard.next();
                 }
@@ -175,8 +193,9 @@ public class Step2 extends Panel {
 
         //set values if this is a second visit
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        configServersColSel.setValue(Util.retainValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getSelectedAgents()));
-        routersColSel.setValue(Util.retainValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getSelectedAgents()));
+
+        configServersColSel.setValue(wizard.getConfig().getConfigServers());
+        routersColSel.setValue(wizard.getConfig().getRouterServers());
     }
 
     private void show(String notification) {
