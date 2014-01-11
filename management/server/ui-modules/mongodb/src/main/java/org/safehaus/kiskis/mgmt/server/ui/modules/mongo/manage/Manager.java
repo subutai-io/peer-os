@@ -273,6 +273,13 @@ public class Manager implements ResponseListener {
                 findPrimaryNodeCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
                 destroyTask.addCommand(findPrimaryNodeCmd);
                 //uninstall mongo
+                Command unregisterFromPrimaryCmd
+                        = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
+                                String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
+                //on response set UUID with primary node agent uuid
+                unregisterFromPrimaryCmd.getRequest().setTaskUuid(destroyTask.getUuid());
+                unregisterFromPrimaryCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
+                destroyTask.addCommand(unregisterFromPrimaryCmd);
                 Command killCmd = Commands.getKillAllCommand();
                 killCmd.getRequest().setUuid(agent.getUuid());
                 killCmd.getRequest().setTaskUuid(destroyTask.getUuid());
@@ -288,13 +295,6 @@ public class Manager implements ResponseListener {
                 uninstallCmd.getRequest().setTaskUuid(destroyTask.getUuid());
                 uninstallCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
                 destroyTask.addCommand(uninstallCmd);
-                Command unregisterFromPrimaryCmd
-                        = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
-                                String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
-                //on response set UUID with primary node agent uuid
-                unregisterFromPrimaryCmd.getRequest().setTaskUuid(destroyTask.getUuid());
-                unregisterFromPrimaryCmd.getRequest().setRequestSequenceNumber(destroyTask.getIncrementedReqSeqNumber());
-                destroyTask.addCommand(unregisterFromPrimaryCmd);
 
                 if (commandManager.executeCommand(destroyTask.getNextCommand())) {
                     ManagerAction managerAction = new ManagerAction(
@@ -405,7 +405,7 @@ public class Manager implements ResponseListener {
         }
     }
 
-    private void processDestroyCommandResponse(ManagerAction managerAction, Response response) {
+    private void processDestroyCommandResponse(ManagerAction managerAction, Response response) throws InterruptedException {
         //save task upon completion && launch check-status task 
         if (Util.isFinalResponse(response)) {
             if (managerAction.getErrOutput().contains("mongo: not found")) {
@@ -431,22 +431,26 @@ public class Manager implements ResponseListener {
                     }
                     if (primaryNodeAgent != null) {
                         //!!!!MAY BE UNREGISTER FIRST THEN UNINSTALL, need more tests
+                        int totalTimeout = 0;
+                        //unregister the node from primary node if this node is not primary itself
+                        Command unregisterFromPrimaryCmd = managerAction.getTask().getNextCommand();
+                        unregisterFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
+                        if (primaryNodeAgent.getUuid().compareTo(managerAction.getAgent().getUuid()) != 0) {
+                            totalTimeout += unregisterFromPrimaryCmd.getRequest().getTimeout();
+                            commandManager.executeCommand(unregisterFromPrimaryCmd);
+                        }
+                        //sleep to let the node complete unregistration
+                        Thread.sleep(3000);
+                        //continue cleaning up
                         Command killCmd = managerAction.getTask().getNextCommand();
                         Command cleanCmd = managerAction.getTask().getNextCommand();
                         Command uninstallCmd = managerAction.getTask().getNextCommand();
-                        int totalTimeout = killCmd.getRequest().getTimeout();
+                        totalTimeout = killCmd.getRequest().getTimeout();
                         totalTimeout += cleanCmd.getRequest().getTimeout();
                         totalTimeout += uninstallCmd.getRequest().getTimeout();
                         commandManager.executeCommand(killCmd);
                         commandManager.executeCommand(cleanCmd);
                         commandManager.executeCommand(uninstallCmd);
-                        //unregister the node from primary node if this node is not primary itself
-                        if (primaryNodeAgent.getUuid().compareTo(managerAction.getAgent().getUuid()) != 0) {
-                            Command unregisterFromPrimaryCmd = managerAction.getTask().getNextCommand();
-                            unregisterFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
-                            totalTimeout += unregisterFromPrimaryCmd.getRequest().getTimeout();
-                            commandManager.executeCommand(unregisterFromPrimaryCmd);
-                        }
                         actionsCache.put(managerAction.getTask().getUuid(),
                                 managerAction,
                                 totalTimeout * 1000 + 2000);
