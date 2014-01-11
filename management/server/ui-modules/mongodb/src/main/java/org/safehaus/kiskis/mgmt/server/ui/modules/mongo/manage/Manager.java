@@ -286,6 +286,22 @@ public class Manager implements ResponseListener {
 
             } else if (nodeType == NodeType.ROUTER_NODE) {
                 //uninstall mongo
+                Task destroyTask = Util.createTask("Destroy router node");
+                //add cleanup commands
+                addCleanupCommands(agent, destroyTask);
+
+                //kill
+                commandManager.executeCommand(destroyTask.getNextCommand());
+                //clean
+                commandManager.executeCommand(destroyTask.getNextCommand());
+                //uninstall
+                commandManager.executeCommand(destroyTask.getNextCommand());
+
+                Action action = new Action(
+                        destroyTask,
+                        actionType,
+                        row, agent, nodeType);
+                cacheAction(action, destroyTask.getTotalTimeout() * 1000 + 2000);
             } else if (nodeType == NodeType.DATA_NODE) {
                 //uninstall mongo
                 //unregister from primary node if this node is not primary otherwise no-op
