@@ -86,6 +86,9 @@ public class Step3 extends Panel {
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 wizard.getConfig().setDataNodes(agentList);
+                //clean 
+                wizard.getConfig().getConfigServers().removeAll(wizard.getConfig().getDataNodes());
+                wizard.getConfig().getRouterServers().removeAll(wizard.getConfig().getDataNodes());
             }
         });
 
@@ -140,7 +143,7 @@ public class Step3 extends Panel {
 
         //set values if this is a second visit
         replicaNameTxtFld.setValue(wizard.getConfig().getReplicaSetName());
-        shardsColSel.setValue(Util.retainValues(wizard.getConfig().getDataNodes(), wizard.getConfig().getSelectedAgents()));
+        shardsColSel.setValue(wizard.getConfig().getDataNodes());
     }
 
     private void show(String notification) {

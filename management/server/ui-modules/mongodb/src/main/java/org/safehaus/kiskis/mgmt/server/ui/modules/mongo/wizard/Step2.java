@@ -19,6 +19,7 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -68,7 +69,7 @@ public class Step2 extends Panel {
         mainContent.addComponent(clusterNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as config servers<br>"
-                + "(Recommended 3 servers)</strong>");
+                + "(Recommended 3 nodes, choose 1 or 3 nodes)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         mainContent.addComponent(configServersLabel);
 
@@ -90,9 +91,8 @@ public class Step2 extends Panel {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 wizard.getConfig().setConfigServers(agentList);
                 //clean 
-//                Set<Agent> routers = new HashSet<Agent>((Set< Agent>) routersColSel.getValue());
-//                routers.removeAll(agentList);
-//                routersColSel.setValue(routers);
+                wizard.getConfig().getRouterServers().removeAll(wizard.getConfig().getConfigServers());
+                wizard.getConfig().getDataNodes().removeAll(wizard.getConfig().getConfigServers());
             }
         });
 
@@ -117,6 +117,9 @@ public class Step2 extends Panel {
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 wizard.getConfig().setRouterServers(agentList);
+                //clean 
+                wizard.getConfig().getConfigServers().removeAll(wizard.getConfig().getRouterServers());
+                wizard.getConfig().getDataNodes().removeAll(wizard.getConfig().getRouterServers());
             }
         });
 
@@ -143,6 +146,9 @@ public class Step2 extends Panel {
                     show("Please add routers");
                 } else if (wizard.getDbManager().getMongoClusterInfo(wizard.getConfig().getClusterName()) != null) {
                     show(MessageFormat.format("Cluster with name {0} already exists", wizard.getConfig().getClusterName()));
+                } else if (wizard.getConfig().getConfigServers().size() != 1
+                        && wizard.getConfig().getConfigServers().size() != 3) {
+                    show("Please, select 1 or 3 nodes as config servers");
                 } else {
                     wizard.next();
                 }
@@ -175,8 +181,9 @@ public class Step2 extends Panel {
 
         //set values if this is a second visit
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        configServersColSel.setValue(Util.retainValues(wizard.getConfig().getConfigServers(), wizard.getConfig().getSelectedAgents()));
-        routersColSel.setValue(Util.retainValues(wizard.getConfig().getRouterServers(), wizard.getConfig().getSelectedAgents()));
+
+        configServersColSel.setValue(wizard.getConfig().getConfigServers());
+        routersColSel.setValue(wizard.getConfig().getRouterServers());
     }
 
     private void show(String notification) {
