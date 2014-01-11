@@ -20,6 +20,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -49,12 +50,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public class Manager implements ResponseListener {
     /*
      TODO:
-     0) dont't let using the same nodes for diff node types (e.g. routers as data nodes)
-     1) find primary node 
-     2) destroy node (either unregister from primary after check status command and clean data and ui or do it in destroy task)
-     3) add node
-     4) overall cluster check status
-     5) destroy cluster
+     1) dont't let using the same nodes for diff node types (e.g. routers as data nodes)
+     2) add node
+     3) overall cluster check status
+     4) destroy cluster
     
      */
 
@@ -133,6 +132,24 @@ public class Manager implements ResponseListener {
 
         topContent.addComponent(refreshClustersBtn);
 
+        Button checkOverallStatusBtn = new Button("Check overall status");
+        checkOverallStatusBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (clusterInfo != null) {
+                    checkNodesStatus(configServersTable, NodeType.CONFIG_NODE);
+                    checkNodesStatus(routersTable, NodeType.ROUTER_NODE);
+                    checkNodesStatus(dataNodesTable, NodeType.DATA_NODE);
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+
+        });
+
+        topContent.addComponent(checkOverallStatusBtn);
+
         content.addComponent(topContent);
 
         HorizontalLayout midContent = new HorizontalLayout();
@@ -147,6 +164,20 @@ public class Manager implements ResponseListener {
         content.addComponent(dataNodesTable);
 
         refreshClustersInfo();
+    }
+
+    private void checkNodesStatus(Table table, NodeType nodeType) {
+        for (Iterator it = table.getItemIds().iterator(); it.hasNext();) {
+            int rowId = (Integer) it.next();
+            Item row = table.getItem(rowId);
+            String hostname = (String) (row.getItemProperty(Constants.TABLE_HOST_PROPERTY).getValue());
+            Agent agent = agentManager.getAgentByHostname(hostname);
+            if (agent != null) {
+                executeManagerAction(ActionType.CHECK_NODE_STATUS,
+                        agent, nodeType,
+                        row);
+            }
+        }
     }
 
     public Component getContent() {
