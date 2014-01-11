@@ -8,10 +8,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
 import java.util.HashSet;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -33,28 +31,13 @@ public class Uninstaller extends Operation {
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         //uninstall it
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getKillAllCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            uninstallMongoTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getKillAllCommand(), agent, uninstallMongoTask);
         }
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getCleanCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            uninstallMongoTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getCleanCommand(), agent, uninstallMongoTask);
         }
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getUninstallCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            cmd.getRequest().setSource(MongoModule.MODULE_NAME);
-            uninstallMongoTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getUninstallCommand(), agent, uninstallMongoTask);
         }
         uninstallMongoTask.setIgnoreExitCode(true);
         addTask(uninstallMongoTask);

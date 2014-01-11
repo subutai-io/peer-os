@@ -38,7 +38,7 @@ public class CassandraCommands {
                 "root", //                      runas
                 null, //                        arg
                 null, //                        env vars
-                30); //                        timeout (sec)
+                60); //                        timeout (sec)
     }
 
 //    public static Command getInstallCommand() {
@@ -74,7 +74,6 @@ public class CassandraCommands {
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/listen_address:/=' " + conf + ")`'s!.*!listen_address: %listenAddress!'";
         req.setProgram(program.replace("%listenAddress", listenAddress));
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -83,7 +82,6 @@ public class CassandraCommands {
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/rpc_address:/=' " + conf + ")`'s!.*!rpc_address: %rpcAddress!'";
         req.setProgram(program.replace("%rpcAddress", rpcAddress));
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -92,7 +90,6 @@ public class CassandraCommands {
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seedsIps!'";
         req.setProgram(program.replace("%seedsIps", '"' + seeds + '"'));
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -101,7 +98,6 @@ public class CassandraCommands {
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/cluster_name:/=' " + conf + ")`'s!.*!cluster_name: %clusterName!'";
         req.setProgram(program.replace("%clusterName", clusterName));
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -110,7 +106,6 @@ public class CassandraCommands {
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/data_file_directories:/=' " + conf + ") + 1`'s!.*!     - %dir!'";
         req.setProgram(program.replace("%dir", dir));
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -119,7 +114,6 @@ public class CassandraCommands {
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -128,7 +122,6 @@ public class CassandraCommands {
         Request req = cmd.getRequest();
         String program = "sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -136,7 +129,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("rm -rf /var/lib/cassandra/data/*");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -144,7 +136,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("rm -rf /var/lib/cassandra/commitlog/*");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -152,7 +143,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("rm -rf /var/lib/cassandra/saved_caches/*");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -160,7 +150,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram(". /etc/profile");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -168,7 +157,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("service cassandra start");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -176,7 +164,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("service cassandra stop");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -184,7 +171,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("service cassandra status");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -192,7 +178,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("apt-get update");
-        req.setTimeout(30);
         return cmd;
     }
 
@@ -200,7 +185,6 @@ public class CassandraCommands {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram(cce.getProgram());
-        req.setTimeout(30);
         return cmd;
     }
 

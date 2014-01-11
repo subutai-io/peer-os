@@ -18,38 +18,51 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public final class ManagerAction {
+public final class Action {
 
     private final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
     private final Task task;
     private final Item row;
-    private final ManagerActionType managerActionType;
+    private final ActionType actionType;
     private final Agent agent;
     private final NodeType nodeType;
-    private final StringBuilder output = new StringBuilder();
+    private final StringBuilder stdOutput = new StringBuilder();
+    private final StringBuilder errOutput = new StringBuilder();
+    private int responseCount = 0;
 
-    public ManagerAction(Task task, ManagerActionType managerActionType, Item row, Agent agent, NodeType nodeType) {
+    public Action(Task task, ActionType actionType, Item row, Agent agent, NodeType nodeType) {
         this.task = task;
         this.row = row;
         this.agent = agent;
         this.nodeType = nodeType;
-        this.managerActionType = managerActionType;
+        this.actionType = actionType;
         showProgress();
+        disableButtons();
     }
 
     public Task getTask() {
         return task;
     }
 
+    public void incrementResponseCount() {
+        responseCount++;
+    }
+
+    public int getResponseCount() {
+        return responseCount;
+    }
+
     private <T> T getItemPropertyValue(Object itemPropertyId) {
         return (T) row.getItemProperty(itemPropertyId).getValue();
     }
 
-    public void disableStartStopButtons() {
+    public void disableButtons() {
         Button startBtn = getItemPropertyValue(Constants.TABLE_START_PROPERTY);
         Button stopBtn = getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
+        Button destroyBtn = getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
         startBtn.setEnabled(false);
         stopBtn.setEnabled(false);
+        destroyBtn.setEnabled(false);
     }
 
     public void enableStartButton() {
@@ -57,6 +70,11 @@ public final class ManagerAction {
         Button stopBtn = getItemPropertyValue(Constants.TABLE_STOP_PROPERTY);
         startBtn.setEnabled(true);
         stopBtn.setEnabled(false);
+    }
+
+    public void enableDestroyButton() {
+        Button destroyBtn = getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
+        destroyBtn.setEnabled(true);
     }
 
     public void enableStopButton() {
@@ -88,18 +106,33 @@ public final class ManagerAction {
         return nodeType;
     }
 
-    public ManagerActionType getManagerActionType() {
-        return managerActionType;
+    public Object getRowId() {
+        Button destroyBtn = getItemPropertyValue(Constants.TABLE_DESTROY_PROPERTY);
+        return destroyBtn.getData();
     }
 
-    public void addOutput(String out) {
+    public ActionType getActionType() {
+        return actionType;
+    }
+
+    public void addStdOutput(String out) {
         if (!Util.isStringEmpty(out)) {
-            output.append(out);
+            stdOutput.append(out);
         }
     }
 
-    public String getOutput() {
-        return output.toString();
+    public void addErrOutput(String out) {
+        if (!Util.isStringEmpty(out)) {
+            errOutput.append(out);
+        }
+    }
+
+    public String getStdOutput() {
+        return stdOutput.toString();
+    }
+
+    public String getErrOutput() {
+        return errOutput.toString();
     }
 
 }

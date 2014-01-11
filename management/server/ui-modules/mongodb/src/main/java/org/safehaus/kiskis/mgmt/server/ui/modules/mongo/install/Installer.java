@@ -9,10 +9,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -43,25 +41,13 @@ public class Installer extends Operation {
         //KILL && UNINSTALL MONGO
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getKillAllCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            uninstallMongoTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getKillAllCommand(), agent, uninstallMongoTask);
         }
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getCleanCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            uninstallMongoTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getCleanCommand(), agent, uninstallMongoTask);
         }
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getUninstallCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(uninstallMongoTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(uninstallMongoTask.getIncrementedReqSeqNumber());
-            uninstallMongoTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getUninstallCommand(), agent, uninstallMongoTask);
         }
         uninstallMongoTask.setIgnoreExitCode(true);
         addTask(uninstallMongoTask);
@@ -69,22 +55,14 @@ public class Installer extends Operation {
         //INSTALL MONGO
         Task installMongoTask = Util.createTask("Install Mongo");
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getInstallCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(installMongoTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(installMongoTask.getIncrementedReqSeqNumber());
-            installMongoTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getInstallCommand(), agent, installMongoTask);
         }
         addTask(installMongoTask);
 
         //STOP MONGODB ON ALL NODES
         Task stopMongoOnAllNodes = Util.createTask("Stop Mongo on all nodes");
         for (Agent agent : allClusterMembers) {
-            Command cmd = Commands.getKillAllCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(stopMongoOnAllNodes.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(stopMongoOnAllNodes.getIncrementedReqSeqNumber());
-            stopMongoOnAllNodes.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getKillAllCommand(), agent, stopMongoOnAllNodes);
         }
         stopMongoOnAllNodes.setIgnoreExitCode(true);
         addTask(stopMongoOnAllNodes);
@@ -115,33 +93,25 @@ public class Installer extends Operation {
                 cleanHosts.append("' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;");
                 appendHosts.insert(0, cleanHosts);
             }
-            Command cmd = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(addNodesIpHostToOtherNodesTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(addNodesIpHostToOtherNodesTask.getIncrementedReqSeqNumber());
-            addNodesIpHostToOtherNodesTask.addCommand(cmd);
+            bindCmdToAgentNTask(
+                    Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString()),
+                    agent, addNodesIpHostToOtherNodesTask);
         }
         addTask(addNodesIpHostToOtherNodesTask);
 
         //ADD REPLICA SET NAME TO CONFIG OF EACH RS
         Task setReplicaSetNameTask = Util.createTask(String.format("Set replica set name to %s", config.getReplicaSetName()));
         for (Agent agent : config.getDataNodes()) {
-            Command cmd = Commands.getSetReplicaSetNameCommand(config.getReplicaSetName());
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(setReplicaSetNameTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(setReplicaSetNameTask.getIncrementedReqSeqNumber());
-            setReplicaSetNameTask.addCommand(cmd);
+            bindCmdToAgentNTask(
+                    Commands.getSetReplicaSetNameCommand(config.getReplicaSetName()),
+                    agent, setReplicaSetNameTask);
         }
         addTask(setReplicaSetNameTask);
 
         //START CONFIG SERVERS
         startConfigServersTask = Util.createTask("Start config servers");
         for (Agent agent : config.getConfigServers()) {
-            Command cmd = Commands.getStartConfigServerCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(startConfigServersTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(startConfigServersTask.getIncrementedReqSeqNumber());
-            startConfigServersTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getStartConfigServerCommand(), agent, startConfigServersTask);
         }
         addTask(startConfigServersTask);
 
@@ -157,22 +127,15 @@ public class Installer extends Operation {
             configServersArg.setLength(configServersArg.length() - 1);
         }
         for (Agent agent : config.getRouterServers()) {
-            Command cmd = Commands.getStartRouterCommand(configServersArg.toString());
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(startRoutersTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(startRoutersTask.getIncrementedReqSeqNumber());
-            startRoutersTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getStartRouterCommand(configServersArg.toString()),
+                    agent, startRoutersTask);
         }
         addTask(startRoutersTask);
 
         //START RS
         startReplicaSet = Util.createTask("Start replica set");
         for (Agent agent : config.getDataNodes()) {
-            Command cmd = Commands.getStartNodeCommand();
-            cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(startReplicaSet.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(startReplicaSet.getIncrementedReqSeqNumber());
-            startReplicaSet.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getStartNodeCommand(), agent, startReplicaSet);
         }
         addTask(startReplicaSet);
 
@@ -190,11 +153,9 @@ public class Installer extends Operation {
             }
         }
         {
-            Command cmd = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString());
-            cmd.getRequest().setUuid(primaryNode.getUuid());
-            cmd.getRequest().setTaskUuid(registerSecondaryNodesWithPrimaryTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(registerSecondaryNodesWithPrimaryTask.getIncrementedReqSeqNumber());
-            registerSecondaryNodesWithPrimaryTask.addCommand(cmd);
+            bindCmdToAgentNTask(
+                    Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString()),
+                    primaryNode, registerSecondaryNodesWithPrimaryTask);
         }
         addTask(registerSecondaryNodesWithPrimaryTask);
 
@@ -208,12 +169,8 @@ public class Installer extends Operation {
                     append(":").append(Constants.DATA_NODE_PORT).append("');");
         }
         {
-            Command cmd = Commands.getRegisterShardsWithRouterCommand(
-                    shards.toString());
-            cmd.getRequest().setUuid(router.getUuid());
-            cmd.getRequest().setTaskUuid(registerShardsWithRouterTask.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(registerShardsWithRouterTask.getIncrementedReqSeqNumber());
-            registerShardsWithRouterTask.addCommand(cmd);
+            bindCmdToAgentNTask(Commands.getRegisterShardsWithRouterCommand(
+                    shards.toString()), router, registerShardsWithRouterTask);
         }
         addTask(registerShardsWithRouterTask);
 

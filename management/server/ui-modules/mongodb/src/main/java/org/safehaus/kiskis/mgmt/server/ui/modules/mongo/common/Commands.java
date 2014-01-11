@@ -163,23 +163,6 @@ public class Commands {
         return cmd;
     }
 
-    //execute on any router member
-    public static Command getRegisterShardWithRouterCommand2(String routerHost, String shards) {
-        Command cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram("mongo");
-        req.setArgs(Arrays.asList(
-                "--host",
-                routerHost, //supply any one router host
-                "--port",
-                Constants.ROUTER_PORT + "", //supply router port                
-                "--eval",
-                String.format("\"%s\"", shards)
-        ));
-        req.setTimeout(60);
-        return cmd;
-    }
-
     //execute on primary replica
     public static Command getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
         Command cmd = getTemplate();
@@ -198,6 +181,21 @@ public class Commands {
                 String.format("\"%s\"", secondaryNodes)
         ));
         req.setTimeout(180);
+        return cmd;
+    }
+
+    //execute on primary data node
+    public static Command getUnregisterSecondaryNodeFromPrimaryCommand(String host) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("mongo");
+        req.setArgs(Arrays.asList(
+                "--port",
+                Constants.DATA_NODE_PORT + "",
+                "--eval",
+                String.format("\"rs.remove('%s:%s');\"", host, Constants.DATA_NODE_PORT)
+        ));
+        req.setTimeout(30);
         return cmd;
     }
 
@@ -260,6 +258,28 @@ public class Commands {
         return cmd;
     }
 
+    //execute on router
+    public static Command getRestartRouterCommand(String configServersArg) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/pkill");
+        req.setArgs(Arrays.asList(
+                "-2",
+                "mongo",
+                ";",
+                "mongos",
+                "--configdb",
+                configServersArg,
+                "--port",
+                Constants.ROUTER_PORT + "",
+                "--fork",
+                "--logpath",
+                String.format("%s/mongodb.log", Constants.LOG_DIR)
+        ));
+        req.setTimeout(120);
+        return cmd;
+    }
+
     //execute on shard
     public static Command getStartNodeCommand() {
         Command cmd = getTemplate();
@@ -301,6 +321,21 @@ public class Commands {
         req.setArgs(Arrays.asList(
                 "-2",
                 "mongo"
+        ));
+        req.setTimeout(20);
+        return cmd;
+    }
+
+    public static Command getFindPrimaryNodeCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/bin/echo");
+        req.setArgs(Arrays.asList(
+                "'db.isMaster()'",
+                "|",
+                "mongo",
+                "--port",
+                Constants.DATA_NODE_PORT + ""
         ));
         req.setTimeout(20);
         return cmd;
