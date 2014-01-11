@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
@@ -87,6 +88,15 @@ public abstract class Operation implements ResponseListener {
 
     public void stop() {
         stopped = true;
+    }
+
+    protected final void bindCmdToAgentNTask(Command cmd, Agent agent, Task task) {
+        if (cmd != null && agent != null && task != null) {
+            cmd.getRequest().setUuid(agent.getUuid());
+            cmd.getRequest().setTaskUuid(task.getUuid());
+            cmd.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
+            task.addCommand(cmd);
+        }
     }
 
     private boolean executeNextTask() {
@@ -192,7 +202,7 @@ public abstract class Operation implements ResponseListener {
         }
     }
 
-    protected void processResponse(Response response) {
+    protected final void processResponse(Response response) {
         Task task = getCurrentTask();
         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
                 || response.getType() == ResponseType.EXECUTE_TIMEOUTED) {

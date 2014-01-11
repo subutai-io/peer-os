@@ -9,7 +9,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
  *
  * @author dilshat
  */
-public enum ManagerActionType {
+public enum ActionType {
 
     CHECK_NODE_STATUS, START_NODE, STOP_NODE, DESTROY_NODE, ADD_NODE
 }

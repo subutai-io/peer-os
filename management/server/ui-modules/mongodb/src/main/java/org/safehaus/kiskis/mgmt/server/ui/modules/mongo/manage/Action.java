@@ -18,25 +18,26 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public final class ManagerAction {
+public final class Action {
 
     private final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
     private final Task task;
     private final Item row;
-    private final ManagerActionType managerActionType;
+    private final ActionType actionType;
     private final Agent agent;
     private final NodeType nodeType;
     private final StringBuilder stdOutput = new StringBuilder();
     private final StringBuilder errOutput = new StringBuilder();
     private int responseCount = 0;
 
-    public ManagerAction(Task task, ManagerActionType managerActionType, Item row, Agent agent, NodeType nodeType) {
+    public Action(Task task, ActionType actionType, Item row, Agent agent, NodeType nodeType) {
         this.task = task;
         this.row = row;
         this.agent = agent;
         this.nodeType = nodeType;
-        this.managerActionType = managerActionType;
+        this.actionType = actionType;
         showProgress();
+        disableButtons();
     }
 
     public Task getTask() {
@@ -110,8 +111,8 @@ public final class ManagerAction {
         return destroyBtn.getData();
     }
 
-    public ManagerActionType getManagerActionType() {
-        return managerActionType;
+    public ActionType getActionType() {
+        return actionType;
     }
 
     public void addStdOutput(String out) {
