@@ -45,15 +45,15 @@ public class LogListener implements Refresher.RefreshListener {
     private Logger logger = Logger.getLogger("LogUpdateLogger");
     private ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
     private BoolQueryBuilder queryBuilder;
-
-
+    private ReferenceComponent referenceComponent;
     /**
      *
      * @param lastIndex represents the lastIndex get from the query to Elasticsearch
      * @param lastHour  represents the time that we want to start from
      */
-    public LogListener(BoolQueryBuilder queryBuilder, Log log, int lastIndex, Timestamp lastHour)
+    public LogListener(ReferenceComponent referenceComponent, BoolQueryBuilder queryBuilder, Log log, int lastIndex, Timestamp lastHour)
     {
+        this.referenceComponent = referenceComponent;
         this.lastIndex = lastIndex;
         beginTime = lastHour;
         this.log = log;
@@ -64,6 +64,7 @@ public class LogListener implements Refresher.RefreshListener {
         logger.log(Level.INFO, "Log is being refreshed! LastIndex: " + lastIndex +", beginTime: " + beginTime);
         ArrayList<LogResponse> logResponses = ESAO.getLogs(queryBuilder, lastIndex, beginTime, Timestamp.getCurrentTimestamp());
         log.fillTable(logResponses, lastIndex);
+        log.requestRepaintAll();
         lastIndex += logResponses.size();
 
         if(logResponses.size() == 0)
@@ -87,7 +88,7 @@ public class LogListener implements Refresher.RefreshListener {
     public BoolQueryBuilder getAllMetricsQuery() {
 
         BoolQueryBuilder queryBuilder =  QueryBuilders.boolQuery();
-        Host host = Monitor.getMain().getHosts();
+        Host host = ((Monitor) referenceComponent.getApplication()).getMain().getHosts();
 
         if(host != null && host.getHostTermQueryBuilder() != null)
         {

@@ -39,13 +39,18 @@ public class Host {
     private BaseQueryBuilder termQueryBuilder = termQuery("log_host", "");
     private BaseQueryBuilder hostTermQueryBuilder = termQuery("host", "");
     private String listofHosts = "List of Hosts:";
+    private ReferenceComponent referenceComponent;
 
+    public Host(ReferenceComponent referenceComponent)
+    {
+        this.referenceComponent = referenceComponent;
+    }
     public Tree getRealHostTree()
     {
         ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
         ArrayList<String> hosts = ESAO.getHosts();
 
-        Tree nodes = new Tree(listofHosts);
+        final Tree nodes = new Tree(listofHosts);
         for(int i=0; i<hosts.size(); i++){
             nodes.addItem(hosts.get(i));
             nodes.setParent(hosts.get(i), nodes);
@@ -54,10 +59,10 @@ public class Host {
 
         nodes.addListener(new ItemClickEvent.ItemClickListener() {
             public void itemClick(ItemClickEvent event) {
-                MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
+                MonitorTab monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
                 String hostName = event.getItemId().toString().toLowerCase();
                 String hostNameforLog = event.getItemId().toString();
-                showLogTableByHost(Monitor.getMain().getMonitorTab().getLogTable(), hostNameforLog);
+                showLogTableByHost(((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab().getLogTable(), hostNameforLog);
                 setTermQueryBuilder(termQuery("log_host", hostName));
                 setHostTermQueryBuilder(termQuery("host", hostName));
                 monitorTab.updateChart();

@@ -55,23 +55,25 @@ public class MonitorTab extends VerticalLayout {
     private ElasticSearchAccessObject ESAO;
     private HistoryMetricList historyMetricList;
     private BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+    private ReferenceComponent referenceComponent;
 
     private Logger logger;
-    public MonitorTab()
+    public MonitorTab(ReferenceComponent referenceComponent)
     {
+        this.referenceComponent = referenceComponent;
         HorizontalLayout metricLayout = new HorizontalLayout();
         linker = new Linker();
         logger = Logger.getLogger("MonitorTabLogger");
 
-        setMetricList((new MetricList()));
-        setHistoryMetricList(new HistoryMetricList());
+        setMetricList((new MetricList(referenceComponent)));
+        setHistoryMetricList(new HistoryMetricList(referenceComponent));
 
 
         Timestamp currentTime = Timestamp.getCurrentTimestamp();
         lastHour = Timestamp.getHoursEarlier(currentTime,1);
         ESAO = new ElasticSearchAccessObject();
         ArrayList<LogResponse> logResponses = new ArrayList<LogResponse>();
-        statisticChart = new StatisticChart(null);
+        statisticChart = new StatisticChart(referenceComponent, null);
         logTable = new Log();
         setStatisticChart((getStatisticChart().getDefaultChart()));
         logTable.fillTable(logResponses, -1);
@@ -106,7 +108,7 @@ public class MonitorTab extends VerticalLayout {
         }
         memoryChartRefresher = new Refresher();
         memoryChartRefresher.setRefreshInterval(interval);
-        memoryChartListener = new ChartListener(queryBuilder, getStatisticChart(), lastIndex, getHistoryMetricList().getLastHour());
+        memoryChartListener = new ChartListener(referenceComponent, queryBuilder, getStatisticChart(), lastIndex, getHistoryMetricList().getLastHour());
         memoryChartRefresher.addListener(memoryChartListener);
         this.addComponent(memoryChartRefresher);
         this.requestRepaint();
@@ -116,7 +118,7 @@ public class MonitorTab extends VerticalLayout {
     {
         if(getMetricList().getTermQueryBuilderList().size() == 0)
         {
-            Monitor.getMain().showNotification("Please select one metric!");
+            ((Monitor) referenceComponent.getApplication()).getMain().showNotification("Please select one metric!");
             return;
         }
         Timestamp currentTime = Timestamp.getCurrentTimestamp();
@@ -125,7 +127,7 @@ public class MonitorTab extends VerticalLayout {
             removeComponent(getStatisticChart());
 
         SearchResponse response = ESAO.executeQuery(memoryChartListener.getAllMetricsQuery(), -1, getHistoryMetricList().getLastHour(), currentTime);
-        statisticChart = new StatisticChart(response);
+        statisticChart = new StatisticChart(referenceComponent, response);
         addStatisticRefresher(response.getHits().getHits().length, getStatisticUpdateInterval(), memoryChartListener.getAllMetricsQuery());
         setStatisticChart(statisticChart.getDefaultChart());
 
@@ -159,7 +161,7 @@ public class MonitorTab extends VerticalLayout {
             removeComponent(logRefresher);
         }
         logRefresher = new Refresher();
-        logUpdateListener = new LogListener(queryBuilder, logTable, lastIndex, getHistoryMetricList().getLastHour());
+        logUpdateListener = new LogListener(referenceComponent, queryBuilder, logTable, lastIndex, getHistoryMetricList().getLastHour());
         logRefresher.setRefreshInterval(interval);
         logRefresher.addListener(logUpdateListener);
         this.addComponent(logRefresher);

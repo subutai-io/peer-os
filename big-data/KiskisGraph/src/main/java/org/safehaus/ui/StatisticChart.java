@@ -45,14 +45,17 @@ public class StatisticChart extends Chart {
     StatisticResponse statisticResponse;
     String yAxisTitle= "";
     String yAxisTitleWithUnit = "";
-    public StatisticChart(SearchResponse response)
+    private ReferenceComponent referenceComponent;
+
+    public StatisticChart(ReferenceComponent referenceComponent, SearchResponse response)
     {
+        this.referenceComponent = referenceComponent;
         dataSeries = new DataSeries();
         configuration = this.getConfiguration();
         MonitorTab monitorTab;
-        if(Monitor.getMain() != null)
+        if(referenceComponent.getApplication() != null && ((Monitor)referenceComponent.getApplication()).getMain().getMonitorTab() != null)
         {
-            monitorTab = Monitor.getMain().getMonitorTab();
+            monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
             statisticResponse =  new StatisticResponse(response, monitorTab.getMetricList().getMetricValue());
             yAxisTitle = monitorTab.getMetricList().getMetricType();
             yAxisTitleWithUnit = yAxisTitle + " (" +  statisticResponse.getUnits() +")";

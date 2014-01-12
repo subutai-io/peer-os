@@ -20,6 +20,8 @@
 package org.safehaus.ui;
 
 import com.vaadin.Application;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Label;
 
 /**
  * ...
@@ -27,23 +29,14 @@ import com.vaadin.Application;
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  * @version $Rev$
  */
-public class Monitor extends Application {
-
-    // Main window is the primary browser window
-    private MainWindow main;
-
+public class ReferenceComponent extends CustomComponent {
+    Monitor monitor;
+    public ReferenceComponent(Monitor monitor) {
+        this.monitor = monitor;
+    }
     @Override
-    public void init() {
-        main = new MainWindow();
-        setMainWindow(main);
-        ReferenceComponent referenceComponent = new ReferenceComponent(this);
-        main.initialize(referenceComponent);
-    }
-    public MainWindow getMain() {
-        return main;
-    }
-
-    public void setMain(MainWindow main) {
-        this.main = main;
+    public Application getApplication()
+    {
+        return monitor;
     }
 }

@@ -37,7 +37,12 @@ public class HistoryMetricList extends VerticalLayout implements
     ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
     Timestamp currentTime = Timestamp.getCurrentTimestamp();
     private Timestamp lastHour = Timestamp.getHoursEarlier(currentTime,1);
+    private ReferenceComponent referenceComponent;
 
+    public HistoryMetricList(ReferenceComponent referenceComponent)
+    {
+        this.referenceComponent = referenceComponent;
+    }
     public ComboBox getSampleMetricList()
     {
 
@@ -70,7 +75,7 @@ public class HistoryMetricList extends VerticalLayout implements
     public void valueChange(Property.ValueChangeEvent event) {
         currentTime = Timestamp.getCurrentTimestamp();
         setLastHour(Timestamp.getHoursEarlier(currentTime,1));
-        MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
+        MonitorTab monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
         if(event.getProperty().toString().equalsIgnoreCase("1"))
         {
             setLastHour(Timestamp.getHoursEarlier(currentTime,1));

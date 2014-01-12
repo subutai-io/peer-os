@@ -43,6 +43,12 @@ public class MetricList extends VerticalLayout implements Property.ValueChangeLi
     private String metricValue = null;
     private String metricType = "";
     ComboBox l = new ComboBox("Please select your metric");
+    private ReferenceComponent referenceComponent;
+
+    public MetricList(ReferenceComponent referenceComponent)
+    {
+        this.referenceComponent = referenceComponent;
+    }
 
     public ComboBox getMetricList()
     {
@@ -81,7 +87,7 @@ public class MetricList extends VerticalLayout implements Property.ValueChangeLi
 
     }
     public void valueChange(ValueChangeEvent event) {
-        MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
+        MonitorTab monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
         termQueryBuilderList.clear();
         metricValue = null;
         metricType = l.getItemCaption(event.getProperty().getValue());

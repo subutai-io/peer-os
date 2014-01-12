@@ -36,14 +36,18 @@ public class MainWindow extends Window{
     GridLayout layout;
     int temp = 0;
     Tree hostTree;
-    final Button refreshHostsButton;
-    final Button refreshButton;
+    Button refreshHostsButton;
+    Button refreshButton;
     private MonitorTab monitorTab;
     private Logger logger = Logger.getLogger("MainWindowLogger");
-
+    private ReferenceComponent referenceComponent;
     public MainWindow()
     {
 
+    }
+    public void initialize(ReferenceComponent referenceComponent)
+    {
+        this.referenceComponent = referenceComponent;
         refreshHostsButton = new Button("Refresh Hosts");
         refreshButton = new Button("Refresh UI");
 
@@ -51,7 +55,7 @@ public class MainWindow extends Window{
         horiz.setSplitPosition(15); // percent
         horiz.setWidth("100%");
 
-       addInitalUIComponents();
+        addInitalUIComponents();
         setContent(horiz);
 
         refreshHostsButton.addListener(new Button.ClickListener() {
@@ -73,14 +77,15 @@ public class MainWindow extends Window{
             }
         });
 
+
     }
     public void addInitalUIComponents()
     {
-        monitorTab = new MonitorTab();
+        monitorTab = new MonitorTab(referenceComponent);
         getMonitorTab().setWidth("100%");
         layout = new GridLayout(2,2);
         layout.setHeight("100%");
-        setHosts(new Host());
+        setHosts(new Host(referenceComponent));
         updateHosts();
         layout.addComponent(refreshHostsButton, 0 , 1);
         layout.addComponent(refreshButton, 1 , 1);
@@ -116,5 +121,13 @@ public class MainWindow extends Window{
 
     public void setHosts(Host hosts) {
         this.hosts = hosts;
+    }
+
+    public ReferenceComponent getReferenceComponent() {
+        return referenceComponent;
+    }
+
+    public void setReferenceComponent(ReferenceComponent referenceComponent) {
+        this.referenceComponent = referenceComponent;
     }
 }

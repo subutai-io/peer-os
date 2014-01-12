@@ -47,12 +47,15 @@ public class ChartListener implements Refresher.RefreshListener {
     private Logger logger = Logger.getLogger("ChartUpdateLogger");
     private ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
     private BoolQueryBuilder queryBuilder;
+    private ReferenceComponent referenceComponent;
+
     /**
      *
      * @param lastIndex represents the lastIndex get from the query to Elasticsearch
      * @param lastHour  represents the time that we want to start from
      */
-    public ChartListener(BoolQueryBuilder queryBuilder, StatisticChart statisticChart, int lastIndex, Timestamp lastHour) {
+    public ChartListener(ReferenceComponent referenceComponent, BoolQueryBuilder queryBuilder, StatisticChart statisticChart, int lastIndex, Timestamp lastHour) {
+        this.referenceComponent = referenceComponent;
         this.queryBuilder = queryBuilder;
         this.lastIndex = lastIndex;
         setBeginTime(lastHour);
@@ -63,7 +66,7 @@ public class ChartListener implements Refresher.RefreshListener {
         logger.log(Level.INFO, "Chart is being refreshed!");
 
         SearchResponse response = ESAO.executeQuery(queryBuilder, lastIndex, getBeginTime(), Timestamp.getCurrentTimestamp());
-        StatisticResponse statisticResponse = new StatisticResponse(response, Monitor.getMain().getMonitorTab().getMetricList().getMetricValue());
+        StatisticResponse statisticResponse = new StatisticResponse(response, ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab().getMetricList().getMetricValue());
         lastIndex = (int)response.getHits().getTotalHits();
 
         statisticChart.addData(statisticResponse);
@@ -106,8 +109,8 @@ public class ChartListener implements Refresher.RefreshListener {
     public BoolQueryBuilder getAllMetricsQuery()
     {
         BoolQueryBuilder queryBuilder =  QueryBuilders.boolQuery();
-        MonitorTab monitorTab = Monitor.getMain().getMonitorTab();
-        Host host = Monitor.getMain().getHosts();
+        MonitorTab monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
+        Host host = ((Monitor) referenceComponent.getApplication()).getMain().getHosts();
         MetricList metricList = monitorTab.getMetricList();
         if(metricList != null)
         {
