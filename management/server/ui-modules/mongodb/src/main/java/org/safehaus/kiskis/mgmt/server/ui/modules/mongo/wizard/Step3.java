@@ -68,7 +68,7 @@ public class Step3 extends Panel {
         mainContent.addComponent(replicaNameTxtFld);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as data nodes<br>"
-                + "(Choose odd number of servers, provide at least 1)</strong>");
+                + "(Choose odd number of servers: 1 to 7)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         mainContent.addComponent(configServersLabel);
 
