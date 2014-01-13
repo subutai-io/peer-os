@@ -15,6 +15,6 @@ public interface ResponseListener {
      */
     public void onResponse(Response response);
 
-    public String getSource();
+//    public String getSource();
 
 }

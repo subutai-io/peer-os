@@ -50,6 +50,13 @@ public class Task implements Serializable {
         return null;
     }
 
+    public boolean hasNextCommand() {
+        if (commandIterator != null) {
+            return commandIterator.hasNext();
+        }
+        return false;
+    }
+
     public int getCurrentCommandOrderId() {
         if (commandIterator != null) {
             return commandIterator.previousIndex() + 1;

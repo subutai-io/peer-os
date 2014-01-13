@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -581,10 +580,10 @@ public class Manager implements ResponseListener {
         //save task upon completion && launch check-status task 
     }
 
-    @Override
-    public String getSource() {
-        return MongoModule.MODULE_NAME;
-    }
+//    @Override
+//    public String getSource() {
+//        return MongoModule.MODULE_NAME;
+//    }
 
     private void show(String notification) {
         contentRoot.getWindow().showNotification(notification);

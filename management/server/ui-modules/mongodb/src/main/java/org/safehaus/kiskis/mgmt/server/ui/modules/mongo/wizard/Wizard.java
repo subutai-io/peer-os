@@ -13,7 +13,6 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
@@ -143,9 +142,9 @@ public class Wizard implements ResponseListener {
 
     }
 
-    @Override
-    public String getSource() {
-        return MongoModule.MODULE_NAME;
-    }
+//    @Override
+//    public String getSource() {
+//        return MongoModule.MODULE_NAME;
+//    }
 
 }

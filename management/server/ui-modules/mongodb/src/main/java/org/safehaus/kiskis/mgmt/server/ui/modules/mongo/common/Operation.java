@@ -378,9 +378,9 @@ public abstract class Operation implements ResponseListener {
         log.setLength(0);
     }
 
-    @Override
-    public String getSource() {
-        return getClass().getName();
-    }
+//    @Override
+//    public String getSource() {
+//        return getClass().getName();
+//    }
 
 }
