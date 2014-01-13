@@ -3,22 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Window;
 import java.text.MessageFormat;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Installer;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Uninstaller;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -30,78 +28,68 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
  *
  * @author dilshat
  */
-public class Step5 extends Panel implements ResponseListener {
+public class DestroyWindow extends Window implements ResponseListener {
 
-    private static final Logger LOG = Logger.getLogger(Step5.class.getName());
-    private final Wizard wizard;
+    private static final Logger LOG = Logger.getLogger(DestroyWindow.class.getName());
+
     private final TextArea outputTxtArea;
     private final TextArea logTextArea;
-    private Operation operation;
     private final Button ok;
-    private final Button cancel;
     private final Label indicator;
+    private final Set<Agent> clusterMembers;
     private Thread operationTimeoutThread;
+    private Operation operation;
 
-    public Step5(final Wizard wizard) {
-        this.wizard = wizard;
+    public DestroyWindow(String caption, Set<Agent> clusterMembers) {
+        super(caption);
+        setModal(true);
+
+        setWidth(600, DestroyWindow.UNITS_PIXELS);
+
+        this.clusterMembers = clusterMembers;
 
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Installation output");
+        outputTxtArea = new TextArea("Uninstallation output");
         outputTxtArea.setRows(17);
-        outputTxtArea.setColumns(60);
+        outputTxtArea.setColumns(35);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
         content.addComponent(outputTxtArea, 0, 0, 18, 0);
-
         ok = new Button("Ok");
-        ok.setEnabled(false);
+//        ok.setEnabled(false);
         ok.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.init();
-            }
-        });
-        cancel = new Button("Cancel");
-        cancel.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                cancel.setEnabled(false);
-                Set<Agent> clusterMembers = new HashSet<Agent>();
-                clusterMembers.addAll(wizard.getConfig().getConfigServers());
-                clusterMembers.addAll(wizard.getConfig().getRouterServers());
-                clusterMembers.addAll(wizard.getConfig().getDataNodes());
-                startOperation(new Uninstaller(clusterMembers));
+                //close window   
+                MgmtApplication.removeCustomWindow(getWindow());
             }
         });
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
 
         content.addComponent(ok, 0, 1, 0, 1);
-        content.addComponent(cancel, 1, 1, 1, 1);
         content.addComponent(indicator, 19, 0, 19, 0);
         content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
         logTextArea = new TextArea("Command output");
         logTextArea.setRows(17);
-        logTextArea.setColumns(60);
+        logTextArea.setColumns(35);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
         content.addComponent(logTextArea, 0, 2, 18, 2);
 
         addComponent(content);
-
     }
 
-    public void startInstallation() {
-        startOperation(new Installer(wizard.getConfig()));
+    public void startUninstallation() {
+        startOperation(new Uninstaller(clusterMembers));
     }
 
     private void startOperation(final Operation operation) {
@@ -160,7 +148,6 @@ public class Step5 extends Panel implements ResponseListener {
     private void hideProgress() {
         indicator.setVisible(false);
         ok.setEnabled(true);
-        cancel.setEnabled(true);
     }
 
     @Override
@@ -200,8 +187,4 @@ public class Step5 extends Panel implements ResponseListener {
         }
     }
 
-//    @Override
-//    public String getSource() {
-//        return getClass().getName();
-//    }
 }

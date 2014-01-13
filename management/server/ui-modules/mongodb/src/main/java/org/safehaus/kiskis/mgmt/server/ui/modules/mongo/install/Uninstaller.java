@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
-import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -19,24 +18,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class Uninstaller extends Operation {
 
-    public Uninstaller(InstallerConfig config) {
+    public Uninstaller(Set<Agent> clusterMembers) {
         super("Mongo Uninstallation");
-
-        Set<Agent> allClusterMembers = new HashSet<Agent>();
-        allClusterMembers.addAll(config.getConfigServers());
-        allClusterMembers.addAll(config.getRouterServers());
-        allClusterMembers.addAll(config.getDataNodes());
 
         //UNINSTALL MONGO
         Task uninstallMongoTask = Util.createTask("Uninstall Mongo");
         //uninstall it
-        for (Agent agent : allClusterMembers) {
+        for (Agent agent : clusterMembers) {
             bindCmdToAgentNTask(Commands.getKillAllCommand(), agent, uninstallMongoTask);
         }
-        for (Agent agent : allClusterMembers) {
+        for (Agent agent : clusterMembers) {
             bindCmdToAgentNTask(Commands.getCleanCommand(), agent, uninstallMongoTask);
         }
-        for (Agent agent : allClusterMembers) {
+        for (Agent agent : clusterMembers) {
             bindCmdToAgentNTask(Commands.getUninstallCommand(), agent, uninstallMongoTask);
         }
         uninstallMongoTask.setIgnoreExitCode(true);

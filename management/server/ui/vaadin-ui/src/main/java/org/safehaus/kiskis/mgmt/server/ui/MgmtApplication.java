@@ -235,4 +235,14 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         }
     }
 
+    public static void removeCustomWindow(Window window) {
+        try {
+            if (getInstance() != null && window != null) {
+                getInstance().getMainWindow().removeWindow(window);
+            }
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in removeCustomWindow", e);
+        }
+    }
+
 }

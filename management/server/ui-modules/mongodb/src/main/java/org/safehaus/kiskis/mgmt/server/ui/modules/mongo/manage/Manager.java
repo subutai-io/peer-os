@@ -21,8 +21,10 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +70,7 @@ public class Manager implements ResponseListener {
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
+    private DestroyWindow destroyWindow;
 
     public Manager(final CustomComponent component) {
         //get db and transport managers
@@ -163,7 +166,31 @@ public class Manager implements ResponseListener {
 
                                 @Override
                                 public void response(boolean ok) {
-                                    show("" + ok);
+                                    if (ok) {
+                                        Set clusterMembers = new HashSet<Agent>();
+                                        for (UUID agentUUID : clusterInfo.getConfigServers()) {
+                                            Agent agent = agentManager.getAgent(agentUUID);
+                                            if (agent != null) {
+                                                clusterMembers.add(agent);
+                                            }
+                                        }
+                                        for (UUID agentUUID : clusterInfo.getRouters()) {
+                                            Agent agent = agentManager.getAgent(agentUUID);
+                                            if (agent != null) {
+                                                clusterMembers.add(agent);
+                                            }
+                                        }
+                                        for (UUID agentUUID : clusterInfo.getDataNodes()) {
+                                            Agent agent = agentManager.getAgent(agentUUID);
+                                            if (agent != null) {
+                                                clusterMembers.add(agent);
+                                            }
+                                        }
+                                        destroyWindow = new DestroyWindow(
+                                                "Destroy Mongo Cluster", clusterMembers);
+                                        MgmtApplication.addCustomWindow(destroyWindow);
+                                        destroyWindow.startUninstallation();
+                                    }
                                 }
                             });
                 } else {
@@ -584,7 +611,6 @@ public class Manager implements ResponseListener {
 //    public String getSource() {
 //        return MongoModule.MODULE_NAME;
 //    }
-
     private void show(String notification) {
         contentRoot.getWindow().showNotification(notification);
     }
