@@ -22,8 +22,6 @@ package org.safehaus.ui;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Tree;
 import org.elasticsearch.index.query.BaseQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.safehaus.core.ElasticSearchAccessObject;
 
 import java.util.ArrayList;
@@ -37,8 +35,8 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
  * @version $Rev$
  */
 public class Host {
-    private ArrayList<BaseQueryBuilder> termQueryBuilder =  new ArrayList<BaseQueryBuilder>();
-    private BaseQueryBuilder hostTermQueryBuilder = termQuery("host", "");
+    private ArrayList<BaseQueryBuilder> chartHostTermQueryBuilder =  new ArrayList<BaseQueryBuilder>();
+    private ArrayList<BaseQueryBuilder> logHostTermQueryBuilder = new ArrayList<BaseQueryBuilder>();
     private String listofHosts = "List of Hosts:";
     private ReferenceComponent referenceComponent;
 
@@ -63,20 +61,25 @@ public class Host {
                 MonitorTab monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
                 String hostName = event.getItemId().toString().toLowerCase();
                 String hostNameforLog = event.getItemId().toString();
-                ArrayList<BaseQueryBuilder> baseQueryBuilders = new ArrayList<BaseQueryBuilder>();
+                ArrayList<BaseQueryBuilder> chartBaseQueryBuilders = new ArrayList<BaseQueryBuilder>();
+                ArrayList<BaseQueryBuilder> logBaseQueryBuilders = new ArrayList<BaseQueryBuilder>();
                 showLogTableByHost(((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab().getLogTable(), hostNameforLog);
                 if(!hostName.contains("-"))
-                    baseQueryBuilders.add(termQuery("log_host", hostName));
+                {
+                    chartBaseQueryBuilders.add(termQuery("log_host", hostName));
+                    logBaseQueryBuilders.add(termQuery("host", hostName));
+                }
                 else
                 {
                     ArrayList<String> hostNameList = setHostNameQueryBuilder(hostName);
                     for(int i=0; i < hostNameList.size(); i++ )
                     {
-                       baseQueryBuilders.add(termQuery("log_host", hostNameList.get(i)));
+                       chartBaseQueryBuilders.add(termQuery("log_host", hostNameList.get(i)));
+                       logBaseQueryBuilders.add(termQuery("host", hostNameList.get(i)));
                     }
                 }
-                setTermQueryBuilder(baseQueryBuilders);
-                setHostTermQueryBuilder(termQuery("host", hostName));
+                setChartHostTermQueryBuilder(chartBaseQueryBuilders);
+                setLogHostTermQueryBuilder(logBaseQueryBuilders);
                 monitorTab.updateChart();
                 monitorTab.updateLog();
             }
@@ -97,12 +100,12 @@ public class Host {
         logTable.getPagedFilterTable().setFilterFieldValue("host", hostName);
 
     }
-    public ArrayList<BaseQueryBuilder> getTermQueryBuilder() {
-        return termQueryBuilder;
+    public ArrayList<BaseQueryBuilder> getChartHostTermQueryBuilder() {
+        return chartHostTermQueryBuilder;
     }
 
-    public void setTermQueryBuilder(ArrayList<BaseQueryBuilder> termQueryBuilder) {
-        this.termQueryBuilder = termQueryBuilder;
+    public void setChartHostTermQueryBuilder(ArrayList<BaseQueryBuilder> chartHostTermQueryBuilder) {
+        this.chartHostTermQueryBuilder = chartHostTermQueryBuilder;
     }
 
     public Tree getSampleHosts() {
@@ -122,11 +125,11 @@ public class Host {
         return nodes;
     }
 
-    public BaseQueryBuilder getHostTermQueryBuilder() {
-        return hostTermQueryBuilder;
+    public ArrayList<BaseQueryBuilder> getLogHostTermQueryBuilder() {
+        return logHostTermQueryBuilder;
     }
 
-    public void setHostTermQueryBuilder(BaseQueryBuilder hostTermQueryBuilder) {
-        this.hostTermQueryBuilder = hostTermQueryBuilder;
+    public void setLogHostTermQueryBuilder(ArrayList<BaseQueryBuilder> logHostTermQueryBuilder) {
+        this.logHostTermQueryBuilder = logHostTermQueryBuilder;
     }
 }

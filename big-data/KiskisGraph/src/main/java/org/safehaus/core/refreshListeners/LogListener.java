@@ -90,9 +90,12 @@ public class LogListener implements Refresher.RefreshListener {
         BoolQueryBuilder queryBuilder =  QueryBuilders.boolQuery();
         Host host = ((Monitor) referenceComponent.getApplication()).getMain().getHosts();
 
-        if(host != null && host.getHostTermQueryBuilder() != null)
+        if(host != null && host.getLogHostTermQueryBuilder() != null)
         {
-            queryBuilder = queryBuilder.must(host.getHostTermQueryBuilder());
+            for(int i = 0; i < host.getChartHostTermQueryBuilder().size(); i++)
+            {
+                queryBuilder = queryBuilder.must(host.getLogHostTermQueryBuilder().get(i));
+            }
         }
 
         return queryBuilder;
