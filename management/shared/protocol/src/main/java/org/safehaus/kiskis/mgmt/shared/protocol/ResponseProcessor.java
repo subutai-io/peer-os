@@ -45,6 +45,16 @@ public class ResponseProcessor {
         }
     }
 
+    public Task getCurrentTask(Response response) {
+        if (response != null && response.getTaskUuid() != null) {
+            TaskListener tl = taskListenerCache.get(response.getTaskUuid());
+            if (tl != null) {
+                return tl.getTask();
+            }
+        }
+        return null;
+    }
+
     public void executeTaskParallelly(Task task, ResponseListener responseListener) {
         if (task != null && task.getUuid() != null && responseListener != null) {
             if (taskListenerCache.get(task.getUuid()) == null && task.hasNextCommand()) {
