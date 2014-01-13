@@ -36,17 +36,14 @@ public class DestroyWindow extends Window implements ResponseListener {
     private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
-    private final Set<Agent> clusterMembers;
     private Thread operationTimeoutThread;
     private Operation operation;
 
-    public DestroyWindow(String caption, Set<Agent> clusterMembers) {
+    public DestroyWindow(String caption) {
         super(caption);
         setModal(true);
 
         setWidth(600, DestroyWindow.UNITS_PIXELS);
-
-        this.clusterMembers = clusterMembers;
 
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
@@ -88,7 +85,7 @@ public class DestroyWindow extends Window implements ResponseListener {
         addComponent(content);
     }
 
-    public void startUninstallation() {
+    public void startUninstallation(Set<Agent> clusterMembers) {
         startOperation(new Uninstaller(clusterMembers));
     }
 

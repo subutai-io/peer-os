@@ -13,12 +13,12 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,7 +72,7 @@ public class Manager implements ResponseListener {
     private final Table dataNodesTable;
     private DestroyWindow destroyWindow;
 
-    public Manager(final CustomComponent component) {
+    public Manager() {
         //get db and transport managers
         agentManager = ServiceLocator.getService(AgentManagerInterface.class);
         commandManager = ServiceLocator.getService(CommandManagerInterface.class);
@@ -114,10 +114,7 @@ public class Manager implements ResponseListener {
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() instanceof MongoClusterInfo) {
                     clusterInfo = (MongoClusterInfo) event.getProperty().getValue();
-                    populateTable(configServersTable, clusterInfo.getConfigServers(), NodeType.CONFIG_NODE);
-                    populateTable(routersTable, clusterInfo.getRouters(), NodeType.ROUTER_NODE);
-                    populateTable(dataNodesTable, clusterInfo.getDataNodes(), NodeType.DATA_NODE);
-                    actionsCache.clear();
+                    refreshUI();
                 }
             }
         });
@@ -186,10 +183,16 @@ public class Manager implements ResponseListener {
                                                 clusterMembers.add(agent);
                                             }
                                         }
-                                        destroyWindow = new DestroyWindow(
-                                                "Destroy Mongo Cluster", clusterMembers);
+                                        destroyWindow = new DestroyWindow("Destroy Mongo Cluster");
                                         MgmtApplication.addCustomWindow(destroyWindow);
-                                        destroyWindow.startUninstallation();
+                                        destroyWindow.startUninstallation(clusterMembers);
+                                        destroyWindow.addListener(new Window.CloseListener() {
+
+                                            @Override
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshUI();
+                                            }
+                                        });
                                     }
                                 }
                             });
@@ -216,6 +219,15 @@ public class Manager implements ResponseListener {
         content.addComponent(dataNodesTable);
 
         refreshClustersInfo();
+    }
+
+    private void refreshUI() {
+        if (clusterInfo != null) {
+            populateTable(configServersTable, clusterInfo.getConfigServers(), NodeType.CONFIG_NODE);
+            populateTable(routersTable, clusterInfo.getRouters(), NodeType.ROUTER_NODE);
+            populateTable(dataNodesTable, clusterInfo.getDataNodes(), NodeType.DATA_NODE);
+            actionsCache.clear();
+        }
     }
 
     private void checkNodesStatus(Table table, NodeType nodeType) {
