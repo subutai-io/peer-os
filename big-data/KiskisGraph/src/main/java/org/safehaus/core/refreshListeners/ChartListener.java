@@ -120,9 +120,12 @@ public class ChartListener implements Refresher.RefreshListener {
             }
         }
 
-        if(host != null && host.getTermQueryBuilder() != null)
+        if(host != null && host.getTermQueryBuilder() != null )
         {
-            queryBuilder = queryBuilder.must(host.getTermQueryBuilder());
+            for(int i = 0; i < host.getTermQueryBuilder().size(); i++)
+            {
+                queryBuilder = queryBuilder.must(host.getTermQueryBuilder().get(i));
+            }
         }
 
         return queryBuilder;

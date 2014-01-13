@@ -52,31 +52,50 @@ public class MetricList extends VerticalLayout implements Property.ValueChangeLi
 
     public ComboBox getMetricList()
     {
-        int size = 21;
+        int size = 32;
+        int currentCount = 1;
         for(int i = 1 ; i < size+1; i++)
             l.addItem(i);
 
-        l.setItemCaption(1, "Bytes In");
-        l.setItemCaption(2, "Bytes Out");
-        l.setItemCaption(3, "CPU Aidle");
-        l.setItemCaption(4, "CPU Idle");
-        l.setItemCaption(5, "CPU Nice");
-        l.setItemCaption(6, "CPU System");
-        l.setItemCaption(7, "CPU User");
-        l.setItemCaption(8, "CPU Wio");
-        l.setItemCaption(9, "Load One");
-        l.setItemCaption(10, "Load Five");
-        l.setItemCaption(11, "Load Fifteen");
-        l.setItemCaption(12, "Memory Buffers");
-        l.setItemCaption(13, "Memory Cached");
-        l.setItemCaption(14, "Memory Free");
-        l.setItemCaption(15, "Memory Shared");
-        l.setItemCaption(16, "Memory Total");
-        l.setItemCaption(17, "Part Max Used");
-        l.setItemCaption(18, "Packets In");
-        l.setItemCaption(19, "Packets Out");
-        l.setItemCaption(20, "Swap Free");
-        l.setItemCaption(21, "Swap Total");
+        l.setItemCaption(currentCount++, "Bytes In");
+        l.setItemCaption(currentCount++, "Bytes Out");
+        l.setItemCaption(currentCount++, "CPU Aidle");
+        l.setItemCaption(currentCount++, "CPU Idle");
+        l.setItemCaption(currentCount++, "CPU Nice");
+        l.setItemCaption(currentCount++, "CPU System");
+        l.setItemCaption(currentCount++, "CPU User");
+        l.setItemCaption(currentCount++, "CPU Wio");
+        l.setItemCaption(currentCount++, "Load One");
+        l.setItemCaption(currentCount++, "Load Five");
+        l.setItemCaption(currentCount++, "Load Fifteen");
+        l.setItemCaption(currentCount++, "Memory Buffers");
+        l.setItemCaption(currentCount++, "Memory Cached");
+        l.setItemCaption(currentCount++, "Memory Free");
+        l.setItemCaption(currentCount++, "Memory Shared");
+        l.setItemCaption(currentCount++, "Memory Total");
+        l.setItemCaption(currentCount++, "Part Max Used");
+        l.setItemCaption(currentCount++, "Packets In");
+        l.setItemCaption(currentCount++, "Packets Out");
+        l.setItemCaption(currentCount++, "Swap Free");
+        l.setItemCaption(currentCount++, "Swap Total");
+//        l.setItemCaption(currentCount++, "JVM HeapMemoryUsage_committed");
+        l.removeItem(22);
+        currentCount++;
+        l.setItemCaption(currentCount++, "JVM HeapMemoryUsage_init");
+        l.setItemCaption(currentCount++, "JVM HeapMemoryUsage_max");
+        l.setItemCaption(currentCount++, "JVM HeapMemoryUsage_used");
+        l.setItemCaption(currentCount++, "JVM NonHeapMemoryUsage_committed");
+        l.setItemCaption(currentCount++, "JVM NonHeapMemoryUsage_init");
+        l.setItemCaption(currentCount++, "JVM NonHeapMemoryUsage_max");
+        l.setItemCaption(currentCount++, "JVM NonHeapMemoryUsage_used");
+//        l.setItemCaption(currentCount++, "JVM PeakUsage_committed");
+//        l.setItemCaption(currentCount++, "JVM PeakUsage_init");
+//        l.setItemCaption(currentCount++, "JVM PeakUsage_max");
+//        l.setItemCaption(currentCount++, "JVM PeakUsage_used");
+        l.setItemCaption(currentCount++, "JVM DaemonThreadCount");
+        l.setItemCaption(currentCount++, "JVM PeakThreadCount");
+        l.setItemCaption(currentCount++, "JVM ThreadCount");
+        l.setItemCaption(currentCount++, "JVM TotalStartedThreadCount");
 
         l.setFilteringMode(Filtering.FILTERINGMODE_CONTAINS);
         l.setImmediate(true);
@@ -197,10 +216,69 @@ public class MetricList extends VerticalLayout implements Property.ValueChangeLi
             termQueryBuilderList.add(termQuery("name", "swap_total"));
             metricValue = "val";
         }
+//        else if(event.getProperty().toString().equalsIgnoreCase("22"))
+//        {
+//            termQueryBuilderList.add(termQuery("name", "sun_management_emoryImpl.HeapMemoryUsage_committed".toLowerCase()));
+//            metricValue = "val";
+//        }
+        else if(event.getProperty().toString().equalsIgnoreCase("23"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_MemoryImpl.HeapMemoryUsage_init".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("24"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_MemoryImpl.HeapMemoryUsage_max".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("25"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_MemoryImpl.HeapMemoryUsage_used".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("26"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_MemoryImpl.NonHeapMemoryUsage_committed".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("27"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_MemoryImpl.NonHeapMemoryUsage_init".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("28"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_MemoryImpl.NonHeapMemoryUsage_max".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("29"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_MemoryImpl.NonHeapMemoryUsage_used".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("30"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_ThreadImpl.DaemonThreadCount".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("31"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_ThreadImpl.PeakThreadCount".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("32"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_ThreadImpl.ThreadCount".toLowerCase()));
+            metricValue = "val";
+        }
+        else if(event.getProperty().toString().equalsIgnoreCase("33"))
+        {
+            termQueryBuilderList.add(termQuery("name", "sun_management_ThreadImpl.TotalStartedThreadCount".toLowerCase()));
+            metricValue = "val";
+        }
         else
         {
         }
-
         // Update Chart according to the metric change
         monitorTab.updateChart();
 

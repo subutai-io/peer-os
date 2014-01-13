@@ -31,6 +31,8 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -117,12 +119,16 @@ public class ElasticSearchAccessObject {
         for(int i = 0; i<searchResponse.getHits().getHits().length; i++)
         {
             String temp = (String) searchResponse.getHits().getHits()[i].getSource().get("log_host");
-
+            if(temp.contains(":"))
+            {
+                temp = temp.substring(temp.indexOf(":")+1,temp.length());
+            }
             if( !(exists(hosts, temp))){
                 hosts.add(temp);
             }
         }
         client.close();
+        Collections.sort(hosts);
         logger.log(Level.INFO, "Updated host list: ");
         for(int i = 0; i < hosts.size(); i++)
             System.out.println(hosts.get(i));

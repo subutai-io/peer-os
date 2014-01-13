@@ -23,6 +23,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Tree;
 import org.elasticsearch.index.query.BaseQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.safehaus.core.ElasticSearchAccessObject;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
  * @version $Rev$
  */
 public class Host {
-    private BaseQueryBuilder termQueryBuilder = termQuery("log_host", "");
+    private ArrayList<BaseQueryBuilder> termQueryBuilder =  new ArrayList<BaseQueryBuilder>();
     private BaseQueryBuilder hostTermQueryBuilder = termQuery("host", "");
     private String listofHosts = "List of Hosts:";
     private ReferenceComponent referenceComponent;
@@ -62,11 +63,30 @@ public class Host {
                 MonitorTab monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
                 String hostName = event.getItemId().toString().toLowerCase();
                 String hostNameforLog = event.getItemId().toString();
+                ArrayList<BaseQueryBuilder> baseQueryBuilders = new ArrayList<BaseQueryBuilder>();
                 showLogTableByHost(((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab().getLogTable(), hostNameforLog);
-                setTermQueryBuilder(termQuery("log_host", hostName));
+                if(!hostName.contains("-"))
+                    baseQueryBuilders.add(termQuery("log_host", hostName));
+                else
+                {
+                    ArrayList<String> hostNameList = setHostNameQueryBuilder(hostName);
+                    for(int i=0; i < hostNameList.size(); i++ )
+                    {
+                       baseQueryBuilders.add(termQuery("log_host", hostNameList.get(i)));
+                    }
+                }
+                setTermQueryBuilder(baseQueryBuilders);
                 setHostTermQueryBuilder(termQuery("host", hostName));
                 monitorTab.updateChart();
                 monitorTab.updateLog();
+            }
+
+            private ArrayList<String> setHostNameQueryBuilder(String hostName) {
+                ArrayList<String> hostNameList = new ArrayList<String>();
+                String[] split = hostName.split("-");
+                for(int i = 0; i< split.length; i++)
+                    hostNameList.add(i, split[i]);
+                return hostNameList;
             }
         });
         return nodes;
@@ -77,11 +97,11 @@ public class Host {
         logTable.getPagedFilterTable().setFilterFieldValue("host", hostName);
 
     }
-    public BaseQueryBuilder getTermQueryBuilder() {
+    public ArrayList<BaseQueryBuilder> getTermQueryBuilder() {
         return termQueryBuilder;
     }
 
-    public void setTermQueryBuilder(BaseQueryBuilder termQueryBuilder) {
+    public void setTermQueryBuilder(ArrayList<BaseQueryBuilder> termQueryBuilder) {
         this.termQueryBuilder = termQueryBuilder;
     }
 
