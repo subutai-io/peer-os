@@ -190,6 +190,9 @@ public class Manager implements ResponseListener {
 
                                             @Override
                                             public void windowClose(Window.CloseEvent e) {
+                                                if (destroyWindow.isSucceeded()) {
+                                                    commandManager.deleteMongoClusterInfo(clusterInfo.getClusterName());
+                                                }
                                                 refreshUI();
                                             }
                                         });

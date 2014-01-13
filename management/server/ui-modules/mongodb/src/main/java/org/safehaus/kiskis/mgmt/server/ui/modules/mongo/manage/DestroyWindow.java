@@ -164,6 +164,13 @@ public class DestroyWindow extends Window implements ResponseListener {
 
     }
 
+    public boolean isSucceeded() {
+        if (operation != null) {
+            return operation.isSucceeded();
+        }
+        return false;
+    }
+
     private void addOutput(String output) {
         if (!Util.isStringEmpty(output)) {
             outputTxtArea.setValue(
