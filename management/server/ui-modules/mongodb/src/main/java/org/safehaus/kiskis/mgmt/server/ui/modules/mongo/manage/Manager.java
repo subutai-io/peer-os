@@ -192,6 +192,7 @@ public class Manager implements ResponseListener {
                                             public void windowClose(Window.CloseEvent e) {
                                                 if (destroyWindow.isSucceeded()) {
                                                     commandManager.deleteMongoClusterInfo(clusterInfo.getClusterName());
+                                                    clusterInfo = null;
                                                 }
                                                 refreshUI();
                                             }
@@ -229,8 +230,12 @@ public class Manager implements ResponseListener {
             populateTable(configServersTable, clusterInfo.getConfigServers(), NodeType.CONFIG_NODE);
             populateTable(routersTable, clusterInfo.getRouters(), NodeType.ROUTER_NODE);
             populateTable(dataNodesTable, clusterInfo.getDataNodes(), NodeType.DATA_NODE);
-            actionsCache.clear();
+        } else {
+            configServersTable.removeAllItems();
+            routersTable.removeAllItems();
+            dataNodesTable.removeAllItems();
         }
+        actionsCache.clear();
     }
 
     private void checkNodesStatus(Table table, NodeType nodeType) {
