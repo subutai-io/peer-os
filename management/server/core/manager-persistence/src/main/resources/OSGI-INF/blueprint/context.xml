@@ -26,4 +26,16 @@
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
     </service>
+    <bean id="dbManager" class="org.safehaus.kiskis.mgmt.server.persistence.DbManagerImpl"
+          init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
+        <property name="cassandraHost" value="${cassandraHost}"/>
+        <property name="cassandraPort" value="${cassandraPort}"/>
+        <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>
+    </bean>
+    <service ref="dbManager"
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager">
+        <service-properties>
+            <entry key="service.exported.interfaces" value="*"/>
+        </service-properties>
+    </service>
 </blueprint>

@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
@@ -16,10 +16,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 public class ResponseProcessor {
 
     private final ExpiringCache<UUID, TaskListener> taskListenerCache = new ExpiringCache<UUID, TaskListener>();
-    private final CommandManagerInterface commandManager;
+    private final CommandManager commandManager;
 
     public ResponseProcessor() {
-        this.commandManager = ServiceLocator.getService(CommandManagerInterface.class);
+        this.commandManager = ServiceLocator.getService(CommandManager.class);
         if (commandManager == null) {
             throw new RuntimeException("Command manager is not available");
         }

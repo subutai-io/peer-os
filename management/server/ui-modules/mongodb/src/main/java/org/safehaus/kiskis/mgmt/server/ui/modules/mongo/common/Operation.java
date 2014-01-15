@@ -93,8 +93,6 @@ public abstract class Operation implements ResponseListener {
     protected final void bindCmdToAgentNTask(Command cmd, Agent agent, Task task) {
         if (cmd != null && agent != null && task != null) {
             cmd.getRequest().setUuid(agent.getUuid());
-            cmd.getRequest().setTaskUuid(task.getUuid());
-            cmd.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
             task.addCommand(cmd);
         }
     }
@@ -382,5 +380,4 @@ public abstract class Operation implements ResponseListener {
 //    public String getSource() {
 //        return getClass().getName();
 //    }
-
 }

@@ -39,4 +39,17 @@
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
     </service>
+    
+    <bean id="agentManager"
+          class="org.safehaus.kiskis.mgmt.server.agent.AgentManagerImpl"
+          init-method="init" destroy-method="destroy" scope="singleton">
+        <property name="commandTransportInterface" ref="commandTransportInterface"/>
+        <property name="agentFreshnessMin" value="${agentFreshnessMin}"/>  
+    </bean>
+    <service ref="agentManager"
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager">
+        <service-properties>
+            <entry key="service.exported.interfaces" value="*"/>
+        </service-properties>
+    </service>
 </blueprint>

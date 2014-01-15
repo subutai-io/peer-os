@@ -192,8 +192,10 @@ public class Manager implements ResponseListener {
                                             public void windowClose(Window.CloseEvent e) {
                                                 if (destroyWindow.isSucceeded()) {
                                                     commandManager.deleteMongoClusterInfo(clusterInfo.getClusterName());
+                                                    clusterCombo.removeItem(clusterInfo);
                                                     clusterInfo = null;
                                                 }
+                                                destroyWindow = null;
                                                 refreshUI();
                                             }
                                         });
@@ -449,70 +451,71 @@ public class Manager implements ResponseListener {
 
     private void bindCmdToAgentNTask(Command cmd, Agent agent, Task task) {
         cmd.getRequest().setUuid(agent.getUuid());
-        cmd.getRequest().setTaskUuid(task.getUuid());
-        cmd.getRequest().setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
         task.addCommand(cmd);
     }
 
     @Override
     public void onResponse(Response response) {
         try {
-
-            if (response != null && response.getTaskUuid() != null) {
-                Action action = actionsCache.get(response.getTaskUuid());
-                if (action != null) {
-                    boolean succeeded = false;
-                    action.addStdOutput(response.getStdOut());
-                    action.addErrOutput(response.getStdErr());
-                    if (action.getActionType() == ActionType.CHECK_NODE_STATUS) {
-                        if (action.getStdOutput().contains("couldn't connect to server")) {
-                            action.enableStartButton();
-                            succeeded = true;
-                        } else if (action.getStdOutput().
-                                contains("connecting to")) {
-                            action.enableStopButton();
-                            succeeded = true;
-                        } else if (action.getErrOutput().contains("mongo: not found")) {
-//                            removeNode(action);
-                        }
-                    } else if (action.getActionType() == ActionType.START_NODE) {
-                        if (action.getStdOutput().contains("child process started successfully, parent exiting")) {
-                            succeeded = true;
-                            checkNodeStatus(action);
-                        } else if (Util.isFinalResponse(response)) {
-                            checkNodeStatus(action);
-                        }
-                    } else if (action.getActionType() == ActionType.STOP_NODE) {
-                        if (Util.isFinalResponse(response)) {
-                            succeeded = response.getExitCode() != null && response.getExitCode() == 0;
-                            checkNodeStatus(action);
-                        }
-                    } else if (action.getActionType() == ActionType.DESTROY_NODE) {
-
-                        processDestroyCommandResponse(action, response);
-                    } else if (action.getActionType() == ActionType.ADD_NODE) {
-
-                        processAddCommandResponse(action, response);
-                    }
-                    if (succeeded || Util.isFinalResponse(response)) {
-                        if (action.getActionType() != ActionType.DESTROY_NODE
-                                && action.getActionType() != ActionType.ADD_NODE) {
-                            Task task = action.getTask();
-                            task.setTaskStatus(succeeded ? TaskStatus.SUCCESS : TaskStatus.FAIL);
-                            Util.saveTask(task);
-                            actionsCache.remove(action.getTask().getUuid());
-                            if (!succeeded) {
-                                show(String.format("Failed:\n%s\n%s", action.getStdOutput(), action.getErrOutput()));
-                            }
-                        }
-                        //since we launch check-status command after any action command 
-                        //then action commands shud not hide progress indicator
-                        //also destroy button will be reenabled after check-status completion 
+            if (destroyWindow != null && destroyWindow.isVisible()) {
+                destroyWindow.onResponse(response);
+            } else {
+                if (response != null && response.getTaskUuid() != null) {
+                    Action action = actionsCache.get(response.getTaskUuid());
+                    if (action != null) {
+                        boolean succeeded = false;
+                        action.addStdOutput(response.getStdOut());
+                        action.addErrOutput(response.getStdErr());
                         if (action.getActionType() == ActionType.CHECK_NODE_STATUS) {
-                            try {
-                                action.enableDestroyButton();
-                                action.hideProgress();
-                            } catch (Exception e) {
+                            if (action.getStdOutput().contains("couldn't connect to server")) {
+                                action.enableStartButton();
+                                succeeded = true;
+                            } else if (action.getStdOutput().
+                                    contains("connecting to")) {
+                                action.enableStopButton();
+                                succeeded = true;
+                            } else if (action.getErrOutput().contains("mongo: not found")) {
+//                            removeNode(action);
+                            }
+                        } else if (action.getActionType() == ActionType.START_NODE) {
+                            if (action.getStdOutput().contains("child process started successfully, parent exiting")) {
+                                succeeded = true;
+                                checkNodeStatus(action);
+                            } else if (Util.isFinalResponse(response)) {
+                                checkNodeStatus(action);
+                            }
+                        } else if (action.getActionType() == ActionType.STOP_NODE) {
+                            if (Util.isFinalResponse(response)) {
+                                succeeded = response.getExitCode() != null && response.getExitCode() == 0;
+                                checkNodeStatus(action);
+                            }
+                        } else if (action.getActionType() == ActionType.DESTROY_NODE) {
+
+                            processDestroyCommandResponse(action, response);
+                        } else if (action.getActionType() == ActionType.ADD_NODE) {
+
+                            processAddCommandResponse(action, response);
+                        }
+                        if (succeeded || Util.isFinalResponse(response)) {
+                            if (action.getActionType() != ActionType.DESTROY_NODE
+                                    && action.getActionType() != ActionType.ADD_NODE) {
+                                Task task = action.getTask();
+                                task.setTaskStatus(succeeded ? TaskStatus.SUCCESS : TaskStatus.FAIL);
+                                Util.saveTask(task);
+                                actionsCache.remove(action.getTask().getUuid());
+                                if (!succeeded) {
+                                    show(String.format("Failed:\n%s\n%s", action.getStdOutput(), action.getErrOutput()));
+                                }
+                            }
+                            //since we launch check-status command after any action command 
+                            //then action commands shud not hide progress indicator
+                            //also destroy button will be reenabled after check-status completion 
+                            if (action.getActionType() == ActionType.CHECK_NODE_STATUS) {
+                                try {
+                                    action.enableDestroyButton();
+                                    action.hideProgress();
+                                } catch (Exception e) {
+                                }
                             }
                         }
                     }

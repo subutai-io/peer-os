@@ -24,12 +24,16 @@ public class Task implements Serializable {
     private TaskStatus taskStatus;
     private Integer reqSeqNumber;
     private final List<Command> commands;
+    @Deprecated
     private boolean ignoreExitCode = false;
+    @Deprecated
     private boolean completed = false;
     private ListIterator commandIterator;
 
     public void addCommand(Command command) {
         if (command != null) {
+            command.getRequest().setTaskUuid(uuid);
+            command.getRequest().setRequestSequenceNumber(getIncrementedReqSeqNumber());
             commands.add(command);
             commandIterator = commands.listIterator();
         }
@@ -70,18 +74,27 @@ public class Task implements Serializable {
         commands = new ArrayList<Command>();
     }
 
+    public Task(String description) {
+        this();
+        this.description = description;
+    }
+
+    @Deprecated
     public boolean isIgnoreExitCode() {
         return ignoreExitCode;
     }
 
+    @Deprecated
     public void setIgnoreExitCode(boolean ignoreExitCode) {
         this.ignoreExitCode = ignoreExitCode;
     }
 
+    @Deprecated
     public boolean isCompleted() {
         return completed;
     }
 
+    @Deprecated
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
@@ -90,14 +103,17 @@ public class Task implements Serializable {
         return Collections.unmodifiableList(commands);
     }
 
+    @Deprecated
     public Integer getIncrementedReqSeqNumber() {
         return ++reqSeqNumber;
     }
 
+    @Deprecated
     public Integer getReqSeqNumber() {
         return reqSeqNumber;
     }
 
+    @Deprecated
     public void setReqSeqNumber(Integer reqSeqNumber) {
         this.reqSeqNumber = reqSeqNumber;
     }
@@ -132,21 +148,25 @@ public class Task implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Task task = (Task) o;
-
-        return !(uuid != null ? !uuid.equals(task.uuid) : task.uuid != null);
+    public int hashCode() {
+        int hash = 5;
+        hash = 67 * hash + (this.uuid != null ? this.uuid.hashCode() : 0);
+        return hash;
     }
 
     @Override
-    public int hashCode() {
-        return uuid != null ? 1 : 0;
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Task other = (Task) obj;
+        if (this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid))) {
+            return false;
+        }
+        return true;
     }
+
 }

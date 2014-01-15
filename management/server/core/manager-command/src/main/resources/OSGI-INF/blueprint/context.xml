@@ -20,4 +20,17 @@
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
     </service>
+    
+    <bean id="commandManager"
+          class="org.safehaus.kiskis.mgmt.server.command.CommandManagerImpl" scope="singleton"
+          init-method="init" destroy-method="destroy">
+        <property name="communicationService" ref="communicationService"/>
+    </bean>
+    
+    <service ref="commandManager"
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager">
+        <service-properties>
+            <entry key="service.exported.interfaces" value="*"/>
+        </service-properties>
+    </service>
 </blueprint>
