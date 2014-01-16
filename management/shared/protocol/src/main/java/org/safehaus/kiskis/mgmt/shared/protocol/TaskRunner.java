@@ -48,7 +48,7 @@ public class TaskRunner {
                         }
                     }
 
-                    tl.getTaskCallback().onResponse(tl.getTaskCallback(), tl.getTask(), response);
+                    tl.getTaskCallback().onResponse(tl.getTask(), response);
 
                 } catch (Exception e) {
                 }

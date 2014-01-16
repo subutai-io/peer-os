@@ -14,5 +14,5 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
  */
 public interface TaskCallback {
 
-    public void onResponse(TaskCallback taskCallback, Task task, Response response);
+    public void onResponse(Task task, Response response);
 }

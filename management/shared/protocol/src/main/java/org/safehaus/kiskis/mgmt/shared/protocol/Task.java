@@ -26,7 +26,7 @@ public class Task implements Serializable {
     private final List<Command> commands;
     private boolean ignoreExitCode = false;
     private boolean completed = false;
-    private int currentCmdIdx = -1;
+    private int currentCmdId = -1;
     private int completedCommandsCount = 0;
     private int succeededCommandsCount = 0;
     private Object data;
@@ -89,7 +89,7 @@ public class Task implements Serializable {
 
     public Command getNextCommand() {
         if (hasNextCommand()) {
-            return commands.get(++currentCmdIdx);
+            return commands.get(++currentCmdId);
         }
 
         return null;
@@ -97,31 +97,31 @@ public class Task implements Serializable {
 
     public Command peekNextCommand() {
         if (hasNextCommand()) {
-            return commands.get(currentCmdIdx + 1);
+            return commands.get(currentCmdId + 1);
         }
         return null;
     }
 
     public Command peekPreviousCommand() {
-        if (currentCmdIdx > 0) {
-            return commands.get(currentCmdIdx - 1);
+        if (currentCmdId > 0) {
+            return commands.get(currentCmdId - 1);
         }
         return null;
     }
 
     public Command peekCurrentCommand() {
-        if (currentCmdIdx >= 0) {
-            return commands.get(currentCmdIdx);
+        if (currentCmdId >= 0) {
+            return commands.get(currentCmdId);
         }
         return null;
     }
 
     public boolean hasNextCommand() {
-        return currentCmdIdx < commands.size() - 1;
+        return currentCmdId < commands.size() - 1;
     }
 
     public int getLaunchedCommandsCount() {
-        return currentCmdIdx + 1;
+        return currentCmdId + 1;
     }
 
     public boolean isIgnoreExitCode() {

@@ -32,7 +32,8 @@ public class Wizard implements ResponseListener {
     private int step = 1;
     private final InstallerConfig mongoConfig = new InstallerConfig();
     private final VerticalLayout contentRoot;
-    private Step5 step5;
+//    private Step5 step5;
+    private InstallationStep step5;
     private final PersistenceInterface persistenceManager;
 
     public Wizard() {
@@ -123,7 +124,7 @@ public class Wizard implements ResponseListener {
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step5 = new Step5(this);
+                step5 = new InstallationStep(this);
                 verticalLayout.addComponent(step5);
                 step5.startInstallation();
                 break;
@@ -146,5 +147,4 @@ public class Wizard implements ResponseListener {
 //    public String getSource() {
 //        return MongoModule.MODULE_NAME;
 //    }
-
 }
