@@ -168,8 +168,8 @@ public class InstallationStep extends Panel implements ResponseListener {
                     addLog(String.format("%s:\n%s\n%s",
                             agent != null
                             ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
-                            response.getStdOut(),
-                            response.getStdErr()));
+                            response.getStdOut() == null ? "" : response.getStdOut(),
+                            response.getStdErr() == null ? "" : response.getStdErr()));
 
                     if (Util.isFinalResponse(response)) {
                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
@@ -181,6 +181,7 @@ public class InstallationStep extends Panel implements ResponseListener {
 
                     if (task.isCompleted()) {
                         if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                            addOutput(String.format("Task %s succeeded", task.getDescription()));
                             if (installOperation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
@@ -192,6 +193,7 @@ public class InstallationStep extends Panel implements ResponseListener {
                             }
                         } else {
                             installOperation.setCompleted(true);
+                            addOutput(String.format("Task %s failed", task.getDescription()));
                             addOutput(String.format("Operation %s failed", installOperation.getDescription()));
                             showProgress();
                         }
@@ -243,6 +245,7 @@ public class InstallationStep extends Panel implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
+        System.out.println("Feeding response " + response);
         taskRunner.feedResponse(response);
 
     }
