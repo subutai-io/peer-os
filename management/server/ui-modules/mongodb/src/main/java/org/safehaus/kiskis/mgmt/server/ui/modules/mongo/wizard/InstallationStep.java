@@ -15,6 +15,7 @@ import com.vaadin.ui.TextArea;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallOperation;
@@ -82,8 +83,19 @@ public class InstallationStep extends Panel implements ResponseListener {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                cancel.setEnabled(false);
-                startInstallation(false);
+                MgmtApplication.showConfirmationDialog(
+                        "Abort cluster installation",
+                        "Do you want to abort cluster installation?\nWarning: If 'Install mongo' task is currently running,\ndpkg process might be locked and uninstallation would fail", "Yes", "No", new ConfirmationDialogCallback() {
+
+                            @Override
+                            public void response(boolean ok) {
+                                if (ok) {
+                                    cancel.setEnabled(false);
+                                    startInstallation(false);
+                                }
+                            }
+                        });
+
             }
         });
 

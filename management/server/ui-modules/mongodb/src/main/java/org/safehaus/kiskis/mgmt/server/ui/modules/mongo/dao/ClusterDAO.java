@@ -98,7 +98,7 @@ public class ClusterDAO {
         try {
             String cql = String.format("delete from %s where %s = ?",
                     MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME);
-            dbManager.executeUpdate(cql);
+            dbManager.executeUpdate(cql, clusterName);
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in deleteMongoClusterInfo", ex);
