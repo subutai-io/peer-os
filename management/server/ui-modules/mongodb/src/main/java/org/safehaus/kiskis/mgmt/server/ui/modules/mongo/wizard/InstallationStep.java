@@ -180,6 +180,7 @@ public class InstallationStep extends Panel implements ResponseListener {
                     }
 
                     if (task.isCompleted()) {
+                        taskRunner.removeTaskCallback(task.getUuid());
                         if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                             addOutput(String.format("Task %s succeeded", task.getDescription()));
                             if (installOperation.hasNextTask()) {
