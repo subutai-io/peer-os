@@ -612,7 +612,7 @@ public class Manager implements ResponseListener {
                     }
                 } else {
                     //this is the last command
-                    if (action.getResponseCount() == action.getTask().getCurrentCommandOrderId()) {
+                    if (action.getResponseCount() == action.getTask().getLaunchedCommandsCount()) {
                         Task task = action.getTask();
                         task.setTaskStatus(TaskStatus.SUCCESS);
                         Util.saveTask(task);

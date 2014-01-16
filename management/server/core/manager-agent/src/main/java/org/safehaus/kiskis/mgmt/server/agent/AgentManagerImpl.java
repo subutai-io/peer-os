@@ -5,9 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.server.agent;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -21,11 +24,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
@@ -36,7 +44,8 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
 
     private static final Logger LOG = Logger.getLogger(AgentManagerImpl.class.getName());
 
-    private CommandTransportInterface commandTransportInterface;
+    private CommandTransportInterface communicationService;
+    private DbManager dbManagerService;
     private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
     private ExecutorService exec;
     private Cache<UUID, Agent> agents;
@@ -47,8 +56,12 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
         this.agentFreshnessMin = agentFreshnessMin;
     }
 
-    public void setCommandTransportInterface(CommandTransportInterface commandTransportInterface) {
-        this.commandTransportInterface = commandTransportInterface;
+    public void setCommunicationService(CommandTransportInterface communicationService) {
+        this.communicationService = communicationService;
+    }
+
+    public void setDbManagerService(DbManager dbManagerService) {
+        this.dbManagerService = dbManagerService;
     }
 
     public Set<Agent> getAgents() {
@@ -123,7 +136,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
     public void init() {
         try {
 
-            commandTransportInterface.addListener(this);
+            communicationService.addListener(this);
             agents = CacheBuilder.newBuilder().
                     expireAfterWrite(agentFreshnessMin, TimeUnit.MINUTES).
                     build();
@@ -162,7 +175,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
         try {
             agents.invalidateAll();
             exec.shutdownNow();
-            commandTransportInterface.removeListener(this);
+            communicationService.removeListener(this);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in destroy", ex);
         }
@@ -220,12 +233,23 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
                     agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
                 }
             }
-
+            sendAck(agent.getUuid());
             agents.put(response.getUuid(), agent);
+            saveAgent(agent);
             notifyAgentListeners = true;
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in addAgent", e);
         }
+    }
+
+    private void sendAck(UUID agentUUID) {
+        Request request = new Request();
+        request.setType(RequestType.REGISTRATION_REQUEST_DONE);
+        request.setUuid(agentUUID);
+        request.setStdErr(OutputRedirection.NO);
+        request.setStdOut(OutputRedirection.NO);
+        Command command = new Command(request);
+        communicationService.sendCommand(command);
     }
 
     private void removeAgent(Response response) {
@@ -234,6 +258,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
                 for (Agent agent : agents.asMap().values()) {
                     if (response.getTransportId().equalsIgnoreCase(agent.getTransportId())) {
                         agents.invalidate(agent.getUuid());
+                        deleteAgent(agent);
                         notifyAgentListeners = true;
                         return;
                     }
@@ -241,6 +266,48 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
             }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in removeAgent", e);
+        }
+    }
+
+    private void saveAgent(Agent agent) {
+        try {
+            String cql = "select uuid from agents where hostname = ?";
+            ResultSet rs = dbManagerService.executeQuery(cql, agent.getHostname());
+            Set<UUID> uuids = new HashSet<UUID>();
+            for (Row row : rs) {
+                uuids.add(row.getUUID("uuid"));
+            }
+
+            cql = "delete from agents where uuid = ?";
+
+            for (UUID uuid : uuids) {
+                dbManagerService.executeUpdate(cql, uuid);
+            }
+
+            cql = "insert into agents (uuid, hostname, islxc, listip, macaddress, lastheartbeat,parenthostname,transportid) "
+                    + "values (?,?,?,?,?,?,?,?)";
+
+            dbManagerService.executeUpdate(cql, agent.getUuid(),
+                    agent.getHostname(), agent.isIsLXC(), agent.getListIP(),
+                    agent.getMacAddress(), new Date(),
+                    agent.getParentHostName(), agent.getTransportId());
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in saveAgent", e);
+        }
+    }
+
+    private void deleteAgent(Agent agent) {
+
+        String cql = "select uuid from agents where transportid = ?";
+        ResultSet rs = dbManagerService.executeQuery(cql, agent.getTransportId());
+        Set<UUID> uuids = new HashSet<UUID>();
+        for (Row row : rs) {
+            uuids.add(row.getUUID("uuid"));
+        }
+
+        cql = "delete from agents where uuid = ?";
+        for (UUID uuid : uuids) {
+            dbManagerService.executeUpdate(cql, uuid);
         }
     }
 

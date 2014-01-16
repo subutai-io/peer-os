@@ -78,6 +78,7 @@ public class Step5 extends Panel implements ResponseListener {
                 clusterMembers.addAll(wizard.getConfig().getRouterServers());
                 clusterMembers.addAll(wizard.getConfig().getDataNodes());
                 startOperation(new Uninstaller(clusterMembers));
+                //delete cluster info here
             }
         });
 

@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
+//import java.util.ListIterator;
 import java.util.UUID;
 
 /**
@@ -24,18 +24,54 @@ public class Task implements Serializable {
     private TaskStatus taskStatus;
     private Integer reqSeqNumber;
     private final List<Command> commands;
-    @Deprecated
     private boolean ignoreExitCode = false;
-    @Deprecated
     private boolean completed = false;
-    private ListIterator commandIterator;
+    private int currentCmdIdx = -1;
+    private int completedCommandsCount = 0;
+    private int succeededCommandsCount = 0;
+    private Object data;
+
+    public Task() {
+        taskStatus = TaskStatus.NEW;
+        uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        reqSeqNumber = 0;
+        commands = new ArrayList<Command>();
+    }
+
+    public Task(String description) {
+        this();
+        this.description = description;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    public void incrementCompletedCommandsCount() {
+        completedCommandsCount++;
+    }
+
+    public void incrementSucceededCommandsCount() {
+        succeededCommandsCount++;
+    }
+
+    public int getCompletedCommandsCount() {
+        return completedCommandsCount;
+    }
+
+    public int getSucceededCommandsCount() {
+        return succeededCommandsCount;
+    }
 
     public void addCommand(Command command) {
         if (command != null) {
             command.getRequest().setTaskUuid(uuid);
             command.getRequest().setRequestSequenceNumber(getIncrementedReqSeqNumber());
             commands.add(command);
-            commandIterator = commands.listIterator();
         }
     }
 
@@ -47,54 +83,59 @@ public class Task implements Serializable {
         return timeout;
     }
 
+    public int getAvgTimeout() {
+        return commands.size() > 0 ? getTotalTimeout() / commands.size() : 0;
+    }
+
     public Command getNextCommand() {
-        if (commandIterator != null && commandIterator.hasNext()) {
-            return (Command) commandIterator.next();
+        if (hasNextCommand()) {
+            return commands.get(++currentCmdIdx);
+        }
+
+        return null;
+    }
+
+    public Command peekNextCommand() {
+        if (hasNextCommand()) {
+            return commands.get(currentCmdIdx + 1);
+        }
+        return null;
+    }
+
+    public Command peekPreviousCommand() {
+        if (currentCmdIdx > 0) {
+            return commands.get(currentCmdIdx - 1);
+        }
+        return null;
+    }
+
+    public Command peekCurrentCommand() {
+        if (currentCmdIdx >= 0) {
+            return commands.get(currentCmdIdx);
         }
         return null;
     }
 
     public boolean hasNextCommand() {
-        if (commandIterator != null) {
-            return commandIterator.hasNext();
-        }
-        return false;
+        return currentCmdIdx < commands.size() - 1;
     }
 
-    public int getCurrentCommandOrderId() {
-        if (commandIterator != null) {
-            return commandIterator.previousIndex() + 1;
-        }
-        return -1;
+    public int getLaunchedCommandsCount() {
+        return currentCmdIdx + 1;
     }
 
-    public Task() {
-        uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
-        reqSeqNumber = 0;
-        commands = new ArrayList<Command>();
-    }
-
-    public Task(String description) {
-        this();
-        this.description = description;
-    }
-
-    @Deprecated
     public boolean isIgnoreExitCode() {
         return ignoreExitCode;
     }
 
-    @Deprecated
     public void setIgnoreExitCode(boolean ignoreExitCode) {
         this.ignoreExitCode = ignoreExitCode;
     }
 
-    @Deprecated
     public boolean isCompleted() {
         return completed;
     }
 
-    @Deprecated
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
@@ -103,17 +144,14 @@ public class Task implements Serializable {
         return Collections.unmodifiableList(commands);
     }
 
-    @Deprecated
     public Integer getIncrementedReqSeqNumber() {
         return ++reqSeqNumber;
     }
 
-    @Deprecated
     public Integer getReqSeqNumber() {
         return reqSeqNumber;
     }
 
-    @Deprecated
     public void setReqSeqNumber(Integer reqSeqNumber) {
         this.reqSeqNumber = reqSeqNumber;
     }

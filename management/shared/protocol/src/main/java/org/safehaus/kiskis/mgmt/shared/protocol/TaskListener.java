@@ -5,7 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 
 /**
  *
@@ -14,19 +14,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 public class TaskListener {
 
     private final Task task;
-    private final ResponseListener responseListener;
+    private final TaskCallback taskCallback;
 
-    public TaskListener(Task task, ResponseListener responseListener) {
+    public TaskListener(Task task, TaskCallback taskCallback) {
         this.task = task;
-        this.responseListener = responseListener;
+        this.taskCallback = taskCallback;
     }
 
     public Task getTask() {
         return task;
     }
 
-    public ResponseListener getResponseListener() {
-        return responseListener;
+    public TaskCallback getTaskCallback() {
+        return taskCallback;
     }
 
 }

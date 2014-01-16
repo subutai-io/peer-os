@@ -21,6 +21,8 @@
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface"/>
     <reference id="commandTransportInterface" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface"/>
+    <reference id="dbManagerService" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager"/>
 
     <bean id="agentManagerService"
           class="org.safehaus.kiskis.mgmt.server.agent.AgentManager"
@@ -43,7 +45,8 @@
     <bean id="agentManager"
           class="org.safehaus.kiskis.mgmt.server.agent.AgentManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton">
-        <property name="commandTransportInterface" ref="commandTransportInterface"/>
+        <property name="communicationService" ref="commandTransportInterface"/>
+        <property name="dbManagerService" ref="dbManagerService"/>
         <property name="agentFreshnessMin" value="${agentFreshnessMin}"/>  
     </bean>
     <service ref="agentManager"
