@@ -372,7 +372,7 @@ int main(int argc,char *argv[],char *envp[])
 	clientaddress = Uuid;
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection url:",url));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Server Address:",serveraddress));
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Cleint Address:",clientaddress));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Client Address:",clientaddress));
 	KAConnection connection(url,serveraddress,clientaddress);
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying to open Connection with ActiveMQ Broker: ",url));
 	KACommand command;

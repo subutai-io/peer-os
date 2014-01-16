@@ -504,7 +504,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int 
 	 */
 	boost::posix_time::ptime startheart = boost::posix_time::second_clock::local_time();
 	unsigned int startheartsec  =  startheart.time_of_day().seconds();
-	unsigned int exectimeoutheat = 30;
+	unsigned int exectimeoutheat = 10;
 	bool overflagheat = false;
 	unsigned int countheat = 0;
 
@@ -538,7 +538,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int 
 			startheart = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Timeout values
 			startheartsec  =  startheart.time_of_day().seconds();
 			overflagheat = false;
-			exectimeoutheat = 30;
+			exectimeoutheat = 10;
 			countheat = 0;
 		}
 		else	//check the Heartbeat Timeout
@@ -589,7 +589,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int 
 				startheart = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Timeout values
 				startheartsec  =  startheart.time_of_day().seconds();
 				overflagheat = false;
-				exectimeoutheat = 30;
+				exectimeoutheat = 10;
 				countheat = 0;
 			}
 		}
