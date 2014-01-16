@@ -70,7 +70,9 @@ public class CommandManagerImpl implements ResponseListener, org.safehaus.kiskis
         try {
             LOG.log(Level.INFO, "Removing module listener : {0}", listener.getName());
             ExecutorService exec = listeners.remove(listener);
-            exec.shutdown();
+            if (exec != null) {
+                exec.shutdown();
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in removeListener", ex);
         }
