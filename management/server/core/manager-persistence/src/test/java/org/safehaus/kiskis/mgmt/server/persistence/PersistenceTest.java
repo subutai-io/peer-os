@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.persistence;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

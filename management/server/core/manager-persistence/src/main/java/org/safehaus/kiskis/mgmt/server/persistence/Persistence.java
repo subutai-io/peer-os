@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.persistence;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import com.datastax.driver.core.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;

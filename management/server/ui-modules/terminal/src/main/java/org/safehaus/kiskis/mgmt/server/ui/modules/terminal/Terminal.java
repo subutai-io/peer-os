@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;

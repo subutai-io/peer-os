@@ -4,6 +4,7 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.io.Serializable;

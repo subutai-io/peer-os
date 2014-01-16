@@ -16,9 +16,10 @@ import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallerConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Operation;
+import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -46,9 +47,7 @@ public class InstallationStep extends Panel implements ResponseListener {
     private final Button cancel;
     private final Label indicator;
     private Thread operationTimeoutThread;
-    //============
     private final TaskRunner taskRunner = new TaskRunner();
-//    private final InstallOperation installOperation;
     private final AgentManager agentManager;
     private final InstallerConfig config;
 
@@ -117,7 +116,7 @@ public class InstallationStep extends Panel implements ResponseListener {
         return count;
     }
 
-    public void startInstallation(boolean install) {
+    public void startInstallation(final boolean install) {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
@@ -192,6 +191,9 @@ public class InstallationStep extends Panel implements ResponseListener {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
                                 hideProgress();
+                                if (!install) {
+                                    ClusterDAO.deleteMongoClusterInfo(config.getClusterName());
+                                }
                             }
                         } else {
                             installOperation.setCompleted(true);

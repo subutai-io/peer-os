@@ -17,8 +17,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Uninstaller;
+//import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
+//import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Uninstaller;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -37,7 +37,7 @@ public class DestroyWindow extends Window implements ResponseListener {
     private final Button ok;
     private final Label indicator;
     private Thread operationTimeoutThread;
-    private Operation operation;
+//    private Operation operation;
 
     public DestroyWindow(String caption) {
         super(caption);
@@ -86,57 +86,56 @@ public class DestroyWindow extends Window implements ResponseListener {
     }
 
     public void startUninstallation(Set<Agent> clusterMembers) {
-        startOperation(new Uninstaller(clusterMembers));
+//        startOperation(new Uninstaller(clusterMembers));
     }
 
-    private void startOperation(final Operation operation) {
-        if (operation != null) {
-            try {
-                //stop any running operation
-                if (this.operation != null) {
-                    this.operation.stop();
-                    this.operation = null;
-                }
-                this.operation = operation;
-                if (operation.start()) {
-                    showProgress();
-                    addOutput(operation.getOutput());
-                    addLog(operation.getLog());
-                    if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                        operationTimeoutThread.interrupt();
-                    }
-                    operationTimeoutThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                //wait for overalltimeout + 15 sec just in case
-                                Thread.sleep(operation.getTotalTimeout() * 1000 + 15000);
-                                if (!operation.isStopped()
-                                        && !operation.isFailed()
-                                        && !operation.isSucceeded()) {
-                                    addOutput(MessageFormat.format(
-                                            "Operation \"{0}\" timeouted!!!",
-                                            operation.getDescription()));
-                                    hideProgress();
-                                }
-                            } catch (InterruptedException ex) {
-                            }
-                        }
-                    });
-                    operationTimeoutThread.start();
-                } else {
-                    this.operation = null;
-                    addOutput(MessageFormat.format(
-                            "Operation \"{0}\" could not be started: {1}.",
-                            operation.getDescription(),
-                            operation.getOutput()));
-                }
-            } catch (Exception ex) {
-                LOG.log(Level.SEVERE, "Error in startOperation", ex);
-            }
-        }
-    }
-
+//    private void startOperation(final Operation operation) {
+//        if (operation != null) {
+//            try {
+//                //stop any running operation
+//                if (this.operation != null) {
+//                    this.operation.stop();
+//                    this.operation = null;
+//                }
+//                this.operation = operation;
+//                if (operation.start()) {
+//                    showProgress();
+//                    addOutput(operation.getOutput());
+//                    addLog(operation.getLog());
+//                    if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
+//                        operationTimeoutThread.interrupt();
+//                    }
+//                    operationTimeoutThread = new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            try {
+//                                //wait for overalltimeout + 15 sec just in case
+//                                Thread.sleep(operation.getTotalTimeout() * 1000 + 15000);
+//                                if (!operation.isStopped()
+//                                        && !operation.isFailed()
+//                                        && !operation.isSucceeded()) {
+//                                    addOutput(MessageFormat.format(
+//                                            "Operation \"{0}\" timeouted!!!",
+//                                            operation.getDescription()));
+//                                    hideProgress();
+//                                }
+//                            } catch (InterruptedException ex) {
+//                            }
+//                        }
+//                    });
+//                    operationTimeoutThread.start();
+//                } else {
+//                    this.operation = null;
+//                    addOutput(MessageFormat.format(
+//                            "Operation \"{0}\" could not be started: {1}.",
+//                            operation.getDescription(),
+//                            operation.getOutput()));
+//                }
+//            } catch (Exception ex) {
+//                LOG.log(Level.SEVERE, "Error in startOperation", ex);
+//            }
+//        }
+//    }
     private void showProgress() {
         indicator.setVisible(true);
         ok.setEnabled(false);
@@ -149,25 +148,25 @@ public class DestroyWindow extends Window implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        if (operation != null) {
-            try {
-                operation.onResponse(response);
-                addOutput(operation.getOutput());
-                addLog(operation.getLog());
-                if (operation.isSucceeded() || operation.isStopped() || operation.isFailed()) {
-                    hideProgress();
-                }
-            } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Error in onResponse", e);
-            }
-        }
+//        if (operation != null) {
+//            try {
+//                operation.onResponse(response);
+//                addOutput(operation.getOutput());
+//                addLog(operation.getLog());
+//                if (operation.isSucceeded() || operation.isStopped() || operation.isFailed()) {
+//                    hideProgress();
+//                }
+//            } catch (Exception e) {
+//                LOG.log(Level.SEVERE, "Error in onResponse", e);
+//            }
+//        }
 
     }
 
     public boolean isSucceeded() {
-        if (operation != null) {
-            return operation.isSucceeded();
-        }
+//        if (operation != null) {
+//            return operation.isSucceeded();
+//        }
         return false;
     }
 

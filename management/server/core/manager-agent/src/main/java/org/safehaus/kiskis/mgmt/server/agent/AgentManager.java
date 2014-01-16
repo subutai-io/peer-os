@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.agent;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;

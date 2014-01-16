@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
  *
  * @author dilshat
  */
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;

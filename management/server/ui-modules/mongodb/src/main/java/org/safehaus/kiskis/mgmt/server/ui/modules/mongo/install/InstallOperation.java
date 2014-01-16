@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
