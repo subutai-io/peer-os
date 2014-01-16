@@ -17,8 +17,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallerConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.TaskType;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
@@ -46,11 +48,12 @@ public class InstallationStep extends Panel implements ResponseListener {
     private Thread operationTimeoutThread;
     //============
     private final TaskRunner taskRunner = new TaskRunner();
-    private final InstallOperation installOperation;
+//    private final InstallOperation installOperation;
     private final AgentManager agentManager;
+    private final InstallerConfig config;
 
     public InstallationStep(final Wizard wizard) {
-
+        this.config = wizard.getConfig();
         agentManager = ServiceLocator.getService(AgentManager.class);
 
         GridLayout content = new GridLayout(20, 3);
@@ -81,12 +84,7 @@ public class InstallationStep extends Panel implements ResponseListener {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 cancel.setEnabled(false);
-//                Set<Agent> clusterMembers = new HashSet<Agent>();
-//                clusterMembers.addAll(wizard.getConfig().getConfigServers());
-//                clusterMembers.addAll(wizard.getConfig().getRouterServers());
-//                clusterMembers.addAll(wizard.getConfig().getDataNodes());
-////                startOperation(new Uninstaller(clusterMembers));
-//                //delete cluster info here
+                startInstallation(false);
             }
         });
 
@@ -107,8 +105,6 @@ public class InstallationStep extends Panel implements ResponseListener {
 
         addComponent(content);
 
-        installOperation = new InstallOperation(wizard.getConfig());
-
     }
 
     private int countNumberOfOccurences(StringBuilder sb, String strToCount) {
@@ -121,8 +117,11 @@ public class InstallationStep extends Panel implements ResponseListener {
         return count;
     }
 
-    public void startInstallation() {
+    public void startInstallation(boolean install) {
         try {
+            //stop any running installation
+            taskRunner.removeAllTaskCallbacks();
+            final Operation installOperation = install ? new InstallOperation(config) : new UninstallOperation(config);
             runTimeoutThread(installOperation);
             showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
@@ -142,21 +141,21 @@ public class InstallationStep extends Panel implements ResponseListener {
                             startConfigServersOutput.append(response.getStdOut());
                             if (countNumberOfOccurences(startConfigServersOutput,
                                     "child process started successfully, parent exiting")
-                                    == installOperation.getConfig().getConfigServers().size()) {
+                                    == config.getConfigServers().size()) {
                                 taskOk = true;
                             }
                         } else if (task.getData() == TaskType.START_ROUTERS) {
                             startRoutersOutput.append(response.getStdOut());
                             if (countNumberOfOccurences(startRoutersOutput,
                                     "child process started successfully, parent exiting")
-                                    == installOperation.getConfig().getRouterServers().size()) {
+                                    == config.getRouterServers().size()) {
                                 taskOk = true;
                             }
                         } else if (task.getData() == TaskType.START_REPLICA_SET) {
                             startDataNodesOutput.append(response.getStdOut());
                             if (countNumberOfOccurences(startDataNodesOutput,
                                     "child process started successfully, parent exiting")
-                                    == installOperation.getConfig().getDataNodes().size()) {
+                                    == config.getDataNodes().size()) {
                                 taskOk = true;
                             }
                         }
@@ -204,6 +203,7 @@ public class InstallationStep extends Panel implements ResponseListener {
                 }
             });
         } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in startInstallation", e);
         }
     }
 

@@ -57,10 +57,20 @@ public class InstallTasks {
         return task;
     }
 
+    public static Task getAptGetUpdateTask(Set<Agent> agents) {
+        Task task = new Task("Apt-get update");
+        for (Agent agent : agents) {
+            Command cmd = Commands.getAptGetUpdateCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        return task;
+    }
+
     public static Task getInstallMongoTask(Set<Agent> agents) {
         Task task = new Task("Install mongo");
         for (Agent agent : agents) {
-            Command cmd = Commands.getInstallCommand();
+            Command cmd = Commands.getInstallCommand2();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }

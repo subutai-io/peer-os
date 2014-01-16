@@ -58,6 +58,33 @@ public class Commands {
     }
 
     //execute on each selected lxc node
+    public static Command getInstallCommand2() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/apt-get");
+        req.setArgs(Arrays.asList(
+                "--force-yes",
+                "--assume-yes",
+                "install",
+                "ksks-mongo"
+        ));
+        req.setTimeout(180);
+        return cmd;
+    }
+
+    //execute on each selected lxc node
+    public static Command getAptGetUpdateCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/apt-get");
+        req.setArgs(Arrays.asList(
+                "update"
+        ));
+        req.setTimeout(180);
+        return cmd;
+    }
+
+    //execute on each selected lxc node
     public static Command getUninstallCommand() {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();

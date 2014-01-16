@@ -20,9 +20,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public class Step1 extends Panel {
+public class WelcomeStep extends Panel {
 
-    public Step1(final Wizard wizard) {
+    public WelcomeStep(final Wizard wizard) {
 
         GridLayout grid = new GridLayout(10, 6);
         grid.setSizeFull();

@@ -24,6 +24,7 @@ public class InstallOperation extends Operation {
     public InstallOperation(InstallerConfig config) {
         super("Install Mongo cluster");
         this.config = config;
+        
         Set<Agent> clusterMembers = new HashSet<Agent>();
         clusterMembers.addAll(config.getConfigServers());
         clusterMembers.addAll(config.getRouterServers());
@@ -34,6 +35,8 @@ public class InstallOperation extends Operation {
         addTask(InstallTasks.getUninstallMongoTask(clusterMembers));
 
         addTask(InstallTasks.getCleanMongoDataTask(clusterMembers));
+
+        addTask(InstallTasks.getAptGetUpdateTask(clusterMembers));
 
         addTask(InstallTasks.getInstallMongoTask(clusterMembers));
 

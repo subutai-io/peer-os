@@ -72,6 +72,10 @@ public class TaskRunner {
         }
     }
 
+    public void removeAllTaskCallbacks() {
+        taskListenerCache.clear();
+    }
+
     public void runTask(Task task, TaskCallback taskCallback) {
         if (task != null && task.getUuid() != null && taskCallback != null) {
             if (taskListenerCache.get(task.getUuid()) == null && task.hasNextCommand()) {

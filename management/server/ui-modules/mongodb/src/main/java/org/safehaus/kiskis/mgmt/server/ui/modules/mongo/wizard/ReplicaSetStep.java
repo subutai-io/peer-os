@@ -27,9 +27,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public class Step3 extends Panel {
+public class ReplicaSetStep extends Panel {
 
-    public Step3(final Wizard wizard) {
+    public ReplicaSetStep(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();

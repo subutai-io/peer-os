@@ -28,12 +28,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public class Step2 extends Panel {
+public class ConfigNRoutersStep extends Panel {
 
     Property.ValueChangeListener configChangeListener = null;
     Property.ValueChangeListener routersChangeListener = null;
 
-    public Step2(final Wizard wizard) {
+    public ConfigNRoutersStep(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();

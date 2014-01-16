@@ -33,7 +33,7 @@ public class Wizard implements ResponseListener {
     private final InstallerConfig mongoConfig = new InstallerConfig();
     private final VerticalLayout contentRoot;
 //    private Step5 step5;
-    private InstallationStep step5;
+    private InstallationStep installationStep;
     private final PersistenceInterface persistenceManager;
 
     public Wizard() {
@@ -104,29 +104,29 @@ public class Wizard implements ResponseListener {
         switch (step) {
             case 1: {
                 progressBar.setValue(0f);
-                verticalLayout.addComponent(new Step1(this));
+                verticalLayout.addComponent(new WelcomeStep(this));
                 break;
             }
             case 2: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step2(this));
+                verticalLayout.addComponent(new ConfigNRoutersStep(this));
                 break;
             }
             case 3: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step3(this));
+                verticalLayout.addComponent(new ReplicaSetStep(this));
                 break;
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step4(this));
+                verticalLayout.addComponent(new VerifyStep(this));
                 break;
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step5 = new InstallationStep(this);
-                verticalLayout.addComponent(step5);
-                step5.startInstallation();
+                installationStep = new InstallationStep(this);
+                verticalLayout.addComponent(installationStep);
+                installationStep.startInstallation(true);
                 break;
             }
             default: {
@@ -137,8 +137,8 @@ public class Wizard implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        if (step == 5 && step5 != null) {
-            step5.onResponse(response);
+        if (step == 5 && installationStep != null) {
+            installationStep.onResponse(response);
         }
 
     }

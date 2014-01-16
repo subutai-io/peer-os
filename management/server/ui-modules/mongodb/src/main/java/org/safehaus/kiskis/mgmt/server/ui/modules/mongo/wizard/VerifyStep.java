@@ -20,11 +20,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public class Step4 extends Panel {
+public class VerifyStep extends Panel {
 
-    private static final Logger LOG = Logger.getLogger(Step4.class.getName());
+    private static final Logger LOG = Logger.getLogger(VerifyStep.class.getName());
 
-    public Step4(final Wizard wizard) {
+    public VerifyStep(final Wizard wizard) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
