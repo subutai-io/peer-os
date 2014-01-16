@@ -137,30 +137,33 @@ public class InstallationStep extends Panel implements ResponseListener {
                 public void onResponse(Task task, Response response) {
 
                     if (task.getData() != null) {
+                        boolean taskOk = false;
                         if (task.getData() == TaskType.START_CONFIG_SERVERS) {
                             startConfigServersOutput.append(response.getStdOut());
                             if (countNumberOfOccurences(startConfigServersOutput,
                                     "child process started successfully, parent exiting")
                                     == installOperation.getConfig().getConfigServers().size()) {
-                                task.setCompleted(true);
-                                task.setTaskStatus(TaskStatus.SUCCESS);
+                                taskOk = true;
                             }
                         } else if (task.getData() == TaskType.START_ROUTERS) {
                             startRoutersOutput.append(response.getStdOut());
                             if (countNumberOfOccurences(startRoutersOutput,
                                     "child process started successfully, parent exiting")
                                     == installOperation.getConfig().getRouterServers().size()) {
-                                task.setCompleted(true);
-                                task.setTaskStatus(TaskStatus.SUCCESS);
+                                taskOk = true;
                             }
                         } else if (task.getData() == TaskType.START_REPLICA_SET) {
                             startDataNodesOutput.append(response.getStdOut());
                             if (countNumberOfOccurences(startDataNodesOutput,
                                     "child process started successfully, parent exiting")
                                     == installOperation.getConfig().getDataNodes().size()) {
-                                task.setCompleted(true);
-                                task.setTaskStatus(TaskStatus.SUCCESS);
+                                taskOk = true;
                             }
+                        }
+                        if (taskOk) {
+                            task.setCompleted(true);
+                            task.setTaskStatus(TaskStatus.SUCCESS);
+                            taskRunner.removeTaskCallback(task.getUuid());
                         }
                     }
 
@@ -180,7 +183,6 @@ public class InstallationStep extends Panel implements ResponseListener {
                     }
 
                     if (task.isCompleted()) {
-                        taskRunner.removeTaskCallback(task.getUuid());
                         if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                             addOutput(String.format("Task %s succeeded", task.getDescription()));
                             if (installOperation.hasNextTask()) {
