@@ -19,7 +19,7 @@
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface"/>
     <reference id="commandManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface"/>
-    <reference id="commandTransportInterface" availability="mandatory"
+    <reference id="communicationService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface"/>
     <reference id="dbManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager"/>
@@ -29,7 +29,7 @@
           init-method="init" destroy-method="destroy" scope="singleton">
         <property name="persistenceAgentService" ref="persistenceAgentService"/>
         <property name="commandManagerService" ref="commandManagerService"/>
-        <property name="commandTransportInterface" ref="commandTransportInterface"/>
+        <property name="commandTransportInterface" ref="communicationService"/>
         <property name="heartbeatTimeoutSec" value="${heartbeatTimeoutSec}"/>  
         <property name="heartbeatFromMin" value="${heartbeatFromMin}"/>  
         <property name="heartbeatToMin" value="${heartbeatToMin}"/>  
@@ -45,7 +45,7 @@
     <bean id="agentManager"
           class="org.safehaus.kiskis.mgmt.server.agent.AgentManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton">
-        <property name="communicationService" ref="commandTransportInterface"/>
+        <property name="communicationService" ref="communicationService"/>
         <property name="dbManagerService" ref="dbManagerService"/>
         <property name="agentFreshnessMin" value="${agentFreshnessMin}"/>  
     </bean>

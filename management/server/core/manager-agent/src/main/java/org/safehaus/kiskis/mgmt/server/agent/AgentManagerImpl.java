@@ -89,8 +89,52 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
         return null;
     }
 
+    public Agent getAgentByHostnameFromDB(String hostname) {
+        Agent agent = null;
+        try {
+            String cql = "select * from agents where islxc = true and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
+            ResultSet rs = dbManagerService.executeQuery(cql, hostname,
+                    new Date(System.currentTimeMillis() - agentFreshnessMin * 60 * 1000));
+            Row row = rs.one();
+            if (row != null) {
+                agent = new Agent();
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getAgentByHostnameFromDB", ex);
+        }
+        return agent;
+    }
+
     public Agent getAgentByUUID(UUID uuid) {
         return agents.getIfPresent(uuid);
+    }
+
+    public Agent getAgentByUUIDFromDB(UUID uuid) {
+        Agent agent = new Agent();
+        try {
+            String cql = "select * from agents where uuid = ?";
+            ResultSet rs = dbManagerService.executeQuery(cql, uuid);
+            for (Row row : rs) {
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getAgentByUUIDFromDB", ex);
+        }
+        return agent;
     }
 
     public Set<Agent> getLxcAgents() {
