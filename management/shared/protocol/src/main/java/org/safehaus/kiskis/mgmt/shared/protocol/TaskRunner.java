@@ -76,7 +76,7 @@ public class TaskRunner {
         if (task != null && task.getUuid() != null && taskCallback != null) {
             if (taskListenerCache.get(task.getUuid()) == null && task.hasNextCommand()) {
                 taskListenerCache.put(task.getUuid(),
-                        new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 3000);
+                        new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
                 while (task.hasNextCommand()) {
                     commandManager.executeCommand(task.getNextCommand());
                 }

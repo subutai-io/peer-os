@@ -124,7 +124,7 @@ public class InstallationStep extends Panel implements ResponseListener {
     public void startInstallation() {
         try {
             runTimeoutThread(installOperation);
-            hideProgress();
+            showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
@@ -189,13 +189,13 @@ public class InstallationStep extends Panel implements ResponseListener {
                             } else {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
-                                showProgress();
+                                hideProgress();
                             }
                         } else {
                             installOperation.setCompleted(true);
                             addOutput(String.format("Task %s failed", task.getDescription()));
                             addOutput(String.format("Operation %s failed", installOperation.getDescription()));
-                            showProgress();
+                            hideProgress();
                         }
                     }
                 }
@@ -245,9 +245,7 @@ public class InstallationStep extends Panel implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        System.out.println("Feeding response " + response);
         taskRunner.feedResponse(response);
-
     }
 
     private void addOutput(String output) {
