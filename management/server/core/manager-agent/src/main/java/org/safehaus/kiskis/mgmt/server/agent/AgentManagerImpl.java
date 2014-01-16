@@ -123,10 +123,10 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
     public void init() {
         try {
 
+            commandTransportInterface.addListener(this);
             agents = CacheBuilder.newBuilder().
                     expireAfterWrite(agentFreshnessMin, TimeUnit.MINUTES).
                     build();
-            commandTransportInterface.addListener(this);
             exec = Executors.newSingleThreadExecutor();
             exec.execute(new Runnable() {
 
@@ -230,10 +230,13 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
 
     private void removeAgent(Response response) {
         try {
-            if (response.getUuid() != null) {
-                if (agents.getIfPresent(response.getUuid()) != null) {
-                    agents.invalidate(response.getUuid());
-                    notifyAgentListeners = true;
+            if (response.getTransportId() != null) {
+                for (Agent agent : agents.asMap().values()) {
+                    if (response.getTransportId().equalsIgnoreCase(agent.getTransportId())) {
+                        agents.invalidate(agent.getUuid());
+                        notifyAgentListeners = true;
+                        return;
+                    }
                 }
             }
         } catch (Exception e) {
