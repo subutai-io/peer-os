@@ -168,6 +168,12 @@
             <version>0.9.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>overlays</artifactId>
+            <version>0.9.8</version>
+        </dependency>
+
         <!--<dependency>-->
         <!--<groupId>com.vaadin</groupId>-->
         <!--<artifactId>vaadin-server</artifactId>-->

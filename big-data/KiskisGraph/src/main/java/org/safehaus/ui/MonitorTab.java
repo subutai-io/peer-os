@@ -20,15 +20,18 @@
 package org.safehaus.ui;
 
 import com.github.wolfie.refresher.Refresher;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.VerticalLayout;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.safehaus.core.ElasticSearchAccessObject;
 import org.safehaus.core.LogResponse;
+import org.safehaus.core.Timestamp;
 import org.safehaus.core.refreshListeners.ChartListener;
 import org.safehaus.core.refreshListeners.LogListener;
-import org.safehaus.core.Timestamp;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
