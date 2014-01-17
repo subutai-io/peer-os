@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
@@ -27,7 +26,6 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
@@ -35,11 +33,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 
 /**
  *
@@ -258,9 +254,7 @@ public class Manager2 implements ResponseListener {
                 progressIcon},
                     null);
 
-            final Item row = table.getItem(rowId);
-            destroyBtn.setData(rowId);
-
+//            final Item row = table.getItem(rowId);
             startBtn.addListener(new Button.ClickListener() {
 
                 @Override
@@ -287,39 +281,7 @@ public class Manager2 implements ResponseListener {
                     Task checkStatusTask = ManagerTasks.getCheckStatusTask(
                             new HashSet<Agent>(Arrays.asList(agent)),
                             nodeType);
-
-                    stopBtn.setEnabled(false);
-                    startBtn.setEnabled(false);
-                    progressIcon.setVisible(true);
-
-                    taskRunner.runTask(checkStatusTask, new TaskCallback() {
-
-                        private final StringBuilder stdOutput = new StringBuilder();
-                        private final StringBuilder stdErr = new StringBuilder();
-
-                        @Override
-                        public void onResponse(Task task, Response response) {
-                            if (!Util.isStringEmpty(response.getStdOut())) {
-                                stdOutput.append(response.getStdOut());
-                            }
-                            if (!Util.isStringEmpty(response.getStdErr())) {
-                                stdErr.append(response.getStdErr());
-                            }
-
-                            if (stdOutput.toString().contains("couldn't connect to server")) {
-                                startBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                                taskRunner.removeTaskCallback(task.getUuid());
-                            } else if (stdOutput.toString().contains("connecting to")) {
-                                stopBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                                taskRunner.removeTaskCallback(task.getUuid());
-                            } else if (stdErr.toString().contains("mongo: not found")) {
-                                progressIcon.setVisible(false);
-                                taskRunner.removeTaskCallback(task.getUuid());
-                            }
-                        }
-                    });
+                    taskRunner.runTask(checkStatusTask, new CheckStatusCallback(taskRunner, startBtn, stopBtn, progressIcon));
                 }
             });
         }
@@ -327,11 +289,11 @@ public class Manager2 implements ResponseListener {
 
     private Table createTableTemplate(String caption) {
         Table table = new Table(caption);
-        table.addContainerProperty(Constants.TABLE_HOST_PROPERTY, String.class, null);
-        table.addContainerProperty(Constants.TABLE_CHECK_PROPERTY, Button.class, null);
-        table.addContainerProperty(Constants.TABLE_START_PROPERTY, Button.class, null);
-        table.addContainerProperty(Constants.TABLE_STOP_PROPERTY, Button.class, null);
-        table.addContainerProperty(Constants.TABLE_DESTROY_PROPERTY, Button.class, null);
+        table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Start", Button.class, null);
+        table.addContainerProperty("Stop", Button.class, null);
+        table.addContainerProperty("Destroy", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(250, Sizeable.UNITS_PIXELS);
@@ -350,16 +312,6 @@ public class Manager2 implements ResponseListener {
                 clusterCombo.setItemCaption(mongoClusterInfo,
                         String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
             }
-        }
-    }
-
-    private String getNodePort(NodeType nodeType) {
-        if (nodeType == NodeType.CONFIG_NODE) {
-            return Constants.CONFIG_SRV_PORT + "";
-        } else if (nodeType == NodeType.ROUTER_NODE) {
-            return Constants.ROUTER_PORT + "";
-        } else {
-            return Constants.DATA_NODE_PORT + "";
         }
     }
 
