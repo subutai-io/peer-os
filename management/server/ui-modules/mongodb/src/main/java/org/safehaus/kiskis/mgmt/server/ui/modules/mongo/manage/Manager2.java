@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -61,9 +62,9 @@ public class Manager2 implements ResponseListener {
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
+    private final TaskRunner taskRunner = new TaskRunner();
     private DestroyWindow destroyWindow;
     private ClusterConfig config;
-    private final TaskRunner taskRunner = new TaskRunner();
 
     public Manager2() {
         agentManager = ServiceLocator.getService(AgentManager.class);
@@ -239,12 +240,14 @@ public class Manager2 implements ResponseListener {
 
         for (final Agent agent : agents) {
 
-            Button checkBtn = new Button("Check");
+            final Button checkBtn = new Button("Check");
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
-            Button destroyBtn = new Button("Destroy");
+            final Button destroyBtn = new Button("Destroy");
+            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
+            progressIcon.setVisible(false);
 
             Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
@@ -252,7 +255,7 @@ public class Manager2 implements ResponseListener {
                 startBtn,
                 stopBtn,
                 destroyBtn,
-                null},
+                progressIcon},
                     null);
 
             final Item row = table.getItem(rowId);
@@ -287,11 +290,12 @@ public class Manager2 implements ResponseListener {
 
                     stopBtn.setEnabled(false);
                     startBtn.setEnabled(false);
+                    progressIcon.setVisible(true);
 
                     taskRunner.runTask(checkStatusTask, new TaskCallback() {
 
-                        private StringBuilder stdOutput = new StringBuilder();
-                        private StringBuilder stdErr = new StringBuilder();
+                        private final StringBuilder stdOutput = new StringBuilder();
+                        private final StringBuilder stdErr = new StringBuilder();
 
                         @Override
                         public void onResponse(Task task, Response response) {
@@ -304,15 +308,16 @@ public class Manager2 implements ResponseListener {
 
                             if (stdOutput.toString().contains("couldn't connect to server")) {
                                 startBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
                                 taskRunner.removeTaskCallback(task.getUuid());
                             } else if (stdOutput.toString().contains("connecting to")) {
                                 stopBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
                                 taskRunner.removeTaskCallback(task.getUuid());
                             } else if (stdErr.toString().contains("mongo: not found")) {
-                                //no-op
+                                progressIcon.setVisible(false);
                                 taskRunner.removeTaskCallback(task.getUuid());
                             }
-                            startBtn.setCaption(null);
                         }
                     });
                 }
