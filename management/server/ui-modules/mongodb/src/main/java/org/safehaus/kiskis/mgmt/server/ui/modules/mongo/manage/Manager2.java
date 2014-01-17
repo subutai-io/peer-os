@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
@@ -19,6 +20,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -26,6 +28,7 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
@@ -34,7 +37,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
@@ -52,7 +54,6 @@ public class Manager2 implements ResponseListener {
     private static final Logger LOG = Logger.getLogger(Manager2.class.getName());
 
     private final VerticalLayout contentRoot;
-    private final CommandManager commandManager;
     private final AgentManager agentManager;
     private final ComboBox clusterCombo;
     private final Table configServersTable;
@@ -64,7 +65,6 @@ public class Manager2 implements ResponseListener {
 
     public Manager2() {
         agentManager = ServiceLocator.getService(AgentManager.class);
-        commandManager = ServiceLocator.getService(CommandManager.class);
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
@@ -124,6 +124,9 @@ public class Manager2 implements ResponseListener {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                checkNodesStatus(configServersTable);
+                checkNodesStatus(routersTable);
+                checkNodesStatus(dataNodesTable);
             }
 
         });
@@ -255,25 +258,6 @@ public class Manager2 implements ResponseListener {
                     null);
 
 //            final Item row = table.getItem(rowId);
-            startBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                }
-            });
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                }
-            });
-            destroyBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                }
-            });
-
             checkBtn.addListener(new Button.ClickListener() {
 
                 @Override
@@ -281,16 +265,85 @@ public class Manager2 implements ResponseListener {
                     Task checkStatusTask = ManagerTasks.getCheckStatusTask(
                             new HashSet<Agent>(Arrays.asList(agent)),
                             nodeType);
-                    taskRunner.runTask(checkStatusTask, new CheckStatusCallback(taskRunner, startBtn, stopBtn, progressIcon));
+                    taskRunner.runTask(checkStatusTask, new CheckStatusCallback(taskRunner, progressIcon, startBtn, stopBtn, destroyBtn));
                 }
             });
+
+            startBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Task startNodeTask = null;
+                    if (nodeType == NodeType.CONFIG_NODE) {
+                        startNodeTask = ManagerTasks.getStartConfigSrvTask(
+                                new HashSet<Agent>(Arrays.asList(agent)));
+
+                    } else if (nodeType == NodeType.DATA_NODE) {
+
+                        startNodeTask = ManagerTasks.getStartDataNodeTask(
+                                new HashSet<Agent>(Arrays.asList(agent)));
+
+                    } else if (nodeType == NodeType.ROUTER_NODE) {
+                        startNodeTask = ManagerTasks.getStartRouterTask(
+                                new HashSet<Agent>(Arrays.asList(agent)),
+                                config.getConfigServers());
+
+                    }
+                    if (startNodeTask != null) {
+                        taskRunner.runTask(startNodeTask,
+                                new StartNodeCallback(progressIcon, checkBtn, startBtn, stopBtn, destroyBtn));
+                    }
+                }
+            });
+
+            stopBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Task stopNodeTask = ManagerTasks.getStopNodeTask(
+                            new HashSet<Agent>(Arrays.asList(agent)));
+
+                    taskRunner.runTask(stopNodeTask,
+                            new StopNodeCallback(progressIcon, checkBtn, startBtn, stopBtn, destroyBtn));
+                }
+            });
+
+            destroyBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    if (nodeType == NodeType.CONFIG_NODE) {
+                        //uninstall
+                        //restart routers
+                        //adjust db
+                    } else if (nodeType == NodeType.DATA_NODE) {
+                        //find primary
+                        //unregister from primary
+                        //uninstall
+                        //adjust db                        
+
+                    } else if (nodeType == NodeType.ROUTER_NODE) {
+                        //uninstall
+                        //adjust db
+                    }
+                }
+            });
+        }
+    }
+
+    private void checkNodesStatus(Table table) {
+        for (Iterator it = table.getItemIds().iterator(); it.hasNext();) {
+            int rowId = (Integer) it.next();
+            Item row = table.getItem(rowId);
+            Button checkBtn = (Button) (row.getItemProperty(Constants.TABLE_CHECK_PROPERTY).getValue());
+            checkBtn.click();
         }
     }
 
     private Table createTableTemplate(String caption) {
         Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty(Constants.TABLE_CHECK_PROPERTY, Button.class, null);
         table.addContainerProperty("Start", Button.class, null);
         table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);

@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 public class ManagerTasks {
 
     public static Task getCheckStatusTask(Set<Agent> agents, NodeType nodeType) {
-        Task task = new Task("Check status");
+        Task task = new Task();
         for (Agent agent : agents) {
             Command cmd;
             if (nodeType == NodeType.CONFIG_NODE) {
@@ -37,4 +37,107 @@ public class ManagerTasks {
         }
         return task;
     }
+
+    public static Task getStopNodeTask(Set<Agent> agents) {
+        Task task = new Task();
+        for (Agent agent : agents) {
+            Command cmd = Commands.getStopNodeCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        return task;
+    }
+
+    public static Task getStartDataNodeTask(Set<Agent> dataNodes) {
+        Task task = new Task();
+        for (Agent agent : dataNodes) {
+            Command cmd = Commands.getStartNodeCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        return task;
+    }
+
+    public static Task getStartConfigSrvTask(Set<Agent> configServers) {
+        Task task = new Task();
+        for (Agent agent : configServers) {
+            Command cmd = Commands.getStartConfigServerCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        return task;
+    }
+
+    public static Task getStartRouterTask(Set<Agent> routers, Set<Agent> configServers) {
+        StringBuilder configServersArg = new StringBuilder();
+        for (Agent cfgSrvAgent : configServers) {
+            configServersArg.append(cfgSrvAgent.getHostname()).append(Constants.DOMAIN).
+                    append(":").append(Constants.CONFIG_SRV_PORT).append(",");
+        }
+        //drop comma
+        if (configServersArg.length() > 0) {
+            configServersArg.setLength(configServersArg.length() - 1);
+        }
+        Task task = new Task();
+        for (Agent agent : routers) {
+            Command cmd = Commands.getStartRouterCommand(configServersArg.toString());
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        return task;
+    }
+
+    public static Task getKillRunningMongoTask(Set<Agent> agents) {
+        Task task = new Task("Kill running mongo");
+        for (Agent agent : agents) {
+            Command cmd = Commands.getKillAllCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        //ignore exit code
+        task.setIgnoreExitCode(true);
+        return task;
+    }
+
+    public static Task getUninstallMongoTask(Set<Agent> agents) {
+        Task task = new Task("Uninstall existing Mongo");
+        for (Agent agent : agents) {
+            Command cmd = Commands.getUninstallCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        //ignore exit code
+        task.setIgnoreExitCode(true);
+        return task;
+    }
+
+    public static Task getCleanMongoDataTask(Set<Agent> agents) {
+        Task task = new Task("Clean previous Mongo data");
+        for (Agent agent : agents) {
+            Command cmd = Commands.getCleanCommand();
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
+        //ignore exit code
+        task.setIgnoreExitCode(true);
+        return task;
+    }
+
+    public static Task getFindPrimaryNodeTask(Agent secondaryNode) {
+        Task task = new Task();
+        Command cmd = Commands.getFindPrimaryNodeCommand();
+        cmd.getRequest().setUuid(secondaryNode.getUuid());
+        task.addCommand(cmd);
+        return task;
+    }
+
+    public static Task getUnregisterSecondaryFromPrimaryTask(Agent primaryNode, Agent secondaryNode) {
+        Task task = new Task();
+        Command cmd = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
+                String.format("%s%s", secondaryNode.getHostname(), Constants.DOMAIN));
+        cmd.getRequest().setUuid(primaryNode.getUuid());
+        task.addCommand(cmd);
+        return task;
+    }
+
 }

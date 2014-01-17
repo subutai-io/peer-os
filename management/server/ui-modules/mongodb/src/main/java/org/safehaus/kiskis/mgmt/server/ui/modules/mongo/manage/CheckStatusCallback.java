@@ -20,18 +20,21 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 public class CheckStatusCallback implements TaskCallback {
 
     private final TaskRunner taskRunner;
+    private final Embedded progressIcon;
     private final Button startButton;
     private final Button stopButton;
-    private final Embedded progressIcon;
+    private final Button destroyButton;
 
-    public CheckStatusCallback(TaskRunner taskRunner, Button startButton, Button stopButton, Embedded progressIcon) {
+    public CheckStatusCallback(TaskRunner taskRunner, Embedded progressIcon, Button startButton, Button stopButton, Button destroyButton) {
         this.taskRunner = taskRunner;
+        this.progressIcon = progressIcon;
         this.startButton = startButton;
         this.stopButton = stopButton;
-        this.progressIcon = progressIcon;
+        this.destroyButton = destroyButton;
+        progressIcon.setVisible(true);
         startButton.setEnabled(false);
         stopButton.setEnabled(false);
-        progressIcon.setVisible(true);
+        destroyButton.setEnabled(false);
     }
 
     private final StringBuilder stdOutput = new StringBuilder();
@@ -48,15 +51,21 @@ public class CheckStatusCallback implements TaskCallback {
 
         if (stdOutput.toString().contains("couldn't connect to server")) {
             startButton.setEnabled(true);
+            destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
             taskRunner.removeTaskCallback(task.getUuid());
         } else if (stdOutput.toString().contains("connecting to")) {
             stopButton.setEnabled(true);
+            destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
             taskRunner.removeTaskCallback(task.getUuid());
         } else if (stdErr.toString().contains("mongo: not found")) {
+            destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
             taskRunner.removeTaskCallback(task.getUuid());
+        } else if (Util.isFinalResponse(response)) {
+            destroyButton.setEnabled(true);
+            progressIcon.setVisible(false);
         }
     }
 
