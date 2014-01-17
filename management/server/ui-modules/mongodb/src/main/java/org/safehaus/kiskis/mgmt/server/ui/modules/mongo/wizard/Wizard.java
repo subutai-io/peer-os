@@ -5,7 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallerConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -30,7 +30,7 @@ public class Wizard implements ResponseListener {
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
-    private final InstallerConfig mongoConfig = new InstallerConfig();
+    private final ClusterConfig config = new ClusterConfig();
     private final VerticalLayout contentRoot;
 //    private Step5 step5;
     private InstallationStep installationStep;
@@ -95,8 +95,8 @@ public class Wizard implements ResponseListener {
         putForm();
     }
 
-    public InstallerConfig getConfig() {
-        return mongoConfig;
+    public ClusterConfig getConfig() {
+        return config;
     }
 
     private void putForm() {

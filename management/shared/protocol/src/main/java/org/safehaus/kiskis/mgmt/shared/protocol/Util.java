@@ -109,4 +109,15 @@ public class Util {
         }
         return null;
     }
+
+    public static int countNumberOfOccurences(String strToSearch, String strToCount) {
+        int idx = strToSearch.indexOf(strToCount);
+        int count = 0;
+        while (idx > -1) {
+            count++;
+            idx = strToSearch.indexOf(strToCount, idx + 1);
+        }
+        return count;
+    }
+
 }

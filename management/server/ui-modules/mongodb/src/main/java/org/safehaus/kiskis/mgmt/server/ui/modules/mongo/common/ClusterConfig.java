@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class InstallerConfig {
+public class ClusterConfig {
 
     private String clusterName = "";
     private String replicaSetName = "";

@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class UninstallOperation extends Operation {
 
-    public UninstallOperation(InstallerConfig config) {
+    public UninstallOperation(ClusterConfig config) {
         super("Uninstall Mongo cluster");
 
         Set<Agent> clusterMembers = new HashSet<Agent>();

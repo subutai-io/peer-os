@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallOperation;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallerConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
@@ -50,7 +50,7 @@ public class InstallationStep extends Panel implements ResponseListener {
     private Thread operationTimeoutThread;
     private final TaskRunner taskRunner = new TaskRunner();
     private final AgentManager agentManager;
-    private final InstallerConfig config;
+    private final ClusterConfig config;
 
     public InstallationStep(final Wizard wizard) {
         this.config = wizard.getConfig();
@@ -84,8 +84,8 @@ public class InstallationStep extends Panel implements ResponseListener {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 MgmtApplication.showConfirmationDialog(
-                        "Abort cluster installation",
-                        "Do you want to abort cluster installation?\nWarning: If 'Install mongo' task is currently running,\ndpkg process might be locked and uninstallation would fail", "Yes", "No", new ConfirmationDialogCallback() {
+                        "Undo cluster installation",
+                        "Do you want to revert cluster installation?\nWarning: If 'Install mongo' task is currently running,\ndpkg process might be locked and uninstallation would fail", "Yes", "No", new ConfirmationDialogCallback() {
 
                             @Override
                             public void response(boolean ok) {
@@ -118,16 +118,6 @@ public class InstallationStep extends Panel implements ResponseListener {
 
     }
 
-    private int countNumberOfOccurences(StringBuilder sb, String strToCount) {
-        int idx = sb.indexOf(strToCount);
-        int count = 0;
-        while (idx > -1) {
-            count++;
-            idx = sb.indexOf(strToCount, idx + 1);
-        }
-        return count;
-    }
-
     public void startInstallation(final boolean install) {
         try {
             //stop any running installation
@@ -150,21 +140,21 @@ public class InstallationStep extends Panel implements ResponseListener {
                         boolean taskOk = false;
                         if (task.getData() == TaskType.START_CONFIG_SERVERS) {
                             startConfigServersOutput.append(response.getStdOut());
-                            if (countNumberOfOccurences(startConfigServersOutput,
+                            if (Util.countNumberOfOccurences(startConfigServersOutput.toString(),
                                     "child process started successfully, parent exiting")
                                     == config.getConfigServers().size()) {
                                 taskOk = true;
                             }
                         } else if (task.getData() == TaskType.START_ROUTERS) {
                             startRoutersOutput.append(response.getStdOut());
-                            if (countNumberOfOccurences(startRoutersOutput,
+                            if (Util.countNumberOfOccurences(startRoutersOutput.toString(),
                                     "child process started successfully, parent exiting")
                                     == config.getRouterServers().size()) {
                                 taskOk = true;
                             }
                         } else if (task.getData() == TaskType.START_REPLICA_SET) {
                             startDataNodesOutput.append(response.getStdOut());
-                            if (countNumberOfOccurences(startDataNodesOutput,
+                            if (Util.countNumberOfOccurences(startDataNodesOutput.toString(),
                                     "child process started successfully, parent exiting")
                                     == config.getDataNodes().size()) {
                                 taskOk = true;
@@ -181,8 +171,8 @@ public class InstallationStep extends Panel implements ResponseListener {
                     addLog(String.format("%s:\n%s\n%s",
                             agent != null
                             ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
-                            response.getStdOut() == null ? "" : response.getStdOut(),
-                            response.getStdErr() == null ? "" : response.getStdErr()));
+                            Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
+                            Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
 
                     if (Util.isFinalResponse(response)) {
                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {

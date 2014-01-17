@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,16 +17,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class InstallOperation extends Operation {
 
-    private final InstallerConfig config;
+    private final ClusterConfig config;
 
-    public InstallerConfig getConfig() {
+    public ClusterConfig getConfig() {
         return config;
     }
 
-    public InstallOperation(InstallerConfig config) {
+    public InstallOperation(ClusterConfig config) {
         super("Install Mongo cluster");
         this.config = config;
-        
+
         Set<Agent> clusterMembers = new HashSet<Agent>();
         clusterMembers.addAll(config.getConfigServers());
         clusterMembers.addAll(config.getRouterServers());

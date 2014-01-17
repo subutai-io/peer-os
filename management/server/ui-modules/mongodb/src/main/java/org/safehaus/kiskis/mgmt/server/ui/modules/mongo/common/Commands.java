@@ -340,6 +340,18 @@ public class Commands {
         return cmd;
     }
 
+    public static Command getCheckConfigSrvStatusCommand(String host) {
+        return getCheckInstanceRunningCommand(host, Constants.CONFIG_SRV_PORT + "");
+    }
+
+    public static Command getCheckRouterStatusCommand(String host) {
+        return getCheckInstanceRunningCommand(host, Constants.ROUTER_PORT + "");
+    }
+
+    public static Command getCheckDataNodeStatusCommand(String host) {
+        return getCheckInstanceRunningCommand(host, Constants.DATA_NODE_PORT + "");
+    }
+
     // RECONFIGURATION COMMANDS
     public static Command getStopNodeCommand() {
         Command cmd = getTemplate();
