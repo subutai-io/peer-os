@@ -24,6 +24,8 @@ public class CheckStatusCallback implements TaskCallback {
     private final Button startButton;
     private final Button stopButton;
     private final Button destroyButton;
+    private final StringBuilder stdOutput = new StringBuilder();
+    private final StringBuilder stdErr = new StringBuilder();
 
     public CheckStatusCallback(TaskRunner taskRunner, Embedded progressIcon, Button startButton, Button stopButton, Button destroyButton) {
         this.taskRunner = taskRunner;
@@ -36,9 +38,6 @@ public class CheckStatusCallback implements TaskCallback {
         stopButton.setEnabled(false);
         destroyButton.setEnabled(false);
     }
-
-    private final StringBuilder stdOutput = new StringBuilder();
-    private final StringBuilder stdErr = new StringBuilder();
 
     @Override
     public void onResponse(Task task, Response response) {

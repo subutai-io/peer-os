@@ -291,7 +291,7 @@ public class Manager2 implements ResponseListener {
                     }
                     if (startNodeTask != null) {
                         taskRunner.runTask(startNodeTask,
-                                new StartNodeCallback(progressIcon, checkBtn, startBtn, stopBtn, destroyBtn));
+                                new StartNodeCallback(taskRunner, progressIcon, checkBtn, startBtn, stopBtn, destroyBtn));
                     }
                 }
             });
