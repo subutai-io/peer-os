@@ -271,7 +271,7 @@ public class Manager2 implements ResponseListener {
                     if (nodeType == NodeType.CONFIG_NODE) {
                         Operation destroyCfgSrvOperation = new DestroyNodeOperation(agent, config, nodeType);
                         taskRunner.runTask(destroyCfgSrvOperation.getNextTask(),
-                                new DestroyCfgSrvCallback(
+                                new DestroyCfgSrvCallback(contentRoot.getWindow(),
                                         (MongoClusterInfo) clusterCombo.getValue(),
                                         config, agent,
                                         configServersTable, routersTable,
@@ -281,14 +281,29 @@ public class Manager2 implements ResponseListener {
                                         stopBtn, destroyBtn));
 
                     } else if (nodeType == NodeType.DATA_NODE) {
-                        //find primary
-                        //unregister from primary
-                        //uninstall
-                        //adjust db                        
+                        Operation destroyDataNodeOperation = new DestroyNodeOperation(agent, config, nodeType);
+                        taskRunner.runTask(destroyDataNodeOperation.getNextTask(),
+                                new DestroyDataNodeCallback(
+                                        contentRoot.getWindow(), agentManager,
+                                        (MongoClusterInfo) clusterCombo.getValue(),
+                                        config, agent,
+                                        dataNodesTable, rowId,
+                                        destroyDataNodeOperation,
+                                        taskRunner, progressIcon,
+                                        checkBtn, startBtn,
+                                        stopBtn, destroyBtn));
 
                     } else if (nodeType == NodeType.ROUTER_NODE) {
-                        //uninstall
-                        //adjust db
+                        Operation destroyRouterOperation = new DestroyNodeOperation(agent, config, nodeType);
+                        taskRunner.runTask(destroyRouterOperation.getNextTask(),
+                                new DestroyRouterCallback(contentRoot.getWindow(),
+                                        (MongoClusterInfo) clusterCombo.getValue(),
+                                        config, agent,
+                                        routersTable,
+                                        rowId, destroyRouterOperation,
+                                        taskRunner, progressIcon,
+                                        checkBtn, startBtn,
+                                        stopBtn, destroyBtn));
                     }
                 }
             });

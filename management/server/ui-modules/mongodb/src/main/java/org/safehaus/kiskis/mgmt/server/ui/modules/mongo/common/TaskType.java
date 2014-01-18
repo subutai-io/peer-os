@@ -11,5 +11,5 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
  */
 public enum TaskType {
 
-    START_CONFIG_SERVERS, START_ROUTERS, START_REPLICA_SET
+    START_CONFIG_SERVERS, START_ROUTERS, START_REPLICA_SET, FIND_PRIMARY_NODE
 }

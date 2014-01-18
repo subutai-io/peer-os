@@ -13,16 +13,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -30,14 +35,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author dilshat
  */
-public class DestroyCfgSrvCallback implements TaskCallback {
+public class DestroyDataNodeCallback implements TaskCallback {
 
     private final Window parentWindow;
+    private final AgentManager agentManager;
     private final MongoClusterInfo clusterInfo;
     private final ClusterConfig config;
     private final Agent nodeAgent;
-    private final Table cfgSrvTable;
-    private final Table routersTable;
+    private final Table dataNodesTable;
     private final Object rowId;
     private final Operation op;
     private final TaskRunner taskRunner;
@@ -46,13 +51,13 @@ public class DestroyCfgSrvCallback implements TaskCallback {
     private final Embedded progressIcon;
     private final StringBuilder stdOutput = new StringBuilder();
 
-    public DestroyCfgSrvCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table cfgSrvTable, Table routersTable, Object rowId, Operation op, TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyDataNodeCallback(Window parentWindow, AgentManager agentManager, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table dataNodesTable, Object rowId, Operation op, TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
+        this.agentManager = agentManager;
         this.clusterInfo = clusterInfo;
         this.config = config;
         this.nodeAgent = nodeAgent;
-        this.cfgSrvTable = cfgSrvTable;
-        this.routersTable = routersTable;
+        this.dataNodesTable = dataNodesTable;
         this.rowId = rowId;
         this.op = op;
         this.taskRunner = taskRunner;
@@ -68,51 +73,68 @@ public class DestroyCfgSrvCallback implements TaskCallback {
 
     @Override
     public void onResponse(Task task, Response response) {
-        if (task.getData() == TaskType.START_ROUTERS
-                && !Util.isStringEmpty(response.getStdOut())) {
-            stdOutput.append(response.getStdOut());
-            if (Util.countNumberOfOccurences(stdOutput.toString(), "child process started successfully, parent exiting")
-                    == clusterInfo.getRouters().size()) {
-                task.setTaskStatus(TaskStatus.SUCCESS);
-                task.setCompleted(true);
-                taskRunner.removeTaskCallback(task.getUuid());
+        if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
+            if (!Util.isStringEmpty(response.getStdOut())) {
+                stdOutput.append(response.getStdOut());
             }
-        }
+            if (task.isCompleted()) {
+                Pattern p = Pattern.compile("primary\" : \"(.*)\"");
+                Matcher m = p.matcher(stdOutput.toString());
+                Agent primaryNodeAgent = null;
+                if (m.find()) {
+                    String primaryNodeHost = m.group(1);
+                    if (!Util.isStringEmpty(primaryNodeHost)) {
+                        String hostname = primaryNodeHost.split(":")[0].replace(Constants.DOMAIN, "");
+                        primaryNodeAgent = agentManager.getAgentByHostname(hostname);
+                    }
+                }
 
-        if (task.isCompleted()) {
+//                if (primaryNodeAgent == null) {
+//                    progressIcon.setVisible(false);
+//                    checkButton.setEnabled(true);
+//                    destroyButton.setEnabled(true);
+//                    //show message
+//                    parentWindow.showNotification("Failed: Could not find primary node");
+//                } else {
+                if (primaryNodeAgent != null && primaryNodeAgent.getUuid().compareTo(nodeAgent.getUuid()) != 0) {
+                    Command unregisterSecondaryFromPrimaryCmd = op.peekNextTask().getCommands().iterator().next();
+                    unregisterSecondaryFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
+                } else {
+                    //skip unregister command
+                    op.getNextTask();
+                }
+
+                taskRunner.runTask(op.getNextTask(), this);
+//                }
+            }
+        } else if (task.isCompleted()) {
             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                 if (op.hasNextTask()) {
                     taskRunner.runTask(op.getNextTask(), this);
                 } else {
                     //update db
-                    List<UUID> configServers = new ArrayList<UUID>(clusterInfo.getConfigServers());
-                    for (Iterator<UUID> it = configServers.iterator(); it.hasNext();) {
+                    List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
+                    for (Iterator<UUID> it = dataNodes.iterator(); it.hasNext();) {
                         UUID agentUUID = it.next();
                         if (agentUUID.compareTo(nodeAgent.getUuid()) == 0) {
                             it.remove();
                             break;
                         }
                     }
-                    clusterInfo.setConfigServers(configServers);
+                    clusterInfo.setDataNodes(dataNodes);
                     ClusterDAO.saveMongoClusterInfo(clusterInfo);
-                    config.getConfigServers().remove(nodeAgent);
+                    config.getDataNodes().remove(nodeAgent);
 
                     //update UI
-                    cfgSrvTable.removeItem(rowId);
-
-                    //check statuses of routers
-                    Manager2.checkNodesStatus(routersTable);
+                    dataNodesTable.removeItem(rowId);
                 }
             } else {
                 progressIcon.setVisible(false);
                 checkButton.setEnabled(true);
                 destroyButton.setEnabled(true);
-
+                
                 //show message
                 parentWindow.showNotification(String.format("Failed task %s", task.getDescription()));
-
-                //check statuses of routers
-                Manager2.checkNodesStatus(routersTable);
             }
         }
     }

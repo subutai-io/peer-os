@@ -20,7 +20,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 public class ManagerTasks {
 
     public static Task getCheckStatusTask(Set<Agent> agents, NodeType nodeType) {
-        Task task = new Task();
+        Task task = new Task("Check status");
         for (Agent agent : agents) {
             Command cmd;
             if (nodeType == NodeType.CONFIG_NODE) {
@@ -40,7 +40,7 @@ public class ManagerTasks {
     }
 
     public static Task getStopNodeTask(Set<Agent> agents) {
-        Task task = new Task();
+        Task task = new Task("Stop mongo");
         for (Agent agent : agents) {
             Command cmd = Commands.getStopNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -50,7 +50,7 @@ public class ManagerTasks {
     }
 
     public static Task getStartDataNodeTask(Set<Agent> dataNodes) {
-        Task task = new Task();
+        Task task = new Task("Start data node");
         for (Agent agent : dataNodes) {
             Command cmd = Commands.getStartNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -60,7 +60,7 @@ public class ManagerTasks {
     }
 
     public static Task getStartConfigSrvTask(Set<Agent> configServers) {
-        Task task = new Task();
+        Task task = new Task("Start config server");
         for (Agent agent : configServers) {
             Command cmd = Commands.getStartConfigServerCommand();
             cmd.getRequest().setUuid(agent.getUuid());
@@ -79,7 +79,7 @@ public class ManagerTasks {
         if (configServersArg.length() > 0) {
             configServersArg.setLength(configServersArg.length() - 1);
         }
-        Task task = new Task();
+        Task task = new Task("Start router");
         for (Agent agent : routers) {
             Command cmd = Commands.getStartRouterCommand(configServersArg.toString());
             cmd.getRequest().setUuid(agent.getUuid());
@@ -126,7 +126,7 @@ public class ManagerTasks {
     }
 
     public static Task getFindPrimaryNodeTask(Agent secondaryNode) {
-        Task task = new Task();
+        Task task = new Task("Find primary node");
         Command cmd = Commands.getFindPrimaryNodeCommand();
         cmd.getRequest().setUuid(secondaryNode.getUuid());
         task.addCommand(cmd);
@@ -134,11 +134,12 @@ public class ManagerTasks {
     }
 
     public static Task getUnregisterSecondaryFromPrimaryTask(Agent primaryNode, Agent secondaryNode) {
-        Task task = new Task();
+        Task task = new Task("Unregister secondary node from primary");
         Command cmd = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
                 String.format("%s%s", secondaryNode.getHostname(), Constants.DOMAIN));
         cmd.getRequest().setUuid(primaryNode.getUuid());
         task.addCommand(cmd);
+        task.setIgnoreExitCode(true);
         return task;
     }
 

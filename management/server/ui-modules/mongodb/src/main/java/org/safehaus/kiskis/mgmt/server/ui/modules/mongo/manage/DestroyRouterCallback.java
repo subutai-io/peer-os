@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
@@ -22,7 +21,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -30,13 +28,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author dilshat
  */
-public class DestroyCfgSrvCallback implements TaskCallback {
+public class DestroyRouterCallback implements TaskCallback {
 
     private final Window parentWindow;
     private final MongoClusterInfo clusterInfo;
     private final ClusterConfig config;
     private final Agent nodeAgent;
-    private final Table cfgSrvTable;
     private final Table routersTable;
     private final Object rowId;
     private final Operation op;
@@ -44,21 +41,19 @@ public class DestroyCfgSrvCallback implements TaskCallback {
     private final Button checkButton;
     private final Button destroyButton;
     private final Embedded progressIcon;
-    private final StringBuilder stdOutput = new StringBuilder();
 
-    public DestroyCfgSrvCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table cfgSrvTable, Table routersTable, Object rowId, Operation op, TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyRouterCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table routersTable, Object rowId, Operation op, TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
         this.clusterInfo = clusterInfo;
         this.config = config;
         this.nodeAgent = nodeAgent;
-        this.cfgSrvTable = cfgSrvTable;
         this.routersTable = routersTable;
         this.rowId = rowId;
         this.op = op;
         this.taskRunner = taskRunner;
-        this.progressIcon = progressIcon;
         this.checkButton = checkButton;
         this.destroyButton = destroyButton;
+        this.progressIcon = progressIcon;
         progressIcon.setVisible(true);
         checkButton.setEnabled(false);
         startButton.setEnabled(false);
@@ -68,40 +63,26 @@ public class DestroyCfgSrvCallback implements TaskCallback {
 
     @Override
     public void onResponse(Task task, Response response) {
-        if (task.getData() == TaskType.START_ROUTERS
-                && !Util.isStringEmpty(response.getStdOut())) {
-            stdOutput.append(response.getStdOut());
-            if (Util.countNumberOfOccurences(stdOutput.toString(), "child process started successfully, parent exiting")
-                    == clusterInfo.getRouters().size()) {
-                task.setTaskStatus(TaskStatus.SUCCESS);
-                task.setCompleted(true);
-                taskRunner.removeTaskCallback(task.getUuid());
-            }
-        }
-
         if (task.isCompleted()) {
             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                 if (op.hasNextTask()) {
                     taskRunner.runTask(op.getNextTask(), this);
                 } else {
                     //update db
-                    List<UUID> configServers = new ArrayList<UUID>(clusterInfo.getConfigServers());
-                    for (Iterator<UUID> it = configServers.iterator(); it.hasNext();) {
+                    List<UUID> routers = new ArrayList<UUID>(clusterInfo.getRouters());
+                    for (Iterator<UUID> it = routers.iterator(); it.hasNext();) {
                         UUID agentUUID = it.next();
                         if (agentUUID.compareTo(nodeAgent.getUuid()) == 0) {
                             it.remove();
                             break;
                         }
                     }
-                    clusterInfo.setConfigServers(configServers);
+                    clusterInfo.setRouters(routers);
                     ClusterDAO.saveMongoClusterInfo(clusterInfo);
-                    config.getConfigServers().remove(nodeAgent);
+                    config.getRouterServers().remove(nodeAgent);
 
                     //update UI
-                    cfgSrvTable.removeItem(rowId);
-
-                    //check statuses of routers
-                    Manager2.checkNodesStatus(routersTable);
+                    routersTable.removeItem(rowId);
                 }
             } else {
                 progressIcon.setVisible(false);
@@ -110,9 +91,6 @@ public class DestroyCfgSrvCallback implements TaskCallback {
 
                 //show message
                 parentWindow.showNotification(String.format("Failed task %s", task.getDescription()));
-
-                //check statuses of routers
-                Manager2.checkNodesStatus(routersTable);
             }
         }
     }

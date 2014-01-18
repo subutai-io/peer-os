@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -32,6 +33,18 @@ public class DestroyNodeOperation extends Operation {
             Task startRoutersTask = ManagerTasks.getStartRouterTask(config.getRouterServers(), otherConfigServers);
             startRoutersTask.setIgnoreExitCode(true);
             addTask(startRoutersTask);
+        } else if (nodeType == NodeType.DATA_NODE) {
+            Task findPrimaryNodeTask = ManagerTasks.getFindPrimaryNodeTask(nodeAgent);
+            findPrimaryNodeTask.setData(TaskType.FIND_PRIMARY_NODE);
+            addTask(findPrimaryNodeTask);
+            addTask(ManagerTasks.getUnregisterSecondaryFromPrimaryTask(nodeAgent, nodeAgent));
+            addTask(ManagerTasks.getKillRunningMongoTask(Util.wrapAgentToSet(nodeAgent)));
+            addTask(ManagerTasks.getUninstallMongoTask(Util.wrapAgentToSet(nodeAgent)));
+            addTask(ManagerTasks.getCleanMongoDataTask(Util.wrapAgentToSet(nodeAgent)));
+        } else if (nodeType == NodeType.ROUTER_NODE) {
+            addTask(ManagerTasks.getKillRunningMongoTask(Util.wrapAgentToSet(nodeAgent)));
+            addTask(ManagerTasks.getUninstallMongoTask(Util.wrapAgentToSet(nodeAgent)));
+            addTask(ManagerTasks.getCleanMongoDataTask(Util.wrapAgentToSet(nodeAgent)));
         }
     }
 

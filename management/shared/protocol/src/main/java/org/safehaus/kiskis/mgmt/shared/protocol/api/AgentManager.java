@@ -28,6 +28,10 @@ public interface AgentManager {
 
     public Set<Agent> getLxcAgentsByParentHostname(String parentHostname);
 
+    public Agent getAgentByHostnameFromDB(String hostname);
+
+    public Agent getAgentByUUIDFromDB(UUID uuid);
+
     public void addListener(AgentListener listener);
 
     public void removeListener(AgentListener listener);
