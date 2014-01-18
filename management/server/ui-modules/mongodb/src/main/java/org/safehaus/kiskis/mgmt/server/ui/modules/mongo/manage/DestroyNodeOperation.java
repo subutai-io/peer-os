@@ -10,6 +10,7 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
@@ -28,7 +29,9 @@ public class DestroyNodeOperation extends Operation {
             addTask(ManagerTasks.getStopNodeTask(config.getRouterServers()));
             Set<Agent> otherConfigServers = new HashSet<Agent>(config.getConfigServers());
             otherConfigServers.remove(nodeAgent);
-            addTask(ManagerTasks.getStartRouterTask(config.getRouterServers(), otherConfigServers));
+            Task startRoutersTask = ManagerTasks.getStartRouterTask(config.getRouterServers(), otherConfigServers);
+            startRoutersTask.setIgnoreExitCode(true);
+            addTask(startRoutersTask);
         }
     }
 

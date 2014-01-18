@@ -50,6 +50,7 @@ public class Manager2 implements ResponseListener {
      TODO:
      1) add node
      2) destroy cluster
+     3) add agent log
      */
 
     private static final Logger LOG = Logger.getLogger(Manager2.class.getName());
@@ -204,7 +205,7 @@ public class Manager2 implements ResponseListener {
             startBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
-            Object rowId = table.addItem(new Object[]{
+            final Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
                 checkBtn,
                 startBtn,
@@ -213,7 +214,6 @@ public class Manager2 implements ResponseListener {
                 progressIcon},
                     null);
 
-//            final Item row = table.getItem(rowId);
             checkBtn.addListener(new Button.ClickListener() {
 
                 @Override
@@ -269,15 +269,16 @@ public class Manager2 implements ResponseListener {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     if (nodeType == NodeType.CONFIG_NODE) {
-//                        Operation destroyCfgSrvOperation = new DestroyNodeOperation(agent, config, nodeType);
-//                        taskRunner.runTask(destroyCfgSrvOperation.getNextTask(),
-//                                new DestroyCfgSrvCallback(
-//                                        (MongoClusterInfo) clusterCombo.getValue(),
-//                                        configServersTable, destroyCfgSrvOperation,
-//                                        taskRunner, progressIcon,
-//                                        checkBtn, startBtn,
-//                                        stopBtn, destroyBtn));
-                        System.out.println((MongoClusterInfo) clusterCombo.getValue());
+                        Operation destroyCfgSrvOperation = new DestroyNodeOperation(agent, config, nodeType);
+                        taskRunner.runTask(destroyCfgSrvOperation.getNextTask(),
+                                new DestroyCfgSrvCallback(
+                                        (MongoClusterInfo) clusterCombo.getValue(),
+                                        config, agent,
+                                        configServersTable, routersTable,
+                                        rowId, destroyCfgSrvOperation,
+                                        taskRunner, progressIcon,
+                                        checkBtn, startBtn,
+                                        stopBtn, destroyBtn));
 
                     } else if (nodeType == NodeType.DATA_NODE) {
                         //find primary
@@ -351,7 +352,7 @@ public class Manager2 implements ResponseListener {
         }
     }
 
-    private void checkNodesStatus(Table table) {
+    public static void checkNodesStatus(Table table) {
         for (Iterator it = table.getItemIds().iterator(); it.hasNext();) {
             int rowId = (Integer) it.next();
             Item row = table.getItem(rowId);

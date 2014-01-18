@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import java.util.Iterator;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;

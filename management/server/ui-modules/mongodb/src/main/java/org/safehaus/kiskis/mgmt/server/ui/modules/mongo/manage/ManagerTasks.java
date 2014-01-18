@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -84,6 +85,7 @@ public class ManagerTasks {
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
+        task.setData(TaskType.START_ROUTERS);
         return task;
     }
 
