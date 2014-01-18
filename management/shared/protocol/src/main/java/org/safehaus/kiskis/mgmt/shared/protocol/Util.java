@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -118,6 +119,13 @@ public class Util {
             idx = strToSearch.indexOf(strToCount, idx + 1);
         }
         return count;
+    }
+
+    public static Set<Agent> wrapAgentToSet(Agent agent) {
+        if (agent != null) {
+            return new HashSet<Agent>(Arrays.asList(agent));
+        }
+        return new HashSet<Agent>();
     }
 
 }

@@ -32,6 +32,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -179,51 +180,6 @@ public class Manager2 implements ResponseListener {
         return contentRoot;
     }
 
-    private ClusterConfig constructClusterConfig(MongoClusterInfo clusterInfo) {
-        ClusterConfig cfg = null;
-
-        if (clusterInfo != null) {
-            cfg = new ClusterConfig();
-            cfg.setConfigServers(new HashSet<Agent>());
-            cfg.setRouterServers(new HashSet<Agent>());
-            cfg.setDataNodes(new HashSet<Agent>());
-            cfg.setClusterName(clusterInfo.getClusterName());
-            cfg.setReplicaSetName(clusterInfo.getReplicaSetName());
-
-            for (UUID agentUUID : clusterInfo.getConfigServers()) {
-                Agent agent = agentManager.getAgentByUUID(agentUUID);
-                if (agent != null) {
-                    cfg.getConfigServers().add(agent);
-                }
-            }
-            for (UUID agentUUID : clusterInfo.getRouters()) {
-                Agent agent = agentManager.getAgentByUUID(agentUUID);
-                if (agent != null) {
-                    cfg.getRouterServers().add(agent);
-                }
-            }
-            for (UUID agentUUID : clusterInfo.getDataNodes()) {
-                Agent agent = agentManager.getAgentByUUID(agentUUID);
-                if (agent != null) {
-                    cfg.getDataNodes().add(agent);
-                }
-            }
-        }
-        return cfg;
-    }
-
-    private void refreshUI() {
-        if (config != null) {
-            populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
-            populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
-            populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
-        } else {
-            configServersTable.removeAllItems();
-            routersTable.removeAllItems();
-            dataNodesTable.removeAllItems();
-        }
-    }
-
     @Override
     public void onResponse(Response response) {
         taskRunner.feedResponse(response);
@@ -313,9 +269,16 @@ public class Manager2 implements ResponseListener {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     if (nodeType == NodeType.CONFIG_NODE) {
-                        //uninstall
-                        //restart routers
-                        //adjust db
+//                        Operation destroyCfgSrvOperation = new DestroyNodeOperation(agent, config, nodeType);
+//                        taskRunner.runTask(destroyCfgSrvOperation.getNextTask(),
+//                                new DestroyCfgSrvCallback(
+//                                        (MongoClusterInfo) clusterCombo.getValue(),
+//                                        configServersTable, destroyCfgSrvOperation,
+//                                        taskRunner, progressIcon,
+//                                        checkBtn, startBtn,
+//                                        stopBtn, destroyBtn));
+                        System.out.println((MongoClusterInfo) clusterCombo.getValue());
+
                     } else if (nodeType == NodeType.DATA_NODE) {
                         //find primary
                         //unregister from primary
@@ -328,6 +291,63 @@ public class Manager2 implements ResponseListener {
                     }
                 }
             });
+        }
+    }
+
+    private ClusterConfig constructClusterConfig(MongoClusterInfo clusterInfo) {
+        ClusterConfig cfg = null;
+
+        if (clusterInfo != null) {
+            cfg = new ClusterConfig();
+            cfg.setConfigServers(new HashSet<Agent>());
+            cfg.setRouterServers(new HashSet<Agent>());
+            cfg.setDataNodes(new HashSet<Agent>());
+            cfg.setClusterName(clusterInfo.getClusterName());
+            cfg.setReplicaSetName(clusterInfo.getReplicaSetName());
+
+            for (UUID agentUUID : clusterInfo.getConfigServers()) {
+                Agent agent = agentManager.getAgentByUUID(agentUUID);
+                if (agent != null) {
+                    cfg.getConfigServers().add(agent);
+                }
+            }
+            for (UUID agentUUID : clusterInfo.getRouters()) {
+                Agent agent = agentManager.getAgentByUUID(agentUUID);
+                if (agent != null) {
+                    cfg.getRouterServers().add(agent);
+                }
+            }
+            for (UUID agentUUID : clusterInfo.getDataNodes()) {
+                Agent agent = agentManager.getAgentByUUID(agentUUID);
+                if (agent != null) {
+                    cfg.getDataNodes().add(agent);
+                }
+            }
+        }
+        return cfg;
+    }
+
+    private void refreshUI() {
+        if (config != null) {
+            populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
+            populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
+            populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
+        } else {
+            configServersTable.removeAllItems();
+            routersTable.removeAllItems();
+            dataNodesTable.removeAllItems();
+        }
+    }
+
+    private void refreshClustersInfo() {
+        List<MongoClusterInfo> mongoClusterInfos = ClusterDAO.getMongoClustersInfo();
+        clusterCombo.removeAllItems();
+        if (mongoClusterInfos != null) {
+            for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
+                clusterCombo.addItem(mongoClusterInfo);
+                clusterCombo.setItemCaption(mongoClusterInfo,
+                        String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
+            }
         }
     }
 
@@ -354,18 +374,6 @@ public class Manager2 implements ResponseListener {
         table.setSelectable(false);
         table.setImmediate(true);
         return table;
-    }
-
-    private void refreshClustersInfo() {
-        List<MongoClusterInfo> mongoClusterInfos = ClusterDAO.getMongoClustersInfo();
-        clusterCombo.removeAllItems();
-        if (mongoClusterInfos != null) {
-            for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
-                clusterCombo.addItem(mongoClusterInfo);
-                clusterCombo.setItemCaption(mongoClusterInfo,
-                        String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
-            }
-        }
     }
 
 }
