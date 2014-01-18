@@ -50,6 +50,33 @@ public class Log extends VerticalLayout {
     private PagedFilterTable<IndexedContainer> pagedFilterTable;
     private Logger logger = Logger.getLogger("LogLogger");
 
+    // Create a dynamically updating content for the popup
+    public class PopupTextField implements PopupView.Content {
+
+        private TextField tf = new TextField("Edit me");
+        private VerticalLayout root = new VerticalLayout();
+
+        public PopupTextField() {
+            root.setSizeUndefined();
+            root.setSpacing(true);
+            root.setMargin(true);
+            root.addComponent(new Label(
+                    "The changes made to any components inside the popup are reflected automatically when the popup is closed, but you might want to provide explicit action buttons for the user, like \"Save\" or \"Close\"."));
+
+            root.addComponent(tf);
+            tf.setValue("Initial dynamic content");
+            tf.setWidth("300px");
+        }
+
+        public String getMinimizedValueAsHTML() {
+            return tf.getValue().toString();
+        }
+
+        public Component getPopupComponent() {
+            return root;
+        }
+    };
+
     public Log(){
         TabSheet tabSheet = new TabSheet();
         indexedContainer =  new IndexedContainer();
@@ -93,23 +120,6 @@ public class Log extends VerticalLayout {
         });
         mainLayout.addComponent(test);
 
-
-        // Create the content for the popup
-        Label content = new Label("This popup will close as soon as you move the mouse cursor outside of the popup area.");
-        // The PopupView popup will be as large as needed by the content
-        content.setWidth("300px");
-
-        // Construct the PopupView with simple HTML text representing the minimized view
-        PopupView popup = new PopupView("Default popup", content);
-        popup.setHideOnMouseOut(true);
-        popup.addListener(new PopupView.PopupVisibilityListener() {
-            public void popupVisibilityChange(PopupView.PopupVisibilityEvent event) {
-                getWindow().showNotification("Popup closed");
-            }
-        });
-        mainLayout.addComponent(popup);
-
-
         Panel p = new Panel();
         p.setStyleName(Reindeer.PANEL_LIGHT);
         p.setSizeFull();
@@ -147,50 +157,97 @@ public class Log extends VerticalLayout {
         filterTable.setContainerDataSource(buildContainer());
         filterTable.setVisibleColumns(new String[]{"message", "path", "version", "type", "date", "host"});
         filterTable.setColumnWidth("message", 800);
-
         filterTable.addListener(new Property.ValueChangeListener() {
             public void valueChange(Property.ValueChangeEvent event) {
                 String a = event.getProperty().getValue().toString();
                 a = a.substring(1, a.length()-1);
                 int index = Integer.parseInt(a);
+
+                String text = parseMessage(indexedContainer.getItem(index).toString());
+                String[] parts = text.split("%");
+
+                String message = parts[0];
+                String path = parts[1];
+                String version = parts[2];
+                String type = parts[3];
+                String date = parts[4];
+                String host = parts[5];
+
+
+                String notice = "<table  style=\"font-size:12px;color:#000000;\" >\n" +
+                        "<tr>\n" +
+                        "<td> Message    </td>  <td> &nbsp;&nbsp;: " + message + "</td>\n" +
+                        "</tr>\n" +
+                        "<tr>\n" +
+                        "<td> Path       </td>  <td> &nbsp;&nbsp;: " + path    + "</td>\n" +
+                        "</tr>  \n" +
+                        "<tr>\n" +
+                        "<td> Version    </td>  <td> &nbsp;&nbsp;: " + version + "</td>\n" +
+                        "</tr>  \n" +
+                        "<tr>\n" +
+                        "<td> Type       </td>  <td> &nbsp;&nbsp;: " + type    + "</td>\n" +
+                        "</tr>  \n" +
+                        "<tr>\n" +
+                        "<td> Timestamp  </td>  <td> &nbsp;&nbsp;: " + date    + "</td>\n" +
+                        "</tr>  \n" +
+                        "<tr>\n" +
+                        "<td> Host       </td>  <td> &nbsp;&nbsp;: " + host    + "</td>\n" +
+                        "</tr>  \n" +
+                        "</table> ";
+
+                Window.Notification notification = new Window.Notification(notice);
+                notification.setPosition(Window.Notification.POSITION_CENTERED_BOTTOM);
+                getWindow().showNotification(notification);
+
+                /*
                 TextArea area = new TextArea();
-                area.setValue(parseMessage(indexedContainer.getItem(index).toString()));
+                String result = parseMessage(indexedContainer.getItem(index).toString());
                 area.setWidth("800px");
                 area.setHeight("120px");
+                area.setWordwrap(false);
 
-                final PopupView popup = new PopupView("", area);
-                addComponent(popup);
+                String[] parts = result.split("%");
+                for (int i=0; i<parts.length; i++){
+                    System.out.println(parts[i]);
+                }
+                area.setValue(parts[0] + "\n" + parts[1] + "\n" + parts[2] + "\n" + parts[3] + "\n" + parts[4] + "\n" + parts[5]);
+
+                PopupView popup = new PopupView(null, area);
+                getComponent(popup.getComponentCount()).getWindow().setPositionX(400);
+                getComponent(popup.getComponentCount()).getWindow().setPositionY(400);
                 popup.setPopupVisible(true);
+                addComponent(popup);
+                */
             }
         });
         return filterTable;
     }
 
     public static String parseMessage(String message){
-        String result = "";
+        String result;
         String host = message.substring(message.lastIndexOf(' ')+1, message.length());
         message = message.substring(0, message.lastIndexOf(' '));
         int tmp = message.lastIndexOf(' ');
         String t = message.substring(0, tmp);
         int tmp1 = t.lastIndexOf(' ');
+
         String date = message.substring(tmp1+1, message.length());
         message = message.substring(0, tmp1);
         int tmp2 = message.lastIndexOf(' ');
+
         String type = message.substring(tmp2+1, message.length());
         message = message.substring(0, tmp2);
         int tmp3 = message.lastIndexOf(' ');
+
         String version = message.substring(tmp3+1, message.length());
         message = message.substring(0, tmp3);
         int tmp4 = message.lastIndexOf(' ');
+
         String path = message.substring(tmp4+1, message.length());
         message = message.substring(0, tmp4);
 
-        result= "Message    : " + message + "\n" +
-                "Path            : " + path + "\n" +
-                "Version       : " + version + "\n" +
-                "Type            : " + type + "\n" +
-                "Timestamp : " + date + "\n" +
-                "Host             : " + host;
+        result= message + "%" + path + "%" + version + "%" + type + "%" + date + "%" + host;
+
         return result;
     }
 
