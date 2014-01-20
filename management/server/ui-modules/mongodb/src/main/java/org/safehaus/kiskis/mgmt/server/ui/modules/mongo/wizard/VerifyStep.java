@@ -13,6 +13,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ConfigView;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -69,7 +70,7 @@ public class VerifyStep extends Panel {
                                     wizard.getConfig().getConfigServers(),
                                     wizard.getConfig().getRouterServers(),
                                     wizard.getConfig().getDataNodes());
-                    if (wizard.getDbManager().saveMongoClusterInfo(mongoClusterInfo)) {
+                    if (MongoDAO.saveMongoClusterInfo(mongoClusterInfo)) {
                         wizard.next();
                     } else {
                         show("Could not save new cluster configuration! Please see logs.");

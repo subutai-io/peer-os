@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
@@ -78,7 +78,7 @@ public class DestroyRouterCallback implements TaskCallback {
                         }
                     }
                     clusterInfo.setRouters(routers);
-                    ClusterDAO.saveMongoClusterInfo(clusterInfo);
+                    MongoDAO.saveMongoClusterInfo(clusterInfo);
                     config.getRouterServers().remove(nodeAgent);
 
                     //update UI

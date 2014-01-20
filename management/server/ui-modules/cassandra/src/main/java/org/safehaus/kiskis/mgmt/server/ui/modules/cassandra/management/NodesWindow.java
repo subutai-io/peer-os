@@ -14,12 +14,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import static org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager.getAgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
@@ -88,7 +89,7 @@ public class NodesWindow extends Window {
         container.addContainerProperty("Seed", Button.class, "");
 //        container.addContainerProperty("Destroy", Button.class, "");
         for (UUID uuid : cci.getNodes()) {
-            Agent agent = getAgentManager().getAgent(uuid);
+            Agent agent = getAgentManager().getAgentByUUID(uuid);
             addOrderToContainer(container, agent);
 //            serviceManager.statusCassandraService(uuid);
         }
@@ -164,7 +165,7 @@ public class NodesWindow extends Window {
                 cci.setSeeds(seeds);
                 StringBuilder seedsSB = new StringBuilder();
                 for (UUID seed : cci.getSeeds()) {
-                    Agent agent = getAgentManager().getAgent(seed);
+                    Agent agent = getAgentManager().getAgentByUUID(seed);
                     seedsSB.append(agent.getHostname()).append(".").append(cci.getDomainName()).append(",");
                 }
                 serviceManager.updateSeeds(cci.getNodes(), seedsSB.substring(0, seedsSB.length() - 1));
@@ -179,13 +180,13 @@ public class NodesWindow extends Window {
 //        item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
-    public static AgentManagerInterface getAgentManager() {
+    public static AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(NodesWindow.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
             if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+                return AgentManager.class.cast(ctx.getService(serviceReference));
             }
         }
 
@@ -239,7 +240,7 @@ public class NodesWindow extends Window {
                             Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
                             seed.setCaption("Remove seed");
                         }
-                        if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                        if (CassandraDAO.saveCassandraClusterInfo(cci)) {
                             System.out.println("updated");
                         }
                     }
@@ -251,7 +252,7 @@ public class NodesWindow extends Window {
                             Button seed = (Button) selectedItem.getItemProperty("Seed").getValue();
                             seed.setCaption("Set as seed");
                         }
-                        if (ServiceLocator.getService(CommandManagerInterface.class).saveCassandraClusterData(cci)) {
+                        if (CassandraDAO.saveCassandraClusterInfo(cci)) {
                             System.out.println("updated");
                         }
                     }

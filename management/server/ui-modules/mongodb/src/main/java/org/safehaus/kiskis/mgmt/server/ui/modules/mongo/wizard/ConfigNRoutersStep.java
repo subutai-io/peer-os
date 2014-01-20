@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -156,7 +157,7 @@ public class ConfigNRoutersStep extends Panel {
                     show("Please add config servers");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getRouterServers())) {
                     show("Please add routers");
-                } else if (wizard.getDbManager().getMongoClusterInfo(wizard.getConfig().getClusterName()) != null) {
+                } else if (MongoDAO.getMongoClusterInfo(wizard.getConfig().getClusterName()) != null) {
                     show(MessageFormat.format("Cluster with name {0} already exists", wizard.getConfig().getClusterName()));
                 } else if (wizard.getConfig().getConfigServers().size() != 1
                         && wizard.getConfig().getConfigServers().size() != 3) {

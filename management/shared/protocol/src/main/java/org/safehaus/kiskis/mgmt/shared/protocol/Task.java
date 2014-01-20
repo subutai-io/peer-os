@@ -23,7 +23,7 @@ public class Task implements Serializable {
     private String description;
     private TaskStatus taskStatus;
     private Integer reqSeqNumber;
-    private final List<Command> commands;
+    private final List<CommandImpl> commands;
     private boolean ignoreExitCode = false;
     private boolean completed = false;
     private int currentCmdId = -1;
@@ -35,7 +35,7 @@ public class Task implements Serializable {
         taskStatus = TaskStatus.NEW;
         uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
         reqSeqNumber = 0;
-        commands = new ArrayList<Command>();
+        commands = new ArrayList<CommandImpl>();
     }
 
     public Task(String description) {
@@ -67,7 +67,7 @@ public class Task implements Serializable {
         return succeededCommandsCount;
     }
 
-    public void addCommand(Command command) {
+    public void addCommand(CommandImpl command) {
         if (command != null) {
             command.getRequest().setTaskUuid(uuid);
             command.getRequest().setRequestSequenceNumber(getIncrementedReqSeqNumber());
@@ -77,7 +77,7 @@ public class Task implements Serializable {
 
     public int getTotalTimeout() {
         int timeout = 0;
-        for (Command cmd : commands) {
+        for (CommandImpl cmd : commands) {
             timeout += cmd.getRequest().getTimeout();
         }
         return timeout;
@@ -87,7 +87,7 @@ public class Task implements Serializable {
         return commands.size() > 0 ? getTotalTimeout() / commands.size() : 0;
     }
 
-    public Command getNextCommand() {
+    public CommandImpl getNextCommand() {
         if (hasNextCommand()) {
             return commands.get(++currentCmdId);
         }
@@ -95,21 +95,21 @@ public class Task implements Serializable {
         return null;
     }
 
-    public Command peekNextCommand() {
+    public CommandImpl peekNextCommand() {
         if (hasNextCommand()) {
             return commands.get(currentCmdId + 1);
         }
         return null;
     }
 
-    public Command peekPreviousCommand() {
+    public CommandImpl peekPreviousCommand() {
         if (currentCmdId > 0) {
             return commands.get(currentCmdId - 1);
         }
         return null;
     }
 
-    public Command peekCurrentCommand() {
+    public CommandImpl peekCurrentCommand() {
         if (currentCmdId >= 0) {
             return commands.get(currentCmdId);
         }
@@ -140,7 +140,7 @@ public class Task implements Serializable {
         this.completed = completed;
     }
 
-    public List<Command> getCommands() {
+    public List<CommandImpl> getCommands() {
         return Collections.unmodifiableList(commands);
     }
 

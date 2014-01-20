@@ -6,11 +6,12 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.*;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/7/13 Time: 5:55 PM
@@ -39,10 +40,10 @@ public class Installation {
     private List<Agent> allSlaveNodes;
     private List<String> keys;
 
-    private CommandManagerInterface commandManager;
+    private CommandManager commandManager;
     private Step3 panel;
 
-    public Installation(CommandManagerInterface commandManagerInterface) {
+    public Installation(CommandManager commandManagerInterface) {
         this.commandManager = commandManagerInterface;
 
         hadoopInstallationTask = null;
@@ -64,7 +65,7 @@ public class Installation {
     public void installHadoop() {
         setCluster();
         if (hadoopInstallationTask == null) {
-            hadoopInstallationTask = RequestUtil.createTask(commandManager, "Setup Hadoop cluster");
+            hadoopInstallationTask = RequestUtil.createTask("Setup Hadoop cluster");
             panel.addOutput(hadoopInstallationTask, " started...");
 
             for (Agent agent : allNodes) {
@@ -81,7 +82,7 @@ public class Installation {
 
     public void configureHadoop() {
         if (hadoopConfigureTask == null) {
-            hadoopConfigureTask = RequestUtil.createTask(commandManager, "Configure Hadoop cluster");
+            hadoopConfigureTask = RequestUtil.createTask("Configure Hadoop cluster");
             panel.addOutput(hadoopConfigureTask, " started...");
 
             for (Agent agent : allNodes) {
@@ -102,7 +103,7 @@ public class Installation {
 
     public void configureSNameNode() {
         if (hadoopSNameNodeTask == null) {
-            hadoopSNameNodeTask = RequestUtil.createTask(commandManager, "Configure Hadoop secondary name node");
+            hadoopSNameNodeTask = RequestUtil.createTask("Configure Hadoop secondary name node");
             panel.addOutput(hadoopSNameNodeTask, " started...");
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -123,7 +124,7 @@ public class Installation {
 
     public void setSlaveNameNode() {
         if (hadoopSlaveNameNode == null) {
-            hadoopSlaveNameNode = RequestUtil.createTask(commandManager, "Set Hadoop slave name nodes");
+            hadoopSlaveNameNode = RequestUtil.createTask("Set Hadoop slave name nodes");
             panel.addOutput(hadoopSlaveNameNode, " started...");
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -148,7 +149,7 @@ public class Installation {
 
     public void setSlaveJobTracker() {
         if (hadoopSlaveJobTracker == null) {
-            hadoopSlaveJobTracker = RequestUtil.createTask(commandManager, "Set Hadoop slave job tracker");
+            hadoopSlaveJobTracker = RequestUtil.createTask("Set Hadoop slave job tracker");
             panel.addOutput(hadoopSlaveJobTracker, " started...");
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -174,7 +175,7 @@ public class Installation {
 
     public void setSSH() {
         if (hadoopSetSSH == null) {
-            hadoopSetSSH = RequestUtil.createTask(commandManager, "Set Hadoop configure SSH");
+            hadoopSetSSH = RequestUtil.createTask("Set Hadoop configure SSH");
             panel.addOutput(hadoopSetSSH, " started...");
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -201,7 +202,7 @@ public class Installation {
 
     public void setSSHMaster() {
         if (hadoopSSHMaster == null) {
-            hadoopSSHMaster = RequestUtil.createTask(commandManager, "Set Hadoop SSH master");
+            hadoopSSHMaster = RequestUtil.createTask("Set Hadoop SSH master");
             panel.addOutput(hadoopSSHMaster, " started...");
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -228,7 +229,7 @@ public class Installation {
 
     public void copySSHSlaves() {
         if (hadoopCopySSHSlaves == null) {
-            hadoopCopySSHSlaves = RequestUtil.createTask(commandManager, "Copy Hadoop SSH key to slaves");
+            hadoopCopySSHSlaves = RequestUtil.createTask("Copy Hadoop SSH key to slaves");
             panel.addOutput(hadoopCopySSHSlaves, " started...");
 
             if (keys != null && !keys.isEmpty()) {
@@ -251,7 +252,7 @@ public class Installation {
 
     public void configSSHMaster() {
         if (hadoopConfigMasterSSH == null) {
-            hadoopConfigMasterSSH = RequestUtil.createTask(commandManager, "Config SSH Masters");
+            hadoopConfigMasterSSH = RequestUtil.createTask("Config SSH Masters");
             panel.addOutput(hadoopConfigMasterSSH, " started...");
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -278,7 +279,7 @@ public class Installation {
 
     public void formatMaster() {
         if (hadoopFormatMaster == null) {
-            hadoopFormatMaster = RequestUtil.createTask(commandManager, "Format name node");
+            hadoopFormatMaster = RequestUtil.createTask("Format name node");
             panel.addOutput(hadoopFormatMaster, " started...");
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -286,13 +287,13 @@ public class Installation {
             map.put(":uuid", nameNode.getUuid().toString());
             RequestUtil.createRequest(commandManager, Commands.FORMAT_NAME_NODE, hadoopFormatMaster, map);
 
-            commandManager.saveHadoopClusterData(cluster);
+            HadoopDAO.saveHadoopClusterInfo(cluster);
         }
     }
 
     public void readHosts() {
         if (hadoopReadHosts == null) {
-            hadoopReadHosts = RequestUtil.createTask(commandManager, "Read /etc/hosts file");
+            hadoopReadHosts = RequestUtil.createTask("Read /etc/hosts file");
             panel.addOutput(hadoopReadHosts, " started...");
 
             for (Agent agent : allNodes) {
@@ -306,11 +307,11 @@ public class Installation {
 
     public void writeHosts(List<ParseResult> list) {
         if (hadoopWriteHosts == null) {
-            hadoopWriteHosts = RequestUtil.createTask(commandManager, "Write /etc/hosts file");
+            hadoopWriteHosts = RequestUtil.createTask("Write /etc/hosts file");
             panel.addOutput(hadoopWriteHosts, " started...");
 
             for (ParseResult pr : list) {
-                Agent agent = getAgentManager().getAgent(pr.getRequest().getUuid());
+                Agent agent = getAgentManager().getAgentByUUID(pr.getRequest().getUuid());
                 String hosts = editHosts(pr.getResponse().getStdOut(), agent);
 
                 HashMap<String, String> map = new HashMap<String, String>();
@@ -330,10 +331,10 @@ public class Installation {
             host = host.trim();
             boolean isContains = false;
             for (Agent agent : allNodes) {
-                if (host.contains(agent.getHostname()) ||
-                        host.contains("localhost") ||
-                        host.contains(localAgent.getHostname()) ||
-                        host.contains(localAgent.getListIP().get(0))) {
+                if (host.contains(agent.getHostname())
+                        || host.contains("localhost")
+                        || host.contains(localAgent.getHostname())
+                        || host.contains(localAgent.getListIP().get(0))) {
                     isContains = true;
                 }
             }
@@ -361,9 +362,9 @@ public class Installation {
     }
 
     public void onCommand(Response response, Step3 panel) {
-        List<ParseResult> list = commandManager.parseTask(response.getTaskUuid(), true);
-        Task task = commandManager.getTask(response.getTaskUuid());
-        int count = commandManager.getResponseCount(task.getUuid());
+        List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+        Task task = RequestUtil.getTask(response.getTaskUuid());
+        int count = RequestUtil.getResponsesCount(task.getUuid());
         if (!list.isEmpty() && panel != null && list.size() == count) {
             if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
                 if (task.equals(hadoopInstallationTask)) {
@@ -524,13 +525,13 @@ public class Installation {
         this.domainName = domainName;
     }
 
-    public AgentManagerInterface getAgentManager() {
+    public AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
             if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+                return AgentManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

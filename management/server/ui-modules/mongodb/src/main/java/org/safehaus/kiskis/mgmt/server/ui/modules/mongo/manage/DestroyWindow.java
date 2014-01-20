@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
@@ -140,7 +140,7 @@ public class DestroyWindow extends Window {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
                                 hideProgress();
-                                ClusterDAO.deleteMongoClusterInfo(config.getClusterName());
+                                MongoDAO.deleteMongoClusterInfo(config.getClusterName());
                                 succeeded = true;
                             }
                         } else {

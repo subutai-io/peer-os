@@ -30,7 +30,7 @@ import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
@@ -368,7 +368,7 @@ public class Manager implements ResponseListener {
     }
 
     private void refreshClustersInfo() {
-        List<MongoClusterInfo> mongoClusterInfos = ClusterDAO.getMongoClustersInfo();
+        List<MongoClusterInfo> mongoClusterInfos = MongoDAO.getMongoClustersInfo();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null) {
             for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {

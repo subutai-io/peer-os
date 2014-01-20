@@ -11,9 +11,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
+import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
@@ -23,15 +24,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
  */
 public class CommandManagerImpl implements ResponseListener, org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager {
 
-    private static final Logger LOG = Logger.getLogger(CommandManager.class.getName());
-    private CommandTransportInterface communicationService;
+    private static final Logger LOG = Logger.getLogger(CommandManagerImpl.class.getName());
+    private CommunicationService communicationService;
     private final Map<CommandListener, ExecutorService> listeners = new ConcurrentHashMap<CommandListener, ExecutorService>();
     private ExecutorService notifierExecService;
     private CommandNotifier commandNotifier;
 
     @Override
-    public boolean executeCommand(Command command) {
+    public boolean executeCommand(CommandImpl command) {
         try {
+            RequestUtil.saveCommand(command);//temporary until parseTask is removed
             communicationService.sendCommand(command);
             return true;
         } catch (Exception ex) {
@@ -46,6 +48,7 @@ public class CommandManagerImpl implements ResponseListener, org.safehaus.kiskis
             case EXECUTE_TIMEOUTED:
             case EXECUTE_RESPONSE:
             case EXECUTE_RESPONSE_DONE: {
+                RequestUtil.saveResponse(response);//temporary until parseTask is removed
                 commandNotifier.addResponse(response);
                 break;
             }
@@ -109,7 +112,7 @@ public class CommandManagerImpl implements ResponseListener, org.safehaus.kiskis
         }
     }
 
-    public void setCommunicationService(CommandTransportInterface communicationService) {
+    public void setCommunicationService(CommunicationService communicationService) {
         this.communicationService = communicationService;
     }
 

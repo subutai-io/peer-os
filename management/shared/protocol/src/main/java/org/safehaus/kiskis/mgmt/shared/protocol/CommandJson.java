@@ -6,7 +6,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +21,7 @@ public class CommandJson {
 
     public static Request getRequest(String json) {
         try {
-            Command cmd = gson.fromJson(escape(json), Command.class);
+            CommandImpl cmd = gson.fromJson(escape(json), CommandImpl.class);
             if (cmd.command != null) {
                 return (Request) cmd.command;
             }
@@ -29,13 +29,12 @@ public class CommandJson {
             LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
 
-
         return null;
     }
 
     public static Response getResponse(String json) {
         try {
-            Command cmd = gson.fromJson(escape(json), Command.class);
+            CommandImpl cmd = gson.fromJson(escape(json), CommandImpl.class);
             if (cmd.response != null) {
                 return (Response) cmd.response;
             }
@@ -46,7 +45,7 @@ public class CommandJson {
         return null;
     }
 
-    public static String getJson(CommandInterface cmd) {
+    public static String getJson(Command cmd) {
         try {
             return gson.toJson(cmd);
         } catch (Exception ex) {

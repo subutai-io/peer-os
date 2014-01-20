@@ -12,110 +12,108 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 11/30/13
- * Time: 6:56 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
  */
 public class LxcTable extends Table {
-    public static final String LIST_LXC = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": \":source\",\n" +
-            "\t    \"uuid\": \":uuid\",\n" +
-            "\t    \"taskUuid\": \":taskUuid\",\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/lxc-list\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
 
-    public static final String INFO_LXC = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": \":source\",\n" +
-            "\t    \"uuid\": \":uuid\",\n" +
-            "\t    \"taskUuid\": \":taskUuid\",\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/lxc-info\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"-n\",\":lxc-host-name\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
+    public static final String LIST_LXC = "{\n"
+            + "\t  \"command\": {\n"
+            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+            + "\t    \"source\": \":source\",\n"
+            + "\t    \"uuid\": \":uuid\",\n"
+            + "\t    \"taskUuid\": \":taskUuid\",\n"
+            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+            + "\t    \"workingDirectory\": \"/\",\n"
+            + "\t    \"program\": \"/usr/bin/lxc-list\",\n"
+            + "\t    \"stdOut\": \"RETURN\",\n"
+            + "\t    \"stdErr\": \"RETURN\",\n"
+            + "\t    \"runAs\": \"root\",\n"
+            + "\t    \"timeout\": 180\n"
+            + "\t  }\n"
+            + "\t}";
 
-    public static final String DESTROY_LXC = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": \":source\",\n" +
-            "\t    \"uuid\": \":uuid\",\n" +
-            "\t    \"taskUuid\": \":taskUuid\",\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/lxc-stop -n :lxc-host-name && /usr/bin/lxc-destroy\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"-n\",\":lxc-host-name\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
+    public static final String INFO_LXC = "{\n"
+            + "\t  \"command\": {\n"
+            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+            + "\t    \"source\": \":source\",\n"
+            + "\t    \"uuid\": \":uuid\",\n"
+            + "\t    \"taskUuid\": \":taskUuid\",\n"
+            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+            + "\t    \"workingDirectory\": \"/\",\n"
+            + "\t    \"program\": \"/usr/bin/lxc-info\",\n"
+            + "\t    \"stdOut\": \"RETURN\",\n"
+            + "\t    \"stdErr\": \"RETURN\",\n"
+            + "\t    \"runAs\": \"root\",\n"
+            + "\t    \"args\": [\n"
+            + "\t      \"-n\",\":lxc-host-name\"\n"
+            + "\t    ],\n"
+            + "\t    \"timeout\": 180\n"
+            + "\t  }\n"
+            + "\t}";
 
-    public static final String START_LXC = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": \":source\",\n" +
-            "\t    \"uuid\": \":uuid\",\n" +
-            "\t    \"taskUuid\": \":taskUuid\",\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/lxc-start\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"-n\",\":lxc-host-name\", \"-d\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
+    public static final String DESTROY_LXC = "{\n"
+            + "\t  \"command\": {\n"
+            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+            + "\t    \"source\": \":source\",\n"
+            + "\t    \"uuid\": \":uuid\",\n"
+            + "\t    \"taskUuid\": \":taskUuid\",\n"
+            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+            + "\t    \"workingDirectory\": \"/\",\n"
+            + "\t    \"program\": \"/usr/bin/lxc-stop -n :lxc-host-name && /usr/bin/lxc-destroy\",\n"
+            + "\t    \"stdOut\": \"RETURN\",\n"
+            + "\t    \"stdErr\": \"RETURN\",\n"
+            + "\t    \"runAs\": \"root\",\n"
+            + "\t    \"args\": [\n"
+            + "\t      \"-n\",\":lxc-host-name\"\n"
+            + "\t    ],\n"
+            + "\t    \"timeout\": 180\n"
+            + "\t  }\n"
+            + "\t}";
 
-    public static final String STOP_LXC = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": \":source\",\n" +
-            "\t    \"uuid\": \":uuid\",\n" +
-            "\t    \"taskUuid\": \":taskUuid\",\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/usr/bin/lxc-stop\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"-n\",\":lxc-host-name\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
+    public static final String START_LXC = "{\n"
+            + "\t  \"command\": {\n"
+            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+            + "\t    \"source\": \":source\",\n"
+            + "\t    \"uuid\": \":uuid\",\n"
+            + "\t    \"taskUuid\": \":taskUuid\",\n"
+            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+            + "\t    \"workingDirectory\": \"/\",\n"
+            + "\t    \"program\": \"/usr/bin/lxc-start\",\n"
+            + "\t    \"stdOut\": \"RETURN\",\n"
+            + "\t    \"stdErr\": \"RETURN\",\n"
+            + "\t    \"runAs\": \"root\",\n"
+            + "\t    \"args\": [\n"
+            + "\t      \"-n\",\":lxc-host-name\", \"-d\"\n"
+            + "\t    ],\n"
+            + "\t    \"timeout\": 180\n"
+            + "\t  }\n"
+            + "\t}";
+
+    public static final String STOP_LXC = "{\n"
+            + "\t  \"command\": {\n"
+            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+            + "\t    \"source\": \":source\",\n"
+            + "\t    \"uuid\": \":uuid\",\n"
+            + "\t    \"taskUuid\": \":taskUuid\",\n"
+            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+            + "\t    \"workingDirectory\": \"/\",\n"
+            + "\t    \"program\": \"/usr/bin/lxc-stop\",\n"
+            + "\t    \"stdOut\": \"RETURN\",\n"
+            + "\t    \"stdErr\": \"RETURN\",\n"
+            + "\t    \"runAs\": \"root\",\n"
+            + "\t    \"args\": [\n"
+            + "\t      \"-n\",\":lxc-host-name\"\n"
+            + "\t    ],\n"
+            + "\t    \"timeout\": 180\n"
+            + "\t  }\n"
+            + "\t}";
 
     private Agent agent;
     private IndexedContainer container;
@@ -221,7 +219,7 @@ public class LxcTable extends Table {
         task.setTaskStatus(TaskStatus.NEW);
         task.setDescription(description);
         if (getCommandManager() != null) {
-            getCommandManager().saveTask(task);
+            RequestUtil.saveTask(task);
         }
 
         return task;
@@ -238,7 +236,7 @@ public class LxcTable extends Table {
 
         Request request = CommandJson.getRequest(json);
         if (getCommandManager() != null) {
-            getCommandManager().executeCommand(new Command(request));
+            getCommandManager().executeCommand(new CommandImpl(request));
         }
     }
 
@@ -246,7 +244,7 @@ public class LxcTable extends Table {
         List<ParseResult> output;
 
         if (destroyTask != null && response.getTaskUuid().compareTo(destroyTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(destroyTask.getUuid(), true);
+            output = RequestUtil.parseTask(destroyTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -256,7 +254,7 @@ public class LxcTable extends Table {
                 parent.refreshTable();
             }
         } else if (startTask != null && response.getTaskUuid().compareTo(startTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(startTask.getUuid(), true);
+            output = RequestUtil.parseTask(startTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -266,7 +264,7 @@ public class LxcTable extends Table {
                 parent.refreshTable();
             }
         } else if (stopTask != null && response.getTaskUuid().compareTo(stopTask.getUuid()) == 0) {
-            output = getCommandManager().parseTask(stopTask.getUuid(), true);
+            output = RequestUtil.parseTask(stopTask.getUuid(), true);
             if (output != null) {
                 for (ParseResult pr : output) {
                     findRow(pr);
@@ -317,13 +315,13 @@ public class LxcTable extends Table {
         this.setContainerDataSource(getContainer(startedList, stoppedList));
     }
 
-    public CommandManagerInterface getCommandManager() {
+    public CommandManager getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(LxcModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
             if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+                return CommandManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

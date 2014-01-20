@@ -5,7 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 /**
@@ -14,7 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
  */
 public interface CommandManager {
 
-    boolean executeCommand(Command command);
+    boolean executeCommand(CommandImpl command);
 
     void addListener(CommandListener listener);
 

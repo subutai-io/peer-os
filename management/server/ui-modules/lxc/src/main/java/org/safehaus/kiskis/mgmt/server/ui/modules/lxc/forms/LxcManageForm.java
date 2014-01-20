@@ -11,13 +11,12 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.*;
 
 //import org.safehaus.kiskis.mgmt.server.ui.install.AppData;
-
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
  */
@@ -119,7 +118,7 @@ public class LxcManageForm extends VerticalLayout {
     }
 
     public void refreshTable() {
-        listTask = RequestUtil.createTask(getCommandManager(), "List lxc container");
+        listTask = RequestUtil.createTask("List lxc container");
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", LxcModule.MODULE_NAME);
@@ -130,7 +129,7 @@ public class LxcManageForm extends VerticalLayout {
 
     private void startAllTask() {
         if (!stoppedLXC.isEmpty()) {
-            startTask = RequestUtil.createTask(getCommandManager(), "Start all lxc containers");
+            startTask = RequestUtil.createTask("Start all lxc containers");
 
             for (String lxc : stoppedLXC) {
                 HashMap<String, String> map = new HashMap<String, String>();
@@ -145,7 +144,7 @@ public class LxcManageForm extends VerticalLayout {
 
     private void stopAllTask() {
         if (!startedLXC.isEmpty()) {
-            stopTask = RequestUtil.createTask(getCommandManager(), "Stop all lxc containers");
+            stopTask = RequestUtil.createTask("Stop all lxc containers");
 
             for (String lxc : startedLXC) {
                 HashMap<String, String> map = new HashMap<String, String>();
@@ -159,7 +158,7 @@ public class LxcManageForm extends VerticalLayout {
     }
 
     private void destroyAllTask() {
-        destroyTask = RequestUtil.createTask(getCommandManager(), "Destroy all lxc containers");
+        destroyTask = RequestUtil.createTask("Destroy all lxc containers");
 
         if (!startedLXC.isEmpty()) {
             for (String lxc : startedLXC) {
@@ -187,12 +186,11 @@ public class LxcManageForm extends VerticalLayout {
             }
         }
 
-
     }
 
     public void outputResponse(Response response) {
-        List<ParseResult> output = getCommandManager().parseTask(response.getTaskUuid(), true);
-        Task task = getCommandManager().getTask(response.getTaskUuid());
+        List<ParseResult> output = RequestUtil.parseTask(response.getTaskUuid(), true);
+        Task task = RequestUtil.getTask(response.getTaskUuid());
 
         if (listTask != null && task.equals(listTask)) {
             if (!output.isEmpty() && task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
@@ -292,13 +290,13 @@ public class LxcManageForm extends VerticalLayout {
         return physicalAgent;
     }
 
-    public CommandManagerInterface getCommandManager() {
+    public CommandManager getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(LxcModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
             if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+                return CommandManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

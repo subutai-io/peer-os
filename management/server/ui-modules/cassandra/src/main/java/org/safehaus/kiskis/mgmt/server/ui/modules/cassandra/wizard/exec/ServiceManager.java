@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.NodesWindow;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 
 /**
  *
@@ -33,9 +33,9 @@ public class ServiceManager {
     }
 
     public void runCommand(List<UUID> list, CassandraCommandEnum cce) {
-        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Run command");
+        Task startTask = RequestUtil.createTask("Run command");
         for (UUID uuid : list) {
-            Command command = new CassandraCommands().getCommand(cce);
+            CommandImpl command = new CassandraCommands().getCommand(cce);
             command.getRequest().setUuid(uuid);
             command.getRequest().setTaskUuid(startTask.getUuid());
             command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
@@ -46,8 +46,8 @@ public class ServiceManager {
     }
 
     public void runCommand(UUID agentUuid, CassandraCommandEnum cce) {
-        Task startTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Run command");
-        Command command = new CassandraCommands().getCommand(cce);
+        Task startTask = RequestUtil.createTask("Run command");
+        CommandImpl command = new CassandraCommands().getCommand(cce);
         command.getRequest().setUuid(agentUuid);
         command.getRequest().setTaskUuid(startTask.getUuid());
         command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
@@ -59,7 +59,7 @@ public class ServiceManager {
     public void start() {
         moveToNextTask();
         if (currentTask != null) {
-            for (Command command : currentTask.getCommands()) {
+            for (CommandImpl command : currentTask.getCommands()) {
                 executeCommand(command);
             }
         }
@@ -73,14 +73,14 @@ public class ServiceManager {
         return currentTask;
     }
 
-    public void executeCommand(Command command) {
-        ServiceLocator.getService(CommandManagerInterface.class).executeCommand(command);
+    public void executeCommand(CommandImpl command) {
+        ServiceLocator.getService(CommandManager.class).executeCommand(command);
     }
 
     public void updateSeeds(List<UUID> nodes, String seeds) {
-        Task setSeedsTask = RequestUtil.createTask(ServiceLocator.getService(CommandManagerInterface.class), "Update seeds");
+        Task setSeedsTask = RequestUtil.createTask("Update seeds");
         for (UUID agent : nodes) {
-            Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seeds);
+            CommandImpl setSeedsCommand = CassandraCommands.getSetSeedsCommand(seeds);
             setSeedsCommand.getRequest().setUuid(agent);
             setSeedsCommand.getRequest().setTaskUuid(setSeedsTask.getUuid());
             setSeedsCommand.getRequest().setRequestSequenceNumber(setSeedsTask.getIncrementedReqSeqNumber());
@@ -90,13 +90,13 @@ public class ServiceManager {
         start();
     }
 
-    public static AgentManagerInterface getAgentManager() {
+    public static AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(NodesWindow.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
             if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+                return AgentManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

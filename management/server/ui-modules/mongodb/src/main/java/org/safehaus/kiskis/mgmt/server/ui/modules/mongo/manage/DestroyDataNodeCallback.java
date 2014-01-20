@@ -18,9 +18,9 @@ import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -97,7 +97,7 @@ public class DestroyDataNodeCallback implements TaskCallback {
 //                    parentWindow.showNotification("Failed: Could not find primary node");
 //                } else {
                 if (primaryNodeAgent != null && primaryNodeAgent.getUuid().compareTo(nodeAgent.getUuid()) != 0) {
-                    Command unregisterSecondaryFromPrimaryCmd = op.peekNextTask().getCommands().iterator().next();
+                    CommandImpl unregisterSecondaryFromPrimaryCmd = op.peekNextTask().getCommands().iterator().next();
                     unregisterSecondaryFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
                 } else {
                     //skip unregister command
@@ -122,7 +122,7 @@ public class DestroyDataNodeCallback implements TaskCallback {
                         }
                     }
                     clusterInfo.setDataNodes(dataNodes);
-                    ClusterDAO.saveMongoClusterInfo(clusterInfo);
+                    MongoDAO.saveMongoClusterInfo(clusterInfo);
                     config.getDataNodes().remove(nodeAgent);
 
                     //update UI

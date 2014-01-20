@@ -3,13 +3,13 @@ package org.safehaus.kiskis.mgmt.server.ui;
 import com.vaadin.Application;
 import com.vaadin.Application.SystemMessages;
 import org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 
 public class MgmtAppFactory implements ApplicationFactory {
 
     private final String title;
     private MgmtApplication mgmtApplication;
-    private AgentManagerInterface agentManager;
+    private AgentManager agentManager;
 
     public MgmtAppFactory(String title) {
         this.title = title;
@@ -31,7 +31,7 @@ public class MgmtAppFactory implements ApplicationFactory {
         return mgmtApplication;
     }
 
-    public void setAgentManager(AgentManagerInterface agentManager) {
+    public void setAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
     }
 

@@ -6,10 +6,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import javax.jms.*;
 import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.broker.region.policy.AbortSlowAckConsumerStrategy;
@@ -21,9 +21,9 @@ import org.apache.activemq.pool.PooledConnectionFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 //check branch
 
-public class CommandTransport implements CommandTransportInterface {
+public class CommunicationServiceImpl implements CommunicationService {
 
-    private static final Logger LOG = Logger.getLogger(CommandTransport.class.getName());
+    private static final Logger LOG = Logger.getLogger(CommunicationServiceImpl.class.getName());
     private BrokerService broker;
     private PooledConnectionFactory pooledConnectionFactory;
     private CommunicationMessageListener communicationMessageListener;
@@ -95,15 +95,15 @@ public class CommandTransport implements CommandTransportInterface {
     }
 
     @Override
-    public void sendCommand(Command command) {
+    public void sendCommand(CommandImpl command) {
         exec.submit(new CommandProducer(command));
     }
 
     public class CommandProducer implements Runnable {
 
-        Command command;
+        CommandImpl command;
 
-        public CommandProducer(Command command) {
+        public CommandProducer(CommandImpl command) {
             this.command = command;
         }
 

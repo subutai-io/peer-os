@@ -9,7 +9,7 @@ import java.util.Collections;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 @SuppressWarnings("serial")
@@ -29,16 +29,16 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private static final Logger LOG = Logger.getLogger(MgmtApplication.class.getName());
     private static final ThreadLocal<MgmtApplication> threadLocal = new ThreadLocal<MgmtApplication>();
     private final ModuleNotifier moduleNotifier;
-    private final AgentManagerInterface agentManager;
-    private final CommandManagerInterface commandManager;
+    private final AgentManager agentManager;
+    private final CommandManager commandManager;
     private Window window;
     private Set<Agent> selectedAgents = new HashSet<Agent>();
     private MgmtAgentManager agentList;
 
-    public MgmtApplication(String title, AgentManagerInterface agentManager) {
+    public MgmtApplication(String title, AgentManager agentManager) {
         this.agentManager = agentManager;
         this.moduleNotifier = ServiceLocator.getService(ModuleNotifier.class);
-        this.commandManager = ServiceLocator.getService(CommandManagerInterface.class);
+        this.commandManager = ServiceLocator.getService(CommandManager.class);
         this.title = title;
     }
     private final String title;
@@ -64,7 +64,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             layout.setExpandRatio(horizontalSplit, 1);
             horizontalSplit.setSplitPosition(200, Sizeable.UNITS_PIXELS);
 
-            agentList = new MgmtAgentManager();
+            agentList = new MgmtAgentManager(agentManager);
             //add listener
             agentManager.addListener(agentList);
             Panel panel = new Panel();

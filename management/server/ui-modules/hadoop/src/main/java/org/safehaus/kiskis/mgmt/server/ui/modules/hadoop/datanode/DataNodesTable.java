@@ -11,19 +11,17 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 11/30/13
- * Time: 6:56 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
  */
 public class DataNodesTable extends Table {
 
@@ -51,7 +49,7 @@ public class DataNodesTable extends Table {
     }
 
     private IndexedContainer getContainer() {
-        this.cluster = getCommandManager().getHadoopClusterData(clusterName);
+        this.cluster = HadoopDAO.getHadoopClusterInfo(clusterName);
         container = new IndexedContainer();
 
         // Create the container properties
@@ -59,11 +57,11 @@ public class DataNodesTable extends Table {
         container.addContainerProperty(STATUS, String.class, "");
 //        container.addContainerProperty(REMOVE, Button.class, "");
 
-        statusTask = RequestUtil.createTask(getCommandManager(), "Status data node from Hadoop Cluster");
+        statusTask = RequestUtil.createTask("Status data node from Hadoop Cluster");
         // Create some orders
         List<UUID> list = cluster.getDataNodes();
         for (UUID item : list) {
-            Agent agent = getAgentManager().getAgent(item);
+            Agent agent = getAgentManager().getAgentByUUID(item);
             addOrderToContainer(container, agent);
 
             HashMap<String, String> map = new HashMap<String, String>();
@@ -83,41 +81,41 @@ public class DataNodesTable extends Table {
         item.getItemProperty(STATUS).setValue("");
 
         /*Button buttonRemove = new Button("Remove");
-        buttonRemove.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                Agent master = getAgentManager().getAgent(cluster.getNameNode());
-                cluster = getCommandManager().getHadoopClusterData(clusterName);
-                cluster.getDataNodes().remove(agent.getUuid());
+         buttonRemove.addListener(new Button.ClickListener() {
+         @Override
+         public void buttonClick(Button.ClickEvent event) {
+         Agent master = getAgentManager().getAgent(cluster.getNameNode());
+         cluster = getCommandManager().getHadoopClusterData(clusterName);
+         cluster.getDataNodes().remove(agent.getUuid());
 
-                removeTask = RequestUtil.createTask(getCommandManager(), "Remove data node from Hadoop Cluster");
+         removeTask = RequestUtil.createTask(getCommandManager(), "Remove data node from Hadoop Cluster");
 
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", master.getUuid().toString());
-                map.put(":slave-hostname", agent.getUuid().toString());
-                RequestUtil.createRequest(getCommandManager(), Commands.REMOVE_DATA_NODE, removeTask, map);
+         HashMap<String, String> map = new HashMap<String, String>();
+         map.put(":source", HadoopModule.MODULE_NAME);
+         map.put(":uuid", master.getUuid().toString());
+         map.put(":slave-hostname", agent.getUuid().toString());
+         RequestUtil.createRequest(getCommandManager(), Commands.REMOVE_DATA_NODE, removeTask, map);
 
-                if (!agent.getListIP().isEmpty()) {
-                    map = new HashMap<String, String>();
-                    map.put(":source", HadoopModule.MODULE_NAME);
-                    map.put(":uuid", master.getUuid().toString());
-                    map.put(":IP", agent.getHostname());
-                    RequestUtil.createRequest(getCommandManager(), Commands.EXCLUDE_DATA_NODE, removeTask, map);
-                }
+         if (!agent.getListIP().isEmpty()) {
+         map = new HashMap<String, String>();
+         map.put(":source", HadoopModule.MODULE_NAME);
+         map.put(":uuid", master.getUuid().toString());
+         map.put(":IP", agent.getHostname());
+         RequestUtil.createRequest(getCommandManager(), Commands.EXCLUDE_DATA_NODE, removeTask, map);
+         }
 
-                map = new HashMap<String, String>();
-                map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", master.getUuid().toString());
-                RequestUtil.createRequest(getCommandManager(), Commands.REFRESH_DATA_NODES, removeTask, map);
+         map = new HashMap<String, String>();
+         map.put(":source", HadoopModule.MODULE_NAME);
+         map.put(":uuid", master.getUuid().toString());
+         RequestUtil.createRequest(getCommandManager(), Commands.REFRESH_DATA_NODES, removeTask, map);
 
-                map = new HashMap<String, String>();
-                map.put(":source", HadoopModule.MODULE_NAME);
-                map.put(":uuid", agent.getUuid().toString());
-                RequestUtil.createRequest(getCommandManager(), Commands.STOP_DATA_NODE, removeTask, map);
-            }
-        });
-        item.getItemProperty(REMOVE).setValue(buttonRemove);*/
+         map = new HashMap<String, String>();
+         map.put(":source", HadoopModule.MODULE_NAME);
+         map.put(":uuid", agent.getUuid().toString());
+         RequestUtil.createRequest(getCommandManager(), Commands.STOP_DATA_NODE, removeTask, map);
+         }
+         });
+         item.getItemProperty(REMOVE).setValue(buttonRemove);*/
     }
 
     public void refreshDataSource() {
@@ -126,13 +124,13 @@ public class DataNodesTable extends Table {
 
     public void onCommand(Response response) {
 
-        List<ParseResult> list = getCommandManager().parseTask(response.getTaskUuid(), true);
-        Task task = getCommandManager().getTask(response.getTaskUuid());
+        List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+        Task task = RequestUtil.getTask(response.getTaskUuid());
 
         if (removeTask != null) {
             if (task.equals(removeTask)) {
                 if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-                    getCommandManager().saveHadoopClusterData(cluster);
+                    HadoopDAO.saveHadoopClusterInfo(cluster);
                 }
                 refreshDataSource();
             }
@@ -150,7 +148,7 @@ public class DataNodesTable extends Table {
     }
 
     private void findRow(ParseResult parseResult) {
-        Agent agent = getAgentManager().getAgent(parseResult.getRequest().getUuid());
+        Agent agent = getAgentManager().getAgentByUUID(parseResult.getRequest().getUuid());
 
         for (Object itemId : container.getItemIds()) {
             Item item = container.getItem(itemId);
@@ -166,8 +164,8 @@ public class DataNodesTable extends Table {
     private String parseDataNodeStatus(String response) {
         String[] array = response.split("\n");
 
-        for(String status : array){
-            if(status.contains("DataNode is")){
+        for (String status : array) {
+            if (status.contains("DataNode is")) {
                 return status.replaceAll("DataNode is ", "");
             }
         }
@@ -175,26 +173,26 @@ public class DataNodesTable extends Table {
         return "";
     }
 
-    public CommandManagerInterface getCommandManager() {
+    public CommandManager getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
             if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+                return CommandManager.class.cast(ctx.getService(serviceReference));
             }
         }
 
         return null;
     }
 
-    public AgentManagerInterface getAgentManager() {
+    public AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
             if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+                return AgentManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

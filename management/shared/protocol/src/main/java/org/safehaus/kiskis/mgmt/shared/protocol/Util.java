@@ -9,11 +9,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
@@ -41,31 +38,6 @@ public class Util {
         if (col1 != null && col2 != null) {
             col1.removeAll(col2);
         }
-    }
-
-    public static Task createTask(String description) {
-        try {
-            Task task = new Task();
-            task.setTaskStatus(TaskStatus.NEW);
-            task.setDescription(description);
-            ServiceLocator.getService(CommandManagerInterface.class).saveTask(task);
-            return task;
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in createTask", e);
-
-        }
-        return null;
-    }
-
-    public static boolean saveTask(Task task) {
-        try {
-            ServiceLocator.getService(CommandManagerInterface.class).saveTask(task);
-            return true;
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in saveTask", e);
-        }
-        return false;
-
     }
 
     public static boolean isFinalResponse(Response response) {

@@ -20,9 +20,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
  *
  * @author dilshat
  */
-public class ClusterDAO {
+public class MongoDAO {
 
-    private static final Logger LOG = Logger.getLogger(ClusterDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(MongoDAO.class.getName());
 
     private static final DbManager dbManager;
 

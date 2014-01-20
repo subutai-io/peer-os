@@ -9,11 +9,9 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -24,12 +22,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandTransportInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
@@ -44,7 +42,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
 
     private static final Logger LOG = Logger.getLogger(AgentManagerImpl.class.getName());
 
-    private CommandTransportInterface communicationService;
+    private CommunicationService communicationService;
     private DbManager dbManagerService;
     private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
     private ExecutorService exec;
@@ -56,7 +54,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
         this.agentFreshnessMin = agentFreshnessMin;
     }
 
-    public void setCommunicationService(CommandTransportInterface communicationService) {
+    public void setCommunicationService(CommunicationService communicationService) {
         this.communicationService = communicationService;
     }
 
@@ -192,7 +190,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
                         try {
                             if (notifyAgentListeners) {
                                 notifyAgentListeners = false;
-                                List<Agent> freshAgents = new ArrayList(agents.asMap().values());
+                                Set<Agent> freshAgents = new HashSet(agents.asMap().values());
                                 for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
                                     AgentListener listener = it.next();
                                     try {
@@ -292,7 +290,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
         request.setUuid(agentUUID);
         request.setStdErr(OutputRedirection.NO);
         request.setStdOut(OutputRedirection.NO);
-        Command command = new Command(request);
+        CommandImpl command = new CommandImpl(request);
         communicationService.sendCommand(command);
     }
 

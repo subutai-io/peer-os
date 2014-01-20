@@ -10,7 +10,7 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 //import org.safehaus.kiskis.mgmt.server.ui.install.AppData;
-
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
  */
@@ -29,27 +28,26 @@ public class LxcCloneForm extends VerticalLayout implements
         Button.ClickListener {
 
     /*private static final String CLONE_LXC = ""
-            + "{\n"
-            + "\t  \"command\": {\n"
-            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
-            + "\t    \"source\": \":source\",\n"
-            + "\t    \"uuid\": \":uuid\",\n"
-            + "\t    \"taskUuid\": \":task\",\n"
-            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
-            + "\t    \"workingDirectory\": \"/\",\n"
-            + "\t    \"program\": \"/usr/bin/lxc-clone\",\n"
-            + "\t    \"stdOut\": \"RETURN\",\n"
-            + "\t    \"stdErr\": \"RETURN\",\n"
-            + "\t    \"runAs\": \"root\",\n"
-            + "\t    \"args\": [\n"
-            + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name;\","
-            + "\"  cat /dev/null > /etc/resolvconf/resolv.conf.d/original && "
-            + " cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original"
-            + "\t    ],\n"
-            + "\t    \"timeout\": 360\n"
-            + "\t  }\n"
-            + "\t}";*/
-
+     + "{\n"
+     + "\t  \"command\": {\n"
+     + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
+     + "\t    \"source\": \":source\",\n"
+     + "\t    \"uuid\": \":uuid\",\n"
+     + "\t    \"taskUuid\": \":task\",\n"
+     + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
+     + "\t    \"workingDirectory\": \"/\",\n"
+     + "\t    \"program\": \"/usr/bin/lxc-clone\",\n"
+     + "\t    \"stdOut\": \"RETURN\",\n"
+     + "\t    \"stdErr\": \"RETURN\",\n"
+     + "\t    \"runAs\": \"root\",\n"
+     + "\t    \"args\": [\n"
+     + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name;\","
+     + "\"  cat /dev/null > /etc/resolvconf/resolv.conf.d/original && "
+     + " cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original"
+     + "\t    ],\n"
+     + "\t    \"timeout\": 360\n"
+     + "\t  }\n"
+     + "\t}";*/
     private static final String CLONE_LXC = ""
             + "{\n"
             + "\t  \"command\": {\n"
@@ -138,7 +136,7 @@ public class LxcCloneForm extends VerticalLayout implements
         cloneTask.setTaskStatus(TaskStatus.NEW);
         cloneTask.setDescription("Cloning lxc container");
         if (getCommandManager() != null) {
-            getCommandManager().saveTask(cloneTask);
+            RequestUtil.saveTask(cloneTask);
             createRequests();
         }
     }
@@ -158,7 +156,7 @@ public class LxcCloneForm extends VerticalLayout implements
 
                 Request request = CommandJson.getRequest(json);
                 if (getCommandManager() != null) {
-                    getCommandManager().executeCommand(new Command(request));
+                    getCommandManager().executeCommand(new CommandImpl(request));
                 }
 
                 buttonClone.setEnabled(false);
@@ -175,7 +173,7 @@ public class LxcCloneForm extends VerticalLayout implements
     public void setTaskStatus() {
         if (getCommandManager() != null) {
             outputPanel.removeAllComponents();
-            List<ParseResult> result = getCommandManager().parseTask(cloneTask.getUuid(), true);
+            List<ParseResult> result = RequestUtil.parseTask(cloneTask.getUuid(), true);
             for (ParseResult pr : result) {
                 if (pr.getResponse().getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
                     if (pr.getResponse().getExitCode() == 0) {
@@ -208,12 +206,12 @@ public class LxcCloneForm extends VerticalLayout implements
         }
     }
 
-    public CommandManagerInterface getCommandManager() {
+    public CommandManager getCommandManager() {
         BundleContext ctx = FrameworkUtil.getBundle(LxcModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
             if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+                return CommandManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

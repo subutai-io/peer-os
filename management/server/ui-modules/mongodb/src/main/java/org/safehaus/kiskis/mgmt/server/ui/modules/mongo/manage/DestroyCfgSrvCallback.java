@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
@@ -94,7 +94,7 @@ public class DestroyCfgSrvCallback implements TaskCallback {
                         }
                     }
                     clusterInfo.setConfigServers(configServers);
-                    ClusterDAO.saveMongoClusterInfo(clusterInfo);
+                    MongoDAO.saveMongoClusterInfo(clusterInfo);
                     config.getConfigServers().remove(nodeAgent);
 
                     //update UI

@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -20,8 +20,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 public class Commands {
 
     // INSTALLATION COMMANDS ===================================================
-    public static Command getTemplate() {
-        return (Command) CommandFactory.createRequest(
+    public static CommandImpl getTemplate() {
+        return (CommandImpl) CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
                 MongoModule.MODULE_NAME, //     source
@@ -40,8 +40,8 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Command getInstallCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getInstallCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
@@ -58,8 +58,8 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Command getInstallCommand2() {
-        Command cmd = getTemplate();
+    public static CommandImpl getInstallCommand2() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
@@ -73,8 +73,8 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Command getAptGetUpdateCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getAptGetUpdateCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
@@ -85,8 +85,8 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Command getUninstallCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getUninstallCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
@@ -100,8 +100,8 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Command getKillAllCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getKillAllCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/pkill");
         req.setArgs(Arrays.asList(
@@ -115,8 +115,8 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Command getCleanCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getCleanCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/rm -R");
         req.setArgs(Arrays.asList(
@@ -136,8 +136,8 @@ public class Commands {
     }
 
     //execute on each replica
-    public static Command getSetReplicaSetNameCommand(String replicaSetName) {
-        Command cmd = getTemplate();
+    public static CommandImpl getSetReplicaSetNameCommand(String replicaSetName) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/sed");
         req.setArgs(Arrays.asList(
@@ -150,8 +150,8 @@ public class Commands {
     }
 
     //execute for each replica adding info about each of the other replicas
-    public static Command getAddNodesIpHostToOtherNodesCommand(String ipHostPair) {
-        Command cmd = getTemplate();
+    public static CommandImpl getAddNodesIpHostToOtherNodesCommand(String ipHostPair) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram(ipHostPair);
         req.setTimeout(30);
@@ -159,8 +159,8 @@ public class Commands {
     }
 
     //execute on each replica
-    public static Command getCheckReplicaSetMasterCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getCheckReplicaSetMasterCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/echo");
         req.setArgs(Arrays.asList(
@@ -173,8 +173,8 @@ public class Commands {
     }
 
     //execute on any one replica
-    public static Command getFindReplicaSetMasterCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getFindReplicaSetMasterCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/echo");
         req.setArgs(Arrays.asList(
@@ -191,8 +191,8 @@ public class Commands {
     }
 
     //execute on primary replica
-    public static Command getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
-        Command cmd = getTemplate();
+    public static CommandImpl getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
@@ -212,8 +212,8 @@ public class Commands {
     }
 
     //execute on primary data node
-    public static Command getUnregisterSecondaryNodeFromPrimaryCommand(String host) {
-        Command cmd = getTemplate();
+    public static CommandImpl getUnregisterSecondaryNodeFromPrimaryCommand(String host) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
@@ -227,8 +227,8 @@ public class Commands {
     }
 
     //execute on any router member
-    public static Command getRegisterShardsWithRouterCommand(String shards) {
-        Command cmd = getTemplate();
+    public static CommandImpl getRegisterShardsWithRouterCommand(String shards) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("sleep 30;");
         req.setArgs(Arrays.asList(
@@ -244,8 +244,8 @@ public class Commands {
 
     // LIFECYCLE COMMANDS =======================================================
     //execute on config server
-    public static Command getStartConfigServerCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getStartConfigServerCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/mkdir");
         req.setArgs(Arrays.asList(
@@ -268,8 +268,8 @@ public class Commands {
     }
 
     //execute on router
-    public static Command getStartRouterCommand(String configServersArg) {
-        Command cmd = getTemplate();
+    public static CommandImpl getStartRouterCommand(String configServersArg) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongos");
         req.setArgs(Arrays.asList(
@@ -286,8 +286,8 @@ public class Commands {
     }
 
     //execute on router
-    public static Command getRestartRouterCommand(String configServersArg) {
-        Command cmd = getTemplate();
+    public static CommandImpl getRestartRouterCommand(String configServersArg) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/pkill");
         req.setArgs(Arrays.asList(
@@ -308,8 +308,8 @@ public class Commands {
     }
 
     //execute on shard
-    public static Command getStartNodeCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getStartNodeCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongod");
         req.setArgs(Arrays.asList(
@@ -326,8 +326,8 @@ public class Commands {
     }
 
     //execute on any cluster member
-    public static Command getCheckInstanceRunningCommand(String host, String port) {
-        Command cmd = getTemplate();
+    public static CommandImpl getCheckInstanceRunningCommand(String host, String port) {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
@@ -340,21 +340,21 @@ public class Commands {
         return cmd;
     }
 
-    public static Command getCheckConfigSrvStatusCommand(String host) {
+    public static CommandImpl getCheckConfigSrvStatusCommand(String host) {
         return getCheckInstanceRunningCommand(host, Constants.CONFIG_SRV_PORT + "");
     }
 
-    public static Command getCheckRouterStatusCommand(String host) {
+    public static CommandImpl getCheckRouterStatusCommand(String host) {
         return getCheckInstanceRunningCommand(host, Constants.ROUTER_PORT + "");
     }
 
-    public static Command getCheckDataNodeStatusCommand(String host) {
+    public static CommandImpl getCheckDataNodeStatusCommand(String host) {
         return getCheckInstanceRunningCommand(host, Constants.DATA_NODE_PORT + "");
     }
 
     // RECONFIGURATION COMMANDS
-    public static Command getStopNodeCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getStopNodeCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/usr/bin/pkill");
         req.setArgs(Arrays.asList(
@@ -365,8 +365,8 @@ public class Commands {
         return cmd;
     }
 
-    public static Command getFindPrimaryNodeCommand() {
-        Command cmd = getTemplate();
+    public static CommandImpl getFindPrimaryNodeCommand() {
+        CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("/bin/echo");
         req.setArgs(Arrays.asList(
