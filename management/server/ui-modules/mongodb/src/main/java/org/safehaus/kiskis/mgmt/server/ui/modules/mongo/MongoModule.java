@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage.Manager2;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage.Manager;
 
 public class MongoModule implements Module {
 
@@ -19,7 +19,7 @@ public class MongoModule implements Module {
             CommandListener {
 
         private final Wizard wizard;
-        private final Manager2 manager;
+        private final Manager manager;
 
         public ModuleComponent() {
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -30,7 +30,7 @@ public class MongoModule implements Module {
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
             wizard = new Wizard();
-            manager = new Manager2();
+            manager = new Manager();
             mongoSheet.addTab(wizard.getContent(), "Install");
             mongoSheet.addTab(manager.getContent(), "Manage");
 

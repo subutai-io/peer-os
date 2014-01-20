@@ -13,22 +13,29 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.text.MessageFormat;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-//import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Operation;
-//import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.Uninstaller;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.ClusterDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author dilshat
  */
-public class DestroyWindow extends Window implements ResponseListener {
+public class DestroyWindow extends Window {
 
     private static final Logger LOG = Logger.getLogger(DestroyWindow.class.getName());
 
@@ -36,12 +43,19 @@ public class DestroyWindow extends Window implements ResponseListener {
     private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
+    private final TaskRunner taskRunner;
+    private final AgentManager agentManager;
+    private final ClusterConfig config;
     private Thread operationTimeoutThread;
-//    private Operation operation;
+    private boolean succeeded = false;
 
-    public DestroyWindow(String caption) {
-        super(caption);
+    public DestroyWindow(ClusterConfig config, TaskRunner taskRunner) {
+        super("Cluster uninstallation");
         setModal(true);
+
+        this.taskRunner = taskRunner;
+        this.config = config;
+        agentManager = ServiceLocator.getService(AgentManager.class);
 
         setWidth(600, DestroyWindow.UNITS_PIXELS);
 
@@ -58,7 +72,6 @@ public class DestroyWindow extends Window implements ResponseListener {
 
         content.addComponent(outputTxtArea, 0, 0, 18, 0);
         ok = new Button("Ok");
-//        ok.setEnabled(false);
         ok.addListener(new Button.ClickListener() {
 
             @Override
@@ -85,57 +98,93 @@ public class DestroyWindow extends Window implements ResponseListener {
         addComponent(content);
     }
 
-    public void startUninstallation(Set<Agent> clusterMembers) {
-//        startOperation(new Uninstaller(clusterMembers));
+    public void startUninstallation() {
+        try {
+            //stop any running installation
+            taskRunner.removeAllTaskCallbacks();
+            final Operation installOperation = new UninstallOperation(config);
+            runTimeoutThread(installOperation);
+            showProgress();
+            addOutput(String.format("Operation %s started", installOperation.getDescription()));
+            addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
+            addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
+
+            taskRunner.runTask(installOperation.getNextTask(), new TaskCallback() {
+
+                @Override
+                public void onResponse(Task task, Response response) {
+
+                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
+                    addLog(String.format("%s:\n%s\n%s",
+                            agent != null
+                            ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
+                            Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
+                            Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
+
+                    if (Util.isFinalResponse(response)) {
+                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                            addLog(String.format("Exit code: %d", response.getExitCode()));
+                        } else {
+                            addLog("Command timed out");
+                        }
+                    }
+
+                    if (task.isCompleted()) {
+                        if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                            addOutput(String.format("Task %s succeeded", task.getDescription()));
+                            if (installOperation.hasNextTask()) {
+                                addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
+                                addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
+                                taskRunner.runTask(installOperation.getNextTask(), this);
+                            } else {
+                                installOperation.setCompleted(true);
+                                addOutput(String.format("Operation %s completed", installOperation.getDescription()));
+                                hideProgress();
+                                ClusterDAO.deleteMongoClusterInfo(config.getClusterName());
+                                succeeded = true;
+                            }
+                        } else {
+                            installOperation.setCompleted(true);
+                            addOutput(String.format("Task %s failed", task.getDescription()));
+                            addOutput(String.format("Operation %s failed", installOperation.getDescription()));
+                            hideProgress();
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in startInstallation", e);
+        }
     }
 
-//    private void startOperation(final Operation operation) {
-//        if (operation != null) {
-//            try {
-//                //stop any running operation
-//                if (this.operation != null) {
-//                    this.operation.stop();
-//                    this.operation = null;
-//                }
-//                this.operation = operation;
-//                if (operation.start()) {
-//                    showProgress();
-//                    addOutput(operation.getOutput());
-//                    addLog(operation.getLog());
-//                    if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-//                        operationTimeoutThread.interrupt();
-//                    }
-//                    operationTimeoutThread = new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            try {
-//                                //wait for overalltimeout + 15 sec just in case
-//                                Thread.sleep(operation.getTotalTimeout() * 1000 + 15000);
-//                                if (!operation.isStopped()
-//                                        && !operation.isFailed()
-//                                        && !operation.isSucceeded()) {
-//                                    addOutput(MessageFormat.format(
-//                                            "Operation \"{0}\" timeouted!!!",
-//                                            operation.getDescription()));
-//                                    hideProgress();
-//                                }
-//                            } catch (InterruptedException ex) {
-//                            }
-//                        }
-//                    });
-//                    operationTimeoutThread.start();
-//                } else {
-//                    this.operation = null;
-//                    addOutput(MessageFormat.format(
-//                            "Operation \"{0}\" could not be started: {1}.",
-//                            operation.getDescription(),
-//                            operation.getOutput()));
-//                }
-//            } catch (Exception ex) {
-//                LOG.log(Level.SEVERE, "Error in startOperation", ex);
-//            }
-//        }
-//    }
+    private void runTimeoutThread(final Operation operation) {
+        try {
+            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
+                operationTimeoutThread.interrupt();
+            }
+            operationTimeoutThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //wait for timeout + 5 sec just in case
+                        Thread.sleep(operation.getTotalTimeout() * 1000 + 5000);
+                        if (!operation.isCompleted()) {
+                            addOutput(String.format(
+                                    "Operation %s timed out!!!",
+                                    operation.getDescription()));
+                            hideProgress();
+                        }
+                    } catch (InterruptedException ex) {
+                    }
+                }
+            });
+            operationTimeoutThread.start();
+
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
+        }
+    }
+
     private void showProgress() {
         indicator.setVisible(true);
         ok.setEnabled(false);
@@ -146,28 +195,8 @@ public class DestroyWindow extends Window implements ResponseListener {
         ok.setEnabled(true);
     }
 
-    @Override
-    public void onResponse(Response response) {
-//        if (operation != null) {
-//            try {
-//                operation.onResponse(response);
-//                addOutput(operation.getOutput());
-//                addLog(operation.getLog());
-//                if (operation.isSucceeded() || operation.isStopped() || operation.isFailed()) {
-//                    hideProgress();
-//                }
-//            } catch (Exception e) {
-//                LOG.log(Level.SEVERE, "Error in onResponse", e);
-//            }
-//        }
-
-    }
-
     public boolean isSucceeded() {
-//        if (operation != null) {
-//            return operation.isSucceeded();
-//        }
-        return false;
+        return succeeded;
     }
 
     private void addOutput(String output) {

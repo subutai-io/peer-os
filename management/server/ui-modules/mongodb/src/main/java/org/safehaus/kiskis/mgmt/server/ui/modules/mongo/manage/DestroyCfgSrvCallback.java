@@ -101,7 +101,7 @@ public class DestroyCfgSrvCallback implements TaskCallback {
                     cfgSrvTable.removeItem(rowId);
 
                     //check statuses of routers
-                    Manager2.checkNodesStatus(routersTable);
+                    Manager.checkNodesStatus(routersTable);
                 }
             } else {
                 progressIcon.setVisible(false);
@@ -112,7 +112,7 @@ public class DestroyCfgSrvCallback implements TaskCallback {
                 parentWindow.showNotification(String.format("Failed task %s", task.getDescription()));
 
                 //check statuses of routers
-                Manager2.checkNodesStatus(routersTable);
+                Manager.checkNodesStatus(routersTable);
             }
         }
     }
