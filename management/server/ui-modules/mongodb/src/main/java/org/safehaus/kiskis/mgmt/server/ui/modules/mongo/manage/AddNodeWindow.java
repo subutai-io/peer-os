@@ -5,14 +5,18 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
 
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.text.MessageFormat;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -36,9 +40,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  * @author dilshat
  */
 public class AddNodeWindow extends Window {
-
+    
     private static final Logger LOG = Logger.getLogger(AddNodeWindow.class.getName());
-
+    
     private final TextArea outputTxtArea;
     private final TextArea logTextArea;
     private final Button ok;
@@ -48,56 +52,129 @@ public class AddNodeWindow extends Window {
     private final ClusterConfig config;
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
-
+    
     public AddNodeWindow(ClusterConfig config, TaskRunner taskRunner) {
         super("Add New Node");
         setModal(true);
-
+        
         this.taskRunner = taskRunner;
         this.config = config;
         agentManager = ServiceLocator.getService(AgentManager.class);
-
-        setWidth(600, AddNodeWindow.UNITS_PIXELS);
-
-        GridLayout content = new GridLayout(20, 3);
+        
+        setWidth(650, AddNodeWindow.UNITS_PIXELS);
+        
+        GridLayout content = new GridLayout(20, 4);
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
-
-        outputTxtArea = new TextArea("Installation output");
+        content.setSpacing(true);
+        
+        HorizontalLayout topContent = new HorizontalLayout();
+        topContent.setSpacing(true);
+        
+        content.addComponent(topContent, 0, 0, 18, 0);
+        
+        Label label = new Label("Select node:");
+        
+        topContent.addComponent(label);
+        
+        final ComboBox nodesCombo = new ComboBox();
+        nodesCombo.setMultiSelect(false);
+        nodesCombo.setImmediate(true);
+        nodesCombo.setTextInputAllowed(false);
+        nodesCombo.setWidth(200, Sizeable.UNITS_PIXELS);
+        
+        Set<Agent> agents = agentManager.getLxcAgents();
+        
+        agents.removeAll(config.getConfigServers());
+        agents.removeAll(config.getRouterServers());
+        agents.removeAll(config.getDataNodes());
+        
+        if (agents.size() > 0) {
+            for (Agent agent : agents) {
+                nodesCombo.addItem(agent);
+                nodesCombo.setItemCaption(agent, agent.getHostname());
+            }
+            nodesCombo.setValue(agents.iterator().next());
+        }
+        
+        topContent.addComponent(nodesCombo);
+        
+        final ComboBox nodeTypeCombo = new ComboBox();
+        nodeTypeCombo.setMultiSelect(false);
+        nodeTypeCombo.setImmediate(true);
+        nodeTypeCombo.setTextInputAllowed(false);
+        nodeTypeCombo.setWidth(200, Sizeable.UNITS_PIXELS);
+        
+        nodeTypeCombo.addItem(NodeType.CONFIG_NODE);
+        nodeTypeCombo.setItemCaption(NodeType.CONFIG_NODE, "Add as Config Server");
+        nodeTypeCombo.addItem(NodeType.ROUTER_NODE);
+        nodeTypeCombo.setItemCaption(NodeType.ROUTER_NODE, "Add as Router Server");
+        nodeTypeCombo.addItem(NodeType.DATA_NODE);
+        nodeTypeCombo.setItemCaption(NodeType.DATA_NODE, "Add as Data Node");
+        nodeTypeCombo.setValue(NodeType.CONFIG_NODE);
+        topContent.addComponent(nodeTypeCombo);
+        
+        Button addNodeBtn = new Button("Add");
+        topContent.addComponent(addNodeBtn);
+        
+        addNodeBtn.addListener(new Button.ClickListener() {
+            
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                NodeType nodeType = (NodeType) nodeTypeCombo.getValue();
+                Agent agent = (Agent) nodesCombo.getValue();
+                if (agent == null) {
+                    show("Please, select node");
+                } else if (nodeType == null) {
+                    show("Please, select node type");
+                } else {
+                    show("OK");
+                }
+            }
+        });
+        
+        outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setRows(17);
-        outputTxtArea.setColumns(35);
+        outputTxtArea.setColumns(45);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
-
-        content.addComponent(outputTxtArea, 0, 0, 18, 0);
+        
+        content.addComponent(outputTxtArea, 0, 1, 18, 1);
+        
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
+        indicator.setVisible(false);
+        
+        content.addComponent(indicator, 19, 1, 19, 1);
+        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
+        
+        logTextArea = new TextArea("Node output");
+        logTextArea.setRows(17);
+        logTextArea.setColumns(45);
+        logTextArea.setImmediate(true);
+        logTextArea.setWordwrap(true);
+        
+        content.addComponent(logTextArea, 0, 2, 18, 2);
+        
         ok = new Button("Ok");
         ok.addListener(new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 //close window   
                 MgmtApplication.removeCustomWindow(getWindow());
             }
         });
-
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
-
-        content.addComponent(ok, 0, 1, 0, 1);
-        content.addComponent(indicator, 19, 0, 19, 0);
-        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
-
-        logTextArea = new TextArea("Command output");
-        logTextArea.setRows(17);
-        logTextArea.setColumns(35);
-        logTextArea.setImmediate(true);
-        logTextArea.setWordwrap(true);
-
-        content.addComponent(logTextArea, 0, 2, 18, 2);
-
+        
+        content.addComponent(ok, 18, 3, 18, 3);
+        
         addComponent(content);
     }
-
+    
+    private void show(String notification) {
+        getWindow().showNotification(notification);
+    }
+    
     public void startOperation() {
         try {
             //stop any running installation
@@ -108,19 +185,19 @@ public class AddNodeWindow extends Window {
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-
+            
             taskRunner.runTask(installOperation.getNextTask(), new TaskCallback() {
-
+                
                 @Override
                 public void onResponse(Task task, Response response) {
-
+                    
                     Agent agent = agentManager.getAgentByUUID(response.getUuid());
                     addLog(String.format("%s:\n%s\n%s",
                             agent != null
                             ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
                             Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
                             Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
-
+                    
                     if (Util.isFinalResponse(response)) {
                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                             addLog(String.format("Exit code: %d", response.getExitCode()));
@@ -128,7 +205,7 @@ public class AddNodeWindow extends Window {
                             addLog("Command timed out");
                         }
                     }
-
+                    
                     if (task.isCompleted()) {
                         if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                             addOutput(String.format("Task %s succeeded", task.getDescription()));
@@ -156,7 +233,7 @@ public class AddNodeWindow extends Window {
             LOG.log(Level.SEVERE, "Error in startOperation", e);
         }
     }
-
+    
     private void runTimeoutThread(final Operation operation) {
         try {
             if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
@@ -179,26 +256,26 @@ public class AddNodeWindow extends Window {
                 }
             });
             operationTimeoutThread.start();
-
+            
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
         }
     }
-
+    
     private void showProgress() {
         indicator.setVisible(true);
         ok.setEnabled(false);
     }
-
+    
     private void hideProgress() {
         indicator.setVisible(false);
         ok.setEnabled(true);
     }
-
+    
     public boolean isSucceeded() {
         return succeeded;
     }
-
+    
     private void addOutput(String output) {
         if (!Util.isStringEmpty(output)) {
             outputTxtArea.setValue(
@@ -208,7 +285,7 @@ public class AddNodeWindow extends Window {
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }
     }
-
+    
     private void addLog(String log) {
         if (!Util.isStringEmpty(log)) {
             logTextArea.setValue(
@@ -218,5 +295,5 @@ public class AddNodeWindow extends Window {
             logTextArea.setCursorPosition(logTextArea.getValue().toString().length() - 1);
         }
     }
-
+    
 }

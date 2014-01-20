@@ -63,6 +63,7 @@ public class Manager implements ResponseListener {
     private final Table dataNodesTable;
     private final TaskRunner taskRunner = new TaskRunner();
     private DestroyWindow destroyWindow;
+    private AddNodeWindow addNodeWindow;
     private ClusterConfig config;
 
     public Manager() {
@@ -158,6 +159,7 @@ public class Manager implements ResponseListener {
                                                 if (destroyWindow.isSucceeded()) {
                                                     refreshClustersInfo();
                                                 }
+                                                taskRunner.removeAllTaskCallbacks();
                                             }
                                         });
                                         destroyWindow.startOperation();
@@ -172,6 +174,31 @@ public class Manager implements ResponseListener {
         });
 
         topContent.addComponent(destroyClusterBtn);
+
+        Button addNodeBtn = new Button("Add New Node");
+
+        addNodeBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+                    addNodeWindow = new AddNodeWindow(config, taskRunner);
+                    MgmtApplication.addCustomWindow(addNodeWindow);
+                    addNodeWindow.addListener(new Window.CloseListener() {
+
+                        @Override
+                        public void windowClose(Window.CloseEvent e) {
+                            //refresh clusters and show the current one again
+                            taskRunner.removeAllTaskCallbacks();
+                        }
+                    });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+        });
+
+        topContent.addComponent(addNodeBtn);
 
         content.addComponent(topContent);
 
@@ -369,12 +396,22 @@ public class Manager implements ResponseListener {
 
     private void refreshClustersInfo() {
         List<MongoClusterInfo> mongoClusterInfos = MongoDAO.getMongoClustersInfo();
+        MongoClusterInfo clusterInfo = (MongoClusterInfo) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null) {
             for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
                 clusterCombo.addItem(mongoClusterInfo);
                 clusterCombo.setItemCaption(mongoClusterInfo,
                         String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
+            }
+            if (clusterInfo != null) {
+                for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
+                    if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+                        clusterCombo.setValue(mongoClusterInfo);
+                    }
+                }
+            } else {
+                clusterCombo.setValue(mongoClusterInfos.iterator().next());
             }
         }
     }

@@ -61,7 +61,7 @@ public class InstallationStep extends Panel implements ResponseListener {
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Installation output");
+        outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setRows(17);
         outputTxtArea.setColumns(60);
         outputTxtArea.setImmediate(true);
@@ -106,7 +106,7 @@ public class InstallationStep extends Panel implements ResponseListener {
         content.addComponent(indicator, 19, 0, 19, 0);
         content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
-        logTextArea = new TextArea("Command output");
+        logTextArea = new TextArea("Node output");
         logTextArea.setRows(17);
         logTextArea.setColumns(60);
         logTextArea.setImmediate(true);

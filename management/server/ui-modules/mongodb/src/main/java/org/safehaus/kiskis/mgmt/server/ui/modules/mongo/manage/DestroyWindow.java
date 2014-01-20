@@ -64,7 +64,7 @@ public class DestroyWindow extends Window {
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Uninstallation output");
+        outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setRows(17);
         outputTxtArea.setColumns(35);
         outputTxtArea.setImmediate(true);
@@ -87,7 +87,7 @@ public class DestroyWindow extends Window {
         content.addComponent(indicator, 19, 0, 19, 0);
         content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
-        logTextArea = new TextArea("Command output");
+        logTextArea = new TextArea("Node output");
         logTextArea.setRows(17);
         logTextArea.setColumns(35);
         logTextArea.setImmediate(true);
