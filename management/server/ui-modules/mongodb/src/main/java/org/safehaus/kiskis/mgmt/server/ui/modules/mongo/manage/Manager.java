@@ -50,8 +50,7 @@ public class Manager implements ResponseListener {
     /*
      TODO:
      1) add node
-     2) destroy cluster
-     3) add agent log
+     2) add agent log to main manager window???
      */
 
     private static final Logger LOG = Logger.getLogger(Manager.class.getName());
@@ -161,7 +160,7 @@ public class Manager implements ResponseListener {
                                                 }
                                             }
                                         });
-                                        destroyWindow.startUninstallation();
+                                        destroyWindow.startOperation();
                                     }
                                 }
                             });

@@ -91,7 +91,7 @@ public class InstallationStep extends Panel implements ResponseListener {
                             public void response(boolean ok) {
                                 if (ok) {
                                     cancel.setEnabled(false);
-                                    startInstallation(false);
+                                    startOperation(false);
                                 }
                             }
                         });
@@ -118,7 +118,7 @@ public class InstallationStep extends Panel implements ResponseListener {
 
     }
 
-    public void startInstallation(final boolean install) {
+    public void startOperation(final boolean install) {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
@@ -208,7 +208,7 @@ public class InstallationStep extends Panel implements ResponseListener {
                 }
             });
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in startInstallation", e);
+            LOG.log(Level.SEVERE, "Error in startOperation", e);
         }
     }
 

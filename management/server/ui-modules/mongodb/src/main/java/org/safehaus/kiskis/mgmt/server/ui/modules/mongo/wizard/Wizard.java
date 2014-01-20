@@ -126,7 +126,7 @@ public class Wizard implements ResponseListener {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
                 installationStep = new InstallationStep(this);
                 verticalLayout.addComponent(installationStep);
-                installationStep.startInstallation(true);
+                installationStep.startOperation(true);
                 break;
             }
             default: {

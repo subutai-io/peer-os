@@ -35,9 +35,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author dilshat
  */
-public class DestroyWindow extends Window {
+public class AddNodeWindow extends Window {
 
-    private static final Logger LOG = Logger.getLogger(DestroyWindow.class.getName());
+    private static final Logger LOG = Logger.getLogger(AddNodeWindow.class.getName());
 
     private final TextArea outputTxtArea;
     private final TextArea logTextArea;
@@ -49,22 +49,22 @@ public class DestroyWindow extends Window {
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public DestroyWindow(ClusterConfig config, TaskRunner taskRunner) {
-        super("Cluster uninstallation");
+    public AddNodeWindow(ClusterConfig config, TaskRunner taskRunner) {
+        super("Add New Node");
         setModal(true);
 
         this.taskRunner = taskRunner;
         this.config = config;
         agentManager = ServiceLocator.getService(AgentManager.class);
 
-        setWidth(600, DestroyWindow.UNITS_PIXELS);
+        setWidth(600, AddNodeWindow.UNITS_PIXELS);
 
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Uninstallation output");
+        outputTxtArea = new TextArea("Installation output");
         outputTxtArea.setRows(17);
         outputTxtArea.setColumns(35);
         outputTxtArea.setImmediate(true);
