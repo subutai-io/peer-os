@@ -90,25 +90,24 @@ public class Agent implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
-
-        Agent agent = (Agent) o;
-
-        if (uuid != null ? !uuid.equals(agent.uuid) : agent.uuid != null) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
+        final Agent other = (Agent) obj;
+        if (this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid))) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public int hashCode() {
-        return uuid != null ? 1 : 0;
+        int hash = 5;
+        hash = 83 * hash + (this.uuid != null ? this.uuid.hashCode() : 0);
+        return hash;
     }
 }

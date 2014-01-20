@@ -7,8 +7,7 @@ import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
@@ -24,14 +23,14 @@ import java.util.logging.Logger;
 public final class MgmtAgentManager extends ConcurrentComponent
         implements AgentListener {
 
-    private final AgentManagerInterface agentManagerInterface;
+    private final AgentManager agentManager;
     private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
-    private List<Agent> currentAgents = new ArrayList<Agent>();
+    private Set<Agent> currentAgents = new HashSet<Agent>();
 
-    public MgmtAgentManager() {
-        this.agentManagerInterface = ServiceLocator.getService(AgentManagerInterface.class);
+    public MgmtAgentManager(AgentManager agentManager) {
+        this.agentManager = agentManager;
         setSizeFull();
         setMargin(true);
 
@@ -106,14 +105,14 @@ public final class MgmtAgentManager extends ConcurrentComponent
             public void buttonClick(Button.ClickEvent event) {
                 tree.setValue(null);
                 MgmtApplication.clearSelectedAgents();
-                refreshAgents(agentManagerInterface.getRegisteredAgents());
+                refreshAgents(agentManager.getAgents());
             }
         });
         return button;
     }
 
     @Override
-    public void onAgent(final List<Agent> freshAgents) {
+    public void onAgent(final Set<Agent> freshAgents) {
         executeUpdate(new Runnable() {
             @Override
             public void run() {
@@ -127,11 +126,11 @@ public final class MgmtAgentManager extends ConcurrentComponent
         container.addContainerProperty("value", Agent.class, null);
         container.addContainerProperty("icon", Resource.class,
                 new ThemeResource("icons/16/folder.png"));
-        refreshAgents(agentManagerInterface.getRegisteredAgents());
+        refreshAgents(agentManager.getAgents());
         return container;
     }
 
-    private void refreshAgents(List<Agent> allFreshAgents) {
+    private void refreshAgents(Set<Agent> allFreshAgents) {
         if (allFreshAgents != null && tree != null) {
             try {
 

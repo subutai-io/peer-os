@@ -14,14 +14,14 @@
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <bean id="persistenceService" class="org.safehaus.kiskis.mgmt.server.persistence.Persistence"
+    <bean id="dbManager" class="org.safehaus.kiskis.mgmt.server.persistence.DbManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="cassandraHost" value="${cassandraHost}"/>
         <property name="cassandraPort" value="${cassandraPort}"/>
         <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>
     </bean>
-    <service ref="persistenceService"
-             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface">
+    <service ref="dbManager"
+             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>

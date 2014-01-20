@@ -9,14 +9,15 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode.AgentsComboBox;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 public final class TaskTrackersWindow extends Window {
 
@@ -36,7 +37,7 @@ public final class TaskTrackersWindow extends Window {
         setModal(true);
         setCaption("Hadoop Job Tracker Configuration");
 
-        this.cluster = getCommandManager().getHadoopClusterData(clusterName);
+        this.cluster = HadoopDAO.getHadoopClusterInfo(clusterName);
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setWidth(900, Sizeable.UNITS_PIXELS);
@@ -52,12 +53,11 @@ public final class TaskTrackersWindow extends Window {
         buttonLayout.addComponent(getStatusLabel());
 
         /*HorizontalLayout agentsLayout = new HorizontalLayout();
-        agentsLayout.setSpacing(true);
+         agentsLayout.setSpacing(true);
 
-        agentsComboBox = new AgentsComboBox(clusterName);
-        agentsLayout.addComponent(agentsComboBox);
-        agentsLayout.addComponent(getAddButton());*/
-
+         agentsComboBox = new AgentsComboBox(clusterName);
+         agentsLayout.addComponent(agentsComboBox);
+         agentsLayout.addComponent(getAddButton());*/
         Panel panel = new Panel();
         panel.setSizeFull();
         panel.addComponent(buttonLayout);
@@ -78,8 +78,8 @@ public final class TaskTrackersWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                startTask = RequestUtil.createTask(getCommandManager(), "Start Hadoop Cluster Job Tracker");
-                Agent master = getAgentManager().getAgent(cluster.getJobTracker());
+                startTask = RequestUtil.createTask("Start Hadoop Cluster Job Tracker");
+                Agent master = getAgentManager().getAgentByUUID(cluster.getJobTracker());
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
@@ -102,8 +102,8 @@ public final class TaskTrackersWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                stopTask = RequestUtil.createTask(getCommandManager(), "Stop Hadoop Cluster Job Tracker");
-                Agent master = getAgentManager().getAgent(cluster.getJobTracker());
+                stopTask = RequestUtil.createTask("Stop Hadoop Cluster Job Tracker");
+                Agent master = getAgentManager().getAgentByUUID(cluster.getJobTracker());
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
@@ -114,7 +114,6 @@ public final class TaskTrackersWindow extends Window {
                 disableButtons(0);
             }
         });
-
 
         return stopButton;
     }
@@ -127,8 +126,8 @@ public final class TaskTrackersWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                restartTask = RequestUtil.createTask(getCommandManager(), "Restart Hadoop Cluster Job Tracker");
-                Agent master = getAgentManager().getAgent(cluster.getJobTracker());
+                restartTask = RequestUtil.createTask("Restart Hadoop Cluster Job Tracker");
+                Agent master = getAgentManager().getAgentByUUID(cluster.getJobTracker());
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
@@ -165,7 +164,7 @@ public final class TaskTrackersWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (configureTask == null) {
-                    cluster = getCommandManager().getHadoopClusterData(cluster.getClusterName());
+                    cluster = HadoopDAO.getHadoopClusterInfo(cluster.getClusterName());
                     Agent agent = (Agent) agentsComboBox.getValue();
 
                     List<UUID> list = new ArrayList<UUID>();
@@ -184,8 +183,8 @@ public final class TaskTrackersWindow extends Window {
     }
 
     private void getStatus() {
-        statusTask = RequestUtil.createTask(getCommandManager(), "Get status for Hadoop Task Tracker");
-        Agent master = getAgentManager().getAgent(cluster.getJobTracker());
+        statusTask = RequestUtil.createTask("Get status for Hadoop Task Tracker");
+        Agent master = getAgentManager().getAgentByUUID(cluster.getJobTracker());
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
@@ -197,7 +196,7 @@ public final class TaskTrackersWindow extends Window {
     }
 
     private void configureNode() {
-        configureTask = RequestUtil.createTask(getCommandManager(), "Configuring new node on Hadoop Cluster");
+        configureTask = RequestUtil.createTask("Configuring new node on Hadoop Cluster");
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
@@ -221,7 +220,7 @@ public final class TaskTrackersWindow extends Window {
 
     private void addNode() {
         Agent agent = (Agent) agentsComboBox.getValue();
-        addTask = RequestUtil.createTask(getCommandManager(), "Adding data node to Hadoop Cluster");
+        addTask = RequestUtil.createTask("Adding data node to Hadoop Cluster");
 
         for (String key : keys) {
             HashMap<String, String> map = new HashMap<String, String>();
@@ -240,32 +239,32 @@ public final class TaskTrackersWindow extends Window {
 
         map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+        map.put(":uuid", getAgentManager().getAgentByUUID(cluster.getNameNode()).getUuid().toString());
         map.put(":slave-hostname", agent.getHostname());
         RequestUtil.createRequest(getCommandManager(), Commands.ADD_DATA_NODE, addTask, map);
 
         for (UUID uuid : cluster.getDataNodes()) {
-            Agent agentDataNode = getAgentManager().getAgent(uuid);
+            Agent agentDataNode = getAgentManager().getAgentByUUID(uuid);
             map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
-            map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+            map.put(":uuid", getAgentManager().getAgentByUUID(cluster.getNameNode()).getUuid().toString());
             map.put(":IP", agentDataNode.getHostname());
             RequestUtil.createRequest(getCommandManager(), Commands.INCLUDE_DATA_NODE, addTask, map);
         }
 
         /*map = new HashMap<String, String>();
-        map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", agent.getUuid().toString());
-//        map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
-        RequestUtil.createRequest(getCommandManager(), Commands.START_DATA_NODE, addTask, map);*/
+         map.put(":source", HadoopModule.MODULE_NAME);
+         map.put(":uuid", agent.getUuid().toString());
+         //        map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+         RequestUtil.createRequest(getCommandManager(), Commands.START_DATA_NODE, addTask, map);*/
     }
 
     public void readHosts() {
         if (readHostsTask == null) {
-            readHostsTask = RequestUtil.createTask(getCommandManager(), "Read /etc/hosts file");
+            readHostsTask = RequestUtil.createTask("Read /etc/hosts file");
 
             for (UUID uuid : getAllNodes()) {
-                Agent agent = getAgentManager().getAgent(uuid);
+                Agent agent = getAgentManager().getAgentByUUID(uuid);
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", agent.getUuid().toString());
@@ -276,10 +275,10 @@ public final class TaskTrackersWindow extends Window {
 
     public void writeHosts(List<ParseResult> list) {
         if (writeHostsTask == null) {
-            writeHostsTask = RequestUtil.createTask(getCommandManager(), "Write /etc/hosts file");
+            writeHostsTask = RequestUtil.createTask("Write /etc/hosts file");
 
             for (ParseResult pr : list) {
-                Agent agent = getAgentManager().getAgent(pr.getRequest().getUuid());
+                Agent agent = getAgentManager().getAgentByUUID(pr.getRequest().getUuid());
                 String hosts = editHosts(pr.getResponse().getStdOut(), agent);
 
                 HashMap<String, String> map = new HashMap<String, String>();
@@ -290,9 +289,9 @@ public final class TaskTrackersWindow extends Window {
             }
 
             /*HashMap<String, String> map = new HashMap<String, String>();
-            map.put(":source", HadoopModule.MODULE_NAME);
-            map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
-            RequestUtil.createRequest(getCommandManager(), Commands.REFRESH_DATA_NODES, writeHostsTask, map);*/
+             map.put(":source", HadoopModule.MODULE_NAME);
+             map.put(":uuid", getAgentManager().getAgent(cluster.getNameNode()).getUuid().toString());
+             RequestUtil.createRequest(getCommandManager(), Commands.REFRESH_DATA_NODES, writeHostsTask, map);*/
         }
     }
 
@@ -304,11 +303,11 @@ public final class TaskTrackersWindow extends Window {
             host = host.trim();
             boolean isContains = false;
             for (UUID uuid : getAllNodes()) {
-                Agent agent = getAgentManager().getAgent(uuid);
-                if (host.contains(agent.getHostname()) ||
-                        host.contains("localhost") ||
-                        host.contains(localAgent.getHostname()) ||
-                        host.contains(localAgent.getListIP().get(0))) {
+                Agent agent = getAgentManager().getAgentByUUID(uuid);
+                if (host.contains(agent.getHostname())
+                        || host.contains("localhost")
+                        || host.contains(localAgent.getHostname())
+                        || host.contains(localAgent.getListIP().get(0))) {
                     isContains = true;
                 }
             }
@@ -320,7 +319,7 @@ public final class TaskTrackersWindow extends Window {
         }
 
         for (UUID uuid : getAllNodes()) {
-            Agent agent = getAgentManager().getAgent(uuid);
+            Agent agent = getAgentManager().getAgentByUUID(uuid);
             result.append(agent.getListIP().get(0));
             result.append("\t");
             result.append(agent.getHostname());
@@ -362,8 +361,8 @@ public final class TaskTrackersWindow extends Window {
 
     public void onCommand(Response response) {
 
-        List<ParseResult> list = getCommandManager().parseTask(response.getTaskUuid(), true);
-        Task task = getCommandManager().getTask(response.getTaskUuid());
+        List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+        Task task = RequestUtil.getTask(response.getTaskUuid());
 
         if (configureTask != null) {
             if (!list.isEmpty() && task.equals(configureTask)) {
@@ -439,7 +438,7 @@ public final class TaskTrackersWindow extends Window {
 
         if (writeHostsTask != null && task.equals(writeHostsTask)) {
             if (task.getTaskStatus().equals(TaskStatus.SUCCESS)) {
-                getCommandManager().saveHadoopClusterData(cluster);
+                HadoopDAO.saveHadoopClusterInfo(cluster);
                 agentsComboBox.refreshDataSource();
                 taskTrackersTable.refreshDataSource();
             } else {
@@ -465,26 +464,26 @@ public final class TaskTrackersWindow extends Window {
         return "";
     }
 
-    public CommandManagerInterface getCommandManager() {
+    public CommandManager getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
             if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+                return CommandManager.class.cast(ctx.getService(serviceReference));
             }
         }
 
         return null;
     }
 
-    public AgentManagerInterface getAgentManager() {
+    public AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
             if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+                return AgentManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

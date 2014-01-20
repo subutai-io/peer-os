@@ -9,17 +9,15 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 12/22/13
- * Time: 6:29 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 12/22/13 Time: 6:29 PM
  */
 public class AgentsComboBox extends ComboBox {
 
@@ -42,50 +40,50 @@ public class AgentsComboBox extends ComboBox {
     }
 
     public void refreshDataSource() {
-        this.cluster = getCommandManager().getHadoopClusterData(clusterName);
+        this.cluster = HadoopDAO.getHadoopClusterInfo(clusterName);
         setContainerDataSource(getDataSourceMasters());
     }
 
     private BeanItemContainer getDataSourceMasters() {
-        List<Agent> list = getAgentManager().getRegisteredLxcAgents();
+        Set<Agent> list = getAgentManager().getLxcAgents();
 
         if (cluster != null) {
-            list.remove(getAgentManager().getAgent(cluster.getNameNode()));
-            list.remove(getAgentManager().getAgent(cluster.getSecondaryNameNode()));
-            list.remove(getAgentManager().getAgent(cluster.getJobTracker()));
+            list.remove(getAgentManager().getAgentByUUID(cluster.getNameNode()));
+            list.remove(getAgentManager().getAgentByUUID(cluster.getSecondaryNameNode()));
+            list.remove(getAgentManager().getAgentByUUID(cluster.getJobTracker()));
 
             for (UUID uuid : cluster.getDataNodes()) {
-                list.remove(getAgentManager().getAgent(uuid));
+                list.remove(getAgentManager().getAgentByUUID(uuid));
             }
 
             for (UUID uuid : cluster.getTaskTrackers()) {
-                list.remove(getAgentManager().getAgent(uuid));
+                list.remove(getAgentManager().getAgentByUUID(uuid));
             }
         }
 
         return new BeanItemContainer<Agent>(Agent.class, list);
     }
 
-    public AgentManagerInterface getAgentManager() {
+    public AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
             if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+                return AgentManager.class.cast(ctx.getService(serviceReference));
             }
         }
 
         return null;
     }
 
-    public CommandManagerInterface getCommandManager() {
+    public CommandManager getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
             if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+                return CommandManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

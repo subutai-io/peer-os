@@ -14,23 +14,21 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode.DataNodesWindo
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker.TaskTrackersWindow;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManagerInterface;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 
 import java.util.List;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 11/30/13
- * Time: 6:56 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
  */
 public class ClusterTable extends Table {
 
     static final Action ACTION_NAME_NODE = new Action("Edit name node and data trackers");
     static final Action ACTION_JOB_TRACKER = new Action("Edit job tracker and task trackers");
     static final Action[] ACTIONS = new Action[]{ACTION_NAME_NODE,
-            ACTION_JOB_TRACKER};
+        ACTION_JOB_TRACKER};
 
     private DataNodesWindow dataNodesWindow;
     private TaskTrackersWindow taskTrackersWindow;
@@ -81,7 +79,7 @@ public class ClusterTable extends Table {
         container.addContainerProperty(HadoopClusterInfo.TASK_TRACKERS_LABEL, Integer.class, "");
 
         // Create some orders
-        List<HadoopClusterInfo> cdList = getCommandManager().getHadoopClusterData();
+        List<HadoopClusterInfo> cdList = HadoopDAO.getHadoopClusterInfo();
         for (HadoopClusterInfo cluster : cdList) {
             addOrderToContainer(container, cluster);
         }
@@ -95,11 +93,11 @@ public class ClusterTable extends Table {
 
         item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).setValue(cluster.getClusterName());
         item.getItemProperty(HadoopClusterInfo.NAME_NODE_LABEL)
-                .setValue(getAgentManager().getAgent(cluster.getNameNode()).getHostname());
+                .setValue(getAgentManager().getAgentByUUID(cluster.getNameNode()).getHostname());
         item.getItemProperty(HadoopClusterInfo.SECONDARY_NAME_NODE_LABEL)
-                .setValue(getAgentManager().getAgent(cluster.getSecondaryNameNode()).getHostname());
+                .setValue(getAgentManager().getAgentByUUID(cluster.getSecondaryNameNode()).getHostname());
         item.getItemProperty(HadoopClusterInfo.JOB_TRACKER_LABEL)
-                .setValue(getAgentManager().getAgent(cluster.getJobTracker()).getHostname());
+                .setValue(getAgentManager().getAgentByUUID(cluster.getJobTracker()).getHostname());
         item.getItemProperty(HadoopClusterInfo.REPLICATION_FACTOR_LABEL)
                 .setValue(cluster.getReplicationFactor());
         item.getItemProperty(HadoopClusterInfo.DATA_NODES_LABEL)
@@ -112,36 +110,36 @@ public class ClusterTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-    public void onCommand(Response response){
-         if(dataNodesWindow != null && dataNodesWindow.isVisible()){
-             dataNodesWindow.onCommand(response);
-         }
+    public void onCommand(Response response) {
+        if (dataNodesWindow != null && dataNodesWindow.isVisible()) {
+            dataNodesWindow.onCommand(response);
+        }
 
-        if(taskTrackersWindow != null && taskTrackersWindow.isVisible()){
+        if (taskTrackersWindow != null && taskTrackersWindow.isVisible()) {
             taskTrackersWindow.onCommand(response);
         }
     }
 
-    public CommandManagerInterface getCommandManager() {
+    public CommandManager getCommandManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
             if (serviceReference != null) {
-                return CommandManagerInterface.class.cast(ctx.getService(serviceReference));
+                return CommandManager.class.cast(ctx.getService(serviceReference));
             }
         }
 
         return null;
     }
 
-    public AgentManagerInterface getAgentManager() {
+    public AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
         if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManagerInterface.class.getName());
+            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
             if (serviceReference != null) {
-                return AgentManagerInterface.class.cast(ctx.getService(serviceReference));
+                return AgentManager.class.cast(ctx.getService(serviceReference));
             }
         }
 

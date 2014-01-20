@@ -51,7 +51,7 @@ public class CommandNotifier implements Runnable {
                         notifyListeners(response);
                     }
                 }
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in CommandNotifier.run", ex);
             }

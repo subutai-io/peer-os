@@ -5,7 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallerConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -13,10 +13,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.PersistenceInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
@@ -31,13 +28,12 @@ public class Wizard implements ResponseListener {
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
     private int step = 1;
-    private final InstallerConfig mongoConfig = new InstallerConfig();
+    private final ClusterConfig config = new ClusterConfig();
     private final VerticalLayout contentRoot;
-    private Step5 step5;
-    private final PersistenceInterface persistenceManager;
+//    private Step5 step5;
+    private InstallationStep installationStep;
 
     public Wizard() {
-        persistenceManager = ServiceLocator.getService(PersistenceInterface.class);
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -72,10 +68,6 @@ public class Wizard implements ResponseListener {
 
     }
 
-    public PersistenceInterface getDbManager() {
-        return persistenceManager;
-    }
-
     public Component getContent() {
         return contentRoot;
     }
@@ -95,8 +87,8 @@ public class Wizard implements ResponseListener {
         putForm();
     }
 
-    public InstallerConfig getConfig() {
-        return mongoConfig;
+    public ClusterConfig getConfig() {
+        return config;
     }
 
     private void putForm() {
@@ -104,29 +96,29 @@ public class Wizard implements ResponseListener {
         switch (step) {
             case 1: {
                 progressBar.setValue(0f);
-                verticalLayout.addComponent(new Step1(this));
+                verticalLayout.addComponent(new WelcomeStep(this));
                 break;
             }
             case 2: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step2(this));
+                verticalLayout.addComponent(new ConfigNRoutersStep(this));
                 break;
             }
             case 3: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step3(this));
+                verticalLayout.addComponent(new ReplicaSetStep(this));
                 break;
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new Step4(this));
+                verticalLayout.addComponent(new VerifyStep(this));
                 break;
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                step5 = new Step5(this);
-                verticalLayout.addComponent(step5);
-                step5.startInstallation();
+                installationStep = new InstallationStep(this);
+                verticalLayout.addComponent(installationStep);
+                installationStep.startOperation(true);
                 break;
             }
             default: {
@@ -137,15 +129,14 @@ public class Wizard implements ResponseListener {
 
     @Override
     public void onResponse(Response response) {
-        if (step == 5 && step5 != null) {
-            step5.onResponse(response);
+        if (step == 5 && installationStep != null) {
+            installationStep.onResponse(response);
         }
 
     }
 
-    @Override
-    public String getSource() {
-        return MongoModule.MODULE_NAME;
-    }
-
+//    @Override
+//    public String getSource() {
+//        return MongoModule.MODULE_NAME;
+//    }
 }

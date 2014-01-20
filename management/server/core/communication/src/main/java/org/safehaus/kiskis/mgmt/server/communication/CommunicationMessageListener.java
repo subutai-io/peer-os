@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
@@ -35,10 +35,9 @@ public class CommunicationMessageListener implements MessageListener {
                 TextMessage txtMsg = (TextMessage) message;
                 String jsonCmd = txtMsg.getText();
                 Response response = CommandJson.getResponse(jsonCmd);
-                long ts = System.currentTimeMillis();
                 if (response != null) {
                     if (response.getType() != ResponseType.HEARTBEAT_RESPONSE) {
-                        LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(new Command(response)));
+                        LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(new CommandImpl(response)));
                     }
                     response.setTransportId(((ActiveMQTextMessage) message).getProducerId().toString());
                     notifyListeners(response);

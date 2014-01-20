@@ -8,14 +8,14 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 
 import java.util.List;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
+import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManagerInterface;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -51,7 +51,7 @@ public class CassandraTable extends Table {
 //        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
-        List<CassandraClusterInfo> cdList = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterData();
+        List<CassandraClusterInfo> cdList = CassandraDAO.getCassandraClusterInfo();
         for (CassandraClusterInfo cluster : cdList) {
             addClusterDataToContainer(container, cluster);
         }
@@ -103,7 +103,7 @@ public class CassandraTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                CassandraClusterInfo info = ServiceLocator.getService(CommandManagerInterface.class).getCassandraClusterDataByUUID(cci.getUuid());
+                CassandraClusterInfo info = CassandraDAO.getCassandraClusterInfoByUUID(cci.getUuid());
                 nodesWindow = new NodesWindow(info, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
 
@@ -148,13 +148,13 @@ public class CassandraTable extends Table {
     public void onResponse(Response response) {
         if (manager.getCurrentTask() != null && response.getTaskUuid() != null
                 && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
-            List<ParseResult> list = ServiceLocator.getService(CommandManagerInterface.class).parseTask(response.getTaskUuid(), true);
-            Task task = ServiceLocator.getService(CommandManagerInterface.class).getTask(response.getTaskUuid());
+            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+            Task task = RequestUtil.getTask(response.getTaskUuid());
             if (!list.isEmpty()) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     manager.moveToNextTask();
                     if (manager.getCurrentTask() != null) {
-                        for (Command command : manager.getCurrentTask().getCommands()) {
+                        for (CommandImpl command : manager.getCurrentTask().getCommands()) {
                             manager.executeCommand(command);
                         }
                     } else {
@@ -210,8 +210,8 @@ public class CassandraTable extends Table {
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
-                            if (ServiceLocator.getService(CommandManagerInterface.class)
-                                    .deleteCassandraClusterData(selectedCci.getUuid())) {
+                            if (CassandraDAO
+                                    .deleteCassandraClusterInfo(selectedCci.getUuid())) {
 //                    container.removeItem(itemId);
                                 refreshDatasource();
                             }

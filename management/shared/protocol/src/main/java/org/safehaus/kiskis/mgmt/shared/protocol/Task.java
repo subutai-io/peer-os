@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
+//import java.util.ListIterator;
 import java.util.UUID;
 
 /**
@@ -23,44 +23,105 @@ public class Task implements Serializable {
     private String description;
     private TaskStatus taskStatus;
     private Integer reqSeqNumber;
-    private final List<Command> commands;
+    private final List<CommandImpl> commands;
     private boolean ignoreExitCode = false;
     private boolean completed = false;
-    private ListIterator commandIterator;
+    private int currentCmdId = -1;
+    private int completedCommandsCount = 0;
+    private int succeededCommandsCount = 0;
+    private Object data;
 
-    public void addCommand(Command command) {
+    public Task() {
+        taskStatus = TaskStatus.NEW;
+        uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        reqSeqNumber = 0;
+        commands = new ArrayList<CommandImpl>();
+    }
+
+    public Task(String description) {
+        this();
+        this.description = description;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    public void incrementCompletedCommandsCount() {
+        completedCommandsCount++;
+    }
+
+    public void incrementSucceededCommandsCount() {
+        succeededCommandsCount++;
+    }
+
+    public int getCompletedCommandsCount() {
+        return completedCommandsCount;
+    }
+
+    public int getSucceededCommandsCount() {
+        return succeededCommandsCount;
+    }
+
+    public void addCommand(CommandImpl command) {
         if (command != null) {
+            command.getRequest().setTaskUuid(uuid);
+            command.getRequest().setRequestSequenceNumber(getIncrementedReqSeqNumber());
             commands.add(command);
-            commandIterator = commands.listIterator();
         }
     }
 
     public int getTotalTimeout() {
         int timeout = 0;
-        for (Command cmd : commands) {
+        for (CommandImpl cmd : commands) {
             timeout += cmd.getRequest().getTimeout();
         }
         return timeout;
     }
 
-    public Command getNextCommand() {
-        if (commandIterator != null && commandIterator.hasNext()) {
-            return (Command) commandIterator.next();
+    public int getAvgTimeout() {
+        return commands.size() > 0 ? getTotalTimeout() / commands.size() : 0;
+    }
+
+    public CommandImpl getNextCommand() {
+        if (hasNextCommand()) {
+            return commands.get(++currentCmdId);
+        }
+
+        return null;
+    }
+
+    public CommandImpl peekNextCommand() {
+        if (hasNextCommand()) {
+            return commands.get(currentCmdId + 1);
         }
         return null;
     }
 
-    public int getCurrentCommandOrderId() {
-        if (commandIterator != null) {
-            return commandIterator.previousIndex() + 1;
+    public CommandImpl peekPreviousCommand() {
+        if (currentCmdId > 0) {
+            return commands.get(currentCmdId - 1);
         }
-        return -1;
+        return null;
     }
 
-    public Task() {
-        uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
-        reqSeqNumber = 0;
-        commands = new ArrayList<Command>();
+    public CommandImpl peekCurrentCommand() {
+        if (currentCmdId >= 0) {
+            return commands.get(currentCmdId);
+        }
+        return null;
+    }
+
+    public boolean hasNextCommand() {
+        return currentCmdId < commands.size() - 1;
+    }
+
+    public int getLaunchedCommandsCount() {
+        return currentCmdId + 1;
     }
 
     public boolean isIgnoreExitCode() {
@@ -79,7 +140,7 @@ public class Task implements Serializable {
         this.completed = completed;
     }
 
-    public List<Command> getCommands() {
+    public List<CommandImpl> getCommands() {
         return Collections.unmodifiableList(commands);
     }
 
@@ -125,21 +186,25 @@ public class Task implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Task task = (Task) o;
-
-        return !(uuid != null ? !uuid.equals(task.uuid) : task.uuid != null);
+    public int hashCode() {
+        int hash = 5;
+        hash = 67 * hash + (this.uuid != null ? this.uuid.hashCode() : 0);
+        return hash;
     }
 
     @Override
-    public int hashCode() {
-        return uuid != null ? 1 : 0;
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Task other = (Task) obj;
+        if (this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid))) {
+            return false;
+        }
+        return true;
     }
+
 }

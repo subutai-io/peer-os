@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.api.ui;
 
-import java.util.List;
+import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
@@ -8,5 +8,5 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public interface AgentListener {
 
-    public void onAgent(List<Agent> freshAgents);
+    public void onAgent(Set<Agent> freshAgents);
 }

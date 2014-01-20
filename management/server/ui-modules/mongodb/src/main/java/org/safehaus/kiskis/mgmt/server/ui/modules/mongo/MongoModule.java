@@ -1,13 +1,13 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage.Manager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage.Manager;
 
 public class MongoModule implements Module {
 
@@ -19,7 +19,7 @@ public class MongoModule implements Module {
             CommandListener {
 
         private final Wizard wizard;
-        private final Manager mongoManager;
+        private final Manager manager;
 
         public ModuleComponent() {
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -30,9 +30,9 @@ public class MongoModule implements Module {
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
             wizard = new Wizard();
-            mongoManager = new Manager(this);
+            manager = new Manager();
             mongoSheet.addTab(wizard.getContent(), "Install");
-            mongoSheet.addTab(mongoManager.getContent(), "Manage");
+            mongoSheet.addTab(manager.getContent(), "Manage");
 
             verticalLayout.addComponent(mongoSheet);
 
@@ -43,7 +43,7 @@ public class MongoModule implements Module {
         @Override
         public void onCommand(Response response) {
             wizard.onResponse(response);
-            mongoManager.onResponse(response);
+            manager.onResponse(response);
         }
 
         @Override
