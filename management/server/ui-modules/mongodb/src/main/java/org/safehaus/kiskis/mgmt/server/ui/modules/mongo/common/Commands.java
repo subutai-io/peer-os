@@ -21,7 +21,7 @@ public class Commands {
 
     // INSTALLATION COMMANDS ===================================================
     public static Command getTemplate() {
-        return (Command) CommandFactory.createRequest(
+        return CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
                 MongoModule.MODULE_NAME, //     source
