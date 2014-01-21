@@ -41,7 +41,6 @@ public class Wizard implements ResponseListener {
 
         GridLayout content = new GridLayout(1, 2);
         content.setSpacing(true);
-//            gridLayout.setMargin(false, true, true, true);
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setWidth(900, Sizeable.UNITS_PIXELS);
 
