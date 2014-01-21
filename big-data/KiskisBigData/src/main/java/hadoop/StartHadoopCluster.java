@@ -32,12 +32,12 @@ import java.io.IOException;
  */
 public class StartHadoopCluster {
 
-    String inputPathHDFS="/home/emin/dft-input/dft";
-    String inputPathLocal = "/home/emin/Desktop/hadoop_play/dft";
-    String outputPath="/home/emin/dft-output";
-    String mapredJarPath = "/home/emin/workspace/TestLib/target/TestLib-1.0-SNAPSHOT.jar";
+//    String inputPathHDFS="/home/emin/dft-input/dft";
+//    String inputPathLocal = "/home/emin/Desktop/hadoop_play/dft";
+//    String outputPath="/home/emin/dft-output";
+//    String mapredJarPath = "/home/emin/workspace/TestLib/target/TestLib-1.0-SNAPSHOT.jar";
 
-    boolean isLocal = true;
+//    boolean isLocal = true;
     private Configuration conf;
 
     public static void main(String [] args) throws InterruptedException, IOException, ClassNotFoundException {

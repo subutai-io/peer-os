@@ -17,15 +17,18 @@
     <!-- <set-property name="user.agent" value="gecko1_8"/> -->
 
 
+
+    <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
+
     <inherits name="com.github.wolfie.refresher.RefresherApplicationWidgetset" />
 
     <inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" />
 
+    <inherits name="org.tepi.filtertable.gwt.FilterTableWidgetset" />
+
+    
+
     <inherits name="com.vaadin.addon.charts.Widgetset" />
 
     <inherits name="com.vaadin.addon.timeline.gwt.TimelineWidgetSet" />
-
-    <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
-
-    <inherits name="org.tepi.filtertable.gwt.FilterTableWidgetset" />
 </module>

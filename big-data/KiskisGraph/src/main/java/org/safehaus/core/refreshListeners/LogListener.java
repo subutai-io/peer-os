@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.elasticsearch.index.query.QueryBuilders.queryString;
+
 /**
  * ...
  *
@@ -96,6 +98,7 @@ public class LogListener implements Refresher.RefreshListener {
             {
                 queryBuilder = queryBuilder.must(host.getLogHostTermQueryBuilder().get(i));
             }
+            queryBuilder = queryBuilder.must(queryString("path:*log"));
         }
 
         return queryBuilder;

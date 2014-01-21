@@ -55,8 +55,8 @@ public class Log extends VerticalLayout {
 
         Component tab1 = buildNormalTableTab(getNormalFilterTable());
         Component tab2 = buildPagedTableTab(getPagedFilterTable());
-        tabSheet.addTab(tab1,"Normal");
-        tabSheet.addTab(tab2,"Paged");
+        tabSheet.addTab(tab1,"Normal",null);
+        tabSheet.addTab(tab2,"Paged",null);
         addComponent(tabSheet);
     }
 

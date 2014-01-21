@@ -156,6 +156,8 @@
             <artifactId>vaadin-charts-vaadin6</artifactId>
             <version>1.1.4</version>
         </dependency>
+
+
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>refresher</artifactId>

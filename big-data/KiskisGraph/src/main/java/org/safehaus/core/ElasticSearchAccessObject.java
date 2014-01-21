@@ -85,7 +85,7 @@ public class ElasticSearchAccessObject {
         requestBuilder.addSort(fieldSort("@timestamp"));
         requestBuilder.setFrom(lastIndex).setSize(200000);
         requestBuilder.setQuery(queryBuilders);
-       logger.log(Level.INFO, "Full Query: " + requestBuilder.toString());
+        logger.log(Level.INFO, "Full Query: " + requestBuilder.toString());
 
         SearchResponse response= requestBuilder.execute().actionGet();
         logger.log(Level.INFO, "New query is sent with lastIndex: " + lastIndex +" and the total result count is: "+response.getHits().getTotalHits());
@@ -149,26 +149,34 @@ public class ElasticSearchAccessObject {
 
         SearchRequestBuilder requestBuilder = client.prepareSearch("logstash*");
         requestBuilder.setFilter(FilterBuilders.rangeFilter("@timestamp").from(beginTime).to(endTime));
-        requestBuilder.addSort(fieldSort("@timestamp"));
+//        requestBuilder.addSort(fieldSort("@timestamp"));
         requestBuilder.setFrom(lastIndex).setSize(999999);
         requestBuilder.setQuery(queryBuilders);
         logger.log(Level.INFO, "Full Query: " + requestBuilder.toString());
+        SearchResponse searchResponse;
+        try{
+            searchResponse= requestBuilder.execute().actionGet();
+            logger.log(Level.INFO, "New query is sent with lastIndex: " + lastIndex +" and the total result count is: "+searchResponse.getHits().getTotalHits());
+            int diff = searchResponse.getHits().getHits().length;
 
-        SearchResponse searchResponse= requestBuilder.execute().actionGet();
-        logger.log(Level.INFO, "New query is sent with lastIndex: " + lastIndex +" and the total result count is: "+searchResponse.getHits().getTotalHits());
+            for(int i = 0; i<diff; i++)
+            {
+                LogResponse tmp = new LogResponse();
+                tmp.setMessage((String) searchResponse.getHits().getHits()[i].getSource().get("message"));
+                tmp.setHost((String) searchResponse.getHits().getHits()[i].getSource().get("host"));
+                tmp.setPath((String) searchResponse.getHits().getHits()[i].getSource().get("path"));
+                tmp.setTimestamp((String) searchResponse.getHits().getHits()[i].getSource().get("@timestamp"));
+                tmp.setVersion((String) searchResponse.getHits().getHits()[i].getSource().get("@version"));
+                tmp.setType((String) searchResponse.getHits().getHits()[i].getSource().get("type"));
+                list.add(tmp);
 
-        int diff = searchResponse.getHits().getHits().length;
+            }
 
-        for(int i = 0; i<diff; i++)
+        }catch (Exception e)
         {
-            LogResponse tmp = new LogResponse();
-            tmp.setMessage((String) searchResponse.getHits().getHits()[i].getSource().get("message"));
-            tmp.setHost((String) searchResponse.getHits().getHits()[i].getSource().get("host"));
-            tmp.setPath((String) searchResponse.getHits().getHits()[i].getSource().get("path"));
-            tmp.setTimestamp((String) searchResponse.getHits().getHits()[i].getSource().get("@timestamp"));
-            tmp.setVersion((String) searchResponse.getHits().getHits()[i].getSource().get("@version"));
-            tmp.setType((String) searchResponse.getHits().getHits()[i].getSource().get("type"));
-            list.add(tmp);
+            logger.log(Level.SEVERE, "Query exception caught!!!");
+            e.printStackTrace();
+            searchResponse = new SearchResponse();
 
         }
 
