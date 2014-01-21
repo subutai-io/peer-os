@@ -48,12 +48,14 @@ public class InstallationStep extends Panel implements ResponseListener {
     private final Button cancel;
     private final Label indicator;
     private Thread operationTimeoutThread;
-    private final TaskRunner taskRunner = new TaskRunner();
+
     private final AgentManager agentManager;
     private final ClusterConfig config;
+    private final TaskRunner taskRunner;
 
     public InstallationStep(final Wizard wizard) {
         this.config = wizard.getConfig();
+        this.taskRunner = wizard.getTaskRunner();
         agentManager = ServiceLocator.getService(AgentManager.class);
 
         GridLayout content = new GridLayout(20, 3);
@@ -128,7 +130,7 @@ public class InstallationStep extends Panel implements ResponseListener {
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-            
+
             taskRunner.runTask(installOperation.getNextTask(), new TaskCallback() {
                 private final StringBuilder startConfigServersOutput = new StringBuilder();
                 private final StringBuilder startRoutersOutput = new StringBuilder();

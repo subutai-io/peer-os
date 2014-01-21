@@ -14,6 +14,7 @@ import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
@@ -27,11 +28,10 @@ public class Wizard implements ResponseListener {
     private static final int MAX_STEPS = 4;
     private final ProgressIndicator progressBar;
     private final VerticalLayout verticalLayout;
-    private int step = 1;
     private final ClusterConfig config = new ClusterConfig();
     private final VerticalLayout contentRoot;
-//    private Step5 step5;
-    private InstallationStep installationStep;
+    private final TaskRunner taskRunner = new TaskRunner();
+    private int step = 1;
 
     public Wizard() {
         contentRoot = new VerticalLayout();
@@ -116,7 +116,7 @@ public class Wizard implements ResponseListener {
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                installationStep = new InstallationStep(this);
+                InstallationStep installationStep = new InstallationStep(this);
                 verticalLayout.addComponent(installationStep);
                 installationStep.startOperation(true);
                 break;
@@ -127,16 +127,14 @@ public class Wizard implements ResponseListener {
         }
     }
 
+    public TaskRunner getTaskRunner() {
+        return taskRunner;
+    }
+
     @Override
     public void onResponse(Response response) {
-        if (step == 5 && installationStep != null) {
-            installationStep.onResponse(response);
-        }
+        taskRunner.feedResponse(response);
 
     }
 
-//    @Override
-//    public String getSource() {
-//        return MongoModule.MODULE_NAME;
-//    }
 }
