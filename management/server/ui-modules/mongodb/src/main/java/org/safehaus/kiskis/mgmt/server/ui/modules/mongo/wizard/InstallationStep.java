@@ -30,7 +30,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -39,7 +38,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author dilshat
  */
-public class InstallationStep extends Panel implements ResponseListener {
+public class InstallationStep extends Panel {
 
     private static final Logger LOG = Logger.getLogger(InstallationStep.class.getName());
     private final TextArea outputTxtArea;
@@ -251,11 +250,6 @@ public class InstallationStep extends Panel implements ResponseListener {
         indicator.setVisible(false);
         ok.setEnabled(true);
         cancel.setEnabled(true);
-    }
-
-    @Override
-    public void onResponse(Response response) {
-        taskRunner.feedResponse(response);
     }
 
     private void addOutput(String output) {
