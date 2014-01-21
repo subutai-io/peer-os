@@ -98,7 +98,7 @@ public class DestroyWindow extends Window {
         addComponent(content);
     }
 
-    public void startOperation() {
+    void startOperation() {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();

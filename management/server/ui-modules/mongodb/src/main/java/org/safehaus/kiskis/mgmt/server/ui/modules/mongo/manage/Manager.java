@@ -182,13 +182,17 @@ public class Manager implements ResponseListener {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    addNodeWindow = new AddNodeWindow(config, taskRunner);
+                    addNodeWindow = new AddNodeWindow(
+                            config, (MongoClusterInfo) clusterCombo.getValue(), taskRunner);
                     MgmtApplication.addCustomWindow(addNodeWindow);
                     addNodeWindow.addListener(new Window.CloseListener() {
 
                         @Override
                         public void windowClose(Window.CloseEvent e) {
                             //refresh clusters and show the current one again
+                            if (addNodeWindow.isSucceeded()) {
+                                refreshClustersInfo();
+                            }
                             taskRunner.removeAllTaskCallbacks();
                         }
                     });
@@ -408,6 +412,7 @@ public class Manager implements ResponseListener {
                 for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
                     if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
                         clusterCombo.setValue(mongoClusterInfo);
+                        return;
                     }
                 }
             } else {

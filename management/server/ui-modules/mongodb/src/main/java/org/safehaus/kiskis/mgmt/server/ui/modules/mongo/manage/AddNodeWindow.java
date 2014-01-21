@@ -15,7 +15,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -26,6 +29,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
@@ -53,15 +57,17 @@ public class AddNodeWindow extends Window {
     private final TaskRunner taskRunner;
     private final AgentManager agentManager;
     private final ClusterConfig config;
+    private final MongoClusterInfo clusterInfo;
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public AddNodeWindow(ClusterConfig config, TaskRunner taskRunner) {
+    public AddNodeWindow(ClusterConfig config, MongoClusterInfo clusterInfo, TaskRunner taskRunner) {
         super("Add New Node");
         setModal(true);
 
         this.taskRunner = taskRunner;
         this.config = config;
+        this.clusterInfo = clusterInfo;
         agentManager = ServiceLocator.getService(AgentManager.class);
 
         setWidth(650, AddNodeWindow.UNITS_PIXELS);
@@ -145,7 +151,8 @@ public class AddNodeWindow extends Window {
                     //6) find primary node
                     //7) register node with primary
                     //8) adjust db
-                    //9) refresh UI                    
+                    //9) refresh UI         
+                    //********************
                     //add config server:
                     //0) uninstall mongo
                     //1) install mongo
@@ -155,6 +162,7 @@ public class AddNodeWindow extends Window {
                     //5) restart routers with new config server added
                     //6) adjust db
                     //7) refresh UI                    
+                    //********************
                     //add router:
                     //0) uninstall mongo
                     //1) install mongo
@@ -208,7 +216,7 @@ public class AddNodeWindow extends Window {
         getWindow().showNotification(notification);
     }
 
-    public void startOperation(NodeType nodeType, Agent agent) {
+    private void startOperation(final NodeType nodeType, final Agent agent) {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
@@ -224,7 +232,7 @@ public class AddNodeWindow extends Window {
 
             taskRunner.runTask(operation.getNextTask(), new TaskCallback() {
 
-                private StringBuilder stdOutput = new StringBuilder();
+                private final StringBuilder stdOutput = new StringBuilder();
 
                 @Override
                 public void onResponse(Task task, Response response) {
@@ -251,6 +259,18 @@ public class AddNodeWindow extends Window {
                             } else {
                                 task.setTaskStatus(TaskStatus.FAIL);
                             }
+                            stdOutput.setLength(0);
+                        }
+                    } else if (task.getData() == TaskType.START_REPLICA_SET) {
+                        if (!Util.isStringEmpty(response.getStdOut())) {
+                            stdOutput.append(response.getStdOut());
+                        }
+
+                        if (stdOutput.toString().contains("child process started successfully, parent exiting")) {
+                            task.setTaskStatus(TaskStatus.SUCCESS);
+                            task.setCompleted(true);
+                            taskRunner.removeTaskCallback(task.getUuid());
+                            stdOutput.setLength(0);
                         }
                     }
 
@@ -281,8 +301,13 @@ public class AddNodeWindow extends Window {
                                 operation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", operation.getDescription()));
                                 hideProgress();
-                                MongoDAO.deleteMongoClusterInfo(config.getClusterName());
                                 succeeded = true;
+                                if (nodeType == NodeType.DATA_NODE) {
+                                    List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
+                                    dataNodes.add(agent.getUuid());
+                                    clusterInfo.setDataNodes(dataNodes);
+                                    MongoDAO.saveMongoClusterInfo(clusterInfo);
+                                }
                             }
                         } else {
                             operation.setCompleted(true);
