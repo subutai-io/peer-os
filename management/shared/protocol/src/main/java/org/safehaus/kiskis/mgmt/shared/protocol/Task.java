@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 //import java.util.ListIterator;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 /**
  * @author bahadyr
@@ -23,7 +24,7 @@ public class Task implements Serializable {
     private String description;
     private TaskStatus taskStatus;
     private Integer reqSeqNumber;
-    private final List<CommandImpl> commands;
+    private final List<Command> commands;
     private boolean ignoreExitCode = false;
     private boolean completed = false;
     private int currentCmdId = -1;
@@ -35,7 +36,7 @@ public class Task implements Serializable {
         taskStatus = TaskStatus.NEW;
         uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
         reqSeqNumber = 0;
-        commands = new ArrayList<CommandImpl>();
+        commands = new ArrayList<Command>();
     }
 
     public Task(String description) {
@@ -67,7 +68,7 @@ public class Task implements Serializable {
         return succeededCommandsCount;
     }
 
-    public void addCommand(CommandImpl command) {
+    public void addCommand(Command command) {
         if (command != null) {
             command.getRequest().setTaskUuid(uuid);
             command.getRequest().setRequestSequenceNumber(getIncrementedReqSeqNumber());
@@ -77,7 +78,7 @@ public class Task implements Serializable {
 
     public int getTotalTimeout() {
         int timeout = 0;
-        for (CommandImpl cmd : commands) {
+        for (Command cmd : commands) {
             timeout += cmd.getRequest().getTimeout();
         }
         return timeout;
@@ -87,7 +88,7 @@ public class Task implements Serializable {
         return commands.size() > 0 ? getTotalTimeout() / commands.size() : 0;
     }
 
-    public CommandImpl getNextCommand() {
+    public Command getNextCommand() {
         if (hasNextCommand()) {
             return commands.get(++currentCmdId);
         }
@@ -95,21 +96,21 @@ public class Task implements Serializable {
         return null;
     }
 
-    public CommandImpl peekNextCommand() {
+    public Command peekNextCommand() {
         if (hasNextCommand()) {
             return commands.get(currentCmdId + 1);
         }
         return null;
     }
 
-    public CommandImpl peekPreviousCommand() {
+    public Command peekPreviousCommand() {
         if (currentCmdId > 0) {
             return commands.get(currentCmdId - 1);
         }
         return null;
     }
 
-    public CommandImpl peekCurrentCommand() {
+    public Command peekCurrentCommand() {
         if (currentCmdId >= 0) {
             return commands.get(currentCmdId);
         }
@@ -140,7 +141,7 @@ public class Task implements Serializable {
         this.completed = completed;
     }
 
-    public List<CommandImpl> getCommands() {
+    public List<Command> getCommands() {
         return Collections.unmodifiableList(commands);
     }
 

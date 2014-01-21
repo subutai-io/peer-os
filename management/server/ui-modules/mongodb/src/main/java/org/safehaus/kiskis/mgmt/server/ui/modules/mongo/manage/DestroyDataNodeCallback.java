@@ -20,7 +20,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -28,6 +27,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -97,7 +97,7 @@ public class DestroyDataNodeCallback implements TaskCallback {
 //                    parentWindow.showNotification("Failed: Could not find primary node");
 //                } else {
                 if (primaryNodeAgent != null && primaryNodeAgent.getUuid().compareTo(nodeAgent.getUuid()) != 0) {
-                    CommandImpl unregisterSecondaryFromPrimaryCmd = op.peekNextTask().getCommands().iterator().next();
+                    Command unregisterSecondaryFromPrimaryCmd = op.peekNextTask().getCommands().iterator().next();
                     unregisterSecondaryFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
                 } else {
                     //skip unregister command
@@ -132,7 +132,7 @@ public class DestroyDataNodeCallback implements TaskCallback {
                 progressIcon.setVisible(false);
                 checkButton.setEnabled(true);
                 destroyButton.setEnabled(true);
-                
+
                 //show message
                 parentWindow.showNotification(String.format("Failed task %s", task.getDescription()));
             }

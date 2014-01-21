@@ -19,6 +19,7 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.NodesWindow;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 /**
  *
@@ -35,7 +36,7 @@ public class ServiceManager {
     public void runCommand(List<UUID> list, CassandraCommandEnum cce) {
         Task startTask = RequestUtil.createTask("Run command");
         for (UUID uuid : list) {
-            CommandImpl command = new CassandraCommands().getCommand(cce);
+            Command command = new CassandraCommands().getCommand(cce);
             command.getRequest().setUuid(uuid);
             command.getRequest().setTaskUuid(startTask.getUuid());
             command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
@@ -47,7 +48,7 @@ public class ServiceManager {
 
     public void runCommand(UUID agentUuid, CassandraCommandEnum cce) {
         Task startTask = RequestUtil.createTask("Run command");
-        CommandImpl command = new CassandraCommands().getCommand(cce);
+        Command command = new CassandraCommands().getCommand(cce);
         command.getRequest().setUuid(agentUuid);
         command.getRequest().setTaskUuid(startTask.getUuid());
         command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
@@ -59,7 +60,7 @@ public class ServiceManager {
     public void start() {
         moveToNextTask();
         if (currentTask != null) {
-            for (CommandImpl command : currentTask.getCommands()) {
+            for (Command command : currentTask.getCommands()) {
                 executeCommand(command);
             }
         }
@@ -73,14 +74,14 @@ public class ServiceManager {
         return currentTask;
     }
 
-    public void executeCommand(CommandImpl command) {
+    public void executeCommand(Command command) {
         ServiceLocator.getService(CommandManager.class).executeCommand(command);
     }
 
     public void updateSeeds(List<UUID> nodes, String seeds) {
         Task setSeedsTask = RequestUtil.createTask("Update seeds");
         for (UUID agent : nodes) {
-            CommandImpl setSeedsCommand = CassandraCommands.getSetSeedsCommand(seeds);
+            Command setSeedsCommand = CassandraCommands.getSetSeedsCommand(seeds);
             setSeedsCommand.getRequest().setUuid(agent);
             setSeedsCommand.getRequest().setTaskUuid(setSeedsTask.getUuid());
             setSeedsCommand.getRequest().setRequestSequenceNumber(setSeedsTask.getIncrementedReqSeqNumber());

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
@@ -36,14 +37,14 @@ public class RequestUtil {
         return task;
     }
 
-    public static boolean saveCommand(CommandImpl command) {
+    public static boolean saveCommand(Command command) {
         try {
             String cql = "insert into requests (source, reqseqnum, type, agentuuid, taskuuid, "
                     + "workingdirectory, program, outputredirectionstdout, outputredirectionstderr, "
                     + "stdoutpath, erroutpath, runsas, args, environment, pid, timeout) "
                     + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-            Request request = command.getCommand();
+            Request request = command.getRequest();
             dbManager.executeUpdate(cql, request.getSource(), request.getRequestSequenceNumber(),
                     request.getType() + "", request.getUuid(), request.getTaskUuid(), request.getWorkingDirectory(),
                     request.getProgram(), request.getStdOut() + "", request.getStdErr() + "",

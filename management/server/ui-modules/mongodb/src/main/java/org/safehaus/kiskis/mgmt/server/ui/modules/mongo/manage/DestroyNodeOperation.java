@@ -35,7 +35,6 @@ public class DestroyNodeOperation extends Operation {
             addTask(startRoutersTask);
         } else if (nodeType == NodeType.DATA_NODE) {
             Task findPrimaryNodeTask = ManagerTasks.getFindPrimaryNodeTask(nodeAgent);
-            findPrimaryNodeTask.setData(TaskType.FIND_PRIMARY_NODE);
             addTask(findPrimaryNodeTask);
             addTask(ManagerTasks.getUnregisterSecondaryFromPrimaryTask(nodeAgent, nodeAgent));
             addTask(ManagerTasks.getKillRunningMongoTask(Util.wrapAgentToSet(nodeAgent)));

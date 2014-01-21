@@ -18,10 +18,13 @@ import java.text.MessageFormat;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -30,6 +33,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -114,7 +118,7 @@ public class AddNodeWindow extends Window {
         nodeTypeCombo.setValue(NodeType.CONFIG_NODE);
         topContent.addComponent(nodeTypeCombo);
 
-        Button addNodeBtn = new Button("Add");
+        final Button addNodeBtn = new Button("Add");
         topContent.addComponent(addNodeBtn);
 
         addNodeBtn.addListener(new Button.ClickListener() {
@@ -128,7 +132,37 @@ public class AddNodeWindow extends Window {
                 } else if (nodeType == null) {
                     show("Please, select node type");
                 } else {
-                    show("OK");
+                    addNodeBtn.setEnabled(false);
+                    startOperation(nodeType, agent);
+
+                    //add data node:
+                    //0) uninstall mongo
+                    //1) install mongo
+                    //2) stop mongo
+                    //3) register IP
+                    //4) adjust replica set name
+                    //5) start mongo
+                    //6) find primary node
+                    //7) register node with primary
+                    //8) adjust db
+                    //9) refresh UI                    
+                    //add config server:
+                    //0) uninstall mongo
+                    //1) install mongo
+                    //2) stop mongo
+                    //3) register IP
+                    //4) start mongo with custom config
+                    //5) restart routers with new config server added
+                    //6) adjust db
+                    //7) refresh UI                    
+                    //add router:
+                    //0) uninstall mongo
+                    //1) install mongo
+                    //2) stop mongo
+                    //3) register IP
+                    //4) start mongo with custom config
+                    //5) adjust db
+                    //6) refresh UI                    
                 }
             }
         });
@@ -174,21 +208,51 @@ public class AddNodeWindow extends Window {
         getWindow().showNotification(notification);
     }
 
-    public void startOperation() {
+    public void startOperation(NodeType nodeType, Agent agent) {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
-            final Operation installOperation = new UninstallOperation(config);
-            runTimeoutThread(installOperation);
+            final Operation operation
+                    = (nodeType == NodeType.DATA_NODE)
+                    ? new AddDataNodeOperation(config, agent)
+                    : new AddDataNodeOperation(config, agent);
+            runTimeoutThread(operation);
             showProgress();
-            addOutput(String.format("Operation %s started", installOperation.getDescription()));
-            addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
-            addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
+            addOutput(String.format("Operation %s started", operation.getDescription()));
+            addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
+            addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
 
-            taskRunner.runTask(installOperation.getNextTask(), new TaskCallback() {
+            taskRunner.runTask(operation.getNextTask(), new TaskCallback() {
+
+                private StringBuilder stdOutput = new StringBuilder();
 
                 @Override
                 public void onResponse(Task task, Response response) {
+                    if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
+                        if (!Util.isStringEmpty(response.getStdOut())) {
+                            stdOutput.append(response.getStdOut());
+                        }
+
+                        if (task.isCompleted()) {
+                            Agent primaryNodeAgent = null;
+                            Pattern p = Pattern.compile("primary\" : \"(.*)\"");
+                            Matcher m = p.matcher(stdOutput.toString());
+                            if (m.find()) {
+                                String primaryNodeHost = m.group(1);
+                                if (!Util.isStringEmpty(primaryNodeHost)) {
+                                    String hostname = primaryNodeHost.split(":")[0].replace(Constants.DOMAIN, "");
+                                    primaryNodeAgent = agentManager.getAgentByHostname(hostname);
+                                }
+                            }
+
+                            if (primaryNodeAgent != null) {
+                                Command registerSecondaryWithPrimaryCmd = operation.peekNextTask().getCommands().iterator().next();
+                                registerSecondaryWithPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
+                            } else {
+                                task.setTaskStatus(TaskStatus.FAIL);
+                            }
+                        }
+                    }
 
                     Agent agent = agentManager.getAgentByUUID(response.getUuid());
                     addLog(String.format("%s:\n%s\n%s",
@@ -208,21 +272,22 @@ public class AddNodeWindow extends Window {
                     if (task.isCompleted()) {
                         if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                             addOutput(String.format("Task %s succeeded", task.getDescription()));
-                            if (installOperation.hasNextTask()) {
-                                addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
-                                addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-                                taskRunner.runTask(installOperation.getNextTask(), this);
+
+                            if (operation.hasNextTask()) {
+                                addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
+                                addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
+                                taskRunner.runTask(operation.getNextTask(), this);
                             } else {
-                                installOperation.setCompleted(true);
-                                addOutput(String.format("Operation %s completed", installOperation.getDescription()));
+                                operation.setCompleted(true);
+                                addOutput(String.format("Operation %s completed", operation.getDescription()));
                                 hideProgress();
                                 MongoDAO.deleteMongoClusterInfo(config.getClusterName());
                                 succeeded = true;
                             }
                         } else {
-                            installOperation.setCompleted(true);
+                            operation.setCompleted(true);
                             addOutput(String.format("Task %s failed", task.getDescription()));
-                            addOutput(String.format("Operation %s failed", installOperation.getDescription()));
+                            addOutput(String.format("Operation %s failed", operation.getDescription()));
                             hideProgress();
                         }
                     }
