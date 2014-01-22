@@ -16,9 +16,6 @@
           <root url="file://$MODULE_DIR$/src/main/resources" />
         </sourceRoots>
       </configuration>
-      <facet type="Vaadin" name="Vaadin Application">
-        <configuration vaadinUsedWebRootPathUrl="" vaadinGWTLocationPath="" vaadinVMOptions="-Xss8M -Xmx512M -XX:MaxPermSize=512M" vaadinJavaScriptStyle="Obfuscated" vaadinCompilerThreads="" />
-      </facet>
     </facet>
     <facet type="gwt" name="GWT">
       <configuration>
@@ -42,6 +39,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.vaadin.addons:overlays:0.9.8" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch:elasticsearch:0.90.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-core:4.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-analyzers-common:4.4.0" level="project" />
@@ -64,6 +62,7 @@
     <orderEntry type="library" name="Maven: org.vaadin.addons:refresher:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:filteringtable:0.9.1" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:popupbutton:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.vaadin.addons:overlays:0.9.8" level="project" />
   </component>
 </module>
 

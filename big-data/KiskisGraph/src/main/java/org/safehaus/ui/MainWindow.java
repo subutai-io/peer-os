@@ -41,6 +41,7 @@ public class MainWindow extends Window{
     private MonitorTab monitorTab;
     private Logger logger = Logger.getLogger("MainWindowLogger");
     private ReferenceComponent referenceComponent;
+    private static int count = 1;
     public MainWindow()
     {
 

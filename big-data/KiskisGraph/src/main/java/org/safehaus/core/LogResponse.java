@@ -42,6 +42,15 @@ public class LogResponse {
 
     }
 
+    public LogResponse(String message, String timestamp, String version, String type, String host, String path){
+        this.message = message;
+        this.timestamp = timestamp;
+        this.version = version;
+        this.type = type;
+        this.host = host;
+        this.path = path;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -88,5 +97,9 @@ public class LogResponse {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String toString(){
+        return "heyyy";
     }
 }

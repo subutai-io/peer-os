@@ -38,6 +38,7 @@ public class Monitor extends Application {
         setMainWindow(main);
         ReferenceComponent referenceComponent = new ReferenceComponent(this);
         main.initialize(referenceComponent);
+
     }
     public MainWindow getMain() {
         return main;

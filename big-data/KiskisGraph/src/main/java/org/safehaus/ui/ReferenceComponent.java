@@ -21,7 +21,6 @@ package org.safehaus.ui;
 
 import com.vaadin.Application;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Label;
 
 /**
  * ...

@@ -25,7 +25,10 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.safehaus.core.ElasticSearchAccessObject;
 import org.safehaus.core.LogResponse;
 import org.safehaus.core.Timestamp;
-import org.safehaus.ui.*;
+import org.safehaus.ui.Host;
+import org.safehaus.ui.Log;
+import org.safehaus.ui.Monitor;
+import org.safehaus.ui.ReferenceComponent;
 
 import java.util.ArrayList;
 import java.util.logging.Level;

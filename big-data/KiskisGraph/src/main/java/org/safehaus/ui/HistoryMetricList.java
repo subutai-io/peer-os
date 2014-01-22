@@ -23,8 +23,9 @@ import com.vaadin.data.Property;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.core.ElasticSearchAccessObject;
 import org.safehaus.core.Timestamp;
+
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 /**
  * ...
@@ -34,10 +35,31 @@ import org.safehaus.core.Timestamp;
  */
 public class HistoryMetricList extends VerticalLayout implements
         Property.ValueChangeListener {
-    ElasticSearchAccessObject ESAO = new ElasticSearchAccessObject();
     Timestamp currentTime = Timestamp.getCurrentTimestamp();
     private Timestamp lastHour = Timestamp.getHoursEarlier(currentTime,1);
     private ReferenceComponent referenceComponent;
+
+    private enum HistoryMetric {
+        metric1("1 hour",1,1),
+        metric2("2 hours",2,2),
+        metric3("6 hours",6,3),
+        metric4("1 day",24,4),
+        metric5("2 days",24*2,5),
+        metric6("1 week",24*7,6),
+        metric7("2 weeks",24*7*2,7),
+        metric8("1 month",24*7*4,8),
+        ;
+        String name;
+        int hoursEarlier;
+        int id;
+        HistoryMetric(String name, int hoursEarlier, int id)
+        {
+            this.name = name;
+            this.hoursEarlier = hoursEarlier;
+            this.id = id;
+        }
+
+    };
 
     public HistoryMetricList(ReferenceComponent referenceComponent)
     {
@@ -47,22 +69,13 @@ public class HistoryMetricList extends VerticalLayout implements
     {
 
         ComboBox l = new ComboBox("Please select history metric");
-        l.addItem(1);
-        l.addItem(2);
-        l.addItem(3);
-        l.addItem(4);
-        l.addItem(5);
-        l.addItem(6);
-        l.addItem(7);
-        l.addItem(8);
-        l.setItemCaption(1, "1 hour");
-        l.setItemCaption(2, "2 hours");
-        l.setItemCaption(3, "6 hours");
-        l.setItemCaption(4, "1 day");
-        l.setItemCaption(5, "2 days");
-        l.setItemCaption(6, "5 days");
-        l.setItemCaption(7, "1 week");
-        l.setItemCaption(8, "2 weeks");
+
+        //Add metrics to Combobox
+        for(int i = 0 ; i < HistoryMetric.values().length; i++)
+        {
+            l.addItem(i+1);
+            l.setItemCaption(i+1, HistoryMetric.values()[i].name);
+        }
 
         l.setFilteringMode(AbstractSelect.Filtering.FILTERINGMODE_CONTAINS);
         l.setImmediate(true);
@@ -76,41 +89,10 @@ public class HistoryMetricList extends VerticalLayout implements
         currentTime = Timestamp.getCurrentTimestamp();
         setLastHour(Timestamp.getHoursEarlier(currentTime,1));
         MonitorTab monitorTab = ((Monitor) referenceComponent.getApplication()).getMain().getMonitorTab();
-        if(event.getProperty().toString().equalsIgnoreCase("1"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,1));
-        }
-        else if(event.getProperty().toString().equalsIgnoreCase("2"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,2));
-        }
-        else if(event.getProperty().toString().equalsIgnoreCase("3"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,6));
-        }
-        else if(event.getProperty().toString().equalsIgnoreCase("4"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,24));
-        }
-        else if(event.getProperty().toString().equalsIgnoreCase("5"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,48));
-        }
-        else if(event.getProperty().toString().equalsIgnoreCase("6"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,120));
-        }
-        else if(event.getProperty().toString().equalsIgnoreCase("7"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,168));
-        }
-        else if(event.getProperty().toString().equalsIgnoreCase("8"))
-        {
-            setLastHour(Timestamp.getHoursEarlier(currentTime,168*2));
-        }
-        else
-        {
-        }
+        HistoryMetric historyMetric = HistoryMetric.values()[((Integer)event.getProperty().getValue())-1];
+
+        //Change history metric according to history metric change
+        setLastHour(Timestamp.getHoursEarlier(currentTime,historyMetric.hoursEarlier));
         // Update Chart according to the history metric
         monitorTab.updateChart();
 

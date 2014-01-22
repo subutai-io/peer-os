@@ -31,8 +31,6 @@ import org.safehaus.ui.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-
 /**
  * ...
  *
