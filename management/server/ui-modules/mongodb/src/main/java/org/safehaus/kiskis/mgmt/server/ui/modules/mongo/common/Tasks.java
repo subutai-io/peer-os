@@ -3,13 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import java.util.Iterator;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -20,7 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  */
-public class InstallTasks {
+public class Tasks {
 
     public static Task getKillRunningMongoTask(Set<Agent> agents) {
         Task task = new Task("Kill running mongo");
@@ -216,6 +213,45 @@ public class InstallTasks {
                 shard.toString());
         cmd.getRequest().setUuid(router.getUuid());
         task.addCommand(cmd);
+        return task;
+    }
+
+    public static Task getFindPrimaryNodeTask(Agent secondaryNode) {
+        Task task = new Task("Find primary node");
+        Command cmd = Commands.getFindPrimaryNodeCommand();
+        cmd.getRequest().setUuid(secondaryNode.getUuid());
+        task.addCommand(cmd);
+        task.setData(TaskType.FIND_PRIMARY_NODE);
+        return task;
+    }
+
+    public static Task getUnregisterSecondaryFromPrimaryTask(Agent primaryNode, Agent secondaryNode) {
+        Task task = new Task("Unregister secondary node from primary");
+        Command cmd = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
+                String.format("%s%s", secondaryNode.getHostname(), Constants.DOMAIN));
+        cmd.getRequest().setUuid(primaryNode.getUuid());
+        task.addCommand(cmd);
+        task.setIgnoreExitCode(true);
+        return task;
+    }
+
+    public static Task getCheckStatusTask(Set<Agent> agents, NodeType nodeType) {
+        Task task = new Task("Check status");
+        for (Agent agent : agents) {
+            Command cmd;
+            if (nodeType == NodeType.CONFIG_NODE) {
+                cmd = Commands.getCheckConfigSrvStatusCommand(
+                        String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
+            } else if (nodeType == NodeType.ROUTER_NODE) {
+                cmd = Commands.getCheckRouterStatusCommand(
+                        String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
+            } else {
+                cmd = Commands.getCheckDataNodeStatusCommand(
+                        String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
+            }
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
         return task;
     }
 }

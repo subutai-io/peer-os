@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage.Manager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.Manager;
 
 public class MongoModule implements Module {
 

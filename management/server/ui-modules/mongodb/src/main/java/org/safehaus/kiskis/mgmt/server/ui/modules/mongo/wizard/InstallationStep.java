@@ -18,11 +18,11 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
@@ -123,7 +123,7 @@ public class InstallationStep extends Panel {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
-            final Operation installOperation = install ? new InstallOperation(config) : new UninstallOperation(config);
+            final Operation installOperation = install ? new InstallClusterOperation(config) : new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));

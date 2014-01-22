@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class InstallOperation extends Operation {
+public class InstallClusterOperation extends Operation {
 
     private final ClusterConfig config;
 
@@ -23,7 +24,7 @@ public class InstallOperation extends Operation {
         return config;
     }
 
-    public InstallOperation(ClusterConfig config) {
+    public InstallClusterOperation(ClusterConfig config) {
         super("Install Mongo cluster");
         this.config = config;
 
@@ -32,38 +33,38 @@ public class InstallOperation extends Operation {
         clusterMembers.addAll(config.getRouterServers());
         clusterMembers.addAll(config.getDataNodes());
 
-        addTask(InstallTasks.getKillRunningMongoTask(clusterMembers));
+        addTask(Tasks.getKillRunningMongoTask(clusterMembers));
 
-        addTask(InstallTasks.getUninstallMongoTask(clusterMembers));
+        addTask(Tasks.getUninstallMongoTask(clusterMembers));
 
-        addTask(InstallTasks.getCleanMongoDataTask(clusterMembers));
+        addTask(Tasks.getCleanMongoDataTask(clusterMembers));
 
-        addTask(InstallTasks.getAptGetUpdateTask(clusterMembers));
+        addTask(Tasks.getAptGetUpdateTask(clusterMembers));
 
-        addTask(InstallTasks.getInstallMongoTask(clusterMembers));
+        addTask(Tasks.getInstallMongoTask(clusterMembers));
 
-        addTask(InstallTasks.getStopMongoTask(clusterMembers));
+        addTask(Tasks.getStopMongoTask(clusterMembers));
 
-        addTask(InstallTasks.getRegisterIpsTask(clusterMembers));
+        addTask(Tasks.getRegisterIpsTask(clusterMembers));
 
-        addTask(InstallTasks.getSetReplicaSetNameTask(
+        addTask(Tasks.getSetReplicaSetNameTask(
                 config.getReplicaSetName(),
                 config.getDataNodes()));
 
-        addTask(InstallTasks.getStartConfigServersTask(
+        addTask(Tasks.getStartConfigServersTask(
                 config.getConfigServers()));
 
-        addTask(InstallTasks.getStartRoutersTask(
+        addTask(Tasks.getStartRoutersTask(
                 config.getRouterServers(),
                 config.getConfigServers()));
 
-        addTask(InstallTasks.getStartReplicaSetTask(
+        addTask(Tasks.getStartReplicaSetTask(
                 config.getDataNodes()));
 
-        addTask(InstallTasks.getRegisterSecondaryNodesWithPrimaryTask(
+        addTask(Tasks.getRegisterSecondaryNodesWithPrimaryTask(
                 config.getDataNodes()));
 
-        addTask(InstallTasks.getRegisterReplicaSetAsShardWithRouter(
+        addTask(Tasks.getRegisterReplicaSetAsShardWithRouter(
                 config.getReplicaSetName(),
                 config.getRouterServers().iterator().next(),
                 config.getDataNodes()));

@@ -3,8 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.AddConfigSrvOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.AddRouterOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.AddDataNodeOperation;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -140,37 +144,6 @@ public class AddNodeWindow extends Window {
                 } else {
                     addNodeBtn.setEnabled(false);
                     startOperation(nodeType, agent);
-
-                    //add data node:
-                    //0) uninstall mongo
-                    //1) install mongo
-                    //2) stop mongo
-                    //3) register IP
-                    //4) adjust replica set name
-                    //5) start mongo
-                    //6) find primary node
-                    //7) register node with primary
-                    //8) adjust db
-                    //9) refresh UI         
-                    //********************
-                    //add config server:
-                    //0) uninstall mongo
-                    //1) install mongo
-                    //2) stop mongo
-                    //3) register IP
-                    //4) start mongo with custom config
-                    //5) restart routers with new config server added
-                    //6) adjust db
-                    //7) refresh UI                    
-                    //********************
-                    //add router:
-                    //0) uninstall mongo
-                    //1) install mongo
-                    //2) stop mongo
-                    //3) register IP
-                    //4) start mongo with custom config
-                    //5) adjust db
-                    //6) refresh UI                    
                 }
             }
         });
@@ -223,7 +196,9 @@ public class AddNodeWindow extends Window {
             final Operation operation
                     = (nodeType == NodeType.DATA_NODE)
                     ? new AddDataNodeOperation(config, agent)
-                    : new AddDataNodeOperation(config, agent);
+                    : (nodeType == NodeType.CONFIG_NODE)
+                    ? new AddConfigSrvOperation(config, agent)
+                    : new AddRouterOperation(config, agent);
             runTimeoutThread(operation);
             showProgress();
             addOutput(String.format("Operation %s started", operation.getDescription()));
@@ -304,14 +279,18 @@ public class AddNodeWindow extends Window {
                                 succeeded = true;
                                 if (nodeType == NodeType.DATA_NODE) {
                                     List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
-                                    System.out.println("===================");
-                                    System.out.println(dataNodes);
                                     dataNodes.add(agent.getUuid());
-                                    System.out.println("===================");
-                                    System.out.println(dataNodes);
-                                    System.out.println("===================");
                                     clusterInfo.setDataNodes(dataNodes);
-                                    System.out.println(clusterInfo.getDataNodes());
+                                    MongoDAO.saveMongoClusterInfo(clusterInfo);
+                                } else if (nodeType == NodeType.CONFIG_NODE) {
+                                    List<UUID> cfgServers = new ArrayList<UUID>(clusterInfo.getConfigServers());
+                                    cfgServers.add(agent.getUuid());
+                                    clusterInfo.setConfigServers(cfgServers);
+                                    MongoDAO.saveMongoClusterInfo(clusterInfo);
+                                } else if (nodeType == NodeType.ROUTER_NODE) {
+                                    List<UUID> routers = new ArrayList<UUID>(clusterInfo.getRouters());
+                                    routers.add(agent.getUuid());
+                                    clusterInfo.setRouters(routers);
                                     MongoDAO.saveMongoClusterInfo(clusterInfo);
                                 }
                             }

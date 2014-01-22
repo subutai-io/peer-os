@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallTasks;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -29,32 +29,32 @@ public class AddDataNodeOperation extends Operation {
 
         clusterMembers.add(agent);
 
-        addTask(InstallTasks.getKillRunningMongoTask(Util.wrapAgentToSet(agent)));
+        addTask(Tasks.getKillRunningMongoTask(Util.wrapAgentToSet(agent)));
 
-        addTask(InstallTasks.getUninstallMongoTask(Util.wrapAgentToSet(agent)));
+        addTask(Tasks.getUninstallMongoTask(Util.wrapAgentToSet(agent)));
 
-        addTask(InstallTasks.getCleanMongoDataTask(Util.wrapAgentToSet(agent)));
+        addTask(Tasks.getCleanMongoDataTask(Util.wrapAgentToSet(agent)));
 
-        addTask(InstallTasks.getAptGetUpdateTask(Util.wrapAgentToSet(agent)));
+        addTask(Tasks.getAptGetUpdateTask(Util.wrapAgentToSet(agent)));
 
-        addTask(InstallTasks.getInstallMongoTask(Util.wrapAgentToSet(agent)));
+        addTask(Tasks.getInstallMongoTask(Util.wrapAgentToSet(agent)));
 
-        addTask(InstallTasks.getStopMongoTask(Util.wrapAgentToSet(agent)));
+        addTask(Tasks.getStopMongoTask(Util.wrapAgentToSet(agent)));
 
-        addTask(InstallTasks.getRegisterIpsTask(clusterMembers));
+        addTask(Tasks.getRegisterIpsTask(clusterMembers));
 
-        addTask(InstallTasks.getSetReplicaSetNameTask(
+        addTask(Tasks.getSetReplicaSetNameTask(
                 config.getReplicaSetName(),
                 Util.wrapAgentToSet(agent)));
 
-        addTask(InstallTasks.getStartReplicaSetTask(
+        addTask(Tasks.getStartReplicaSetTask(
                 Util.wrapAgentToSet(agent)));
 
         //find primary node task
-        addTask(ManagerTasks.getFindPrimaryNodeTask(config.getDataNodes().iterator().next()));
+        addTask(Tasks.getFindPrimaryNodeTask(config.getDataNodes().iterator().next()));
 
         //adjust uuid with real primary agent uuid during the operation
-        addTask(InstallTasks.getRegisterSecondaryNodeWithPrimaryTask(agent,
+        addTask(Tasks.getRegisterSecondaryNodeWithPrimaryTask(agent,
                 agent));
 
     }

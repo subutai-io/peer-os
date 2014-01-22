@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -35,9 +35,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author dilshat
  */
-public class DestroyWindow extends Window {
+public class DestroyClusterWindow extends Window {
 
-    private static final Logger LOG = Logger.getLogger(DestroyWindow.class.getName());
+    private static final Logger LOG = Logger.getLogger(DestroyClusterWindow.class.getName());
 
     private final TextArea outputTxtArea;
     private final TextArea logTextArea;
@@ -49,7 +49,7 @@ public class DestroyWindow extends Window {
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public DestroyWindow(ClusterConfig config, TaskRunner taskRunner) {
+    public DestroyClusterWindow(ClusterConfig config, TaskRunner taskRunner) {
         super("Cluster uninstallation");
         setModal(true);
 
@@ -57,7 +57,7 @@ public class DestroyWindow extends Window {
         this.config = config;
         agentManager = ServiceLocator.getService(AgentManager.class);
 
-        setWidth(600, DestroyWindow.UNITS_PIXELS);
+        setWidth(600, DestroyClusterWindow.UNITS_PIXELS);
 
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
@@ -102,7 +102,7 @@ public class DestroyWindow extends Window {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
-            final Operation installOperation = new UninstallOperation(config);
+            final Operation installOperation = new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
