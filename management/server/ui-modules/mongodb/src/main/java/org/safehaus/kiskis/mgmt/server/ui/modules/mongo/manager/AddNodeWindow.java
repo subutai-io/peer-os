@@ -125,7 +125,7 @@ public class AddNodeWindow extends Window {
         nodeTypeCombo.setItemCaption(NodeType.ROUTER_NODE, "Add as Router Server");
         nodeTypeCombo.addItem(NodeType.DATA_NODE);
         nodeTypeCombo.setItemCaption(NodeType.DATA_NODE, "Add as Data Node");
-        nodeTypeCombo.setValue(NodeType.CONFIG_NODE);
+        nodeTypeCombo.setValue(NodeType.DATA_NODE);
         topContent.addComponent(nodeTypeCombo);
 
         final Button addNodeBtn = new Button("Add");
