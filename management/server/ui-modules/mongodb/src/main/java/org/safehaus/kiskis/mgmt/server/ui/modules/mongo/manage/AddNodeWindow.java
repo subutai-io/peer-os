@@ -113,7 +113,7 @@ public class AddNodeWindow extends Window {
         nodeTypeCombo.setMultiSelect(false);
         nodeTypeCombo.setImmediate(true);
         nodeTypeCombo.setTextInputAllowed(false);
-        nodeTypeCombo.setWidth(200, Sizeable.UNITS_PIXELS);
+        nodeTypeCombo.setWidth(150, Sizeable.UNITS_PIXELS);
 
         nodeTypeCombo.addItem(NodeType.CONFIG_NODE);
         nodeTypeCombo.setItemCaption(NodeType.CONFIG_NODE, "Add as Config Server");
@@ -274,10 +274,10 @@ public class AddNodeWindow extends Window {
                         }
                     }
 
-                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
+                    Agent responseAgent = agentManager.getAgentByUUID(response.getUuid());
                     addLog(String.format("%s:\n%s\n%s",
-                            agent != null
-                            ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
+                            responseAgent != null
+                            ? responseAgent.getHostname() : String.format("Offline[%s]", response.getUuid()),
                             Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
                             Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
 
@@ -304,8 +304,14 @@ public class AddNodeWindow extends Window {
                                 succeeded = true;
                                 if (nodeType == NodeType.DATA_NODE) {
                                     List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
+                                    System.out.println("===================");
+                                    System.out.println(dataNodes);
                                     dataNodes.add(agent.getUuid());
+                                    System.out.println("===================");
+                                    System.out.println(dataNodes);
+                                    System.out.println("===================");
                                     clusterInfo.setDataNodes(dataNodes);
+                                    System.out.println(clusterInfo.getDataNodes());
                                     MongoDAO.saveMongoClusterInfo(clusterInfo);
                                 }
                             }
