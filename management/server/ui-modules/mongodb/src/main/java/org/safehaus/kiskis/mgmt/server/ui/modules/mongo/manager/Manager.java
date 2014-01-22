@@ -3,8 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyCfgSrvCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.CheckStatusCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyDataNodeCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StopNodeCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyRouterCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StartNodeCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.DestroyNodeOperation;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
@@ -31,6 +39,7 @@ import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
@@ -38,6 +47,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
@@ -62,7 +72,8 @@ public class Manager implements ResponseListener {
     private final Table routersTable;
     private final Table dataNodesTable;
     private final TaskRunner taskRunner = new TaskRunner();
-    private DestroyWindow destroyWindow;
+    private DestroyClusterWindow destroyWindow;
+    private AddNodeWindow addNodeWindow;
     private ClusterConfig config;
 
     public Manager() {
@@ -149,7 +160,7 @@ public class Manager implements ResponseListener {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        destroyWindow = new DestroyWindow(config, taskRunner);
+                                        destroyWindow = new DestroyClusterWindow(config, taskRunner);
                                         MgmtApplication.addCustomWindow(destroyWindow);
                                         destroyWindow.addListener(new Window.CloseListener() {
 
@@ -158,6 +169,7 @@ public class Manager implements ResponseListener {
                                                 if (destroyWindow.isSucceeded()) {
                                                     refreshClustersInfo();
                                                 }
+                                                taskRunner.removeAllTaskCallbacks();
                                             }
                                         });
                                         destroyWindow.startOperation();
@@ -172,6 +184,35 @@ public class Manager implements ResponseListener {
         });
 
         topContent.addComponent(destroyClusterBtn);
+
+        Button addNodeBtn = new Button("Add New Node");
+
+        addNodeBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+                    addNodeWindow = new AddNodeWindow(
+                            config, (MongoClusterInfo) clusterCombo.getValue(), taskRunner);
+                    MgmtApplication.addCustomWindow(addNodeWindow);
+                    addNodeWindow.addListener(new Window.CloseListener() {
+
+                        @Override
+                        public void windowClose(Window.CloseEvent e) {
+                            //refresh clusters and show the current one again
+                            if (addNodeWindow.isSucceeded()) {
+                                refreshClustersInfo();
+                            }
+                            taskRunner.removeAllTaskCallbacks();
+                        }
+                    });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+        });
+
+        topContent.addComponent(addNodeBtn);
 
         content.addComponent(topContent);
 
@@ -230,7 +271,7 @@ public class Manager implements ResponseListener {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Task checkStatusTask = ManagerTasks.getCheckStatusTask(
+                    Task checkStatusTask = Tasks.getCheckStatusTask(
                             new HashSet<Agent>(Arrays.asList(agent)),
                             nodeType);
                     taskRunner.runTask(checkStatusTask, new CheckStatusCallback(taskRunner, progressIcon, startBtn, stopBtn, destroyBtn));
@@ -243,17 +284,17 @@ public class Manager implements ResponseListener {
                 public void buttonClick(Button.ClickEvent event) {
                     Task startNodeTask = null;
                     if (nodeType == NodeType.CONFIG_NODE) {
-                        startNodeTask = ManagerTasks.getStartConfigSrvTask(
-                                new HashSet<Agent>(Arrays.asList(agent)));
+                        startNodeTask = Tasks.getStartConfigServersTask(
+                                Util.wrapAgentToSet(agent));
 
                     } else if (nodeType == NodeType.DATA_NODE) {
 
-                        startNodeTask = ManagerTasks.getStartDataNodeTask(
-                                new HashSet<Agent>(Arrays.asList(agent)));
+                        startNodeTask = Tasks.getStartReplicaSetTask(
+                                Util.wrapAgentToSet(agent));
 
                     } else if (nodeType == NodeType.ROUTER_NODE) {
-                        startNodeTask = ManagerTasks.getStartRouterTask(
-                                new HashSet<Agent>(Arrays.asList(agent)),
+                        startNodeTask = Tasks.getStartRoutersTask(
+                                Util.wrapAgentToSet(agent),
                                 config.getConfigServers());
 
                     }
@@ -268,8 +309,8 @@ public class Manager implements ResponseListener {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Task stopNodeTask = ManagerTasks.getStopNodeTask(
-                            new HashSet<Agent>(Arrays.asList(agent)));
+                    Task stopNodeTask = Tasks.getStopMongoTask(
+                            Util.wrapAgentToSet(agent));
 
                     taskRunner.runTask(stopNodeTask,
                             new StopNodeCallback(progressIcon, checkBtn, startBtn, stopBtn, destroyBtn));
@@ -369,12 +410,23 @@ public class Manager implements ResponseListener {
 
     private void refreshClustersInfo() {
         List<MongoClusterInfo> mongoClusterInfos = MongoDAO.getMongoClustersInfo();
+        MongoClusterInfo clusterInfo = (MongoClusterInfo) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null) {
             for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
                 clusterCombo.addItem(mongoClusterInfo);
                 clusterCombo.setItemCaption(mongoClusterInfo,
                         String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
+            }
+            if (clusterInfo != null) {
+                for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
+                    if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+                        clusterCombo.setValue(mongoClusterInfo);
+                        return;
+                    }
+                }
+            } else {
+                clusterCombo.setValue(mongoClusterInfos.iterator().next());
             }
         }
     }

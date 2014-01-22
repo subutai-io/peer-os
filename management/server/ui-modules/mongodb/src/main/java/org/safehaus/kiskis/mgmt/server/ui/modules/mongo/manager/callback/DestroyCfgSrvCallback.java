@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
@@ -16,6 +16,7 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.Manager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;

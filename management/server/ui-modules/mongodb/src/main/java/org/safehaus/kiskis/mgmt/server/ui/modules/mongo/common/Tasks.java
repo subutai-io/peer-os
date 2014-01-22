@@ -3,29 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import java.util.Iterator;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Commands;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
  * @author dilshat
  */
-public class InstallTasks {
+public class Tasks {
 
     public static Task getKillRunningMongoTask(Set<Agent> agents) {
         Task task = new Task("Kill running mongo");
         for (Agent agent : agents) {
-            CommandImpl cmd = Commands.getKillAllCommand();
+            Command cmd = Commands.getKillAllCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -37,7 +34,7 @@ public class InstallTasks {
     public static Task getUninstallMongoTask(Set<Agent> agents) {
         Task task = new Task("Uninstall existing Mongo");
         for (Agent agent : agents) {
-            CommandImpl cmd = Commands.getUninstallCommand();
+            Command cmd = Commands.getUninstallCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -49,7 +46,7 @@ public class InstallTasks {
     public static Task getCleanMongoDataTask(Set<Agent> agents) {
         Task task = new Task("Clean previous Mongo data");
         for (Agent agent : agents) {
-            CommandImpl cmd = Commands.getCleanCommand();
+            Command cmd = Commands.getCleanCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -61,7 +58,7 @@ public class InstallTasks {
     public static Task getAptGetUpdateTask(Set<Agent> agents) {
         Task task = new Task("Apt-get update");
         for (Agent agent : agents) {
-            CommandImpl cmd = Commands.getAptGetUpdateCommand();
+            Command cmd = Commands.getAptGetUpdateCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -71,7 +68,7 @@ public class InstallTasks {
     public static Task getInstallMongoTask(Set<Agent> agents) {
         Task task = new Task("Install mongo");
         for (Agent agent : agents) {
-            CommandImpl cmd = Commands.getInstallCommand2();
+            Command cmd = Commands.getInstallCommand2();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -81,7 +78,7 @@ public class InstallTasks {
     public static Task getStopMongoTask(Set<Agent> agents) {
         Task task = new Task("Stop mongo");
         for (Agent agent : agents) {
-            CommandImpl cmd = Commands.getStopNodeCommand();
+            Command cmd = Commands.getStopNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -116,7 +113,7 @@ public class InstallTasks {
                 cleanHosts.append("' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;");
                 appendHosts.insert(0, cleanHosts);
             }
-            CommandImpl cmd = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
+            Command cmd = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -126,7 +123,7 @@ public class InstallTasks {
     public static Task getSetReplicaSetNameTask(String replicaSetName, Set<Agent> dataNodes) {
         Task task = new Task(String.format("Set replica set name to %s", replicaSetName));
         for (Agent agent : dataNodes) {
-            CommandImpl cmd = Commands.getSetReplicaSetNameCommand(replicaSetName);
+            Command cmd = Commands.getSetReplicaSetNameCommand(replicaSetName);
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -136,7 +133,7 @@ public class InstallTasks {
     public static Task getStartConfigServersTask(Set<Agent> configServers) {
         Task task = new Task("Start config servers");
         for (Agent agent : configServers) {
-            CommandImpl cmd = Commands.getStartConfigServerCommand();
+            Command cmd = Commands.getStartConfigServerCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -156,7 +153,7 @@ public class InstallTasks {
             configServersArg.setLength(configServersArg.length() - 1);
         }
         for (Agent agent : routers) {
-            CommandImpl cmd = Commands.getStartRouterCommand(configServersArg.toString());
+            Command cmd = Commands.getStartRouterCommand(configServersArg.toString());
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -167,7 +164,7 @@ public class InstallTasks {
     public static Task getStartReplicaSetTask(Set<Agent> dataNodes) {
         Task task = new Task("Start replica set");
         for (Agent agent : dataNodes) {
-            CommandImpl cmd = Commands.getStartNodeCommand();
+            Command cmd = Commands.getStartNodeCommand();
             cmd.getRequest().setUuid(agent.getUuid());
             task.addCommand(cmd);
         }
@@ -186,7 +183,19 @@ public class InstallTasks {
                     append(secondaryNodeAgent.getHostname()).append(Constants.DOMAIN).
                     append(":").append(Constants.DATA_NODE_PORT).append("');");
         }
-        CommandImpl cmd = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString());
+        Command cmd = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString());
+        cmd.getRequest().setUuid(primaryNodeAgent.getUuid());
+        task.addCommand(cmd);
+        return task;
+    }
+
+    public static Task getRegisterSecondaryNodeWithPrimaryTask(Agent primaryNodeAgent, Agent secondaryNodeAgent) {
+        Task task = new Task("Register secondary node with primary");
+        StringBuilder secondaryStr = new StringBuilder();
+        secondaryStr.append("rs.add('").
+                append(secondaryNodeAgent.getHostname()).append(Constants.DOMAIN).
+                append(":").append(Constants.DATA_NODE_PORT).append("');");
+        Command cmd = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString());
         cmd.getRequest().setUuid(primaryNodeAgent.getUuid());
         task.addCommand(cmd);
         return task;
@@ -200,10 +209,49 @@ public class InstallTasks {
                     append("/").append(agent.getHostname()).append(Constants.DOMAIN).
                     append(":").append(Constants.DATA_NODE_PORT).append("');");
         }
-        CommandImpl cmd = Commands.getRegisterShardsWithRouterCommand(
+        Command cmd = Commands.getRegisterShardsWithRouterCommand(
                 shard.toString());
         cmd.getRequest().setUuid(router.getUuid());
         task.addCommand(cmd);
+        return task;
+    }
+
+    public static Task getFindPrimaryNodeTask(Agent secondaryNode) {
+        Task task = new Task("Find primary node");
+        Command cmd = Commands.getFindPrimaryNodeCommand();
+        cmd.getRequest().setUuid(secondaryNode.getUuid());
+        task.addCommand(cmd);
+        task.setData(TaskType.FIND_PRIMARY_NODE);
+        return task;
+    }
+
+    public static Task getUnregisterSecondaryFromPrimaryTask(Agent primaryNode, Agent secondaryNode) {
+        Task task = new Task("Unregister secondary node from primary");
+        Command cmd = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
+                String.format("%s%s", secondaryNode.getHostname(), Constants.DOMAIN));
+        cmd.getRequest().setUuid(primaryNode.getUuid());
+        task.addCommand(cmd);
+        task.setIgnoreExitCode(true);
+        return task;
+    }
+
+    public static Task getCheckStatusTask(Set<Agent> agents, NodeType nodeType) {
+        Task task = new Task("Check status");
+        for (Agent agent : agents) {
+            Command cmd;
+            if (nodeType == NodeType.CONFIG_NODE) {
+                cmd = Commands.getCheckConfigSrvStatusCommand(
+                        String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
+            } else if (nodeType == NodeType.ROUTER_NODE) {
+                cmd = Commands.getCheckRouterStatusCommand(
+                        String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
+            } else {
+                cmd = Commands.getCheckDataNodeStatusCommand(
+                        String.format("%s%s", agent.getHostname(), Constants.DOMAIN));
+            }
+            cmd.getRequest().setUuid(agent.getUuid());
+            task.addCommand(cmd);
+        }
         return task;
     }
 }

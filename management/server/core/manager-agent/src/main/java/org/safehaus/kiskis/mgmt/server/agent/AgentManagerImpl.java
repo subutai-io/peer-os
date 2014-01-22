@@ -22,11 +22,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
@@ -290,7 +291,13 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
         request.setUuid(agentUUID);
         request.setStdErr(OutputRedirection.NO);
         request.setStdOut(OutputRedirection.NO);
-        CommandImpl command = new CommandImpl(request);
+        Command command = CommandFactory.createRequest(
+                RequestType.REGISTRATION_REQUEST_DONE,
+                agentUUID,
+                null, null, null, null, null,
+                OutputRedirection.NO,
+                OutputRedirection.RETURN,
+                null, null, null, null, null, null);
         communicationService.sendCommand(command);
     }
 

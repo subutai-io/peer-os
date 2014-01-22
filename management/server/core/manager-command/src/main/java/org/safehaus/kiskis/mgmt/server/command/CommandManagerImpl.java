@@ -11,9 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
@@ -31,7 +31,7 @@ public class CommandManagerImpl implements ResponseListener, org.safehaus.kiskis
     private CommandNotifier commandNotifier;
 
     @Override
-    public boolean executeCommand(CommandImpl command) {
+    public boolean executeCommand(Command command) {
         try {
             RequestUtil.saveCommand(command);//temporary until parseTask is removed
             communicationService.sendCommand(command);

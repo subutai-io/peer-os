@@ -7,8 +7,7 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 /**
- * @author dilshat
- *         Wrapper object for proper JSON generation
+ * @author dilshat Wrapper object for proper JSON generation
  */
 public class CommandImpl implements Command {
 
@@ -23,24 +22,14 @@ public class CommandImpl implements Command {
         }
     }
 
-    public Request getCommand() {
-        return command;
-    }
-
-    public void setCommand(Request command) {
-        this.command = command;
-    }
-
+    @Override
     public Response getResponse() {
         return response;
     }
 
+    @Override
     public Request getRequest() {
         return command;
-    }
-
-    public void setResponse(Response response) {
-        this.response = response;
     }
 
 }

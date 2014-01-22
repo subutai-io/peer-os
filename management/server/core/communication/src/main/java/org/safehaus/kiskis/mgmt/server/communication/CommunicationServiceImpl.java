@@ -6,7 +6,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
@@ -18,6 +17,7 @@ import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 //check branch
 
@@ -95,15 +95,15 @@ public class CommunicationServiceImpl implements CommunicationService {
     }
 
     @Override
-    public void sendCommand(CommandImpl command) {
+    public void sendCommand(Command command) {
         exec.submit(new CommandProducer(command));
     }
 
     public class CommandProducer implements Runnable {
 
-        CommandImpl command;
+        Command command;
 
-        public CommandProducer(CommandImpl command) {
+        public CommandProducer(Command command) {
             this.command = command;
         }
 
@@ -115,7 +115,7 @@ public class CommunicationServiceImpl implements CommunicationService {
                 connection = pooledConnectionFactory.createConnection();
                 connection.start();
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                Destination destination = session.createQueue(command.getCommand().getUuid().toString());
+                Destination destination = session.createQueue(command.getRequest().getUuid().toString());
                 producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);

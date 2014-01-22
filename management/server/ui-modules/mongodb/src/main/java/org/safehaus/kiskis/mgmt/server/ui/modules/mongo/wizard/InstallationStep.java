@@ -18,11 +18,11 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.InstallOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
@@ -30,7 +30,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -39,7 +38,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author dilshat
  */
-public class InstallationStep extends Panel implements ResponseListener {
+public class InstallationStep extends Panel {
 
     private static final Logger LOG = Logger.getLogger(InstallationStep.class.getName());
     private final TextArea outputTxtArea;
@@ -48,12 +47,14 @@ public class InstallationStep extends Panel implements ResponseListener {
     private final Button cancel;
     private final Label indicator;
     private Thread operationTimeoutThread;
-    private final TaskRunner taskRunner = new TaskRunner();
+
     private final AgentManager agentManager;
     private final ClusterConfig config;
+    private final TaskRunner taskRunner;
 
     public InstallationStep(final Wizard wizard) {
         this.config = wizard.getConfig();
+        this.taskRunner = wizard.getTaskRunner();
         agentManager = ServiceLocator.getService(AgentManager.class);
 
         GridLayout content = new GridLayout(20, 3);
@@ -61,7 +62,7 @@ public class InstallationStep extends Panel implements ResponseListener {
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Installation output");
+        outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setRows(17);
         outputTxtArea.setColumns(60);
         outputTxtArea.setImmediate(true);
@@ -106,7 +107,7 @@ public class InstallationStep extends Panel implements ResponseListener {
         content.addComponent(indicator, 19, 0, 19, 0);
         content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
-        logTextArea = new TextArea("Command output");
+        logTextArea = new TextArea("Node output");
         logTextArea.setRows(17);
         logTextArea.setColumns(60);
         logTextArea.setImmediate(true);
@@ -122,13 +123,13 @@ public class InstallationStep extends Panel implements ResponseListener {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
-            final Operation installOperation = install ? new InstallOperation(config) : new UninstallOperation(config);
+            final Operation installOperation = install ? new InstallClusterOperation(config) : new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-            
+
             taskRunner.runTask(installOperation.getNextTask(), new TaskCallback() {
                 private final StringBuilder startConfigServersOutput = new StringBuilder();
                 private final StringBuilder startRoutersOutput = new StringBuilder();
@@ -249,11 +250,6 @@ public class InstallationStep extends Panel implements ResponseListener {
         indicator.setVisible(false);
         ok.setEnabled(true);
         cancel.setEnabled(true);
-    }
-
-    @Override
-    public void onResponse(Response response) {
-        taskRunner.feedResponse(response);
     }
 
     private void addOutput(String output) {

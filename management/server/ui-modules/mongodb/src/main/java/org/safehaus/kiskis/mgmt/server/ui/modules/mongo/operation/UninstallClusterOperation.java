@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import java.util.HashSet;
@@ -15,9 +16,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class UninstallOperation extends Operation {
+public class UninstallClusterOperation extends Operation {
 
-    public UninstallOperation(ClusterConfig config) {
+    public UninstallClusterOperation(ClusterConfig config) {
         super("Uninstall Mongo cluster");
 
         Set<Agent> clusterMembers = new HashSet<Agent>();
@@ -25,11 +26,11 @@ public class UninstallOperation extends Operation {
         clusterMembers.addAll(config.getRouterServers());
         clusterMembers.addAll(config.getDataNodes());
 
-        addTask(InstallTasks.getKillRunningMongoTask(clusterMembers));
+        addTask(Tasks.getKillRunningMongoTask(clusterMembers));
 
-        addTask(InstallTasks.getUninstallMongoTask(clusterMembers));
+        addTask(Tasks.getUninstallMongoTask(clusterMembers));
 
-        addTask(InstallTasks.getCleanMongoDataTask(clusterMembers));
+        addTask(Tasks.getCleanMongoDataTask(clusterMembers));
     }
 
 }

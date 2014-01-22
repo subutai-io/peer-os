@@ -11,11 +11,11 @@ import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.CassandraClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -154,7 +154,7 @@ public class CassandraTable extends Table {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     manager.moveToNextTask();
                     if (manager.getCurrentTask() != null) {
-                        for (CommandImpl command : manager.getCurrentTask().getCommands()) {
+                        for (Command command : manager.getCurrentTask().getCommands()) {
                             manager.executeCommand(command);
                         }
                     } else {

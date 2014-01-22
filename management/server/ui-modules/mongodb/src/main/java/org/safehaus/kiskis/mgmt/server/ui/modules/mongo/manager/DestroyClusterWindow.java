@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manage;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.install.UninstallOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -35,9 +35,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  *
  * @author dilshat
  */
-public class AddNodeWindow extends Window {
+public class DestroyClusterWindow extends Window {
 
-    private static final Logger LOG = Logger.getLogger(AddNodeWindow.class.getName());
+    private static final Logger LOG = Logger.getLogger(DestroyClusterWindow.class.getName());
 
     private final TextArea outputTxtArea;
     private final TextArea logTextArea;
@@ -49,22 +49,22 @@ public class AddNodeWindow extends Window {
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public AddNodeWindow(ClusterConfig config, TaskRunner taskRunner) {
-        super("Add New Node");
+    public DestroyClusterWindow(ClusterConfig config, TaskRunner taskRunner) {
+        super("Cluster uninstallation");
         setModal(true);
 
         this.taskRunner = taskRunner;
         this.config = config;
         agentManager = ServiceLocator.getService(AgentManager.class);
 
-        setWidth(600, AddNodeWindow.UNITS_PIXELS);
+        setWidth(600, DestroyClusterWindow.UNITS_PIXELS);
 
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
 
-        outputTxtArea = new TextArea("Installation output");
+        outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setRows(17);
         outputTxtArea.setColumns(35);
         outputTxtArea.setImmediate(true);
@@ -87,7 +87,7 @@ public class AddNodeWindow extends Window {
         content.addComponent(indicator, 19, 0, 19, 0);
         content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
-        logTextArea = new TextArea("Command output");
+        logTextArea = new TextArea("Node output");
         logTextArea.setRows(17);
         logTextArea.setColumns(35);
         logTextArea.setImmediate(true);
@@ -98,11 +98,11 @@ public class AddNodeWindow extends Window {
         addComponent(content);
     }
 
-    public void startOperation() {
+    void startOperation() {
         try {
             //stop any running installation
             taskRunner.removeAllTaskCallbacks();
-            final Operation installOperation = new UninstallOperation(config);
+            final Operation installOperation = new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));

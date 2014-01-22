@@ -21,9 +21,9 @@ public class CommandJson {
 
     public static Request getRequest(String json) {
         try {
-            CommandImpl cmd = gson.fromJson(escape(json), CommandImpl.class);
-            if (cmd.command != null) {
-                return (Request) cmd.command;
+            Command cmd = gson.fromJson(escape(json), CommandImpl.class);
+            if (cmd.getRequest() != null) {
+                return cmd.getRequest();
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getRequest", ex);
@@ -34,10 +34,20 @@ public class CommandJson {
 
     public static Response getResponse(String json) {
         try {
-            CommandImpl cmd = gson.fromJson(escape(json), CommandImpl.class);
-            if (cmd.response != null) {
-                return (Response) cmd.response;
+            Command cmd = gson.fromJson(escape(json), CommandImpl.class);
+            if (cmd.getResponse() != null) {
+                return cmd.getResponse();
             }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequest", ex);
+        }
+
+        return null;
+    }
+
+    public static Command getCommand(String json) {
+        try {
+            return gson.fromJson(escape(json), CommandImpl.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
