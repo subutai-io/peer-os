@@ -236,7 +236,9 @@ public class AddNodeWindow extends Window {
                             }
                             stdOutput.setLength(0);
                         }
-                    } else if (task.getData() == TaskType.START_REPLICA_SET) {
+                    } else if (task.getData() == TaskType.START_REPLICA_SET
+                            || task.getData() == TaskType.START_ROUTERS
+                            || task.getData() == TaskType.START_CONFIG_SERVERS) {
                         if (!Util.isStringEmpty(response.getStdOut())) {
                             stdOutput.append(response.getStdOut());
                         }
