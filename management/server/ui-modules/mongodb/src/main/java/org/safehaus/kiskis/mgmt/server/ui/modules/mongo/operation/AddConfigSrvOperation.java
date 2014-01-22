@@ -8,9 +8,11 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
@@ -45,12 +47,17 @@ public class AddConfigSrvOperation extends Operation {
 
         addTask(Tasks.getStartConfigServersTask(Util.wrapAgentToSet(agent)));
 
-        addTask(Tasks.getStopMongoTask(config.getRouterServers()));
+        Task stopMongoTask = Tasks.getStopMongoTask(config.getRouterServers());
+        stopMongoTask.setIgnoreExitCode(true);
+        addTask(stopMongoTask);
 
         Set<Agent> newConfigServers = new HashSet<Agent>(config.getConfigServers());
         newConfigServers.add(agent);
 
-        addTask(Tasks.getStartRoutersTask(config.getRouterServers(), newConfigServers));
+        Task startRoutersTask = Tasks.getStartRoutersTask(config.getRouterServers(), newConfigServers);
+        startRoutersTask.setData(TaskType.RESTART_ROUTERS);
+        startRoutersTask.setIgnoreExitCode(true);
+        addTask(startRoutersTask);
 
     }
 

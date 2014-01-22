@@ -65,7 +65,7 @@ public class AddNodeWindow extends Window {
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public AddNodeWindow(ClusterConfig config, MongoClusterInfo clusterInfo, TaskRunner taskRunner) {
+    public AddNodeWindow(final ClusterConfig config, MongoClusterInfo clusterInfo, TaskRunner taskRunner) {
         super("Add New Node");
         setModal(true);
 
@@ -119,8 +119,8 @@ public class AddNodeWindow extends Window {
         nodeTypeCombo.setTextInputAllowed(false);
         nodeTypeCombo.setWidth(150, Sizeable.UNITS_PIXELS);
 
-        nodeTypeCombo.addItem(NodeType.CONFIG_NODE);
-        nodeTypeCombo.setItemCaption(NodeType.CONFIG_NODE, "Add as Config Server");
+//        nodeTypeCombo.addItem(NodeType.CONFIG_NODE);
+//        nodeTypeCombo.setItemCaption(NodeType.CONFIG_NODE, "Add as Config Server");
         nodeTypeCombo.addItem(NodeType.ROUTER_NODE);
         nodeTypeCombo.setItemCaption(NodeType.ROUTER_NODE, "Add as Router Server");
         nodeTypeCombo.addItem(NodeType.DATA_NODE);
@@ -141,6 +141,8 @@ public class AddNodeWindow extends Window {
                     show("Please, select node");
                 } else if (nodeType == null) {
                     show("Please, select node type");
+                } else if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7) {
+                    show("Replica set cannot have more than 7 members");
                 } else {
                     addNodeBtn.setEnabled(false);
                     startOperation(nodeType, agent);
@@ -238,12 +240,19 @@ public class AddNodeWindow extends Window {
                         }
                     } else if (task.getData() == TaskType.START_REPLICA_SET
                             || task.getData() == TaskType.START_ROUTERS
-                            || task.getData() == TaskType.START_CONFIG_SERVERS) {
+                            || task.getData() == TaskType.START_CONFIG_SERVERS
+                            || task.getData() == TaskType.RESTART_ROUTERS) {
                         if (!Util.isStringEmpty(response.getStdOut())) {
                             stdOutput.append(response.getStdOut());
                         }
 
-                        if (stdOutput.toString().contains("child process started successfully, parent exiting")) {
+                        if ((task.getData() == TaskType.RESTART_ROUTERS
+                                && Util.countNumberOfOccurences(stdOutput.toString(),
+                                        "child process started successfully, parent exiting")
+                                == config.getRouterServers().size())
+                                || (task.getData() != TaskType.RESTART_ROUTERS
+                                && stdOutput.toString().contains(
+                                        "child process started successfully, parent exiting"))) {
                             task.setTaskStatus(TaskStatus.SUCCESS);
                             task.setCompleted(true);
                             taskRunner.removeTaskCallback(task.getUuid());

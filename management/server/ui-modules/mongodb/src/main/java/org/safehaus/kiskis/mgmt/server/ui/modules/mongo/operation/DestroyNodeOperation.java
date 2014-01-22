@@ -28,7 +28,9 @@ public class DestroyNodeOperation extends Operation {
             addTask(Tasks.getKillRunningMongoTask(Util.wrapAgentToSet(nodeAgent)));
             addTask(Tasks.getUninstallMongoTask(Util.wrapAgentToSet(nodeAgent)));
             addTask(Tasks.getCleanMongoDataTask(Util.wrapAgentToSet(nodeAgent)));
-            addTask(Tasks.getStopMongoTask(config.getRouterServers()));
+            Task stopMongoTask = Tasks.getStopMongoTask(config.getRouterServers());
+            stopMongoTask.setIgnoreExitCode(true);
+            addTask(stopMongoTask);
             Set<Agent> otherConfigServers = new HashSet<Agent>(config.getConfigServers());
             otherConfigServers.remove(nodeAgent);
             Task startRoutersTask = Tasks.getStartRoutersTask(config.getRouterServers(), otherConfigServers);
