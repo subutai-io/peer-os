@@ -124,12 +124,11 @@ public class Terminal implements Module {
                                     }
                                     if (Util.isFinalResponse(response)) {
                                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                            out.append("Exit code: ").append(response.getExitCode()).append("\n");
+                                            out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
                                         } else {
-                                            out.append("Command timed out").append("\n");
+                                            out.append("Command timed out").append("\n\n");
                                         }
                                     }
-                                    out.append("\n");
                                     addOutput(out.toString());
                                 }
 

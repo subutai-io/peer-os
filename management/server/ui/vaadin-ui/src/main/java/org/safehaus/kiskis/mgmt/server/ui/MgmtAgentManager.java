@@ -76,10 +76,11 @@ public final class MgmtAgentManager extends ConcurrentComponent
                     }
 
                     MgmtApplication.setSelectedAgents(selectedList);
-                    getWindow().showNotification(
-                            "Selected agents",
-                            selectedList.toString(),
-                            Window.Notification.POSITION_TOP_RIGHT);
+                    
+//                    getWindow().showNotification(
+//                            "Selected agents",
+//                            selectedList.toString(),
+//                            Window.Notification.POSITION_TOP_RIGHT);
                 }
             }
         });
