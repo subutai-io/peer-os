@@ -12,6 +12,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class Terminal implements Module {
 
@@ -45,7 +46,7 @@ public class Terminal implements Module {
             programTxtFld.setWidth(100, Sizeable.UNITS_PERCENTAGE);
             grid.addComponent(programLbl, 0, 1, 1, 1);
             grid.addComponent(programTxtFld, 2, 1, 12, 1);
-            Label workDirLbl = new Label("WorkDir");
+            Label workDirLbl = new Label("Cwd");
             final TextField workDirTxtFld = new TextField();
             workDirTxtFld.setValue("/");
             grid.addComponent(workDirLbl, 13, 1, 13, 1);
@@ -89,6 +90,7 @@ public class Terminal implements Module {
 
                             task.addCommand(cmd);
                         }
+                        addOutput("Commands started =====================");
                         taskRunner.runTask(task, new TaskCallback() {
 
                             @Override
@@ -105,8 +107,19 @@ public class Terminal implements Module {
                                     if (!Util.isStringEmpty(response.getStdErr())) {
                                         out.append(response.getStdErr()).append("\n");
                                     }
+                                    if (Util.isFinalResponse(response)) {
+                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                            out.append("Exit code: ").append(response.getExitCode());
+                                        } else {
+                                            out.append("Command timed out");
+                                        }
+                                    }
 
                                     addOutput(out.toString());
+                                }
+
+                                if (task.isCompleted()) {
+                                    addOutput("Commands completed =====================");
                                 }
                             }
                         });
