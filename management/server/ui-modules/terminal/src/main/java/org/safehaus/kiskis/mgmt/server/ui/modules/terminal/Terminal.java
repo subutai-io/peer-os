@@ -129,7 +129,7 @@ public class Terminal implements Module {
                                             out.append("Command timed out").append("\n");
                                         }
                                     }
-
+                                    out.append("\n");
                                     addOutput(out.toString());
                                 }
 

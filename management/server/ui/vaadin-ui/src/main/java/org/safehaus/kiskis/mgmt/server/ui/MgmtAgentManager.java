@@ -79,7 +79,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
                     getWindow().showNotification(
                             "Selected agents",
                             selectedList.toString(),
-                            Window.Notification.TYPE_TRAY_NOTIFICATION);
+                            Window.Notification.POSITION_TOP_RIGHT);
                 }
             }
         });
