@@ -412,7 +412,7 @@ public class Manager implements ResponseListener {
         List<MongoClusterInfo> mongoClusterInfos = MongoDAO.getMongoClustersInfo();
         MongoClusterInfo clusterInfo = (MongoClusterInfo) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if (mongoClusterInfos != null) {
+        if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
             for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
                 clusterCombo.addItem(mongoClusterInfo);
                 clusterCombo.setItemCaption(mongoClusterInfo,
