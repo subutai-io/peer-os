@@ -61,6 +61,10 @@ public class ExpiringCache<KeyType, ValueType> {
         entries.clear();
     }
 
+    public int size() {
+        return entries.size();
+    }
+
     private void runEviction() {
         if (System.currentTimeMillis() - lastEvictionRun > evictionRunIntervalMs
                 && lock.compareAndSet(true, false)) {

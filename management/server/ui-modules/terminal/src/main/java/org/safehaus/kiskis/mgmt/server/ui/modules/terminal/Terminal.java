@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.Set;
@@ -44,24 +46,37 @@ public class Terminal implements Module {
             final TextField programTxtFld = new TextField();
             programTxtFld.setValue("pwd");
             programTxtFld.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+
             grid.addComponent(programLbl, 0, 1, 1, 1);
-            grid.addComponent(programTxtFld, 2, 1, 12, 1);
+            grid.addComponent(programTxtFld, 2, 1, 11, 1);
             Label workDirLbl = new Label("Cwd");
             final TextField workDirTxtFld = new TextField();
             workDirTxtFld.setValue("/");
-            grid.addComponent(workDirLbl, 13, 1, 13, 1);
-            grid.addComponent(workDirTxtFld, 14, 1, 14, 1);
+            grid.addComponent(workDirLbl, 12, 1, 12, 1);
+            grid.addComponent(workDirTxtFld, 13, 1, 13, 1);
             Label timeoutLbl = new Label("Timeout");
             final TextField timeoutTxtFld = new TextField();
             timeoutTxtFld.setValue("30");
-            grid.addComponent(timeoutLbl, 15, 1, 16, 1);
-            grid.addComponent(timeoutTxtFld, 17, 1, 17, 1);
+            grid.addComponent(timeoutLbl, 14, 1, 15, 1);
+            grid.addComponent(timeoutTxtFld, 16, 1, 16, 1);
             Button clearBtn = new Button("Clear");
-            grid.addComponent(clearBtn, 18, 1, 18, 1);
-            Button sendBtn = new Button("Send");
-            grid.addComponent(sendBtn, 19, 1, 19, 1);
+            grid.addComponent(clearBtn, 17, 1, 17, 1);
+            final Button sendBtn = new Button("Send");
+            grid.addComponent(sendBtn, 18, 1, 18, 1);
+
+            final Label indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
+            indicator.setVisible(false);
+            grid.addComponent(indicator, 19, 1, 19, 1);
 
             setCompositionRoot(grid);
+
+            programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
+
+                @Override
+                public void handleAction(Object sender, Object target) {
+                    sendBtn.click();
+                }
+            });
 
             sendBtn.addListener(new Button.ClickListener() {
 
@@ -90,7 +105,7 @@ public class Terminal implements Module {
 
                             task.addCommand(cmd);
                         }
-                        addOutput("Commands started =====================");
+                        indicator.setVisible(true);
                         taskRunner.runTask(task, new TaskCallback() {
 
                             @Override
@@ -109,17 +124,17 @@ public class Terminal implements Module {
                                     }
                                     if (Util.isFinalResponse(response)) {
                                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                            out.append("Exit code: ").append(response.getExitCode());
+                                            out.append("Exit code: ").append(response.getExitCode()).append("\n");
                                         } else {
-                                            out.append("Command timed out");
+                                            out.append("Command timed out").append("\n");
                                         }
                                     }
 
                                     addOutput(out.toString());
                                 }
 
-                                if (task.isCompleted()) {
-                                    addOutput("Commands completed =====================");
+                                if (task.isCompleted() && taskRunner.getRemainingTaskCount() == 0) {
+                                    indicator.setVisible(false);
                                 }
                             }
                         });
@@ -140,7 +155,7 @@ public class Terminal implements Module {
         private void addOutput(String output) {
             if (!Util.isStringEmpty(output)) {
                 commandOutputTxtArea.setValue(
-                        String.format("%s\n\n%s",
+                        String.format("%s%s",
                                 commandOutputTxtArea.getValue(),
                                 output));
                 commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
