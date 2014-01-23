@@ -1,5 +1,6 @@
 *.project
 *.settings
 *.classpath
+*.log
 VAADIN/
 target/
