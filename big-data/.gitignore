@@ -2,5 +2,6 @@
 *.settings
 *.classpath
 *.log
+.idea/
 VAADIN/
 target/

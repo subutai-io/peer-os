@@ -6,15 +6,9 @@
     <groupId>org.safehaus</groupId>
     <artifactId>KiskisGraph</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Kiskis Graph Project</name>
-    <!--<url>http://172.16.9.5/graph</url>-->
-    <!--<repositories>-->
-    <!--<repository>-->
-    <!--<id>vaadin-addons</id>-->
-    <!--<url>http://maven.vaadin.com/vaadin-addons</url>-->
-    <!--</repository>-->
-    <!--</repositories>-->
+    <url>http://172.16.9.5/graph</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <vaadin.version>6.8.2</vaadin.version>
@@ -23,6 +17,7 @@
     </properties>
 
     <build>
+        <finalName>graph</finalName>
         <plugins>
             <!-- Compile custom GWT components or widget dependencies with the GWT
                 compiler -->
@@ -155,6 +150,8 @@
             <artifactId>vaadin-charts-vaadin6</artifactId>
             <version>1.1.4</version>
         </dependency>
+
+
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>refresher</artifactId>
@@ -167,23 +164,11 @@
             <version>0.9.1</version>
         </dependency>
 
-        <!--invient chart -->
         <dependency>
             <groupId>org.vaadin.addons</groupId>
-            <artifactId>invient-charts</artifactId>
-            <version>0.8.6</version>
+            <artifactId>overlays</artifactId>
+            <version>0.9.8</version>
         </dependency>
 
-        <!--<dependency>-->
-        <!--<groupId>com.vaadin</groupId>-->
-        <!--<artifactId>vaadin-server</artifactId>-->
-        <!--<version>7.1.5</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-        <!--<groupId>org.elasticsearch</groupId>-->
-        <!--<artifactId>elasticsearch</artifactId>-->
-        <!--<version>0.90.3</version>-->
-        <!--</dependency>-->
     </dependencies>
 </project>
