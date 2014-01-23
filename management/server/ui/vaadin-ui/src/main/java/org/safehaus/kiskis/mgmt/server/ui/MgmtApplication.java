@@ -183,7 +183,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         if (getInstance() != null) {
             return Collections.unmodifiableSet(getInstance().selectedAgents);
         }
-        return null;
+        return new HashSet<Agent>();
     }
 
     static void setSelectedAgents(Set<Agent> agents) {
