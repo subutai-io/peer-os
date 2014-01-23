@@ -76,11 +76,17 @@ public class TaskRunner {
         taskListenerCache.clear();
     }
 
+    public int getRemainingTaskCount() {
+        return taskListenerCache.size();
+    }
+
     public void runTask(Task task, TaskCallback taskCallback) {
-        if (task != null && task.getUuid() != null && taskCallback != null) {
+        if (task != null && task.getUuid() != null) {
             if (taskListenerCache.get(task.getUuid()) == null && task.hasNextCommand()) {
-                taskListenerCache.put(task.getUuid(),
-                        new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
+                if (taskCallback != null) {
+                    taskListenerCache.put(task.getUuid(),
+                            new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
+                }
                 while (task.hasNextCommand()) {
                     commandManager.executeCommand(task.getNextCommand());
                 }

@@ -35,17 +35,14 @@ public class HadoopModule implements Module {
         private ClusterForm hadoopManager;
 
         public ModuleComponent() {
-
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-
             hadoopWizard = new HadoopWizard();
             hadoopManager = new ClusterForm();
-
             sheet.addTab(hadoopWizard.getContent(), "Install");
             sheet.addTab(hadoopManager, "Manage");
 

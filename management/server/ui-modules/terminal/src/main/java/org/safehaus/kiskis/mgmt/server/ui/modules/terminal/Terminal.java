@@ -1,137 +1,193 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
-    private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
-        private Task task;
-        private final TextField textFieldWorkingDirectory;
-        private final TextField textFieldProgram;
-        private final TextField textFieldRunAs;
-        private final TextField textFieldArgs;
-        private final TextField textFieldTimeout;
-        private final TextArea textAreaCommand;
-        private final TextArea textAreaOutput;
-        private final CommandManager commandManagerInterface;
+        private final TextArea commandOutputTxtArea;
         private final AgentManager agentManager;
+        private final TaskRunner taskRunner = new TaskRunner();
 
         public ModuleComponent() {
-            commandManagerInterface = ServiceLocator.getService(CommandManager.class);
             agentManager = ServiceLocator.getService(AgentManager.class);
 
-            VerticalLayout verticalLayout = new VerticalLayout();
-            verticalLayout.setSpacing(true);
-            verticalLayout.setMargin(true);
+            GridLayout grid = new GridLayout(20, 2);
+            grid.setSizeFull();
+            grid.setMargin(true);
+            grid.setSpacing(true);
 
-            HorizontalLayout horizontalLayout = new HorizontalLayout();
-            horizontalLayout.setSpacing(true);
-            horizontalLayout.setMargin(true);
+            commandOutputTxtArea = new TextArea("Commands output");
+            commandOutputTxtArea.setRows(40);
+            commandOutputTxtArea.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+            commandOutputTxtArea.setImmediate(true);
+            commandOutputTxtArea.setWordwrap(false);
+            grid.addComponent(commandOutputTxtArea, 0, 0, 19, 0);
 
-            textFieldWorkingDirectory = new TextField("Working Directory");
-            textFieldWorkingDirectory.setValue("/home");
+            Label programLbl = new Label("Program");
+            final TextField programTxtFld = new TextField();
+            programTxtFld.setValue("pwd");
+            programTxtFld.setWidth(100, Sizeable.UNITS_PERCENTAGE);
 
-            textFieldProgram = new TextField("Program");
-            textFieldProgram.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-            textFieldProgram.setValue("ls");
+            grid.addComponent(programLbl, 0, 1, 1, 1);
+            grid.addComponent(programTxtFld, 2, 1, 11, 1);
+            Label workDirLbl = new Label("Cwd");
+            final TextField workDirTxtFld = new TextField();
+            workDirTxtFld.setValue("/");
+            grid.addComponent(workDirLbl, 12, 1, 12, 1);
+            grid.addComponent(workDirTxtFld, 13, 1, 13, 1);
+            Label timeoutLbl = new Label("Timeout");
+            final TextField timeoutTxtFld = new TextField();
+            timeoutTxtFld.setValue("30");
+            grid.addComponent(timeoutLbl, 14, 1, 15, 1);
+            grid.addComponent(timeoutTxtFld, 16, 1, 16, 1);
+            Button clearBtn = new Button("Clear");
+            grid.addComponent(clearBtn, 17, 1, 17, 1);
+            final Button sendBtn = new Button("Send");
+            grid.addComponent(sendBtn, 18, 1, 18, 1);
 
-            textFieldRunAs = new TextField("Run As");
-            textFieldRunAs.setValue("root");
+            final Label indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
+            indicator.setVisible(false);
+            grid.addComponent(indicator, 19, 1, 19, 1);
 
-            textFieldArgs = new TextField("Args");
+            setCompositionRoot(grid);
 
-            textFieldTimeout = new TextField("Timeout");
-            textFieldTimeout.setValue("180");
+            programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
 
-            Label labelText = new Label("Enter command:");
+                @Override
+                public void handleAction(Object sender, Object target) {
+                    sendBtn.click();
+                }
+            });
 
-            textAreaCommand = new TextArea();
-            textAreaCommand.setRows(10);
-            textAreaCommand.setColumns(80);
-            textAreaCommand.setImmediate(true);
-            textAreaCommand.setWordwrap(true);
+            sendBtn.addListener(new Button.ClickListener() {
 
-            verticalLayout.addComponent(labelText);
-            verticalLayout.addComponent(textAreaCommand);
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Set<Agent> agents = MgmtApplication.getSelectedAgents();
+                    if (agents.isEmpty()) {
+                        show("Please, select nodes");
+                    } else if (programTxtFld.getValue() == null || Util.isStringEmpty(programTxtFld.getValue().toString())) {
+                        show("Please, enter command");
+                    } else {
+                        Task task = new Task();
+                        for (Agent agent : agents) {
+                            Command cmd = getTemplate();
+                            cmd.getRequest().setUuid(agent.getUuid());
+                            cmd.getRequest().setProgram(programTxtFld.getValue().toString());
+                            if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
+                                int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
+                                if (timeout > 0) {
+                                    cmd.getRequest().setTimeout(timeout);
+                                }
+                            }
+                            if (workDirTxtFld.getValue() != null && !Util.isStringEmpty(workDirTxtFld.getValue().toString())) {
+                                cmd.getRequest().setWorkingDirectory(workDirTxtFld.getValue().toString());
+                            }
 
-            horizontalLayout.addComponent(textFieldWorkingDirectory);
-            horizontalLayout.addComponent(textFieldRunAs);
-            horizontalLayout.addComponent(textFieldArgs);
-            horizontalLayout.addComponent(textFieldTimeout);
-            verticalLayout.addComponent(horizontalLayout);
-            verticalLayout.addComponent(textFieldProgram);
+                            task.addCommand(cmd);
+                        }
+                        indicator.setVisible(true);
+                        taskRunner.runTask(task, new TaskCallback() {
 
-            HorizontalLayout hLayout = new HorizontalLayout();
-            Button buttonSend = genSendButton();
-            Button buttonClear = getClearButton();
-            Button buttonGetPhysicalAgents = getPhysicalAgents();
-            Button buttonGetLxcAgents = getLxcAgents();
+                            @Override
+                            public void onResponse(Task task, Response response) {
+                                if (response != null && response.getUuid() != null) {
+                                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
+                                    String host = agent == null
+                                            ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
 
-            hLayout.addComponent(buttonSend);
-            hLayout.addComponent(buttonClear);
-            hLayout.addComponent(buttonGetPhysicalAgents);
-            hLayout.addComponent(buttonGetLxcAgents);
+                                    StringBuilder out = new StringBuilder(host).append(":\n");
+                                    if (!Util.isStringEmpty(response.getStdOut())) {
+                                        out.append(response.getStdOut()).append("\n");
+                                    }
+                                    if (!Util.isStringEmpty(response.getStdErr())) {
+                                        out.append(response.getStdErr()).append("\n");
+                                    }
+                                    if (Util.isFinalResponse(response)) {
+                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                            out.append("Exit code: ").append(response.getExitCode()).append("\n");
+                                        } else {
+                                            out.append("Command timed out").append("\n");
+                                        }
+                                    }
 
-            verticalLayout.addComponent(hLayout);
+                                    addOutput(out.toString());
+                                }
 
-            Label labelOutput = new Label("Commands output");
-            textAreaOutput = new TextArea();
-            textAreaOutput.setRows(20);
-            textAreaOutput.setColumns(80);
-            textAreaOutput.setImmediate(true);
-            textAreaOutput.setWordwrap(false);
-            verticalLayout.addComponent(labelOutput);
-            verticalLayout.addComponent(textAreaOutput);
+                                if (task.isCompleted() && taskRunner.getRemainingTaskCount() == 0) {
+                                    indicator.setVisible(false);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
 
-            setCompositionRoot(verticalLayout);
+            clearBtn.addListener(new Button.ClickListener() {
 
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    commandOutputTxtArea.setValue("");
+                }
+            });
+
+        }
+
+        private void addOutput(String output) {
+            if (!Util.isStringEmpty(output)) {
+                commandOutputTxtArea.setValue(
+                        String.format("%s%s",
+                                commandOutputTxtArea.getValue(),
+                                output));
+                commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
+            }
+        }
+
+        private void show(String notification) {
+            getWindow().showNotification(notification);
+        }
+
+        public static Command getTemplate() {
+            return CommandFactory.createRequest(
+                    RequestType.EXECUTE_REQUEST, // type
+                    null, //                        !! agent uuid
+                    MODULE_NAME, //     source
+                    null, //                        !! task uuid 
+                    1, //                           !! request sequence number
+                    "/", //                         cwd
+                    "pwd", //                        program
+                    OutputRedirection.RETURN, //    std output redirection 
+                    OutputRedirection.RETURN, //    std error redirection
+                    null, //                        stdout capture file path
+                    null, //                        stderr capture file path
+                    "root", //                      runas
+                    null, //                        arg
+                    null, //                        env vars
+                    30); //  
         }
 
         @Override
         public void onCommand(Response response) {
-            if (task != null && task.getUuid().compareTo(response.getTaskUuid()) == 0) {
-                List<ParseResult> result = RequestUtil.parseTask(response.getTaskUuid(), false);
-                StringBuilder sb = new StringBuilder();
-                for (ParseResult parseResult : result) {
-                    if (parseResult.getResponse() != null) {
-                        String res = CommandJson.getJson(new CommandImpl(parseResult.getResponse()));
-                        if (res != null) {
-                            sb.append(res).append("\n\n");
-                        } else {
-                            sb.append("Error parsing response: ").append(parseResult.getResponse()).append("\n\n");
-                        }
-                        if (parseResult.getResponse().getType().compareTo(ResponseType.EXECUTE_RESPONSE_DONE) == 0) {
-                            sb.append("Exit Code: ").append(parseResult.getResponse().getExitCode()).append("\n\n");
-                        } else if (parseResult.getResponse().getType().compareTo(ResponseType.EXECUTE_TIMEOUTED) == 0) {
-                            sb.append("EXECUTE TIMEOUTED").append("\n\n");
-                        }
-                    }
-                }
-                String res = sb.toString().replace("\\n", "\n");
-                textAreaOutput.setValue(res);
-                textAreaOutput.setCursorPosition(res.length() - 1);
-            }
-
+            taskRunner.feedResponse(response);
         }
 
         @Override
@@ -139,125 +195,6 @@ public class Terminal implements Module {
             return Terminal.MODULE_NAME;
         }
 
-        private Button getPhysicalAgents() {
-            Button button = new Button("Get physical agents");
-            button.setDescription("Gets agents from Cassandra");
-            button.addListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = agentManager.getPhysicalAgents();
-                    StringBuilder sb = new StringBuilder();
-
-                    for (Agent agent : agents) {
-                        sb.append(agent).append("\n");
-
-                        Set<Agent> childAgents = agentManager.getLxcAgentsByParentHostname(agent.getHostname());
-                        for (Agent lxcAgent : childAgents) {
-                            sb.append("\t").append(lxcAgent).append("\n");
-                        }
-                    }
-                    textAreaOutput.setValue(sb.toString());
-                }
-            });
-            return button;
-        }
-
-        private Button getLxcAgents() {
-            Button button = new Button("Get LXC agents");
-            button.setDescription("Gets LXC agents from Cassandra");
-            button.addListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = agentManager.getLxcAgents();
-                    StringBuilder sb = new StringBuilder();
-
-                    for (Agent agent : agents) {
-                        sb.append(agent).append("\n");
-                    }
-                    textAreaOutput.setValue(sb.toString());
-                }
-            });
-            return button;
-        }
-
-        private Button genSendButton() {
-            Button button = new Button("Send");
-            button.setDescription("Sends command to agent");
-            button.addListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    try {
-                        Set<Agent> agents = MgmtApplication.getSelectedAgents();
-                        if (agents != null && agents.size() > 0) {
-                            task = new Task();
-                            task.setDescription("JSON executing");
-                            task.setTaskStatus(TaskStatus.NEW);
-                            RequestUtil.saveTask(task);
-                            for (Agent agent : agents) {
-                                if (!Util.isStringEmpty(textAreaCommand.getValue().toString())) {
-                                    String json = textAreaCommand.getValue().toString().trim();
-
-                                    Request r = CommandJson.getRequest(json);
-
-                                    if (r != null) {
-
-                                        r.setUuid(agent.getUuid());
-                                        r.setSource(Terminal.MODULE_NAME);
-                                        r.setTaskUuid(task.getUuid());
-                                        r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-
-                                        CommandImpl command = new CommandImpl(r);
-                                        commandManagerInterface.executeCommand(command);
-                                    } else {
-                                        textAreaOutput.setValue("ERROR IN COMMAND JSON");
-                                    }
-                                } else {
-
-                                    Request r = new Request();
-
-                                    r.setUuid(agent.getUuid());
-                                    r.setSource(Terminal.MODULE_NAME);
-                                    r.setTaskUuid(task.getUuid());
-                                    r.setType(RequestType.EXECUTE_REQUEST);
-                                    r.setRequestSequenceNumber(task.getIncrementedReqSeqNumber());
-                                    r.setWorkingDirectory(textFieldWorkingDirectory.getValue().toString());
-                                    r.setProgram(textFieldProgram.getValue().toString());
-                                    r.setStdOut(OutputRedirection.RETURN);
-                                    r.setStdErr(OutputRedirection.RETURN);
-                                    r.setRunAs(textFieldRunAs.getValue().toString());
-
-                                    String[] args = textFieldArgs.getValue().toString().split(" ");
-                                    r.setArgs(Arrays.asList(args));
-
-                                    r.setTimeout(Integer.parseInt(textFieldTimeout.getValue().toString()));
-
-                                    CommandImpl command = new CommandImpl(r);
-                                    commandManagerInterface.executeCommand(command);
-                                }
-                            }
-                        } else {
-                            getWindow().showNotification("Select agent!");
-                        }
-                    } catch (Exception ex) {
-                        getWindow().showNotification(ex.toString());
-                        LOG.log(Level.SEVERE, "Error in buttonClick", ex);
-                    }
-                }
-            });
-            return button;
-        }
-
-        private Button getClearButton() {
-            Button button = new Button("Clear");
-            button.setDescription("Clear output area");
-            button.addListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    textAreaOutput.setValue("");
-                }
-            });
-            return button;
-        }
     }
 
     @Override
