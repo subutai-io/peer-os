@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
@@ -16,7 +15,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,13 +34,11 @@ public class ConfigNRoutersStep extends Panel {
 
     public ConfigNRoutersStep(final Wizard wizard) {
 
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeFull();
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        content.setMargin(true);
+        setSizeFull();
 
         GridLayout grid = new GridLayout(10, 10);
         grid.setSpacing(true);
+        grid.setMargin(true);
         grid.setSizeFull();
 
         Panel panel = new Panel();
@@ -52,12 +48,8 @@ public class ConfigNRoutersStep extends Panel {
 
         menu.setContentMode(Label.CONTENT_XHTML);
         panel.addComponent(menu);
-        grid.addComponent(menu, 0, 0, 2, 1);
+        grid.addComponent(menu, 0, 0, 1, 8);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
-
-        VerticalLayout mainContent = new VerticalLayout();
-        mainContent.setSizeFull();
-        mainContent.setSpacing(true);
 
         final TextField clusterNameTxtFld = new TextField("Enter cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
@@ -70,12 +62,12 @@ public class ConfigNRoutersStep extends Panel {
             }
         });
 
-        mainContent.addComponent(clusterNameTxtFld);
+        grid.addComponent(clusterNameTxtFld, 2, 0, 3, 0);
 
-        Label configServersLabel = new Label("<strong>Choose hosts that will act as config servers<br>"
+        Label configServersLabel = new Label("<strong>Choose hosts that will act as config servers "
                 + "(Recommended 3 nodes, choose 1 or 3 nodes)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
-        mainContent.addComponent(configServersLabel);
+        grid.addComponent(configServersLabel, 2, 1, 9, 1);
 
         final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
@@ -112,38 +104,35 @@ public class ConfigNRoutersStep extends Panel {
         };
 
         configServersColSel.setItemCaptionPropertyId("hostname");
-        configServersColSel.setRows(7);
+        configServersColSel.setRows(5);
         configServersColSel.setNullSelectionAllowed(true);
         configServersColSel.setMultiSelect(true);
         configServersColSel.setImmediate(true);
         configServersColSel.setLeftColumnCaption("Available Nodes");
         configServersColSel.setRightColumnCaption("Config Servers");
-        configServersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        configServersColSel.setSizeFull();
         configServersColSel.setRequired(true);
         configServersColSel.addListener(configChangeListener);
 
-        mainContent.addComponent(configServersColSel);
+        grid.addComponent(configServersColSel, 2, 2, 9, 4);
 
-        Label routersLabel = new Label("<strong>Choose hosts that will act as routers<br>"
+        Label routersLabel = new Label("<strong>Choose hosts that will act as routers "
                 + "(Provide at least 2 servers)</strong>");
         routersLabel.setContentMode(Label.CONTENT_XHTML);
-        mainContent.addComponent(routersLabel);
+        grid.addComponent(routersLabel, 2, 5, 9, 5);
 
         routersColSel.setItemCaptionPropertyId("hostname");
-        routersColSel.setRows(7);
+        routersColSel.setRows(5);
         routersColSel.setNullSelectionAllowed(true);
         routersColSel.setMultiSelect(true);
         routersColSel.setImmediate(true);
         routersColSel.setLeftColumnCaption("Available Nodes");
         routersColSel.setRightColumnCaption("Routers");
-        routersColSel.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        routersColSel.setSizeFull();
         routersColSel.setRequired(true);
         routersColSel.addListener(routersChangeListener);
 
-        mainContent.addComponent(routersColSel);
-
-        grid.addComponent(mainContent, 3, 0, 9, 9);
-        grid.setComponentAlignment(mainContent, Alignment.TOP_CENTER);
+        grid.addComponent(routersColSel, 2, 6, 9, 8);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -176,14 +165,12 @@ public class ConfigNRoutersStep extends Panel {
             }
         });
 
-        content.addComponent(grid);
-
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
         buttons.addComponent(next);
-        content.addComponent(buttons);
+        grid.addComponent(buttons, 0, 9, 2, 9);
 
-        addComponent(content);
+        addComponent(grid);
 
         routersColSel.setContainerDataSource(
                 new BeanItemContainer<Agent>(

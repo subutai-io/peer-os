@@ -5,10 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
@@ -53,22 +52,24 @@ public class InstallationStep extends Panel {
     private final TaskRunner taskRunner;
 
     public InstallationStep(final Wizard wizard) {
+
         this.config = wizard.getConfig();
         this.taskRunner = wizard.getTaskRunner();
         agentManager = ServiceLocator.getService(AgentManager.class);
 
-        GridLayout content = new GridLayout(20, 3);
-        content.setSizeFull();
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        content.setMargin(true);
+        setSizeFull();
+
+        GridLayout grid = new GridLayout(20, 10);
+        grid.setSizeFull();
+        grid.setMargin(true);
 
         outputTxtArea = new TextArea("Operation output");
-        outputTxtArea.setRows(17);
-        outputTxtArea.setColumns(60);
+        outputTxtArea.setSizeFull();
+        outputTxtArea.setRows(13);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea, 0, 0, 18, 0);
+        grid.addComponent(outputTxtArea, 0, 0, 18, 3);
 
         ok = new Button("Ok");
         ok.setEnabled(false);
@@ -102,20 +103,21 @@ public class InstallationStep extends Panel {
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
 
-        content.addComponent(ok, 0, 1, 0, 1);
-        content.addComponent(cancel, 1, 1, 1, 1);
-        content.addComponent(indicator, 19, 0, 19, 0);
-        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(ok);
+        buttons.addComponent(cancel);
+        grid.addComponent(buttons, 0, 9, 5, 9);
+        grid.addComponent(indicator, 19, 0, 19, 0);
 
         logTextArea = new TextArea("Node output");
-        logTextArea.setRows(17);
-        logTextArea.setColumns(60);
+        logTextArea.setSizeFull();
+        logTextArea.setRows(13);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
-        content.addComponent(logTextArea, 0, 2, 18, 2);
+        grid.addComponent(logTextArea, 0, 4, 18, 8);
 
-        addComponent(content);
+        addComponent(grid);
 
     }
 

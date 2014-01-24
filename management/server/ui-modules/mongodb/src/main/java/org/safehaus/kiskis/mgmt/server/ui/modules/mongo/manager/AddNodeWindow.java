@@ -78,7 +78,6 @@ public class AddNodeWindow extends Window {
 
         GridLayout content = new GridLayout(20, 4);
         content.setSizeFull();
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
         content.setSpacing(true);
 
@@ -151,8 +150,8 @@ public class AddNodeWindow extends Window {
         });
 
         outputTxtArea = new TextArea("Operation output");
-        outputTxtArea.setRows(17);
-        outputTxtArea.setColumns(45);
+        outputTxtArea.setRows(13);
+        outputTxtArea.setColumns(43);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
@@ -165,8 +164,8 @@ public class AddNodeWindow extends Window {
         content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
         logTextArea = new TextArea("Node output");
-        logTextArea.setRows(17);
-        logTextArea.setColumns(45);
+        logTextArea.setRows(13);
+        logTextArea.setColumns(43);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 

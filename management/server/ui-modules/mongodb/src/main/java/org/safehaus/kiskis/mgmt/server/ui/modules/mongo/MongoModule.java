@@ -22,6 +22,7 @@ public class MongoModule implements Module {
         private final Manager manager;
 
         public ModuleComponent() {
+            setSizeFull();
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
             verticalLayout.setSizeFull();

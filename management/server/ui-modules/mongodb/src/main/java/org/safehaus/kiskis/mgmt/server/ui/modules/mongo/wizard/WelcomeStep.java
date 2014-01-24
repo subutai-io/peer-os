@@ -24,7 +24,11 @@ public class WelcomeStep extends Panel {
 
     public WelcomeStep(final Wizard wizard) {
 
+        setSizeFull();
+        
         GridLayout grid = new GridLayout(10, 6);
+        grid.setSpacing(true);
+        grid.setMargin(true);        
         grid.setSizeFull();
 
         Label welcomeMsg = new Label(
