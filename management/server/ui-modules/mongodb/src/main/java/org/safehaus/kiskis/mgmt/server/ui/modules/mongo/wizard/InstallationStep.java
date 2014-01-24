@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
@@ -60,12 +61,11 @@ public class InstallationStep extends Panel {
 
         GridLayout grid = new GridLayout(20, 10);
         grid.setSizeFull();
-        grid.setSpacing(true);
         grid.setMargin(true);
 
         outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setSizeFull();
-        outputTxtArea.setRows(10);
+        outputTxtArea.setRows(13);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
@@ -103,17 +103,19 @@ public class InstallationStep extends Panel {
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
 
-        grid.addComponent(ok, 0, 4, 0, 4);
-        grid.addComponent(cancel, 1, 4, 1, 4);
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(ok);
+        buttons.addComponent(cancel);
+        grid.addComponent(buttons, 0, 9, 5, 9);
         grid.addComponent(indicator, 19, 0, 19, 0);
 
         logTextArea = new TextArea("Node output");
         logTextArea.setSizeFull();
-        logTextArea.setRows(10);
+        logTextArea.setRows(13);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
-        grid.addComponent(logTextArea, 0, 5, 18, 9);
+        grid.addComponent(logTextArea, 0, 4, 18, 8);
 
         addComponent(grid);
 
