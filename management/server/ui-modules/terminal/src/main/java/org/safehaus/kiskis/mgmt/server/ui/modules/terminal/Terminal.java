@@ -30,43 +30,43 @@ public class Terminal implements Module {
         public ModuleComponent() {
             agentManager = ServiceLocator.getService(AgentManager.class);
 
-            GridLayout grid = new GridLayout(20, 2);
+            setHeight("100%");
+            GridLayout grid = new GridLayout(20, 10);
             grid.setSizeFull();
             grid.setMargin(true);
             grid.setSpacing(true);
 
             commandOutputTxtArea = new TextArea("Commands output");
-            commandOutputTxtArea.setRows(40);
-            commandOutputTxtArea.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+            commandOutputTxtArea.setSizeFull();
             commandOutputTxtArea.setImmediate(true);
             commandOutputTxtArea.setWordwrap(false);
-            grid.addComponent(commandOutputTxtArea, 0, 0, 19, 0);
+            grid.addComponent(commandOutputTxtArea, 0, 0, 19, 8);
 
             Label programLbl = new Label("Program");
             final TextField programTxtFld = new TextField();
             programTxtFld.setValue("pwd");
             programTxtFld.setWidth(100, Sizeable.UNITS_PERCENTAGE);
 
-            grid.addComponent(programLbl, 0, 1, 1, 1);
-            grid.addComponent(programTxtFld, 2, 1, 11, 1);
+            grid.addComponent(programLbl, 0, 9, 1, 9);
+            grid.addComponent(programTxtFld, 2, 9, 11, 9);
             Label workDirLbl = new Label("Cwd");
             final TextField workDirTxtFld = new TextField();
             workDirTxtFld.setValue("/");
-            grid.addComponent(workDirLbl, 12, 1, 12, 1);
-            grid.addComponent(workDirTxtFld, 13, 1, 13, 1);
+            grid.addComponent(workDirLbl, 12, 9, 12, 9);
+            grid.addComponent(workDirTxtFld, 13, 9, 13, 9);
             Label timeoutLbl = new Label("Timeout");
             final TextField timeoutTxtFld = new TextField();
             timeoutTxtFld.setValue("30");
-            grid.addComponent(timeoutLbl, 14, 1, 15, 1);
-            grid.addComponent(timeoutTxtFld, 16, 1, 16, 1);
+            grid.addComponent(timeoutLbl, 14, 9, 15, 9);
+            grid.addComponent(timeoutTxtFld, 16, 9, 16, 9);
             Button clearBtn = new Button("Clear");
-            grid.addComponent(clearBtn, 17, 1, 17, 1);
+            grid.addComponent(clearBtn, 17, 9, 17, 9);
             final Button sendBtn = new Button("Send");
-            grid.addComponent(sendBtn, 18, 1, 18, 1);
+            grid.addComponent(sendBtn, 18, 9, 18, 9);
 
             final Label indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
             indicator.setVisible(false);
-            grid.addComponent(indicator, 19, 1, 19, 1);
+            grid.addComponent(indicator, 19, 9, 19, 9);
 
             setCompositionRoot(grid);
 
