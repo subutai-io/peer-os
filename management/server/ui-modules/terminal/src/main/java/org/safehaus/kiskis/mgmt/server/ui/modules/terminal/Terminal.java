@@ -30,15 +30,14 @@ public class Terminal implements Module {
         public ModuleComponent() {
             agentManager = ServiceLocator.getService(AgentManager.class);
 
+            setHeight("100%");
             GridLayout grid = new GridLayout(20, 10);
             grid.setSizeFull();
             grid.setMargin(true);
             grid.setSpacing(true);
 
             commandOutputTxtArea = new TextArea("Commands output");
-            commandOutputTxtArea.setRows(40);
-            commandOutputTxtArea.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-            commandOutputTxtArea.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+            commandOutputTxtArea.setSizeFull();
             commandOutputTxtArea.setImmediate(true);
             commandOutputTxtArea.setWordwrap(false);
             grid.addComponent(commandOutputTxtArea, 0, 0, 19, 8);
