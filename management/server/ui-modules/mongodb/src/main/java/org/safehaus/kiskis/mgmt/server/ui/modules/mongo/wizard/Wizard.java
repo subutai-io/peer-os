@@ -11,7 +11,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
@@ -27,48 +26,31 @@ public class Wizard implements ResponseListener {
 
     private static final int MAX_STEPS = 4;
     private final ProgressIndicator progressBar;
-    private final VerticalLayout verticalLayout;
     private final ClusterConfig config = new ClusterConfig();
-    private final VerticalLayout contentRoot;
+    private final GridLayout grid;
     private final TaskRunner taskRunner = new TaskRunner();
     private int step = 1;
 
     public Wizard() {
-        contentRoot = new VerticalLayout();
-        contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
-        contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 
-        GridLayout content = new GridLayout(1, 2);
-        content.setSpacing(true);
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        content.setWidth(900, Sizeable.UNITS_PIXELS);
+        grid = new GridLayout(1, 20);
+        grid.setMargin(true);
+        grid.setSizeFull();
 
         progressBar = new ProgressIndicator();
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(false);
         progressBar.setValue(0f);
         progressBar.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        content.addComponent(progressBar, 0, 0);
-        content.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
-
-        verticalLayout = new VerticalLayout();
-        verticalLayout.setSpacing(true);
-        verticalLayout.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        content.addComponent(verticalLayout, 0, 1);
-        content.setComponentAlignment(verticalLayout, Alignment.TOP_CENTER);
-
-        contentRoot.addComponent(content);
-        contentRoot.setMargin(true);
-        contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
+        grid.addComponent(progressBar, 0, 0, 0, 0);
+        grid.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
 
         putForm();
 
     }
 
     public Component getContent() {
-        return contentRoot;
+        return grid;
     }
 
     protected void next() {
@@ -91,38 +73,42 @@ public class Wizard implements ResponseListener {
     }
 
     private void putForm() {
-        verticalLayout.removeAllComponents();
+        grid.removeComponent(0, 1);
+        Component component = null;
         switch (step) {
             case 1: {
                 progressBar.setValue(0f);
-                verticalLayout.addComponent(new WelcomeStep(this));
+                component = new WelcomeStep(this);
                 break;
             }
             case 2: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new ConfigNRoutersStep(this));
+                component = new ConfigNRoutersStep(this);
                 break;
             }
             case 3: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new ReplicaSetStep(this));
+                component = new ReplicaSetStep(this);
                 break;
             }
             case 4: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                verticalLayout.addComponent(new VerifyStep(this));
+                component = new VerifyStep(this);
                 break;
             }
             case 5: {
                 progressBar.setValue((float) (step - 1) / MAX_STEPS);
-                InstallationStep installationStep = new InstallationStep(this);
-                verticalLayout.addComponent(installationStep);
-                installationStep.startOperation(true);
+                component = new InstallationStep(this);
+                ((InstallationStep) component).startOperation(true);
                 break;
             }
             default: {
                 break;
             }
+        }
+
+        if (component != null) {
+            grid.addComponent(component, 0, 1, 0, 19);
         }
     }
 

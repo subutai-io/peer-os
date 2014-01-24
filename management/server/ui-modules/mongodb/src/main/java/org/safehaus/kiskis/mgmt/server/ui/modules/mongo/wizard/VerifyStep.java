@@ -5,12 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ConfigView;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
@@ -27,10 +26,12 @@ public class VerifyStep extends Panel {
 
     public VerifyStep(final Wizard wizard) {
 
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeFull();
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-        content.setMargin(true);
+        setSizeFull();
+
+        GridLayout grid = new GridLayout(1, 5);
+        grid.setSpacing(true);
+        grid.setMargin(true);
+        grid.setSizeFull();
 
         Label confirmationLbl = new Label("<strong>Please verify the installation configuration "
                 + "(you may change it by clicking on Back button)</strong><br/>");
@@ -91,13 +92,13 @@ public class VerifyStep extends Panel {
         buttons.addComponent(back);
         buttons.addComponent(install);
 
-        content.addComponent(confirmationLbl);
+        grid.addComponent(confirmationLbl, 0, 0);
 
-        content.addComponent(cfgView.getCfgTable());
+        grid.addComponent(cfgView.getCfgTable(), 0, 1, 0, 3);
 
-        content.addComponent(buttons);
+        grid.addComponent(buttons, 0, 4);
 
-        addComponent(content);
+        addComponent(grid);
 
     }
 
