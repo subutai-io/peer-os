@@ -85,7 +85,6 @@ public class Manager implements ResponseListener {
         contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 
         VerticalLayout content = new VerticalLayout();
-        content.setSpacing(true);
         content.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 
@@ -94,9 +93,9 @@ public class Manager implements ResponseListener {
         contentRoot.setMargin(true);
 
         //tables go here
-        configServersTable = createTableTemplate("Config Servers");
-        routersTable = createTableTemplate("Query Routers");
-        dataNodesTable = createTableTemplate("Data Nodes");
+        configServersTable = createTableTemplate("Config Servers", 150);
+        routersTable = createTableTemplate("Query Routers", 150);
+        dataNodesTable = createTableTemplate("Data Nodes", 270);
         //tables go here
 
         Label clusterNameLabel = new Label("Select the cluster");
@@ -440,7 +439,7 @@ public class Manager implements ResponseListener {
         }
     }
 
-    private Table createTableTemplate(String caption) {
+    private Table createTableTemplate(String caption, int size) {
         Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty(Constants.TABLE_CHECK_PROPERTY, Button.class, null);
@@ -449,7 +448,7 @@ public class Manager implements ResponseListener {
         table.addContainerProperty("Destroy", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(250, Sizeable.UNITS_PIXELS);
+        table.setHeight(size, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);

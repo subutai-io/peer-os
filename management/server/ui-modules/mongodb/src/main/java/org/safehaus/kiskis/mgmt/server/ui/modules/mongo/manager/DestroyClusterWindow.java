@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
@@ -57,16 +56,16 @@ public class DestroyClusterWindow extends Window {
         this.config = config;
         agentManager = ServiceLocator.getService(AgentManager.class);
 
-        setWidth(600, DestroyClusterWindow.UNITS_PIXELS);
+        setWidth(650, DestroyClusterWindow.UNITS_PIXELS);
 
         GridLayout content = new GridLayout(20, 3);
         content.setSizeFull();
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         content.setMargin(true);
+        content.setSpacing(true);
 
         outputTxtArea = new TextArea("Operation output");
-        outputTxtArea.setRows(17);
-        outputTxtArea.setColumns(35);
+        outputTxtArea.setRows(13);
+        outputTxtArea.setColumns(43);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
@@ -83,17 +82,18 @@ public class DestroyClusterWindow extends Window {
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
 
-        content.addComponent(ok, 0, 1, 0, 1);
+        content.addComponent(ok, 18, 2, 18, 2);
         content.addComponent(indicator, 19, 0, 19, 0);
         content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
+        content.setComponentAlignment(ok, Alignment.MIDDLE_RIGHT);
 
         logTextArea = new TextArea("Node output");
-        logTextArea.setRows(17);
-        logTextArea.setColumns(35);
+        logTextArea.setRows(13);
+        logTextArea.setColumns(43);
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
-        content.addComponent(logTextArea, 0, 2, 18, 2);
+        content.addComponent(logTextArea, 0, 1, 18, 1);
 
         addComponent(content);
     }
