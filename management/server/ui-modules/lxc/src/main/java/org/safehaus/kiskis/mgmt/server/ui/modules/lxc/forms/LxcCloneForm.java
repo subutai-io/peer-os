@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms;
 
+import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
@@ -15,6 +16,7 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
@@ -24,8 +26,9 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final Label indicator;
-    private final Table lxcTable;
+    private final TreeTable lxcTable;
     private final TaskRunner taskRunner;
+    private final Map<Integer, String> requestToLxcMatchMap = new HashMap<Integer, String>();
 
     public LxcCloneForm(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
@@ -61,14 +64,10 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
         addComponent(panel);
     }
 
-    private Table createTableTemplate(String caption, int size) {
-        Table table = new Table(caption);
+    private TreeTable createTableTemplate(String caption, int size) {
+        TreeTable table = new TreeTable(caption);
         table.addContainerProperty("Physical Host", String.class, null);
         table.addContainerProperty("Lxc Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
@@ -79,57 +78,22 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
     }
 
     private void populateTable(Map<Agent, List<String>> agents) {
-
         lxcTable.removeAllItems();
 
         for (final Agent agent : agents.keySet()) {
+            lxcTable.addItem(new Object[]{agent.getHostname(), null, null}, agent.getHostname());
+            lxcTable.setCollapsed(agent.getHostname(), false);
             for (String lxc : agents.get(agent)) {
-                final Button checkBtn = new Button("Check");
-                final Button startBtn = new Button("Start");
-                final Button stopBtn = new Button("Stop");
-                final Button destroyBtn = new Button("Destroy");
-                final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-                stopBtn.setEnabled(false);
-                startBtn.setEnabled(false);
-                progressIcon.setVisible(false);
+                Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
 
-                final Object rowId = lxcTable.addItem(new Object[]{
-                    agent.getHostname(),
+                lxcTable.addItem(new Object[]{
+                    null,
                     lxc,
-                    checkBtn,
-                    startBtn,
-                    stopBtn,
-                    destroyBtn,
                     progressIcon},
-                        null);
+                        lxc);
 
-                checkBtn.addListener(new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(Button.ClickEvent event) {
-                    }
-                });
-
-                startBtn.addListener(new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(Button.ClickEvent event) {
-                    }
-                });
-
-                stopBtn.addListener(new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(Button.ClickEvent event) {
-                    }
-                });
-
-                destroyBtn.addListener(new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(Button.ClickEvent event) {
-                    }
-                });
+                lxcTable.setParent(lxc, agent.getHostname());
+                lxcTable.setChildrenAllowed(lxc, false);
             }
         }
     }
@@ -152,7 +116,7 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
                 getWindow().showNotification("Enter product name");
             } else {
                 //do the magic
-                lxcTable.removeAllItems();
+                requestToLxcMatchMap.clear();
                 String productName = textFieldLxcName.getValue().toString().trim();
                 Task task = new Task("Clone lxc containers for " + productName);
                 Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
@@ -166,13 +130,14 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
                         String lxcHostFull = lxcHost.toString() + i;
                         cmd.getRequest().getArgs().set(cmd.getRequest().getArgs().size() - 1, lxcHostFull);
                         task.addCommand(cmd);
+                        requestToLxcMatchMap.put(cmd.getRequest().getRequestSequenceNumber(), lxcHostFull);
                         lxcNames.add(lxcHostFull);
                     }
                     agentFamilies.put(physAgent, lxcNames);
                 }
                 populateTable(agentFamilies);
                 indicator.setVisible(true);
-//                taskRunner.runTask(task, this);
+                taskRunner.runTask(task, this);
             }
         } else {
             getWindow().showNotification("Select at least one physical agent");
@@ -181,6 +146,23 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
 
     @Override
     public void onResponse(Task task, Response response) {
+        if (Util.isFinalResponse(response)) {
+            Embedded statusIcon = null;
+            if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE && response.getExitCode() == 0) {
+                statusIcon = new Embedded("", new ThemeResource("icons/16/ok.png"));
+            } else {
+                statusIcon = new Embedded("", new ThemeResource("icons/16/cancel.png"));
+
+            }
+            String lxcHost = requestToLxcMatchMap.get(response.getRequestSequenceNumber());
+            if (lxcHost != null) {
+                Item row = lxcTable.getItem(lxcHost);
+                if (row != null) {
+                    row.getItemProperty("Status").setValue(statusIcon);
+                }
+            }
+            requestToLxcMatchMap.remove(response.getRequestSequenceNumber());
+        }
         if (task.isCompleted()) {
             indicator.setVisible(false);
         }

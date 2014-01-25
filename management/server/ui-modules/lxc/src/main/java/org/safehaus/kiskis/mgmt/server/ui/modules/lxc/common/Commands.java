@@ -44,6 +44,7 @@ public class Commands {
         req.setProgram("/usr/bin/lxc-clone");
         req.setArgs(Arrays.asList(
                 "-o",
+                "base-container",
                 "-n",
                 ""
         ));
