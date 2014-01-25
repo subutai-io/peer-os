@@ -45,7 +45,6 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
 
         GridLayout grid = new GridLayout(6, 1);
         grid.setSpacing(true);
-//        grid.setWidth("100%");
 
         grid.addComponent(new Label("Product name"));
         grid.addComponent(textFieldLxcName);
@@ -53,6 +52,7 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
         grid.addComponent(slider);
         grid.addComponent(cloneBtn);
         grid.addComponent(indicator);
+        grid.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         panel.addComponent(grid);
 
         lxcTable = createTableTemplate("Lxc containers", 500);
