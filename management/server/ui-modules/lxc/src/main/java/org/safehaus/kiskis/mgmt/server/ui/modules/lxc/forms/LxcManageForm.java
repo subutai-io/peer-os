@@ -30,8 +30,10 @@ public class LxcManageForm extends VerticalLayout {
 
     private Button startAllButton, stopAllButton, destroyAllButton;
     private List<String> startedLXC, stoppedLXC;
+    private final TaskRunner taskRunner;
 
-    public LxcManageForm() {
+    public LxcManageForm(TaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
         setSpacing(true);
 
         HorizontalLayout hLayout = new HorizontalLayout();

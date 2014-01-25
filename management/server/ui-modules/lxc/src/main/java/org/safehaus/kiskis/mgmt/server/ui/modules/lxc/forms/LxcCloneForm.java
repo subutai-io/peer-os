@@ -1,119 +1,147 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.forms;
 
-import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-//import org.safehaus.kiskis.mgmt.server.ui.install.AppData;
-/**
- * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 5:56 PM
- */
 @SuppressWarnings("serial")
-public class LxcCloneForm extends VerticalLayout implements
-        Button.ClickListener {
+public class LxcCloneForm extends VerticalLayout implements Button.ClickListener, TaskCallback {
 
-    /*private static final String CLONE_LXC = ""
-     + "{\n"
-     + "\t  \"command\": {\n"
-     + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
-     + "\t    \"source\": \":source\",\n"
-     + "\t    \"uuid\": \":uuid\",\n"
-     + "\t    \"taskUuid\": \":task\",\n"
-     + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
-     + "\t    \"workingDirectory\": \"/\",\n"
-     + "\t    \"program\": \"/usr/bin/lxc-clone\",\n"
-     + "\t    \"stdOut\": \"RETURN\",\n"
-     + "\t    \"stdErr\": \"RETURN\",\n"
-     + "\t    \"runAs\": \"root\",\n"
-     + "\t    \"args\": [\n"
-     + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name;\","
-     + "\"  cat /dev/null > /etc/resolvconf/resolv.conf.d/original && "
-     + " cat /dev/null > /var/lib/lxc/:lxc-host-name/rootfs/etc/resolvconf/resolv.conf.d/original"
-     + "\t    ],\n"
-     + "\t    \"timeout\": 360\n"
-     + "\t  }\n"
-     + "\t}";*/
-    private static final String CLONE_LXC = ""
-            + "{\n"
-            + "\t  \"command\": {\n"
-            + "\t    \"type\": \"EXECUTE_REQUEST\",\n"
-            + "\t    \"source\": \":source\",\n"
-            + "\t    \"uuid\": \":uuid\",\n"
-            + "\t    \"taskUuid\": \":task\",\n"
-            + "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n"
-            + "\t    \"workingDirectory\": \"/\",\n"
-            + "\t    \"program\": \"/usr/bin/lxc-clone\",\n"
-            + "\t    \"stdOut\": \"RETURN\",\n"
-            + "\t    \"stdErr\": \"RETURN\",\n"
-            + "\t    \"runAs\": \"root\",\n"
-            + "\t    \"args\": [\n"
-            + "\t      \"-o\",\"base-container\",\"-n\",\":lxc-host-name\""
-            + "\t    ],\n"
-            + "\t    \"timeout\": 360\n"
-            + "\t  }\n"
-            + "\t}";
+    private final Button cloneBtn;
+    private final TextField textFieldLxcName;
+    private final Slider slider;
+    private final Label indicator;
+    private final Table lxcTable;
+    private final TaskRunner taskRunner;
 
-    private Set<Agent> physicalAgents;
-    private Task cloneTask;
-    private TextField textFieldLxcName;
-    private Button buttonClone;
-    private Panel outputPanel;
-    private Slider slider;
-
-    public LxcCloneForm() {
+    public LxcCloneForm(TaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
         setSpacing(true);
-        // Panel 1 - with caption
         Panel panel = new Panel("Clone LXC template");
-        textFieldLxcName = new TextField("Clone LXC Template");
-        slider = new Slider("Select lxc count");
+        textFieldLxcName = new TextField();
+        slider = new Slider();
         slider.setMin(1);
         slider.setMax(20);
         slider.setWidth(150, Sizeable.UNITS_PIXELS);
         slider.setImmediate(true);
-        buttonClone = new Button("Clone");
-        buttonClone.addListener(this);
+        cloneBtn = new Button("Clone");
+        cloneBtn.addListener(this);
 
-        HorizontalLayout hLayout = new HorizontalLayout();
-        hLayout.setSpacing(true);
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 10);
+        indicator.setVisible(false);
 
-        hLayout.addComponent(textFieldLxcName);
-        hLayout.addComponent(slider);
-        hLayout.addComponent(buttonClone);
-        hLayout.setComponentAlignment(textFieldLxcName, Alignment.BOTTOM_CENTER);
-        hLayout.setComponentAlignment(buttonClone, Alignment.BOTTOM_CENTER);
-        panel.addComponent(hLayout);
+        GridLayout grid = new GridLayout(6, 1);
+        grid.setSpacing(true);
+//        grid.setWidth("100%");
 
-        VerticalLayout layout = (VerticalLayout) panel.getContent();
-        layout.setMargin(true);
-        layout.setSpacing(true);
+        grid.addComponent(new Label("Product name"));
+        grid.addComponent(textFieldLxcName);
+        grid.addComponent(new Label("Lxc count"));
+        grid.addComponent(slider);
+        grid.addComponent(cloneBtn);
+        grid.addComponent(indicator);
+//        grid.setComponentAlignment(cloneBtn, Alignment.BOTTOM_CENTER);
+        grid.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
+        panel.addComponent(grid);
 
-        outputPanel = new Panel("Clone command output");
+        lxcTable = createTableTemplate("Lxc containers", 500);
+        panel.addComponent(lxcTable);
 
         addComponent(panel);
-        addComponent(outputPanel);
+    }
+
+    private Table createTableTemplate(String caption, int size) {
+        Table table = new Table(caption);
+        table.addContainerProperty("Physical Host", String.class, null);
+        table.addContainerProperty("Lxc Host", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Start", Button.class, null);
+        table.addContainerProperty("Stop", Button.class, null);
+        table.addContainerProperty("Destroy", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
+        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        table.setHeight(size, Sizeable.UNITS_PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
+        return table;
+    }
+
+    private void populateTable(Map<Agent, List<String>> agents) {
+
+        lxcTable.removeAllItems();
+
+        for (final Agent agent : agents.keySet()) {
+            for (String lxc : agents.get(agent)) {
+                final Button checkBtn = new Button("Check");
+                final Button startBtn = new Button("Start");
+                final Button stopBtn = new Button("Stop");
+                final Button destroyBtn = new Button("Destroy");
+                final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+                stopBtn.setEnabled(false);
+                startBtn.setEnabled(false);
+                progressIcon.setVisible(false);
+
+                final Object rowId = lxcTable.addItem(new Object[]{
+                    agent.getHostname(),
+                    lxc,
+                    checkBtn,
+                    startBtn,
+                    stopBtn,
+                    destroyBtn,
+                    progressIcon},
+                        null);
+
+                checkBtn.addListener(new Button.ClickListener() {
+
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                    }
+                });
+
+                startBtn.addListener(new Button.ClickListener() {
+
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                    }
+                });
+
+                stopBtn.addListener(new Button.ClickListener() {
+
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                    }
+                });
+
+                destroyBtn.addListener(new Button.ClickListener() {
+
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                    }
+                });
+            }
+        }
     }
 
     @Override
     public void buttonClick(Button.ClickEvent clickEvent) {
-//        List<Agent> agents = AppData.getSelectedAgentList();
         Set<Agent> agents = MgmtApplication.getSelectedAgents();
-        if (agents != null && agents.size() > 0) {
-            physicalAgents = new HashSet<Agent>();
+        if (agents.size() > 0) {
+            Set<Agent> physicalAgents = new HashSet<Agent>();
+            //filter physical agents
             for (Agent agent : agents) {
                 if (!agent.isIsLXC()) {
                     physicalAgents.add(agent);
@@ -122,99 +150,41 @@ public class LxcCloneForm extends VerticalLayout implements
 
             if (physicalAgents.isEmpty()) {
                 getWindow().showNotification("Select at least one physical agent");
-            } else if (Strings.isNullOrEmpty(textFieldLxcName.getValue().toString())) {
-                getWindow().showNotification("Enter lxc hostname");
+            } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
+                getWindow().showNotification("Enter product name");
             } else {
-                outputPanel.removeAllComponents();
-                createTask();
-            }
-        }
-    }
-
-    private void createTask() {
-        cloneTask = new Task();
-        cloneTask.setTaskStatus(TaskStatus.NEW);
-        cloneTask.setDescription("Cloning lxc container");
-        if (getCommandManager() != null) {
-            RequestUtil.saveTask(cloneTask);
-            createRequests();
-        }
-    }
-
-    private void createRequests() {
-        String jsonTemplate = CLONE_LXC;
-        jsonTemplate = jsonTemplate.replaceAll(":task", cloneTask.getUuid().toString());
-        jsonTemplate = jsonTemplate.replaceAll(":source", LxcModule.MODULE_NAME);
-
-        Double count = (Double) slider.getValue();
-        for (int i = 1; i <= count; i++) {
-            for (Agent agent : physicalAgents) {
-                String json = jsonTemplate.replaceAll(":uuid", agent.getUuid().toString());
-                json = json.replaceAll(":requestSequenceNumber", cloneTask.getIncrementedReqSeqNumber().toString());
-                json = json.replaceAll(":lxc-host-name",
-                        agent.getHostname() + Common.PARENT_CHILD_LXC_SEPARATOR + textFieldLxcName.getValue().toString() + i);
-
-                Request request = CommandJson.getRequest(json);
-                if (getCommandManager() != null) {
-                    getCommandManager().executeCommand(new CommandImpl(request));
-                }
-
-                buttonClone.setEnabled(false);
-            }
-        }
-    }
-
-    public void outputResponse(Response response) {
-        if (cloneTask != null && response.getTaskUuid().compareTo(cloneTask.getUuid()) == 0) {
-            setTaskStatus();
-        }
-    }
-
-    public void setTaskStatus() {
-        if (getCommandManager() != null) {
-            outputPanel.removeAllComponents();
-            List<ParseResult> result = RequestUtil.parseTask(cloneTask.getUuid(), true);
-            for (ParseResult pr : result) {
-                if (pr.getResponse().getType().equals(ResponseType.EXECUTE_RESPONSE_DONE)) {
-                    if (pr.getResponse().getExitCode() == 0) {
-                        Label labelOk = new Label(pr.getResponse().getStdOut());
-                        labelOk.setIcon(new ThemeResource("icons/16/ok.png"));
-                        outputPanel.addComponent(labelOk);
-
-                        buttonClone.setEnabled(true);
-                    } else {
-                        if (pr.getResponse().getStdErr().contains("unable to write 'random state'")) {
-                            Label labelOk = new Label(pr.getResponse().getStdOut());
-                            labelOk.setIcon(new ThemeResource("icons/16/ok.png"));
-                            outputPanel.addComponent(labelOk);
-                        } else {
-                            Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
-                            labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
-                            outputPanel.addComponent(labelError);
-                        }
-
-                        buttonClone.setEnabled(true);
+                //do the magic
+                lxcTable.removeAllItems();
+                String productName = textFieldLxcName.getValue().toString().trim();
+                Task task = new Task("Clone lxc containers for " + productName);
+                Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
+                for (Agent physAgent : physicalAgents) {
+                    StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
+                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName);
+                    List<String> lxcNames = new ArrayList<String>();
+                    for (int i = 1; i <= (Double) slider.getValue(); i++) {
+                        Command cmd = Commands.getCloneCommand();
+                        cmd.getRequest().setUuid(physAgent.getUuid());
+                        String lxcHostFull = lxcHost.toString() + i;
+                        cmd.getRequest().getArgs().set(cmd.getRequest().getArgs().size() - 1, lxcHostFull);
+                        task.addCommand(cmd);
+                        lxcNames.add(lxcHostFull);
                     }
-                } else if (pr.getResponse().getType().equals(ResponseType.EXECUTE_TIMEOUTED)) {
-                    Label labelError = new Label(pr.getResponse().getStdOut() + " " + pr.getResponse().getStdErr());
-                    labelError.setIcon(new ThemeResource("icons/16/cancel.png"));
-                    outputPanel.addComponent(labelError);
-
-                    buttonClone.setEnabled(true);
+                    agentFamilies.put(physAgent, lxcNames);
                 }
+                populateTable(agentFamilies);
+                indicator.setVisible(true);
+//                taskRunner.runTask(task, this);
             }
+        } else {
+            getWindow().showNotification("Select at least one physical agent");
         }
     }
 
-    public CommandManager getCommandManager() {
-        BundleContext ctx = FrameworkUtil.getBundle(LxcModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
-            if (serviceReference != null) {
-                return CommandManager.class.cast(ctx.getService(serviceReference));
-            }
+    @Override
+    public void onResponse(Task task, Response response) {
+        if (task.isCompleted()) {
+            indicator.setVisible(false);
         }
-
-        return null;
     }
 }
