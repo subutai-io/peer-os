@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
@@ -22,6 +24,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 @SuppressWarnings("serial")
 public class LxcCloneForm extends VerticalLayout implements Button.ClickListener, TaskCallback {
 
+    private static final Logger LOG = Logger.getLogger(LxcCloneForm.class.getName());
+
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
@@ -29,9 +33,13 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
     private final TreeTable lxcTable;
     private final TaskRunner taskRunner;
     private final Map<Integer, String> requestToLxcMatchMap = new HashMap<Integer, String>();
+    private final int timeout;
+    private Thread operationTimeoutThread;
 
     public LxcCloneForm(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
+        timeout = Commands.getCloneCommand().getRequest().getTimeout();
+
         setSpacing(true);
         Panel panel = new Panel("Clone LXC template");
         textFieldLxcName = new TextField();
@@ -137,10 +145,36 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
                 }
                 populateTable(agentFamilies);
                 indicator.setVisible(true);
+                cloneBtn.setEnabled(false);
                 taskRunner.runTask(task, this);
             }
         } else {
             getWindow().showNotification("Select at least one physical agent");
+        }
+    }
+
+    private void runTimeoutThread() {
+        try {
+            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
+                operationTimeoutThread.interrupt();
+            }
+            operationTimeoutThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //wait for timeout + 5 sec just in case
+                        Thread.sleep(timeout * 1000 + 5000);
+
+                        cloneBtn.setEnabled(true);
+                        indicator.setVisible(false);
+                    } catch (InterruptedException ex) {
+                    }
+                }
+            });
+            operationTimeoutThread.start();
+
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
         }
     }
 
@@ -165,6 +199,7 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
         }
         if (task.isCompleted()) {
             indicator.setVisible(false);
+            cloneBtn.setEnabled(true);
         }
     }
 }
