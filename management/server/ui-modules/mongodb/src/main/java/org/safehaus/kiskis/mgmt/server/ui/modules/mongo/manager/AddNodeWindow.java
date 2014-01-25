@@ -157,7 +157,7 @@ public class AddNodeWindow extends Window {
 
         content.addComponent(outputTxtArea, 0, 1, 18, 1);
 
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
         content.addComponent(indicator, 19, 1, 19, 1);

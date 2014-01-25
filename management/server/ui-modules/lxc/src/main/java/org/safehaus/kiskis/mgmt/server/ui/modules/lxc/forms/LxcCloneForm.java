@@ -40,7 +40,7 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
         cloneBtn = new Button("Clone");
         cloneBtn.addListener(this);
 
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 10);
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
         GridLayout grid = new GridLayout(6, 1);
@@ -53,8 +53,6 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
         grid.addComponent(slider);
         grid.addComponent(cloneBtn);
         grid.addComponent(indicator);
-//        grid.setComponentAlignment(cloneBtn, Alignment.BOTTOM_CENTER);
-        grid.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
         panel.addComponent(grid);
 
         lxcTable = createTableTemplate("Lxc containers", 500);

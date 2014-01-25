@@ -101,7 +101,7 @@ public class InstallationStep extends Panel {
             }
         });
 
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(ok);
