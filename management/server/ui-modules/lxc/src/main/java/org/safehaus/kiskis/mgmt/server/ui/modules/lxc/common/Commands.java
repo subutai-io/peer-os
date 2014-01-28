@@ -52,4 +52,65 @@ public class Commands {
         return cmd;
     }
 
+    public static Command getLxcListCommand() {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/lxc-list");
+        req.setTimeout(60);
+        return cmd;
+    }
+
+    public static Command getLxcInfoCommand(String lxcHostname) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/lxc-info");
+        req.setArgs(Arrays.asList(
+                "-n",
+                lxcHostname
+        ));
+        req.setTimeout(60);
+        return cmd;
+    }
+
+    public static Command getLxcStartCommand(String lxcHostname) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/lxc-start");
+        req.setArgs(Arrays.asList(
+                "-n",
+                lxcHostname,
+                "-d"
+        ));
+        req.setTimeout(120);
+        return cmd;
+    }
+
+    public static Command getLxcStopCommand(String lxcHostname) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/lxc-stop");
+        req.setArgs(Arrays.asList(
+                "-n",
+                lxcHostname
+        ));
+        req.setTimeout(120);
+        return cmd;
+    }
+
+    public static Command getLxcDestroyCommand(String lxcHostname) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("/usr/bin/lxc-stop");
+        req.setArgs(Arrays.asList(
+                "-n",
+                lxcHostname,
+                "&&",
+                "/usr/bin/lxc-destroy",
+                "-n",
+                lxcHostname
+        ));
+        req.setTimeout(180);
+        return cmd;
+    }
+
 }

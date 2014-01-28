@@ -32,7 +32,7 @@ public class Request implements Serializable {
     private List<String> args = null;
     private Map<String, String> environment = null;
     private Integer pid = null;
-    private Integer timeout = null;
+    private Integer timeout = 30;
 
     public UUID getTaskUuid() {
         return taskUuid;
@@ -151,7 +151,9 @@ public class Request implements Serializable {
     }
 
     public void setTimeout(Integer timeout) {
-        this.timeout = timeout;
+        if (timeout != null && timeout > 0) {
+            this.timeout = timeout;
+        }
     }
 
     public Integer getPid() {
