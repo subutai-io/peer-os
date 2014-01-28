@@ -43,20 +43,18 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
  * @author dilshat
  *
  */
-public class Manager implements ResponseListener {
+public class Manager {
     /*
      TODO:
      1) add node
@@ -71,12 +69,13 @@ public class Manager implements ResponseListener {
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
-    private final TaskRunner taskRunner = new TaskRunner();
+    private final TaskRunner taskRunner;
     private DestroyClusterWindow destroyWindow;
     private AddNodeWindow addNodeWindow;
     private ClusterConfig config;
 
-    public Manager() {
+    public Manager(final TaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
         agentManager = ServiceLocator.getService(AgentManager.class);
 
         contentRoot = new VerticalLayout();
@@ -231,11 +230,6 @@ public class Manager implements ResponseListener {
 
     public Component getContent() {
         return contentRoot;
-    }
-
-    @Override
-    public void onResponse(Response response) {
-        taskRunner.feedResponse(response);
     }
 
     private void show(String notification) {

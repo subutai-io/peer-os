@@ -20,6 +20,7 @@ public class MongoModule implements Module {
 
         private final Wizard wizard;
         private final Manager manager;
+        private final TaskRunner taskRunner = new TaskRunner();
 
         public ModuleComponent() {
             setSizeFull();
@@ -30,8 +31,8 @@ public class MongoModule implements Module {
             TabSheet mongoSheet = new TabSheet();
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
-            wizard = new Wizard();
-            manager = new Manager();
+            wizard = new Wizard(taskRunner);
+            manager = new Manager(taskRunner);
             mongoSheet.addTab(wizard.getContent(), "Install");
             mongoSheet.addTab(manager.getContent(), "Manage");
 
@@ -43,8 +44,7 @@ public class MongoModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            wizard.onResponse(response);
-            manager.onResponse(response);
+            taskRunner.feedResponse(response);
         }
 
         @Override

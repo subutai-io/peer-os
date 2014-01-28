@@ -12,15 +12,13 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 
 /**
  *
  * @author dilshat
  */
-public class Wizard implements ResponseListener {
+public class Wizard {
 
     private static final Logger LOG = Logger.getLogger(Wizard.class.getName());
 
@@ -28,11 +26,11 @@ public class Wizard implements ResponseListener {
     private final ProgressIndicator progressBar;
     private final ClusterConfig config = new ClusterConfig();
     private final GridLayout grid;
-    private final TaskRunner taskRunner = new TaskRunner();
+    private final TaskRunner taskRunner;
     private int step = 1;
 
-    public Wizard() {
-
+    public Wizard(TaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
         grid = new GridLayout(1, 20);
         grid.setMargin(true);
         grid.setSizeFull();
@@ -114,12 +112,6 @@ public class Wizard implements ResponseListener {
 
     public TaskRunner getTaskRunner() {
         return taskRunner;
-    }
-
-    @Override
-    public void onResponse(Response response) {
-        taskRunner.feedResponse(response);
-
     }
 
 }
