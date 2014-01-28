@@ -72,6 +72,19 @@ public class Commands {
         return cmd;
     }
 
+    public static Command getLxcInfoWithWaitCommand(String lxcHostname) {
+        Command cmd = getTemplate();
+        Request req = cmd.getRequest();
+        req.setProgram("sleep 5;");
+        req.setArgs(Arrays.asList(
+                "/usr/bin/lxc-info",
+                "-n",
+                lxcHostname
+        ));
+        req.setTimeout(60);
+        return cmd;
+    }
+
     public static Command getLxcStartCommand(String lxcHostname) {
         Command cmd = getTemplate();
         Request req = cmd.getRequest();
