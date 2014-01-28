@@ -124,7 +124,7 @@ public class InstallationStep extends Panel {
     public void startOperation(final boolean install) {
         try {
             //stop any running installation
-            taskRunner.removeAllTaskCallbacks();
+//            taskRunner.removeAllTaskCallbacks();
             final Operation installOperation = install ? new InstallClusterOperation(config) : new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();

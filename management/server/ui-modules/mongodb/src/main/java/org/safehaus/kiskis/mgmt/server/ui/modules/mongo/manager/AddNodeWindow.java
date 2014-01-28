@@ -193,7 +193,7 @@ public class AddNodeWindow extends Window {
     private void startOperation(final NodeType nodeType, final Agent agent) {
         try {
             //stop any running installation
-            taskRunner.removeAllTaskCallbacks();
+//            taskRunner.removeAllTaskCallbacks();
             final Operation operation
                     = (nodeType == NodeType.DATA_NODE)
                     ? new AddDataNodeOperation(config, agent)

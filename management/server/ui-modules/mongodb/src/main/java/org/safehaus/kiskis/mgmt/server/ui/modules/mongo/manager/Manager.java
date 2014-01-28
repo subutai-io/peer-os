@@ -167,7 +167,7 @@ public class Manager {
                                                 if (destroyWindow.isSucceeded()) {
                                                     refreshClustersInfo();
                                                 }
-                                                taskRunner.removeAllTaskCallbacks();
+//                                                taskRunner.removeAllTaskCallbacks();
                                             }
                                         });
                                         destroyWindow.startOperation();
@@ -201,7 +201,7 @@ public class Manager {
                             if (addNodeWindow.isSucceeded()) {
                                 refreshClustersInfo();
                             }
-                            taskRunner.removeAllTaskCallbacks();
+//                            taskRunner.removeAllTaskCallbacks();
                         }
                     });
                 } else {

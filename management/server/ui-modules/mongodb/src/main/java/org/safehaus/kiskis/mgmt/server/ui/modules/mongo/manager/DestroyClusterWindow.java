@@ -101,7 +101,7 @@ public class DestroyClusterWindow extends Window {
     void startOperation() {
         try {
             //stop any running installation
-            taskRunner.removeAllTaskCallbacks();
+//            taskRunner.removeAllTaskCallbacks();
             final Operation installOperation = new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();
