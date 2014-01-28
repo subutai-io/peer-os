@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage;
 
+import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +38,10 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
 
     private final TaskRunner taskRunner;
     private final Label indicator;
-    private final Button getLxcsBtn;
+    private final Button infoBtn;
+    private final Button startAllBtn;
+    private final Button stopAllBtn;
+    private final Button destroyAllBtn;
     private final TreeTable lxcTable;
     private final int timeout;
     private final Map<UUID, StringBuilder> lxcMap = new HashMap<UUID, StringBuilder>();
@@ -53,21 +58,68 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
         this.agentManager = ServiceLocator.getService(AgentManager.class);
         timeout = Commands.getLxcListCommand().getRequest().getTimeout();
 
-        getLxcsBtn = new Button("Get LXCs");
-        getLxcsBtn.addListener(this);
+        lxcTable = createTableTemplate("Lxc containers", 500);
+
+        infoBtn = new Button("Info");
+        infoBtn.addListener(this);
+
+        stopAllBtn = new Button("Stop All");
+        stopAllBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+                    Item row = lxcTable.getItem(it.next());
+                    Button stopBtn = (Button) (row.getItemProperty("Stop").getValue());
+                    if (stopBtn != null) {
+                        stopBtn.click();
+                    }
+                }
+            }
+        });
+        startAllBtn = new Button("Start All");
+        startAllBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+                    Item row = lxcTable.getItem(it.next());
+                    Button startBtn = (Button) (row.getItemProperty("Start").getValue());
+                    if (startBtn != null) {
+                        startBtn.click();
+                    }
+                }
+            }
+        });
+        destroyAllBtn = new Button("Destroy All");
+        destroyAllBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+                    Item row = lxcTable.getItem(it.next());
+                    Button destroyBtn = (Button) (row.getItemProperty("Destroy").getValue());
+                    if (destroyBtn != null) {
+                        destroyBtn.click();
+                    }
+                }
+            }
+        });
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout grid = new GridLayout(6, 1);
+        GridLayout grid = new GridLayout(5, 1);
         grid.setSpacing(true);
 
-        grid.addComponent(getLxcsBtn);
+        grid.addComponent(infoBtn);
+        grid.addComponent(startAllBtn);
+        grid.addComponent(stopAllBtn);
+        grid.addComponent(destroyAllBtn);
         grid.addComponent(indicator);
         grid.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(grid);
 
-        lxcTable = createTableTemplate("Lxc containers", 500);
         addComponent(lxcTable);
 
     }
@@ -122,12 +174,18 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
 
     private void showProgress() {
         indicator.setVisible(true);
-        getLxcsBtn.setEnabled(false);
+        infoBtn.setEnabled(false);
+        startAllBtn.setEnabled(false);
+        stopAllBtn.setEnabled(false);
+        destroyAllBtn.setEnabled(false);
     }
 
     private void hideProgress() {
         indicator.setVisible(false);
-        getLxcsBtn.setEnabled(true);
+        infoBtn.setEnabled(true);
+        startAllBtn.setEnabled(true);
+        stopAllBtn.setEnabled(true);
+        destroyAllBtn.setEnabled(true);
     }
 
     private void runTimeoutThread() {
