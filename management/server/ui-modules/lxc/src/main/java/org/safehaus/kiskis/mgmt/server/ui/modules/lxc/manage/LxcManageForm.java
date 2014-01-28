@@ -11,6 +11,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.LxcState;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.TaskType;
@@ -32,7 +34,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
-public class LxcManageForm extends VerticalLayout implements Button.ClickListener, TaskCallback {
+public class LxcManageForm extends VerticalLayout {
 
     private static final Logger LOG = Logger.getLogger(LxcManageForm.class.getName());
 
@@ -46,6 +48,7 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
     private final int timeout;
     private final Map<UUID, StringBuilder> lxcMap = new HashMap<UUID, StringBuilder>();
     private final AgentManager agentManager;
+    private final static String physicalHostLabel = "Physical Host";
     private Thread operationTimeoutThread;
     private Set<Agent> physicalAgents;
 
@@ -60,45 +63,69 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
 
         lxcTable = createTableTemplate("Lxc containers", 500);
 
-        infoBtn = new Button("Info");
-        infoBtn.addListener(this);
+        infoBtn = new Button(Buttons.INFO.getButtonLabel());
+        infoBtn.addListener(new Button.ClickListener() {
 
-        stopAllBtn = new Button("Stop All");
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                Set<Agent> agents = MgmtApplication.getSelectedAgents();
+                if (agents.size() > 0) {
+                    physicalAgents = new HashSet<Agent>();
+                    //filter physical agents
+                    for (Agent agent : agents) {
+                        if (!agent.isIsLXC()) {
+                            physicalAgents.add(agent);
+                        }
+                    }
+
+                    if (physicalAgents.isEmpty()) {
+                        getWindow().showNotification("Select at least one physical agent");
+                    } else {
+                        //do the magic
+                        sendGetLxcListCmd(physicalAgents);
+                    }
+                } else {
+                    getWindow().showNotification("Select at least one physical agent");
+                }
+            }
+        });
+
+        stopAllBtn = new Button(Buttons.STOP_ALL.getButtonLabel());
         stopAllBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
                     Item row = lxcTable.getItem(it.next());
-                    Button stopBtn = (Button) (row.getItemProperty("Stop").getValue());
+                    Button stopBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
                     if (stopBtn != null) {
                         stopBtn.click();
                     }
                 }
             }
         });
-        startAllBtn = new Button("Start All");
+        startAllBtn = new Button(Buttons.START_ALL.getButtonLabel());
         startAllBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
                     Item row = lxcTable.getItem(it.next());
-                    Button startBtn = (Button) (row.getItemProperty("Start").getValue());
+                    Button startBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
                     if (startBtn != null) {
                         startBtn.click();
                     }
                 }
             }
         });
-        destroyAllBtn = new Button("Destroy All");
+        destroyAllBtn = new Button(Buttons.DESTROY_ALL.getButtonLabel());
         destroyAllBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
                     Item row = lxcTable.getItem(it.next());
-                    Button destroyBtn = (Button) (row.getItemProperty("Destroy").getValue());
+                    Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
                     if (destroyBtn != null) {
                         destroyBtn.click();
                     }
@@ -126,11 +153,11 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
 
     private TreeTable createTableTemplate(String caption, int size) {
         TreeTable table = new TreeTable(caption);
-        table.addContainerProperty("Physical Host", String.class, null);
+        table.addContainerProperty(physicalHostLabel, String.class, null);
         table.addContainerProperty("Lxc Host", String.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
+        table.addContainerProperty(Buttons.START.getButtonLabel(), Button.class, null);
+        table.addContainerProperty(Buttons.STOP.getButtonLabel(), Button.class, null);
+        table.addContainerProperty(Buttons.DESTROY.getButtonLabel(), Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
@@ -140,34 +167,57 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
         return table;
     }
 
-    @Override
-    public void buttonClick(Button.ClickEvent event) {
-        Set<Agent> agents = MgmtApplication.getSelectedAgents();
-        if (agents.size() > 0) {
-            physicalAgents = new HashSet<Agent>();
-            //filter physical agents
-            for (Agent agent : agents) {
-                if (!agent.isIsLXC()) {
-                    physicalAgents.add(agent);
-                }
-            }
-
-            if (physicalAgents.isEmpty()) {
-                getWindow().showNotification("Select at least one physical agent");
-            } else {
-                //do the magic
-                sendGetLxcListCmd(physicalAgents);
-            }
-        } else {
-            getWindow().showNotification("Select at least one physical agent");
-        }
-    }
-
     private void sendGetLxcListCmd(Set<Agent> physicalAgents) {
         lxcMap.clear();
         lxcTable.setEnabled(false);
         Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
-        taskRunner.runTask(getLxcListTask, this);
+        taskRunner.runTask(getLxcListTask, new TaskCallback() {
+
+            @Override
+            public void onResponse(Task task, Response response) {
+                if (task.getData() == TaskType.GET_LXC_LIST) {
+                    if (lxcMap.get(response.getUuid()) == null) {
+                        lxcMap.put(response.getUuid(), new StringBuilder());
+                    }
+                    if (!Util.isStringEmpty(response.getStdOut())) {
+                        lxcMap.get(response.getUuid()).append(response.getStdOut());
+                    }
+
+                    if (task.isCompleted()) {
+                        Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
+                        for (Map.Entry<UUID, StringBuilder> parentEntry : lxcMap.entrySet()) {
+                            Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
+                            String parentHostname = agent == null
+                                    ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
+                            EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
+                            String[] lxcStrs = parentEntry.getValue().toString().split("\\n");
+                            LxcState currState = null;
+                            for (String lxcStr : lxcStrs) {
+                                if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
+                                    if (lxcs.get(LxcState.RUNNING) == null) {
+                                        lxcs.put(LxcState.RUNNING, new ArrayList<String>());
+                                    }
+                                    currState = LxcState.RUNNING;
+                                } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
+                                    if (lxcs.get(LxcState.STOPPED) == null) {
+                                        lxcs.put(LxcState.STOPPED, new ArrayList<String>());
+                                    }
+                                    currState = LxcState.STOPPED;
+                                } else if (currState != null
+                                        && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                                    lxcs.get(currState).add(lxcStr);
+                                }
+                            }
+                            agentFamilies.put(parentHostname, lxcs);
+                        }
+
+                        populateTable(agentFamilies);
+                        lxcTable.setEnabled(true);
+                        hideProgress();
+                    }
+                }
+            }
+        });
         runTimeoutThread();
         showProgress();
     }
@@ -178,14 +228,50 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
         startAllBtn.setEnabled(false);
         stopAllBtn.setEnabled(false);
         destroyAllBtn.setEnabled(false);
+        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+            Item row = lxcTable.getItem(it.next());
+            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
+                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
+                if (startAllPerParentBtn != null) {
+                    startAllPerParentBtn.setEnabled(false);
+                }
+                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
+                if (stopAllPerParentBtn != null) {
+                    stopAllPerParentBtn.setEnabled(false);
+                }
+                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+                if (destroyPerParentAllBtn != null) {
+                    destroyPerParentAllBtn.setEnabled(false);
+                }
+            }
+        }
     }
 
     private void hideProgress() {
-        indicator.setVisible(false);
+        if (taskRunner.getRemainingTaskCount() == 0) {
+            indicator.setVisible(false);
+        }
         infoBtn.setEnabled(true);
         startAllBtn.setEnabled(true);
         stopAllBtn.setEnabled(true);
         destroyAllBtn.setEnabled(true);
+        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+            Item row = lxcTable.getItem(it.next());
+            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
+                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
+                if (startAllPerParentBtn != null) {
+                    startAllPerParentBtn.setEnabled(true);
+                }
+                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
+                if (stopAllPerParentBtn != null) {
+                    stopAllPerParentBtn.setEnabled(true);
+                }
+                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+                if (destroyPerParentAllBtn != null) {
+                    destroyPerParentAllBtn.setEnabled(true);
+                }
+            }
+        }
     }
 
     private void runTimeoutThread() {
@@ -212,74 +298,74 @@ public class LxcManageForm extends VerticalLayout implements Button.ClickListene
         }
     }
 
-    @Override
-    public void onResponse(Task task, Response response) {
-        try {
-            if (task.getData() == TaskType.GET_LXC_LIST) {
-                processLxcListCmd(task, response);
-            }
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in onResponse", e);
-        }
-    }
-
-    private void processLxcListCmd(Task task, Response response) {
-        if (lxcMap.get(response.getUuid()) == null) {
-            lxcMap.put(response.getUuid(), new StringBuilder());
-        }
-        if (!Util.isStringEmpty(response.getStdOut())) {
-            lxcMap.get(response.getUuid()).append(response.getStdOut());
-        }
-
-        if (task.isCompleted()) {
-            Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
-            for (Map.Entry<UUID, StringBuilder> parentEntry : lxcMap.entrySet()) {
-                Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
-                String parentHostname = agent == null
-                        ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
-                EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
-                String[] lxcStrs = parentEntry.getValue().toString().split("\\n");
-                LxcState currState = null;
-                for (String lxcStr : lxcStrs) {
-                    if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
-                        if (lxcs.get(LxcState.RUNNING) == null) {
-                            lxcs.put(LxcState.RUNNING, new ArrayList<String>());
-                        }
-                        currState = LxcState.RUNNING;
-                    } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
-                        if (lxcs.get(LxcState.STOPPED) == null) {
-                            lxcs.put(LxcState.STOPPED, new ArrayList<String>());
-                        }
-                        currState = LxcState.STOPPED;
-                    } else if (currState != null
-                            && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                        lxcs.get(currState).add(lxcStr);
-                    }
-                }
-                agentFamilies.put(parentHostname, lxcs);
-            }
-
-            populateTable(agentFamilies);
-            lxcTable.setEnabled(true);
-            hideProgress();
-        }
-    }
-
     private void populateTable(Map<String, EnumMap<LxcState, List<String>>> agentFamilies) {
         lxcTable.removeAllItems();
 
         for (Map.Entry<String, EnumMap<LxcState, List<String>>> agentFamily : agentFamilies.entrySet()) {
             final String parentHostname = agentFamily.getKey();
-            lxcTable.addItem(new Object[]{parentHostname, null, null, null, null, null}, parentHostname);
+            final Button startAllChildrenBtn = new Button(Buttons.START.getButtonLabel());
+            final Button stopAllChildrenBtn = new Button(Buttons.STOP.getButtonLabel());
+            final Button destroyAllChildrenBtn = new Button(Buttons.DESTROY.getButtonLabel());
+            final Object parentId = lxcTable.addItem(new Object[]{parentHostname, null, startAllChildrenBtn, stopAllChildrenBtn, destroyAllChildrenBtn, null}, parentHostname);
             lxcTable.setCollapsed(parentHostname, false);
+
+            startAllChildrenBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Collection col = lxcTable.getChildren(parentId);
+                    if (col != null) {
+                        for (Iterator it = col.iterator(); it.hasNext();) {
+                            Item row = lxcTable.getItem(it.next());
+                            Button startBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
+                            if (startBtn != null) {
+                                startBtn.click();
+                            }
+                        }
+                    }
+                }
+            });
+
+            stopAllChildrenBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Collection col = lxcTable.getChildren(parentId);
+                    if (col != null) {
+                        for (Iterator it = col.iterator(); it.hasNext();) {
+                            Item row = lxcTable.getItem(it.next());
+                            Button stopBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
+                            if (stopBtn != null) {
+                                stopBtn.click();
+                            }
+                        }
+                    }
+                }
+            });
+
+            destroyAllChildrenBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    Collection col = lxcTable.getChildren(parentId);
+                    if (col != null) {
+                        for (Iterator it = col.iterator(); it.hasNext();) {
+                            Item row = lxcTable.getItem(it.next());
+                            Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+                            if (destroyBtn != null) {
+                                destroyBtn.click();
+                            }
+                        }
+                    }
+                }
+            });
 
             for (Map.Entry<LxcState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
 
                 for (final String lxcHostname : lxcs.getValue()) {
-                    final Button startBtn = new Button("Start");
-                    final Button stopBtn = new Button("Stop");
-                    final Button destroyBtn = new Button("Destroy");
+                    final Button startBtn = new Button(Buttons.START.getButtonLabel());
+                    final Button stopBtn = new Button(Buttons.STOP.getButtonLabel());
+                    final Button destroyBtn = new Button(Buttons.DESTROY.getButtonLabel());
                     final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
                     progressIcon.setVisible(false);
 
