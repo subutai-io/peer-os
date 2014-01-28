@@ -80,7 +80,7 @@ public class DestroyClusterWindow extends Window {
             }
         });
 
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
         content.addComponent(ok, 18, 2, 18, 2);
         content.addComponent(indicator, 19, 0, 19, 0);
@@ -101,7 +101,7 @@ public class DestroyClusterWindow extends Window {
     void startOperation() {
         try {
             //stop any running installation
-            taskRunner.removeAllTaskCallbacks();
+//            taskRunner.removeAllTaskCallbacks();
             final Operation installOperation = new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();

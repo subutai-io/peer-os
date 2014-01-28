@@ -64,7 +64,7 @@ public class Terminal implements Module {
             final Button sendBtn = new Button("Send");
             grid.addComponent(sendBtn, 18, 9, 18, 9);
 
-            final Label indicator = MgmtApplication.createImage("indicator.gif", 50, 50);
+            final Label indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
             indicator.setVisible(false);
             grid.addComponent(indicator, 19, 9, 19, 9);
 

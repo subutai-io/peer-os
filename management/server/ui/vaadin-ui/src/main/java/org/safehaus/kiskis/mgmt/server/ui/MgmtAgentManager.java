@@ -76,15 +76,10 @@ public final class MgmtAgentManager extends ConcurrentComponent
                     }
 
                     MgmtApplication.setSelectedAgents(selectedList);
-                    
-//                    getWindow().showNotification(
-//                            "Selected agents",
-//                            selectedList.toString(),
-//                            Window.Notification.POSITION_TOP_RIGHT);
+
                 }
             }
         });
-        addComponent(getRefreshButton());
         addComponent(tree);
     }
 
@@ -96,20 +91,6 @@ public final class MgmtAgentManager extends ConcurrentComponent
     @Override
     public synchronized Component getParent() {
         return super.getParent();
-    }
-
-    private Button getRefreshButton() {
-        Button button = new Button("Refresh");
-        button.setDescription("Gets LXC agents from Cassandra");
-        button.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                tree.setValue(null);
-                MgmtApplication.clearSelectedAgents();
-                refreshAgents(agentManager.getAgents());
-            }
-        });
-        return button;
     }
 
     @Override
