@@ -41,9 +41,9 @@ public class CommunicationServiceImpl implements CommunicationService {
     private int amqMaxPooledConnections;
     private int amqMaxSenderPoolSize;
     private int amqInactiveQueuesDropTimeoutSec;
-    private int amqNeedClientAuth;
+    private boolean amqNeedClientAuth;
 
-    public void setAmqNeedClientAuth(int amqNeedClientAuth) {
+    public void setAmqNeedClientAuth(boolean amqNeedClientAuth) {
         this.amqNeedClientAuth = amqNeedClientAuth;
     }
 
