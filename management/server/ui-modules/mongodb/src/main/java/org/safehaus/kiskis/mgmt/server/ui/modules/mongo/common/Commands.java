@@ -68,7 +68,7 @@ public class Commands {
                 "install",
                 "ksks-mongo"
         ));
-        req.setTimeout(180);
+        req.setTimeout(360);
         return cmd;
     }
 
