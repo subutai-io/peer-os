@@ -368,15 +368,22 @@ public class Manager extends VerticalLayout {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        Collection col = lxcTable.getChildren(parentId);
-                                        if (col != null) {
-                                            for (Iterator it = col.iterator(); it.hasNext();) {
-                                                Item row = lxcTable.getItem(it.next());
-                                                Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
-                                                if (destroyBtn != null) {
-                                                    destroyBtn.click();
+                                        System.out.println("IN destroy");
+                                        try {
+                                            Collection col = lxcTable.getChildren(parentId);
+                                            if (col != null) {
+                                                for (Iterator it = col.iterator(); it.hasNext();) {
+                                            System.out.println("Destorying");
+                                                    Item row = lxcTable.getItem(it.next());
+                                                    Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+                                                    if (destroyBtn != null) {
+                                                        System.out.println("Clicking");
+                                                        destroyBtn.click();
+                                                    }
                                                 }
                                             }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
                                         }
                                     }
                                 }
@@ -502,14 +509,14 @@ public class Manager extends VerticalLayout {
 
                         @Override
                         public void buttonClick(Button.ClickEvent event) {
-                            MgmtApplication.showConfirmationDialog(
-                                    "Lxc destruction confirmation",
-                                    "Do you want to destroy this lxc node?",
-                                    "Yes", "No", new ConfirmationDialogCallback() {
-
-                                        @Override
-                                        public void response(boolean ok) {
-                                            if (ok) {
+//                            MgmtApplication.showConfirmationDialog(
+//                                    "Lxc destruction confirmation",
+//                                    "Do you want to destroy this lxc node?",
+//                                    "Yes", "No", new ConfirmationDialogCallback() {
+//
+//                                        @Override
+//                                        public void response(boolean ok) {
+//                                            if (ok) {
 
                                                 final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                                                 if (physicalAgent != null) {
@@ -549,9 +556,9 @@ public class Manager extends VerticalLayout {
                                                         }
                                                     });
                                                 }
-                                            }
-                                        }
-                                    });
+//                                            }
+//                                        }
+//                                    });
                         }
                     });
 

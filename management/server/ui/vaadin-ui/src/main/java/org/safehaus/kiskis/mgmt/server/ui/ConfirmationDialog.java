@@ -93,10 +93,9 @@ public final class ConfirmationDialog extends Window implements Button.ClickList
      */
     @Override
     public void buttonClick(final ClickEvent event) {
-//        if (getParent() != null) {
-//            ((Window) getParent()).removeWindow(this);
-//        }
-        MgmtApplication.removeCustomWindow(this);
+        if (getParent() != null) {
+            ((Window) getParent()).removeWindow(this);
+        }
         callback.response(event.getSource() == okButton);
     }
 
