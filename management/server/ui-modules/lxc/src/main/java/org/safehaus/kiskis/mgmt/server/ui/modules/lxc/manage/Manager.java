@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
@@ -123,13 +124,24 @@ public class Manager extends VerticalLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
-                    Item row = lxcTable.getItem(it.next());
-                    Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
-                    if (destroyBtn != null) {
-                        destroyBtn.click();
-                    }
-                }
+                MgmtApplication.showConfirmationDialog(
+                        "Lxc destruction confirmation",
+                        "Do you want to destroy all lxc nodes?",
+                        "Yes", "No", new ConfirmationDialogCallback() {
+
+                            @Override
+                            public void response(boolean ok) {
+                                if (ok) {
+                                    for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+                                        Item row = lxcTable.getItem(it.next());
+                                        Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+                                        if (destroyBtn != null) {
+                                            destroyBtn.click();
+                                        }
+                                    }
+                                }
+                            }
+                        });
             }
         });
 
@@ -347,16 +359,28 @@ public class Manager extends VerticalLayout {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    Collection col = lxcTable.getChildren(parentId);
-                    if (col != null) {
-                        for (Iterator it = col.iterator(); it.hasNext();) {
-                            Item row = lxcTable.getItem(it.next());
-                            Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
-                            if (destroyBtn != null) {
-                                destroyBtn.click();
-                            }
-                        }
-                    }
+
+                    MgmtApplication.showConfirmationDialog(
+                            "Lxc destruction confirmation",
+                            "Do you want to destroy all lxc nodes on this physical node?",
+                            "Yes", "No", new ConfirmationDialogCallback() {
+
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+                                        Collection col = lxcTable.getChildren(parentId);
+                                        if (col != null) {
+                                            for (Iterator it = col.iterator(); it.hasNext();) {
+                                                Item row = lxcTable.getItem(it.next());
+                                                Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+                                                if (destroyBtn != null) {
+                                                    destroyBtn.click();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
                 }
             });
 
@@ -478,45 +502,56 @@ public class Manager extends VerticalLayout {
 
                         @Override
                         public void buttonClick(Button.ClickEvent event) {
+                            MgmtApplication.showConfirmationDialog(
+                                    "Lxc destruction confirmation",
+                                    "Do you want to destroy this lxc node?",
+                                    "Yes", "No", new ConfirmationDialogCallback() {
 
-                            final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
-                            if (physicalAgent != null) {
-                                Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
-                                startBtn.setEnabled(false);
-                                stopBtn.setEnabled(false);
-                                destroyBtn.setEnabled(false);
-                                progressIcon.setVisible(true);
-                                showProgress();
-                                taskRunner.runTask(destroyLxcTask, new TaskCallback() {
-                                    StringBuilder output = new StringBuilder();
+                                        @Override
+                                        public void response(boolean ok) {
+                                            if (ok) {
 
-                                    @Override
-                                    public void onResponse(Task task, Response response) {
-                                        if (task.getData() == TaskType.DESTROY_LXC) {
-                                            //send lxc-info cmd
-                                            if (task.isCompleted()) {
-                                                Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                taskRunner.runTask(lxcInfoTask, this);
-                                            }
-                                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                            if (!Util.isStringEmpty(response.getStdOut())) {
-                                                output.append(response.getStdOut());
-                                            }
-                                            if (task.isCompleted()) {
-                                                if (output.indexOf("RUNNING") != -1) {
-                                                    stopBtn.setEnabled(true);
-                                                    destroyBtn.setEnabled(true);
-                                                    progressIcon.setVisible(false);
-                                                } else {
-                                                    //remove row
-                                                    lxcTable.removeItem(rowId);
+                                                final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
+                                                if (physicalAgent != null) {
+                                                    Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
+                                                    startBtn.setEnabled(false);
+                                                    stopBtn.setEnabled(false);
+                                                    destroyBtn.setEnabled(false);
+                                                    progressIcon.setVisible(true);
+                                                    showProgress();
+                                                    taskRunner.runTask(destroyLxcTask, new TaskCallback() {
+                                                        StringBuilder output = new StringBuilder();
+
+                                                        @Override
+                                                        public void onResponse(Task task, Response response) {
+                                                            if (task.getData() == TaskType.DESTROY_LXC) {
+                                                                //send lxc-info cmd
+                                                                if (task.isCompleted()) {
+                                                                    Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
+                                                                    taskRunner.runTask(lxcInfoTask, this);
+                                                                }
+                                                            } else if (task.getData() == TaskType.GET_LXC_INFO) {
+                                                                if (!Util.isStringEmpty(response.getStdOut())) {
+                                                                    output.append(response.getStdOut());
+                                                                }
+                                                                if (task.isCompleted()) {
+                                                                    if (output.indexOf("RUNNING") != -1) {
+                                                                        stopBtn.setEnabled(true);
+                                                                        destroyBtn.setEnabled(true);
+                                                                        progressIcon.setVisible(false);
+                                                                    } else {
+                                                                        //remove row
+                                                                        lxcTable.removeItem(rowId);
+                                                                    }
+                                                                    hideProgress();
+                                                                }
+                                                            }
+                                                        }
+                                                    });
                                                 }
-                                                hideProgress();
                                             }
                                         }
-                                    }
-                                });
-                            }
+                                    });
                         }
                     });
 
