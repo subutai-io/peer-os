@@ -5,8 +5,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.clone.LxcCloneForm;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage.LxcManageForm;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.clone.Cloner;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage.Manager;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
@@ -21,8 +21,8 @@ public class LxcModule implements Module {
     public static class ModuleComponent extends CustomComponent implements CommandListener {
 
         private final TabSheet commandsSheet;
-        private final LxcCloneForm cloneForm;
-        private final LxcManageForm manageForm;
+        private final Cloner cloneForm;
+        private final Manager manageForm;
         private final TaskRunner taskRunner = new TaskRunner();
 
         public ModuleComponent() {
@@ -35,9 +35,9 @@ public class LxcModule implements Module {
             commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
             commandsSheet.setSizeFull();
 
-            cloneForm = new LxcCloneForm(taskRunner);
+            cloneForm = new Cloner(taskRunner);
             commandsSheet.addTab(cloneForm, "Clone");
-            manageForm = new LxcManageForm(taskRunner);
+            manageForm = new Manager(taskRunner);
             commandsSheet.addTab(manageForm, "Manage");
 
             verticalLayout.addComponent(commandsSheet);

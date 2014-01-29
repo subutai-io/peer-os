@@ -22,9 +22,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 @SuppressWarnings("serial")
-public class LxcCloneForm extends VerticalLayout implements Button.ClickListener, TaskCallback {
+public class Cloner extends VerticalLayout implements Button.ClickListener, TaskCallback {
 
-    private static final Logger LOG = Logger.getLogger(LxcCloneForm.class.getName());
+    private static final Logger LOG = Logger.getLogger(Cloner.class.getName());
 
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
@@ -36,7 +36,7 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
     private final int timeout;
     private Thread operationTimeoutThread;
 
-    public LxcCloneForm(TaskRunner taskRunner) {
+    public Cloner(TaskRunner taskRunner) {
         setSpacing(true);
         setMargin(true);
 

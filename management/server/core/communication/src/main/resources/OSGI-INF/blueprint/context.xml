@@ -21,6 +21,7 @@
             <cm:property name="amqMaxPooledConnections" value="11"/>
             <cm:property name="amqMaxSenderPoolSize" value="20"/>
             <cm:property name="amqInactiveQueuesDropTimeoutSec" value="360"/>
+            <cm:property name="amqNeedClientAuth" value="true"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -40,6 +41,7 @@
         <property name="amqMaxPooledConnections" value="${amqMaxPooledConnections}"/>
         <property name="amqMaxSenderPoolSize" value="${amqMaxSenderPoolSize}"/>
         <property name="amqInactiveQueuesDropTimeoutSec" value="${amqInactiveQueuesDropTimeoutSec}"/>
+        <property name="amqNeedClientAuth" value="${amqNeedClientAuth}"/>
     </bean>
 
     <service ref="communicationService"

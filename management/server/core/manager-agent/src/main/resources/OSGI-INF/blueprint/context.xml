@@ -8,9 +8,6 @@
     
     <cm:property-placeholder persistent-id="AgentMgrConfig" update-strategy="none">
         <cm:default-properties>
-            <cm:property name="heartbeatTimeoutSec" value="300"/>
-            <cm:property name="heartbeatFromMin" value="30"/>
-            <cm:property name="heartbeatToMin" value="5"/>
             <cm:property name="agentFreshnessMin" value="30"/>
         </cm:default-properties>
     </cm:property-placeholder>

@@ -41,6 +41,11 @@ public class CommunicationServiceImpl implements CommunicationService {
     private int amqMaxPooledConnections;
     private int amqMaxSenderPoolSize;
     private int amqInactiveQueuesDropTimeoutSec;
+    private boolean amqNeedClientAuth;
+
+    public void setAmqNeedClientAuth(boolean amqNeedClientAuth) {
+        this.amqNeedClientAuth = amqNeedClientAuth;
+    }
 
     public void setAmqPort(int amqPort) {
         this.amqPort = amqPort;
@@ -197,7 +202,7 @@ public class CommunicationServiceImpl implements CommunicationService {
             //***policy
             broker.setPersistent(true);
             broker.setUseJmx(false);
-            broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true");
+            broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=" + amqNeedClientAuth);
             broker.start();
             broker.waitUntilStarted();
             //executor service setup
