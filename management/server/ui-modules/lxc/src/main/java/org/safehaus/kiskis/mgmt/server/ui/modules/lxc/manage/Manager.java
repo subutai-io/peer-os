@@ -227,6 +227,7 @@ public class Manager extends VerticalLayout {
                         }
 
                         populateTable(agentFamilies);
+                        clearEmptyParents();
                         lxcTable.setEnabled(true);
                         hideProgress();
                     }
@@ -235,6 +236,18 @@ public class Manager extends VerticalLayout {
         });
         runTimeoutThread();
         showProgress();
+    }
+
+    private void clearEmptyParents() {
+        //clear empty parents
+        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+            Object rowId = it.next();
+            Item row = lxcTable.getItem(rowId);
+            if (row != null && row.getItemProperty(physicalHostLabel).getValue() != null
+                    && (lxcTable.getChildren(rowId) == null || lxcTable.getChildren(rowId).isEmpty())) {
+                lxcTable.removeItem(rowId);
+            }
+        }
     }
 
     private void showProgress() {
@@ -547,6 +560,7 @@ public class Manager extends VerticalLayout {
                                                                         } else {
                                                                             //remove row
                                                                             lxcTable.removeItem(rowId);
+                                                                            clearEmptyParents();
                                                                         }
                                                                         hideProgress();
                                                                     }
@@ -590,6 +604,7 @@ public class Manager extends VerticalLayout {
                                                     } else {
                                                         //remove row
                                                         lxcTable.removeItem(rowId);
+                                                        clearEmptyParents();
                                                     }
                                                     hideProgress();
                                                 }
