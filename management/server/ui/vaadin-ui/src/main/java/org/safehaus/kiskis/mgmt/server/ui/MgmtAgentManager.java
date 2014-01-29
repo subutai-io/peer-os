@@ -50,6 +50,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
                     if (agent != null) {
                         description = "Hostname: " + agent.getHostname() + "<br>"
                                 + "Is LXC: " + agent.isIsLXC() + "<br>"
+                                + "UUID: " + agent.getUuid() + "<br>"
                                 + "IP: " + agent.getListIP();
                     }
                 }
