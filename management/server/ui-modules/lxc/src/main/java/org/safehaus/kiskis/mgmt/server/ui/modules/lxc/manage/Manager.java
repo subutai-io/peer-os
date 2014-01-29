@@ -34,9 +34,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
-public class LxcManageForm extends VerticalLayout {
+public class Manager extends VerticalLayout {
 
-    private static final Logger LOG = Logger.getLogger(LxcManageForm.class.getName());
+    private static final Logger LOG = Logger.getLogger(Manager.class.getName());
 
     private final TaskRunner taskRunner;
     private final Label indicator;
@@ -52,7 +52,7 @@ public class LxcManageForm extends VerticalLayout {
     private Thread operationTimeoutThread;
     private Set<Agent> physicalAgents;
 
-    public LxcManageForm(TaskRunner taskRunner) {
+    public Manager(TaskRunner taskRunner) {
 
         setSpacing(true);
         setMargin(true);
