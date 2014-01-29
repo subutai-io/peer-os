@@ -110,7 +110,7 @@ public class Commands {
                 //                "'mongod|ksks-mongo|mongos'"
                 "'mongod|mongos'"
         ));
-        req.setTimeout(20);
+        req.setTimeout(30);
         return cmd;
     }
 
@@ -131,7 +131,7 @@ public class Commands {
                 "/bin/rm -R",
                 Constants.LOG_DIR
         ));
-        req.setTimeout(20);
+        req.setTimeout(30);
         return cmd;
     }
 
@@ -263,7 +263,7 @@ public class Commands {
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         //                        "--logappend"
         ));
-        req.setTimeout(120);
+        req.setTimeout(180);
         return cmd;
     }
 
@@ -281,7 +281,7 @@ public class Commands {
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(120);
+        req.setTimeout(180);
         return cmd;
     }
 
@@ -303,7 +303,7 @@ public class Commands {
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(120);
+        req.setTimeout(180);
         return cmd;
     }
 
@@ -336,7 +336,7 @@ public class Commands {
                 "--port",
                 port
         ));
-        req.setTimeout(3);
+        req.setTimeout(10);
         return cmd;
     }
 
@@ -361,7 +361,7 @@ public class Commands {
                 "-2",
                 "mongo"
         ));
-        req.setTimeout(20);
+        req.setTimeout(30);
         return cmd;
     }
 
@@ -376,7 +376,7 @@ public class Commands {
                 "--port",
                 Constants.DATA_NODE_PORT + ""
         ));
-        req.setTimeout(20);
+        req.setTimeout(30);
         return cmd;
     }
 }
