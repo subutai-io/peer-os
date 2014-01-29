@@ -252,54 +252,54 @@ public class Manager extends VerticalLayout {
 
     private void showProgress() {
         indicator.setVisible(true);
-        infoBtn.setEnabled(false);
-        startAllBtn.setEnabled(false);
-        stopAllBtn.setEnabled(false);
-        destroyAllBtn.setEnabled(false);
-        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
-            Item row = lxcTable.getItem(it.next());
-            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
-                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
-                if (startAllPerParentBtn != null) {
-                    startAllPerParentBtn.setEnabled(false);
-                }
-                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
-                if (stopAllPerParentBtn != null) {
-                    stopAllPerParentBtn.setEnabled(false);
-                }
-                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
-                if (destroyPerParentAllBtn != null) {
-                    destroyPerParentAllBtn.setEnabled(false);
-                }
-            }
-        }
+//        infoBtn.setEnabled(false);
+//        startAllBtn.setEnabled(false);
+//        stopAllBtn.setEnabled(false);
+//        destroyAllBtn.setEnabled(false);
+//        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+//            Item row = lxcTable.getItem(it.next());
+//            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
+//                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
+//                if (startAllPerParentBtn != null) {
+//                    startAllPerParentBtn.setEnabled(false);
+//                }
+//                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
+//                if (stopAllPerParentBtn != null) {
+//                    stopAllPerParentBtn.setEnabled(false);
+//                }
+//                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+//                if (destroyPerParentAllBtn != null) {
+//                    destroyPerParentAllBtn.setEnabled(false);
+//                }
+//            }
+//        }
     }
 
     private void hideProgress() {
         if (taskRunner.getRemainingTaskCount() == 0) {
             indicator.setVisible(false);
         }
-        infoBtn.setEnabled(true);
-        startAllBtn.setEnabled(true);
-        stopAllBtn.setEnabled(true);
-        destroyAllBtn.setEnabled(true);
-        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
-            Item row = lxcTable.getItem(it.next());
-            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
-                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
-                if (startAllPerParentBtn != null) {
-                    startAllPerParentBtn.setEnabled(true);
-                }
-                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
-                if (stopAllPerParentBtn != null) {
-                    stopAllPerParentBtn.setEnabled(true);
-                }
-                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
-                if (destroyPerParentAllBtn != null) {
-                    destroyPerParentAllBtn.setEnabled(true);
-                }
-            }
-        }
+//        infoBtn.setEnabled(true);
+//        startAllBtn.setEnabled(true);
+//        stopAllBtn.setEnabled(true);
+//        destroyAllBtn.setEnabled(true);
+//        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+//            Item row = lxcTable.getItem(it.next());
+//            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
+//                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
+//                if (startAllPerParentBtn != null) {
+//                    startAllPerParentBtn.setEnabled(true);
+//                }
+//                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
+//                if (stopAllPerParentBtn != null) {
+//                    stopAllPerParentBtn.setEnabled(true);
+//                }
+//                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
+//                if (destroyPerParentAllBtn != null) {
+//                    destroyPerParentAllBtn.setEnabled(true);
+//                }
+//            }
+//        }
     }
 
     private void runTimeoutThread() {
