@@ -10,6 +10,7 @@ import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,27 +23,31 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 @SuppressWarnings("serial")
-public class LxcCloneForm extends VerticalLayout implements Button.ClickListener, TaskCallback {
-
-    private static final Logger LOG = Logger.getLogger(LxcCloneForm.class.getName());
-
+public class Cloner extends VerticalLayout implements Button.ClickListener, TaskCallback {
+    
+    private static final Logger LOG = Logger.getLogger(Cloner.class.getName());
+    
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final Label indicator;
     private final TreeTable lxcTable;
     private final TaskRunner taskRunner;
-    private final Map<Integer, String> requestToLxcMatchMap = new HashMap<Integer, String>();
+    private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
     private final int timeout;
+    private final String physicalHostLabel = "Physical Host";
+    private final String statusLabel = "Status";
+    private final String okIconSource = "icons/16/ok.png";
+    private final String errorIconSource = "icons/16/cancel.png";
     private Thread operationTimeoutThread;
-
-    public LxcCloneForm(TaskRunner taskRunner) {
+    
+    public Cloner(TaskRunner taskRunner) {
         setSpacing(true);
         setMargin(true);
-
+        
         this.taskRunner = taskRunner;
         timeout = Commands.getCloneCommand().getRequest().getTimeout();
-
+        
         textFieldLxcName = new TextField();
         slider = new Slider();
         slider.setMin(1);
@@ -51,31 +56,62 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
         slider.setImmediate(true);
         cloneBtn = new Button("Clone");
         cloneBtn.addListener(this);
-
+        
+        Button clearBtn = new Button("Clear");
+        clearBtn.addListener(new Button.ClickListener() {
+            
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                //clear completed
+                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+                    Object rowId = it.next();
+                    Item row = lxcTable.getItem(rowId);
+                    if (row != null) {
+                        Embedded statusIcon = (Embedded) (row.getItemProperty(statusLabel).getValue());
+                        if (statusIcon != null
+                                && (okIconSource.equals(((ThemeResource) statusIcon.getSource()).getResourceId())
+                                || errorIconSource.equals(((ThemeResource) statusIcon.getSource()).getResourceId()))) {
+                            lxcTable.removeItem(rowId);
+                        }
+                    }
+                }
+                //clear empty parents
+                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
+                    Object rowId = it.next();
+                    Item row = lxcTable.getItem(rowId);
+                    if (row != null && row.getItemProperty(physicalHostLabel).getValue() != null
+                            && (lxcTable.getChildren(rowId) == null || lxcTable.getChildren(rowId).isEmpty())) {
+                        lxcTable.removeItem(rowId);
+                    }
+                }
+            }
+        });
+        
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
-
-        GridLayout grid = new GridLayout(6, 1);
+        
+        GridLayout grid = new GridLayout(7, 1);
         grid.setSpacing(true);
-
+        
         grid.addComponent(new Label("Product name"));
         grid.addComponent(textFieldLxcName);
         grid.addComponent(new Label("Lxc count"));
         grid.addComponent(slider);
         grid.addComponent(cloneBtn);
+        grid.addComponent(clearBtn);
         grid.addComponent(indicator);
         grid.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(grid);
-
+        
         lxcTable = createTableTemplate("Lxc containers", 500);
         addComponent(lxcTable);
     }
-
+    
     private TreeTable createTableTemplate(String caption, int size) {
         TreeTable table = new TreeTable(caption);
-        table.addContainerProperty("Physical Host", String.class, null);
+        table.addContainerProperty(physicalHostLabel, String.class, null);
         table.addContainerProperty("Lxc Host", String.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
+        table.addContainerProperty(statusLabel, Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);
@@ -83,28 +119,29 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
         table.setImmediate(true);
         return table;
     }
-
+    
     private void populateTable(Map<Agent, List<String>> agents) {
-        lxcTable.removeAllItems();
-
+        
         for (final Agent agent : agents.keySet()) {
-            lxcTable.addItem(new Object[]{agent.getHostname(), null, null}, agent.getHostname());
+            if (lxcTable.getItem(agent.getHostname()) == null) {
+                lxcTable.addItem(new Object[]{agent.getHostname(), null, null}, agent.getHostname());
+            }
             lxcTable.setCollapsed(agent.getHostname(), false);
             for (String lxc : agents.get(agent)) {
                 Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-
+                
                 lxcTable.addItem(new Object[]{
                     null,
                     lxc,
                     progressIcon},
                         lxc);
-
+                
                 lxcTable.setParent(lxc, agent.getHostname());
                 lxcTable.setChildrenAllowed(lxc, false);
             }
         }
     }
-
+    
     @Override
     public void buttonClick(Button.ClickEvent clickEvent) {
         Set<Agent> agents = MgmtApplication.getSelectedAgents();
@@ -116,14 +153,13 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
                     physicalAgents.add(agent);
                 }
             }
-
+            
             if (physicalAgents.isEmpty()) {
                 getWindow().showNotification("Select at least one physical agent");
             } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
                 getWindow().showNotification("Enter product name");
             } else {
                 //do the magic
-                requestToLxcMatchMap.clear();
                 String productName = textFieldLxcName.getValue().toString().trim();
                 Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
                 Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
@@ -133,9 +169,9 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
                         if (cmd.getRequest().getUuid().compareTo(physAgent.getUuid()) == 0) {
                             String lxcHostname
                                     = cmd.getRequest().getArgs().get(cmd.getRequest().getArgs().size() - 1);
-                            requestToLxcMatchMap.put(cmd.getRequest().getRequestSequenceNumber(),
+                            requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequest().getRequestSequenceNumber(),
                                     lxcHostname);
-
+                            
                             lxcNames.add(lxcHostname);
                         }
                     }
@@ -143,7 +179,6 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
                 }
                 populateTable(agentFamilies);
                 indicator.setVisible(true);
-                cloneBtn.setEnabled(false);
                 runTimeoutThread();
                 taskRunner.runTask(task, this);
             }
@@ -151,7 +186,7 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
             getWindow().showNotification("Select at least one physical agent");
         }
     }
-
+    
     private void runTimeoutThread() {
         try {
             if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
@@ -163,39 +198,38 @@ public class LxcCloneForm extends VerticalLayout implements Button.ClickListener
                     try {
                         //wait for timeout + 5 sec just in case
                         Thread.sleep(timeout * 1000 + 5000);
-
-                        cloneBtn.setEnabled(true);
+                        
                         indicator.setVisible(false);
                     } catch (InterruptedException ex) {
                     }
                 }
             });
             operationTimeoutThread.start();
-
+            
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
         }
     }
-
+    
     @Override
     public void onResponse(Task task, Response response) {
         if (Util.isFinalResponse(response)) {
-            String lxcHost = requestToLxcMatchMap.get(response.getRequestSequenceNumber());
+            String lxcHost = requestToLxcMatchMap.get(task.getUuid() + "-" + response.getRequestSequenceNumber());
             if (lxcHost != null) {
                 Item row = lxcTable.getItem(lxcHost);
                 if (row != null) {
                     if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE && response.getExitCode() == 0) {
-                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource("icons/16/ok.png")));
+                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
                     } else {
-                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource("icons/16/cancel.png")));
+                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
                     }
                 }
             }
-            requestToLxcMatchMap.remove(response.getRequestSequenceNumber());
+            requestToLxcMatchMap.remove(task.getUuid() + "-" + response.getRequestSequenceNumber());
         }
-        if (task.isCompleted()) {
+        if (task.isCompleted() && taskRunner.getRemainingTaskCount() == 0) {
             indicator.setVisible(false);
-            cloneBtn.setEnabled(true);
+            requestToLxcMatchMap.clear();
         }
     }
 }
