@@ -359,7 +359,7 @@ public class Manager extends VerticalLayout {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-
+                    System.out.println(event);
                     MgmtApplication.showConfirmationDialog(
                             "Lxc destruction confirmation",
                             "Do you want to destroy all lxc nodes on this physical node?",
@@ -368,16 +368,13 @@ public class Manager extends VerticalLayout {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        System.out.println("IN destroy");
                                         try {
                                             Collection col = lxcTable.getChildren(parentId);
                                             if (col != null) {
                                                 for (Iterator it = col.iterator(); it.hasNext();) {
-                                            System.out.println("Destorying");
                                                     Item row = lxcTable.getItem(it.next());
                                                     Button destroyBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
                                                     if (destroyBtn != null) {
-                                                        System.out.println("Clicking");
                                                         destroyBtn.click();
                                                     }
                                                 }
