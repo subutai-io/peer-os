@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.async.runner;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -28,19 +29,38 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     private static final Logger LOG = Logger.getLogger(AsyncTaskRunnerImpl.class.getName());
 
     private static final String MODULE_NAME = "AsyncRunner";
+    private CommandManager commandManager;
     private TaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
 
     public void setCommandManager(CommandManager commandManager) {
-        taskRunner = new TaskRunner(commandManager);
+        this.commandManager = commandManager;
     }
 
     public void init() {
-        LOG.info(MODULE_NAME + " started");
+        try {
+            if (commandManager != null) {
+                taskRunner = new TaskRunner(commandManager);
+                commandManager.addListener(this);
+                LOG.info(MODULE_NAME + " started");
+            } else {
+                throw new Exception("Missing CommandManager service");
+            }
+
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in init", e);
+        }
     }
 
     public void destroy() {
-        executors.clear();
+        try {
+            executors.clear();
+            if (commandManager != null) {
+                commandManager.removeListener(this);
+            }
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in destroy", e);
+        }
     }
 
     @Override

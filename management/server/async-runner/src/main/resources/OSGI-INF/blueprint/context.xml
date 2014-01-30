@@ -9,7 +9,7 @@
     <reference id="commandManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager"/>
         
-    <bean id = "module" scope="singleton"
+    <bean id="module" scope="singleton"
           class="org.safehaus.kiskis.mgmt.async.runner.AsyncTaskRunnerImpl"
           init-method="init" destroy-method="destroy" activation="eager">
         <property name="commandManager" ref="commandManager"/>
