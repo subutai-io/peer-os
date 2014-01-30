@@ -97,6 +97,7 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
 
         for (Command cmd : task.getCommands()) {
             cmd.getRequest().setSource(MODULE_NAME);
+            System.out.println("+++++++++");
             System.out.println(cmd.getRequest().getSource());
         }
 
