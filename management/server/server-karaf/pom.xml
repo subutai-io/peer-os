@@ -335,6 +335,11 @@
                                     <artifactId>mgmt-server-communication</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>async-runner</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!--Core Dependencies-->
 
                                 <!--Shared Dependencies-->
