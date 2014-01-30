@@ -208,11 +208,12 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                         public void onResponse(Task task, Response response) {
                             if (task.isCompleted()) {
                                 //one could save task status to db here
+                                //code here must not reference any UI specific objects
                                 System.out.println("Background cloning is done");
                             }
                         }
                     });
-                    show("Clone task is submitted for execution.");
+                    show("Clone task is submitted for execution.\nPlease, check later the status of nodes");
                 }
             }
         } else {
