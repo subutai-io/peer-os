@@ -34,6 +34,7 @@
         <module>ui</module>
         <module>ui-modules</module>
         <module>server-karaf</module>
+        <module>async-runner</module>
     </modules>
 
     <description>Parent project for the Kiskis Management Server Artifacts</description>

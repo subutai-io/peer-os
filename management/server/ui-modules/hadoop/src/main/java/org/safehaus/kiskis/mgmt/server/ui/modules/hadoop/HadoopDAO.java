@@ -25,8 +25,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 public class HadoopDAO {
 
     private static final Logger LOG = Logger.getLogger(HadoopDAO.class.getName());
-    private static DbManager dbManager;
-    private static AgentManager agentManager;
+    private static final DbManager dbManager;
+    private static final AgentManager agentManager;
 
     static {
         dbManager = ServiceLocator.getService(DbManager.class);

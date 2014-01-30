@@ -4,7 +4,7 @@
     <reference id="communicationService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService"/>
 
-    <bean id="commandManager"
+    <bean id="commandManager" activation="eager"
           class="org.safehaus.kiskis.mgmt.server.command.CommandManagerImpl" scope="singleton"
           init-method="init" destroy-method="destroy">
         <property name="communicationService" ref="communicationService"/>

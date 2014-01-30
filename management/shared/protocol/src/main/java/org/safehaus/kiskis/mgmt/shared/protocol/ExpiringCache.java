@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
 
 /**
  *
@@ -47,6 +48,17 @@ public class ExpiringCache<KeyType, ValueType> {
         return false;
     }
 
+    public boolean put(KeyType key, ValueType value, long ttlMs, EntryExpiryCallback<ValueType> callback) {
+        try {
+            entries.put(key, new CacheEntryWithExpiryCallback<ValueType>(value, ttlMs, callback));
+            return true;
+        } catch (Exception ignore) {
+        } finally {
+            runEviction();
+        }
+        return false;
+    }
+
     public ValueType remove(KeyType key) {
         try {
             return entries.remove(key).getValue();
@@ -58,6 +70,14 @@ public class ExpiringCache<KeyType, ValueType> {
     }
 
     public void clear() {
+        for (Map.Entry<KeyType, CacheEntry<ValueType>> entry : entries.entrySet()) {
+            if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
+                try {
+                    ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
+                } catch (Exception e) {
+                }
+            }
+        }
         entries.clear();
     }
 
@@ -79,6 +99,12 @@ public class ExpiringCache<KeyType, ValueType> {
                             Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
                             if (entry.getValue().isExpired()) {
                                 it.remove();
+                                if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
+                                    try {
+                                        ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
+                                    } catch (Exception e) {
+                                    }
+                                }
                             }
                         }
                     } catch (Exception ignore) {
