@@ -213,7 +213,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                             }
                         }
                     });
-                    show("Clone task is submitted for execution.\nPlease, check later the status of nodes");
+                    show("Clone task is submitted for execution.<br/>Please, check later the status of nodes", -1);
                 }
             }
         } else {
@@ -223,6 +223,12 @@ public class Cloner extends VerticalLayout implements TaskCallback {
 
     private void show(String msg) {
         getWindow().showNotification(msg);
+    }
+
+    private void show(String msg, int delayMs) {
+        Window.Notification notification = new Window.Notification(msg);
+        notification.setDelayMsec(delayMs);
+        getWindow().showNotification(notification);
     }
 
     private void runTimeoutThread() {
