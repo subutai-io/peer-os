@@ -15,6 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
@@ -93,6 +94,11 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
                 }
             });
         }
+
+        for (Command cmd : task.getCommands()) {
+            cmd.getRequest().setSource(MODULE_NAME);
+        }
+
         executor.execute(new Runnable() {
             @Override
             public void run() {
