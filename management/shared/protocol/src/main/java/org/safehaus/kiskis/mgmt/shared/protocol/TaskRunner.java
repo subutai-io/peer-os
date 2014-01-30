@@ -26,6 +26,13 @@ public class TaskRunner {
         }
     }
 
+    public TaskRunner(CommandManager commandManager) {
+        this.commandManager = commandManager;
+        if (commandManager == null) {
+            throw new RuntimeException("Command manager is not available");
+        }
+    }
+
     public void feedResponse(Response response) {
         if (response != null && response.getTaskUuid() != null) {
             TaskListener tl = taskListenerCache.get(response.getTaskUuid());
