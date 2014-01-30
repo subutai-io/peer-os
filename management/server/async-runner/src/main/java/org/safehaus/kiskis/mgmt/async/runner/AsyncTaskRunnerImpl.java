@@ -30,14 +30,12 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     private static final String MODULE_NAME = "AsyncRunner";
     private TaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
-    private CommandManager commandManager;
 
     public void setCommandManager(CommandManager commandManager) {
-        this.commandManager = commandManager;
+        taskRunner = new TaskRunner(commandManager);
     }
 
     public void init() {
-        taskRunner = new TaskRunner(commandManager);
         LOG.info(MODULE_NAME + " started");
     }
 
