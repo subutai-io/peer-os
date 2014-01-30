@@ -55,6 +55,7 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     public void destroy() {
         try {
             executors.clear();
+            taskRunner.removeAllTaskCallbacks();
             if (commandManager != null) {
                 commandManager.removeListener(this);
             }
