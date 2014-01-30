@@ -73,7 +73,7 @@ public class ExpiringCache<KeyType, ValueType> {
         for (Map.Entry<KeyType, CacheEntry<ValueType>> entry : entries.entrySet()) {
             if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
                 try {
-                    ((EntryExpiryCallback) entry.getValue()).onEntryExpiry(entry);
+                    ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
                 } catch (Exception e) {
                 }
             }
@@ -99,9 +99,9 @@ public class ExpiringCache<KeyType, ValueType> {
                             Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
                             if (entry.getValue().isExpired()) {
                                 it.remove();
-                                if (entry.getValue() instanceof EntryExpiryCallback) {
+                                if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
                                     try {
-                                        ((EntryExpiryCallback) entry.getValue()).onEntryExpiry(entry);
+                                        ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
                                     } catch (Exception e) {
                                     }
                                 }

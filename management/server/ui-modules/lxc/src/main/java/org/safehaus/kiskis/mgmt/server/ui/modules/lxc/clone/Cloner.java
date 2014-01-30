@@ -72,7 +72,6 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 startCloneTask(true);
-                show("Clone task is submitted for execution.");
             }
         });
 
@@ -214,6 +213,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                             }
                         }
                     });
+                    show("Clone task is submitted for execution.");
                 }
             }
         } else {
