@@ -36,19 +36,21 @@
     <build>
         <plugins>
             <plugin>
-                <version>2.4.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <inherited>true</inherited>
+                <version>2.3.7</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
-                    <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.async.runner</Bundle-SymbolicName>
-                        <Export-Package>
-                            {local-packages};{local-packages}.impl;version=${project.version};-noimport:=true
-                        </Export-Package>
+                        <Bundle-SymbolicName>${project.artifactId}.async.runner</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
