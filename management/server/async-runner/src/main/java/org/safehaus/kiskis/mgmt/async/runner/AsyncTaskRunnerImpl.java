@@ -69,6 +69,7 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
         ExecutorService executor = executors.get(response.getTaskUuid());
         if (executor != null) {
             executor.execute(new Runnable() {
+                @Override
                 public void run() {
                     taskRunner.feedResponse(response);
                 }
@@ -83,6 +84,7 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
             executor = Executors.newSingleThreadExecutor();
             executors.put(task.getUuid(), executor, task.getAvgTimeout() * 1000 + 10000, new EntryExpiryCallback<ExecutorService>() {
 
+                @Override
                 public void onEntryExpiry(ExecutorService entry) {
                     try {
                         entry.shutdown();
@@ -92,6 +94,7 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
             });
         }
         executor.execute(new Runnable() {
+            @Override
             public void run() {
                 taskRunner.runTask(task, taskCallback);
             }
