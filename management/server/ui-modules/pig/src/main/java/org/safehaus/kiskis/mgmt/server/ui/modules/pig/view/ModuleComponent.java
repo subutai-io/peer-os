@@ -3,15 +3,13 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig.view;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.Pig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.action.Action;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandBuilder;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandHandler;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandAction;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ModuleComponent extends CustomComponent implements CommandListener {
@@ -45,24 +43,21 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                AgentManager agentManager = ServiceLocator.getService(AgentManager.class);
                 Set<Agent> agents = MgmtApplication.getSelectedAgents();
-                Command cmd = null;
+                Agent agent = null;
 
-                for (Agent agent : agents) {
-
-                    LOG.info(">> agent id: " + agent.getUuid());
-                    LOG.info(">> hostname: " + agent.getHostname());
-
-                    cmd = CommandBuilder.getTemplate();
-                    cmd.getRequest().setUuid(agent.getUuid());
-                    //cmd.getRequest().setProgram("dpkg -l|grep ksks-hadoop");
-                    cmd.getRequest().setProgram("dpkg -l");
-                    cmd.getRequest().setTimeout(30);
-                    cmd.getRequest().setWorkingDirectory("/");
+                for (Agent a : agents) {
+                    agent = a;
                 }
 
-                CommandHandler.handle(cmd, new Action());
+
+                Map<String, Object> context = new HashMap<String, Object>();
+                context.put("agent", agent);
+
+                CommandAction commandAction = new CommandAction();
+                Chain chain = new Chain(commandAction);
+                chain.execute(context);
+
             }
         });
 
@@ -100,7 +95,7 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
 
     @Override
     public void onCommand(Response response) {
-        CommandHandler.INSTANCE.onCommand(response);
+        CommandExecutor.INSTANCE.onResponse(response);
     }
 
     @Override
