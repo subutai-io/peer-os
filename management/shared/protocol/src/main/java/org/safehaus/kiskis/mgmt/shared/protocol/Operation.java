@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
  *
