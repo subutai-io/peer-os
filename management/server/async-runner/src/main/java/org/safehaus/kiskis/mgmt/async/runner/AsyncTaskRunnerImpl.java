@@ -14,6 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
@@ -29,9 +30,14 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     private static final String MODULE_NAME = "AsyncRunner";
     private TaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
+    private CommandManager commandManager;
+
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
+    }
 
     public void init() {
-        taskRunner = new TaskRunner();
+        taskRunner = new TaskRunner(commandManager);
         LOG.info(MODULE_NAME + " started");
     }
 
