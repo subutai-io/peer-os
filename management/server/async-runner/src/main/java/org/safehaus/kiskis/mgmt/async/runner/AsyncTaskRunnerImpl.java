@@ -27,10 +27,11 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     private static final Logger LOG = Logger.getLogger(AsyncTaskRunnerImpl.class.getName());
 
     private static final String MODULE_NAME = "AsyncRunner";
-    private static final TaskRunner taskRunner = new TaskRunner();
+    private TaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
 
     public void init() {
+        taskRunner = new TaskRunner();
         LOG.info(MODULE_NAME + " started");
     }
 
