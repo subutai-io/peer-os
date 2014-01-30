@@ -28,37 +28,49 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.safehaus.kiskis.mgmt</groupId>
     <artifactId>async-runner</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
-
     <name>Kiskis Management Async Runner</name>
     <description>async task runner bundle</description>
 
     <build>
         <plugins>
             <plugin>
+                <version>2.4.0</version>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
+                <inherited>true</inherited>
                 <extensions>true</extensions>
                 <configuration>
+                    <manifestLocation>META-INF</manifestLocation>
+                    <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Export-Package>org.safehaus.kiskis.mgmt*;version=${project.version}</Export-Package>
-                        <Import-Package>*</Import-Package>
+                        <Bundle-SymbolicName>${project.groupId}.async.runner</Bundle-SymbolicName>
+                        <Export-Package>
+                            {local-packages};{local-packages}.impl;version=${project.version};-noimport:=true
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>${osgi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
