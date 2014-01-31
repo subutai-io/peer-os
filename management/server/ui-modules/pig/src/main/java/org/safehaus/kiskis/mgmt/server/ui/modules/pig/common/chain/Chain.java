@@ -21,6 +21,7 @@ public class Chain {
         ACTIONS.addAll(chain.ACTIONS);
     }
 
+    // TODO exception handling
     public void execute(Context context) {
         i++;
         if (i < ACTIONS.size()) {

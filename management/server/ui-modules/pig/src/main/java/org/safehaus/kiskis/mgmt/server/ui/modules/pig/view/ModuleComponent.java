@@ -5,12 +5,11 @@ import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.Pig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.ActionListener;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandAction;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandExecutor;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.ActionListener;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandAction;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
 public class ModuleComponent extends CustomComponent implements CommandListener {
 
     private static final Logger LOG = Logger.getLogger(ModuleComponent.class.getName());
-    private final TextArea commandOutputTxtArea;
+    private final TextArea logTextArea;
 
     public ModuleComponent() {
 
@@ -32,67 +31,25 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
 
         setCompositionRoot(grid);
 
-        commandOutputTxtArea = new TextArea("Log:");
-        commandOutputTxtArea.setSizeFull();
-        commandOutputTxtArea.setImmediate(true);
-        commandOutputTxtArea.setWordwrap(false);
-        grid.addComponent(commandOutputTxtArea, 1, 0, 9, 9);
+        logTextArea = new TextArea("Log:");
+        logTextArea.setSizeFull();
+        logTextArea.setImmediate(true);
+        logTextArea.setWordwrap(false);
+        grid.addComponent(logTextArea, 1, 0, 9, 9);
 
-
-        Button statusButton = new Button("Update Status");
-        grid.addComponent(statusButton, 0, 0);
-
-        statusButton.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-
-                Set<Agent> agents = MgmtApplication.getSelectedAgents();
-                Agent agent = null;
-
-                for (Agent a : agents) {
-                    agent = a;
-                }
-
-                Context context = new Context();
-                context.put("agent", agent);
-
-                CommandAction commandAction = new CommandAction("dpkg -l|grep ksks", new ActionListener("ksks"));
-
-                Chain chain = new Chain(commandAction);
-                chain.execute(context);
-
-            }
-        });
-
+        UILog uiLog = new UILog(logTextArea);
+        grid.addComponent(StatusButtonManager.getButton(uiLog), 0, 0);
 
         Button clearButton = new Button("Install");
         grid.addComponent(clearButton, 0, 1);
 
-        clearButton.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-
-
-
-
-            }
-        });
-
         Button removeButton = new Button("Remove");
         grid.addComponent(removeButton, 0, 2);
 
-        removeButton.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                alert("remove");
-                LOG.info("remove");
-                commandOutputTxtArea.setValue("remove");
-            }
-        });
     }
 
-    private void alert(String message) {
-        getWindow().showNotification(message);
+    private static void log(String message) {
+
     }
 
     @Override

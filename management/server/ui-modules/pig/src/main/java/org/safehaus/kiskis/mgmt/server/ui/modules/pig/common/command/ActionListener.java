@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command;
+package org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -8,10 +8,10 @@ import java.util.logging.Logger;
 public class ActionListener {
 
     private final Logger LOG = Logger.getLogger(getClass().getName());
-    private final String EXPECTED_REGEX[];
+    protected String expectedRegex[];
 
     public ActionListener(String ... expectedRegex) {
-        EXPECTED_REGEX = expectedRegex;
+        this.expectedRegex = expectedRegex;
     }
 
     public void onExecute(Context context, String programLine) {
@@ -34,9 +34,9 @@ public class ActionListener {
     }
 
     // TODO with regex
-    private boolean allRegexMatched(String stdOut) {
+    protected boolean allRegexMatched(String stdOut) {
 
-        for (String regex : EXPECTED_REGEX) {
+        for (String regex : expectedRegex) {
             if (!stdOut.contains(regex)) {
                 return false;
             }

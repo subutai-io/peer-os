@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command;
+package org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.Pig;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
