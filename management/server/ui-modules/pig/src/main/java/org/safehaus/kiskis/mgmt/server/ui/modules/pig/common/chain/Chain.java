@@ -21,7 +21,7 @@ public class Chain {
         ACTIONS.addAll(chain.ACTIONS);
     }
 
-    public void execute(Map<String, Object> context) {
+    public void execute(Context context) {
         i++;
         if (i < ACTIONS.size()) {
             ACTIONS.get(i).execute(context, this);

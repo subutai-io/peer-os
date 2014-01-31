@@ -8,24 +8,24 @@ public class CommandExecutor implements TaskCallback {
 
     private static final TaskRunner TASK_RUNNER = new TaskRunner();
 
-    private static StringBuilder stdOut;
-    private static StringBuilder stdErr;
-    private static ResponseHandler responseHandler;
+    private StringBuilder stdOut;
+    private StringBuilder stdErr;
+    private CommandAction commandAction;
 
     public static final CommandExecutor INSTANCE = new CommandExecutor();
 
-    public static void execute(Command command, ResponseHandler responseHandler) {
-        reset(responseHandler);
-        runCommand(command);
+    public void execute(Command command, CommandAction commandAction) {
+        reset(commandAction);
+        execute(command);
     }
 
-    private static void reset(ResponseHandler _responseHandler) {
+    private void reset(CommandAction commandAction) {
         stdOut = new StringBuilder();
         stdErr = new StringBuilder();
-        responseHandler = _responseHandler;
+        this.commandAction = commandAction;
     }
 
-    private static void runCommand(Command command) {
+    private void execute(Command command) {
         Task task = new Task();
         task.addCommand(command);
 
@@ -47,7 +47,7 @@ public class CommandExecutor implements TaskCallback {
         }
 
         if (Util.isFinalResponse(response)) {
-            responseHandler.handleResponse(stdOut.toString(), stdErr.toString(), response.getType());
+            commandAction.handleResponse(stdOut.toString(), stdErr.toString(), response.getType());
         }
     }
 

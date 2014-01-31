@@ -1,43 +1,62 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command;
 
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.BaseAction;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Action;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
-public class CommandAction extends BaseAction implements ResponseHandler {
+public class CommandAction implements Action {
 
     private final Logger LOG = Logger.getLogger(getClass().getName());
+    private final String PROGRAM_LINE;
+    private final ActionListener ACTION_LISTENER;
+
     private Chain chain;
-    private Map<String, Object> context;
+    private Context context;
 
-    private String commandString = "dpkg -l|grep ksks";
-
-    public void execute(Map<String, Object> context, Chain chain) {
-        this.chain = chain;
-        this.context = context;
-
-        Command cmd = CommandBuilder.getTemplate();
-
-        Agent agent = (Agent) context.get("agent");
-        cmd.getRequest().setUuid(agent.getUuid());
-
-        cmd.getRequest().setProgram(commandString);
-
-        CommandExecutor.execute(cmd, this);
+    public CommandAction(String programLine, ActionListener actionListener) {
+        PROGRAM_LINE = programLine;
+        ACTION_LISTENER = actionListener;
     }
 
-    @Override
+    public void execute(Context context, Chain chain) {
+        ACTION_LISTENER.onExecute(context);
+        reset(context, chain);
+        CommandExecutor.INSTANCE.execute(getCommand(), this);
+    }
+
+    private void reset(Context context, Chain chain) {
+        this.chain = chain;
+        this.context = context;
+    }
+
+    private Command getCommand() {
+        Command cmd = CommandBuilder.getTemplate();
+
+        Agent agent = context.get("agent");
+        cmd.getRequest().setUuid(agent.getUuid());
+
+        cmd.getRequest().setProgram(PROGRAM_LINE);
+
+        return cmd;
+    }
+
     public void handleResponse(String stdOut, String stdErr, ResponseType responseType) {
-        LOG.info(">> " + stdOut);
-        //chain.execute(context);
+
+        boolean isError = false;
+
+        ACTION_LISTENER.onResponse(context, stdOut, stdErr, isError);
+
+        if (isError) {
+            return;
+        }
+
+        if (chain != null) {
+            chain.execute(context);
+        }
     }
 }

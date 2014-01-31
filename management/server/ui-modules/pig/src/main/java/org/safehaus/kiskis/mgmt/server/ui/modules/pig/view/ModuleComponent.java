@@ -4,6 +4,8 @@ import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.Pig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.ActionListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandAction;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -50,17 +52,29 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
                     agent = a;
                 }
 
-
-                Map<String, Object> context = new HashMap<String, Object>();
+                Context context = new Context();
                 context.put("agent", agent);
 
-                CommandAction commandAction = new CommandAction();
+                ActionListener actionListener = new ActionListener() {
+
+                    @Override
+                    public void onExecute(Context context) {
+                        LOG.info("on execute");
+                    }
+
+                    @Override
+                    public void onResponse(Context context, String stdOut, String stdErr, boolean isError) {
+                        LOG.info("on response");
+                    }
+                };
+
+                CommandAction commandAction = new CommandAction("dpkg -l|grep ksks", actionListener);
+
                 Chain chain = new Chain(commandAction);
                 chain.execute(context);
 
             }
         });
-
 
 
         Button clearButton = new Button("Install");
