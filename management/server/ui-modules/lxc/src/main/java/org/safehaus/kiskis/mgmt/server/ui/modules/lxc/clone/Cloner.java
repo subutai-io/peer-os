@@ -126,7 +126,9 @@ public class Cloner extends VerticalLayout implements TaskCallback {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                populateTasksTable();
+                Task task = new Task();
+                task.addCommand(Commands.getCloneCommand());
+                runTaskPollerThread(task);
             }
         });
         Button truncateLxcInfosBtn = new Button("Delete Background Tasks");
@@ -217,7 +219,8 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         }
     }
 
-    private void populateTasksTable() {
+    private boolean populateTasksTable() {
+        boolean allDone = true;
         List<LxcCloneInfo> cloneInfos = LxcDao.getLxcCloneInfos();
         tasksTable.removeAllItems();
         if (!cloneInfos.isEmpty()) {
@@ -248,11 +251,14 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                 } else if (cloneInfo.getCloneStatus() == LxcCloneStatus.SUCCEEDED) {
                     statusIcon = new Embedded("", new ThemeResource(okIconSource));
                 } else {
+                    allDone = false;
                     statusIcon = new Embedded("", new ThemeResource(loadIconSource));
                 }
                 tasksTable.addItem(new Object[]{cloneInfo.getPhysicalHosts(), checkBtn, statusIcon}, cloneInfo.getTaskUUID());
             }
         }
+
+        return allDone;
     }
 
     private void startCloneTask(boolean runInBackground) {
@@ -376,8 +382,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                     long startTs = System.currentTimeMillis();
                     try {
                         while (!Thread.interrupted()) {
-                            populateTasksTable();
-                            if (task.isCompleted()
+                            if (populateTasksTable() || task.isCompleted()
                                     || System.currentTimeMillis() - startTs > task.getAvgTimeout() * 1000) {
                                 return;
                             }
