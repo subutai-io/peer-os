@@ -5,7 +5,6 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.Set;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
@@ -17,27 +16,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-public class Terminal implements Module, CommandListener {
-    private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
+public class Terminal implements Module {
 
-    
     public static final String MODULE_NAME = "Terminal";
-    private static final TaskRunner taskRunner = new TaskRunner();
 
-    @Override
-    public void onCommand(Response response) {
-        LOG.info("Feeding response");
-        taskRunner.feedResponse(response);
-    }
-
-    public static TaskRunner getTaskRunner() {
-        return taskRunner;
-    }
-
-    public static class ModuleComponent extends CustomComponent {
+    public static class ModuleComponent extends CustomComponent implements
+            CommandListener {
 
         private final TextArea commandOutputTxtArea;
         private final AgentManager agentManager;
+        private final TaskRunner taskRunner = new TaskRunner();
 
         public ModuleComponent() {
             agentManager = ServiceLocator.getService(AgentManager.class);
@@ -194,6 +182,16 @@ public class Terminal implements Module, CommandListener {
                     null, //                        arg
                     null, //                        env vars
                     30); //  
+        }
+
+        @Override
+        public void onCommand(Response response) {
+            taskRunner.feedResponse(response);
+        }
+
+        @Override
+        public String getName() {
+            return Terminal.MODULE_NAME;
         }
 
     }
