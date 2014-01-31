@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management;
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -18,13 +16,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-public class CassandraManager {
+public class Manager {
 
     private final VerticalLayout content;
-//    private final TextArea terminal;
-    private final CassandraTable table;
+    private final HBaseTable table;
 
-    public CassandraManager() {
+    public Manager() {
 
         content = new VerticalLayout();
         content.setMargin(true);
@@ -33,7 +30,7 @@ public class CassandraManager {
 
         Label clusterNameLabel = new Label("Select the cluster");
 
-        table = new CassandraTable();
+        table = new HBaseTable();
         Button getClustersBtn = new Button("Get clusters");
         getClustersBtn.addListener(new Button.ClickListener() {
 

@@ -1,7 +1,7 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWizard;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.Manager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -11,19 +11,20 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
 
-public class CassandraModule implements Module {
+public class HBaseModule implements Module {
 
-    public static final String MODULE_NAME = "Cassandra";
-    private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
+    public static final String MODULE_NAME = "HBase";
+    private static final Logger LOG = Logger.getLogger(HBaseModule.class.getName());
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
-        CassandraWizard cassandraWizard;
-        CassandraManager cassandraManager;
+        Wizard wizard;
+        Manager manager;
 
         public ModuleComponent() {
             setSizeFull();
+
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
             verticalLayout.setSizeFull();
@@ -32,10 +33,10 @@ public class CassandraModule implements Module {
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
 
-            cassandraWizard = new CassandraWizard();
-            cassandraManager = new CassandraManager();
-            sheet.addTab(cassandraWizard.getContent(), "Install");
-            sheet.addTab(cassandraManager.getContent(), "Manage");
+            wizard = new Wizard();
+            manager = new Manager();
+            sheet.addTab(wizard.getContent(), "Install");
+            sheet.addTab(manager.getContent(), "Manage");
 
             verticalLayout.addComponent(sheet);
 
@@ -44,11 +45,11 @@ public class CassandraModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            if (cassandraWizard != null) {
-                cassandraWizard.setOutput(response);
+            if (wizard != null) {
+                wizard.setOutput(response);
             }
-            if (cassandraManager != null) {
-                cassandraManager.setOutput(response);
+            if (manager != null) {
+                manager.setOutput(response);
             }
         }
 
@@ -65,7 +66,7 @@ public class CassandraModule implements Module {
 
     @Override
     public String getName() {
-        return CassandraModule.MODULE_NAME;
+        return HBaseModule.MODULE_NAME;
     }
 
     @Override

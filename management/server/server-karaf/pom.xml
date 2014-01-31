@@ -252,6 +252,11 @@
                                     <artifactId>pig-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hbase-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!--UI Modules-->
 
                                 <!--UI Dependencies-->

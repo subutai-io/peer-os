@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
@@ -13,7 +13,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceInstaller;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceInstaller;
 
 /**
  *
@@ -24,7 +24,7 @@ public class StepFinish extends Panel {
     private TextArea terminal;
     ServiceInstaller installer;
 
-    public StepFinish(final CassandraWizard wizard) {
+    public StepFinish(final Wizard wizard) {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -53,7 +53,6 @@ public class StepFinish extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 installer = new ServiceInstaller(wizard.getConfig(), terminal);
-//                wizard.registerResponseListener(installer);
                 installer.start();
                 next.setCaption("Installing...");
                 next.setEnabled(false);

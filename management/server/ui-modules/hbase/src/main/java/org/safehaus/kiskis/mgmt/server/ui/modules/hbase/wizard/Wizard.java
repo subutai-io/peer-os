@@ -3,11 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
@@ -15,30 +13,23 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-public class CassandraWizard {
+public class Wizard {
 
     private static final int MAX_STEPS = 3;
-    private final VerticalLayout verticalLayout;
+    private final VerticalLayout vlayout;
     private int step = 1;
-    private final CassandraConfig config = new CassandraConfig();
+    private final Config config = new Config();
     private StepFinish stepFinish;
-    GridLayout grid;
 
-    public CassandraWizard() {
-        verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-        grid = new GridLayout(1, 1);
-        grid.setMargin(true);
-        grid.setSizeFull();
-        grid.addComponent(verticalLayout);
-        grid.setComponentAlignment(verticalLayout, Alignment.TOP_CENTER);
-
+    public Wizard() {
+        vlayout = new VerticalLayout();
+        vlayout.setSizeFull();
+        vlayout.setMargin(true);
         putForm();
-
     }
 
     public Component getContent() {
-        return grid;
+        return vlayout;
     }
 
     protected void next() {
@@ -56,33 +47,41 @@ public class CassandraWizard {
         putForm();
     }
 
-    protected CassandraConfig getConfig() {
+    protected Config getConfig() {
         return config;
     }
 
     private void putForm() {
-        verticalLayout.removeAllComponents();
+        vlayout.removeAllComponents();
         switch (step) {
             case 1: {
-                verticalLayout.addComponent(new StepStart(this));
+                vlayout.addComponent(new StepStart(this));
                 break;
             }
             case 2: {
-                verticalLayout.addComponent(new StepSeeds(this));
+                vlayout.addComponent(new StepSetMaster(this));
                 break;
             }
             case 3: {
-                verticalLayout.addComponent(new StepSetDirectories(this));
+                vlayout.addComponent(new StepSetRegion(this));
                 break;
             }
             case 4: {
+                vlayout.addComponent(new StepSetQuorum(this));
+                break;
+            }
+            case 5: {
+                vlayout.addComponent(new StepSetBackuUpMasters(this));
+                break;
+            }
+            case 6: {
                 stepFinish = new StepFinish(this);
-                verticalLayout.addComponent(stepFinish);
+                vlayout.addComponent(stepFinish);
                 break;
             }
             default: {
                 step = 1;
-                verticalLayout.addComponent(new StepStart(this));
+                vlayout.addComponent(new StepStart(this));
                 break;
             }
         }

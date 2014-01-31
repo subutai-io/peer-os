@@ -24,6 +24,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public class StepStart extends Panel {
 
     public StepStart(final CassandraWizard wizard) {
+        setSizeFull();
 
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();

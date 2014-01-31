@@ -20,7 +20,6 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import static org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager.getAgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
