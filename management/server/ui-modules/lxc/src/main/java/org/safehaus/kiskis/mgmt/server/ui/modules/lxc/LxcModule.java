@@ -21,8 +21,8 @@ public class LxcModule implements Module {
     public static class ModuleComponent extends CustomComponent implements CommandListener {
 
         private final TabSheet commandsSheet;
-        private final Cloner cloneForm;
-        private final Manager manageForm;
+        private final Cloner cloner;
+        private final Manager manager;
         private final TaskRunner taskRunner = new TaskRunner();
 
         public ModuleComponent() {
@@ -35,10 +35,10 @@ public class LxcModule implements Module {
             commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
             commandsSheet.setSizeFull();
 
-            cloneForm = new Cloner(taskRunner);
-            commandsSheet.addTab(cloneForm, "Clone");
-            manageForm = new Manager(taskRunner);
-            commandsSheet.addTab(manageForm, "Manage");
+            manager = new Manager(taskRunner);
+            cloner = new Cloner(commandsSheet, taskRunner, manager);
+            commandsSheet.addTab(cloner, "Clone");
+            commandsSheet.addTab(manager, "Manage");
 
             verticalLayout.addComponent(commandsSheet);
 
