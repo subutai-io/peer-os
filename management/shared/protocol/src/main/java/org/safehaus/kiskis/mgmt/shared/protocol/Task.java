@@ -22,11 +22,11 @@ public class Task implements Serializable {
 
     private UUID uuid;
     private String description;
-    private TaskStatus taskStatus;
+    private volatile TaskStatus taskStatus;
     private Integer reqSeqNumber;
     private final List<Command> commands;
     private boolean ignoreExitCode = false;
-    private boolean completed = false;
+    private volatile boolean completed = false;
     private int currentCmdId = -1;
     private int completedCommandsCount = 0;
     private int succeededCommandsCount = 0;

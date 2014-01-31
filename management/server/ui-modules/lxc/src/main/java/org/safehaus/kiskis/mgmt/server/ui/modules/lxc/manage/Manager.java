@@ -182,7 +182,7 @@ public class Manager extends VerticalLayout {
         return table;
     }
 
-    private void sendGetLxcListCmd(Set<Agent> physicalAgents) {
+    public void sendGetLxcListCmd(Set<Agent> physicalAgents) {
         lxcMap.clear();
         lxcTable.setEnabled(false);
         Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
