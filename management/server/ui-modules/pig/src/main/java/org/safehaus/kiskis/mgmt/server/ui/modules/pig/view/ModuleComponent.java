@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig.view;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandBuilder;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.ChainManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.UILogger;
@@ -16,6 +16,7 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
     public ModuleComponent(String moduleName) {
 
         this.moduleName = moduleName;
+        CommandBuilder.setSource(moduleName);
 
         setHeight("100%");
 
@@ -44,7 +45,7 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                chain.start(new Context());
+                ChainManager.run(chain);
             }
         });
 

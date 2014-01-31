@@ -5,23 +5,22 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.AbstractListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.UILogger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-public class RemoveListener extends AbstractListener {
+public class RemoveStatusListener extends AbstractListener {
 
-    public RemoveListener(UILogger log) {
-        super(log, "Pig installed. Removing, please wait...");
+    public RemoveStatusListener(UILogger log) {
+        super(log, "Checking status, please wait...");
     }
 
     @Override
     public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
 
-        String msg = response.getExitCode() == null || response.getExitCode() == 0
-                ? "Pig removed successfully"
-                : "Error occurred while removing Pig. Please see the server logs for details.";
+        if (stdOut == null || !stdOut.contains("ksks-pig")) {
+            LOG.info("Pig NOT INSTALLED. Nothing to remove.");
+            LOG.info("Completed");
+            return false;
+        }
 
-        LOG.info(msg);
-        LOG.info("Completed");
-
-        return false;
+        return true;
     }
 
 }

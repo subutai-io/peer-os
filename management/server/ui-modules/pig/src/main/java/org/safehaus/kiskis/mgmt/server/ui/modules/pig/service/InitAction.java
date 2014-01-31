@@ -32,6 +32,9 @@ public class InitAction implements Action {
     }
 
     private void proceed(Context context, Chain chain, Agent agent) {
+
+        LOG.info("Selected node: " + agent.getHostname());
+
         context.put("agent", agent);
         chain.proceed(context);
     }

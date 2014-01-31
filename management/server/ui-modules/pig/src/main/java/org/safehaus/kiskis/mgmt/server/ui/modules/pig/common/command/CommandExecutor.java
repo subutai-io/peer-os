@@ -3,7 +3,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 public class CommandExecutor implements TaskCallback {
 
@@ -35,7 +34,7 @@ public class CommandExecutor implements TaskCallback {
 
     @Override
     public void onResponse(Task task, Response response) {
-        if (response == null && response.getUuid() == null) {
+        if (response == null || response.getUuid() == null) {
             return;
         }
 

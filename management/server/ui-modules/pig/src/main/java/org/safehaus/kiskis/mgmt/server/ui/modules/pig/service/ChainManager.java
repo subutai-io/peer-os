@@ -2,11 +2,13 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Action;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandAction;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.install.CheckListener;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.install.InstallStatusListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.install.InstallListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.remove.RemoveListener;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.status.CheckStatusListener;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.remove.RemoveStatusListener;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.status.StatusListener;
 
 public class ChainManager {
 
@@ -29,14 +31,14 @@ public class ChainManager {
 
     private static Chain getStatusChain(UILogger logger, Action initAction) {
 
-        CommandAction statusAction = new CommandAction(STATUS_COMMAND, new CheckStatusListener(logger));
+        CommandAction statusAction = new CommandAction(STATUS_COMMAND, new StatusListener(logger));
 
         return new Chain(initAction, statusAction);
     }
 
     private static Chain getInstallChain(UILogger logger, Action initAction) {
 
-        CommandAction statusAction = new CommandAction(STATUS_COMMAND, new CheckListener(logger));
+        CommandAction statusAction = new CommandAction(STATUS_COMMAND, new InstallStatusListener(logger));
         CommandAction installAction = new CommandAction(INSTALL_COMMAND, new InstallListener(logger));
 
         return new Chain(initAction, statusAction, installAction);
@@ -44,10 +46,13 @@ public class ChainManager {
 
     private static Chain getRemoveChain(UILogger logger, Action initAction) {
 
-        CommandAction statusAction = new CommandAction(STATUS_COMMAND, new org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.remove.CheckListener(logger));
+        CommandAction statusAction = new CommandAction(STATUS_COMMAND, new RemoveStatusListener(logger));
         CommandAction removeAction = new CommandAction(REMOVE_COMMAND, new RemoveListener(logger));
 
         return new Chain(initAction, statusAction, removeAction);
     }
 
+    public static void run(Chain chain) {
+        chain.start(new Context());
+    }
 }
