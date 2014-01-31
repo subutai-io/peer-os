@@ -18,6 +18,8 @@
         <module>hadoop</module>
         <module>mongodb</module>
         <module>cassandra</module>
+        <module>pig</module>
+
         <!--        <module>nutch</module>
         <module>solr</module>
         <module>sqoop</module>
