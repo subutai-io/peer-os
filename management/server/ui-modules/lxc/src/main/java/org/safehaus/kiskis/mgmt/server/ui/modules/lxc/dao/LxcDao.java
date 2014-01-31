@@ -8,7 +8,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.dao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

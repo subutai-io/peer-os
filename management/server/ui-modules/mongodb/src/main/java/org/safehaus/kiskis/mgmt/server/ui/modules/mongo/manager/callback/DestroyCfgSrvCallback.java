@@ -18,7 +18,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.Manager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;

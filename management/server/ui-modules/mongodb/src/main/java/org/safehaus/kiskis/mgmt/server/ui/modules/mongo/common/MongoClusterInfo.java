@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  *

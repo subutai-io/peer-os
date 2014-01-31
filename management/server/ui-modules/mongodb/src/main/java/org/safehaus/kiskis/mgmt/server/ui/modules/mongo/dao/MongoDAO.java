@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.MongoClusterInfo;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 
