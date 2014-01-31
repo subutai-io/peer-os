@@ -43,7 +43,7 @@ public class ModuleNotifierImpl implements ModuleNotifier {
 
     public void setModule(Module module) {
         modules.add(module);
-        LOG.info("Adding " + module.getName() + " " + (module instanceof CommandListener));
+        LOG.info("Adding " + module.getName() + " " + ((CommandListener) module));
         if (module instanceof CommandListener) {
             commandManager.addListener((CommandListener) module);
         }
