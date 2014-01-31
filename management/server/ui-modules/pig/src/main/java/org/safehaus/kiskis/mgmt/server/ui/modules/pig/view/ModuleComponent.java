@@ -10,6 +10,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandAct
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -55,20 +56,7 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
                 Context context = new Context();
                 context.put("agent", agent);
 
-                ActionListener actionListener = new ActionListener() {
-
-                    @Override
-                    public void onExecute(Context context) {
-                        LOG.info("on execute");
-                    }
-
-                    @Override
-                    public void onResponse(Context context, String stdOut, String stdErr, boolean isError) {
-                        LOG.info("on response");
-                    }
-                };
-
-                CommandAction commandAction = new CommandAction("dpkg -l|grep ksks", actionListener);
+                CommandAction commandAction = new CommandAction("dpkg -l|grep ksks", new ActionListener("ksks"));
 
                 Chain chain = new Chain(commandAction);
                 chain.execute(context);

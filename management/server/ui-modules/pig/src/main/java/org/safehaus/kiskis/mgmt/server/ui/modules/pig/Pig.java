@@ -21,12 +21,8 @@ public class Pig implements Module {
 
     public static void main(String args[]) throws Exception {
 
-        /*
-        chain.add(chain2);
-        chain.add(new BaseAction("2"));
-        chain.add(new BaseAction("3"));
+        String s = "ii  ksks-bridge                     1.0.0-1                      This package configures Br0 bridge for Physical machines using eth0 interface.";
 
-        chain.execute(new HashMap<String, Object>());
-        */
+        System.out.println(s.matches(".*ksks.*"));
     }
 }

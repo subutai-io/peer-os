@@ -8,6 +8,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 public class CommandBuilder {
 
+    // public getCommand(Context)
+
     public static Command getTemplate() {
         return CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST, // type

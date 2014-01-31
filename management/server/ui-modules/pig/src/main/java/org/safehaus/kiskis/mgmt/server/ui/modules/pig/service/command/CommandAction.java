@@ -7,11 +7,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-import java.util.logging.Logger;
-
 public class CommandAction implements Action {
 
-    private final Logger LOG = Logger.getLogger(getClass().getName());
     private final String PROGRAM_LINE;
     private final ActionListener ACTION_LISTENER;
 
@@ -24,7 +21,7 @@ public class CommandAction implements Action {
     }
 
     public void execute(Context context, Chain chain) {
-        ACTION_LISTENER.onExecute(context);
+        ACTION_LISTENER.onExecute(context, PROGRAM_LINE);
         reset(context, chain);
         CommandExecutor.INSTANCE.execute(getCommand(), this);
     }
@@ -34,6 +31,7 @@ public class CommandAction implements Action {
         this.context = context;
     }
 
+    // TODO
     private Command getCommand() {
         Command cmd = CommandBuilder.getTemplate();
 
@@ -47,15 +45,9 @@ public class CommandAction implements Action {
 
     public void handleResponse(String stdOut, String stdErr, ResponseType responseType) {
 
-        boolean isError = false;
+        boolean canContinue = ACTION_LISTENER.onResponse(context, stdOut, stdErr, responseType);
 
-        ACTION_LISTENER.onResponse(context, stdOut, stdErr, isError);
-
-        if (isError) {
-            return;
-        }
-
-        if (chain != null) {
+        if (canContinue && chain != null) {
             chain.execute(context);
         }
     }
