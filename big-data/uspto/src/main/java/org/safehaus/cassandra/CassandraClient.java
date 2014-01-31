@@ -54,28 +54,8 @@ public class CassandraClient {
 				+ "xml text,"
 				+ "json text"
 				+ ");");
-//		session.execute("CREATE TABLE simplex.playlists (" + "id uuid,"
-//				+ "title text," + "album text, " + "artist text,"
-//				+ "song_id uuid," + "PRIMARY KEY (id, title, album, artist)"
-//				+ ");");
 	}
 
-	public void loadData() {
-		session.execute("INSERT INTO simplex.songs (id, title, album, artist, tags) "
-				+ "VALUES ("
-				+ "756716f7-2e54-4715-9f00-91dcbea6cf50,"
-				+ "'La Petite Tonkinoise',"
-				+ "'Bye Bye Blackbird',"
-				+ "'Joséphine Baker'," + "{'jazz', '2013'})" + ";");
-		session.execute("INSERT INTO simplex.playlists (id, song_id, title, album, artist) "
-				+ "VALUES ("
-				+ "2cc9ccb7-6221-4ccb-8387-f22b6a1b354d,"
-				+ "756716f7-2e54-4715-9f00-91dcbea6cf50,"
-				+ "'La Petite Tonkinoise',"
-				+ "'Bye Bye Blackbird',"
-				+ "'Joséphine Baker'" + ");");
-	}
-	
 	public void insertXML(String id, String date, String applId, String applDate, String xmlString, String jsonString)
 	{
 		session.execute("INSERT INTO uspto.xml (id, date, applId, applDate, xml, json)"

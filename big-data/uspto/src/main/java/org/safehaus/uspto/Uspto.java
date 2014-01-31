@@ -80,9 +80,9 @@ public class Uspto {
 		System.setProperty("entityExpansionLimit","200000");
 		
 //		addFiles("/home/selcuk/share/uspto");
-//		addFiles("/home/selcuk/tmp");
+		addFiles("/home/selcuk/2013");
 //		addFiles("/home/selcuk/workspace/USPTO/src/main/resources/samples");
-		addFiles("/data/trunk/uspto/products/full_text_grants/2013");
+//		addFiles("/data/trunk/uspto/products/full_text_grants/2013");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2012");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2011");
 //		addFiles("/data/trunk/uspto/products/full_text_grants/2010");
@@ -115,7 +115,7 @@ public class Uspto {
 		ConcurrentLinkedQueue<File> patentFilesQueue = new ConcurrentLinkedQueue<File>();
 		patentFilesQueue.addAll(patentFiles);
 		
-		int maxThreadCount = 4;
+		int maxThreadCount = 3;
 		
 		Thread[] threads = new Thread[maxThreadCount];
 		for (int i=0; i<maxThreadCount; i++)
