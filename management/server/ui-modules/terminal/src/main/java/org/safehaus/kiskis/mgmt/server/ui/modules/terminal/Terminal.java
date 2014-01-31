@@ -16,16 +16,25 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-public class Terminal implements Module {
+public class Terminal implements Module,
+        CommandListener {
 
     public static final String MODULE_NAME = "Terminal";
+    private static final TaskRunner taskRunner = new TaskRunner();
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    @Override
+    public void onCommand(Response response) {
+        taskRunner.feedResponse(response);
+    }
+
+    public static TaskRunner getTaskRunner() {
+        return taskRunner;
+    }
+
+    public static class ModuleComponent extends CustomComponent {
 
         private final TextArea commandOutputTxtArea;
         private final AgentManager agentManager;
-        private final TaskRunner taskRunner = new TaskRunner();
 
         public ModuleComponent() {
             agentManager = ServiceLocator.getService(AgentManager.class);
@@ -182,16 +191,6 @@ public class Terminal implements Module {
                     null, //                        arg
                     null, //                        env vars
                     30); //  
-        }
-
-        @Override
-        public void onCommand(Response response) {
-            taskRunner.feedResponse(response);
-        }
-
-        @Override
-        public String getName() {
-            return Terminal.MODULE_NAME;
         }
 
     }

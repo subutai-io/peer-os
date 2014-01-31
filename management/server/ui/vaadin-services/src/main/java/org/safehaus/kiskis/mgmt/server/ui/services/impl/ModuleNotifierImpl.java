@@ -10,6 +10,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 /**
  *
@@ -19,6 +22,11 @@ public class ModuleNotifierImpl implements ModuleNotifier {
 
     private final Queue<Module> modules = new ConcurrentLinkedQueue<Module>();
     private final Queue<ModuleServiceListener> moduleListeners = new ConcurrentLinkedQueue<ModuleServiceListener>();
+    private final CommandManager commandManager;
+
+    public ModuleNotifierImpl() {
+        commandManager = ServiceLocator.getService(CommandManager.class);
+    }
 
     @Override
     public Queue<Module> getModules() {
@@ -32,6 +40,9 @@ public class ModuleNotifierImpl implements ModuleNotifier {
 
     public void setModule(Module module) {
         modules.add(module);
+        if (module instanceof CommandListener) {
+            commandManager.addListener((CommandListener) module);
+        }
         for (ModuleServiceListener moduleServiceListener : moduleListeners) {
             moduleServiceListener.moduleRegistered(module);
         }
@@ -39,6 +50,9 @@ public class ModuleNotifierImpl implements ModuleNotifier {
 
     public void unsetModule(Module module) {
         modules.remove(module);
+        if (module instanceof CommandListener) {
+            commandManager.removeListener((CommandListener) module);
+        }
         for (ModuleServiceListener moduleServiceListener : moduleListeners) {
             moduleServiceListener.moduleUnregistered(module);
         }
