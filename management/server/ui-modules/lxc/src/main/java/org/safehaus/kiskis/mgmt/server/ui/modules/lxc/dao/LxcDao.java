@@ -49,6 +49,20 @@ public class LxcDao {
         return false;
     }
 
+    public static boolean truncateLxcInfos() {
+        try {
+            String cql = String.format(
+                    "truncate %s",
+                    LxcCloneInfo.TABLE_NAME);
+            dbManager.executeUpdate(cql);
+
+            return true;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in truncateLxcInfo", ex);
+        }
+        return false;
+    }
+
     public static List<LxcCloneInfo> getLxcCloneInfos() {
         List<LxcCloneInfo> list = new ArrayList<LxcCloneInfo>();
         try {

@@ -129,11 +129,20 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                 populateTasksTable();
             }
         });
+        Button truncateLxcInfosBtn = new Button("Delete Background Tasks");
+        truncateLxcInfosBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                LxcDao.truncateLxcInfos();
+                populateTasksTable();
+            }
+        });
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(9, 1);
+        GridLayout topContent = new GridLayout(10, 1);
         topContent.setSpacing(true);
 
         topContent.addComponent(new Label("Product name"));
@@ -144,6 +153,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         topContent.addComponent(asyncCloneBtn);
         topContent.addComponent(refreshTasksBtn);
         topContent.addComponent(clearBtn);
+        topContent.addComponent(truncateLxcInfosBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(topContent);
