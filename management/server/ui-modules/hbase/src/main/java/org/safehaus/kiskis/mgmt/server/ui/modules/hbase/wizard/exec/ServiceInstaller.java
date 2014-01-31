@@ -14,7 +14,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import static org.antlr.tool.ErrorManager.info;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.commands.HBaseCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
@@ -146,6 +145,7 @@ public class ServiceInstaller {
                     } else {
                         terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
 //                        saveInfo();
+                        saveHBaseInfo();
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
@@ -169,7 +169,6 @@ public class ServiceInstaller {
 //            terminal.setValue(terminal.getValue().toString() + info.getUuid() + " cluster saved into keyspace.\n");
 //        }
 //    }
-    
     private void saveHBaseInfo() {
         if (HBaseDAO.saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");

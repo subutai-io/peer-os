@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.SerializationUtils;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
@@ -54,18 +52,18 @@ public class HBaseDAO {
     }
 
     public static boolean saveClusterInfo(Config cluster) {
-        try {
-
-            byte[] data = SerializationUtils.serialize(cluster);
-
-            String cql = "insert into hbase_info (uid, info) "
-                    + "values (?,?)";
-            dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
-
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveHBaseClusterInfo", ex);
-            return false;
-        }
+//        try {
+//
+//            byte[] data = SerializationUtils.serialize(cluster);
+//
+//            String cql = "insert into hbase_info (uid, info) "
+//                    + "values (?,?)";
+//            dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
+//
+//        } catch (Exception ex) {
+//            LOG.log(Level.SEVERE, "Error in saveHBaseClusterInfo", ex);
+//            return false;
+//        }
         return true;
     }
 
