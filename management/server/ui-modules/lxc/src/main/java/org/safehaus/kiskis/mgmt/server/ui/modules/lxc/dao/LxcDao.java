@@ -39,8 +39,8 @@ public class LxcDao {
                     LxcCloneInfo.PHYSICAL_HOSTS_NAME, LxcCloneInfo.STATUS_NAME,
                     LxcCloneInfo.DATE_IN_NAME);
             dbManager.executeUpdate(cql, cloneInfo.getTaskUUID(),
-                    cloneInfo.getPhysicalHosts(), LxcCloneStatus.NEW,
-                    new Date());
+                    cloneInfo.getPhysicalHosts(), cloneInfo.getCloneStatus().toString(),
+                    cloneInfo.getDateIn());
 
             return true;
         } catch (Exception ex) {

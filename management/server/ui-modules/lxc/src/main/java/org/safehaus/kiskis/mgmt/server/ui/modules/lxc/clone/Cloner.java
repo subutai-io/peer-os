@@ -5,6 +5,7 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -29,9 +30,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 @SuppressWarnings("serial")
 public class Cloner extends VerticalLayout implements TaskCallback {
-
+    
     private static final Logger LOG = Logger.getLogger(Cloner.class.getName());
-
+    
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
@@ -47,17 +48,18 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private Thread operationTimeoutThread;
+    private Thread taskPollerThread;
     private final AsyncTaskRunner asyncTaskRunner;
-
+    
     public Cloner(TaskRunner taskRunner) {
         setSpacing(true);
         setMargin(true);
-
+        
         asyncTaskRunner = ServiceLocator.getService(AsyncTaskRunner.class);
-
+        
         this.taskRunner = taskRunner;
         timeout = Commands.getCloneCommand().getRequest().getTimeout();
-
+        
         textFieldLxcName = new TextField();
         slider = new Slider();
         slider.setMin(1);
@@ -66,7 +68,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         slider.setImmediate(true);
         cloneBtn = new Button("Clone");
         cloneBtn.addListener(new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 startCloneTask(false);
@@ -74,16 +76,16 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         });
         Button asyncCloneBtn = new Button("Clone in background");
         asyncCloneBtn.addListener(new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 startCloneTask(true);
             }
         });
-
+        
         Button clearBtn = new Button("Clear");
         clearBtn.addListener(new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 //clear completed
@@ -110,22 +112,22 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                 }
             }
         });
-
+        
         Button refreshTasksBtn = new Button("Refresh Background Tasks");
         refreshTasksBtn.addListener(new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 populateTasksTable();
             }
         });
-
+        
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
-
+        
         GridLayout topContent = new GridLayout(9, 1);
         topContent.setSpacing(true);
-
+        
         topContent.addComponent(new Label("Product name"));
         topContent.addComponent(textFieldLxcName);
         topContent.addComponent(new Label("Lxc count"));
@@ -137,18 +139,18 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(topContent);
-
+        
         GridLayout bottomContent = new GridLayout(2, 1);
         bottomContent.setSizeFull();
         lxcTable = createLxcTable("Lxc containers", 500);
         bottomContent.addComponent(lxcTable);
-
+        
         tasksTable = createTasksTable("Background Clone Tasks", 500);
         bottomContent.addComponent(tasksTable);
-
+        
         addComponent(bottomContent);
     }
-
+    
     private TreeTable createLxcTable(String caption, int size) {
         TreeTable table = new TreeTable(caption);
         table.addContainerProperty(physicalHostLabel, String.class, null);
@@ -161,7 +163,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         table.setImmediate(true);
         return table;
     }
-
+    
     private Table createTasksTable(String caption, int size) {
         Table table = new Table(caption);
         table.addContainerProperty("Physical Hosts", String.class, null);
@@ -174,9 +176,9 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         table.setImmediate(true);
         return table;
     }
-
+    
     private void populateLxcTable(Map<Agent, List<String>> agents) {
-
+        
         for (final Agent agent : agents.keySet()) {
             if (lxcTable.getItem(agent.getHostname()) == null) {
                 lxcTable.addItem(new Object[]{agent.getHostname(), null, null}, agent.getHostname());
@@ -184,19 +186,19 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             lxcTable.setCollapsed(agent.getHostname(), false);
             for (String lxc : agents.get(agent)) {
                 Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
-
+                
                 lxcTable.addItem(new Object[]{
                     null,
                     lxc,
                     progressIcon},
                         lxc);
-
+                
                 lxcTable.setParent(lxc, agent.getHostname());
                 lxcTable.setChildrenAllowed(lxc, false);
             }
         }
     }
-
+    
     private void populateTasksTable() {
         List<LxcCloneInfo> cloneInfos = LxcDao.getLxcCloneInfos();
         tasksTable.removeAllItems();
@@ -215,7 +217,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             }
         }
     }
-
+    
     private void startCloneTask(boolean runInBackground) {
         Set<Agent> agents = MgmtApplication.getSelectedAgents();
         if (agents.size() > 0) {
@@ -226,7 +228,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                     physicalAgents.add(agent);
                 }
             }
-
+            
             if (physicalAgents.isEmpty()) {
                 show("Select at least one physical agent");
             } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
@@ -245,7 +247,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                                         = cmd.getRequest().getArgs().get(cmd.getRequest().getArgs().size() - 1);
                                 requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequest().getRequestSequenceNumber(),
                                         lxcHostname);
-
+                                
                                 lxcNames.add(lxcHostname);
                             }
                         }
@@ -261,10 +263,11 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                     for (Agent agent : physicalAgents) {
                         physicalHosts.add(agent.getHostname());
                     }
-                    final LxcCloneInfo cloneInfo = new LxcCloneInfo(task.getUuid(), physicalHosts);
+                    final LxcCloneInfo cloneInfo = new LxcCloneInfo(
+                            task.getUuid(), physicalHosts, new Date(), LxcCloneStatus.NEW);
                     if (LxcDao.saveLxcCloneInfo(cloneInfo)) {
                         asyncTaskRunner.executeTask(task, new TaskCallback() {
-
+                            
                             @Override
                             public void onResponse(Task task, Response response) {
                                 if (task.isCompleted()) {
@@ -280,7 +283,8 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                                 }
                             }
                         });
-                        show("Clone task is submitted for execution.<br/>Please, check later the status of nodes", -1);
+                        runTaskPollerThread(task);
+                        show("Clone task is submitted for execution.<br/>Please, check later the status of nodes");
                     } else {
                         show("Error saving background task to DB");
                     }
@@ -290,17 +294,16 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             show("Select at least one physical agent");
         }
     }
-
+    
     private void show(String msg) {
         getWindow().showNotification(msg);
     }
 
-    private void show(String msg, int delayMs) {
-        Window.Notification notification = new Window.Notification(msg);
-        notification.setDelayMsec(delayMs);
-        getWindow().showNotification(notification);
-    }
-
+//    private void show(String msg, int delayMs) {
+//        Window.Notification notification = new Window.Notification(msg);
+//        notification.setDelayMsec(delayMs);
+//        getWindow().showNotification(notification);
+//    }
     private void runTimeoutThread() {
         try {
             if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
@@ -312,19 +315,47 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                     try {
                         //wait for timeout + 5 sec just in case
                         Thread.sleep(timeout * 1000 + 5000);
-
+                        
                         indicator.setVisible(false);
                     } catch (InterruptedException ex) {
                     }
                 }
             });
             operationTimeoutThread.start();
-
+            
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
         }
     }
-
+    
+    private void runTaskPollerThread(final Task task) {
+        try {
+            if (taskPollerThread != null && taskPollerThread.isAlive()) {
+                taskPollerThread.interrupt();
+            }
+            taskPollerThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        while (!Thread.interrupted()) {
+                            populateTasksTable();
+                            if (task.isCompleted()) {
+                                return;
+                            }
+                            Thread.sleep(500);
+                        }
+                        
+                    } catch (InterruptedException ex) {
+                    }
+                }
+            });
+            taskPollerThread.start();
+            
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in runPollerThread", e);
+        }
+    }
+    
     @Override
     public void onResponse(Task task, Response response) {
         if (Util.isFinalResponse(response)) {

@@ -22,13 +22,8 @@ public class LxcCloneInfo {
             STATUS_NAME = "status";
     private final UUID taskUUID;
     private final List<String> physicalHosts;
-    private Date dateIn;
+    private final Date dateIn;
     private LxcCloneStatus cloneStatus;
-
-    public LxcCloneInfo(UUID taskUUID, List<String> physicalHosts) {
-        this.taskUUID = taskUUID;
-        this.physicalHosts = physicalHosts;
-    }
 
     public LxcCloneInfo(UUID taskUUID, List<String> physicalHosts, Date dateIn, LxcCloneStatus cloneStatus) {
         this.taskUUID = taskUUID;
