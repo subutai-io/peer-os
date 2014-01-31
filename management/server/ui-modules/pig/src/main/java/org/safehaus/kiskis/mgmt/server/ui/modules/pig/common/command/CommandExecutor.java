@@ -34,7 +34,7 @@ public class CommandExecutor implements TaskCallback {
 
     @Override
     public void onResponse(Task task, Response response) {
-        if (response == null && response.getUuid() == null) {
+        if (response == null || response.getUuid() == null) {
             return;
         }
 

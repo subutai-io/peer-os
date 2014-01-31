@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class Pig implements Module {
 
-    public static final String MODULE_NAME = "Pig";
+    private static final String MODULE_NAME = "Pig";
 
     @Override
     public String getName() {
@@ -16,13 +16,6 @@ public class Pig implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
-    }
-
-    public static void main(String args[]) throws Exception {
-
-        String s = "ii  ksks-bridge                     1.0.0-1                      This package configures Br0 bridge for Physical machines using eth0 interface.";
-
-        System.out.println(s.matches(".*ksks.*"));
+        return new ModuleComponent(MODULE_NAME);
     }
 }
