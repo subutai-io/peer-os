@@ -1,13 +1,13 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 import java.util.logging.Logger;
 
 public class ActionListener {
 
-    private final Logger LOG = Logger.getLogger(getClass().getName());
+    protected final Logger LOG = Logger.getLogger(getClass().getName());
     protected String expectedRegex[];
 
     public ActionListener(String ... expectedRegex) {
@@ -18,13 +18,13 @@ public class ActionListener {
         LOG.info("Executing command: " + programLine);
     }
 
-    public boolean onResponse(Context context, String stdOut, String stdErr, ResponseType responseType) {
+    public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
 
         LOG.info(
                 "\n---"
                 + "\n stdOut: " + stdOut
                 + "\n stdErr: " + stdErr
-                + "\n responseType: " + responseType
+                + "\n response: " + response
                 + "\n expected regex matched: " + allRegexMatched(stdOut)
                 + "\n---\n"
         );

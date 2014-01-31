@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.status;
+package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.install;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.ActionListener;
@@ -7,11 +7,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-public class CheckStatusListener extends ActionListener {
+public class CheckListener extends ActionListener {
 
     private UILog log;
 
-    public CheckStatusListener(UILog log) {
+    public CheckListener(UILog log) {
         this.log = log;
     }
 
@@ -36,14 +36,12 @@ public class CheckStatusListener extends ActionListener {
         log.log("Hadoop installed - OK");
 
         if (stdOut.contains("ksks-pig")) {
-            log.log("Pig installed - OK");
-        } else {
-            log.log("Pig NOT INSTALLED");
+            log.log("Pig ALREADY INSTALLED");
+            log.log("Completed");
+            return false;
         }
 
-        log.log("Completed");
-
-        return false;
+        return true;
     }
 
 }

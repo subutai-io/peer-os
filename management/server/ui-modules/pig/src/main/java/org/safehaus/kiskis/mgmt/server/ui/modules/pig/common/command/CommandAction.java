@@ -4,6 +4,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Action;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
@@ -43,9 +44,9 @@ public class CommandAction implements Action {
         return cmd;
     }
 
-    public void handleResponse(String stdOut, String stdErr, ResponseType responseType) {
+    public void handleResponse(String stdOut, String stdErr, Response response) {
 
-        boolean canContinue = ACTION_LISTENER.onResponse(context, stdOut, stdErr, responseType);
+        boolean canContinue = ACTION_LISTENER.onResponse(context, stdOut, stdErr, response);
 
         if (canContinue && chain != null) {
             chain.execute(context);
