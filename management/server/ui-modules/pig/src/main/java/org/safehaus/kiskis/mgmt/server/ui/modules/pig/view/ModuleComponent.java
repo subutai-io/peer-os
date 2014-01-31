@@ -41,9 +41,7 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
 
         grid.addComponent(StatusButtonManager.getButton(uiLog), 0, 0);
         grid.addComponent(InstallButtonManager.getButton(uiLog), 0, 1);
-
-        Button removeButton = new Button("Remove");
-        grid.addComponent(removeButton, 0, 2);
+        grid.addComponent(RemoveButtonManager.getButton(uiLog), 0, 2);
 
     }
 
