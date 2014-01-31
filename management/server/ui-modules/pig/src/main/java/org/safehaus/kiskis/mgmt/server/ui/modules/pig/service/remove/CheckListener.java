@@ -2,15 +2,15 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.remove;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.ActionListener;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UILog;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.UILogger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class CheckListener extends ActionListener {
 
-    private UILog log;
+    private UILogger log;
 
-    public CheckListener(UILog log) {
+    public CheckListener(UILogger log) {
         this.log = log;
     }
 
@@ -20,15 +20,15 @@ public class CheckListener extends ActionListener {
         Agent agent = context.get("agent");
 
         log.clear();
-        log.log("Checking status for %s. Please wait...", agent.getHostname());
+        log.info("Checking status for %s. Please wait...", agent.getHostname());
     }
 
     @Override
     public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
 
         if (stdOut == null || !stdOut.contains("ksks-pig")) {
-            log.log("Pig NOT INSTALLED. Nothing to remove.");
-            log.log("Completed");
+            log.info("Pig NOT INSTALLED. Nothing to remove.");
+            log.info("Completed");
             return false;
         }
 

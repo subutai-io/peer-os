@@ -14,7 +14,8 @@ public class CommandBuilder {
         return CommandFactory.createRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
-                Pig.MODULE_NAME, //     source
+                //Pig.MODULE_NAME, //     source
+                "Pig",
                 null, //                        !! task uuid
                 1, //                           !! request sequence number
                 "/", //                         cwd

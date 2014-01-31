@@ -6,7 +6,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class CommandAction implements Action {
 
@@ -21,6 +20,7 @@ public class CommandAction implements Action {
         ACTION_LISTENER = actionListener;
     }
 
+    @Override
     public void execute(Context context, Chain chain) {
         ACTION_LISTENER.onExecute(context, PROGRAM_LINE);
         reset(context, chain);
@@ -49,7 +49,7 @@ public class CommandAction implements Action {
         boolean canContinue = ACTION_LISTENER.onResponse(context, stdOut, stdErr, response);
 
         if (canContinue && chain != null) {
-            chain.execute(context);
+            chain.proceed(context);
         }
     }
 }
