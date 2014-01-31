@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.services.impl;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
@@ -19,6 +20,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
  * @author dilshat
  */
 public class ModuleNotifierImpl implements ModuleNotifier {
+
+    private static final Logger LOG = Logger.getLogger(ModuleNotifierImpl.class.getName());
 
     private final Queue<Module> modules = new ConcurrentLinkedQueue<Module>();
     private final Queue<ModuleServiceListener> moduleListeners = new ConcurrentLinkedQueue<ModuleServiceListener>();
@@ -40,6 +43,7 @@ public class ModuleNotifierImpl implements ModuleNotifier {
 
     public void setModule(Module module) {
         modules.add(module);
+        LOG.info("Adding " + module.getName() + " " + (module instanceof CommandListener));
         if (module instanceof CommandListener) {
             commandManager.addListener((CommandListener) module);
         }

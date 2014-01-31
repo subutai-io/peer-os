@@ -5,6 +5,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
@@ -16,14 +17,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-public class Terminal implements Module,
-        CommandListener {
+public class Terminal implements Module, CommandListener {
+    private static final Logger LOG = Logger.getLogger(Terminal.class.getName());
 
+    
     public static final String MODULE_NAME = "Terminal";
     private static final TaskRunner taskRunner = new TaskRunner();
 
     @Override
     public void onCommand(Response response) {
+        LOG.info("Feeding response");
         taskRunner.feedResponse(response);
     }
 
