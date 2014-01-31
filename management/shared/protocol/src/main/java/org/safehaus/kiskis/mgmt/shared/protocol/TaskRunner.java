@@ -6,6 +6,8 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -15,6 +17,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
  * @author dilshat
  */
 public class TaskRunner {
+
+    private static final Logger LOG = Logger.getLogger(TaskRunner.class.getName());
 
     private final ExpiringCache<UUID, TaskListener> taskListenerCache = new ExpiringCache<UUID, TaskListener>();
     private final CommandManager commandManager;
@@ -58,6 +62,7 @@ public class TaskRunner {
                     tl.getTaskCallback().onResponse(tl.getTask(), response);
 
                 } catch (Exception e) {
+                    LOG.log(Level.SEVERE, String.format("Error processing response: %s"), e);
                 }
             }
         }

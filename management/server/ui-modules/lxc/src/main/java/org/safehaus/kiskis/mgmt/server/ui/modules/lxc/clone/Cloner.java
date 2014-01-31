@@ -18,10 +18,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.dao.LxcCloneInfo;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.dao.LxcCloneStatus;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.dao.LxcDao;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 @SuppressWarnings("serial")
 public class Cloner extends VerticalLayout implements TaskCallback {
@@ -33,6 +37,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final Slider slider;
     private final Label indicator;
     private final TreeTable lxcTable;
+    private final Table tasksTable;
     private final TaskRunner taskRunner;
     private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
     private final int timeout;
@@ -40,6 +45,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final String statusLabel = "Status";
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
+    private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private Thread operationTimeoutThread;
     private final AsyncTaskRunner asyncTaskRunner;
 
@@ -105,28 +111,45 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             }
         });
 
+        Button refreshTasksBtn = new Button("Refresh Background Tasks");
+        refreshTasksBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                populateTasksTable();
+            }
+        });
+
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout grid = new GridLayout(8, 1);
-        grid.setSpacing(true);
+        GridLayout topContent = new GridLayout(9, 1);
+        topContent.setSpacing(true);
 
-        grid.addComponent(new Label("Product name"));
-        grid.addComponent(textFieldLxcName);
-        grid.addComponent(new Label("Lxc count"));
-        grid.addComponent(slider);
-        grid.addComponent(cloneBtn);
-        grid.addComponent(asyncCloneBtn);
-        grid.addComponent(clearBtn);
-        grid.addComponent(indicator);
-        grid.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
-        addComponent(grid);
+        topContent.addComponent(new Label("Product name"));
+        topContent.addComponent(textFieldLxcName);
+        topContent.addComponent(new Label("Lxc count"));
+        topContent.addComponent(slider);
+        topContent.addComponent(cloneBtn);
+        topContent.addComponent(asyncCloneBtn);
+        topContent.addComponent(refreshTasksBtn);
+        topContent.addComponent(clearBtn);
+        topContent.addComponent(indicator);
+        topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
+        addComponent(topContent);
 
-        lxcTable = createTableTemplate("Lxc containers", 500);
-        addComponent(lxcTable);
+        GridLayout bottomContent = new GridLayout(2, 1);
+        bottomContent.setSizeFull();
+        lxcTable = createLxcTable("Lxc containers", 500);
+        bottomContent.addComponent(lxcTable);
+
+        tasksTable = createTasksTable("Background Clone Tasks", 500);
+        bottomContent.addComponent(tasksTable);
+
+        addComponent(bottomContent);
     }
 
-    private TreeTable createTableTemplate(String caption, int size) {
+    private TreeTable createLxcTable(String caption, int size) {
         TreeTable table = new TreeTable(caption);
         table.addContainerProperty(physicalHostLabel, String.class, null);
         table.addContainerProperty("Lxc Host", String.class, null);
@@ -139,7 +162,20 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         return table;
     }
 
-    private void populateTable(Map<Agent, List<String>> agents) {
+    private Table createTasksTable(String caption, int size) {
+        Table table = new Table(caption);
+        table.addContainerProperty("Physical Hosts", String.class, null);
+        table.addContainerProperty("Check status", Button.class, null);
+        table.addContainerProperty(statusLabel, Embedded.class, null);
+        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        table.setHeight(size, Sizeable.UNITS_PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
+        return table;
+    }
+
+    private void populateLxcTable(Map<Agent, List<String>> agents) {
 
         for (final Agent agent : agents.keySet()) {
             if (lxcTable.getItem(agent.getHostname()) == null) {
@@ -147,7 +183,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             }
             lxcTable.setCollapsed(agent.getHostname(), false);
             for (String lxc : agents.get(agent)) {
-                Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+                Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
 
                 lxcTable.addItem(new Object[]{
                     null,
@@ -157,6 +193,25 @@ public class Cloner extends VerticalLayout implements TaskCallback {
 
                 lxcTable.setParent(lxc, agent.getHostname());
                 lxcTable.setChildrenAllowed(lxc, false);
+            }
+        }
+    }
+
+    private void populateTasksTable() {
+        List<LxcCloneInfo> cloneInfos = LxcDao.getLxcCloneInfos();
+        tasksTable.removeAllItems();
+        if (!cloneInfos.isEmpty()) {
+            for (LxcCloneInfo cloneInfo : cloneInfos) {
+                Button checkBtn = new Button("Check");
+                Embedded statusIcon;
+                if (cloneInfo.getCloneStatus() == LxcCloneStatus.FAILED) {
+                    statusIcon = new Embedded("", new ThemeResource(errorIconSource));
+                } else if (cloneInfo.getCloneStatus() == LxcCloneStatus.SUCCEEDED) {
+                    statusIcon = new Embedded("", new ThemeResource(okIconSource));
+                } else {
+                    statusIcon = new Embedded("", new ThemeResource(loadIconSource));
+                }
+                tasksTable.addItem(new Object[]{cloneInfo.getPhysicalHosts(), checkBtn, statusIcon}, cloneInfo.getTaskUUID());
             }
         }
     }
@@ -196,24 +251,39 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                         }
                         agentFamilies.put(physAgent, lxcNames);
                     }
-                    populateTable(agentFamilies);
+                    populateLxcTable(agentFamilies);
                     indicator.setVisible(true);
                     runTimeoutThread();
                     taskRunner.runTask(task, this);
                 } else {
                     //run task in background
-                    asyncTaskRunner.executeTask(task, new TaskCallback() {
+                    List<String> physicalHosts = new ArrayList<String>();
+                    for (Agent agent : physicalAgents) {
+                        physicalHosts.add(agent.getHostname());
+                    }
+                    final LxcCloneInfo cloneInfo = new LxcCloneInfo(task.getUuid(), physicalHosts);
+                    if (LxcDao.saveLxcCloneInfo(cloneInfo)) {
+                        asyncTaskRunner.executeTask(task, new TaskCallback() {
 
-                        @Override
-                        public void onResponse(Task task, Response response) {
-                            if (task.isCompleted()) {
-                                //one could save task status to db here
-                                //code here must not reference any UI specific objects
-                                System.out.println("Background cloning is done");
+                            @Override
+                            public void onResponse(Task task, Response response) {
+                                if (task.isCompleted()) {
+                                    //one could save task status to db here
+                                    //code here must not reference any UI specific objects
+
+                                    cloneInfo.setCloneStatus(
+                                            task.getTaskStatus() == TaskStatus.SUCCESS
+                                            ? LxcCloneStatus.SUCCEEDED : LxcCloneStatus.FAILED);
+                                    if (LxcDao.saveLxcCloneInfo(cloneInfo)) {
+                                        System.out.println("Background cloning is done");
+                                    }
+                                }
                             }
-                        }
-                    });
-                    show("Clone task is submitted for execution.<br/>Please, check later the status of nodes", -1);
+                        });
+                        show("Clone task is submitted for execution.<br/>Please, check later the status of nodes", -1);
+                    } else {
+                        show("Error saving background task to DB");
+                    }
                 }
             }
         } else {
