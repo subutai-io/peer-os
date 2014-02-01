@@ -9,15 +9,15 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class InstallListener extends AbstractListener {
 
     public InstallListener() {
-        super("Installing Pig, please wait...");
+        super("Installing Sqoop, please wait...");
     }
 
     @Override
     public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
 
         String msg = response.getExitCode() == null || response.getExitCode() == 0
-                ? "Pig installed successfully"
-                : "Error occurred while installing Pig. Please see the server logs for details.";
+                ? "Sqoop installed successfully"
+                : "Error occurred while installing Sqoop. Please see the server logs for details.";
 
         UILogger.info(msg);
         UIStateManager.end();

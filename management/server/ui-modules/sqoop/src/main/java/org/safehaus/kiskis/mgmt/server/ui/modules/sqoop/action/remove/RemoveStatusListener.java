@@ -15,8 +15,8 @@ public class RemoveStatusListener extends AbstractListener {
     @Override
     public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
 
-        if (stdOut == null || !stdOut.contains("ksks-pig")) {
-            UILogger.info("Pig NOT INSTALLED. Nothing to remove.");
+        if (stdOut == null || !stdOut.contains("ksks-sqoop")) {
+            UILogger.info("Sqoop NOT INSTALLED. Nothing to remove.");
             UIStateManager.end();
             return false;
         }

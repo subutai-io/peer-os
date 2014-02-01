@@ -9,14 +9,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class RemoveListener extends AbstractListener {
 
     public RemoveListener() {
-        super("Pig installed. Removing, please wait...");
+        super("Sqoop installed. Removing, please wait...");
     }
 
     @Override
     public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
 
         String msg = response.getExitCode() == null || response.getExitCode() == 0
-                ? "Pig removed successfully"
+                ? "Sqoop removed successfully"
                 : "Error occurred while removing Pig. Please see the server logs for details.";
 
         UILogger.info(msg);

@@ -13,8 +13,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.status.StatusList
 public class ChainManager {
 
     private static final String STATUS_COMMAND = "dpkg -l|grep ksks";
-    private static final String INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ksks-pig";
-    private static final String REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-pig";
+    private static final String INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ksks-sqoop";
+    private static final String REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-sqoop";
 
     private static final Action INIT_ACTION = new InitAction();
 

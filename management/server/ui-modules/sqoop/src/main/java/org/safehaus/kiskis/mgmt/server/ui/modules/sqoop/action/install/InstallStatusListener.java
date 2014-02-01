@@ -16,15 +16,15 @@ public class InstallStatusListener extends AbstractListener {
     public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
 
         if (stdOut == null || !stdOut.contains("ksks-hadoop")) {
-            UILogger.info("Hadoop NOT INSTALLED. Please install hadoop before installing Pig.");
+            UILogger.info("Hadoop NOT INSTALLED. Please install Hadoop before installing Sqoop.");
             UIStateManager.end();
             return false;
         }
 
         UILogger.info("Hadoop installed - OK");
 
-        if (stdOut.contains("ksks-pig")) {
-            UILogger.info("Pig ALREADY INSTALLED");
+        if (stdOut.contains("ksks-sqoop")) {
+            UILogger.info("Sqoop ALREADY INSTALLED");
             UIStateManager.end();
             return false;
         }
