@@ -11,8 +11,8 @@ public class CommandBuilder {
 
     private static String source;
 
-    public static void setSource(String _source) {
-        source = _source;
+    public static void init(String source) {
+        CommandBuilder.source = source;
     }
 
     public static Command getCommand(Context context, String commandLine) {

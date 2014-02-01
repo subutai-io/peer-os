@@ -1,11 +1,12 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.pig.view;
+package org.safehaus.kiskis.mgmt.server.ui.modules.pig;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandBuilder;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandExecutor;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.ChainManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.UILogger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.ChainManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UILogger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UIStateManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
@@ -16,7 +17,7 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
     public ModuleComponent(String moduleName) {
 
         this.moduleName = moduleName;
-        CommandBuilder.setSource(moduleName);
+        CommandBuilder.init(moduleName);
 
         setHeight("100%");
 
@@ -25,17 +26,22 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
 
         TextArea textArea = getTextArea();
         grid.addComponent(textArea, 1, 0, 9, 9);
+        UILogger.init(textArea);
 
-        addButtons(grid, textArea);
+        addButtons(grid);
     }
 
-    private static void addButtons(GridLayout grid, TextArea textArea) {
+    private static void addButtons(GridLayout grid) {
 
-        ChainManager chainManager = new ChainManager(new UILogger(textArea));
+        Button statusButton = getButton("Check Status", ChainManager.STATUS_CHAIN);
+        Button installButton = getButton("Install", ChainManager.INSTALL_CHAIN);
+        Button removeButton = getButton("Remove", ChainManager.REMOVE_CHAIN);
 
-        grid.addComponent(getButton("Check Status", chainManager.STATUS_CHAIN), 0, 0);
-        grid.addComponent(getButton("Install", chainManager.INSTALL_CHAIN), 0, 1);
-        grid.addComponent(getButton("Remove", chainManager.REMOVE_CHAIN), 0, 2);
+        grid.addComponent(statusButton, 0, 0);
+        grid.addComponent(installButton, 0, 1);
+        grid.addComponent(removeButton, 0, 2);
+
+        UIStateManager.init(statusButton, installButton, removeButton);
     }
 
     private static Button getButton(String name, final Chain chain) {

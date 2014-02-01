@@ -1,20 +1,19 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service;
+package org.safehaus.kiskis.mgmt.server.ui.modules.pig.action;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.ActionListener;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UILogger;
 
 public abstract class AbstractListener extends ActionListener {
 
-    protected final UILogger LOG;
     protected final String EXECUTE_MESSAGE;
 
-    protected AbstractListener(UILogger log, String executeMessage) {
-        LOG = log;
+    protected AbstractListener(String executeMessage) {
         EXECUTE_MESSAGE = executeMessage;
     }
 
     @Override
     public void onExecute(Context context, String programLine) {
-        LOG.info(EXECUTE_MESSAGE);
+        UILogger.info(EXECUTE_MESSAGE);
     }
 }

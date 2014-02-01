@@ -1,14 +1,15 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.remove;
+package org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.remove;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.AbstractListener;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.UILogger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.AbstractListener;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UILogger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UIStateManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class RemoveListener extends AbstractListener {
 
-    public RemoveListener(UILogger log) {
-        super(log, "Pig installed. Removing, please wait...");
+    public RemoveListener() {
+        super("Pig installed. Removing, please wait...");
     }
 
     @Override
@@ -18,8 +19,8 @@ public class RemoveListener extends AbstractListener {
                 ? "Pig removed successfully"
                 : "Error occurred while removing Pig. Please see the server logs for details.";
 
-        LOG.info(msg);
-        LOG.info("Completed");
+        UILogger.info(msg);
+        UIStateManager.end();
 
         return false;
     }
