@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
@@ -23,8 +22,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 @SuppressWarnings("serial")
 public class Cloner extends VerticalLayout implements TaskCallback {
-
-    private static final Logger LOG = Logger.getLogger(Cloner.class.getName());
 
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
@@ -88,6 +85,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                         lxcTable.removeItem(rowId);
                     }
                 }
+
             }
         });
 
