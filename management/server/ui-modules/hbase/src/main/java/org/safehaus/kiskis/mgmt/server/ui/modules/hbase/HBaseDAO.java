@@ -75,9 +75,9 @@ public class HBaseDAO {
         return list;
     }
 
-    public static boolean deleteHBaseClusterInfo(UUID uuid) {
+    public static boolean deleteClusterInfo(UUID uuid) {
         try {
-            String cql = "delete from hbase_cluster_info where uid = ?";
+            String cql = "delete from hbase_info where uid = ?";
             dbManager.executeUpdate(cql, uuid);
             return true;
         } catch (Exception ex) {

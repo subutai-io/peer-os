@@ -68,10 +68,10 @@ public class HBaseTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-//                getWindow().showNotification("Starting cassandra cluster: " + cci.getName());
-//                cce = HBaseCommandEnum.START;
-//                selectedItem = item;
-//                manager.runCommand(cci.getNodes(), cce);
+                getWindow().showNotification("Starting cluster: " + config.getUuid());
+                cce = HBaseCommandEnum.START;
+                selectedItem = item;
+                manager.runCommand(config.getAgents(), cce);
             }
         });
 
@@ -80,10 +80,10 @@ public class HBaseTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-//                getWindow().showNotification("Stopping cassandra cluster: " + cci.getName());
-//                cce = HBaseCommandEnum.STOP;
-//                selectedItem = item;
-//                manager.runCommand(cci.getNodes(), cce);
+                getWindow().showNotification("Starting cluster: " + config.getUuid());
+                cce = HBaseCommandEnum.STOP;
+                selectedItem = item;
+                manager.runCommand(config.getAgents(), cce);
 
             }
         });
@@ -114,10 +114,10 @@ public class HBaseTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                selectedConfig = config;
-                getWindow().showNotification("Destroying HBase cluster: " + config.getUuid());
+                getWindow().showNotification("Purging cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.PURGE;
-//                manager.runCommand(cci.getAllnodes(), cce);
+                selectedItem = item;
+                manager.runCommand(config.getAgents(), cce);
             }
         });
 
@@ -173,7 +173,6 @@ public class HBaseTable extends Table {
         if (cce != null) {
             switch (cce) {
                 case START: {
-
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Start success");
@@ -189,7 +188,6 @@ public class HBaseTable extends Table {
 
                 }
                 case STOP: {
-
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Stop success");
@@ -208,7 +206,7 @@ public class HBaseTable extends Table {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
                             if (HBaseDAO
-                                    .deleteHBaseClusterInfo(selectedConfig.getUuid())) {
+                                    .deleteClusterInfo(selectedConfig.getUuid())) {
 //                    container.removeItem(itemId);
                                 refreshDatasource();
                             }
