@@ -8,8 +8,8 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -19,15 +19,23 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
+    private AsyncTaskRunner taskRunner;
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    public AsyncTaskRunner getTaskRunner() {
+        return taskRunner;
+    }
+
+    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
+    }
+
+    public static class ModuleComponent extends CustomComponent {
 
         private final TextArea commandOutputTxtArea;
         private final AgentManager agentManager;
-        private final TaskRunner taskRunner = new TaskRunner();
+        private volatile int taskCount = 0;
 
-        public ModuleComponent() {
+        public ModuleComponent(final AsyncTaskRunner taskRunner) {
             agentManager = ServiceLocator.getService(AgentManager.class);
 
             setHeight("100%");
@@ -106,7 +114,8 @@ public class Terminal implements Module {
                             task.addCommand(cmd);
                         }
                         indicator.setVisible(true);
-                        taskRunner.runTask(task, new TaskCallback() {
+                        taskCount++;
+                        taskRunner.executeTask(task, new TaskCallback() {
 
                             @Override
                             public void onResponse(Task task, Response response) {
@@ -132,8 +141,11 @@ public class Terminal implements Module {
                                     addOutput(out.toString());
                                 }
 
-                                if (task.isCompleted() && taskRunner.getRemainingTaskCount() == 0) {
-                                    indicator.setVisible(false);
+                                if (task.isCompleted()) {
+                                    taskCount--;
+                                    if (taskCount == 0) {
+                                        indicator.setVisible(false);
+                                    }
                                 }
                             }
                         });
@@ -184,16 +196,6 @@ public class Terminal implements Module {
                     30); //  
         }
 
-        @Override
-        public void onCommand(Response response) {
-            taskRunner.feedResponse(response);
-        }
-
-        @Override
-        public String getName() {
-            return Terminal.MODULE_NAME;
-        }
-
     }
 
     @Override
@@ -203,7 +205,7 @@ public class Terminal implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(taskRunner);
     }
 
 }

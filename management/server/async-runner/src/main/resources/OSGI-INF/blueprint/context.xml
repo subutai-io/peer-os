@@ -14,5 +14,7 @@
     </bean>
     
     <service ref="module" interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner"/>
+    
+    <service ref="module" interface="org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener"/>
 
 </blueprint>

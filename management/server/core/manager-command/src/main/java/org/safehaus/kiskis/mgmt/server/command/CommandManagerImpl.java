@@ -61,8 +61,10 @@ public class CommandManagerImpl implements ResponseListener, org.safehaus.kiskis
     @Override
     public void addListener(CommandListener listener) {
         try {
-            LOG.log(Level.INFO, "Adding module listener : {0}", listener.getName());
-            listeners.put(listener, Executors.newSingleThreadExecutor());
+            if (listener != null) {
+                LOG.log(Level.INFO, "Adding module listener : {0}", listener.getName());
+                listeners.put(listener, Executors.newSingleThreadExecutor());
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in addListener", ex);
         }
@@ -71,10 +73,12 @@ public class CommandManagerImpl implements ResponseListener, org.safehaus.kiskis
     @Override
     public void removeListener(CommandListener listener) {
         try {
-            LOG.log(Level.INFO, "Removing module listener : {0}", listener.getName());
-            ExecutorService exec = listeners.remove(listener);
-            if (exec != null) {
-                exec.shutdown();
+            if (listener != null) {
+                LOG.log(Level.INFO, "Removing module listener : {0}", listener.getName());
+                ExecutorService exec = listeners.remove(listener);
+                if (exec != null) {
+                    exec.shutdown();
+                }
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in removeListener", ex);
