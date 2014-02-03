@@ -21,10 +21,6 @@ public class Terminal implements Module {
     public static final String MODULE_NAME = "Terminal";
     private AsyncTaskRunner taskRunner;
 
-    public AsyncTaskRunner getTaskRunner() {
-        return taskRunner;
-    }
-
     public void setTaskRunner(AsyncTaskRunner taskRunner) {
         this.taskRunner = taskRunner;
     }

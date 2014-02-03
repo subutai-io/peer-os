@@ -37,7 +37,7 @@ public class TaskRunner {
         }
     }
 
-    public void feedResponse(Response response) {
+    public Task feedResponse(Response response) {
         if (response != null && response.getTaskUuid() != null) {
             TaskListener tl = taskListenerCache.get(response.getTaskUuid());
             if (tl != null) {
@@ -60,12 +60,13 @@ public class TaskRunner {
                     }
 
                     tl.getTaskCallback().onResponse(tl.getTask(), response);
-
+                    return tl.getTask();
                 } catch (Exception e) {
                     LOG.log(Level.SEVERE, String.format("Error processing response: %s"), e);
                 }
             }
         }
+        return null;
     }
 
     public Task getTask(UUID taskUUID) {

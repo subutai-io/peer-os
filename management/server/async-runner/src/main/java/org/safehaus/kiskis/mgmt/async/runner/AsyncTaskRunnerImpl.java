@@ -67,12 +67,16 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
 
     @Override
     public void onCommand(final Response response) {
-        ExecutorService executor = executors.get(response.getTaskUuid());
+        final ExecutorService executor = executors.get(response.getTaskUuid());
         if (executor != null) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    taskRunner.feedResponse(response);
+                    Task task = taskRunner.feedResponse(response);
+                    if (task == null || task.isCompleted()) {
+                        executor.shutdown();
+                        executors.remove(response.getTaskUuid());
+                    }
                 }
             });
         }
