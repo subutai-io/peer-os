@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec;
 
 import com.vaadin.ui.TextArea;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Config;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;

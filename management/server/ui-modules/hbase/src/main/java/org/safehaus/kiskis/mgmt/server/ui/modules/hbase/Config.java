@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -17,7 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class Config implements Serializable {
 
-    private UUID uuid;
+    private final UUID uuid;
     Set<Agent> agents;
     Set<Agent> master;
     Set<Agent> region;

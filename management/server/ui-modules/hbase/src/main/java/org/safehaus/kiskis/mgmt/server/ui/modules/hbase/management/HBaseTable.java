@@ -9,7 +9,7 @@ import com.vaadin.ui.Table;
 
 import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Config;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
