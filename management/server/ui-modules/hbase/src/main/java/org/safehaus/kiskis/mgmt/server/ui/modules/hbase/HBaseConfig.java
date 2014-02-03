@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class HBaseConfig implements Serializable {
 
-    private final UUID uuid;
+    private UUID uuid;
     Set<Agent> agents;
     Set<Agent> master;
     Set<Agent> region;
@@ -30,6 +30,10 @@ public class HBaseConfig implements Serializable {
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public void reset() {

@@ -5,9 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**

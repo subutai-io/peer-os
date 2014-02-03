@@ -41,7 +41,7 @@ public class HBaseTable extends Table {
         this.setImmediate(true);
     }
 
-    private IndexedContainer getCassandraContainer() {
+    private IndexedContainer getContainer() {
         IndexedContainer container = new IndexedContainer();
         container.addContainerProperty(HBaseClusterInfo.UUID_LABEL, String.class, "");
 //        container.addContainerProperty(HBaseClusterInfo.DOMAINNAME_LABEL, String.class, "");
@@ -129,7 +129,7 @@ public class HBaseTable extends Table {
     }
 
     public void refreshDatasource() {
-        this.setContainerDataSource(getCassandraContainer());
+        this.setContainerDataSource(getContainer());
     }
 
 //    public NodesWindow getNodesWindow() {
