@@ -2,20 +2,20 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import java.util.ArrayList;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/23/13 Time: 3:11 PM
@@ -289,4 +289,16 @@ public class RequestUtil {
         return request;
     }
 
+    public static Request getRequest(final String command, Task task, HashMap<String, String> map) {
+        String json = command;
+
+        json = json.replaceAll(":taskUuid", task.getUuid().toString());
+        json = json.replaceAll(":requestSequenceNumber", task.getIncrementedReqSeqNumber().toString());
+
+        for (String key : map.keySet()) {
+            json = json.replaceAll(key, map.get(key));
+        }
+
+        return CommandJson.getRequest(json);
+    }
 }
