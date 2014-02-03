@@ -16,33 +16,33 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 /**
  *
  * @author dilshat
  */
-public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
+public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
 
     private static final Logger LOG = Logger.getLogger(AsyncTaskRunnerImpl.class.getName());
 
     private static final String MODULE_NAME = "AsyncRunner";
-    private CommandManager commandManager;
+    private CommunicationService communicationService;
     private TaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
 
-    public void setCommandManager(CommandManager commandManager) {
-        this.commandManager = commandManager;
+    public void setCommunicationService(CommunicationService communicationService) {
+        this.communicationService = communicationService;
     }
 
     public void init() {
         try {
-            if (commandManager != null) {
-                taskRunner = new TaskRunner(commandManager);
-                commandManager.addListener(this);
+            if (communicationService != null) {
+                taskRunner = new TaskRunner(communicationService);
+                communicationService.addListener(this);
                 LOG.info(MODULE_NAME + " started");
             } else {
                 throw new Exception("Missing CommandManager service");
@@ -57,8 +57,8 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
         try {
             executors.clear();
             taskRunner.removeAllTaskCallbacks();
-            if (commandManager != null) {
-                commandManager.removeListener(this);
+            if (communicationService != null) {
+                communicationService.removeListener(this);
             }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in destroy", e);
@@ -66,16 +66,34 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     }
 
     @Override
-    public void onCommand(final Response response) {
+    public void onResponse(Response response) {
+        switch (response.getType()) {
+            case EXECUTE_TIMEOUTED:
+            case EXECUTE_RESPONSE:
+            case EXECUTE_RESPONSE_DONE: {
+                processResponse(response);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+    }
+
+    private void processResponse(final Response response) {
         final ExecutorService executor = executors.get(response.getTaskUuid());
         if (executor != null) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Task task = taskRunner.feedResponse(response);
-                    if (task == null || task.isCompleted()) {
-                        executor.shutdown();
-                        executors.remove(response.getTaskUuid());
+                    try {
+                        Task task = taskRunner.feedResponse(response);
+                        if (task == null || task.isCompleted()) {
+                            executors.remove(response.getTaskUuid());
+                            executor.shutdown();
+                        }
+                    } catch (Exception e) {
                     }
                 }
             });
@@ -92,8 +110,8 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
                 @Override
                 public void onEntryExpiry(ExecutorService entry) {
                     try {
-                        entry.shutdown();
                         executors.remove(task.getUuid());
+                        entry.shutdown();
                     } catch (Exception e) {
                     }
                 }
@@ -111,11 +129,6 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
             }
         });
 
-    }
-
-    @Override
-    public String getName() {
-        return MODULE_NAME;
     }
 
     @Override

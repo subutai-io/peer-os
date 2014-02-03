@@ -336,7 +336,7 @@ public class Commands {
                 "--port",
                 port
         ));
-        req.setTimeout(30);
+        req.setTimeout(10);
         return cmd;
     }
 

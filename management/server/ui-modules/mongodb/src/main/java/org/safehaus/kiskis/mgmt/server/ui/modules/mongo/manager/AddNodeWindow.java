@@ -250,8 +250,8 @@ public class AddNodeWindow extends Window {
                                         "child process started successfully, parent exiting")
                                 == config.getRouterServers().size())
                                 || (task.getData() != TaskType.RESTART_ROUTERS
-                                && stdOutput.toString().contains(
-                                        "child process started successfully, parent exiting"))) {
+                                && stdOutput.indexOf(
+                                        "child process started successfully, parent exiting") > -1)) {
                             task.setTaskStatus(TaskStatus.SUCCESS);
                             task.setCompleted(true);
                             taskRunner.removeTaskCallback(task.getUuid());

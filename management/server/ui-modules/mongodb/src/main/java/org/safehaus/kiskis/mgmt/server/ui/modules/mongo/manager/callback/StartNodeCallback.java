@@ -37,7 +37,7 @@ public class StartNodeCallback implements TaskCallback {
         if (!Util.isStringEmpty(response.getStdOut())) {
             stdOutput.append(response.getStdOut());
         }
-        if (stdOutput.toString().contains("child process started successfully, parent exiting")) {
+        if (stdOutput.indexOf("child process started successfully, parent exiting") > -1) {
             taskRunner.removeTaskCallback(task.getUuid());
             checkButton.click();
         } else if (Util.isFinalResponse(response)) {

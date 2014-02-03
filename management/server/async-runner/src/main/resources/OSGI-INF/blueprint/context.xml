@@ -4,13 +4,16 @@
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
     
-    <reference id="commandManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager"/>
+    <!--    <reference id="commandManager" availability="mandatory"
+    interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager"/>-->
+               
+    <reference id="communicationService" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService"/>               
         
     <bean id="module" scope="singleton"
           class="org.safehaus.kiskis.mgmt.async.runner.AsyncTaskRunnerImpl"
           init-method="init" destroy-method="destroy" activation="eager">
-        <property name="commandManager" ref="commandManager"/>
+        <property name="communicationService" ref="communicationService"/>
     </bean>
     
     <service ref="module" interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner"/>

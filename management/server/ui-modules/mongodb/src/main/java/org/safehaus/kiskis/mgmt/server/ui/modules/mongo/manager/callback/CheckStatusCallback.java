@@ -48,17 +48,17 @@ public class CheckStatusCallback implements TaskCallback {
             stdErr.append(response.getStdErr());
         }
 
-        if (stdOutput.toString().contains("couldn't connect to server")) {
+        if (stdOutput.indexOf("couldn't connect to server") > -1) {
             startButton.setEnabled(true);
             destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
             taskRunner.removeTaskCallback(task.getUuid());
-        } else if (stdOutput.toString().contains("connecting to")) {
+        } else if (stdOutput.indexOf("connecting to") > -1) {
             stopButton.setEnabled(true);
             destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
             taskRunner.removeTaskCallback(task.getUuid());
-        } else if (stdErr.toString().contains("mongo: not found")) {
+        } else if (stdErr.indexOf("mongo: not found") > -1) {
             destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
             taskRunner.removeTaskCallback(task.getUuid());
