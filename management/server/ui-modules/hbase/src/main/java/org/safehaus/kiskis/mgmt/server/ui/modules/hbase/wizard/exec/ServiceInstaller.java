@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec;
 
 import com.vaadin.ui.TextArea;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.Config;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -28,9 +28,9 @@ public class ServiceInstaller {
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
     private Task currentTask;
-    Config config;
+    HBaseConfig config;
 
-    public ServiceInstaller(Config config, TextArea terminal) {
+    public ServiceInstaller(HBaseConfig config, TextArea terminal) {
         this.terminal = terminal;
         this.config = config;
 

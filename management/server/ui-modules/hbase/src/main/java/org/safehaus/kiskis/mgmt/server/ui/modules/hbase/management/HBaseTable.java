@@ -9,7 +9,7 @@ import com.vaadin.ui.Table;
 
 import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.Config;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
@@ -28,7 +28,7 @@ public class HBaseTable extends Table {
     Button selectedStartButton;
     Button selectedStopButton;
     Item selectedItem;
-    Config selectedConfig;
+    HBaseConfig selectedConfig;
 
     public HBaseTable() {
         setSizeFull();
@@ -50,14 +50,14 @@ public class HBaseTable extends Table {
 //        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
-        List<Config> cdList = HBaseDAO.getClusterInfo();
-        for (Config config : cdList) {
+        List<HBaseConfig> cdList = HBaseDAO.getClusterInfo();
+        for (HBaseConfig config : cdList) {
             addClusterDataToContainer(container, config);
         }
         return container;
     }
 
-    private void addClusterDataToContainer(final Container container, final Config config) {
+    private void addClusterDataToContainer(final Container container, final HBaseConfig config) {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
         item.getItemProperty(HBaseClusterInfo.UUID_LABEL).setValue(config.getUuid());

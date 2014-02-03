@@ -52,7 +52,7 @@ public class HBaseDAO {
         return true;
     }
 
-    public static boolean saveClusterInfo(Config cluster) {
+    public static boolean saveClusterInfo(HBaseConfig cluster) {
         try {
 
             byte[] data = SerializationUtils.serialize(cluster);
@@ -88,8 +88,8 @@ public class HBaseDAO {
         return list;
     }
 
-    public static List<Config> getClusterInfo() {
-        List<Config> list = new ArrayList<Config>();
+    public static List<HBaseConfig> getClusterInfo() {
+        List<HBaseConfig> list = new ArrayList<HBaseConfig>();
         try {
             String cql = "select * from hbase_info";
             ResultSet results = dbManager.executeQuery(cql);
@@ -101,7 +101,7 @@ public class HBaseDAO {
                 System.out.println(newdata.array());
                 Object config = (Object) SerializationUtils.deserialize(newdata.array());
                 System.out.println(config);
-                list.add((Config)config);
+                list.add((HBaseConfig)config);
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHBaseClusterInfo", ex);

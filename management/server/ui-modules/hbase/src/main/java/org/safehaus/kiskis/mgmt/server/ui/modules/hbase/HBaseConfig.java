@@ -14,7 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class Config implements Serializable {
+public class HBaseConfig implements Serializable {
 
     private final UUID uuid;
     Set<Agent> agents;
@@ -24,7 +24,7 @@ public class Config implements Serializable {
     Set<Agent> backupMasters;
     String domainInfo;
 
-    public Config() {
+    public HBaseConfig() {
         this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
     }
 
