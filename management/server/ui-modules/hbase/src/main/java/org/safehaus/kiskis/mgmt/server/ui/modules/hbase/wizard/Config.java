@@ -46,28 +46,12 @@ public class Config implements Serializable {
         return agents;
     }
 
-    public Set<UUID> getAgentsSet() {
-        Set<UUID> set = new HashSet<UUID>();
-        for (Agent agent : agents) {
-            set.add(agent.getUuid());
-        }
-        return set;
-    }
-
     public void setAgents(Set<Agent> agents) {
         this.agents = agents;
     }
 
     public Set<Agent> getMaster() {
         return master;
-    }
-
-    public Set<UUID> getMasterUUIDset() {
-        Set<UUID> set = new HashSet<UUID>();
-        for (Agent agent : master) {
-            set.add(agent.getUuid());
-        }
-        return set;
     }
 
     public void setMaster(Set<Agent> master) {
@@ -78,14 +62,6 @@ public class Config implements Serializable {
         return region;
     }
 
-    public Set<UUID> getRegionSet() {
-        Set<UUID> set = new HashSet<UUID>();
-        for (Agent agent : region) {
-            set.add(agent.getUuid());
-        }
-        return set;
-    }
-
     public void setRegion(Set<Agent> region) {
         this.region = region;
     }
@@ -94,28 +70,12 @@ public class Config implements Serializable {
         return quorum;
     }
 
-    public Set<UUID> getQuorumSet() {
-        Set<UUID> set = new HashSet<UUID>();
-        for (Agent agent : quorum) {
-            set.add(agent.getUuid());
-        }
-        return set;
-    }
-
     public void setQuorum(Set<Agent> quorum) {
         this.quorum = quorum;
     }
 
     public Set<Agent> getBackupMasters() {
         return backupMasters;
-    }
-
-    public Set<UUID> getBackupMastersSet() {
-        Set<UUID> set = new HashSet<UUID>();
-        for (Agent agent : backupMasters) {
-            set.add(agent.getUuid());
-        }
-        return set;
     }
 
     public void setBackupMasters(Set<Agent> backupMasters) {

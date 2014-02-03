@@ -7,13 +7,16 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.SerializationUtils;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
@@ -52,18 +55,18 @@ public class HBaseDAO {
     }
 
     public static boolean saveClusterInfo(Config cluster) {
-//        try {
-//
-//            byte[] data = SerializationUtils.serialize(cluster);
-//
-//            String cql = "insert into hbase_info (uid, info) "
-//                    + "values (?,?)";
-//            dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
-//
-//        } catch (Exception ex) {
-//            LOG.log(Level.SEVERE, "Error in saveHBaseClusterInfo", ex);
-//            return false;
-//        }
+        try {
+
+            byte[] data = SerializationUtils.serialize(cluster);
+
+            String cql = "insert into hbase_info (uid, info) "
+                    + "values (?,?)";
+            dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveHBaseClusterInfo", ex);
+            return false;
+        }
         return true;
     }
 
@@ -86,6 +89,37 @@ public class HBaseDAO {
             LOG.log(Level.SEVERE, "Error in getHBaseClusterInfo", ex);
         }
         return list;
+    }
+
+    public static List<Config> getClusterInfo() {
+        List<Config> list = new ArrayList<Config>();
+        try {
+            String cql = "select * from hbase_info";
+            ResultSet results = dbManager.executeQuery(cql);
+            for (Row row : results) {
+
+                ByteBuffer data = row.getBytes("info");
+                byte[] result = new byte[data.remaining()];
+                ByteBuffer newdata = data.get(data.array(), 0, result.length);
+
+                Config c = (Config) SerializationUtils.deserialize(newdata.array());
+                list.add(c);
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getHBaseClusterInfo", ex);
+        }
+        return list;
+    }
+
+    public byte[] readFromTable(String key) {
+        String q1 = "SELECT * FROM test_serialization.test_table WHERE id = '" + key + "';";
+
+        ResultSet results = dbManager.executeQuery(q1);
+        for (Row row : results) {
+            ByteBuffer data = row.getBytes("data");
+            return data.array();
+        }
+        return null;
     }
 
     public static HBaseClusterInfo getHBaseClusterInfo(String clusterName) {
