@@ -9,6 +9,7 @@ import com.vaadin.ui.Table;
 
 import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
@@ -27,7 +28,7 @@ public class HBaseTable extends Table {
     Button selectedStartButton;
     Button selectedStopButton;
     Item selectedItem;
-    HBaseClusterInfo selectedCci;
+    HBaseConfig selectedConfig;
 
     public HBaseTable() {
         setSizeFull();
@@ -43,24 +44,24 @@ public class HBaseTable extends Table {
     private IndexedContainer getCassandraContainer() {
         IndexedContainer container = new IndexedContainer();
         container.addContainerProperty(HBaseClusterInfo.UUID_LABEL, String.class, "");
-        container.addContainerProperty(HBaseClusterInfo.DOMAINNAME_LABEL, String.class, "");
+//        container.addContainerProperty(HBaseClusterInfo.DOMAINNAME_LABEL, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
 //        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
-        List<HBaseClusterInfo> cdList = HBaseDAO.getHBaseClusterInfo();
-        for (HBaseClusterInfo cluster : cdList) {
-            addClusterDataToContainer(container, cluster);
+        List<HBaseConfig> cdList = HBaseDAO.getClusterInfo();
+        for (HBaseConfig config : cdList) {
+            addClusterDataToContainer(container, config);
         }
         return container;
     }
 
-    private void addClusterDataToContainer(final Container container, final HBaseClusterInfo cci) {
+    private void addClusterDataToContainer(final Container container, final HBaseConfig config) {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
-        item.getItemProperty(HBaseClusterInfo.UUID_LABEL).setValue(cci.getUuid());
-        item.getItemProperty(HBaseClusterInfo.DOMAINNAME_LABEL).setValue(cci.getDomainName());
+        item.getItemProperty(HBaseClusterInfo.UUID_LABEL).setValue(config.getUuid());
+//        item.getItemProperty(HBaseClusterInfo.DOMAINNAME_LABEL).setValue(config.get);
 
         Button startButton = new Button("Start");
         startButton.addListener(new Button.ClickListener() {
@@ -113,8 +114,8 @@ public class HBaseTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                selectedCci = cci;
-                getWindow().showNotification("Destroying HBase cluster: " + cci.getUuid());
+                selectedConfig = config;
+                getWindow().showNotification("Destroying HBase cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.PURGE;
 //                manager.runCommand(cci.getAllnodes(), cce);
             }
@@ -134,7 +135,6 @@ public class HBaseTable extends Table {
 //    public NodesWindow getNodesWindow() {
 //        return nodesWindow;
 //    }
-
     private void switchState(Boolean state) {
         Button start = (Button) selectedItem.getItemProperty("Start").getValue();
         start.setEnabled(state);
@@ -208,7 +208,7 @@ public class HBaseTable extends Table {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
                             if (HBaseDAO
-                                    .deleteHBaseClusterInfo(selectedCci.getUuid())) {
+                                    .deleteHBaseClusterInfo(selectedConfig.getUuid())) {
 //                    container.removeItem(itemId);
                                 refreshDatasource();
                             }

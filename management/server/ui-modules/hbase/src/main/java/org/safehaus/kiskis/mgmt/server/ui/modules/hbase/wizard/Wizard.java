@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -18,7 +19,7 @@ public class Wizard {
     private static final int MAX_STEPS = 3;
     private final VerticalLayout vlayout;
     private int step = 1;
-    private final Config config = new Config();
+    private final HBaseConfig config = new HBaseConfig();
     private StepFinish stepFinish;
 
     public Wizard() {
@@ -47,7 +48,7 @@ public class Wizard {
         putForm();
     }
 
-    protected Config getConfig() {
+    protected HBaseConfig getConfig() {
         return config;
     }
 
