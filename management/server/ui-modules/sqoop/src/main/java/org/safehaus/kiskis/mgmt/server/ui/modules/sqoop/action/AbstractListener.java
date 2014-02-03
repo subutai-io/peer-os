@@ -6,14 +6,16 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
 
 public abstract class AbstractListener extends ActionListener {
 
-    protected final String EXECUTE_MESSAGE;
+    protected UILogger logger;
+    protected String executeMessage;
 
-    protected AbstractListener(String executeMessage) {
-        EXECUTE_MESSAGE = executeMessage;
+    protected AbstractListener(UILogger logger, String executeMessage) {
+        this.logger = logger;
+        this.executeMessage = executeMessage;
     }
 
     @Override
     public void onExecute(Context context, String programLine) {
-        UILogger.info(EXECUTE_MESSAGE);
+        logger.info(executeMessage);
     }
 }

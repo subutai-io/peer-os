@@ -8,13 +8,13 @@ import java.util.Date;
 public class UILogger {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-    private static TextArea textArea;
+    private TextArea textArea;
 
-    public static void init(TextArea textArea) {
-        UILogger.textArea = textArea;
+    public UILogger(TextArea textArea) {
+        this.textArea = textArea;
     }
 
-    public static void info(String message, Object... values) {
+    public void info(String message, Object... values) {
 
         String text = textArea.getValue() + "\n"
                 + DATE_FORMAT.format(new Date()) + " | "
@@ -23,7 +23,12 @@ public class UILogger {
         textArea.setValue(text);
     }
 
-    public static void clear() {
+    public void complete(String message, Object... values) {
+        info(message, values);
+        info("Completed");
+    }
+
+    public void clear() {
         textArea.setValue("");
     }
 }

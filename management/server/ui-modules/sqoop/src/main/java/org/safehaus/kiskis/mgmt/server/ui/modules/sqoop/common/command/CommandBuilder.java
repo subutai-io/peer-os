@@ -11,7 +11,7 @@ public class CommandBuilder {
 
     private static String source;
 
-    public static void init(String source) {
+    public static void setSource(String source) {
         CommandBuilder.source = source;
     }
 

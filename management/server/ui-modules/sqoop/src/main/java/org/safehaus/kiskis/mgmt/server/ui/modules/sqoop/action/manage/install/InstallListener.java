@@ -1,15 +1,14 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.install;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.AbstractListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Context;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UIStateManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class InstallListener extends AbstractListener {
 
-    public InstallListener() {
-        super("Installing Sqoop, please wait...");
+    public InstallListener(UILogger logger) {
+        super(logger, "Installing Sqoop, please wait...");
     }
 
     @Override
@@ -19,8 +18,7 @@ public class InstallListener extends AbstractListener {
                 ? "Sqoop installed successfully"
                 : "Error occurred while installing Sqoop. Please see the server logs for details.";
 
-        UILogger.info(msg);
-        UIStateManager.end();
+        logger.complete(msg);
 
         return false;
     }

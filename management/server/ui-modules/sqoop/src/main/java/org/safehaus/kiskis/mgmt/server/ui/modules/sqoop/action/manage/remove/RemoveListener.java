@@ -1,15 +1,14 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.remove;
+package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.remove;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Context;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.AbstractListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UIStateManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class RemoveListener extends AbstractListener {
 
-    public RemoveListener() {
-        super("Sqoop installed. Removing, please wait...");
+    public RemoveListener(UILogger logger) {
+        super(logger, "Sqoop installed. Removing, please wait...");
     }
 
     @Override
@@ -19,8 +18,7 @@ public class RemoveListener extends AbstractListener {
                 ? "Sqoop removed successfully"
                 : "Error occurred while removing Pig. Please see the server logs for details.";
 
-        UILogger.info(msg);
-        UIStateManager.end();
+        logger.complete(msg);
 
         return false;
     }
