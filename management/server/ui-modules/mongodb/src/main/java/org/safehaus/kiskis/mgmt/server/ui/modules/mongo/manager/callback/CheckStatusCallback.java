@@ -9,8 +9,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 
 /**
@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
  */
 public class CheckStatusCallback implements TaskCallback {
 
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final Embedded progressIcon;
     private final Button startButton;
     private final Button stopButton;
@@ -27,7 +27,7 @@ public class CheckStatusCallback implements TaskCallback {
     private final StringBuilder stdOutput = new StringBuilder();
     private final StringBuilder stdErr = new StringBuilder();
 
-    public CheckStatusCallback(TaskRunner taskRunner, Embedded progressIcon, Button startButton, Button stopButton, Button destroyButton) {
+    public CheckStatusCallback(AsyncTaskRunner taskRunner, Embedded progressIcon, Button startButton, Button stopButton, Button destroyButton) {
         this.taskRunner = taskRunner;
         this.progressIcon = progressIcon;
         this.startButton = startButton;

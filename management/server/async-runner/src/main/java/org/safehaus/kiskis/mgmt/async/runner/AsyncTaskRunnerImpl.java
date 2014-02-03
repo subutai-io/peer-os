@@ -117,4 +117,9 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     public String getName() {
         return MODULE_NAME;
     }
+
+    @Override
+    public void removeTaskCallback(UUID taskUUID) {
+        taskRunner.removeTaskCallback(taskUUID);
+    }
 }

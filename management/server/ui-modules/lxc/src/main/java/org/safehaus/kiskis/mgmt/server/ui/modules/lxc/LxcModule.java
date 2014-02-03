@@ -23,24 +23,18 @@ public class LxcModule implements Module {
 
     public static class ModuleComponent extends CustomComponent {
 
-        private final TabSheet commandsSheet;
-        private final Cloner cloner;
-        private final Manager manager;
-
         public ModuleComponent(AsyncTaskRunner taskRunner) {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
             verticalLayout.setSizeFull();
 
-            commandsSheet = new TabSheet();
+            TabSheet commandsSheet = new TabSheet();
             commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
             commandsSheet.setSizeFull();
 
-            manager = new Manager(taskRunner);
-            cloner = new Cloner(commandsSheet, taskRunner, manager);
-            commandsSheet.addTab(cloner, "Clone");
-            commandsSheet.addTab(manager, "Manage");
+            commandsSheet.addTab(new Cloner(taskRunner), "Clone");
+            commandsSheet.addTab(new Manager(taskRunner), "Manage");
 
             verticalLayout.addComponent(commandsSheet);
 
