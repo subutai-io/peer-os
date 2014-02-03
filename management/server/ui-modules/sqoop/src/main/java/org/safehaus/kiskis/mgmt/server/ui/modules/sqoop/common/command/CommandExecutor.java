@@ -46,8 +46,10 @@ public class CommandExecutor implements TaskCallback {
             stdErr.append(response.getStdErr());
         }
 
+        commandAction.onResponse(response);
+
         if (Util.isFinalResponse(response)) {
-            commandAction.handleResponse(stdOut.toString(), stdErr.toString(), response);
+            commandAction.onComplete(stdOut.toString(), stdErr.toString(), response);
         }
     }
 

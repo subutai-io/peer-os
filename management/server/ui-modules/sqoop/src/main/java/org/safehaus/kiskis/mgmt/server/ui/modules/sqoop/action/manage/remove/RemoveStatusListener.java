@@ -12,7 +12,7 @@ public class RemoveStatusListener extends AbstractListener {
     }
 
     @Override
-    public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
+    protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
 
         if (stdOut == null || !stdOut.contains("ksks-sqoop")) {
             logger.complete("Sqoop NOT INSTALLED. Nothing to remove.");

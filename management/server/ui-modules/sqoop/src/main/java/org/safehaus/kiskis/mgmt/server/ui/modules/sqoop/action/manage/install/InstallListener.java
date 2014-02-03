@@ -12,7 +12,7 @@ public class InstallListener extends AbstractListener {
     }
 
     @Override
-    public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
+    protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
 
         String msg = response.getExitCode() == null || response.getExitCode() == 0
                 ? "Sqoop installed successfully"

@@ -11,9 +11,11 @@ public class ActionListener {
         this.expectedRegex = expectedRegex;
     }
 
-    public void onExecute(Context context, String programLine) {}
+    protected void onStart(Context context, String programLine) {}
 
-    public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
+    protected void onResponse(Context context, Response response) {}
+
+    protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
         return false;
     }
 

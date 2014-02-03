@@ -12,7 +12,7 @@ public class InstallStatusListener extends AbstractListener {
     }
 
     @Override
-    public boolean onResponse(Context context, String stdOut, String stdErr, Response response) {
+    protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
 
         if (stdOut == null || !stdOut.contains("ksks-hadoop")) {
             logger.complete("Hadoop NOT INSTALLED. Please install Hadoop before installing Sqoop.");

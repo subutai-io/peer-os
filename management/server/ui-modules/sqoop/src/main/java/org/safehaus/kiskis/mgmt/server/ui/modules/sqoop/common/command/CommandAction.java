@@ -7,22 +7,22 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class CommandAction implements Action {
 
-    private final String COMMAND_LINE;
-    private final ActionListener ACTION_LISTENER;
+    private String commandLine;
+    private ActionListener actionListener;
 
     private Chain chain;
     private Context context;
 
     public CommandAction(String commandLine, ActionListener actionListener) {
-        COMMAND_LINE = commandLine;
-        ACTION_LISTENER = actionListener;
+        this.commandLine = commandLine;
+        this.actionListener = actionListener;
     }
 
     @Override
     public void execute(Context context, Chain chain) {
-        ACTION_LISTENER.onExecute(context, COMMAND_LINE);
+        actionListener.onStart(context, commandLine);
         reset(context, chain);
-        CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, COMMAND_LINE), this);
+        CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, commandLine), this);
     }
 
     private void reset(Context context, Chain chain) {
@@ -30,9 +30,13 @@ public class CommandAction implements Action {
         this.context = context;
     }
 
-    public void handleResponse(String stdOut, String stdErr, Response response) {
+    protected void onResponse(Response response) {
+        actionListener.onResponse(context, response);
+    }
 
-        boolean canContinue = ACTION_LISTENER.onResponse(context, stdOut, stdErr, response);
+    protected void onComplete(String stdOut, String stdErr, Response response) {
+
+        boolean canContinue = actionListener.onComplete(context, stdOut, stdErr, response);
 
         if (canContinue && chain != null) {
             chain.proceed(context);

@@ -15,7 +15,7 @@ public abstract class AbstractListener extends ActionListener {
     }
 
     @Override
-    public void onExecute(Context context, String programLine) {
+    public void onStart(Context context, String programLine) {
         logger.info(executeMessage);
     }
 }
