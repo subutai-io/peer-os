@@ -18,11 +18,11 @@
     </service>
     
     
-    <reference-list id="commandListeners"
+<!--    <reference-list id="commandListeners"
                     interface="org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener"
                     availability="optional">
         <reference-listener ref="commandManager"
                             bind-method="addListener" unbind-method="removeListener">
         </reference-listener>
-    </reference-list>       
+    </reference-list>       -->
 </blueprint>

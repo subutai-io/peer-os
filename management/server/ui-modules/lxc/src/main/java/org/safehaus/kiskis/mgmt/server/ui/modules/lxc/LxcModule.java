@@ -8,24 +8,26 @@ import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.clone.Cloner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage.Manager;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 public class LxcModule implements Module {
 
     private static final Logger LOG = Logger.getLogger(LxcModule.class.getName());
     public static final String MODULE_NAME = "LXC";
+    private AsyncTaskRunner taskRunner;
 
-    public static class ModuleComponent extends CustomComponent implements CommandListener {
+    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
+    }
+
+    public static class ModuleComponent extends CustomComponent {
 
         private final TabSheet commandsSheet;
         private final Cloner cloner;
         private final Manager manager;
-        private final TaskRunner taskRunner = new TaskRunner();
 
-        public ModuleComponent() {
+        public ModuleComponent(AsyncTaskRunner taskRunner) {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -46,16 +48,6 @@ public class LxcModule implements Module {
 
         }
 
-        @Override
-        public void onCommand(Response response) {
-            taskRunner.feedResponse(response);
-        }
-
-        @Override
-        public String getName() {
-            return MODULE_NAME;
-        }
-
     }
 
     @Override
@@ -65,7 +57,7 @@ public class LxcModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(taskRunner);
     }
 
 }

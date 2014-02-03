@@ -41,7 +41,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final Label indicator;
     private final TreeTable lxcTable;
     private final Table tasksTable;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
     private final int timeout;
     private final String physicalHostLabel = "Physical Host";
@@ -55,8 +55,9 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final Manager manager;
     private Thread operationTimeoutThread;
     private Thread taskPollerThread;
+    private volatile int taskCount;
 
-    public Cloner(TabSheet tabSheet, TaskRunner taskRunner, Manager manager) {
+    public Cloner(TabSheet tabSheet, AsyncTaskRunner taskRunner, Manager manager) {
         setSpacing(true);
         setMargin(true);
 
@@ -128,7 +129,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             public void buttonClick(Button.ClickEvent event) {
                 Task task = new Task();
                 task.addCommand(Commands.getCloneCommand());
-                runTaskPollerThread(task);
+                executeTaskPollerThread(task);
             }
         });
         Button truncateLxcInfosBtn = new Button("Delete Background Tasks");
@@ -299,7 +300,8 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                     populateLxcTable(agentFamilies);
                     indicator.setVisible(true);
                     runTimeoutThread();
-                    taskRunner.runTask(task, this);
+                    taskCount++;
+                    taskRunner.executeTask(task, this);
                 } else {
                     //run task in background
                     List<String> physicalHosts = new ArrayList<String>();
@@ -326,7 +328,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                                 }
                             }
                         });
-                        runTaskPollerThread(task);
+                        executeTaskPollerThread(task);
                         show("Clone task is submitted for execution.<br/>Please, check later the status of nodes");
                     } else {
                         show("Error saving background task to DB");
@@ -371,7 +373,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         }
     }
 
-    private void runTaskPollerThread(final Task task) {
+    private void executeTaskPollerThread(final Task task) {
         try {
             if (taskPollerThread != null && taskPollerThread.isAlive()) {
                 taskPollerThread.interrupt();
@@ -416,9 +418,12 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             }
             requestToLxcMatchMap.remove(task.getUuid() + "-" + response.getRequestSequenceNumber());
         }
-        if (task.isCompleted() && taskRunner.getRemainingTaskCount() == 0) {
-            indicator.setVisible(false);
-            requestToLxcMatchMap.clear();
+        if (task.isCompleted()) {
+            taskCount--;
+            if (taskCount == 0) {
+                indicator.setVisible(false);
+                requestToLxcMatchMap.clear();
+            }
         }
     }
 }

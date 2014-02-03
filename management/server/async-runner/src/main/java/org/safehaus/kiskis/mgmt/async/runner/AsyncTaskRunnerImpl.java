@@ -42,7 +42,7 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
         try {
             if (commandManager != null) {
                 taskRunner = new TaskRunner(commandManager);
-//                commandManager.addListener(this);
+                commandManager.addListener(this);
                 LOG.info(MODULE_NAME + " started");
             } else {
                 throw new Exception("Missing CommandManager service");
@@ -57,9 +57,9 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
         try {
             executors.clear();
             taskRunner.removeAllTaskCallbacks();
-//            if (commandManager != null) {
-//                commandManager.removeListener(this);
-//            }
+            if (commandManager != null) {
+                commandManager.removeListener(this);
+            }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in destroy", e);
         }
