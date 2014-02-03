@@ -21,9 +21,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public class HBaseTable extends Table {
 
-//    private IndexedContainer container;
     private final ServiceManager manager;
-//    private NodesWindow nodesWindow;
+    private NodesWindow nodesWindow;
     HBaseCommandEnum cce;
     Button selectedStartButton;
     Button selectedStopButton;
@@ -80,7 +79,7 @@ public class HBaseTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Starting cluster: " + config.getUuid());
+                getWindow().showNotification("Stopping cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.STOP;
                 selectedItem = item;
                 manager.runCommand(config.getAgents(), cce);
@@ -102,9 +101,8 @@ public class HBaseTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-//                HBaseClusterInfo info = HBaseDAO.getHBaseClusterInfoByUUID(cci.getUuid());
-//                nodesWindow = new NodesWindow(info, manager);
-//                getApplication().getMainWindow().addWindow(nodesWindow);
+                nodesWindow = new NodesWindow(config, manager);
+                getApplication().getMainWindow().addWindow(nodesWindow);
 
             }
         });
