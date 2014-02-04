@@ -32,7 +32,7 @@
         </amq:sslContext>
  
         <amq:transportConnectors>
-            <amq:transportConnector uri="ssl://localhost:61616" />
+            <amq:transportConnector uri="ssl://0.0.0.0:61616" />
             <amq:transportConnector uri="vm://localhost:7001" > 
         </amq:transportConnectors>
  
