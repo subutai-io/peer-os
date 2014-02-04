@@ -23,17 +23,17 @@
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 
-    <amq:broker useJmx="false" persistent="false" brokerName="localhost" start="true" >
+    <amq:broker useJmx="false" persistent="false" brokerName="sol" start="true" >
  
         <amq:sslContext>
             <amq:sslContext
-                keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="brokers"
+                keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
                 trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
         </amq:sslContext>
  
         <amq:transportConnectors>
             <amq:transportConnector uri="ssl://0.0.0.0:61616" />
-            <amq:transportConnector uri="vm://localhost:7001" > 
+            <!--<amq:transportConnector uri="vm://sol:7001" >--> 
         </amq:transportConnectors>
  
     </amq:broker>
