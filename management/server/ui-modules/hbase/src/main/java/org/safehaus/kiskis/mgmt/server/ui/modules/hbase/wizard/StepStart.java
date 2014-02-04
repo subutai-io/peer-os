@@ -11,6 +11,7 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.HashSet;
@@ -52,11 +53,10 @@ public class StepStart extends Panel {
         logoImg.setWidth(220, Sizeable.UNITS_PIXELS);
         gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
+        HorizontalLayout hl = new HorizontalLayout();
+
         Button next = new Button("Start");
         next.setWidth(100, Sizeable.UNITS_PIXELS);
-        gridLayout.addComponent(next, 6, 4, 6, 4);
-        gridLayout.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
-
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -91,8 +91,24 @@ public class StepStart extends Panel {
 
             }
         });
+
+        Button refresh = new Button("Refresh");
+        refresh.setWidth(100, Sizeable.UNITS_PIXELS);
+        refresh.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                table = getTable();
+            }
+        });
+
+        hl.addComponent(refresh);
+        hl.addComponent(next);
+        
+        gridLayout.addComponent(hl, 6, 4, 6, 4);
+        gridLayout.setComponentAlignment(refresh, Alignment.BOTTOM_RIGHT);
         addComponent(gridLayout);
-        addComponent(getTable());
+        table = getTable();
+        addComponent(table);
     }
 
     private void show(String notification) {
