@@ -27,7 +27,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
@@ -177,7 +176,9 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
             agents = CacheBuilder.newBuilder().
                     expireAfterWrite(Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES).
                     build();
+
             communicationService.addListener(this);
+
             exec = Executors.newSingleThreadExecutor();
             exec.execute(new Runnable() {
 
@@ -283,24 +284,19 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
     }
 
     private void sendAck(UUID agentUUID) {
-        Request request = new Request();
-        request.setType(RequestType.REGISTRATION_REQUEST_DONE);
-        request.setUuid(agentUUID);
-        request.setStdErr(OutputRedirection.NO);
-        request.setStdOut(OutputRedirection.NO);
-        Command command = CommandFactory.createRequest(
+        Request ack = CommandFactory.newRequest(
                 RequestType.REGISTRATION_REQUEST_DONE,
                 agentUUID,
                 null, null, null, null, null,
                 OutputRedirection.NO,
                 OutputRedirection.RETURN,
                 null, null, null, null, null, null);
-        communicationService.sendCommand(command);
+        communicationService.sendRequest(ack);
     }
 
     private void removeAgent(Response response) {
         try {
-            if (response.getTransportId() != null) {
+            if (response != null && response.getTransportId() != null) {
                 for (Agent agent : agents.asMap().values()) {
                     if (response.getTransportId().equalsIgnoreCase(agent.getTransportId())) {
                         agents.invalidate(agent.getUuid());

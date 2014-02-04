@@ -111,6 +111,12 @@ public class CommunicationServiceImpl implements CommunicationService {
             } catch (Exception e) {
             }
         }
+        if (communicationMessageListener != null) {
+            try {
+                communicationMessageListener.destroy();
+            } catch (Exception e) {
+            }
+        }
 
         try {
             //executor service setup
@@ -182,7 +188,9 @@ public class CommunicationServiceImpl implements CommunicationService {
     @Override
     public void removeListener(ResponseListener listener) {
         try {
-            communicationMessageListener.removeListener(listener);
+            if (listener != null && communicationMessageListener != null) {
+                communicationMessageListener.removeListener(listener);
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in removeListener", ex);
         }
