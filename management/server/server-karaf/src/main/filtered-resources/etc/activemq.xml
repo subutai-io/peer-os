@@ -32,7 +32,7 @@
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="${activemq.data}">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="sol-broker" dataDirectory="${activemq.data}">
 
         <!--
             For better performances use VM cursor and small memory limit.
@@ -151,8 +151,6 @@
             
              <!--DOS protection, limit concurrent connections to 1000 and frame size to 100MB--> 
             <transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true">
-            <transportConnector uri="tcp://localhost:61617">
-            <!--<transportConnector uri="vm://localhost?brokerConfig=xbean:activemq.xml ">-->
         </transportConnectors>
         
     
