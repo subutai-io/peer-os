@@ -8,7 +8,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 //import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseConfig;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +63,7 @@ public class HBaseDAO {
 
                 byte[] result = new byte[data.remaining()];
                 data.get(result);
-                HBaseConfig config = (HBaseConfig) Util.deserialize(result);
+                HBaseConfig config = (HBaseConfig) deserialize(result);
                 list.add(config);
             }
         } catch (ClassNotFoundException ex) {
@@ -81,6 +83,14 @@ public class HBaseDAO {
             LOG.log(Level.SEVERE, "Error in deleteHBaseClusterInfo(name)", ex);
         }
         return false;
+    }
+    
+    public static Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object o = ois.readObject();
+        ois.close();
+        return o;
     }
 
 }
