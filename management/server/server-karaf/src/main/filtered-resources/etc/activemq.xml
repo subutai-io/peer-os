@@ -32,7 +32,7 @@
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="sol-broker" dataDirectory="${activemq.data}">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="${activemq.broker-name}" dataDirectory="${activemq.data}">
 
         <!--
             For better performances use VM cursor and small memory limit.
@@ -141,24 +141,25 @@
             http://activemq.apache.org/configuring-transports.html
         -->
         
-        <amq:sslContext>
-          <amq:sslContext
+        <amq:sslContext 
                 keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
                 trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
+            <amq:transportConnectors>
+                <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
+            </amq:transportConnectors>
         </amq:sslContext>
         
         <transportConnectors>
-            
              <!--DOS protection, limit concurrent connections to 1000 and frame size to 100MB--> 
-            <transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true">
-            <transportConnector uri="vm://localhost:7001"/>
+            <!--<transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true">-->
+            <transportConnector uri="vm://${activemq.broker-name}:7001"/>
         </transportConnectors>
         
     
-    <!--    <amq:transportConnectors>
-      <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
-      <amq:transportConnector uri="vm://localhost" />
-    </amq:transportConnectors>        -->
+<!--        <amq:transportConnectors>
+            <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
+            <amq:transportConnector uri="vm://localhost:7001" />
+        </amq:transportConnectors>        -->
 
         <!-- destroy the spring context on shutdown to stop jetty -->
         <shutdownHooks>
