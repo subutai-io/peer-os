@@ -1,55 +1,23 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.AbsoluteLayout;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.export.ExportChainManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
 
 public class ExportLayoutBuilder {
 
-    public static Layout get() {
+    public static Layout create() {
 
+        TextArea textArea = UIUtil.getTextArea(600, 600);
+        UILogger logger = new UILogger(textArea);
+        ExportChainManager chainManager = new ExportChainManager(logger);
         AbsoluteLayout layout = new AbsoluteLayout();
 
-        TextArea textArea = getTextArea();
-        UILogger logger = new UILogger(textArea);
-
-        ExportChainManager chainManager = new ExportChainManager(logger);
-
-        layout.addComponent(getButton("Export", chainManager.getStatusChain()), "left: 20px; top: 30px;");
+        layout.addComponent(UIUtil.getButton("Export", 120, chainManager.getStatusChain()), "left: 20px; top: 30px;");
         layout.addComponent(textArea, "left: 180px; top: 30px;");
 
         return layout;
     }
-
-    private static Button getButton(String name, final Chain chain) {
-
-        Button button = new Button(name);
-        button.setWidth(120, Sizeable.UNITS_PIXELS);
-
-        button.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                ExportChainManager.run(chain);
-            }
-        });
-
-        return button;
-    }
-
-    private static TextArea getTextArea() {
-
-        TextArea textArea = new TextArea("Log:");
-        textArea.setWidth(600, Sizeable.UNITS_PIXELS);
-        textArea.setHeight(600, Sizeable.UNITS_PIXELS);
-        textArea.setWordwrap(false);
-
-        return textArea;
-    }
-
-
 
 }

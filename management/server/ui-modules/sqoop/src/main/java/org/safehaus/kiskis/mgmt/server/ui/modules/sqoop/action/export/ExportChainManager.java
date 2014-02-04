@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.export;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.ChainManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.status.StatusListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.command.CommandAction;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
