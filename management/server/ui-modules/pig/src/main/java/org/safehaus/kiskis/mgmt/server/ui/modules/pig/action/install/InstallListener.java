@@ -1,14 +1,15 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.install;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Context;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.AbstractListener;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.service.UILogger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.AbstractListener;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UILogger;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UIStateManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class InstallListener extends AbstractListener {
 
-    public InstallListener(UILogger log) {
-        super(log, "Installing Pig, please wait...");
+    public InstallListener() {
+        super("Installing Pig, please wait...");
     }
 
     @Override
@@ -18,8 +19,8 @@ public class InstallListener extends AbstractListener {
                 ? "Pig installed successfully"
                 : "Error occurred while installing Pig. Please see the server logs for details.";
 
-        LOG.info(msg);
-        LOG.info("Completed");
+        UILogger.info(msg);
+        UIStateManager.end();
 
         return false;
     }

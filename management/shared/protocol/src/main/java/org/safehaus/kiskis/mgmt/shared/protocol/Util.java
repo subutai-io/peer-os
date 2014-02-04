@@ -5,6 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -104,10 +109,27 @@ public class Util {
         try {
             Double.parseDouble(str);
             return true;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
         }
 
         return false;
+    }
+
+    public static byte[] serialize(Object o) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(o);
+        oos.flush();
+        oos.close();
+        return baos.toByteArray();
+    }
+
+    public static Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object o = ois.readObject();
+        ois.close();
+        return o;
     }
 
 }

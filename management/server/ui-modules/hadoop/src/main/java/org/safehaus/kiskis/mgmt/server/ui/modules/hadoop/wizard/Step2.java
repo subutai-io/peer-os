@@ -72,7 +72,7 @@ public class Step2 extends Panel {
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 List<Agent> dataNodes = new ArrayList<Agent>(agentList);
-                parent.getHadoopInstallation().setDataNodes(dataNodes);
+                parent.getHadoopInstallation().getConfig().setDataNodes(dataNodes);
 
                 twinColSelectTaskTrackers.setContainerDataSource(getDataSourceMasters());
             }
@@ -98,7 +98,7 @@ public class Step2 extends Panel {
             public void valueChange(Property.ValueChangeEvent event) {
                 Set<Agent> agentList = (Set<Agent>) event.getProperty().getValue();
                 List<Agent> taskTrackers = new ArrayList<Agent>(agentList);
-                parent.getHadoopInstallation().setTaskTrackers(taskTrackers);
+                parent.getHadoopInstallation().getConfig().setTaskTrackers(taskTrackers);
             }
         });
         verticalLayoutForm.addComponent(twinColSelectTaskTrackers);
@@ -136,25 +136,25 @@ public class Step2 extends Panel {
     private BeanItemContainer<Agent> getDataSourceMasters(){
         List<Agent> list = parent.getLxcList();
 
-        if(parent.getHadoopInstallation().getsNameNode() != null){
-            list.remove(parent.getHadoopInstallation().getsNameNode());
+        /*if(parent.getHadoopInstallation().getConfig().getsNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getConfig().getsNameNode());
         }
 
-        if(parent.getHadoopInstallation().getNameNode() != null){
-            list.remove(parent.getHadoopInstallation().getNameNode());
+        if(parent.getHadoopInstallation().getConfig().getNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getConfig().getNameNode());
         }
 
-        if(parent.getHadoopInstallation().getJobTracker() != null){
-            list.remove(parent.getHadoopInstallation().getJobTracker());
+        if(parent.getHadoopInstallation().getConfig().getJobTracker() != null){
+            list.remove(parent.getHadoopInstallation().getConfig().getJobTracker());
         }
 
-        if(parent.getHadoopInstallation().getDataNodes() != null){
-            list.removeAll(parent.getHadoopInstallation().getDataNodes());
+        if(parent.getHadoopInstallation().getConfig().getDataNodes() != null){
+            list.removeAll(parent.getHadoopInstallation().getConfig().getDataNodes());
         }
 
-        if(parent.getHadoopInstallation().getTaskTrackers() != null){
-            list.removeAll(parent.getHadoopInstallation().getTaskTrackers());
-        }
+        if(parent.getHadoopInstallation().getConfig().getTaskTrackers() != null){
+            list.removeAll(parent.getHadoopInstallation().getConfig().getTaskTrackers());
+        }*/
 
         return new BeanItemContainer<Agent>(Agent.class, list);
     }

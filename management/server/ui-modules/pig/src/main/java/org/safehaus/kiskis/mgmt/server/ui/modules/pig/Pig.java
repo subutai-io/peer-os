@@ -2,7 +2,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig;
 
 import com.vaadin.ui.*;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.ModuleComponent;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class Pig implements Module {
