@@ -140,16 +140,19 @@
 
             http://activemq.apache.org/configuring-transports.html
         -->
-       <transportConnectors>
+        
+        <amq:sslContext>
+          <amq:sslContext
+                keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
+                trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
+        </amq:sslContext>
+        
+        <transportConnectors>
+            
              <!--DOS protection, limit concurrent connections to 1000 and frame size to 100MB--> 
-            <transportConnector name="ssl" uri="ssl://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
+            <transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true">
         </transportConnectors>
         
-    <amq:sslContext>
-      <amq:sslContext
-            keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
-            trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
-    </amq:sslContext>
     
     <!--    <amq:transportConnectors>
       <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
