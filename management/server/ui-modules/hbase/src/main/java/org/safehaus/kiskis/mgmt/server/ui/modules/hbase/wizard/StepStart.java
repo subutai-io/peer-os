@@ -60,36 +60,35 @@ public class StepStart extends Panel {
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
-                if (Util.isCollectionEmpty(selectedAgents)) {
-                    show("Select nodes in the tree on the left first");
-                } else {
+//                Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
+//                if (Util.isCollectionEmpty(selectedAgents)) {
+//                    show("Select nodes in the tree on the left first");
+//                } else {
+//                    wizard.getConfig().reset();
+//                    wizard.getConfig().setAgents(selectedAgents);
+//                    wizard.next();
+//                }
+
+                if (selectedItem != null) {
+                    UUID uid = (UUID) selectedItem.getItemProperty(HadoopClusterInfo.UUID_LABEL).getValue();
+                    HadoopClusterInfo cluster = HBaseDAO.getHadoopClusterInfo(uid);
+
+                    Set<UUID> dataNodes = new HashSet<UUID>(cluster.getDataNodes());
+                    Set<UUID> taskTrackers = new HashSet<UUID>(cluster.getTaskTrackers());
+                    dataNodes.addAll(taskTrackers);
+                    dataNodes.add(cluster.getJobTracker());
+                    dataNodes.add(cluster.getNameNode());
+                    dataNodes.add(cluster.getSecondaryNameNode());
+
+                    Set<Agent> set = HBaseDAO.getAgents(dataNodes);
+
                     wizard.getConfig().reset();
-                    wizard.getConfig().setAgents(selectedAgents);
+                    wizard.getConfig().setAgents(set);
                     wizard.next();
+                } else {
+                    show("Please select Hadoop cluster first");
                 }
 
-                /*
-                 if (selectedItem != null) {
-                 UUID uid = (UUID) selectedItem.getItemProperty(HadoopClusterInfo.UUID_LABEL).getValue();
-                 HadoopClusterInfo cluster = HadoopDAO.getHadoopClusterInfo(uid);
-
-                 Set<UUID> dataNodes = new HashSet<UUID>(cluster.getDataNodes());
-                 Set<UUID> taskTrackers = new HashSet<UUID>(cluster.getTaskTrackers());
-                 dataNodes.addAll(taskTrackers);
-                 dataNodes.add(cluster.getJobTracker());
-                 dataNodes.add(cluster.getNameNode());
-                 dataNodes.add(cluster.getSecondaryNameNode());
-
-                 Set<Agent> set = HBaseDAO.getAgents(dataNodes);
-
-                 wizard.getConfig().reset();
-                 wizard.getConfig().setAgents(set);
-                 wizard.next();
-                 } else {
-                 show("Please select Hadoop cluster first");
-                 }
-                 */
             }
         });
         addComponent(gridLayout);
