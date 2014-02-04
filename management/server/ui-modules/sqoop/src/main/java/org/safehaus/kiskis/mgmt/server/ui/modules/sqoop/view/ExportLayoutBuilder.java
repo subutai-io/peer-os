@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.ChainManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.export.InputValidationAction;
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.export.ExportValidationAction;
 
 public class ExportLayoutBuilder {
 
@@ -17,7 +17,7 @@ public class ExportLayoutBuilder {
         AbstractTextField passwordField = UIUtil.getTextField("Password:", 300, true);
         AbstractTextField hdfsPathField = UIUtil.getTextField("HDFS file path:", 300);
 
-        InputValidationAction inputValidationAction = new InputValidationAction(logger, connectStringField, tableField, usernameField, passwordField, hdfsPathField);
+        ExportValidationAction inputValidationAction = new ExportValidationAction(logger, connectStringField, usernameField, passwordField, tableField, hdfsPathField);
         ChainManager chainManager = new ChainManager(logger);
 
         AbsoluteLayout layout = new AbsoluteLayout();

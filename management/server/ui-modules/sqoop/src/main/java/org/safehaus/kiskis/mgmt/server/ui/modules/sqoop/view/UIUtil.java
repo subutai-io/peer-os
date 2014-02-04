@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
 
 public class UIUtil {
 
-    static Button getButton(String name, float width, final Chain chain) {
+    public static Button getButton(String name, float width, final Chain chain) {
 
         Button button = new Button(name);
         button.setWidth(width, Sizeable.UNITS_PIXELS);
@@ -22,7 +22,16 @@ public class UIUtil {
         return button;
     }
 
-    static TextArea getTextArea(float width, float height) {
+    public static Button getButton(String name, float width, Button.ClickListener listener) {
+
+        Button button = new Button(name);
+        button.setWidth(width, Sizeable.UNITS_PIXELS);
+        button.addListener(listener);
+
+        return button;
+    }
+
+    public static TextArea getTextArea(float width, float height) {
 
         TextArea textArea = new TextArea("Log:");
         textArea.setWidth(width, Sizeable.UNITS_PIXELS);
@@ -32,7 +41,7 @@ public class UIUtil {
         return textArea;
     }
 
-    static Label getLabel(String text, float width, float height) {
+    public static Label getLabel(String text, float width, float height) {
 
         Label label = new Label(text);
         label.setWidth(width, Sizeable.UNITS_PIXELS);
@@ -42,11 +51,11 @@ public class UIUtil {
         return label;
     }
 
-    static AbstractTextField getTextField(String label, float width) {
+    public static AbstractTextField getTextField(String label, float width) {
         return getTextField(label, width, false);
     }
 
-    static AbstractTextField getTextField(String label, float width, boolean isPassword) {
+    public static AbstractTextField getTextField(String label, float width, boolean isPassword) {
 
         AbstractTextField textField = isPassword ? new PasswordField(label) : new TextField(label);
         textField.setWidth(width, Sizeable.UNITS_PIXELS);
