@@ -27,18 +27,18 @@
             <amq:transportConnector name="ssl" uri="ssl://0.0.0.0:61616?needClientAuth=true" />
         </amq:transportConnectors>
         
-        <amq:destinationPolicy>
+<!--        <amq:destinationPolicy>
             <amq:policyMap>
                 <amq:defaultEntry >
-                    <!--drop inactive queues after 5 min-->
+                    drop inactive queues after 5 min
                     <amq:policyEntry  gcInactiveDestinations="true" inactiveTimoutBeforeGC="300000">
                         
-                        <!--abort slow acking agent after 5 min-->
+                        abort slow acking agent after 5 min
                         <amq:slowConsumerStrategy>
                             <amq:abortSlowAckConsumerStrategy maxTimeSinceLastAck="300000"/>
                         </amq:slowConsumerStrategy>
                         
-                        <!--ignore expired messages without storing them in DLQ-->
+                        ignore expired messages without storing them in DLQ
                         <amq:deadLetterStrategy>
                             <amq:sharedDeadLetterStrategy processExpired="false"/>
                         </amq:deadLetterStrategy>
@@ -46,7 +46,7 @@
                     </amq:policyEntry>
                 </amq:defaultEntry>
             </amq:policyMap>
-        </amq:destinationPolicy>
+        </amq:destinationPolicy>-->
  
     </amq:broker>
 </beans>
