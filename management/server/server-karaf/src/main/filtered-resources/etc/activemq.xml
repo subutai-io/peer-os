@@ -140,22 +140,10 @@
 
             http://activemq.apache.org/configuring-transports.html
         -->
-<!--        <transportConnectors>
-             DOS protection, limit concurrent connections to 1000 and frame size to 100MB 
-            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
-            <transportConnector name="amqp" uri="amqp://0.0.0.0:5672?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
-            <transportConnector > 
-            <bean id="AMQJMSConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory">
-              <property name="trustStore" value="${karaf.base}/certs/broker.ts" />
-              <property name="trustStorePassword" value="client" />
-              <property name="keyStore" value="${karaf.base}/certs/broker.ks" />
-              <property name="keyStorePassword" value="broker" />
-              <property name="brokerURL" value="ssl://0.0.0.0:61616" />
-              <property name="userName" value="admin" /> 
-              <property name="password" value="admin" />
-            </bean>   
-            </transportConnector>          
-        </transportConnectors>-->
+       <transportConnectors>
+             <!--DOS protection, limit concurrent connections to 1000 and frame size to 100MB--> 
+            <transportConnector name="ssl" uri="ssl://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
+        </transportConnectors>
         
     <amq:sslContext>
       <amq:sslContext
@@ -163,10 +151,10 @@
             trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
     </amq:sslContext>
     
-    <amq:transportConnectors>
+    <!--    <amq:transportConnectors>
       <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
-      <!--<amq:transportConnector uri="vm://localhost" />-->
-    </amq:transportConnectors>        
+      <amq:transportConnector uri="vm://localhost" />
+    </amq:transportConnectors>        -->
 
         <!-- destroy the spring context on shutdown to stop jetty -->
         <shutdownHooks>
