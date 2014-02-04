@@ -15,6 +15,7 @@
         </amq:sslContext>
  
         <amq:transportConnectors>
+            <amq:transportConnector name="tcp" uri="tcp://127.0.0.1:61617?useLocalHost=true" />
             <amq:transportConnector name="ssl" uri="ssl://0.0.0.0:61616?needClientAuth=true" />
         </amq:transportConnectors>
  
