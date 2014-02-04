@@ -211,7 +211,7 @@ public class CommunicationServiceImpl implements CommunicationService {
             //executor service setup
             exec = Executors.newFixedThreadPool(amqMaxSenderPoolSize);
             //pooled connection factory setup
-            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory("tcp://localhost:61617");
+            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory("tcp://localhost:61617?useLocalHost=true");
             amqFactory.setCheckForDuplicates(true);
             pooledConnectionFactory = new PooledConnectionFactory(amqFactory);
             pooledConnectionFactory.setMaxConnections(amqMaxPooledConnections);
