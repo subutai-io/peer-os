@@ -6,7 +6,13 @@
          http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 
-    <amq:broker useJmx="true" persistent="false" brokerName="sol" start="true" >
+    <amq:broker 
+        useJmx="true" 
+        persistent="true" 
+        brokerName="sol" 
+        start="true" 
+        schedulePeriodForDestinationPurge="30000"
+        offlineDurableSubscriberTimeout="300000" >
  
         <amq:sslContext>
             <amq:sslContext
@@ -15,9 +21,33 @@
         </amq:sslContext>
  
         <amq:transportConnectors>
+            <!--for webconsole-->
             <amq:transportConnector name="tcp" uri="tcp://127.0.0.1:61617?useLocalHost=true" />
+            <!--for agent-->
             <amq:transportConnector name="ssl" uri="ssl://0.0.0.0:61616?needClientAuth=true" />
         </amq:transportConnectors>
+        
+        <amq:destinationPolicy>
+            <amq:policyMap>
+                <amq:defaultEntry>
+                    
+                    <!--drop inactive queues after 5 min-->
+                    <amq:policyEntry gcInactiveDestinations="true" inactiveTimoutBeforeGC="300000">
+                        
+                        <!--abort slow acking agent after 5 min-->
+                        <amq:slowConsumerStrategy>
+                            <amq:abortSlowAckConsumerStrategy maxTimeSinceLastAck="300000"/>
+                        </amq:slowConsumerStrategy>
+                        
+                        <!--ignore expired messages without storing them in DLQ-->
+                        <amq:deadLetterStrategy>
+                            <amq:sharedDeadLetterStrategy processExpired="false"/>
+                        </amq:deadLetterStrategy>
+                        
+                    </amq:policyEntry>
+                </amq:defaultEntry>
+            </amq:policyMap>
+        </amq:destinationPolicy>
  
     </amq:broker>
 </beans>

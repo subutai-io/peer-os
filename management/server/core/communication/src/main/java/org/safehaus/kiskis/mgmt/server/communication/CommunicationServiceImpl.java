@@ -5,86 +5,32 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import javax.jms.*;
 import org.apache.activemq.advisory.AdvisorySupport;
-import org.apache.activemq.broker.region.policy.AbortSlowAckConsumerStrategy;
-import org.apache.activemq.broker.region.policy.DeadLetterStrategy;
-import org.apache.activemq.broker.region.policy.PolicyEntry;
-import org.apache.activemq.broker.region.policy.PolicyMap;
-import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-//check branch
 
 public class CommunicationServiceImpl implements CommunicationService {
 
     private static final Logger LOG = Logger.getLogger(CommunicationServiceImpl.class.getName());
-    private BrokerService broker;
     private PooledConnectionFactory pooledConnectionFactory;
     private CommunicationMessageListener communicationMessageListener;
     private ExecutorService exec;
-    private String amqBindAddress;
     private String amqServiceQueue;
-    private String amqBrokerCertificateName;
-    private String amqBrokerTrustStoreName;
-    private String amqBrokerCertificatePwd;
-    private String amqBrokerTrustStorePwd;
-    private int amqPort;
     private int amqMaxMessageToAgentTtlSec;
-    private int amqMaxOfflineAgentTtlSec;
-    private int amqMaxSlowAgentConnectionTtlSec;
     private int amqMaxPooledConnections;
     private int amqMaxSenderPoolSize;
-    private int amqInactiveQueuesDropTimeoutSec;
-    private boolean amqNeedClientAuth;
-
-    public void setAmqNeedClientAuth(boolean amqNeedClientAuth) {
-        this.amqNeedClientAuth = amqNeedClientAuth;
-    }
-
-    public void setAmqPort(int amqPort) {
-        this.amqPort = amqPort;
-    }
-
-    public void setAmqBindAddress(String amqBindAddress) {
-        this.amqBindAddress = amqBindAddress;
-    }
 
     public void setAmqServiceQueue(String amqServiceQueue) {
         this.amqServiceQueue = amqServiceQueue;
     }
 
-    public void setAmqBrokerCertificateName(String amqBrokerCertificateName) {
-        this.amqBrokerCertificateName = amqBrokerCertificateName;
-    }
-
-    public void setAmqBrokerTrustStoreName(String amqBrokerTrustStoreName) {
-        this.amqBrokerTrustStoreName = amqBrokerTrustStoreName;
-    }
-
-    public void setAmqBrokerCertificatePwd(String amqBrokerCertificatePwd) {
-        this.amqBrokerCertificatePwd = amqBrokerCertificatePwd;
-    }
-
-    public void setAmqBrokerTrustStorePwd(String amqBrokerTrustStorePwd) {
-        this.amqBrokerTrustStorePwd = amqBrokerTrustStorePwd;
-    }
-
     public void setAmqMaxMessageToAgentTtlSec(int amqMaxMessageToAgentTtlSec) {
         this.amqMaxMessageToAgentTtlSec = amqMaxMessageToAgentTtlSec;
-    }
-
-    public void setAmqMaxOfflineAgentTtlSec(int amqMaxOfflineAgentTtlSec) {
-        this.amqMaxOfflineAgentTtlSec = amqMaxOfflineAgentTtlSec;
-    }
-
-    public void setAmqMaxSlowAgentConnectionTtlSec(int amqMaxSlowAgentConnectionTtlSec) {
-        this.amqMaxSlowAgentConnectionTtlSec = amqMaxSlowAgentConnectionTtlSec;
     }
 
     public void setAmqMaxPooledConnections(int amqMaxPooledConnections) {
@@ -93,10 +39,6 @@ public class CommunicationServiceImpl implements CommunicationService {
 
     public void setAmqMaxSenderPoolSize(int amqMaxSenderPoolSize) {
         this.amqMaxSenderPoolSize = amqMaxSenderPoolSize;
-    }
-
-    public void setAmqInactiveQueuesDropTimeoutSec(int amqInactiveQueuesDropTimeoutSec) {
-        this.amqInactiveQueuesDropTimeoutSec = amqInactiveQueuesDropTimeoutSec;
     }
 
     @Override
@@ -164,50 +106,7 @@ public class CommunicationServiceImpl implements CommunicationService {
             }
         }
 
-        if (broker != null) {
-            try {
-                broker.stop();
-                broker.waitUntilStopped();
-            } catch (Exception e) {
-            }
-        }
-
         try {
-            /*
-             System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerCertificateName);
-             System.setProperty("javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd);
-             System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerTrustStoreName);
-             System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
-
-             broker = new BrokerService();
-             //***policy
-             PolicyMap policy = new PolicyMap();
-             PolicyEntry allDestinationsPolicyEntry = new PolicyEntry();
-             //abort consumers not acking message within this period of time
-             AbortSlowAckConsumerStrategy slowConsumerStrategy = new AbortSlowAckConsumerStrategy();
-             slowConsumerStrategy.setMaxTimeSinceLastAck(amqMaxSlowAgentConnectionTtlSec * 1000);
-             allDestinationsPolicyEntry.setSlowConsumerStrategy(slowConsumerStrategy);
-             //drop expired messages instead of sending to DLQ
-             DeadLetterStrategy deadLetterStrategy = new SharedDeadLetterStrategy();
-             deadLetterStrategy.setProcessExpired(false);
-             allDestinationsPolicyEntry.setDeadLetterStrategy(deadLetterStrategy);
-             //drop queues inactive fo this period of time
-             allDestinationsPolicyEntry.setGcInactiveDestinations(true);
-             allDestinationsPolicyEntry.setInactiveTimoutBeforeGC(amqInactiveQueuesDropTimeoutSec * 1000);
-             broker.setSchedulePeriodForDestinationPurge(30000);
-             //
-             policy.setDefaultEntry(allDestinationsPolicyEntry);
-             //unsubscribe durable subscribers that are offline for this amount of time
-             broker.setOfflineDurableSubscriberTimeout(amqMaxOfflineAgentTtlSec * 1000);
-             //
-             broker.setDestinationPolicy(policy);
-             //***policy
-             broker.setPersistent(true);
-             broker.setUseJmx(false);
-             broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=" + amqNeedClientAuth);
-             broker.start();
-             broker.waitUntilStarted();
-             */
             //executor service setup
             exec = Executors.newFixedThreadPool(amqMaxSenderPoolSize);
             //pooled connection factory setup
@@ -229,12 +128,6 @@ public class CommunicationServiceImpl implements CommunicationService {
             if (pooledConnectionFactory != null) {
                 try {
                     pooledConnectionFactory.stop();
-                } catch (Exception e) {
-                }
-            }
-            if (broker != null) {
-                try {
-                    broker.stop();
                 } catch (Exception e) {
                 }
             }
