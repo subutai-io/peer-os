@@ -164,7 +164,8 @@
     </amq:sslContext>
     
     <amq:transportConnectors>
-      <amq:transportConnector uri="ssl://0.0.0.0:61616" />
+      <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
+      <amq:transportConnector uri="vm://localhost" />
     </amq:transportConnectors>        
 
         <!-- destroy the spring context on shutdown to stop jetty -->
