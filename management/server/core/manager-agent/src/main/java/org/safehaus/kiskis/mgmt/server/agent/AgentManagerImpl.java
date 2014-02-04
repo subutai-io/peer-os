@@ -174,10 +174,10 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
     public void init() {
         try {
 
-            communicationService.addListener(this);
             agents = CacheBuilder.newBuilder().
                     expireAfterWrite(Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES).
                     build();
+            communicationService.addListener(this);
             exec = Executors.newSingleThreadExecutor();
             exec.execute(new Runnable() {
 
