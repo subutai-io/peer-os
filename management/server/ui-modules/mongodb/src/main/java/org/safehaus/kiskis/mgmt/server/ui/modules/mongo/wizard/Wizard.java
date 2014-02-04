@@ -13,6 +13,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 /**
  *
@@ -26,10 +27,10 @@ public class Wizard {
     private final ProgressIndicator progressBar;
     private final ClusterConfig config = new ClusterConfig();
     private final GridLayout grid;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private int step = 1;
 
-    public Wizard(TaskRunner taskRunner) {
+    public Wizard(AsyncTaskRunner taskRunner) {
         this.taskRunner = taskRunner;
         grid = new GridLayout(1, 20);
         grid.setMargin(true);
@@ -110,7 +111,7 @@ public class Wizard {
         }
     }
 
-    public TaskRunner getTaskRunner() {
+    public AsyncTaskRunner getTaskRunner() {
         return taskRunner;
     }
 

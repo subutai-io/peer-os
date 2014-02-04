@@ -4,25 +4,26 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.Manager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 public class MongoModule implements Module {
 
-    public static final String MODULE_NAME = "MongoDB";
-
     private static final Logger LOG = Logger.getLogger(MongoModule.class.getName());
+    public static final String MODULE_NAME = "MongoDB";
+    private AsyncTaskRunner taskRunner;
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
+    }
+
+    public static class ModuleComponent extends CustomComponent {
 
         private final Wizard wizard;
         private final Manager manager;
-        private final TaskRunner taskRunner = new TaskRunner();
 
-        public ModuleComponent() {
+        public ModuleComponent(AsyncTaskRunner taskRunner) {
             setSizeFull();
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -42,16 +43,6 @@ public class MongoModule implements Module {
 
         }
 
-        @Override
-        public void onCommand(Response response) {
-            taskRunner.feedResponse(response);
-        }
-
-        @Override
-        public String getName() {
-            return MODULE_NAME;
-        }
-
     }
 
     @Override
@@ -61,7 +52,7 @@ public class MongoModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(taskRunner);
     }
 
 }

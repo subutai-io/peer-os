@@ -44,6 +44,31 @@ public class CommandFactory {
         return new CommandImpl(req);
     }
 
+    public static Request newRequest(RequestType type, UUID uuid, String source, UUID taskUuid,
+            Integer reqSeqNum, String workDir, String program,
+            OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath,
+            String stdErrPath, String runAs, List<String> args,
+            Map<String, String> envVars, Integer timeout) {
+        Request req = new Request();
+        req.setSource(source);
+        req.setType(type);
+        req.setUuid(uuid);
+        req.setTaskUuid(taskUuid);
+        req.setRequestSequenceNumber(reqSeqNum);
+        req.setWorkingDirectory(workDir);
+        req.setProgram(program);
+        req.setStdOut(stdOut);
+        req.setStdErr(stdErr);
+        req.setStdOutPath(stdOutPath);
+        req.setStdErrPath(stdErrPath);
+        req.setRunAs(runAs);
+        req.setArgs(args);
+        req.setEnvironment(envVars);
+        req.setTimeout(timeout);
+
+        return req;
+    }
+
     public static Command createResponse(ResponseType type, UUID uuid, String source, UUID taskUuid,
             Integer exitCode, String stdOut, String stdErr, Integer reqSeqNum,
             Integer resSeqnum, Integer pid, String macAddress, String hostname,

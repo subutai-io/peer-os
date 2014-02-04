@@ -20,17 +20,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.LxcState;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
@@ -39,29 +38,27 @@ public class Manager extends VerticalLayout {
 
     private static final Logger LOG = Logger.getLogger(Manager.class.getName());
 
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final Label indicator;
     private final Button infoBtn;
     private final Button startAllBtn;
     private final Button stopAllBtn;
     private final Button destroyAllBtn;
     private final TreeTable lxcTable;
-    private final int timeout;
     private final Map<UUID, StringBuilder> lxcMap = new HashMap<UUID, StringBuilder>();
     private final AgentManager agentManager;
     private final static String physicalHostLabel = "Physical Host";
-    private Thread operationTimeoutThread;
     private Set<Agent> physicalAgents;
     private volatile boolean isDestroyAllButtonClicked = false;
+    private volatile int taskCount;
 
-    public Manager(TaskRunner taskRunner) {
+    public Manager(AsyncTaskRunner taskRunner) {
 
         setSpacing(true);
         setMargin(true);
 
         this.taskRunner = taskRunner;
         this.agentManager = ServiceLocator.getService(AgentManager.class);
-        timeout = Commands.getLxcListCommand().getRequest().getTimeout();
 
         lxcTable = createTableTemplate("Lxc containers", 500);
 
@@ -186,7 +183,7 @@ public class Manager extends VerticalLayout {
         lxcMap.clear();
         lxcTable.setEnabled(false);
         Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
-        taskRunner.runTask(getLxcListTask, new TaskCallback() {
+        executeTask(getLxcListTask, new TaskCallback() {
 
             @Override
             public void onResponse(Task task, Response response) {
@@ -229,13 +226,10 @@ public class Manager extends VerticalLayout {
                         populateTable(agentFamilies);
                         clearEmptyParents();
                         lxcTable.setEnabled(true);
-                        hideProgress();
                     }
                 }
             }
         });
-        runTimeoutThread();
-        showProgress();
     }
 
     private void clearEmptyParents() {
@@ -247,82 +241,6 @@ public class Manager extends VerticalLayout {
                     && (lxcTable.getChildren(rowId) == null || lxcTable.getChildren(rowId).isEmpty())) {
                 lxcTable.removeItem(rowId);
             }
-        }
-    }
-
-    private void showProgress() {
-        indicator.setVisible(true);
-//        infoBtn.setEnabled(false);
-//        startAllBtn.setEnabled(false);
-//        stopAllBtn.setEnabled(false);
-//        destroyAllBtn.setEnabled(false);
-//        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
-//            Item row = lxcTable.getItem(it.next());
-//            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
-//                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
-//                if (startAllPerParentBtn != null) {
-//                    startAllPerParentBtn.setEnabled(false);
-//                }
-//                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
-//                if (stopAllPerParentBtn != null) {
-//                    stopAllPerParentBtn.setEnabled(false);
-//                }
-//                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
-//                if (destroyPerParentAllBtn != null) {
-//                    destroyPerParentAllBtn.setEnabled(false);
-//                }
-//            }
-//        }
-    }
-
-    private void hideProgress() {
-        if (taskRunner.getRemainingTaskCount() == 0) {
-            indicator.setVisible(false);
-        }
-//        infoBtn.setEnabled(true);
-//        startAllBtn.setEnabled(true);
-//        stopAllBtn.setEnabled(true);
-//        destroyAllBtn.setEnabled(true);
-//        for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
-//            Item row = lxcTable.getItem(it.next());
-//            if (row.getItemProperty(physicalHostLabel).getValue() != null) {
-//                Button startAllPerParentBtn = (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
-//                if (startAllPerParentBtn != null) {
-//                    startAllPerParentBtn.setEnabled(true);
-//                }
-//                Button stopAllPerParentBtn = (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
-//                if (stopAllPerParentBtn != null) {
-//                    stopAllPerParentBtn.setEnabled(true);
-//                }
-//                Button destroyPerParentAllBtn = (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel()).getValue());
-//                if (destroyPerParentAllBtn != null) {
-//                    destroyPerParentAllBtn.setEnabled(true);
-//                }
-//            }
-//        }
-    }
-
-    private void runTimeoutThread() {
-        try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(timeout * 1000 + 5000);
-
-                        hideProgress();
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            operationTimeoutThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
         }
     }
 
@@ -440,8 +358,7 @@ public class Manager extends VerticalLayout {
                                 startBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                showProgress();
-                                taskRunner.runTask(startLxcTask, new TaskCallback() {
+                                executeTask(startLxcTask, new TaskCallback() {
                                     StringBuilder output = new StringBuilder();
 
                                     @Override
@@ -451,7 +368,7 @@ public class Manager extends VerticalLayout {
                                             //send lxc-info cmd
                                             if (task.isCompleted()) {
                                                 Task lxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
-                                                taskRunner.runTask(lxcInfoTask, this);
+                                                executeTask(lxcInfoTask, this);
                                             }
                                         } else if (task.getData() == TaskType.GET_LXC_INFO) {
                                             if (!Util.isStringEmpty(response.getStdOut())) {
@@ -465,7 +382,6 @@ public class Manager extends VerticalLayout {
                                                 }
                                                 destroyBtn.setEnabled(true);
                                                 progressIcon.setVisible(false);
-                                                hideProgress();
                                             }
                                         }
                                     }
@@ -484,8 +400,7 @@ public class Manager extends VerticalLayout {
                                 stopBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                showProgress();
-                                taskRunner.runTask(stopLxcTask, new TaskCallback() {
+                                executeTask(stopLxcTask, new TaskCallback() {
                                     StringBuilder output = new StringBuilder();
 
                                     @Override
@@ -494,7 +409,7 @@ public class Manager extends VerticalLayout {
                                             //send lxc-info cmd
                                             if (task.isCompleted()) {
                                                 Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                taskRunner.runTask(lxcInfoTask, this);
+                                                executeTask(lxcInfoTask, this);
                                             }
                                         } else if (task.getData() == TaskType.GET_LXC_INFO) {
                                             if (!Util.isStringEmpty(response.getStdOut())) {
@@ -508,7 +423,6 @@ public class Manager extends VerticalLayout {
                                                 }
                                                 destroyBtn.setEnabled(true);
                                                 progressIcon.setVisible(false);
-                                                hideProgress();
                                             }
                                         }
                                     }
@@ -536,8 +450,7 @@ public class Manager extends VerticalLayout {
                                                         stopBtn.setEnabled(false);
                                                         destroyBtn.setEnabled(false);
                                                         progressIcon.setVisible(true);
-                                                        showProgress();
-                                                        taskRunner.runTask(destroyLxcTask, new TaskCallback() {
+                                                        executeTask(destroyLxcTask, new TaskCallback() {
                                                             StringBuilder output = new StringBuilder();
 
                                                             @Override
@@ -546,7 +459,7 @@ public class Manager extends VerticalLayout {
                                                                     //send lxc-info cmd
                                                                     if (task.isCompleted()) {
                                                                         Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                                        taskRunner.runTask(lxcInfoTask, this);
+                                                                        executeTask(lxcInfoTask, this);
                                                                     }
                                                                 } else if (task.getData() == TaskType.GET_LXC_INFO) {
                                                                     if (!Util.isStringEmpty(response.getStdOut())) {
@@ -562,7 +475,6 @@ public class Manager extends VerticalLayout {
                                                                             lxcTable.removeItem(rowId);
                                                                             clearEmptyParents();
                                                                         }
-                                                                        hideProgress();
                                                                     }
                                                                 }
                                                             }
@@ -580,8 +492,7 @@ public class Manager extends VerticalLayout {
                                     stopBtn.setEnabled(false);
                                     destroyBtn.setEnabled(false);
                                     progressIcon.setVisible(true);
-                                    showProgress();
-                                    taskRunner.runTask(destroyLxcTask, new TaskCallback() {
+                                    executeTask(destroyLxcTask, new TaskCallback() {
                                         StringBuilder output = new StringBuilder();
 
                                         @Override
@@ -590,7 +501,7 @@ public class Manager extends VerticalLayout {
                                                 //send lxc-info cmd
                                                 if (task.isCompleted()) {
                                                     Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                    taskRunner.runTask(lxcInfoTask, this);
+                                                    executeTask(lxcInfoTask, this);
                                                 }
                                             } else if (task.getData() == TaskType.GET_LXC_INFO) {
                                                 if (!Util.isStringEmpty(response.getStdOut())) {
@@ -606,7 +517,6 @@ public class Manager extends VerticalLayout {
                                                         lxcTable.removeItem(rowId);
                                                         clearEmptyParents();
                                                     }
-                                                    hideProgress();
                                                 }
                                             }
                                         }
@@ -621,6 +531,24 @@ public class Manager extends VerticalLayout {
             }
         }
 
+    }
+
+    private void executeTask(Task task, final TaskCallback callback) {
+        indicator.setVisible(true);
+        taskCount++;
+        taskRunner.executeTask(task, new TaskCallback() {
+
+            @Override
+            public void onResponse(Task task, Response response) {
+                callback.onResponse(task, response);
+                if (task.isCompleted()) {
+                    taskCount--;
+                    if (taskCount == 0) {
+                        indicator.setVisible(false);
+                    }
+                }
+            }
+        });
     }
 
 }

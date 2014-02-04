@@ -20,7 +20,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -37,12 +37,12 @@ public class DestroyRouterCallback implements TaskCallback {
     private final Table routersTable;
     private final Object rowId;
     private final Operation op;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final Button checkButton;
     private final Button destroyButton;
     private final Embedded progressIcon;
 
-    public DestroyRouterCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table routersTable, Object rowId, Operation op, TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyRouterCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table routersTable, Object rowId, Operation op, AsyncTaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
         this.clusterInfo = clusterInfo;
         this.config = config;
@@ -66,7 +66,7 @@ public class DestroyRouterCallback implements TaskCallback {
         if (task.isCompleted()) {
             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                 if (op.hasNextTask()) {
-                    taskRunner.runTask(op.getNextTask(), this);
+                    taskRunner.executeTask(op.getNextTask(), this);
                 } else {
                     //update db
                     List<UUID> routers = new ArrayList<UUID>(clusterInfo.getRouters());

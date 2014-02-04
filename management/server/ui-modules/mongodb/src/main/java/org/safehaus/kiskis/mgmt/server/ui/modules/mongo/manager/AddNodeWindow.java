@@ -38,9 +38,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -58,14 +58,14 @@ public class AddNodeWindow extends Window {
     private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final AgentManager agentManager;
     private final ClusterConfig config;
     private final MongoClusterInfo clusterInfo;
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public AddNodeWindow(final ClusterConfig config, MongoClusterInfo clusterInfo, TaskRunner taskRunner) {
+    public AddNodeWindow(final ClusterConfig config, MongoClusterInfo clusterInfo, AsyncTaskRunner taskRunner) {
         super("Add New Node");
         setModal(true);
 
@@ -206,7 +206,7 @@ public class AddNodeWindow extends Window {
             addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
 
-            taskRunner.runTask(operation.getNextTask(), new TaskCallback() {
+            taskRunner.executeTask(operation.getNextTask(), new TaskCallback() {
 
                 private final StringBuilder stdOutput = new StringBuilder();
 
@@ -250,8 +250,8 @@ public class AddNodeWindow extends Window {
                                         "child process started successfully, parent exiting")
                                 == config.getRouterServers().size())
                                 || (task.getData() != TaskType.RESTART_ROUTERS
-                                && stdOutput.toString().contains(
-                                        "child process started successfully, parent exiting"))) {
+                                && stdOutput.indexOf(
+                                        "child process started successfully, parent exiting") > -1)) {
                             task.setTaskStatus(TaskStatus.SUCCESS);
                             task.setCompleted(true);
                             taskRunner.removeTaskCallback(task.getUuid());
@@ -281,7 +281,7 @@ public class AddNodeWindow extends Window {
                             if (operation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
                                 addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
-                                taskRunner.runTask(operation.getNextTask(), this);
+                                taskRunner.executeTask(operation.getNextTask(), this);
                             } else {
                                 operation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", operation.getDescription()));

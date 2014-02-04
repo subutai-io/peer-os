@@ -9,8 +9,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 
 /**
@@ -21,9 +21,9 @@ public class StartNodeCallback implements TaskCallback {
 
     private final Button checkButton;
     private final StringBuilder stdOutput = new StringBuilder();
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
 
-    public StartNodeCallback(TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public StartNodeCallback(AsyncTaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.taskRunner = taskRunner;
         progressIcon.setVisible(true);
         startButton.setEnabled(false);
@@ -37,7 +37,7 @@ public class StartNodeCallback implements TaskCallback {
         if (!Util.isStringEmpty(response.getStdOut())) {
             stdOutput.append(response.getStdOut());
         }
-        if (stdOutput.toString().contains("child process started successfully, parent exiting")) {
+        if (stdOutput.indexOf("child process started successfully, parent exiting") > -1) {
             taskRunner.removeTaskCallback(task.getUuid());
             checkButton.click();
         } else if (Util.isFinalResponse(response)) {
