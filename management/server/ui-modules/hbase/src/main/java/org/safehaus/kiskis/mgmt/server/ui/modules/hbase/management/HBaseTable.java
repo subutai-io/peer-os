@@ -115,6 +115,7 @@ public class HBaseTable extends Table {
                 getWindow().showNotification("Purging cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.PURGE;
                 selectedItem = item;
+                selectedConfig = config;
                 manager.runCommand(config.getAgents(), cce);
             }
         });
