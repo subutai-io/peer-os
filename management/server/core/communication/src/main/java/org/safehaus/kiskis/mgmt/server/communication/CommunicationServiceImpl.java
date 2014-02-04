@@ -163,6 +163,7 @@ public class CommunicationServiceImpl implements CommunicationService {
             } catch (Exception e) {
             }
         }
+
         if (broker != null) {
             try {
                 broker.stop();
@@ -172,39 +173,41 @@ public class CommunicationServiceImpl implements CommunicationService {
         }
 
         try {
-            System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerCertificateName);
-            System.setProperty("javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd);
-            System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerTrustStoreName);
-            System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
+            /*
+             System.setProperty("javax.net.ssl.keyStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerCertificateName);
+             System.setProperty("javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd);
+             System.setProperty("javax.net.ssl.trustStore", System.getProperty("karaf.base") + "/certs/" + this.amqBrokerTrustStoreName);
+             System.setProperty("javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd);
 
-            broker = new BrokerService();
-            //***policy
-            PolicyMap policy = new PolicyMap();
-            PolicyEntry allDestinationsPolicyEntry = new PolicyEntry();
-            //abort consumers not acking message within this period of time
-            AbortSlowAckConsumerStrategy slowConsumerStrategy = new AbortSlowAckConsumerStrategy();
-            slowConsumerStrategy.setMaxTimeSinceLastAck(amqMaxSlowAgentConnectionTtlSec * 1000);
-            allDestinationsPolicyEntry.setSlowConsumerStrategy(slowConsumerStrategy);
-            //drop expired messages instead of sending to DLQ
-            DeadLetterStrategy deadLetterStrategy = new SharedDeadLetterStrategy();
-            deadLetterStrategy.setProcessExpired(false);
-            allDestinationsPolicyEntry.setDeadLetterStrategy(deadLetterStrategy);
-            //drop queues inactive fo this period of time
-            allDestinationsPolicyEntry.setGcInactiveDestinations(true);
-            allDestinationsPolicyEntry.setInactiveTimoutBeforeGC(amqInactiveQueuesDropTimeoutSec * 1000);
-            broker.setSchedulePeriodForDestinationPurge(30000);
-            //
-            policy.setDefaultEntry(allDestinationsPolicyEntry);
-            //unsubscribe durable subscribers that are offline for this amount of time
-            broker.setOfflineDurableSubscriberTimeout(amqMaxOfflineAgentTtlSec * 1000);
-            //
-            broker.setDestinationPolicy(policy);
-            //***policy
-            broker.setPersistent(true);
-            broker.setUseJmx(false);
-            broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=" + amqNeedClientAuth);
-            broker.start();
-            broker.waitUntilStarted();
+             broker = new BrokerService();
+             //***policy
+             PolicyMap policy = new PolicyMap();
+             PolicyEntry allDestinationsPolicyEntry = new PolicyEntry();
+             //abort consumers not acking message within this period of time
+             AbortSlowAckConsumerStrategy slowConsumerStrategy = new AbortSlowAckConsumerStrategy();
+             slowConsumerStrategy.setMaxTimeSinceLastAck(amqMaxSlowAgentConnectionTtlSec * 1000);
+             allDestinationsPolicyEntry.setSlowConsumerStrategy(slowConsumerStrategy);
+             //drop expired messages instead of sending to DLQ
+             DeadLetterStrategy deadLetterStrategy = new SharedDeadLetterStrategy();
+             deadLetterStrategy.setProcessExpired(false);
+             allDestinationsPolicyEntry.setDeadLetterStrategy(deadLetterStrategy);
+             //drop queues inactive fo this period of time
+             allDestinationsPolicyEntry.setGcInactiveDestinations(true);
+             allDestinationsPolicyEntry.setInactiveTimoutBeforeGC(amqInactiveQueuesDropTimeoutSec * 1000);
+             broker.setSchedulePeriodForDestinationPurge(30000);
+             //
+             policy.setDefaultEntry(allDestinationsPolicyEntry);
+             //unsubscribe durable subscribers that are offline for this amount of time
+             broker.setOfflineDurableSubscriberTimeout(amqMaxOfflineAgentTtlSec * 1000);
+             //
+             broker.setDestinationPolicy(policy);
+             //***policy
+             broker.setPersistent(true);
+             broker.setUseJmx(false);
+             broker.addConnector("ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=" + amqNeedClientAuth);
+             broker.start();
+             broker.waitUntilStarted();
+             */
             //executor service setup
             exec = Executors.newFixedThreadPool(amqMaxSenderPoolSize);
             //pooled connection factory setup
