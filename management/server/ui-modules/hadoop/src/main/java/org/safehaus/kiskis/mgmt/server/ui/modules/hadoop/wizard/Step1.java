@@ -152,7 +152,7 @@ public class Step1 extends Panel {
     private BeanItemContainer getDataSourceMasters(){
         List<Agent> list = parent.getLxcList();
 
-        if(parent.getHadoopInstallation().getConfig().getsNameNode() != null){
+       /* if(parent.getHadoopInstallation().getConfig().getsNameNode() != null){
             list.remove(parent.getHadoopInstallation().getConfig().getsNameNode());
         }
 
@@ -162,7 +162,7 @@ public class Step1 extends Panel {
 
         if(parent.getHadoopInstallation().getConfig().getJobTracker() != null){
             list.remove(parent.getHadoopInstallation().getConfig().getJobTracker());
-        }
+        }*/
 
         return new BeanItemContainer<Agent>(Agent.class, list);
     }
