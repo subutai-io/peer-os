@@ -10,7 +10,7 @@
         useJmx="true" 
         persistent="true" 
         brokerName="sol" 
-        start="true" 
+        startAsync="true" 
         schedulePeriodForDestinationPurge="30000"
         offlineDurableSubscriberTimeout="300000" >
  
@@ -22,17 +22,16 @@
  
         <amq:transportConnectors>
             <!--for webconsole-->
-            <amq:transportConnector name="tcp" uri="tcp://localhost:61617?useLocalHost=true" />
+            <amq:transportConnector  name="tcp" uri="tcp://localhost:61617?useLocalHost=true" />
             <!--for agent-->
             <amq:transportConnector name="ssl" uri="ssl://0.0.0.0:61616?needClientAuth=true" />
         </amq:transportConnectors>
         
         <amq:destinationPolicy>
             <amq:policyMap>
-                <amq:defaultEntry>
-                    
+                <amq:defaultEntry >
                     <!--drop inactive queues after 5 min-->
-                    <amq:policyEntry gcInactiveDestinations="true" inactiveTimoutBeforeGC="300000">
+                    <amq:policyEntry  gcInactiveDestinations="true" inactiveTimoutBeforeGC="300000">
                         
                         <!--abort slow acking agent after 5 min-->
                         <amq:slowConsumerStrategy>
