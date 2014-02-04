@@ -32,8 +32,8 @@
         </amq:sslContext>
  
         <amq:transportConnectors>
-            <amq:transportConnector uri="ssl://0.0.0.0:61616" />
-            <amq:transportConnector uri="tcp://localhost:7001" > 
+            <amq:transportConnector name="ssl" uri="ssl://0.0.0.0:61616?needClientAuth=true" />
+            <amq:transportConnector name="tcp" uri="tcp://localhost:7001?useLocalHost=true" > 
         </amq:transportConnectors>
  
     </amq:broker>
