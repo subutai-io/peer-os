@@ -23,9 +23,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -42,13 +42,13 @@ public class DestroyClusterWindow extends Window {
     private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final AgentManager agentManager;
     private final ClusterConfig config;
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public DestroyClusterWindow(ClusterConfig config, TaskRunner taskRunner) {
+    public DestroyClusterWindow(ClusterConfig config, AsyncTaskRunner taskRunner) {
         super("Cluster uninstallation");
         setModal(true);
 
@@ -109,7 +109,7 @@ public class DestroyClusterWindow extends Window {
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
-            taskRunner.runTask(installOperation.getNextTask(), new TaskCallback() {
+            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
 
                 @Override
                 public void onResponse(Task task, Response response) {
@@ -135,7 +135,7 @@ public class DestroyClusterWindow extends Window {
                             if (installOperation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-                                taskRunner.runTask(installOperation.getNextTask(), this);
+                                taskRunner.executeTask(installOperation.getNextTask(), this);
                             } else {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));

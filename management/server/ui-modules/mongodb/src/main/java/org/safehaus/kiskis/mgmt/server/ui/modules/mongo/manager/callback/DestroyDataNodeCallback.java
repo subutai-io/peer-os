@@ -24,9 +24,9 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -45,13 +45,13 @@ public class DestroyDataNodeCallback implements TaskCallback {
     private final Table dataNodesTable;
     private final Object rowId;
     private final Operation op;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final Button checkButton;
     private final Button destroyButton;
     private final Embedded progressIcon;
     private final StringBuilder stdOutput = new StringBuilder();
 
-    public DestroyDataNodeCallback(Window parentWindow, AgentManager agentManager, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table dataNodesTable, Object rowId, Operation op, TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyDataNodeCallback(Window parentWindow, AgentManager agentManager, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table dataNodesTable, Object rowId, Operation op, AsyncTaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
         this.agentManager = agentManager;
         this.clusterInfo = clusterInfo;
@@ -104,13 +104,13 @@ public class DestroyDataNodeCallback implements TaskCallback {
                     op.getNextTask();
                 }
 
-                taskRunner.runTask(op.getNextTask(), this);
+                taskRunner.executeTask(op.getNextTask(), this);
 //                }
             }
         } else if (task.isCompleted()) {
             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                 if (op.hasNextTask()) {
-                    taskRunner.runTask(op.getNextTask(), this);
+                    taskRunner.executeTask(op.getNextTask(), this);
                 } else {
                     //update db
                     List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());

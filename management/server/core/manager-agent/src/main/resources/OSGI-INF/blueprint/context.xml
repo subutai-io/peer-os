@@ -3,15 +3,6 @@
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
-    <!-- Allow the use of system properties -->
-    <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-    
-    <cm:property-placeholder persistent-id="AgentMgrConfig" update-strategy="none">
-        <cm:default-properties>
-            <cm:property name="agentFreshnessMin" value="30"/>
-        </cm:default-properties>
-    </cm:property-placeholder>
-    
     <reference id="communicationService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService"/>
     <reference id="dbManagerService" availability="mandatory"
@@ -22,12 +13,13 @@
           init-method="init" destroy-method="destroy" scope="singleton">
         <property name="communicationService" ref="communicationService"/>
         <property name="dbManagerService" ref="dbManagerService"/>
-        <property name="agentFreshnessMin" value="${agentFreshnessMin}"/>  
     </bean>
+    
     <service ref="agentManager"
              interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
     </service>
+    
 </blueprint>

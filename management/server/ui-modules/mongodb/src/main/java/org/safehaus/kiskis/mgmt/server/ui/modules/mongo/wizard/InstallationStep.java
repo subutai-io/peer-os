@@ -26,9 +26,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -49,7 +49,7 @@ public class InstallationStep extends Panel {
 
     private final AgentManager agentManager;
     private final ClusterConfig config;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
 
     public InstallationStep(final Wizard wizard) {
 
@@ -132,7 +132,7 @@ public class InstallationStep extends Panel {
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
-            taskRunner.runTask(installOperation.getNextTask(), new TaskCallback() {
+            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
                 private final StringBuilder startConfigServersOutput = new StringBuilder();
                 private final StringBuilder startRoutersOutput = new StringBuilder();
                 private final StringBuilder startDataNodesOutput = new StringBuilder();
@@ -192,7 +192,7 @@ public class InstallationStep extends Panel {
                             if (installOperation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-                                taskRunner.runTask(installOperation.getNextTask(), this);
+                                taskRunner.executeTask(installOperation.getNextTask(), this);
                             } else {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
