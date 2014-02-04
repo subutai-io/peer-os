@@ -144,7 +144,7 @@
             <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
 <!--            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
             <transportConnector name="amqp" uri="amqp://0.0.0.0:5672?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>-->
-            
+            <transportConnector > 
             <bean id="AMQJMSConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory">
               <property name="trustStore" value="${karaf.base}/certs/broker.ts" />
               <property name="trustStorePassword" value="client" />
@@ -153,7 +153,8 @@
               <property name="brokerURL" value="ssl://0.0.0.0:61616" />
 <!--              <property name="userName" value="admin" /> 
               <property name="password" value="admin" />-->
-            </bean>             
+            </bean>   
+            </transportConnector>          
         </transportConnectors>
 
         <!-- destroy the spring context on shutdown to stop jetty -->
