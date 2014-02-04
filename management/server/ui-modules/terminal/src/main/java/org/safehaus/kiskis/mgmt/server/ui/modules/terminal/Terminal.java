@@ -94,20 +94,20 @@ public class Terminal implements Module {
                     } else {
                         Task task = new Task();
                         for (Agent agent : agents) {
-                            Command cmd = getTemplate();
-                            cmd.getRequest().setUuid(agent.getUuid());
-                            cmd.getRequest().setProgram(programTxtFld.getValue().toString());
+                            Request request = getRequestTemplate();
+                            request.setUuid(agent.getUuid());
+                            request.setProgram(programTxtFld.getValue().toString());
                             if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
                                 int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
                                 if (timeout > 0) {
-                                    cmd.getRequest().setTimeout(timeout);
+                                    request.setTimeout(timeout);
                                 }
                             }
                             if (workDirTxtFld.getValue() != null && !Util.isStringEmpty(workDirTxtFld.getValue().toString())) {
-                                cmd.getRequest().setWorkingDirectory(workDirTxtFld.getValue().toString());
+                                request.setWorkingDirectory(workDirTxtFld.getValue().toString());
                             }
 
-                            task.addCommand(cmd);
+                            task.addRequest(request);
                         }
                         indicator.setVisible(true);
                         taskCount++;
@@ -173,8 +173,8 @@ public class Terminal implements Module {
             getWindow().showNotification(notification);
         }
 
-        public static Command getTemplate() {
-            return CommandFactory.createRequest(
+        public static Request getRequestTemplate() {
+            return CommandFactory.newRequest(
                     RequestType.EXECUTE_REQUEST, // type
                     null, //                        !! agent uuid
                     MODULE_NAME, //     source

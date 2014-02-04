@@ -11,6 +11,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import javax.jms.*;
 import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.pool.PooledConnectionFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
@@ -44,6 +46,10 @@ public class CommunicationServiceImpl implements CommunicationService {
     @Override
     public void sendCommand(Command command) {
         exec.submit(new CommandProducer(command));
+    }
+
+    public void sendRequest(Request request) {
+        exec.submit(new CommandProducer(new CommandImpl(request)));
     }
 
     public class CommandProducer implements Runnable {
