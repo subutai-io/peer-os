@@ -23,7 +23,7 @@
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 
-    <amq:broker useJmx="false" persistent="false" brokerName="sol" start="true" >
+    <amq:broker useJmx="true" persistent="false" brokerName="sol" start="true" >
  
         <amq:sslContext>
             <amq:sslContext
@@ -33,7 +33,7 @@
  
         <amq:transportConnectors>
             <amq:transportConnector uri="ssl://0.0.0.0:61616" />
-            <!--<amq:transportConnector uri="vm://sol:7001" >--> 
+            <amq:transportConnector uri="tcp://localhost:7001" > 
         </amq:transportConnectors>
  
     </amq:broker>
