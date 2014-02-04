@@ -22,28 +22,12 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
-    <!-- Allows us to use system properties as variables in this configuration file -->
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <value>file:${activemq.conf}/credentials.properties</value>
-        </property>
-    </bean>
 
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="${activemq.broker-name}" dataDirectory="${activemq.data}" start="true">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="${broker-name}" dataDirectory="${data}" start="true">
 
-        <!--
-            For better performances use VM cursor and small memory limit.
-            For more information, see:
-
-            http://activemq.apache.org/message-cursors.html
-
-            Also, if your producer is "hanging", it's probably due to producer flow control.
-            For more information, see:
-            http://activemq.apache.org/producer-flow-control.html
-        -->
 
         <destinationPolicy>
             <policyMap>
@@ -96,7 +80,7 @@
             http://activemq.apache.org/persistence.html
         -->
         <persistenceAdapter>
-            <kahaDB directory="${activemq.data}/kahadb"/>
+            <kahaDB directory="${data}/kahadb"/>
         </persistenceAdapter>
 
 
@@ -141,20 +125,19 @@
             http://activemq.apache.org/configuring-transports.html
         -->
         <sslContext>
-        <amq:sslContext 
-                keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
-                trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
-            <amq:transportConnectors>
-                <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
-            </amq:transportConnectors>
-        </amq:sslContext>
-        
+            <amq:sslContext 
+                    keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
+                    trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
+                <amq:transportConnectors>
+                    <amq:transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true" />
+                </amq:transportConnectors>
+            </amq:sslContext>
         </sslContext>
         
         <transportConnectors>
              <!--DOS protection, limit concurrent connections to 1000 and frame size to 100MB--> 
             <!--<transportConnector uri="ssl://0.0.0.0:61616?needClientAuth=true">-->
-            <transportConnector uri="vm://${activemq.broker-name}:7001"/>
+            <transportConnector uri="vm://${broker-name}:7001"/>
         </transportConnectors>
         
     
