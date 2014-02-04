@@ -109,7 +109,7 @@ public class Util {
         try {
             Double.parseDouble(str);
             return true;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
         }
 
         return false;
