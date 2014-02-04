@@ -44,7 +44,7 @@
             For more information, see:
             http://activemq.apache.org/producer-flow-control.html
         -->
-<
+
         <destinationPolicy>
             <policyMap>
               <policyEntries>
