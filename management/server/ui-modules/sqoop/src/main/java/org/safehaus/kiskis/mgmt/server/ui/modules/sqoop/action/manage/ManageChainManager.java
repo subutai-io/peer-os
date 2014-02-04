@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.ChainManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.InitAction;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Action;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
@@ -12,18 +13,14 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.remove.Rem
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.status.StatusListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
 
-public class ChainManager {
+public class ManageChainManager extends ChainManager {
 
     private static final String STATUS_COMMAND = "dpkg -l|grep ksks";
     private static final String INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ksks-sqoop";
     private static final String REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-sqoop";
 
-    private UILogger logger;
-    private Action initAction;
-
-    public ChainManager(UILogger logger) {
-        this.logger = logger;
-        initAction = new InitAction(logger);
+    public ManageChainManager(UILogger logger) {
+        super(logger);
     }
 
     public Chain getStatusChain() {
@@ -47,9 +44,5 @@ public class ChainManager {
         CommandAction removeAction = new CommandAction(REMOVE_COMMAND, new RemoveListener(logger));
 
         return new Chain(initAction, statusAction, removeAction);
-    }
-
-    public static void run(Chain chain) {
-        chain.start(new Context());
     }
 }

@@ -1,11 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view;
 
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.ManageChainManager;
+import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.TextArea;
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.export.ExportChainManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
 
-public class ManageLayoutBuilder {
+public class ExportLayoutBuilder {
 
     public static Layout get() {
 
@@ -14,14 +17,9 @@ public class ManageLayoutBuilder {
         TextArea textArea = getTextArea();
         UILogger logger = new UILogger(textArea);
 
-        ManageChainManager chainManager = new ManageChainManager(logger);
-        Chain statusChain = chainManager.getStatusChain();
-        Chain installChain = chainManager.getInstallChain();
-        Chain removeChain = chainManager.getRemoveChain();
+        ExportChainManager chainManager = new ExportChainManager(logger);
 
-        layout.addComponent(getButton("Check Status", statusChain), "left: 20px; top: 30px;");
-        layout.addComponent(getButton("Install", installChain), "left: 20px; top: 70px;");
-        layout.addComponent(getButton("Remove", removeChain), "left: 20px; top: 110px;");
+        layout.addComponent(getButton("Export", chainManager.getStatusChain()), "left: 20px; top: 30px;");
         layout.addComponent(textArea, "left: 180px; top: 30px;");
 
         return layout;
@@ -35,7 +33,7 @@ public class ManageLayoutBuilder {
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                ManageChainManager.run(chain);
+                ExportChainManager.run(chain);
             }
         });
 
