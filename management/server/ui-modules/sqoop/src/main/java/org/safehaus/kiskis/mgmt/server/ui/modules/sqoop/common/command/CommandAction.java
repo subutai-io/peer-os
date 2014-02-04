@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.command;
 
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Action;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Context;
@@ -7,22 +8,32 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class CommandAction implements Action {
 
-    private String commandLine;
-    private ActionListener actionListener;
+    protected String commandLine;
+    protected ActionListener actionListener;
 
-    private Chain chain;
-    private Context context;
+    protected Context context;
+    protected Chain chain;
+    protected boolean substitute;
 
     public CommandAction(String commandLine, ActionListener actionListener) {
+        this(commandLine, actionListener, false);
+    }
+
+    public CommandAction(String commandLine, ActionListener actionListener, boolean substitute) {
         this.commandLine = commandLine;
         this.actionListener = actionListener;
+        this.substitute = substitute;
     }
 
     @Override
     public void execute(Context context, Chain chain) {
         actionListener.onStart(context, commandLine);
         reset(context, chain);
-        CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, commandLine), this);
+        CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, getCommandLine()), this);
+    }
+
+    protected String getCommandLine() {
+        return substitute ? new StrSubstitutor(context).replace(commandLine) : commandLine;
     }
 
     private void reset(Context context, Chain chain) {

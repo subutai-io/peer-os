@@ -1,11 +1,11 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.remove;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.BasicListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Context;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.AbstractListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-public class RemoveListener extends AbstractListener {
+public class RemoveListener extends BasicListener {
 
     public RemoveListener(UILogger logger) {
         super(logger, "Sqoop installed. Removing, please wait...");

@@ -9,19 +9,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.Set;
 
-public class InitAction implements Action {
+public class AgentInitAction implements Action {
 
     private UILogger logger;
 
-    public InitAction(UILogger logger) {
+    public AgentInitAction(UILogger logger) {
         this.logger = logger;
     }
 
     @Override
     public void execute(Context context, Chain chain) {
 
-        Set<Agent> agents = MgmtApplication.getSelectedAgents();
         logger.clear();
+        Set<Agent> agents = MgmtApplication.getSelectedAgents();
 
         if (agents == null || agents.isEmpty()) {
             logger.info("Please select a node");

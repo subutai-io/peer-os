@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view;
 
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.ManageChainManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.ChainManager;
 
 class ManageLayoutBuilder {
 
@@ -9,7 +9,7 @@ class ManageLayoutBuilder {
 
         TextArea textArea = UIUtil.getTextArea(600, 600);
         UILogger logger = new UILogger(textArea);
-        ManageChainManager chainManager = new ManageChainManager(logger);
+        ChainManager chainManager = new ChainManager(logger);
         AbsoluteLayout layout = new AbsoluteLayout();
 
         layout.addComponent(UIUtil.getButton("Check Status", 120, chainManager.getStatusChain()), "left: 20px; top: 30px;");

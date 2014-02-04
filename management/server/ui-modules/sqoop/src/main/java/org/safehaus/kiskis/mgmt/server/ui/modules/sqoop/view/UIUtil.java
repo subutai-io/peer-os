@@ -1,9 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view;
 
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.ChainManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
 
@@ -34,6 +32,25 @@ public class UIUtil {
         return textArea;
     }
 
+    static Label getLabel(String text, float width, float height) {
 
+        Label label = new Label(text);
+        label.setWidth(width, Sizeable.UNITS_PIXELS);
+        label.setHeight(height, Sizeable.UNITS_PIXELS);
+        label.setContentMode(Label.CONTENT_XHTML);
 
+        return label;
+    }
+
+    static AbstractTextField getTextField(String label, float width) {
+        return getTextField(label, width, false);
+    }
+
+    static AbstractTextField getTextField(String label, float width, boolean isPassword) {
+
+        AbstractTextField textField = isPassword ? new PasswordField(label) : new TextField(label);
+        textField.setWidth(width, Sizeable.UNITS_PIXELS);
+
+        return textField;
+    }
 }

@@ -1,11 +1,11 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.install;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.BasicListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Context;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.AbstractListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-public class InstallStatusListener extends AbstractListener {
+public class InstallStatusListener extends BasicListener {
 
     public InstallStatusListener(UILogger logger) {
         super(logger, "Checking status, please wait...");

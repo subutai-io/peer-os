@@ -1,11 +1,11 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.manage.status;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.BasicListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Context;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.AbstractListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-public class StatusListener extends AbstractListener {
+public class StatusListener extends BasicListener {
 
     public StatusListener(UILogger logger) {
         super(logger, "Checking status, please wait...");

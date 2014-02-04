@@ -16,6 +16,10 @@ public class UILogger {
 
     public void info(String message, Object... values) {
 
+        if (message == null) {
+            return;
+        }
+
         String text = textArea.getValue() + "\n"
                 + DATE_FORMAT.format(new Date()) + " | "
                 + String.format(message, values);
