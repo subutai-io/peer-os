@@ -12,7 +12,9 @@
         brokerName="sol" 
         startAsync="true" 
         schedulePeriodForDestinationPurge="30000"
-        offlineDurableSubscriberTimeout="300000" >
+        offlineDurableSubscriberTimeout="300000" 
+        advisorySupport="true"
+    >
  
         <amq:sslContext>
             <amq:sslContext
