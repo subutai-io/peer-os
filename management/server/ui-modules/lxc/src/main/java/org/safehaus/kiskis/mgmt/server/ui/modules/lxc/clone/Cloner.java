@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -158,47 +156,37 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     }
 
     private void startCloneTask() {
-        Set<Agent> agents = MgmtApplication.getSelectedAgents();
-        if (agents.size() > 0) {
-            Set<Agent> physicalAgents = new HashSet<Agent>();
-            //filter physical agents
-            for (Agent agent : agents) {
-                if (!agent.isIsLXC()) {
-                    physicalAgents.add(agent);
-                }
-            }
+        Set<Agent> physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
 
-            if (physicalAgents.isEmpty()) {
-                show("Select at least one physical agent");
-            } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
-                show("Enter product name");
-            } else {
-                //do the magic
-                String productName = textFieldLxcName.getValue().toString().trim();
-                Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
-                Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
-                for (Agent physAgent : physicalAgents) {
-                    List<String> lxcNames = new ArrayList<String>();
-                    for (Command cmd : task.getCommands()) {
-                        if (cmd.getRequest().getUuid().compareTo(physAgent.getUuid()) == 0) {
-                            String lxcHostname
-                                    = cmd.getRequest().getArgs().get(cmd.getRequest().getArgs().size() - 1);
-                            requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequest().getRequestSequenceNumber(),
-                                    lxcHostname);
-
-                            lxcNames.add(lxcHostname);
-                        }
-                    }
-                    agentFamilies.put(physAgent, lxcNames);
-                }
-                populateLxcTable(agentFamilies);
-                indicator.setVisible(true);
-                taskCount++;
-                taskRunner.executeTask(task, this);
-            }
-        } else {
+        if (physicalAgents.isEmpty()) {
             show("Select at least one physical agent");
+        } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
+            show("Enter product name");
+        } else {
+            //do the magic
+            String productName = textFieldLxcName.getValue().toString().trim();
+            Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
+            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
+            for (Agent physAgent : physicalAgents) {
+                List<String> lxcNames = new ArrayList<String>();
+                for (Command cmd : task.getCommands()) {
+                    if (cmd.getRequest().getUuid().compareTo(physAgent.getUuid()) == 0) {
+                        String lxcHostname
+                                = cmd.getRequest().getArgs().get(cmd.getRequest().getArgs().size() - 1);
+                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequest().getRequestSequenceNumber(),
+                                lxcHostname);
+
+                        lxcNames.add(lxcHostname);
+                    }
+                }
+                agentFamilies.put(physAgent, lxcNames);
+            }
+            populateLxcTable(agentFamilies);
+            indicator.setVisible(true);
+            taskCount++;
+            taskRunner.executeTask(task, this);
         }
+
     }
 
     private void show(String msg) {

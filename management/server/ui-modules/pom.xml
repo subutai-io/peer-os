@@ -21,6 +21,7 @@
         <module>pig</module>
         <module>hbase</module>
         <module>sqoop</module>
+        <module>mahout</module>
     </modules>
    
 </project>
