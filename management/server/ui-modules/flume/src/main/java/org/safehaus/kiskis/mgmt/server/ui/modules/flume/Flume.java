@@ -2,11 +2,12 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.flume;
 
 import com.vaadin.ui.*;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.flume.view.ModuleComponent;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class Flume implements Module {
 
-    private static final String MODULE_NAME = "Hive";
+    private static final String MODULE_NAME = "Flume";
 
     @Override
     public String getName() {
@@ -15,7 +16,6 @@ public class Flume implements Module {
 
     @Override
     public Component createComponent() {
-        //return new ModuleComponent(MODULE_NAME);
-        return null;
+        return new ModuleComponent(MODULE_NAME);
     }
 }
