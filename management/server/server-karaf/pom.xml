@@ -273,6 +273,11 @@
                                     <artifactId>oozie-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hive-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!--UI Modules-->
 
                                 <!--UI Dependencies-->
