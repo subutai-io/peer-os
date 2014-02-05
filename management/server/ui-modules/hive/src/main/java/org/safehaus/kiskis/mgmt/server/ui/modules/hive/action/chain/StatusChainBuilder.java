@@ -34,6 +34,8 @@ public class StatusChainBuilder extends AbstractChainBuilder {
                     return false;
                 }
 
+                logger.info("Hive installed - OK");
+
                 String msg = stdOut.contains("ksks-derby") ? "Derby installed - OK" : "Derby NOT INSTALLED";
                 logger.info(msg);
 
@@ -46,7 +48,9 @@ public class StatusChainBuilder extends AbstractChainBuilder {
         return new BasicListener(logger, "Checking service status, please wait...") {
             @Override
             protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
-                logger.complete(stdOut);
+                logger.info(stdOut);
+                logger.info(stdErr);
+                logger.info("Completed");
                 return false;
             }
         };

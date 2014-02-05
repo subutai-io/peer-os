@@ -16,8 +16,9 @@ public class BasicListener extends ActionListener {
     }
 
     @Override
-    protected void onStart(Context context, String programLine) {
+    protected Result onStart(Context context, String programLine) {
         logger.info(executeMessage);
+        return Result.CONTINUE;
     }
 
     @Override

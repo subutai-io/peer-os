@@ -5,13 +5,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class ActionListener {
 
+    public static enum Result {
+        CONTINUE, SKIP, INTERRUPT,
+    }
+
     protected String expectedRegex[];
 
     public ActionListener(String ... expectedRegex) {
         this.expectedRegex = expectedRegex;
     }
 
-    protected void onStart(Context context, String programLine) {}
+    protected Result onStart(Context context, String programLine) {
+        return Result.CONTINUE;
+    }
 
     protected void onResponse(Context context, Response response) {}
 
@@ -20,6 +26,7 @@ public class ActionListener {
     }
 
     // TODO with regex
+    /*
     protected boolean allRegexMatched(String stdOut) {
 
         for (String regex : expectedRegex) {
@@ -30,5 +37,5 @@ public class ActionListener {
 
         return true;
     }
-
+    */
 }

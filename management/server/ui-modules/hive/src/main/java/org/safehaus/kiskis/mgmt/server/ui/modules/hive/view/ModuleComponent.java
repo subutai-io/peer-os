@@ -29,8 +29,8 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
         layout.addComponent(UIUtil.getButton("Check Status", 120, new StatusChainBuilder(logger).getChain()), "left: 30px; top: 50px;");
 
         layout.addComponent(UIUtil.getLabel("<h3>Manage</h3>", 200, 40), "left: 30px; top: 90px;");
-        layout.addComponent(UIUtil.getButton("Install", 120, null), "left: 30px; top: 130px;");
-        layout.addComponent(UIUtil.getButton("Remove", 120, null), "left: 30px; top: 170px;");
+        layout.addComponent(UIUtil.getButton("Install", 120, new InstallChainBuilder(logger).getChain()), "left: 30px; top: 130px;");
+        layout.addComponent(UIUtil.getButton("Remove", 120, new RemoveChainBuilder(logger).getChain()), "left: 30px; top: 170px;");
 
         layout.addComponent(UIUtil.getLabel("<h3>Service</h3>", 200, 40), "left: 30px; top: 220px;");
         layout.addComponent(UIUtil.getButton("Start", 120, null), "left: 30px; top: 260px;");

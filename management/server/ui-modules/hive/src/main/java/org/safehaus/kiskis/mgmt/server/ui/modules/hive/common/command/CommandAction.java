@@ -27,9 +27,18 @@ public class CommandAction implements Action {
 
     @Override
     public void execute(Context context, Chain chain) {
-        actionListener.onStart(context, commandLine);
-        reset(context, chain);
-        CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, getCommandLine()), this);
+
+        ActionListener.Result result = actionListener.onStart(context, commandLine);
+
+        switch (result) {
+        case CONTINUE:
+            reset(context, chain);
+            CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, getCommandLine()), this);
+            break;
+        case SKIP:
+            chain.proceed(context);
+            break;
+        }
     }
 
     protected String getCommandLine() {
@@ -49,7 +58,7 @@ public class CommandAction implements Action {
 
         boolean canContinue = actionListener.onComplete(context, stdOut, stdErr, response);
 
-        if (canContinue && chain != null) {
+        if (canContinue) {
             chain.proceed(context);
         }
     }

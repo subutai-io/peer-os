@@ -1,8 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hive.action.chain;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.hive.action.AgentInitAction;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.action.BasicListener;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.chain.Action;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.chain.Context;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.ActionListener;
@@ -10,97 +8,99 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.CommandAct
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.view.UILogger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-public class InstallChainBuilder {
+public class InstallChainBuilder extends AbstractChainBuilder {
 
-    private static final String STATUS_COMMAND = "dpkg -l|grep ksks";
-    private static final String SERVICE_COMMAND = "service hive-thrift status";
-    private static final String INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ksks-hive";
-//    private static final String REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-sqoop";
+    private static final String HIVE_INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ksks-hive";
+    private static final String DERBY_INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ksks-derby";
 
-    private UILogger logger;
-    private Action agentInitAction;
+    private static final String HIVE_ALREADY_INSTALLED = "hiveAlreadyInstalled";
+    private static final String DERBY_ALREADY_INSTALLED = "derbyAlreadyInstalled";
 
     public InstallChainBuilder(UILogger logger) {
-        this.logger = logger;
-        agentInitAction = new AgentInitAction(logger);
+        super(logger);
     }
 
+    public Chain getChain() {
+        return new Chain(agentInitAction,
+                new CommandAction(STATUS_COMMAND, getStatusListener()),
+                new CommandAction(HIVE_INSTALL_COMMAND, getHiveInstallListener()),
+                new CommandAction(DERBY_INSTALL_COMMAND, getDerbyInstallListener())
+        );
+    }
 
-    public Chain getStatusChain() {
-
-        ActionListener installStatusListener =  new BasicListener(logger, "Checking installation status, please wait...") {
+    public ActionListener getStatusListener() {
+        return new BasicListener(logger, "Checking status before installing, please wait...") {
             @Override
             protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
-                if (stdOut == null || !stdOut.contains("ksks-hadoop")) {
-                    logger.complete("Hadoop NOT INSTALLED. Please install hadoop before installing Hive.");
+                if (!handleHadoopStatus(stdOut)) {
                     return false;
                 }
 
-                logger.info("Hadoop installed - OK");
+                context.put(HIVE_ALREADY_INSTALLED, stdOut.contains("ksks-hive"));
+                context.put(DERBY_ALREADY_INSTALLED, stdOut.contains("ksks-derby"));
 
-                if (!stdOut.contains("ksks-hive")) {
-                    logger.complete("Hive NOT INSTALLED");
-                    return false;
+                return true;
+            }
+        };
+    }
+
+    public ActionListener getHiveInstallListener() {
+        return new BasicListener(logger, "Installing Hive, please wait...") {
+
+            @Override
+            protected Result onStart(Context context, String programLine) {
+
+                String msg = executeMessage;
+                Result result = Result.CONTINUE;
+
+                if (context.get(HIVE_ALREADY_INSTALLED)) {
+                    msg = "Hive ALREADY INSTALLED";
+                    result = Result.SKIP;
                 }
 
-                String msg = stdOut.contains("ksks-derby") ? "Derby installed - OK" : "Derby NOT INSTALLED";
                 logger.info(msg);
+                return result;
+            }
 
+            @Override
+            protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
+
+                if (response.getExitCode() != null && response.getExitCode() != 0) {
+                    logger.complete("Error occurred while installing Hive. Please see the server logs for details.");
+                    return false;
+                }
+
+                logger.info("Hive installed successfully");
                 return true;
             }
         };
-
-        ActionListener serviceStatusListener =  new BasicListener(logger, "Checking service status, please wait...") {
-            @Override
-            protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
-                logger.complete(stdOut);
-                return false;
-            }
-        };
-
-        CommandAction installStatusAction = new CommandAction(STATUS_COMMAND, installStatusListener);
-        CommandAction serviceStatusAction = new CommandAction(SERVICE_COMMAND, serviceStatusListener);
-
-        return new Chain(agentInitAction, installStatusAction, serviceStatusAction);
     }
 
-    public Chain getInstallChain() {
+    public ActionListener getDerbyInstallListener() {
+        return new BasicListener(logger, "Installing Derby, please wait...") {
 
-        ActionListener beforeListener =  new BasicListener(logger, "Checking status before installing, please wait...") {
             @Override
-            protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
-                if (stdOut == null || !stdOut.contains("ksks-hadoop")) {
-                    logger.complete("Hadoop NOT INSTALLED. Please install Hadoop before installing Sqoop.");
-                    return false;
+            protected Result onStart(Context context, String programLine) {
+
+                if (context.get(DERBY_ALREADY_INSTALLED)) {
+                    logger.complete("Derby ALREADY INSTALLED");
+                    return Result.INTERRUPT;
                 }
 
-                logger.info("Hadoop installed - OK");
-
-                if (stdOut.contains("ksks-hive")) {
-                    logger.complete("Hive ALREADY INSTALLED");
-                    return false;
-                }
-                return true;
+                logger.info(executeMessage);
+                return Result.CONTINUE;
             }
-        };
 
-        ActionListener installListener =  new BasicListener(logger, "Installing Hive, please wait...") {
             @Override
             protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
                 String msg = response.getExitCode() == null || response.getExitCode() == 0
-                        ? "Hive installed successfully"
-                        : "Error occurred while installing Hive. Please see the server logs for details.";
+                        ? "Derby installed successfully"
+                        : "Error occurred while installing Derby. Please see the server logs for details.";
 
                 logger.complete(msg);
                 return false;
             }
         };
-
-        CommandAction beforeAction = new CommandAction(STATUS_COMMAND, beforeListener);
-        CommandAction installAction = new CommandAction(INSTALL_COMMAND, installListener);
-
-        return new Chain(agentInitAction, beforeAction, installAction);
     }
-
 
 }
