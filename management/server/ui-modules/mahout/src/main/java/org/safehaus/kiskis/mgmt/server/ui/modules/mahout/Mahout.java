@@ -44,7 +44,7 @@ public class Mahout implements Module {
             commandOutputTxtArea.setSizeFull();
             commandOutputTxtArea.setImmediate(true);
             commandOutputTxtArea.setWordwrap(false);
-            grid.addComponent(commandOutputTxtArea, 0, 3, 19, 9);
+            grid.addComponent(commandOutputTxtArea, 0, 3, 19, 9); 
 
             Label logo = MgmtApplication.createImage("mahout.png", 200, 100);
             grid.addComponent(logo, 0, 0, 7, 2);
