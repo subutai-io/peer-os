@@ -43,7 +43,7 @@ public class HiveValidationAction extends ValidationAction {
             context.put("tableOption", hiveDatabase);
         } else {
             context.put("importUtil", "sqoop-import");
-            context.put("tableOption", String.format("--hive-table %s.%s", hiveDatabase, hiveTable));
+            context.put("tableOption", String.format("--table %s --hive-table %s.%s", table, hiveDatabase, hiveTable));
         }
 
         return true;

@@ -66,16 +66,16 @@ public class ChainManager {
 
     public Chain getHdfsImportChain(Action validationAction) {
 
-        CommandAction exportAction = new CommandAction(IMPORT_HDFS_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
+        CommandAction importAction = new CommandAction(IMPORT_HDFS_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
 
-        return new Chain(agentInitAction, validationAction, exportAction);
+        return new Chain(agentInitAction, validationAction, importAction);
     }
 
     public Chain getHiveImportChain(Action validationAction) {
 
-        CommandAction exportAction = new CommandAction(IMPORT_HIVE_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
+        CommandAction importAction = new CommandAction(IMPORT_HIVE_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
 
-        return new Chain(agentInitAction, validationAction, exportAction);
+        return new Chain(agentInitAction, validationAction, importAction);
     }
 
 
