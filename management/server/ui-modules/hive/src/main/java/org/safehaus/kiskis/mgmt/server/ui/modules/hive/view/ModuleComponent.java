@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hive.view;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.action.chain.*;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.CommandBuilder;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -33,8 +34,8 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
         layout.addComponent(UIUtil.getButton("Remove", 120, new RemoveChainBuilder(logger).getChain()), "left: 30px; top: 170px;");
 
         layout.addComponent(UIUtil.getLabel("<h3>Service</h3>", 200, 40), "left: 30px; top: 220px;");
-        layout.addComponent(UIUtil.getButton("Start", 120, null), "left: 30px; top: 260px;");
-        layout.addComponent(UIUtil.getButton("Stop", 120, null), "left: 30px; top: 300px;");
+        layout.addComponent(UIUtil.getButton("Start", 120, ServiceChainBuilder.getStartChain(logger)), "left: 30px; top: 260px;");
+        layout.addComponent(UIUtil.getButton("Stop", 120, ServiceChainBuilder.getStopChain(logger)), "left: 30px; top: 300px;");
 
         layout.addComponent(textArea, "left: 200px; top: 50px;");
 
