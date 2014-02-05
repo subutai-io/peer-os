@@ -23,10 +23,7 @@
         </amq:sslContext>
  
         <amq:transportConnectors>
-            <!--for webconsole-->
-            <amq:transportConnector  name="tcp" uri="tcp://127.0.0.1:61617?useLocalHost=true" />
-            <!--for agent-->
-            <amq:transportConnector name="ssl" uri="ssl://0.0.0.0:61616?needClientAuth=true" />
+            <amq:transportConnector name="ssl" uri="nio+ssl://0.0.0.0:61616?needClientAuth=true" />
         </amq:transportConnectors>
         
         <amq:destinationPolicy>

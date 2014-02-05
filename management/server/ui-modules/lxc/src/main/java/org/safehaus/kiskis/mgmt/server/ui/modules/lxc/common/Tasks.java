@@ -7,8 +7,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
@@ -24,11 +24,11 @@ public class Tasks {
             StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
             lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName);
             for (int i = 1; i <= lxcCount; i++) {
-                Command cmd = Commands.getCloneCommand();
-                cmd.getRequest().setUuid(physAgent.getUuid());
+                Request cmd = Commands.getCloneCommand();
+                cmd.setUuid(physAgent.getUuid());
                 String lxcHostFull = lxcHost.toString() + i;
-                cmd.getRequest().getArgs().set(cmd.getRequest().getArgs().size() - 1, lxcHostFull);
-                task.addCommand(cmd);
+                cmd.getArgs().set(cmd.getArgs().size() - 1, lxcHostFull);
+                task.addRequest(cmd);
             }
         }
         return task;
@@ -38,9 +38,9 @@ public class Tasks {
         Task task = new Task();
         task.setData(TaskType.GET_LXC_LIST);
         for (Agent physAgent : physicalAgents) {
-            Command cmd = Commands.getLxcListCommand();
-            cmd.getRequest().setUuid(physAgent.getUuid());
-            task.addCommand(cmd);
+            Request cmd = Commands.getLxcListCommand();
+            cmd.setUuid(physAgent.getUuid());
+            task.addRequest(cmd);
         }
 
         return task;
@@ -49,45 +49,45 @@ public class Tasks {
     public static Task getLxcStartTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.START_LXC);
-        Command cmd = Commands.getLxcStartCommand(lxcHostname);
-        cmd.getRequest().setUuid(physicalAgent.getUuid());
-        task.addCommand(cmd);
+        Request cmd = Commands.getLxcStartCommand(lxcHostname);
+        cmd.setUuid(physicalAgent.getUuid());
+        task.addRequest(cmd);
         return task;
     }
 
     public static Task getLxcStopTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.STOP_LXC);
-        Command cmd = Commands.getLxcStopCommand(lxcHostname);
-        cmd.getRequest().setUuid(physicalAgent.getUuid());
-        task.addCommand(cmd);
+        Request cmd = Commands.getLxcStopCommand(lxcHostname);
+        cmd.setUuid(physicalAgent.getUuid());
+        task.addRequest(cmd);
         return task;
     }
 
     public static Task getLxcInfoTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.GET_LXC_INFO);
-        Command cmd = Commands.getLxcInfoCommand(lxcHostname);
-        cmd.getRequest().setUuid(physicalAgent.getUuid());
-        task.addCommand(cmd);
+        Request cmd = Commands.getLxcInfoCommand(lxcHostname);
+        cmd.setUuid(physicalAgent.getUuid());
+        task.addRequest(cmd);
         return task;
     }
 
     public static Task getLxcInfoWithWaitTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.GET_LXC_INFO);
-        Command cmd = Commands.getLxcInfoWithWaitCommand(lxcHostname);
-        cmd.getRequest().setUuid(physicalAgent.getUuid());
-        task.addCommand(cmd);
+        Request cmd = Commands.getLxcInfoWithWaitCommand(lxcHostname);
+        cmd.setUuid(physicalAgent.getUuid());
+        task.addRequest(cmd);
         return task;
     }
 
     public static Task getLxcDestroyTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.DESTROY_LXC);
-        Command cmd = Commands.getLxcDestroyCommand(lxcHostname);
-        cmd.getRequest().setUuid(physicalAgent.getUuid());
-        task.addCommand(cmd);
+        Request cmd = Commands.getLxcDestroyCommand(lxcHostname);
+        cmd.setUuid(physicalAgent.getUuid());
+        task.addRequest(cmd);
         return task;
     }
 }

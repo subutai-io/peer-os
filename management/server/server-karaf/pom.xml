@@ -270,7 +270,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hive-module</artifactId>
+                                    <artifactId>oozie-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--UI Modules-->
