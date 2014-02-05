@@ -29,6 +29,9 @@ public class Mahout implements Module {
         private final AgentManager agentManager;
         private final Label indicator;
         private final AsyncTaskRunner taskRunner;
+        private final Button checkBtn;
+        private final Button installBtn;
+        private final Button uninstallBtn;
         private volatile int taskCount = 0;
 
         public ModuleComponent(final AsyncTaskRunner taskRunner) {
@@ -44,20 +47,25 @@ public class Mahout implements Module {
             commandOutputTxtArea.setSizeFull();
             commandOutputTxtArea.setImmediate(true);
             commandOutputTxtArea.setWordwrap(false);
-            grid.addComponent(commandOutputTxtArea, 0, 3, 19, 9); 
+            grid.addComponent(commandOutputTxtArea, 0, 1, 19, 9);
 
             Label logo = MgmtApplication.createImage("mahout.png", 200, 100);
-            grid.addComponent(logo, 0, 0, 7, 2);
-            Button checkBtn = new Button("Check");
-            grid.addComponent(checkBtn, 16, 2, 16, 2);
-            final Button installBtn = new Button("Install");
-            grid.addComponent(installBtn, 17, 2, 17, 2);
-            Button uninstallBtn = new Button("Uninstall");
-            grid.addComponent(uninstallBtn, 18, 2, 18, 2);
+            grid.addComponent(logo, 0, 0, 7, 0);
+            checkBtn = new Button("Check");
+            grid.addComponent(checkBtn, 16, 0, 16, 0);
+            installBtn = new Button("Install");
+            grid.addComponent(installBtn, 17, 0, 17, 0);
+            uninstallBtn = new Button("Uninstall");
+            grid.addComponent(uninstallBtn, 18, 0, 18, 0);
 
             indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
             indicator.setVisible(false);
-            grid.addComponent(indicator, 19, 2, 19, 2);
+            grid.addComponent(indicator, 14, 0, 15, 0);
+
+            grid.setComponentAlignment(checkBtn, Alignment.MIDDLE_CENTER);
+            grid.setComponentAlignment(installBtn, Alignment.MIDDLE_CENTER);
+            grid.setComponentAlignment(uninstallBtn, Alignment.MIDDLE_CENTER);
+            grid.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
 
             setCompositionRoot(grid);
 
@@ -68,9 +76,9 @@ public class Mahout implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("Please, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("Installing Mahout ...\n");
+                        commandOutputTxtArea.setValue("\nInstalling Mahout ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
                         final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         for (Agent agent : agents) {
@@ -158,9 +166,9 @@ public class Mahout implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("Please, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("Checking if Mahout is installed ...\n");
+                        commandOutputTxtArea.setValue("\nChecking if Mahout is installed ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
                         final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         for (Agent agent : agents) {
@@ -201,9 +209,9 @@ public class Mahout implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("Please, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("Uninstalling Mahout ...\n");
+                        commandOutputTxtArea.setValue("\nUninstalling Mahout ...\n");
                         Task uninstallTask = Tasks.getUninstallTask(agents);
                         final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
@@ -261,6 +269,9 @@ public class Mahout implements Module {
         }
 
         private void executeTask(Task task, final TaskCallback callback) {
+            checkBtn.setEnabled(false);
+            installBtn.setEnabled(false);
+            uninstallBtn.setEnabled(false);
             indicator.setVisible(true);
             taskCount++;
             taskRunner.executeTask(task, new TaskCallback() {
@@ -272,6 +283,9 @@ public class Mahout implements Module {
                         taskCount--;
                         if (taskCount == 0) {
                             indicator.setVisible(false);
+                            checkBtn.setEnabled(true);
+                            installBtn.setEnabled(true);
+                            uninstallBtn.setEnabled(true);
                         }
                     }
                 }
