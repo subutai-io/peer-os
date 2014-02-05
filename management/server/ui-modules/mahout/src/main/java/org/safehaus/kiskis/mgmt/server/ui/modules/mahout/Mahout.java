@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mahout;
 
 import com.vaadin.ui.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -11,8 +12,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class Mahout implements Module {
@@ -51,8 +50,8 @@ public class Mahout implements Module {
             grid.addComponent(checkBtn, 16, 9, 16, 9);
             final Button installBtn = new Button("Install");
             grid.addComponent(installBtn, 17, 9, 17, 9);
-            Button removeBtn = new Button("Remove");
-            grid.addComponent(removeBtn, 18, 9, 18, 9);
+            Button uninstallBtn = new Button("Uninstall");
+            grid.addComponent(uninstallBtn, 18, 9, 18, 9);
 
             indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
             indicator.setVisible(false);
@@ -67,46 +66,81 @@ public class Mahout implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        show("Please, select lxc node(s)");
+                        commandOutputTxtArea.setValue("Please, select lxc node(s)");
                     } else {
-                        Task task = new Task();
+                        commandOutputTxtArea.setValue("Installing Mahout ...\n");
+                        Task checkTask = Tasks.getCheckTask(agents);
+                        final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         for (Agent agent : agents) {
-                            Request request = getRequestTemplate();
-                            request.setUuid(agent.getUuid());
-                            task.addRequest(request);
+                            outs.put(agent.getUuid(), new StringBuilder());
                         }
-                        indicator.setVisible(true);
-                        taskCount++;
-                        taskRunner.executeTask(task, new TaskCallback() {
+
+                        executeTask(checkTask, new TaskCallback() {
+                            final Set<Agent> eligibleAgents = new HashSet<Agent>();
 
                             @Override
                             public void onResponse(Task task, Response response) {
-                                if (response != null && response.getUuid() != null) {
-                                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                                    String host = agent == null
-                                            ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
+                                if (response != null && response.getUuid() != null
+                                        && outs.get(response.getUuid()) != null) {
 
-                                    StringBuilder out = new StringBuilder(host).append(":\n");
+                                    StringBuilder sb = outs.get(response.getUuid());
+
                                     if (!Util.isStringEmpty(response.getStdOut())) {
-                                        out.append(response.getStdOut()).append("\n");
+                                        sb.append(response.getStdOut());
                                     }
-                                    if (!Util.isStringEmpty(response.getStdErr())) {
-                                        out.append(response.getStdErr()).append("\n");
-                                    }
+
                                     if (Util.isFinalResponse(response)) {
-                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                            out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
+                                        if (sb.indexOf("ksks-mahout") > -1) {
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is already installed. Omitting node from installation set"));
+                                        } else if (sb.indexOf("ksks-hadoop") == -1) {
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Hadoop is not installed. Omitting node from installation set"));
                                         } else {
-                                            out.append("Command timed out").append("\n\n");
+                                            Agent agent = agentManager.getAgentByUUID(response.getUuid());
+                                            if (agent != null) {
+                                                eligibleAgents.add(agent);
+                                            } else {
+                                                addOutput(String.format("%s: %s\n", getHostname(response), "Agent is offline. Omitting node from installation set"));
+                                            }
                                         }
                                     }
-                                    addOutput(out.toString());
                                 }
-
                                 if (task.isCompleted()) {
-                                    taskCount--;
-                                    if (taskCount == 0) {
-                                        indicator.setVisible(false);
+                                    if (eligibleAgents.isEmpty()) {
+                                        addOutput(String.format("%s\n", "No nodes eligible for installation. Installation aborted"));
+                                    } else {
+                                        //run installation 
+                                        Task installTask = Tasks.getInstallTask(eligibleAgents);
+                                        final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
+                                        for (Agent agent : eligibleAgents) {
+                                            errs.put(agent.getUuid(), new StringBuilder());
+                                        }
+                                        executeTask(installTask, new TaskCallback() {
+
+                                            @Override
+                                            public void onResponse(Task task, Response response) {
+                                                if (response != null && response.getUuid() != null
+                                                        && errs.get(response.getUuid()) != null) {
+
+                                                    StringBuilder sb = errs.get(response.getUuid());
+
+                                                    if (!Util.isStringEmpty(response.getStdErr())) {
+                                                        sb.append(response.getStdErr());
+                                                    }
+
+                                                    if (Util.isFinalResponse(response)) {
+                                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                                            if (response.getExitCode() == 0) {
+                                                                addOutput(String.format("%s: %s\n", getHostname(response), "Installation done"));
+                                                            } else {
+                                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Installation failed", sb.toString()));
+                                                            }
+                                                        } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                                                            addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             }
@@ -122,8 +156,9 @@ public class Mahout implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        show("Please, select lxc node(s)");
+                        commandOutputTxtArea.setValue("Please, select lxc node(s)");
                     } else {
+                        commandOutputTxtArea.setValue("Checking if Mahout is installed ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
                         final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         for (Agent agent : agents) {
@@ -145,9 +180,9 @@ public class Mahout implements Module {
 
                                     if (Util.isFinalResponse(response)) {
                                         if (sb.indexOf("ksks-mahout") > -1) {
-                                            addOutput(String.format("%s: %s", getHostname(response), "Mahout is installed"));
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is installed"));
                                         } else {
-                                            addOutput(String.format("%s: %s", getHostname(response), "Mahout is not installed"));
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is not installed"));
                                         }
                                     }
                                 }
@@ -157,10 +192,61 @@ public class Mahout implements Module {
                 }
             });
 
-            removeBtn.addListener(new Button.ClickListener() {
+            uninstallBtn.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
+
+                    if (agents.isEmpty()) {
+                        commandOutputTxtArea.setValue("Please, select lxc node(s)");
+                    } else {
+                        commandOutputTxtArea.setValue("Uninstalling Mahout ...\n");
+                        Task uninstallTask = Tasks.getUninstallTask(agents);
+                        final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
+                        final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
+                        for (Agent agent : agents) {
+                            outs.put(agent.getUuid(), new StringBuilder());
+                            errs.put(agent.getUuid(), new StringBuilder());
+                        }
+                        executeTask(uninstallTask, new TaskCallback() {
+
+                            @Override
+                            public void onResponse(Task task, Response response) {
+
+                                if (response != null && response.getUuid() != null
+                                        && outs.get(response.getUuid()) != null
+                                        && errs.get(response.getUuid()) != null) {
+
+                                    StringBuilder out = outs.get(response.getUuid());
+                                    StringBuilder err = errs.get(response.getUuid());
+
+                                    if (!Util.isStringEmpty(response.getStdOut())) {
+                                        out.append(response.getStdOut());
+                                    }
+                                    if (!Util.isStringEmpty(response.getStdErr())) {
+                                        err.append(response.getStdErr());
+                                    }
+
+                                    if (Util.isFinalResponse(response)) {
+                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                            if (response.getExitCode() == 0) {
+                                                if (out.indexOf("Package ksks-mahout is not installed, so not removed") == -1) {
+                                                    addOutput(String.format("%s: %s\n", getHostname(response), "Uninstallation done"));
+                                                } else {
+                                                    addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is not installed, so not removed"));
+                                                }
+                                            } else {
+                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Uninstallation failed", err.toString()));
+                                            }
+                                        } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
             });
 
@@ -193,34 +279,11 @@ public class Mahout implements Module {
         private void addOutput(String output) {
             if (!Util.isStringEmpty(output)) {
                 commandOutputTxtArea.setValue(
-                        String.format("%s%s",
+                        String.format("%s\n%s",
                                 commandOutputTxtArea.getValue(),
                                 output));
                 commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
             }
-        }
-
-        private void show(String notification) {
-            getWindow().showNotification(notification);
-        }
-
-        public static Request getRequestTemplate() {
-            return CommandFactory.newRequest(
-                    RequestType.EXECUTE_REQUEST, // type
-                    null, //                        !! agent uuid
-                    MODULE_NAME, //     source
-                    null, //                        !! task uuid 
-                    1, //                           !! request sequence number
-                    "/", //                         cwd
-                    "pwd", //                        program
-                    OutputRedirection.RETURN, //    std output redirection 
-                    OutputRedirection.RETURN, //    std error redirection
-                    null, //                        stdout capture file path
-                    null, //                        stderr capture file path
-                    "root", //                      runas
-                    null, //                        arg
-                    null, //                        env vars
-                    30); //  
         }
 
     }
