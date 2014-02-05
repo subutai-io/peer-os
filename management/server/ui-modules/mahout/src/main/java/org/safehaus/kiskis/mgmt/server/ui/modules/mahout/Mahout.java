@@ -44,18 +44,20 @@ public class Mahout implements Module {
             commandOutputTxtArea.setSizeFull();
             commandOutputTxtArea.setImmediate(true);
             commandOutputTxtArea.setWordwrap(false);
-            grid.addComponent(commandOutputTxtArea, 0, 0, 19, 8);
+            grid.addComponent(commandOutputTxtArea, 0, 3, 19, 9);
 
+            Label logo = MgmtApplication.createImage("mahout.png", 200, 100);
+            grid.addComponent(logo, 0, 0, 7, 2);
             Button checkBtn = new Button("Check");
-            grid.addComponent(checkBtn, 16, 9, 16, 9);
+            grid.addComponent(checkBtn, 16, 2, 16, 2);
             final Button installBtn = new Button("Install");
-            grid.addComponent(installBtn, 17, 9, 17, 9);
+            grid.addComponent(installBtn, 17, 2, 17, 2);
             Button uninstallBtn = new Button("Uninstall");
-            grid.addComponent(uninstallBtn, 18, 9, 18, 9);
+            grid.addComponent(uninstallBtn, 18, 2, 18, 2);
 
             indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
             indicator.setVisible(false);
-            grid.addComponent(indicator, 19, 9, 19, 9);
+            grid.addComponent(indicator, 19, 2, 19, 2);
 
             setCompositionRoot(grid);
 
