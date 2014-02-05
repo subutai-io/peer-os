@@ -1,13 +1,13 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hive;
 
 import com.vaadin.ui.*;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.ModuleComponent;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hive.view.ModuleComponent;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
-public class Sqoop implements Module {
+public class Hive implements Module {
 
-    private static final String MODULE_NAME = "Sqoop";
+    private static final String MODULE_NAME = "Hive";
 
     @Override
     public String getName() {

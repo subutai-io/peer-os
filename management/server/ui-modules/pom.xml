@@ -23,6 +23,7 @@
         <module>sqoop</module>
         <module>oozie</module>
         <module>mahout</module>
+        <module>hive</module>
     </modules>
    
 </project>
