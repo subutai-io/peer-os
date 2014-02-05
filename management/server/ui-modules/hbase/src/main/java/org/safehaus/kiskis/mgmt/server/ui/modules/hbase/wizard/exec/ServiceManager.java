@@ -12,7 +12,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
