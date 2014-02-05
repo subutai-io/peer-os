@@ -43,7 +43,7 @@ public class StepStart extends Panel {
         gridLayout.setSizeFull();
 
         Label welcomeMsg = new Label(
-                "<center><h2>Welcome to HBase Installation Wizard!</h2><br/>"
+                "<center><h2>Welcome to Oozie Installation Wizard!</h2><br/>"
                 + "Please click Start button to continue</center>");
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
