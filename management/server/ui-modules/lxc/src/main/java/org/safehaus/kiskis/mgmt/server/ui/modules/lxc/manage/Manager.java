@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -67,24 +66,13 @@ public class Manager extends VerticalLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Set<Agent> agents = MgmtApplication.getSelectedAgents();
-                if (agents.size() > 0) {
-                    physicalAgents = new HashSet<Agent>();
-                    //filter physical agents
-                    for (Agent agent : agents) {
-                        if (!agent.isIsLXC()) {
-                            physicalAgents.add(agent);
-                        }
-                    }
+                physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
 
-                    if (physicalAgents.isEmpty()) {
-                        getWindow().showNotification("Select at least one physical agent");
-                    } else {
-                        //do the magic
-                        sendGetLxcListCmd(physicalAgents);
-                    }
-                } else {
+                if (physicalAgents.isEmpty()) {
                     getWindow().showNotification("Select at least one physical agent");
+                } else {
+                    //do the magic
+                    sendGetLxcListCmd(physicalAgents);
                 }
             }
         });
