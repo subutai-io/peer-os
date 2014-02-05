@@ -21,6 +21,7 @@ public class ChainManager {
 
     private static final String IMPORT_HDFS_COMMAND = ". /etc/profile && ${importUtil} --connect ${connectString} --username ${username} --password ${password} ${tableOption}";
     private static final String IMPORT_HIVE_COMMAND = ". /etc/profile && ${importUtil} --connect ${connectString} --username ${username} --password ${password} --hive-import ${tableOption}";
+    private static final String IMPORT_HBASE_COMMAND = ". /etc/profile && sqoop import --connect ${connectString} --username ${username} --password ${password} --table ${table} --hbase-create-table --hbase-table ${hbaseTable} --column-family ${hbaseColumn}";
 
     protected UILogger logger;
     protected Action agentInitAction;
@@ -78,5 +79,11 @@ public class ChainManager {
         return new Chain(agentInitAction, validationAction, importAction);
     }
 
+    public Chain getHBaseImportChain(Action validationAction) {
+
+        CommandAction importAction = new CommandAction(IMPORT_HBASE_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
+
+        return new Chain(agentInitAction, validationAction, importAction);
+    }
 
 }
