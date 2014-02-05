@@ -17,11 +17,11 @@ public class ChainManager {
     private static final String INSTALL_COMMAND = "apt-get --force-yes --assume-yes install ksks-sqoop";
     private static final String REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-sqoop";
 
-    private static final String EXPORT_COMMAND = ". /etc/profile && sqoop export --connect ${connectString} --table ${table} --username ${username} --password ${password} --export-dir ${hdfsPath}";
+    public static final String EXPORT_COMMAND = ". /etc/profile && sqoop export --connect ${connectString} --table ${table} --username ${username} --password ${password} --export-dir ${hdfsPath}";
 
-    private static final String IMPORT_HDFS_COMMAND = ". /etc/profile && ${importUtil} --connect ${connectString} --username ${username} --password ${password} ${tableOption}";
-    private static final String IMPORT_HIVE_COMMAND = ". /etc/profile && ${importUtil} --connect ${connectString} --username ${username} --password ${password} --hive-import ${tableOption}";
-    private static final String IMPORT_HBASE_COMMAND = ". /etc/profile && sqoop import --connect ${connectString} --username ${username} --password ${password} --table ${table} --hbase-create-table --hbase-table ${hbaseTable} --column-family ${hbaseColumn}";
+    public static final String IMPORT_HDFS_COMMAND = ". /etc/profile && ${importUtil} --connect ${connectString} --username ${username} --password ${password} ${tableOption}";
+    public static final String IMPORT_HIVE_COMMAND = ". /etc/profile && ${importUtil} --connect ${connectString} --username ${username} --password ${password} --hive-import ${tableOption}";
+    public static final String IMPORT_HBASE_COMMAND = ". /etc/profile && sqoop import --connect ${connectString} --username ${username} --password ${password} --table ${table} --hbase-create-table --hbase-table ${hbaseTable} --column-family ${hbaseColumn}";
 
     protected UILogger logger;
     protected Action agentInitAction;
@@ -58,32 +58,10 @@ public class ChainManager {
         return new Chain(agentInitAction, statusAction, removeAction);
     }
 
-    public Chain getExportChain(Action validationAction) {
+    public Chain getChain(String command, String message, Action validationAction) {
 
-        CommandAction exportAction = new CommandAction(EXPORT_COMMAND, new BasicListener(logger, "Export started, please wait..."), true);
+        CommandAction exportAction = new CommandAction(command, new BasicListener(logger, message), true);
 
         return new Chain(agentInitAction, validationAction, exportAction);
     }
-
-    public Chain getHdfsImportChain(Action validationAction) {
-
-        CommandAction importAction = new CommandAction(IMPORT_HDFS_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
-
-        return new Chain(agentInitAction, validationAction, importAction);
-    }
-
-    public Chain getHiveImportChain(Action validationAction) {
-
-        CommandAction importAction = new CommandAction(IMPORT_HIVE_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
-
-        return new Chain(agentInitAction, validationAction, importAction);
-    }
-
-    public Chain getHBaseImportChain(Action validationAction) {
-
-        CommandAction importAction = new CommandAction(IMPORT_HBASE_COMMAND, new BasicListener(logger, "Import started, please wait..."), true);
-
-        return new Chain(agentInitAction, validationAction, importAction);
-    }
-
 }

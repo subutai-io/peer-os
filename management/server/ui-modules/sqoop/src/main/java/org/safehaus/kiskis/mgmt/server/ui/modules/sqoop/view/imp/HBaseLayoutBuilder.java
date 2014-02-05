@@ -2,9 +2,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.imp;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.ChainManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.export.ExportValidationAction;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.imp.HBaseValidationAction;
-import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.action.imp.HiveValidationAction;
+import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UILogger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UIUtil;
 
@@ -24,6 +23,7 @@ public class HBaseLayoutBuilder {
 
         HBaseValidationAction validationAction = new HBaseValidationAction(logger, connectStringField, usernameField, passwordField, tableField, hbaseTableField, hbaseColumnField);
         ChainManager chainManager = new ChainManager(logger);
+        Chain chain = chainManager.getChain(ChainManager.IMPORT_HBASE_COMMAND, "Import started, please wait...", validationAction);
 
         AbsoluteLayout layout = new AbsoluteLayout();
         layout.addComponent(UIUtil.getLabel("<h1>Sqoop Import</h1>" , 200, 40), "left: 30px; top: 10px;");
@@ -39,7 +39,7 @@ public class HBaseLayoutBuilder {
         layout.addComponent(hbaseColumnField, "left: 30px; top: 400px;");
 
         layout.addComponent(UIUtil.getButton("Back", 120, ImportLayoutBuilder.getListener(LayoutType.MAIN)), "left: 30px; top: 500px;");
-        layout.addComponent(UIUtil.getButton("Export", 120, chainManager.getHBaseImportChain(validationAction)), "left: 160px; top: 500px;");
+        layout.addComponent(UIUtil.getButton("Export", 120, chain), "left: 160px; top: 500px;");
         layout.addComponent(textArea, "left: 380px; top: 100px;");
 
         return layout;
