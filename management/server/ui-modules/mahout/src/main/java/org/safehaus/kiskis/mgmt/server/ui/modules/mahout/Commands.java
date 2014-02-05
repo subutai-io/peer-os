@@ -37,7 +37,7 @@ public class Commands {
 
     public static Request getCheckCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("dpkg -l | grep ksks");
+        req.setProgram("dpkg -l | grep '^ii' | grep ksks");
         return req;
     }
 
@@ -50,7 +50,7 @@ public class Commands {
 
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("apt-get --force-yes --assume-yes install ksks-mahout");
+        req.setProgram("apt-get update && apt-get --force-yes --assume-yes install ksks-mahout");
         req.setStdOut(OutputRedirection.NO);
         req.setTimeout(90);
         return req;
