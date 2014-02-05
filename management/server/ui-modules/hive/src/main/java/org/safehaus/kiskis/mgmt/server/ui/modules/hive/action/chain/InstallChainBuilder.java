@@ -81,7 +81,6 @@ public class InstallChainBuilder extends AbstractChainBuilder {
 
             @Override
             protected Result onStart(Context context, String programLine) {
-
                 if (context.get(DERBY_ALREADY_INSTALLED)) {
                     logger.complete("Derby ALREADY INSTALLED");
                     return Result.INTERRUPT;

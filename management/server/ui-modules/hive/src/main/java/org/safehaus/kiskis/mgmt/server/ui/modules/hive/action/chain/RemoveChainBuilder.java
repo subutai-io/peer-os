@@ -11,6 +11,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class RemoveChainBuilder extends AbstractChainBuilder {
 
     private static final String HIVE_REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-hive";
+    private static final String DERBY_REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-derby";
 
     private static final String HIVE_NOT_INSTALLED = "hiveNotInstalled";
 
@@ -21,7 +22,8 @@ public class RemoveChainBuilder extends AbstractChainBuilder {
     public Chain getChain() {
         return new Chain(agentInitAction,
                 new CommandAction(STATUS_COMMAND, getStatusListener()),
-                new CommandAction(HIVE_REMOVE_COMMAND, getHiveInstallListener())
+                new CommandAction(HIVE_REMOVE_COMMAND, getHiveRemoveListener()),
+                new CommandAction(DERBY_REMOVE_COMMAND, getDerbyRemoveListener())
         );
     }
 
@@ -35,7 +37,7 @@ public class RemoveChainBuilder extends AbstractChainBuilder {
         };
     }
 
-    public ActionListener getHiveInstallListener() {
+    public ActionListener getHiveRemoveListener() {
         return new BasicListener(logger, "Removing Hive, please wait...") {
 
             @Override
@@ -45,7 +47,7 @@ public class RemoveChainBuilder extends AbstractChainBuilder {
                 Result result = Result.CONTINUE;
 
                 if (context.get(HIVE_NOT_INSTALLED)) {
-                    msg = "Pig NOT INSTALLED. Nothing to remove.";
+                    msg = "Hive NOT INSTALLED. Nothing to remove.";
                     result = Result.SKIP;
                 }
 
@@ -58,6 +60,32 @@ public class RemoveChainBuilder extends AbstractChainBuilder {
                 String msg = response.getExitCode() == null || response.getExitCode() == 0
                         ? "Hive removed successfully"
                         : "Error occurred while removing Hive. Please see the server logs for details.";
+
+                logger.complete(msg);
+                return false;
+            }
+        };
+    }
+
+    public ActionListener getDerbyRemoveListener() {
+        return new BasicListener(logger, "Removing Derby, please wait...") {
+
+            @Override
+            protected Result onStart(Context context, String programLine) {
+                if (context.get(HIVE_NOT_INSTALLED)) {
+                    logger.complete("Derby NOT INSTALLED. Nothing to remove.");
+                    return Result.INTERRUPT;
+                }
+
+                logger.info(executeMessage);
+                return Result.CONTINUE;
+            }
+
+            @Override
+            protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
+                String msg = response.getExitCode() == null || response.getExitCode() == 0
+                        ? "Derby removed successfully"
+                        : "Error occurred while removing Derby. Please see the server logs for details.";
 
                 logger.complete(msg);
                 return false;
