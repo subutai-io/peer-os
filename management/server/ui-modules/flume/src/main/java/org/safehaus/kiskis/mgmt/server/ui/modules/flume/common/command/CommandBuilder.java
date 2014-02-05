@@ -10,9 +10,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 public class CommandBuilder {
 
     private static String source;
+    private static int timeout = 30;
 
-    public static void setSource(String source) {
-        CommandBuilder.source = source;
+    public static void setSource(String _source) {
+        source = _source;
+    }
+
+    public static void setTimeout(int _timeout) {
+        timeout = _timeout;
     }
 
     public static Command getCommand(Context context, String commandLine) {
@@ -34,7 +39,7 @@ public class CommandBuilder {
                 "root", // runas
                 null, // arg
                 null, // env vars
-                30  // timeout
+                timeout // timeout
         );
     }
 }

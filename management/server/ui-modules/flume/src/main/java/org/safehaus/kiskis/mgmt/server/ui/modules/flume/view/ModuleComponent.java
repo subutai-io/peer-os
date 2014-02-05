@@ -18,6 +18,7 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
 
         this.moduleName = moduleName;
         CommandBuilder.setSource(moduleName);
+        CommandBuilder.setTimeout(60);
 
         setHeight("100%");
         setCompositionRoot(getLayout());
@@ -36,8 +37,8 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
         layout.addComponent(UIUtil.getButton("Remove", 120, new RemoveChainBuilder(logger).getChain()), "left: 30px; top: 170px;");
 
         layout.addComponent(UIUtil.getLabel("<h3>Service</h3>", 200, 40), "left: 30px; top: 220px;");
-//        layout.addComponent(UIUtil.getButton("Start", 120, ServiceChainBuilder.getStartChain(logger)), "left: 30px; top: 260px;");
-//        layout.addComponent(UIUtil.getButton("Stop", 120, ServiceChainBuilder.getStopChain(logger)), "left: 30px; top: 300px;");
+        layout.addComponent(UIUtil.getButton("Start", 120, ServiceChainBuilder.getStartChain(logger)), "left: 30px; top: 260px;");
+        layout.addComponent(UIUtil.getButton("Stop", 120, ServiceChainBuilder.getStopChain(logger)), "left: 30px; top: 300px;");
 
         layout.addComponent(textArea, "left: 200px; top: 50px;");
 
