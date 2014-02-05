@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hive.view;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.chain.Chain;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hive.action.ChainManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.chain.Context;
 
 public class UIUtil {
 
@@ -15,7 +15,7 @@ public class UIUtil {
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                ChainManager.run(chain);
+                chain.start(new Context());
             }
         });
 

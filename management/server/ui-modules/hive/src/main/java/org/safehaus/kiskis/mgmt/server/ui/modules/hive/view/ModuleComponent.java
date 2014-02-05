@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hive.view;
 
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hive.action.ChainManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hive.action.chain.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.CommandBuilder;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -24,11 +24,9 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
 
         TextArea textArea = UIUtil.getTextArea(800, 600);
         UILogger logger = new UILogger(textArea);
-        ChainManager chainManager = new ChainManager(logger);
-
         AbsoluteLayout layout = new AbsoluteLayout();
 
-        layout.addComponent(UIUtil.getButton("Check Status", 120, chainManager.getStatusChain()), "left: 30px; top: 50px;");
+        layout.addComponent(UIUtil.getButton("Check Status", 120, new StatusChainBuilder(logger).getChain()), "left: 30px; top: 50px;");
 
         layout.addComponent(UIUtil.getLabel("<h3>Manage</h3>", 200, 40), "left: 30px; top: 90px;");
         layout.addComponent(UIUtil.getButton("Install", 120, null), "left: 30px; top: 130px;");
