@@ -11,7 +11,7 @@ public class Sqoop implements Module {
 
     @Override
     public String getName() {
-        return Sqoop.MODULE_NAME;
+        return MODULE_NAME;
     }
 
     @Override

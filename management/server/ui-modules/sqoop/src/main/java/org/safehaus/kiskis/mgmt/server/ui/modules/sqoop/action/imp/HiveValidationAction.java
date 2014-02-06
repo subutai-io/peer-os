@@ -40,10 +40,10 @@ public class HiveValidationAction extends ValidationAction {
 
         if (allTables) {
             context.put("importUtil", "sqoop-import-all-tables");
-            context.put("tableOption", hiveDatabase);
+            context.put("tableOption", "");
         } else {
             context.put("importUtil", "sqoop-import");
-            context.put("tableOption", String.format("--hive-table %s.%s", hiveDatabase, hiveTable));
+            context.put("tableOption", String.format("--table %s --hive-table %s.%s", table, hiveDatabase, hiveTable));
         }
 
         return true;

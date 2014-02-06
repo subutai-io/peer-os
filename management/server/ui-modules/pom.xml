@@ -22,6 +22,11 @@
         <module>hbase</module>
         <module>sqoop</module>
         <module>oozie</module>
+        <module>mahout</module>
+        <module>hive</module>
+        <module>flume</module>
+        <module>lucene</module>
+        <module>solr</module>
     </modules>
    
 </project>
