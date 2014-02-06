@@ -313,6 +313,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin-theme</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>ui-vaadin</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
