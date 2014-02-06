@@ -15,18 +15,16 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management;
  */
 public enum OozieCommandEnum {
 
-    START("service hbase start", 120),
-    STOP("service hbase stop", 120),
+    START("service oozie-server start", 120),
+    STOP("service oozie-server stop", 120),
     STATUS("service hbase status", 120),
-    INSTALL("apt-get --assume-yes --force-yes install ksks-hbase", 120),
-    SET_MASTER("sh /opt/hbase-0.94.11/scripts/master.sh", 120),
-    SET_REGION("sh /opt/hbase-0.94.11/scripts/region.sh", 120),
-    SET_QUORUM("sh /opt/hbase-0.94.11/scripts/quorum.sh", 120),
-    SET_BACKUP_MASTERS("sh /opt/hbase-0.94.11/scripts/backUpMasters.sh", 120),
-    PURGE("apt-get --assume-yes --force-yes purge ksks-hbase", 120);
+    INSTALL_SERVER("apt-get --assume-yes --force-yes install ksks-oozie-server", 120),
+    INSTALL_CLIENT("apt-get --assume-yes --force-yes install ksks-oozie-client", 120),
+    CONFIGURE("sh $OOZIE_HOME/bin/oozie-configure.sh configure", 120),
+    PURGE_SERVER("apt-get --assume-yes --force-yes purge oozie-server", 120),
+    PURGE_CLIENT("apt-get --assume-yes --force-yes purge oozie-client", 120);
 
     String program;
-    String yaml = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
     int timeout;
 
     private OozieCommandEnum(String program, int timeout) {

@@ -1,68 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
 import com.vaadin.ui.TextArea;
@@ -93,10 +28,11 @@ public class ServiceInstaller {
     public ServiceInstaller(OozieConfig config, TextArea terminal) {
         this.terminal = terminal;
         this.config = config;
+        OozieCommands oc = new OozieCommands();
 
         Task updateApt = RequestUtil.createTask("apt-get update");
-        for (Agent agent : config.getAgents()) {
-            Command command = OozieCommands.getAptGetUpdate();
+        for (Agent agent : config.getServers()) {
+            Command command = oc.getAptGetUpdate();
             command.getRequest().setUuid(agent.getUuid());
             command.getRequest().setTaskUuid(updateApt.getUuid());
             command.getRequest().setRequestSequenceNumber(updateApt.getIncrementedReqSeqNumber());
@@ -104,72 +40,55 @@ public class ServiceInstaller {
         }
         tasks.add(updateApt);
 
-        Task installTask = RequestUtil.createTask("Install HBase");
-        for (Agent agent : config.getAgents()) {
-            Command command = new OozieCommands().getCommand(OozieCommandEnum.INSTALL);
+        Task updateAptClients = RequestUtil.createTask("apt-get update");
+        for (Agent agent : config.getClients()) {
+            Command command = oc.getAptGetUpdate();
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(installTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(installTask.getIncrementedReqSeqNumber());
-            installTask.addCommand(command);
+            command.getRequest().setTaskUuid(updateAptClients.getUuid());
+            command.getRequest().setRequestSequenceNumber(updateAptClients.getIncrementedReqSeqNumber());
+            updateAptClients.addCommand(command);
         }
-        tasks.add(installTask);
+        tasks.add(updateAptClients);
 
-        StringBuilder masterSB = new StringBuilder();
-        for (Agent agent : config.getMaster()) {
-            masterSB.append(agent.getHostname()).append(" ").append(agent.getHostname());
-            break;
-        }
-        Task setMasterTask = RequestUtil.createTask("Set master");
-        for (Agent agent : config.getAgents()) {
-            Command command = OozieCommands.getSetMasterCommand(masterSB.toString());
+        Task installServer = RequestUtil.createTask("Install Oozie Server");
+        for (Agent agent : config.getServers()) {
+            Command command = oc.getCommand(OozieCommandEnum.INSTALL_SERVER);
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setMasterTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setMasterTask.getIncrementedReqSeqNumber());
-            setMasterTask.addCommand(command);
+            command.getRequest().setTaskUuid(installServer.getUuid());
+            command.getRequest().setRequestSequenceNumber(installServer.getIncrementedReqSeqNumber());
+            installServer.addCommand(command);
         }
-        tasks.add(setMasterTask);
+        tasks.add(installServer);
 
-        StringBuilder regionSB = new StringBuilder();
-        for (Agent agent : config.getRegion()) {
-            regionSB.append(agent.getHostname()).append(" ");
-        }
-        Task setRegionTask = RequestUtil.createTask("Set region");
-        for (Agent agent : config.getAgents()) {
-            Command command = OozieCommands.getSetRegionCommand(regionSB.toString());
+        Task installClient = RequestUtil.createTask("Install Oozie Client");
+        for (Agent agent : config.getClients()) {
+            Command command = oc.getCommand(OozieCommandEnum.INSTALL_CLIENT);
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setRegionTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setRegionTask.getIncrementedReqSeqNumber());
-            setRegionTask.addCommand(command);
+            command.getRequest().setTaskUuid(installClient.getUuid());
+            command.getRequest().setRequestSequenceNumber(installClient.getIncrementedReqSeqNumber());
+            installClient.addCommand(command);
         }
-        tasks.add(setRegionTask);
+        tasks.add(installClient);
 
-        StringBuilder quorumSB = new StringBuilder();
-        for (Agent agent : config.getQuorum()) {
-            quorumSB.append(agent.getHostname()).append(" ");
-        }
-        Task setQuorumTask = RequestUtil.createTask("Set quorum");
-        for (Agent agent : config.getAgents()) {
-            Command command = OozieCommands.getSetQuorumCommand(quorumSB.toString());
+        Task configugeServer = RequestUtil.createTask("Configure server");
+        for (Agent agent : config.getServers()) {
+            Command command = oc.getSetConfigCommand("test");
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setQuorumTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setQuorumTask.getIncrementedReqSeqNumber());
-            setQuorumTask.addCommand(command);
+            command.getRequest().setTaskUuid(configugeServer.getUuid());
+            command.getRequest().setRequestSequenceNumber(configugeServer.getIncrementedReqSeqNumber());
+            configugeServer.addCommand(command);
         }
-        tasks.add(setQuorumTask);
+        tasks.add(configugeServer);
 
-        StringBuilder backupSB = new StringBuilder();
-        for (Agent agent : config.getBackupMasters()) {
-            backupSB.append(agent.getHostname()).append(" ");
-        }
-        Task setBackupMastersTask = RequestUtil.createTask("Set backup masters");
-        for (Agent agent : config.getAgents()) {
-            Command command = OozieCommands.getSetBackupMastersCommand(backupSB.toString());
+        Task configugeClients = RequestUtil.createTask("Configure client");
+        for (Agent agent : config.getServers()) {
+            Command command = oc.getSetConfigCommand("test");
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setBackupMastersTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setBackupMastersTask.getIncrementedReqSeqNumber());
-            setBackupMastersTask.addCommand(command);
+            command.getRequest().setTaskUuid(configugeClients.getUuid());
+            command.getRequest().setRequestSequenceNumber(configugeClients.getIncrementedReqSeqNumber());
+            configugeClients.addCommand(command);
         }
-        tasks.add(setBackupMastersTask);
+        tasks.add(configugeClients);
 
     }
 
@@ -216,19 +135,6 @@ public class ServiceInstaller {
         }
     }
 
-//    private void saveInfo() {
-//        HBaseClusterInfo info = new HBaseClusterInfo();
-//        info.setDomainName(config.getDomainInfo());
-//        info.setMaster(config.getMasterUUIDset());
-//        info.setRegion(config.getRegionSet());
-//        info.setQuorum(config.getQuorumSet());
-//        info.setBmasters(config.getBackupMastersSet());
-//        info.setAllnodes(config.getAgentsSet());
-//
-//        if (HBaseDAO.saveHBaseClusterInfo(info)) {
-//            terminal.setValue(terminal.getValue().toString() + info.getUuid() + " cluster saved into keyspace.\n");
-//        }
-//    }
     private void saveHBaseInfo() {
         if (OozieDAO.saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");

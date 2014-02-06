@@ -68,35 +68,14 @@ public class OozieCommands {
                 120); //                        timeout (sec)
     }
 
-    public static CommandImpl getSetMasterCommand(String param) {
+    public CommandImpl getSetConfigCommand(String param) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        req.setProgram(OozieCommandEnum.SET_MASTER.getProgram() + " " + param);
+        req.setProgram(OozieCommandEnum.CONFIGURE.getProgram() + " " + param);
         return cmd;
     }
 
-    public static CommandImpl getSetRegionCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram(OozieCommandEnum.SET_REGION.getProgram() + " " + param);
-        return cmd;
-    }
-
-    public static CommandImpl getSetQuorumCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram(OozieCommandEnum.SET_QUORUM.getProgram() + " " + param);
-        return cmd;
-    }
-
-    public static CommandImpl getSetBackupMastersCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
-        req.setProgram(OozieCommandEnum.SET_BACKUP_MASTERS.getProgram() + " " + param);
-        return cmd;
-    }
-
-    public static CommandImpl getAptGetUpdate() {
+    public CommandImpl getAptGetUpdate() {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
         req.setProgram("apt-get update");

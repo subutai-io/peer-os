@@ -70,7 +70,7 @@ public class OozieTable extends Table {
                 getWindow().showNotification("Starting cluster: " + config.getUuid());
                 cce = OozieCommandEnum.START;
                 selectedItem = item;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getServers(), cce);
             }
         });
 
@@ -82,7 +82,7 @@ public class OozieTable extends Table {
                 getWindow().showNotification("Stopping cluster: " + config.getUuid());
                 cce = OozieCommandEnum.STOP;
                 selectedItem = item;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getServers(), cce);
 
             }
         });
@@ -113,10 +113,10 @@ public class OozieTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 getWindow().showNotification("Purging cluster: " + config.getUuid());
-                cce = OozieCommandEnum.PURGE;
+                cce = OozieCommandEnum.PURGE_SERVER;
                 selectedItem = item;
                 selectedConfig = config;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getServers(), cce);
             }
         });
 
@@ -200,7 +200,7 @@ public class OozieTable extends Table {
                     }
                     break;
                 }
-                case PURGE: {
+                case PURGE_SERVER: {
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");

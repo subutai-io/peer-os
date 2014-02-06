@@ -2,6 +2,10 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard;
 
@@ -24,9 +28,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public class StepSetMaster extends Panel {
+public class StepSetConfig extends Panel {
 
-    public StepSetMaster(final Wizard wizard) {
+    public StepSetConfig(final Wizard wizard) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
@@ -52,18 +56,31 @@ public class StepSetMaster extends Panel {
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
-        final TwinColSelect select = new TwinColSelect("", new ArrayList<Agent>());
-        select.setItemCaptionPropertyId("hostname");
-        select.setRows(7);
-        select.setNullSelectionAllowed(true);
-        select.setMultiSelect(true);
-        select.setImmediate(true);
-        select.setLeftColumnCaption("Available Nodes");
-        select.setRightColumnCaption("NameNode");
-        select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        select.setRequired(true);
+        final TwinColSelect selectServers = new TwinColSelect("", new ArrayList<Agent>());
+        selectServers.setItemCaptionPropertyId("hostname");
+        selectServers.setRows(7);
+        selectServers.setNullSelectionAllowed(true);
+        selectServers.setMultiSelect(true);
+        selectServers.setImmediate(true);
+        selectServers.setLeftColumnCaption("Task tracker nodes");
+        selectServers.setRightColumnCaption("Server nodes");
+        selectServers.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        selectServers.setRequired(true);
 
-        verticalLayoutForm.addComponent(select);
+        verticalLayoutForm.addComponent(selectServers);
+        
+        final TwinColSelect selectClients = new TwinColSelect("", new ArrayList<Agent>());
+        selectClients.setItemCaptionPropertyId("hostname");
+        selectClients.setRows(7);
+        selectClients.setNullSelectionAllowed(true);
+        selectClients.setMultiSelect(true);
+        selectClients.setImmediate(true);
+        selectClients.setLeftColumnCaption("Other nodes");
+        selectClients.setRightColumnCaption("Client nodes");
+        selectClients.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        selectClients.setRequired(true);
+
+        verticalLayoutForm.addComponent(selectClients);
 
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
@@ -73,10 +90,12 @@ public class StepSetMaster extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.getConfig().setMaster((Set<Agent>) select.getValue());
+                wizard.getConfig().setServers((Set<Agent>) selectServers.getValue());
+                wizard.getConfig().setClients((Set<Agent>) selectClients.getValue());
 //
-                if (Util.isCollectionEmpty(wizard.getConfig().getMaster())) {
-                    show("Please add master servers");
+                if (Util.isCollectionEmpty(wizard.getConfig().getServers())
+                        || Util.isCollectionEmpty(wizard.getConfig().getClients())) {
+                    show("Please select servers to install server and clients");
                 } else {
                     wizard.next();
                 }
@@ -100,10 +119,12 @@ public class StepSetMaster extends Panel {
 
         addComponent(verticalLayout);
 
-        select.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getAgents()));
+        selectServers.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getServers()));
+        selectClients.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getClients()));
 
         //set values if this is a second visit
-        select.setValue(wizard.getConfig().getMaster());
+        selectServers.setValue(wizard.getConfig().getServers());
+        selectClients.setValue(wizard.getConfig().getClients());
     }
 
     private void show(String notification) {

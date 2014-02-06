@@ -75,17 +75,20 @@ public class StepStart extends Panel {
                     UUID uid = (UUID) selectedItem.getItemProperty(HadoopClusterInfo.UUID_LABEL).getValue();
                     HadoopClusterInfo cluster = OozieDAO.getHadoopClusterInfo(uid);
 
-                    Set<UUID> dataNodes = new HashSet<UUID>(cluster.getDataNodes());
-                    Set<UUID> taskTrackers = new HashSet<UUID>(cluster.getTaskTrackers());
-                    dataNodes.addAll(taskTrackers);
-                    dataNodes.add(cluster.getJobTracker());
-                    dataNodes.add(cluster.getNameNode());
-                    dataNodes.add(cluster.getSecondaryNameNode());
+                    Set<UUID> taskTrackers = new HashSet<UUID>();
+                    taskTrackers.add(cluster.getJobTracker());
 
-                    Set<Agent> set = OozieDAO.getAgents(dataNodes);
+                    Set<UUID> nodes = new HashSet<UUID>(cluster.getDataNodes());
+                    nodes.add(cluster.getNameNode());
+                    nodes.add(cluster.getSecondaryNameNode());
+                    nodes.addAll(cluster.getTaskTrackers());
+                    
+                    Set<Agent> servers = OozieDAO.getAgents(taskTrackers);
+                    Set<Agent> clients = OozieDAO.getAgents(nodes);
 
                     wizard.getConfig().reset();
-                    wizard.getConfig().setAgents(set);
+                    wizard.getConfig().setServers(servers);
+                    wizard.getConfig().setClients(clients);
                     wizard.next();
                 } else {
                     show("Please select Hadoop cluster first");

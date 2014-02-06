@@ -75,7 +75,7 @@ public class NodesWindow extends Window {
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Status", Button.class, "");
 //        container.addContainerProperty("Destroy", Button.class, "");
-        for (Agent agent : config.getAgents()) {
+        for (Agent agent : config.getServers()) {
             addOrderToContainer(container, agent);
         }
         return container;

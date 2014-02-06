@@ -20,7 +20,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  */
 public class Wizard {
 
-    private static final int MAX_STEPS = 3;
     private final VerticalLayout vlayout;
     private int step = 1;
     private final OozieConfig config = new OozieConfig();
@@ -64,22 +63,10 @@ public class Wizard {
                 break;
             }
             case 2: {
-                vlayout.addComponent(new StepSetMaster(this));
+                vlayout.addComponent(new StepSetConfig(this));
                 break;
             }
             case 3: {
-                vlayout.addComponent(new StepSetRegion(this));
-                break;
-            }
-            case 4: {
-                vlayout.addComponent(new StepSetQuorum(this));
-                break;
-            }
-            case 5: {
-                vlayout.addComponent(new StepSetBackuUpMasters(this));
-                break;
-            }
-            case 6: {
                 stepFinish = new StepFinish(this);
                 vlayout.addComponent(stepFinish);
                 break;
