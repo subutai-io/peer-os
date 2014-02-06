@@ -102,8 +102,6 @@ public class Solr implements Module {
                                     if (Util.isFinalResponse(response)) {
                                         if (sb.indexOf("ksks-solr") > -1) {
                                             addOutput(String.format("%s: %s\n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
-                                        } else if (sb.indexOf("ksks-hadoop") == -1) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Hadoop is not installed. Omitting node from installation set"));
                                         } else {
                                             Agent agent = agentManager.getAgentByUUID(response.getUuid());
                                             if (agent != null) {
