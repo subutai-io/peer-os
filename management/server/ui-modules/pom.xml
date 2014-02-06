@@ -25,6 +25,7 @@
         <module>mahout</module>
         <module>hive</module>
         <module>flume</module>
+        <module>lucene</module>
     </modules>
    
 </project>
