@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mahout;
+package org.safehaus.kiskis.mgmt.server.ui.modules.solr;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -17,7 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 public class Tasks {
 
     public static Task getCheckTask(Set<Agent> agents) {
-        Task task = new Task("Check existence of Mahout");
+        Task task = new Task("Check existence of Solr");
         for (Agent agent : agents) {
             Request req = Commands.getCheckCommand();
             req.setUuid(agent.getUuid());
@@ -27,7 +27,7 @@ public class Tasks {
     }
 
     public static Task getInstallTask(Set<Agent> agents) {
-        Task task = new Task("Install Mahout");
+        Task task = new Task("Install Solr");
         for (Agent agent : agents) {
             Request req = Commands.getInstallCommand();
             req.setUuid(agent.getUuid());
@@ -37,7 +37,7 @@ public class Tasks {
     }
 
     public static Task getUninstallTask(Set<Agent> agents) {
-        Task task = new Task("Uninstall Mahout");
+        Task task = new Task("Uninstall Solr");
         for (Agent agent : agents) {
             Request req = Commands.getUninstallCommand();
             req.setUuid(agent.getUuid());

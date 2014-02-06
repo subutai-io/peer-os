@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mahout;
+package org.safehaus.kiskis.mgmt.server.ui.modules.solr;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -20,7 +20,7 @@ public class Commands {
         return CommandFactory.newRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
-                Mahout.MODULE_NAME, //     source
+                Solr.MODULE_NAME, //     source
                 null, //                        !! task uuid 
                 1, //                           !! request sequence number
                 "/", //                         cwd
@@ -43,14 +43,14 @@ public class Commands {
 
     public static Request getUninstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("apt-get --force-yes --assume-yes purge ksks-mahout");
+        req.setProgram("apt-get --force-yes --assume-yes purge ksks-solr");
         req.setTimeout(60);
         return req;
     }
 
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("apt-get update && apt-get --force-yes --assume-yes install ksks-mahout");
+        req.setProgram("apt-get update && apt-get --force-yes --assume-yes install ksks-solr");
         req.setStdOut(OutputRedirection.NO);
         req.setTimeout(90);
         return req;

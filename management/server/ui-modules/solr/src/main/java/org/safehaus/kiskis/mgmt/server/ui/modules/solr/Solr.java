@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.mahout;
+package org.safehaus.kiskis.mgmt.server.ui.modules.solr;
 
 import com.vaadin.ui.*;
 import java.util.HashMap;
@@ -14,9 +14,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-public class Mahout implements Module {
+public class Solr implements Module {
 
-    public static final String MODULE_NAME = "Mahout";
+    public static final String MODULE_NAME = "Solr";
     private AsyncTaskRunner taskRunner;
 
     public void setTaskRunner(AsyncTaskRunner taskRunner) {
@@ -49,7 +49,7 @@ public class Mahout implements Module {
             commandOutputTxtArea.setWordwrap(false);
             grid.addComponent(commandOutputTxtArea, 0, 1, 19, 9);
 
-            Label logo = MgmtApplication.createImage("mahout.png", 200, 100);
+            Label logo = MgmtApplication.createImage("solr.png", 200, 100);
             grid.addComponent(logo, 0, 0, 7, 0);
             checkBtn = new Button("Check");
             grid.addComponent(checkBtn, 16, 0, 16, 0);
@@ -78,7 +78,7 @@ public class Mahout implements Module {
                     if (agents.isEmpty()) {
                         commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nInstalling Mahout ...\n");
+                        commandOutputTxtArea.setValue("\nInstalling Solr ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
                         final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         for (Agent agent : agents) {
@@ -100,8 +100,8 @@ public class Mahout implements Module {
                                     }
 
                                     if (Util.isFinalResponse(response)) {
-                                        if (sb.indexOf("ksks-mahout") > -1) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is already installed. Omitting node from installation set"));
+                                        if (sb.indexOf("ksks-solr") > -1) {
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
                                         } else if (sb.indexOf("ksks-hadoop") == -1) {
                                             addOutput(String.format("%s: %s\n", getHostname(response), "Hadoop is not installed. Omitting node from installation set"));
                                         } else {
@@ -168,7 +168,7 @@ public class Mahout implements Module {
                     if (agents.isEmpty()) {
                         commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nChecking if Mahout is installed ...\n");
+                        commandOutputTxtArea.setValue("\nChecking if Solr is installed ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
                         final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         for (Agent agent : agents) {
@@ -189,10 +189,10 @@ public class Mahout implements Module {
                                     }
 
                                     if (Util.isFinalResponse(response)) {
-                                        if (sb.indexOf("ksks-mahout") > -1) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is installed"));
+                                        if (sb.indexOf("ksks-solr") > -1) {
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is installed"));
                                         } else {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is not installed"));
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed"));
                                         }
                                     }
                                 }
@@ -211,7 +211,7 @@ public class Mahout implements Module {
                     if (agents.isEmpty()) {
                         commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nUninstalling Mahout ...\n");
+                        commandOutputTxtArea.setValue("\nUninstalling Solr ...\n");
                         Task uninstallTask = Tasks.getUninstallTask(agents);
                         final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
                         final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
@@ -241,10 +241,10 @@ public class Mahout implements Module {
                                     if (Util.isFinalResponse(response)) {
                                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                                             if (response.getExitCode() == 0) {
-                                                if (out.indexOf("Package ksks-mahout is not installed, so not removed") == -1) {
+                                                if (out.indexOf("Package ksks-solr is not installed, so not removed") == -1) {
                                                     addOutput(String.format("%s: %s\n", getHostname(response), "Uninstallation done"));
                                                 } else {
-                                                    addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is not installed, so not removed"));
+                                                    addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed, so not removed"));
                                                 }
                                             } else {
                                                 addOutput(String.format("%s: %s: %s\n", getHostname(response), "Uninstallation failed", err.toString()));
@@ -306,7 +306,7 @@ public class Mahout implements Module {
 
     @Override
     public String getName() {
-        return Mahout.MODULE_NAME;
+        return Solr.MODULE_NAME;
     }
 
     @Override

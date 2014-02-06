@@ -4,7 +4,7 @@
     <reference id="taskRunner" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner"/>    
     
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.mahout.Mahout">
+    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.solr.Solr">
         <property name="taskRunner" ref="taskRunner"/>
     </bean>    
        
