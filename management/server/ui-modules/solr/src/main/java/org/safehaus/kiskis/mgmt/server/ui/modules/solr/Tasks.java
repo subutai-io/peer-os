@@ -45,4 +45,34 @@ public class Tasks {
         }
         return task;
     }
+
+    public static Task getStartTask(Set<Agent> agents) {
+        Task task = new Task("Start Solr");
+        for (Agent agent : agents) {
+            Request req = Commands.getStartCommand();
+            req.setUuid(agent.getUuid());
+            task.addRequest(req);
+        }
+        return task;
+    }
+
+    public static Task getStopTask(Set<Agent> agents) {
+        Task task = new Task("Stop Solr");
+        for (Agent agent : agents) {
+            Request req = Commands.getStopCommand();
+            req.setUuid(agent.getUuid());
+            task.addRequest(req);
+        }
+        return task;
+    }
+
+    public static Task getStatusTask(Set<Agent> agents) {
+        Task task = new Task("Status of Solr");
+        for (Agent agent : agents) {
+            Request req = Commands.getStatusCommand();
+            req.setUuid(agent.getUuid());
+            task.addRequest(req);
+        }
+        return task;
+    }
 }

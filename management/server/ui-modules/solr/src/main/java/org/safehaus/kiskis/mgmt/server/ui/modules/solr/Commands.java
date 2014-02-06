@@ -43,7 +43,7 @@ public class Commands {
 
     public static Request getUninstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("apt-get --force-yes --assume-yes purge ksks-solr");
+        req.setProgram("service solr stop ; apt-get --force-yes --assume-yes purge ksks-solr");
         req.setTimeout(60);
         return req;
     }
@@ -55,4 +55,25 @@ public class Commands {
         req.setTimeout(90);
         return req;
     }
+
+    public static Request getStartCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service solr start");
+        req.setStdOut(OutputRedirection.NO);
+        req.setTimeout(5);
+        return req;
+    }
+
+    public static Request getStopCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service solr stop");
+        return req;
+    }
+
+    public static Request getStatusCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service solr status");
+        return req;
+    }
+
 }

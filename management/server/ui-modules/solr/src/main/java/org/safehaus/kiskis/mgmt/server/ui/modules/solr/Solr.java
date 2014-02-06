@@ -29,6 +29,8 @@ public class Solr implements Module {
         private final AgentManager agentManager;
         private final Label indicator;
         private final AsyncTaskRunner taskRunner;
+        private final Button startBtn;
+        private final Button stopBtn;
         private final Button checkBtn;
         private final Button installBtn;
         private final Button uninstallBtn;
@@ -47,21 +49,28 @@ public class Solr implements Module {
             commandOutputTxtArea.setSizeFull();
             commandOutputTxtArea.setImmediate(true);
             commandOutputTxtArea.setWordwrap(false);
-            grid.addComponent(commandOutputTxtArea, 0, 1, 19, 9);
 
             Label logo = MgmtApplication.createImage("solr.png", 200, 100);
-            grid.addComponent(logo, 0, 0, 7, 0);
+            startBtn = new Button("Start");
+            stopBtn = new Button("Stop");
             checkBtn = new Button("Check");
-            grid.addComponent(checkBtn, 16, 0, 16, 0);
             installBtn = new Button("Install");
-            grid.addComponent(installBtn, 17, 0, 17, 0);
             uninstallBtn = new Button("Uninstall");
-            grid.addComponent(uninstallBtn, 18, 0, 18, 0);
 
             indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
             indicator.setVisible(false);
-            grid.addComponent(indicator, 14, 0, 15, 0);
 
+            grid.addComponent(logo, 0, 0, 7, 0);
+            grid.addComponent(startBtn, 14, 0, 14, 0);
+            grid.addComponent(stopBtn, 15, 0, 15, 0);
+            grid.addComponent(checkBtn, 16, 0, 16, 0);
+            grid.addComponent(installBtn, 17, 0, 17, 0);
+            grid.addComponent(uninstallBtn, 18, 0, 18, 0);
+            grid.addComponent(indicator, 12, 0, 13, 0);
+            grid.addComponent(commandOutputTxtArea, 0, 1, 19, 9);
+
+            grid.setComponentAlignment(startBtn, Alignment.MIDDLE_CENTER);
+            grid.setComponentAlignment(stopBtn, Alignment.MIDDLE_CENTER);
             grid.setComponentAlignment(checkBtn, Alignment.MIDDLE_CENTER);
             grid.setComponentAlignment(installBtn, Alignment.MIDDLE_CENTER);
             grid.setComponentAlignment(uninstallBtn, Alignment.MIDDLE_CENTER);
@@ -93,14 +102,14 @@ public class Solr implements Module {
                                 if (response != null && response.getUuid() != null
                                         && outs.get(response.getUuid()) != null) {
 
-                                    StringBuilder sb = outs.get(response.getUuid());
+                                    StringBuilder out = outs.get(response.getUuid());
 
                                     if (!Util.isStringEmpty(response.getStdOut())) {
-                                        sb.append(response.getStdOut());
+                                        out.append(response.getStdOut());
                                     }
 
                                     if (Util.isFinalResponse(response)) {
-                                        if (sb.indexOf("ksks-solr") > -1) {
+                                        if (out.indexOf("ksks-solr") > -1) {
                                             addOutput(String.format("%s: %s\n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
                                         } else {
                                             Agent agent = agentManager.getAgentByUUID(response.getUuid());
@@ -129,10 +138,10 @@ public class Solr implements Module {
                                                 if (response != null && response.getUuid() != null
                                                         && errs.get(response.getUuid()) != null) {
 
-                                                    StringBuilder sb = errs.get(response.getUuid());
+                                                    StringBuilder err = errs.get(response.getUuid());
 
                                                     if (!Util.isStringEmpty(response.getStdErr())) {
-                                                        sb.append(response.getStdErr());
+                                                        err.append(response.getStdErr());
                                                     }
 
                                                     if (Util.isFinalResponse(response)) {
@@ -140,7 +149,7 @@ public class Solr implements Module {
                                                             if (response.getExitCode() == 0) {
                                                                 addOutput(String.format("%s: %s\n", getHostname(response), "Installation done"));
                                                             } else {
-                                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Installation failed", sb.toString()));
+                                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Installation failed", err.toString()));
                                                             }
                                                         } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
                                                             addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
@@ -180,14 +189,14 @@ public class Solr implements Module {
                                 if (response != null && response.getUuid() != null
                                         && outs.get(response.getUuid()) != null) {
 
-                                    StringBuilder sb = outs.get(response.getUuid());
+                                    StringBuilder out = outs.get(response.getUuid());
 
                                     if (!Util.isStringEmpty(response.getStdOut())) {
-                                        sb.append(response.getStdOut());
+                                        out.append(response.getStdOut());
                                     }
 
                                     if (Util.isFinalResponse(response)) {
-                                        if (sb.indexOf("ksks-solr") > -1) {
+                                        if (out.indexOf("ksks-solr") > -1) {
                                             addOutput(String.format("%s: %s\n", getHostname(response), "Solr is installed"));
                                         } else {
                                             addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed"));
@@ -258,6 +267,116 @@ public class Solr implements Module {
                 }
             });
 
+            startBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
+
+                    if (agents.isEmpty()) {
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
+                    } else {
+                        commandOutputTxtArea.setValue("\nStarting Solr ...\n");
+                        Task startTask = Tasks.getStartTask(agents);
+
+                        executeTask(startTask, new TaskCallback() {
+
+                            @Override
+                            public void onResponse(Task task, Response response) {
+
+                                if (task.isCompleted()) {
+                                    //run status check task
+                                    final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
+                                    final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
+                                    for (Agent agent : agents) {
+                                        outs.put(agent.getUuid(), new StringBuilder());
+                                        errs.put(agent.getUuid(), new StringBuilder());
+                                    }
+
+                                    Task statusTask = Tasks.getStatusTask(agents);
+
+                                    executeTask(statusTask, new TaskCallback() {
+
+                                        @Override
+                                        public void onResponse(Task task, Response response) {
+                                            if (response != null
+                                                    && response.getUuid() != null
+                                                    && outs.get(response.getUuid()) != null
+                                                    && errs.get(response.getUuid()) != null) {
+                                                StringBuilder out = outs.get(response.getUuid());
+                                                StringBuilder err = errs.get(response.getUuid());
+
+                                                if (!Util.isStringEmpty(response.getStdOut())) {
+                                                    out.append(response.getStdOut());
+                                                }
+                                                if (!Util.isStringEmpty(response.getStdErr())) {
+                                                    err.append(response.getStdErr());
+                                                }
+
+                                                if (Util.isFinalResponse(response)) {
+                                                    if (err.length() > 0) {
+                                                        addOutput(String.format("%s: %s\n", getHostname(response), err.toString()));
+                                                    } else if (out.length() > 0) {
+                                                        addOutput(String.format("%s: %s\n", getHostname(response), out.toString()));
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    });
+
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            stopBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
+
+                    if (agents.isEmpty()) {
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
+                    } else {
+                        commandOutputTxtArea.setValue("\nStopping Solr ...\n");
+
+                        Task stopTask = Tasks.getStopTask(agents);
+                        final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
+                        for (Agent agent : agents) {
+                            errs.put(agent.getUuid(), new StringBuilder());
+                        }
+
+                        executeTask(stopTask, new TaskCallback() {
+
+                            @Override
+                            public void onResponse(Task task, Response response) {
+                                if (response != null && response.getUuid() != null
+                                        && errs.get(response.getUuid()) != null) {
+
+                                    StringBuilder err = errs.get(response.getUuid());
+
+                                    if (!Util.isStringEmpty(response.getStdErr())) {
+                                        err.append(response.getStdErr());
+                                    }
+
+                                    if (Util.isFinalResponse(response)) {
+                                        if (err.length() > 0) {
+                                            addOutput(String.format("%s: %s\n", getHostname(response), err.toString()));
+                                        } else {
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Stop Solr done"));
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                    }
+                }
+            });
+
         }
 
         private String getHostname(Response response) {
@@ -267,6 +386,8 @@ public class Solr implements Module {
         }
 
         private void executeTask(Task task, final TaskCallback callback) {
+            startBtn.setEnabled(false);
+            stopBtn.setEnabled(false);
             checkBtn.setEnabled(false);
             installBtn.setEnabled(false);
             uninstallBtn.setEnabled(false);
@@ -281,6 +402,8 @@ public class Solr implements Module {
                         taskCount--;
                         if (taskCount == 0) {
                             indicator.setVisible(false);
+                            startBtn.setEnabled(true);
+                            stopBtn.setEnabled(true);
                             checkBtn.setEnabled(true);
                             installBtn.setEnabled(true);
                             uninstallBtn.setEnabled(true);
