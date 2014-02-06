@@ -26,6 +26,7 @@
         <module>hive</module>
         <module>flume</module>
         <module>lucene</module>
+        <module>solr</module>
     </modules>
    
 </project>
