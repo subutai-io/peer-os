@@ -14,12 +14,12 @@ import java.util.Map;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout implements TaskCallback {
+public class Cloner extends VerticalLayout implements ChainedTaskCallback {
 
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
@@ -120,19 +120,6 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         return table;
     }
 
-    private Table createTasksTable(String caption, int size) {
-        Table table = new Table(caption);
-        table.addContainerProperty("Physical Hosts", String.class, null);
-        table.addContainerProperty("Check status", Button.class, null);
-        table.addContainerProperty(statusLabel, Embedded.class, null);
-        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(size, Sizeable.UNITS_PIXELS);
-        table.setPageLength(10);
-        table.setSelectable(false);
-        table.setImmediate(true);
-        return table;
-    }
-
     private void populateLxcTable(Map<Agent, List<String>> agents) {
 
         for (final Agent agent : agents.keySet()) {
@@ -194,7 +181,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
         if (Util.isFinalResponse(response)) {
             String lxcHost = requestToLxcMatchMap.get(task.getUuid() + "-" + response.getRequestSequenceNumber());
             if (lxcHost != null) {
@@ -216,5 +203,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                 requestToLxcMatchMap.clear();
             }
         }
+
+        return null;
     }
 }
