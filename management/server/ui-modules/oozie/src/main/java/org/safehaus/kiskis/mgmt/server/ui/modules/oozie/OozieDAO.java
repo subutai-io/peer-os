@@ -50,7 +50,7 @@ public class OozieDAO {
 
             byte[] data = Util.serialize(cluster);
 
-            String cql = "insert into hbase_info (uid, info) values (?,?)";
+            String cql = "insert into oozie_info (uid, info) values (?,?)";
             dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
 
         } catch (IOException ex) {
@@ -63,7 +63,7 @@ public class OozieDAO {
     public static List<OozieConfig> getClusterInfo() {
         List<OozieConfig> list = new ArrayList<OozieConfig>();
         try {
-            String cql = "select * from hbase_info";
+            String cql = "select * from oozie_info";
             ResultSet results = dbManager.executeQuery(cql);
             for (Row row : results) {
 
@@ -84,11 +84,11 @@ public class OozieDAO {
 
     public static boolean deleteClusterInfo(UUID uuid) {
         try {
-            String cql = "delete from hbase_info where uid = ?";
+            String cql = "delete from oozie_info where uid = ?";
             dbManager.executeUpdate(cql, uuid);
             return true;
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in deleteHBaseClusterInfo(name)", ex);
+            LOG.log(Level.SEVERE, "Error ", ex);
         }
         return false;
     }
