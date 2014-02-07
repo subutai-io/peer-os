@@ -74,11 +74,17 @@ public class ChainedTaskListener {
     }
 
     public String getStdOut(Response response) {
-        return stdOut.get(response.getUuid()).toString();
+        if (stdOut.get(response.getUuid()) != null) {
+            return stdOut.get(response.getUuid()).toString();
+        }
+        return "".intern();
     }
 
     public String getStdErr(Response response) {
-        return stdErr.get(response.getUuid()).toString();
+        if (stdErr.get(response.getUuid()) != null) {
+            return stdErr.get(response.getUuid()).toString();
+        }
+        return "".intern();
     }
 
 }
