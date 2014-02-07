@@ -59,6 +59,8 @@ public class VerifyStep extends Panel {
                 } else if (wizard.getConfig().getConfigServers().size() != 1
                         && wizard.getConfig().getConfigServers().size() != 3) {
                     show("Please, select 1 or 3 nodes as config servers");
+                } else if (wizard.getConfig().getDataNodes().size() < 3) {
+                    show("Please add at least 3 data nodes");
                 } else if (wizard.getConfig().getDataNodes().size() % 2 == 0) {
                     show("Please add odd number of data nodes");
                 } else if (wizard.getConfig().getDataNodes().size() > 7) {

@@ -84,25 +84,28 @@ public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
     private void processResponse(final Response response) {
         final ExecutorService executor = executors.get(response.getTaskUuid());
         if (executor != null) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        ChainedTaskListener tl = taskRunner.feedResponse(response);
-                        if (tl == null || tl.getTask().isCompleted()) {
-                            executors.remove(response.getTaskUuid());
-                            executor.shutdown();
-                        } else if (tl.getTask().getUuid().compareTo(response.getTaskUuid()) != 0) {
-                            executors.remove(response.getTaskUuid());
-                            executor.shutdown();
+            try {
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            ChainedTaskListener tl = taskRunner.feedResponse(response);
+                            if (tl == null || tl.getTask().isCompleted()) {
+                                executors.remove(response.getTaskUuid());
+                                executor.shutdown();
+                            } else if (tl.getTask().getUuid().compareTo(response.getTaskUuid()) != 0) {
+                                executors.remove(response.getTaskUuid());
+                                executor.shutdown();
 
-                            //run new task
-                            executeTask(tl.getTask(), tl.getTaskCallback());
+                                //run new task
+                                executeTask(tl.getTask(), tl.getTaskCallback());
+                            }
+                        } catch (Exception e) {
                         }
-                    } catch (Exception e) {
                     }
-                }
-            });
+                });
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -139,7 +142,14 @@ public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
 
     @Override
     public void removeTaskCallback(UUID taskUUID) {
-        taskRunner.removeTaskCallback(taskUUID);
+        try {
+            taskRunner.removeTaskCallback(taskUUID);
+            ExecutorService executor = executors.remove(taskUUID);
+            if (executor != null) {
+                executor.shutdown();
+            }
+        } catch (Exception e) {
+        }
     }
 
     @Override

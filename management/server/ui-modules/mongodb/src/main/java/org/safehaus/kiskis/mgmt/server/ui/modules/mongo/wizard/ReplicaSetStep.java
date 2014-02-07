@@ -60,7 +60,7 @@ public class ReplicaSetStep extends Panel {
         grid.addComponent(replicaNameTxtFld, 2, 0, 3, 0);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as data nodes "
-                + "(Choose odd number of servers: 1 to 7)</strong>");
+                + "(Choose odd number of servers: 3 to 7)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(configServersLabel, 2, 1, 9, 1);
 
@@ -107,6 +107,8 @@ public class ReplicaSetStep extends Panel {
                     show("Please provide replica set name");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getDataNodes())) {
                     show("Please add data nodes");
+                } else if (wizard.getConfig().getDataNodes().size() < 3) {
+                    show("Please add at least 3 data nodes");
                 } else if (wizard.getConfig().getDataNodes().size() % 2 == 0) {
                     show("Please add odd number of data nodes");
                 } else if (wizard.getConfig().getDataNodes().size() > 7) {

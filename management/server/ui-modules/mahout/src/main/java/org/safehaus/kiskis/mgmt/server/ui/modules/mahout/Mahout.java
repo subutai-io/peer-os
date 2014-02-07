@@ -183,7 +183,7 @@ public class Mahout implements Module {
                                                 addOutput(String.format("%s: %s\n", getHostname(response), "Mahout is not installed, so not removed"));
                                             }
                                         } else {
-                                            addOutput(String.format("%s: %s: %s\n", getHostname(response), "Uninstallation failed", stdErr.toString()));
+                                            addOutput(String.format("%s: %s: %s\n", getHostname(response), "Uninstallation failed", stdErr));
                                         }
                                     } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
                                         addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));

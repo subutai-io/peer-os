@@ -64,7 +64,7 @@ public class TaskRunner {
                 }
             }
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, String.format("Error processing response: %s"), e);
+            LOG.log(Level.SEVERE, "Error processing response: {0}", e);
         }
         return null;
     }
@@ -113,7 +113,7 @@ public class TaskRunner {
                 }
             }
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, String.format("Error running task: %s"), e);
+            LOG.log(Level.SEVERE, "Error running task: {0}", e);
         }
     }
 
