@@ -82,9 +82,9 @@ public class Solr implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("%nInstalling Solr ...%n");
+                        commandOutputTxtArea.setValue("\nInstalling Solr ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
 
                         executeTask(checkTask, new ChainedTaskCallback() {
@@ -96,19 +96,19 @@ public class Solr implements Module {
                                 if (task.getData() == TaskType.CHECK) {
                                     if (Util.isFinalResponse(response)) {
                                         if (stdOut.indexOf("ksks-solr") > -1) {
-                                            addOutput(String.format("%s: %s%n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
                                         } else {
                                             Agent agent = agentManager.getAgentByUUID(response.getUuid());
                                             if (agent != null) {
                                                 eligibleAgents.add(agent);
                                             } else {
-                                                addOutput(String.format("%s: %s%n", getHostname(response), "Agent is offline. Omitting node from installation set"));
+                                                addOutput(String.format("%s: %s\n", getHostname(response), "Agent is offline. Omitting node from installation set"));
                                             }
                                         }
                                     }
                                     if (task.isCompleted()) {
                                         if (eligibleAgents.isEmpty()) {
-                                            addOutput(String.format("%s%n", "No nodes eligible for installation. Installation aborted"));
+                                            addOutput(String.format("%s\n", "No nodes eligible for installation. Installation aborted"));
                                         } else {
                                             //run installation 
                                             return Tasks.getInstallTask(eligibleAgents);
@@ -118,12 +118,12 @@ public class Solr implements Module {
                                     if (Util.isFinalResponse(response)) {
                                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                                             if (response.getExitCode() == 0) {
-                                                addOutput(String.format("%s: %s%n", getHostname(response), "Installation done"));
+                                                addOutput(String.format("%s: %s\n", getHostname(response), "Installation done"));
                                             } else {
-                                                addOutput(String.format("%s: %s: %s%n", getHostname(response), "Installation failed", stdErr));
+                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Installation failed", stdErr));
                                             }
                                         } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
-                                            addOutput(String.format("%s: %s%n", getHostname(response), "Command timed out"));
+                                            addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
                                         }
                                     }
 
@@ -143,9 +143,9 @@ public class Solr implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("%nChecking if Solr is installed ...%n");
+                        commandOutputTxtArea.setValue("\nChecking if Solr is installed ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
                         executeTask(checkTask, new ChainedTaskCallback() {
 
@@ -154,9 +154,9 @@ public class Solr implements Module {
 
                                 if (Util.isFinalResponse(response)) {
                                     if (stdOut.indexOf("ksks-solr") > -1) {
-                                        addOutput(String.format("%s: %s%n", getHostname(response), "Solr is installed"));
+                                        addOutput(String.format("%s: %s\n", getHostname(response), "Solr is installed"));
                                     } else {
-                                        addOutput(String.format("%s: %s%n", getHostname(response), "Solr is not installed"));
+                                        addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed"));
                                     }
                                 }
 
@@ -174,9 +174,9 @@ public class Solr implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("%nUninstalling Solr ...%n");
+                        commandOutputTxtArea.setValue("\nUninstalling Solr ...\n");
                         Task uninstallTask = Tasks.getUninstallTask(agents);
                         executeTask(uninstallTask, new ChainedTaskCallback() {
 
@@ -187,15 +187,15 @@ public class Solr implements Module {
                                     if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                                         if (response.getExitCode() == 0) {
                                             if (stdOut.indexOf("Package ksks-solr is not installed, so not removed") == -1) {
-                                                addOutput(String.format("%s: %s%n", getHostname(response), "Uninstallation done"));
+                                                addOutput(String.format("%s: %s\n", getHostname(response), "Uninstallation done"));
                                             } else {
-                                                addOutput(String.format("%s: %s%n", getHostname(response), "Solr is not installed, so not removed"));
+                                                addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed, so not removed"));
                                             }
                                         } else {
-                                            addOutput(String.format("%s: %s: %s%n", getHostname(response), "Uninstallation failed", stdErr));
+                                            addOutput(String.format("%s: %s: %s\n", getHostname(response), "Uninstallation failed", stdErr));
                                         }
                                     } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
-                                        addOutput(String.format("%s: %s%n", getHostname(response), "Command timed out"));
+                                        addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
                                     }
                                 }
 
@@ -213,9 +213,9 @@ public class Solr implements Module {
                     final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("%nStarting Solr ...%n");
+                        commandOutputTxtArea.setValue("\nStarting Solr ...\n");
                         Task startTask = Tasks.getStartTask(agents);
 
                         executeTask(startTask, new ChainedTaskCallback() {
@@ -230,9 +230,9 @@ public class Solr implements Module {
                                 } else if (task.getData() == TaskType.STATUS) {
                                     if (Util.isFinalResponse(response)) {
                                         if (stdErr.length() > 0) {
-                                            addOutput(String.format("%s: %s%n", getHostname(response), stdErr));
+                                            addOutput(String.format("%s: %s\n", getHostname(response), stdErr));
                                         } else if (stdOut.length() > 0) {
-                                            addOutput(String.format("%s: %s%n", getHostname(response), stdOut));
+                                            addOutput(String.format("%s: %s\n", getHostname(response), stdOut));
                                         }
                                     }
 
@@ -252,9 +252,9 @@ public class Solr implements Module {
                     final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("%nStopping Solr ...%n");
+                        commandOutputTxtArea.setValue("\nStopping Solr ...\n");
 
                         Task stopTask = Tasks.getStopTask(agents);
                         executeTask(stopTask, new ChainedTaskCallback() {
@@ -264,9 +264,9 @@ public class Solr implements Module {
 
                                 if (Util.isFinalResponse(response)) {
                                     if (stdErr.length() > 0) {
-                                        addOutput(String.format("%s: %s%n", getHostname(response), stdErr));
+                                        addOutput(String.format("%s: %s\n", getHostname(response), stdErr));
                                     } else {
-                                        addOutput(String.format("%s: %s%n", getHostname(response), "Stop Solr done"));
+                                        addOutput(String.format("%s: %s\n", getHostname(response), "Stop Solr done"));
                                     }
                                 }
 
@@ -320,7 +320,7 @@ public class Solr implements Module {
         private void addOutput(String output) {
             if (!Util.isStringEmpty(output)) {
                 commandOutputTxtArea.setValue(
-                        String.format("%s%n%s",
+                        String.format("%s\n%s",
                                 commandOutputTxtArea.getValue(),
                                 output));
                 commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
