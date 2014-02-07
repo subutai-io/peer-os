@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -98,7 +98,7 @@ public class Terminal implements Module {
                             request.setProgram(programTxtFld.getValue().toString());
                             if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
                                 int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
-                                if (timeout > 0) {
+                                if (timeout > 0 && timeout <= 3600) {
                                     request.setTimeout(timeout);
                                 }
                             }
@@ -110,31 +110,29 @@ public class Terminal implements Module {
                         }
                         indicator.setVisible(true);
                         taskCount++;
-                        taskRunner.executeTask(task, new TaskCallback() {
+                        taskRunner.executeTask(task, new ChainedTaskCallback() {
 
                             @Override
-                            public void onResponse(Task task, Response response) {
-                                if (response != null && response.getUuid() != null) {
-                                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                                    String host = agent == null
-                                            ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                Agent agent = agentManager.getAgentByUUID(response.getUuid());
+                                String host = agent == null
+                                        ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
 
-                                    StringBuilder out = new StringBuilder(host).append(":\n");
-                                    if (!Util.isStringEmpty(response.getStdOut())) {
-                                        out.append(response.getStdOut()).append("\n");
-                                    }
-                                    if (!Util.isStringEmpty(response.getStdErr())) {
-                                        out.append(response.getStdErr()).append("\n");
-                                    }
-                                    if (Util.isFinalResponse(response)) {
-                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                            out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
-                                        } else {
-                                            out.append("Command timed out").append("\n\n");
-                                        }
-                                    }
-                                    addOutput(out.toString());
+                                StringBuilder out = new StringBuilder(host).append(":\n");
+                                if (!Util.isStringEmpty(response.getStdOut())) {
+                                    out.append(response.getStdOut()).append("\n");
                                 }
+                                if (!Util.isStringEmpty(response.getStdErr())) {
+                                    out.append(response.getStdErr()).append("\n");
+                                }
+                                if (Util.isFinalResponse(response)) {
+                                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                        out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
+                                    } else {
+                                        out.append("Command timed out").append("\n\n");
+                                    }
+                                }
+                                addOutput(out.toString());
 
                                 if (task.isCompleted()) {
                                     taskCount--;
@@ -142,6 +140,8 @@ public class Terminal implements Module {
                                         indicator.setVisible(false);
                                     }
                                 }
+
+                                return null;
                             }
                         });
                     }
