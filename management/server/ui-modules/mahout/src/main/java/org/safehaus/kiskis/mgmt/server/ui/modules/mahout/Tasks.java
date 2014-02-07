@@ -18,6 +18,7 @@ public class Tasks {
 
     public static Task getCheckTask(Set<Agent> agents) {
         Task task = new Task("Check existence of Mahout");
+        task.setData(TaskType.CHECK);
         for (Agent agent : agents) {
             Request req = Commands.getCheckCommand();
             req.setUuid(agent.getUuid());
@@ -28,6 +29,7 @@ public class Tasks {
 
     public static Task getInstallTask(Set<Agent> agents) {
         Task task = new Task("Install Mahout");
+        task.setData(TaskType.INSTALL);
         for (Agent agent : agents) {
             Request req = Commands.getInstallCommand();
             req.setUuid(agent.getUuid());
@@ -38,6 +40,7 @@ public class Tasks {
 
     public static Task getUninstallTask(Set<Agent> agents) {
         Task task = new Task("Uninstall Mahout");
+        task.setData(TaskType.UNINSTALL);
         for (Agent agent : agents) {
             Request req = Commands.getUninstallCommand();
             req.setUuid(agent.getUuid());
