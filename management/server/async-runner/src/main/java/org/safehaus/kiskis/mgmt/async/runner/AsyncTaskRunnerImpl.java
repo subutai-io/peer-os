@@ -139,7 +139,14 @@ public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
 
     @Override
     public void removeTaskCallback(UUID taskUUID) {
-        taskRunner.removeTaskCallback(taskUUID);
+        try {
+            taskRunner.removeTaskCallback(taskUUID);
+            ExecutorService executor = executors.get(taskUUID);
+            if (executor != null) {
+                executor.shutdown();
+            }
+        } catch (Exception e) {
+        }
     }
 
     @Override
