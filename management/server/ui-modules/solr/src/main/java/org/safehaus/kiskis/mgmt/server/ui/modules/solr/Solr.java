@@ -1,17 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.solr;
 
 import com.vaadin.ui.*;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class Solr implements Module {
@@ -85,81 +82,54 @@ public class Solr implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nInstalling Solr ...\n");
+                        commandOutputTxtArea.setValue("%nInstalling Solr ...%n");
                         Task checkTask = Tasks.getCheckTask(agents);
-                        final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
-                        for (Agent agent : agents) {
-                            outs.put(agent.getUuid(), new StringBuilder());
-                        }
 
-                        executeTask(checkTask, new TaskCallback() {
+                        executeTask(checkTask, new ChainedTaskCallback() {
                             final Set<Agent> eligibleAgents = new HashSet<Agent>();
 
                             @Override
-                            public void onResponse(Task task, Response response) {
-                                if (response != null && response.getUuid() != null
-                                        && outs.get(response.getUuid()) != null) {
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
-                                    StringBuilder out = outs.get(response.getUuid());
-
-                                    if (!Util.isStringEmpty(response.getStdOut())) {
-                                        out.append(response.getStdOut());
-                                    }
-
+                                if (task.getData() == TaskType.CHECK) {
                                     if (Util.isFinalResponse(response)) {
-                                        if (out.indexOf("ksks-solr") > -1) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
+                                        if (stdOut.indexOf("ksks-solr") > -1) {
+                                            addOutput(String.format("%s: %s%n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
                                         } else {
                                             Agent agent = agentManager.getAgentByUUID(response.getUuid());
                                             if (agent != null) {
                                                 eligibleAgents.add(agent);
                                             } else {
-                                                addOutput(String.format("%s: %s\n", getHostname(response), "Agent is offline. Omitting node from installation set"));
+                                                addOutput(String.format("%s: %s%n", getHostname(response), "Agent is offline. Omitting node from installation set"));
                                             }
                                         }
                                     }
-                                }
-                                if (task.isCompleted()) {
-                                    if (eligibleAgents.isEmpty()) {
-                                        addOutput(String.format("%s\n", "No nodes eligible for installation. Installation aborted"));
-                                    } else {
-                                        //run installation 
-                                        Task installTask = Tasks.getInstallTask(eligibleAgents);
-                                        final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
-                                        for (Agent agent : eligibleAgents) {
-                                            errs.put(agent.getUuid(), new StringBuilder());
+                                    if (task.isCompleted()) {
+                                        if (eligibleAgents.isEmpty()) {
+                                            addOutput(String.format("%s%n", "No nodes eligible for installation. Installation aborted"));
+                                        } else {
+                                            //run installation 
+                                            return Tasks.getInstallTask(eligibleAgents);
                                         }
-                                        executeTask(installTask, new TaskCallback() {
-
-                                            @Override
-                                            public void onResponse(Task task, Response response) {
-                                                if (response != null && response.getUuid() != null
-                                                        && errs.get(response.getUuid()) != null) {
-
-                                                    StringBuilder err = errs.get(response.getUuid());
-
-                                                    if (!Util.isStringEmpty(response.getStdErr())) {
-                                                        err.append(response.getStdErr());
-                                                    }
-
-                                                    if (Util.isFinalResponse(response)) {
-                                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                                            if (response.getExitCode() == 0) {
-                                                                addOutput(String.format("%s: %s\n", getHostname(response), "Installation done"));
-                                                            } else {
-                                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Installation failed", err.toString()));
-                                                            }
-                                                        } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
-                                                            addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        });
                                     }
+                                } else {
+                                    if (Util.isFinalResponse(response)) {
+                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                            if (response.getExitCode() == 0) {
+                                                addOutput(String.format("%s: %s%n", getHostname(response), "Installation done"));
+                                            } else {
+                                                addOutput(String.format("%s: %s: %s%n", getHostname(response), "Installation failed", stdErr));
+                                            }
+                                        } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                                            addOutput(String.format("%s: %s%n", getHostname(response), "Command timed out"));
+                                        }
+                                    }
+
                                 }
+
+                                return null;
                             }
                         });
                     }
@@ -173,36 +143,24 @@ public class Solr implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nChecking if Solr is installed ...\n");
+                        commandOutputTxtArea.setValue("%nChecking if Solr is installed ...%n");
                         Task checkTask = Tasks.getCheckTask(agents);
-                        final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
-                        for (Agent agent : agents) {
-                            outs.put(agent.getUuid(), new StringBuilder());
-                        }
-                        executeTask(checkTask, new TaskCallback() {
+                        executeTask(checkTask, new ChainedTaskCallback() {
 
                             @Override
-                            public void onResponse(Task task, Response response) {
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
-                                if (response != null && response.getUuid() != null
-                                        && outs.get(response.getUuid()) != null) {
-
-                                    StringBuilder out = outs.get(response.getUuid());
-
-                                    if (!Util.isStringEmpty(response.getStdOut())) {
-                                        out.append(response.getStdOut());
-                                    }
-
-                                    if (Util.isFinalResponse(response)) {
-                                        if (out.indexOf("ksks-solr") > -1) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is installed"));
-                                        } else {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed"));
-                                        }
+                                if (Util.isFinalResponse(response)) {
+                                    if (stdOut.indexOf("ksks-solr") > -1) {
+                                        addOutput(String.format("%s: %s%n", getHostname(response), "Solr is installed"));
+                                    } else {
+                                        addOutput(String.format("%s: %s%n", getHostname(response), "Solr is not installed"));
                                     }
                                 }
+
+                                return null;
                             }
                         });
                     }
@@ -216,51 +174,32 @@ public class Solr implements Module {
                     Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nUninstalling Solr ...\n");
+                        commandOutputTxtArea.setValue("%nUninstalling Solr ...%n");
                         Task uninstallTask = Tasks.getUninstallTask(agents);
-                        final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
-                        final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
-                        for (Agent agent : agents) {
-                            outs.put(agent.getUuid(), new StringBuilder());
-                            errs.put(agent.getUuid(), new StringBuilder());
-                        }
-                        executeTask(uninstallTask, new TaskCallback() {
+                        executeTask(uninstallTask, new ChainedTaskCallback() {
 
                             @Override
-                            public void onResponse(Task task, Response response) {
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
-                                if (response != null && response.getUuid() != null
-                                        && outs.get(response.getUuid()) != null
-                                        && errs.get(response.getUuid()) != null) {
-
-                                    StringBuilder out = outs.get(response.getUuid());
-                                    StringBuilder err = errs.get(response.getUuid());
-
-                                    if (!Util.isStringEmpty(response.getStdOut())) {
-                                        out.append(response.getStdOut());
-                                    }
-                                    if (!Util.isStringEmpty(response.getStdErr())) {
-                                        err.append(response.getStdErr());
-                                    }
-
-                                    if (Util.isFinalResponse(response)) {
-                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                            if (response.getExitCode() == 0) {
-                                                if (out.indexOf("Package ksks-solr is not installed, so not removed") == -1) {
-                                                    addOutput(String.format("%s: %s\n", getHostname(response), "Uninstallation done"));
-                                                } else {
-                                                    addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed, so not removed"));
-                                                }
+                                if (Util.isFinalResponse(response)) {
+                                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                        if (response.getExitCode() == 0) {
+                                            if (stdOut.indexOf("Package ksks-solr is not installed, so not removed") == -1) {
+                                                addOutput(String.format("%s: %s%n", getHostname(response), "Uninstallation done"));
                                             } else {
-                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Uninstallation failed", err.toString()));
+                                                addOutput(String.format("%s: %s%n", getHostname(response), "Solr is not installed, so not removed"));
                                             }
-                                        } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
+                                        } else {
+                                            addOutput(String.format("%s: %s: %s%n", getHostname(response), "Uninstallation failed", stdErr));
                                         }
+                                    } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                                        addOutput(String.format("%s: %s%n", getHostname(response), "Command timed out"));
                                     }
                                 }
+
+                                return null;
                             }
                         });
                     }
@@ -274,58 +213,32 @@ public class Solr implements Module {
                     final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nStarting Solr ...\n");
+                        commandOutputTxtArea.setValue("%nStarting Solr ...%n");
                         Task startTask = Tasks.getStartTask(agents);
 
-                        executeTask(startTask, new TaskCallback() {
+                        executeTask(startTask, new ChainedTaskCallback() {
 
                             @Override
-                            public void onResponse(Task task, Response response) {
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
-                                if (task.isCompleted()) {
+                                if (task.getData() == TaskType.START && task.isCompleted()) {
                                     //run status check task
-                                    final Map<UUID, StringBuilder> outs = new HashMap<UUID, StringBuilder>();
-                                    final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
-                                    for (Agent agent : agents) {
-                                        outs.put(agent.getUuid(), new StringBuilder());
-                                        errs.put(agent.getUuid(), new StringBuilder());
+                                    return Tasks.getStatusTask(agents);
+
+                                } else if (task.getData() == TaskType.STATUS) {
+                                    if (Util.isFinalResponse(response)) {
+                                        if (stdErr.length() > 0) {
+                                            addOutput(String.format("%s: %s%n", getHostname(response), stdErr));
+                                        } else if (stdOut.length() > 0) {
+                                            addOutput(String.format("%s: %s%n", getHostname(response), stdOut));
+                                        }
                                     }
 
-                                    Task statusTask = Tasks.getStatusTask(agents);
-
-                                    executeTask(statusTask, new TaskCallback() {
-
-                                        @Override
-                                        public void onResponse(Task task, Response response) {
-                                            if (response != null
-                                                    && response.getUuid() != null
-                                                    && outs.get(response.getUuid()) != null
-                                                    && errs.get(response.getUuid()) != null) {
-                                                StringBuilder out = outs.get(response.getUuid());
-                                                StringBuilder err = errs.get(response.getUuid());
-
-                                                if (!Util.isStringEmpty(response.getStdOut())) {
-                                                    out.append(response.getStdOut());
-                                                }
-                                                if (!Util.isStringEmpty(response.getStdErr())) {
-                                                    err.append(response.getStdErr());
-                                                }
-
-                                                if (Util.isFinalResponse(response)) {
-                                                    if (err.length() > 0) {
-                                                        addOutput(String.format("%s: %s\n", getHostname(response), err.toString()));
-                                                    } else if (out.length() > 0) {
-                                                        addOutput(String.format("%s: %s\n", getHostname(response), out.toString()));
-                                                    }
-                                                }
-
-                                            }
-                                        }
-                                    });
-
                                 }
+
+                                return null;
                             }
                         });
                     }
@@ -339,37 +252,25 @@ public class Solr implements Module {
                     final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
 
                     if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
+                        commandOutputTxtArea.setValue("%nPlease, select lxc node(s)");
                     } else {
-                        commandOutputTxtArea.setValue("\nStopping Solr ...\n");
+                        commandOutputTxtArea.setValue("%nStopping Solr ...%n");
 
                         Task stopTask = Tasks.getStopTask(agents);
-                        final Map<UUID, StringBuilder> errs = new HashMap<UUID, StringBuilder>();
-                        for (Agent agent : agents) {
-                            errs.put(agent.getUuid(), new StringBuilder());
-                        }
-
-                        executeTask(stopTask, new TaskCallback() {
+                        executeTask(stopTask, new ChainedTaskCallback() {
 
                             @Override
-                            public void onResponse(Task task, Response response) {
-                                if (response != null && response.getUuid() != null
-                                        && errs.get(response.getUuid()) != null) {
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
-                                    StringBuilder err = errs.get(response.getUuid());
-
-                                    if (!Util.isStringEmpty(response.getStdErr())) {
-                                        err.append(response.getStdErr());
-                                    }
-
-                                    if (Util.isFinalResponse(response)) {
-                                        if (err.length() > 0) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), err.toString()));
-                                        } else {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Stop Solr done"));
-                                        }
+                                if (Util.isFinalResponse(response)) {
+                                    if (stdErr.length() > 0) {
+                                        addOutput(String.format("%s: %s%n", getHostname(response), stdErr));
+                                    } else {
+                                        addOutput(String.format("%s: %s%n", getHostname(response), "Stop Solr done"));
                                     }
                                 }
+
+                                return null;
                             }
                         });
 
@@ -385,7 +286,7 @@ public class Solr implements Module {
                     ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
         }
 
-        private void executeTask(Task task, final TaskCallback callback) {
+        private void executeTask(Task task, final ChainedTaskCallback callback) {
             startBtn.setEnabled(false);
             stopBtn.setEnabled(false);
             checkBtn.setEnabled(false);
@@ -393,12 +294,13 @@ public class Solr implements Module {
             uninstallBtn.setEnabled(false);
             indicator.setVisible(true);
             taskCount++;
-            taskRunner.executeTask(task, new TaskCallback() {
+            taskRunner.executeTask(task, new ChainedTaskCallback() {
 
                 @Override
-                public void onResponse(Task task, Response response) {
-                    callback.onResponse(task, response);
-                    if (task.isCompleted()) {
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    Task nextTask = callback.onResponse(task, response, stdOut, stdErr);
+
+                    if (task.isCompleted() && nextTask == null) {
                         taskCount--;
                         if (taskCount == 0) {
                             indicator.setVisible(false);
@@ -409,6 +311,8 @@ public class Solr implements Module {
                             uninstallBtn.setEnabled(true);
                         }
                     }
+
+                    return nextTask;
                 }
             });
         }
@@ -416,7 +320,7 @@ public class Solr implements Module {
         private void addOutput(String output) {
             if (!Util.isStringEmpty(output)) {
                 commandOutputTxtArea.setValue(
-                        String.format("%s\n%s",
+                        String.format("%s%n%s",
                                 commandOutputTxtArea.getValue(),
                                 output));
                 commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);

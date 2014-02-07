@@ -29,7 +29,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
@@ -171,10 +171,10 @@ public class Manager extends VerticalLayout {
         lxcMap.clear();
         lxcTable.setEnabled(false);
         Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
-        executeTask(getLxcListTask, new TaskCallback() {
+        executeTask(getLxcListTask, new ChainedTaskCallback() {
 
             @Override
-            public void onResponse(Task task, Response response) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.getData() == TaskType.GET_LXC_LIST) {
                     if (lxcMap.get(response.getUuid()) == null) {
                         lxcMap.put(response.getUuid(), new StringBuilder());
@@ -216,6 +216,8 @@ public class Manager extends VerticalLayout {
                         lxcTable.setEnabled(true);
                     }
                 }
+
+                return null;
             }
         });
     }
@@ -346,24 +348,19 @@ public class Manager extends VerticalLayout {
                                 startBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                executeTask(startLxcTask, new TaskCallback() {
-                                    StringBuilder output = new StringBuilder();
+                                executeTask(startLxcTask, new ChainedTaskCallback() {
 
                                     @Override
-                                    public void onResponse(Task task, Response response) {
+                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
                                         if (task.getData() == TaskType.START_LXC) {
                                             //send lxc-info cmd
                                             if (task.isCompleted()) {
-                                                Task lxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
-                                                executeTask(lxcInfoTask, this);
+                                                return Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
                                             }
                                         } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                            if (!Util.isStringEmpty(response.getStdOut())) {
-                                                output.append(response.getStdOut());
-                                            }
                                             if (task.isCompleted()) {
-                                                if (output.indexOf("RUNNING") != -1) {
+                                                if (stdOut.indexOf("RUNNING") != -1) {
                                                     stopBtn.setEnabled(true);
                                                 } else {
                                                     startBtn.setEnabled(true);
@@ -372,6 +369,8 @@ public class Manager extends VerticalLayout {
                                                 progressIcon.setVisible(false);
                                             }
                                         }
+
+                                        return null;
                                     }
                                 });
                             }
@@ -388,23 +387,18 @@ public class Manager extends VerticalLayout {
                                 stopBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                executeTask(stopLxcTask, new TaskCallback() {
-                                    StringBuilder output = new StringBuilder();
+                                executeTask(stopLxcTask, new ChainedTaskCallback() {
 
                                     @Override
-                                    public void onResponse(Task task, Response response) {
+                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                         if (task.getData() == TaskType.STOP_LXC) {
                                             //send lxc-info cmd
                                             if (task.isCompleted()) {
-                                                Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                executeTask(lxcInfoTask, this);
+                                                return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
                                             }
                                         } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                            if (!Util.isStringEmpty(response.getStdOut())) {
-                                                output.append(response.getStdOut());
-                                            }
                                             if (task.isCompleted()) {
-                                                if (output.indexOf("RUNNING") != -1) {
+                                                if (stdOut.indexOf("RUNNING") != -1) {
                                                     stopBtn.setEnabled(true);
                                                 } else {
                                                     startBtn.setEnabled(true);
@@ -413,6 +407,8 @@ public class Manager extends VerticalLayout {
                                                 progressIcon.setVisible(false);
                                             }
                                         }
+
+                                        return null;
                                     }
                                 });
                             }
@@ -438,23 +434,18 @@ public class Manager extends VerticalLayout {
                                                         stopBtn.setEnabled(false);
                                                         destroyBtn.setEnabled(false);
                                                         progressIcon.setVisible(true);
-                                                        executeTask(destroyLxcTask, new TaskCallback() {
-                                                            StringBuilder output = new StringBuilder();
+                                                        executeTask(destroyLxcTask, new ChainedTaskCallback() {
 
                                                             @Override
-                                                            public void onResponse(Task task, Response response) {
+                                                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                                                 if (task.getData() == TaskType.DESTROY_LXC) {
                                                                     //send lxc-info cmd
                                                                     if (task.isCompleted()) {
-                                                                        Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                                        executeTask(lxcInfoTask, this);
+                                                                        return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
                                                                     }
                                                                 } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                                                    if (!Util.isStringEmpty(response.getStdOut())) {
-                                                                        output.append(response.getStdOut());
-                                                                    }
                                                                     if (task.isCompleted()) {
-                                                                        if (output.indexOf("RUNNING") != -1) {
+                                                                        if (stdOut.indexOf("RUNNING") != -1) {
                                                                             stopBtn.setEnabled(true);
                                                                             destroyBtn.setEnabled(true);
                                                                             progressIcon.setVisible(false);
@@ -465,6 +456,7 @@ public class Manager extends VerticalLayout {
                                                                         }
                                                                     }
                                                                 }
+                                                                return null;
                                                             }
                                                         });
                                                     }
@@ -480,23 +472,18 @@ public class Manager extends VerticalLayout {
                                     stopBtn.setEnabled(false);
                                     destroyBtn.setEnabled(false);
                                     progressIcon.setVisible(true);
-                                    executeTask(destroyLxcTask, new TaskCallback() {
-                                        StringBuilder output = new StringBuilder();
+                                    executeTask(destroyLxcTask, new ChainedTaskCallback() {
 
                                         @Override
-                                        public void onResponse(Task task, Response response) {
+                                        public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                             if (task.getData() == TaskType.DESTROY_LXC) {
                                                 //send lxc-info cmd
                                                 if (task.isCompleted()) {
-                                                    Task lxcInfoTask = Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                    executeTask(lxcInfoTask, this);
+                                                    return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
                                                 }
                                             } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                                if (!Util.isStringEmpty(response.getStdOut())) {
-                                                    output.append(response.getStdOut());
-                                                }
                                                 if (task.isCompleted()) {
-                                                    if (output.indexOf("RUNNING") != -1) {
+                                                    if (stdOut.indexOf("RUNNING") != -1) {
                                                         stopBtn.setEnabled(true);
                                                         destroyBtn.setEnabled(true);
                                                         progressIcon.setVisible(false);
@@ -507,6 +494,8 @@ public class Manager extends VerticalLayout {
                                                     }
                                                 }
                                             }
+
+                                            return null;
                                         }
                                     });
                                 }
@@ -521,20 +510,22 @@ public class Manager extends VerticalLayout {
 
     }
 
-    private void executeTask(Task task, final TaskCallback callback) {
+    private void executeTask(Task task, final ChainedTaskCallback callback) {
         indicator.setVisible(true);
         taskCount++;
-        taskRunner.executeTask(task, new TaskCallback() {
+        taskRunner.executeTask(task, new ChainedTaskCallback() {
 
             @Override
-            public void onResponse(Task task, Response response) {
-                callback.onResponse(task, response);
-                if (task.isCompleted()) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                Task nextTask = callback.onResponse(task, response, stdOut, stdErr);
+                if (task.isCompleted() && nextTask == null) {
                     taskCount--;
                     if (taskCount == 0) {
                         indicator.setVisible(false);
                     }
                 }
+
+                return nextTask;
             }
         });
     }
