@@ -5,6 +5,10 @@
  */
 package org.safehaus.kiskis.mgmt.async.runner;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
@@ -18,14 +22,14 @@ public class ChainedTaskListener {
 
     private final Task task;
     private final ChainedTaskCallback taskCallback;
-    private final StringBuilder stdOut;
-    private final StringBuilder stdErr;
+    private final Map<UUID, StringBuilder> stdOut;
+    private final Map<UUID, StringBuilder> stdErr;
 
     public ChainedTaskListener(Task task, ChainedTaskCallback taskCallback) {
         this.task = task;
         this.taskCallback = taskCallback;
-        stdOut = new StringBuilder();
-        stdErr = new StringBuilder();
+        stdOut = new HashMap<UUID, StringBuilder>();
+        stdErr = new HashMap<UUID, StringBuilder>();
     }
 
     public Task getTask() {
@@ -36,30 +40,45 @@ public class ChainedTaskListener {
         return taskCallback;
     }
 
-    public void appendOut(String stdOutStr) {
-        if (!Util.isStringEmpty(stdOutStr)) {
-            stdOut.append(stdOutStr);
-            if (stdOut.length() > Common.MAX_COLLECTED_RESPONSE_LENGTH) {
-                stdOut.delete(0, stdOut.length() - Common.MAX_COLLECTED_RESPONSE_LENGTH);
+    public void appendStreams(Response response) {
+        appendOut(response);
+        appendErr(response);
+    }
+
+    private void appendOut(Response response) {
+        if (!Util.isStringEmpty(response.getStdOut())) {
+            StringBuilder sb = stdOut.get(response.getUuid());
+            if (sb == null) {
+                sb = new StringBuilder();
+                stdOut.put(response.getUuid(), sb);
+            }
+            sb.append(response.getStdOut());
+            if (sb.length() > Common.MAX_COLLECTED_RESPONSE_LENGTH) {
+                sb.delete(0, sb.length() - Common.MAX_COLLECTED_RESPONSE_LENGTH);
             }
         }
     }
 
-    public void appendErr(String stdErrStr) {
-        if (!Util.isStringEmpty(stdErrStr)) {
-            stdErr.append(stdErrStr);
-            if (stdErr.length() > Common.MAX_COLLECTED_RESPONSE_LENGTH) {
-                stdErr.delete(0, stdErr.length() - Common.MAX_COLLECTED_RESPONSE_LENGTH);
+    private void appendErr(Response response) {
+        if (!Util.isStringEmpty(response.getStdErr())) {
+            StringBuilder sb = stdErr.get(response.getUuid());
+            if (sb == null) {
+                sb = new StringBuilder();
+                stdErr.put(response.getUuid(), sb);
+            }
+            sb.append(response.getStdErr());
+            if (sb.length() > Common.MAX_COLLECTED_RESPONSE_LENGTH) {
+                sb.delete(0, sb.length() - Common.MAX_COLLECTED_RESPONSE_LENGTH);
             }
         }
     }
 
-    public String getStdOut() {
-        return stdOut.toString();
+    public String getStdOut(Response response) {
+        return stdOut.get(response.getUuid()).toString();
     }
 
-    public String getStdErr() {
-        return stdErr.toString();
+    public String getStdErr(Response response) {
+        return stdErr.get(response.getUuid()).toString();
     }
 
 }

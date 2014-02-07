@@ -38,8 +38,7 @@ public class ChainedTaskRunner {
                 ChainedTaskListener tl = taskListenerCache.get(response.getTaskUuid());
                 if (tl != null) {
 
-                    tl.appendOut(response.getStdOut());
-                    tl.appendErr(response.getStdErr());
+                    tl.appendStreams(response);
 
                     if (Util.isFinalResponse(response)) {
                         tl.getTask().incrementCompletedCommandsCount();
@@ -58,7 +57,7 @@ public class ChainedTaskRunner {
                         }
                     }
 
-                    Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(), tl.getStdErr());
+                    Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(response), tl.getStdErr(response));
 
                     return nextTask == null ? tl : new ChainedTaskListener(nextTask, tl.getTaskCallback());
                 }
