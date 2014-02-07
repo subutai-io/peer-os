@@ -27,6 +27,7 @@
         <module>flume</module>
         <module>lucene</module>
         <module>solr</module>
+        <module>monitor</module>
     </modules>
    
 </project>
