@@ -34,9 +34,13 @@ public class ChainedTaskRunner {
 
     public ChainedTaskListener feedResponse(Response response) {
         try {
-            if (response != null && response.getTaskUuid() != null) {
+            if (response != null && response.getTaskUuid() != null && response.getUuid() != null && response.getType() != null) {
                 ChainedTaskListener tl = taskListenerCache.get(response.getTaskUuid());
                 if (tl != null) {
+
+                    tl.appendOut(response.getStdOut());
+                    tl.appendErr(response.getStdErr());
+
                     if (Util.isFinalResponse(response)) {
                         tl.getTask().incrementCompletedCommandsCount();
                         if (response.getExitCode() != null && response.getExitCode() == 0) {
@@ -54,7 +58,7 @@ public class ChainedTaskRunner {
                         }
                     }
 
-                    Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response);
+                    Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(), tl.getStdErr());
 
                     return nextTask == null ? tl : new ChainedTaskListener(nextTask, tl.getTaskCallback());
                 }

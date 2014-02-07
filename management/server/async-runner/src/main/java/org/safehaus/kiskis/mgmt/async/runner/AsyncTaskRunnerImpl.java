@@ -147,7 +147,7 @@ public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
         executeTask(task, new ChainedTaskCallback() {
 
             @Override
-            public Task onResponse(Task task, Response response) {
+            public Task onResponse(Task task, Response response, String stdOut, String stErr) {
                 taskCallback.onResponse(task, response);
                 return null;
             }

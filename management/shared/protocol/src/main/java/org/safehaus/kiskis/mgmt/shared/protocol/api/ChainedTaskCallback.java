@@ -14,5 +14,5 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
  */
 public interface ChainedTaskCallback {
 
-    public Task onResponse(Task task, Response response);
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr);
 }

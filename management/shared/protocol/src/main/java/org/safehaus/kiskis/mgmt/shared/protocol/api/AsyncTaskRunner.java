@@ -16,6 +16,7 @@ public interface AsyncTaskRunner {
 
     public void executeTask(Task task, ChainedTaskCallback taskCallback);
 
+    @Deprecated
     public void executeTask(Task task, TaskCallback taskCallback);
 
     public void removeTaskCallback(UUID taskUUID);
