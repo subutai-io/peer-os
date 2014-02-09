@@ -1,0 +1,12 @@
+target
+*.iml
+*.log
+.idea
+*.idea
+*.classes
+*.o
+*.mk
+*.a
+agent/agent/KiskisAgent/Debug/*
+agent/agent/KiskisAgent/Release/*
+
