@@ -1,0 +1,62 @@
+<!-- (C) International Organization for Standardization 1991
+     Permission to copy in any form is granted for use with
+     conforming SGML systems and applications as defined in
+     ISO 8879, provided this notice is included in all copies.
+-->
+<!-- Character entity set. Typical invocation:
+     <!ENTITY % ISOAMSO  PUBLIC
+       "ISO 9573-13:1991//ENTITIES Added Math Symbols: Ordinary //EN">
+     %ISOAMSO;
+-->
+<!ENTITY ang      SDATA "[ang     ]" --/angle - angle-->
+<!ENTITY ange     SDATA "[ange    ]" --angle, equal-->
+<!ENTITY angmsd   SDATA "[angmsd  ]" --/measuredangle - angle-measured-->
+<!ENTITY angmsdaa SDATA "[angmsdaa]" --angle-measured, arrow, up, right-->
+<!ENTITY angmsdab SDATA "[angmsdab]" --angle-measured, arrow, up, left-->
+<!ENTITY angmsdac SDATA "[angmsdac]" --angle-measured, arrow, down, right-->
+<!ENTITY angmsdad SDATA "[angmsdad]" --angle-measured, arrow, down, left-->
+<!ENTITY angmsdae SDATA "[angmsdae]" --angle-measured, arrow, right, up-->
+<!ENTITY angmsdaf SDATA "[angmsdaf]" --angle-measured, arrow, left, up-->
+<!ENTITY angmsdag SDATA "[angmsdag]" --angle-measured, arrow, right, down-->
+<!ENTITY angmsdah SDATA "[angmsdah]" --angle-measured, arrow, left, down-->
+<!ENTITY angrtvb  SDATA "[angrtvb ]" --right angle-measured-->
+<!ENTITY angrtvbd SDATA "[angrtvbd]" --right angle-measured, dot-->
+<!ENTITY bbrk     SDATA "[bbrk    ]" --bottom square bracket-->
+<!ENTITY bbrktbrk SDATA "[bbrktbrk]" --bottom above top square bracket-->
+<!ENTITY bemptyv  SDATA "[bemptyv ]" --reversed circle, slash-->
+<!ENTITY beth     SDATA "[beth    ]" --/beth - beth, Hebrew-->
+<!ENTITY boxbox   SDATA "[boxbox  ]" --two joined squares-->
+<!ENTITY bprime   SDATA "[bprime  ]" --/backprime - reverse prime-->
+<!ENTITY bsemi    SDATA "[bsemi   ]" --reverse semi-colon-->
+<!ENTITY cemptyv  SDATA "[cemptyv ]" --circle, slash, small circle above-->
+<!ENTITY cirE     SDATA "[cirE    ]" --circle, two horizontal stroked to the right-->
+<!ENTITY cirscir  SDATA "[cirscir ]" --circle, small circle to the right-->
+<!ENTITY comp     SDATA "[comp    ]" --/complement - complement sign-->
+<!ENTITY daleth   SDATA "[daleth  ]" --/daleth - daleth, Hebrew-->
+<!ENTITY demptyv  SDATA "[demptyv ]" --circle, slash, bar above-->
+<!ENTITY ell      SDATA "[ell     ]" --/ell - cursive small l-->
+<!ENTITY empty    SDATA "[empty   ]" --/emptyset - zero, slash-->
+<!ENTITY emptyv   SDATA "[emptyv  ]" --/varnothing - circle, slash-->
+<!ENTITY gimel    SDATA "[gimel   ]" --/gimel - gimel, Hebrew-->
+<!ENTITY iiota    SDATA "[iiota   ]" --inverted iota-->
+<!ENTITY image    SDATA "[image   ]" --/Im - imaginary-->
+<!ENTITY imath    SDATA "[imath   ]" --/imath - small i, no dot-->
+<!ENTITY jmath    SDATA "[jmath   ]" --/jmath - small j, no dot-->
+<!ENTITY laemptyv SDATA "[laemptyv]" --circle, slash, left arrow above-->
+<!ENTITY lltri    SDATA "[lltri   ]" --lower left triangle-->
+<!ENTITY lrtri    SDATA "[lrtri   ]" --lower right triangle-->
+<!ENTITY mho      SDATA "[mho     ]" --/mho - conductance-->
+<!ENTITY nang     SDATA "[nang    ]" --not, vert, angle-->
+<!ENTITY nexist   SDATA "[nexist  ]" --/nexists - negated exists-->
+<!ENTITY oS       SDATA "[oS      ]" --/circledS - capital S in circle-->
+<!ENTITY plank    SDATA "[plank   ]" --/hbar - Planck's over 2pi-->
+<!ENTITY plankv   SDATA "[plankv  ]" --/hslash - variant Planck's over 2pi-->
+<!ENTITY raemptyv SDATA "[raemptyv]" --circle, slash, right arrow above-->
+<!ENTITY range    SDATA "[range   ]" --reverse angle, equal-->
+<!ENTITY real     SDATA "[real    ]" --/Re - real-->
+<!ENTITY tbrk     SDATA "[tbrk    ]" --top square bracket-->
+<!ENTITY trpezium SDATA "[trpezium]" --trapezium-->
+<!ENTITY ultri    SDATA "[ultri   ]" --upper left triangle-->
+<!ENTITY urtri    SDATA "[urtri   ]" --upper right triangle-->
+<!ENTITY vzigzag  SDATA "[vzigzag ]" --vertical zig-zag line-->
+<!ENTITY weierp   SDATA "[weierp  ]" --/wp - Weierstrass p-->

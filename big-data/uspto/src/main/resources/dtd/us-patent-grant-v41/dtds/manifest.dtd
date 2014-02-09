@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Document Type Definition for Manifest
+Reference this DTD as PUBLIC "-//USPTO//DTD manifest v1.0 2003-12-08//EN" 
+Contact: Bruce B. Cox 
+U.S. Patent and Trademark Office 
+Crystal Park 3, Suite 451 
+Washington, DC 20231 
++1-703-306-2606 
+bruce.cox@uspto.gov 
+***** Revision History *****
+2003-12-08
+.First public release.
+***** End Revision History *****-->
+
+<!ENTITY % name_group  "((name | (prefix?,(last-name | orgname),first-name?,
+               middle-name?,suffix?,iid?,role?,orgname?,department?,synonym*)),
+               registered-number?)" >
+
+<!ENTITY % address_group  "((address-1?,address-2?,address-3?,mailcode?,pobox?,room?,
+               address-floor?,building?,street?,city?,county?,state?,postcode?,
+               country) | text)" >
+
+<!--The manifest contains details about the physical volumes delivered. If the delivery includes priority documents, then the element priority-document points to additional files/folders that may be present with details about the priority exchange as instances of the priority-doc DTD. Those instances in turn may point to other files/folders present.-->
+<!ELEMENT manifest  (from,pdoc-certification?,filesplitting-software?,
+               physical-volumes) >
+
+<!ATTLIST manifest
+               lang  CDATA    #REQUIRED 
+               dtd-version  CDATA    #IMPLIED 
+               file  CDATA    #IMPLIED 
+               status  CDATA    #IMPLIED 
+               date-produced  CDATA    #IMPLIED 
+               ro  CDATA    #IMPLIED 
+               produced-by (applicant | RO | ISA | IPEA | IB | DO | EO)   #IMPLIED  >
+
+<!--The Office that sends the document.-->
+<!ELEMENT from  (country) >
+
+<!ELEMENT pdoc-certification  (certificate-date?,office-specific-data*,(doc-page+ | (
+               signatories?,certification-statement+))) >
+
+<!--Identification of the software used to split very large archives into blobs.-->
+<!ELEMENT filesplitting-software  (software-name,software-version,reassembly,
+               software-message?) >
+
+<!--Contains a list of all the physical volumes in the set. For each volume type, attributes indicate volume ID, creation date, and sequence in the set of volumes. The label attribute is used as an eye-readable label on the physical volume. Sequence indicates the sequence of the volume in the set.-->
+<!ELEMENT physical-volumes  (volume+) >
+
+<!--Country: use ST.3 country code, e.g. DE, FR, GB, NL, etc. Also includes EP, WO-->
+<!ELEMENT country  (#PCDATA) >
+
+<!---->
+<!ELEMENT certificate-date  (date) >
+
+<!--Office is the ST.3 country code, including the regional authorities.  Office-dtd is the file which contains the DTD for the office-specific elements.-->
+<!ELEMENT office-specific-data   EMPTY  >
+
+<!ATTLIST office-specific-data
+               office  CDATA    #REQUIRED 
+               office-dtd  CDATA    #REQUIRED 
+               file  CDATA    #REQUIRED 
+               id  ID    #IMPLIED 
+               lang  CDATA    #IMPLIED 
+               status  CDATA    #IMPLIED  >
+
+<!--doc-page - DOCument or PAGE.  This is primarily to be used when data for the whole or major sections of an application are in image format OR other formats such as pdf. Page range attributes are given when required pp- page range ppf - first page ppl - last page (for pdf). The 'img' may also be used for complete pages, eg. in drawings. Recommended id = docp01, docp02, etc.-->
+<!ELEMENT doc-page   EMPTY  >
+
+<!ATTLIST doc-page
+               id  ID    #IMPLIED 
+               he  NMTOKEN    #REQUIRED 
+               wi  NMTOKEN    #REQUIRED 
+               type (jpg | pdf | tif)   #REQUIRED 
+               alt  CDATA    #IMPLIED 
+               pp  CDATA    #IMPLIED 
+               ppf  CDATA    #IMPLIED 
+               ppl  CDATA    #IMPLIED 
+               file  CDATA    #REQUIRED 
+               color (color | bw)   #IMPLIED 
+               orientation (portrait | landscape)  "portrait" >
+
+<!--signatories
+-->
+<!ELEMENT signatories  (signatory+) >
+
+<!ELEMENT certification-statement  (#PCDATA) >
+
+<!ATTLIST certification-statement
+               lang  CDATA    #IMPLIED  >
+
+<!ELEMENT software-name  (#PCDATA) >
+
+<!ELEMENT software-version  (#PCDATA) >
+
+<!--Notes providing instructions for reassembly of blobs.-->
+<!ELEMENT reassembly  (#PCDATA) >
+
+<!ELEMENT software-message  (#PCDATA) >
+
+<!--The attribute vol-label is intended for human-readable labels to be affixed to the physical volumes. The attribute vol-label implies that a delivery might contain physical volumes of a mixture of media types.-->
+<!ELEMENT volume  (blob+) >
+
+<!ATTLIST volume
+               vol-id  CDATA    #REQUIRED 
+               date-produced  CDATA    #REQUIRED 
+               sequence  CDATA    #REQUIRED 
+               vol-type (dlt | dvd | cd | other)   #REQUIRED 
+               vol-label  CDATA    #REQUIRED  >
+
+<!--date: components of a date. Format: YYYYMMDD
+-->
+<!ELEMENT date  (#PCDATA) >
+
+<!--PCT/RO/101 Box No. X: The signature must be that of the applicant (if there are several applicants, all must sign); however, the signature may be that of the agent, or the common representative, where a separate power of attorney appointing the agent or the common representative, respectively, or a copy of a general power of attorney is already in possession of the receiving Office, is furnished... (PCT Rules 4.1(d), 4.15, and 90) Indicate the capacity of the signer with 'signatory-capacity'-->
+<!ELEMENT signatory  (%name_group;,address?,electronic-signature,signatory-capacity) >
+
+<!ELEMENT blob   EMPTY  >
+
+<!ATTLIST blob
+               date-produced  CDATA    #REQUIRED 
+               path  CDATA    #REQUIRED 
+               sequence  CDATA    #REQUIRED  >
+
+<!--Address components: Address formats differ from country to country. If no structure possible use text.-->
+<!ELEMENT address  %address_group; >
+
+<!--A signature represented by electronic means.-->
+<!ELEMENT electronic-signature  (basic-signature | enhanced-signature) >
+
+<!ATTLIST electronic-signature
+               date  CDATA    #REQUIRED 
+               place-signed  CDATA    #IMPLIED  >
+
+<!--The capacity in which the person signs.-->
+<!ELEMENT signatory-capacity  (#PCDATA) >
+
+<!--Name: if no distinction or detail can be given. Also to be used for: personal (natural person) and corporate (legal entity) names.-->
+<!ELEMENT name  (#PCDATA) >
+
+<!ATTLIST name
+               name-type (legal | natural)   #IMPLIED  >
+
+<!--Title: e.g., Mr., Mrs., Dr. etc -->
+<!ELEMENT prefix  (#PCDATA) >
+
+<!--last, family, surname-->
+<!ELEMENT last-name  (#PCDATA) >
+
+<!--organisation name or company name-->
+<!ELEMENT orgname  (#PCDATA) >
+
+<!--First or given name(s), initial(s)-->
+<!ELEMENT first-name  (#PCDATA) >
+
+<!--middle name(s) or initial(s)-->
+<!ELEMENT middle-name  (#PCDATA) >
+
+<!--name suffix (e.g., II, Jr., Dip., Ing., BA, etc.)-->
+<!ELEMENT suffix  (#PCDATA) >
+
+<!--Citations individual id-->
+<!ELEMENT iid  (#PCDATA) >
+
+<!--role, e.g. President, Chairman, etc.-->
+<!ELEMENT role  (#PCDATA) >
+
+<!--department, division, section, etc. name-->
+<!ELEMENT department  (#PCDATA) >
+
+<!--synonym-->
+<!ELEMENT synonym  (#PCDATA) >
+
+<!--registered number-->
+<!ELEMENT registered-number  (#PCDATA) >
+
+<!--a non-PKI electronic signature-->
+<!ELEMENT basic-signature  (fax-image | text-string | click-wrap) >
+
+<!--A PKI / PKCS #7 digital signature data type-->
+<!ELEMENT enhanced-signature  (pkcs7) >
+
+<!--Address, first line-->
+<!ELEMENT address-1  (#PCDATA) >
+
+<!--Address, second line-->
+<!ELEMENT address-2  (#PCDATA) >
+
+<!--Address, third line-->
+<!ELEMENT address-3  (#PCDATA) >
+
+<!--organizational mail code-->
+<!ELEMENT mailcode  (#PCDATA) >
+
+<!--Post Office Box number-->
+<!ELEMENT pobox  (#PCDATA) >
+
+<!--address room; e.g., Room 55B-->
+<!ELEMENT room  (#PCDATA) >
+
+<!--address floor, e.g., 10th-->
+<!ELEMENT address-floor  (#PCDATA) >
+
+<!--building information in address, e.g., Hoffman building-->
+<!ELEMENT building  (#PCDATA) >
+
+<!--street may contain house number or name-->
+<!ELEMENT street  (#PCDATA) >
+
+<!--City or town name-->
+<!ELEMENT city  (#PCDATA) >
+
+<!--County, parish, department, etc (mainly UK, USA)-->
+<!ELEMENT county  (#PCDATA) >
+
+<!--Region of country eg. state, province, etc.-->
+<!ELEMENT state  (#PCDATA) >
+
+<!--postal code or zip code-->
+<!ELEMENT postcode  (#PCDATA) >
+
+<!--if no structure is possible, enter text (without markup)-->
+<!ELEMENT text  (#PCDATA) >
+
+<!--a TIFF image of a signature-->
+<!ELEMENT fax-image   EMPTY  >
+
+<!ATTLIST fax-image
+               file  CDATA    #REQUIRED  >
+
+<!--a simple text string is to be used as the basic electronic signature, e.g., John Doe <text-string>/jd/</text-string>-->
+<!ELEMENT text-string  (#PCDATA) >
+
+<!--a simple 'signature', e.g., clicking a button labeled 'accept' or 'I agree'-->
+<!ELEMENT click-wrap   EMPTY  >
+
+<!--PKCS7 digital signature-->
+<!ELEMENT pkcs7   EMPTY  >

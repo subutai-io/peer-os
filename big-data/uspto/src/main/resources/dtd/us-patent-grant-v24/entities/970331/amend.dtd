@@ -1,0 +1,40 @@
+<!-- ********** Amendment Request Model  *********************         -->
+<!-- Draft Version for Electronic Filing 3/31/1997
+     This version of the DTD is intended for use by the  USPTO. -->
+<!--                                                                         -->
+
+
+<!-- The following set of declarations may be referred
+     to using a public entity as follows:
+	<!ENTITY % PTOamd PUBLIC  "-//USPTO//DTD Amendment Request 970331//EN">
+	%PTOamd;
+										-->
+
+
+<!ENTITY   % aminfo     "appnr?, docket, docdate, fni" >
+
+<!ELEMENT   amendmnt      - -   (amndinfo, amend+) >
+
+
+<!ELEMENT 	docdate	- - 	(DATE)   		-- Date of the Document -->
+
+                      
+<!ELEMENT   amndinfo      - -   (%aminfo;)  -- Amendment Information -->
+   
+<!ELEMENT   amend - -   (amreason?, (amgenmod|(aminstr?, amchgtxt)))  -- Amendment request -->
+<!ATTLIST   amend      id                ID                      #REQUIRED   -- Unique ID --
+                       xref              NMTOKEN                 #IMPLIED  
+                                                                           -- Cross reference to base document object --
+                       by                CDATA                   #REQUIRED    -- Author of Amendment --
+                       date              CDATA                   #REQUIRED    -- Date of Amendment-->   
+
+<!ELEMENT   (amreason|aminstr|amgenmod) - -     (ampara|amlist)+  -- Reason/Instructions/General -->
+   
+<!ELEMENT   amchgtxt    - -   ANY          -- Change text, any allowable in the base document -->
+   
+<!ELEMENT   (ampara|amitem)         - -   (#PCDATA)  -- Modified paragraph or list item -->
+   
+<!ELEMENT   amlist            - -   (amitem+)  -- A list of modified items -->
+   
+
+

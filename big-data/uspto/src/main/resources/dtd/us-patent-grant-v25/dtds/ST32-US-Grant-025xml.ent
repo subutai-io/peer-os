@@ -1,0 +1,39 @@
+<!-- Reference the following entity declarations by including within the parent DTD:
+
+	<!ENTITY % USPTOentities SYSTEM "ST32-US-Grant-025.ent"                                          >
+	%USPTOentities;
+
+	This file (ST32-US-Grant-025.ent) must be local (in the same directory)
+	as the parent DTD. It is used to remove the entity file declarations from
+	the parent DTD, and allows variable SYSTEM path definitions or PUBLIC
+	identifiers for catalog resolution, without altering the DTD.
+-->
+
+
+<!ENTITY % mathpac      SYSTEM "..\dtds\mathml.dtd"       >%mathpac;
+<!ENTITY % ent-mmlalias SYSTEM "..\entities\mmlalias.ent" >%ent-mmlalias;
+<!ENTITY % ent-mmlextra SYSTEM "..\entities\mmlextra.ent" >%ent-mmlextra;
+<!ENTITY % calstblx     SYSTEM "..\dtds\CALSxml.dtd"      >%calstblx;
+<!ENTITY % uspto        SYSTEM "..\entities\uspto.ent"    >%uspto;
+<!ENTITY % ent-isoamsa  SYSTEM "..\entities\isoamsa.ent"  >%ent-isoamsa;
+<!ENTITY % ent-isoamsb  SYSTEM "..\entities\isoamsb.ent"  >%ent-isoamsb;
+<!ENTITY % ent-isoamsc  SYSTEM "..\entities\isoamsc.ent"  >%ent-isoamsc;
+<!ENTITY % ent-isoamsn  SYSTEM "..\entities\isoamsn.ent"  >%ent-isoamsn;
+<!ENTITY % ent-isoamso  SYSTEM "..\entities\isoamso.ent"  >%ent-isoamso;
+<!ENTITY % ent-isoamsr  SYSTEM "..\entities\isoamsr.ent"  >%ent-isoamsr;
+<!ENTITY % ent-isogrk3  SYSTEM "..\entities\isogrk3.ent"  >%ent-isogrk3;
+<!ENTITY % ent-isogrk4  SYSTEM "..\entities\isogrk4.ent"  >%ent-isogrk4;
+<!ENTITY % ent-isomfrk  SYSTEM "..\entities\isomfrk.ent"  >%ent-isomfrk;
+<!ENTITY % ent-isomopf  SYSTEM "..\entities\isomopf.ent"  >%ent-isomopf;
+<!ENTITY % ent-isomscr  SYSTEM "..\entities\isomscr.ent"  >%ent-isomscr;
+<!ENTITY % ent-isotech  SYSTEM "..\entities\isotech.ent"  >%ent-isotech;
+<!ENTITY % ent-isobox   SYSTEM "..\entities\isobox.ent"   >%ent-isobox;
+<!ENTITY % ent-isocyr1  SYSTEM "..\entities\isocyr1.ent"  >%ent-isocyr1;
+<!ENTITY % ent-isocyr2  SYSTEM "..\entities\isocyr2.ent"  >%ent-isocyr2;
+<!ENTITY % ent-isodia   SYSTEM "..\entities\isodia.ent"   >%ent-isodia;
+<!ENTITY % ent-isogrk1  SYSTEM "..\entities\isogrk1.ent"  >%ent-isogrk1;
+<!ENTITY % ent-isogrk2  SYSTEM "..\entities\isogrk2.ent"  >%ent-isogrk2;
+<!ENTITY % ent-isolat1  SYSTEM "..\entities\isolat1.ent"  >%ent-isolat1;
+<!ENTITY % ent-isolat2  SYSTEM "..\entities\isolat2.ent"  >%ent-isolat2;
+<!ENTITY % ent-isonum   SYSTEM "..\entities\isonum.ent"   >%ent-isonum;
+<!ENTITY % ent-isopub   SYSTEM "..\entities\isopub.ent"   >%ent-isopub;

@@ -1,0 +1,18 @@
+-- Red Book XML Catalog --
+
+-- Reference the following entity declarations by including within the parent DTD:
+
+	<!ENTITY % USPTOentities SYSTEM "ST32-US-Grant-025.ent"                                          >
+	%USPTOentities;
+
+	This file (ST32-US-Grant-025.ent) must be local (in the same directory)
+	as the parent DTD. It is used to remove the entity file declarations from
+	the parent DTD, and allows variable SYSTEM path definitions or PUBLIC
+	identifiers for catalog resolution, without altering the DTD.
+--
+
+SGMLDECL "xml.dcl"
+
+SYSTEM "ST32-US-Grant-025xml.dtd"
+       "d:\redbook-2002\dtds\ST32-US-Grant-025xml.dtd"
+

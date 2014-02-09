@@ -1,0 +1,703 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!--
+Document Type Definition for mega table DTD
+Reference this DTD as PUBLIC "-//USPTO//DTD us-table-external v4.2 2007-07-12//EN"
+Alias: Mega Table DTD
+Contact: Bruce B. Cox
+U.S. Patent and Trademark Office
+600 Dulany, MDW-5D01
+Alexandria, VA  22313
++1-571-272-9004
+bruce.cox@uspto.gov
+
+
+**Revision History**
+2007-07-11 
+
+ . Added sub and sup elements to b, i, u.
+ . Added overscore element o (#PCDATA | b | i | smallcaps | sup | sub )* 
+ 
+ ..to b, i, u, crossref, dd, dt, figref,li, othercit, p, smallcaps, sub, sub2, sup, sup2 
+2005-07-19
+
+. Added id attribute to table cell.(!ENTITY % tbl.entry.att id ID #IMPLIED).
+
+-->
+<!ELEMENT us-table-external  (table,us-math*,us-chemistry*) >
+
+<!ATTLIST us-table-external
+               lang  CDATA    #REQUIRED 
+               dtd-version  CDATA    #IMPLIED 
+               file  CDATA    #IMPLIED 
+               status  CDATA    #IMPLIED 
+               id  ID    #IMPLIED 
+               country  CDATA    #REQUIRED 
+               file-reference-id  CDATA    #IMPLIED 
+               date-produced  CDATA    #IMPLIED 
+               date-publ  CDATA    #IMPLIED  
+                external-type        (math | 
+					chemistry | 
+					program-listing | 
+					other )  #IMPLIED >
+
+<!--to include mathml2.dtd  change MATHML2_DTD value to "INCLUDE", 
+change MATH_PLACEHOLDER value to "IGNORE", the same for the TABLE_DTD 
+and TABLE_PLACEHOLDER
+
+INCLUDE
+IGNORE
+-->
+
+
+<!ENTITY % UNICODE_PLANE1D_ESCAPE "INCLUDE">
+<!ENTITY % MATHML2_DTD	"IGNORE">
+<!ENTITY % TABLE_DTD "INCLUDE">
+
+<!ENTITY % MATH_PLACEHOLDER "INCLUDE">
+<!ENTITY % TABLE_PLACEHOLDER "IGNORE">
+
+<![%UNICODE_PLANE1D_ESCAPE; [
+ <!ENTITY % plane1D  "&#38;#38;#xE">
+]]>
+
+<![%MATHML2_DTD; [
+<!-- DTD MathML2: maintained by W3C.  Download from:
+     http://www.w3.org/TR/MathML2/DTD-MathML-20010221.zip
+
+     If using nsgmls-based parser (SP, Near & Far Designer, etc.)
+     Uncomment 'mathml-charent-module' switch below or replace the 
+     Referenced MathML2 DTD with the version downloadable from:
+     http://www.w3.org/Math/DTD/dtd-sp.zip
+
+     This notice copied from: http://www.w3.org/Math/DTD/
+     
+     "DTD for nsgmls
+      Some systems (including the popular nsgmls parser) may not be able 
+      to process files using 'plane 1' characters which have Unicode 
+      numbers higher than #xFFFF. The versions of the DTD provided here
+      incorporate the modifications mentioned above, but the high 
+      characters are replaced by the equivalent mchar construct 
+      <mchar name="..." /> this allows the DTD to be read and for MathML
+      files to be validated using such systems."
+-->
+<!--ENTITY % mathml-charent.module "IGNORE" -->
+<!ENTITY % MATHML.prefixed "IGNORE">
+
+<!--Work around with Microsoft MSXML3 parser in IE-->
+<!ENTITY % MATHML.xmlns.attrib "">
+
+<!--import MathML2 dtd -->
+<!ENTITY % mathml2 PUBLIC "-//W3C//DTD MathML 2.0//EN" "mathml2.dtd">
+%mathml2;
+]]>
+
+<![%TABLE_DTD; [
+<!-- DTD OASIS Open XML Exchange Table Model.  
+       Maintained by OASIS; download from:
+       http://oasis-open.org/specs/soextblx.dtd
+       Note that the FPI in soextblx.dtd refers to itself as 'calstblx'.  
+       That convention has been followed here.
+-->
+<!--  create content for title element in table  -->
+<!ENTITY % title "<!ELEMENT title (#PCDATA | b | i | o | u | sup | sub | smallcaps)* > ">
+%title;
+
+<!--override OASIS Exchange <entry> model -->
+<!ENTITY % tbl.entry.mdl "(#PCDATA | b | i | o | u | sup | sub | smallcaps | br 
+                 | patcit | nplcit | bio-deposit | crossref | figref | img 
+                 | dl | ul | ol | chemistry | maths)* ">
+
+<!ENTITY % tbl.entry.att "id ID #IMPLIED">
+
+<!--import OASIS Exchange model -->
+<!ENTITY % calstblx PUBLIC "-//OASIS//DTD XML Exchange Table Model 19990315//EN" 
+                           "soextblx.dtd">
+<!ENTITY % yesorno  "NMTOKEN" >
+<!ENTITY % tbl.table.att        " pgwide      %yesorno;       #IMPLIED
+                                  orient      (port | land)   #IMPLIED
+                                  tabstyle    NMTOKEN         #IMPLIED">
+%calstblx;
+]]>
+<![%MATH_PLACEHOLDER; [
+<!--(PLACEHOLDER:w3c math dtd)-->
+<!ELEMENT math EMPTY>
+]]>
+<![%TABLE_PLACEHOLDER; [
+<!--(PLACEHOLDER:cals table dtd)-->
+<!ELEMENT table EMPTY>
+]]>
+
+<!ENTITY % name_group "((name | (prefix? , (last-name | orgname) , first-name? , middle-name? , suffix? , iid? , role? , orgname? , department? , synonym*)) , registered-number?)">
+
+<!ENTITY % address_group "((address-1? , address-2? , address-3? , mailcode? , pobox? , room? , address-floor? , building? , street? , city? , county? , state? , postcode? , country) | text)">
+
+
+<!--(US: not used in publication.)-->
+<!ELEMENT absno  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT accepted  (date) >
+
+<!---->
+<!ELEMENT address  %address_group; >
+
+<!--Address, first line.-->
+<!ELEMENT address-1  (#PCDATA) >
+
+<!--Address, second line.-->
+<!ELEMENT address-2  (#PCDATA) >
+
+<!--Address, third line.-->
+<!ELEMENT address-3  (#PCDATA) >
+
+<!--Address floor, e.g., 10th.-->
+<!ELEMENT address-floor  (#PCDATA) >
+
+<!--ADDRESSBOOK GROUP: Holds name and contact information for individuals/organizations. The LANG attribute is REQUIRED for certain document types, e.g. the JPO PCT Request where names and addresses may be repeated in two different languages. If no structure possible use text.-->
+<!ELEMENT addressbook  ((%name_group;,address,phone*,fax*,email*,url*,ead*,dtext?) | 
+               text) >
+
+<!ATTLIST addressbook
+               id  ID    #IMPLIED 
+               lang  CDATA    #IMPLIED  >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT alttitle  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT article  (text | (author*,atl?,subname*,(serial | book),absno?,location?,
+               class*,keyword*,cpyrt?,artid?,refno*)) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT artid  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT atl  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT author  (%name_group; | addressbook) >
+
+<!ATTLIST author
+               id  ID    #IMPLIED  >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT avail  (#PCDATA) >
+
+<!--Bold formatting.-->
+<!ELEMENT b (#PCDATA | i | o | u | smallcaps | sub | sup)*>
+
+<!--Biological accession number: the identification assigned to the biological material by the depository.-->
+<!ELEMENT bio-accno  (#PCDATA) >
+
+<!--Biological deposit citation (US EFS: biological-deposit).-->
+<!ELEMENT bio-deposit  (depositary,bio-accno,date?,term?,dtext?) >
+
+<!ATTLIST bio-deposit
+               id  ID    #IMPLIED 
+               num  CDATA    #REQUIRED 
+               url  CDATA    #IMPLIED 
+               dnum  CDATA    #IMPLIED  >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT book  (text | (author*,(book-title+ | conference),(subtitle?,subname*,
+               edition?,imprint?,descrip?,series?,absno?,location*,isbn*,pubid?,vid?,
+               bookno?,notes?,class*,keyword*,cpyrt?,refno*))) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT book-title  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT bookno  (#PCDATA) >
+
+<!--(US: not used in publishing.) Line break within a paragraph.-->
+<!ELEMENT br   EMPTY  >
+
+<!--Building information in address, e.g., Hoffman building.-->
+<!ELEMENT building  (#PCDATA) >
+
+<!--(US: used for different data types depending on context.)-->
+<!ELEMENT category  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT chapter  (#PCDATA) >
+
+<!---->
+<!ELEMENT chem   EMPTY  >
+
+<!ATTLIST chem
+               id  ID    #IMPLIED 
+               file  CDATA    #REQUIRED 
+               chem-type  CDATA    #IMPLIED  >
+
+<!--Chemical formulae, ring structures, Markush structures, etc. (US: see us-chemistry as well.)-->
+<!ELEMENT chemistry  (img | (chem,img?)) >
+
+<!ATTLIST chemistry
+               id  ID    #IMPLIED 
+               num  CDATA    #REQUIRED  >
+
+<!--City or town name.-->
+<!ELEMENT city  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT class  (#PCDATA) >
+
+<!ATTLIST class
+               class-type  CDATA    #IMPLIED  >
+
+<!--Cited document column, first.-->
+<!ELEMENT colf  (#PCDATA) >
+
+<!--Cited document column, last.-->
+<!ELEMENT coll  (#PCDATA) >
+
+<!--Cited document column numbers.-->
+<!ELEMENT column  (#PCDATA | colf | coll)* >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT conference  (text | (conftitle,date?,confno?,confplace?,confsponsor*)) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT confno  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT confplace  (#PCDATA | address)* >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT confsponsor  (#PCDATA | addressbook)* >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT conftitle  (#PCDATA) >
+
+<!--Country: use ST.3 country code, e.g. DE, FR, GB, NL, etc. Also includes EP, WO, etc.-->
+<!ELEMENT country  (#PCDATA) >
+
+<!--County, parish, department, etc.-->
+<!ELEMENT county  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT cpyrt  (#PCDATA) >
+
+<!--Cross reference to any other element in the instance with an identifier (id).-->
+<!ELEMENT crossref (#PCDATA | b | i | o | u | sup | sub | smallcaps)*>
+
+
+<!ATTLIST crossref
+               idref  IDREF    #REQUIRED  >
+
+<!--Components of a date. Format: YYYYMMDD.-->
+<!ELEMENT date  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT datecit  (date) >
+
+<!--Definition description.-->
+<!ELEMENT dd  (#PCDATA | b | i | o | u | sup | sub | smallcaps | br | pre | patcit | 
+               nplcit | bio-deposit | crossref | figref | img | ul | ol | chemistry | 
+               maths)* >
+
+<!--Name of department, division, section, etc.-->
+<!ELEMENT department  (#PCDATA) >
+
+<!--Information regarding the facility storing the biological deposit.-->
+<!ELEMENT depositary  (#PCDATA | address)* >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT descrip  (#PCDATA) >
+
+<!--Definition list.-->
+<!ELEMENT dl  (dt,dd)+ >
+
+<!ATTLIST dl
+               tsize  CDATA    #IMPLIED 
+               compact (compact)   #IMPLIED 
+               id  ID    #IMPLIED  >
+
+<!--The number of the referenced document.-->
+<!ELEMENT doc-number  (#PCDATA) >
+
+<!--Document identification refers to patents and patent applications only. See WIPO ST.14.-->
+<!ELEMENT document-id  (country,doc-number,kind?,name?,date?) >
+
+<!ATTLIST document-id
+               lang  CDATA    #IMPLIED  >
+
+<!--Term to be defined.-->
+<!ELEMENT dt  (#PCDATA | b | i | o | u | sup | sub | smallcaps)* >
+
+<!ATTLIST dt
+               id  ID    #IMPLIED  >
+
+<!--Where structured data is not possible, enter text-->
+<!ELEMENT dtext  (#PCDATA) >
+
+<!--Electronic address; use for other than email.-->
+<!ELEMENT ead  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT edate  (#PCDATA) >
+
+<!--Edition statement. Indicates the edition of the classification schedule.-->
+<!ELEMENT edition  (#PCDATA) >
+
+<!--Email address.-->
+<!ELEMENT email  (#PCDATA) >
+
+<!--Fax number, format undefined.-->
+<!ELEMENT fax  (#PCDATA) >
+
+<!--A reference to a figure; e.g., "...as shown in figure 1..."-->
+<!ELEMENT figref  (#PCDATA | b | i | o | u | sup | sub | smallcaps)* >
+
+<!ATTLIST figref
+               idref  IDREFS    #IMPLIED 
+               num  CDATA    #IMPLIED  >
+
+<!--First or given name(s).-->
+<!ELEMENT first-name  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT history  (text | (received | accepted | revised | misc)) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT hostno  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT hosttitle  (#PCDATA) >
+
+<!--Italic formatting.-->
+<!ELEMENT i (#PCDATA | b | o | u | smallcaps | sub | sup )*>
+
+<!--Individual id, format undefined.-->
+<!ELEMENT iid  (#PCDATA) >
+
+<!--Image data is used for any kind of image: art work, figures, complex work units (math, tables, chemistry), etc.-->
+<!ELEMENT img   EMPTY  >
+
+<!ATTLIST img
+               id  ID    #IMPLIED 
+               he  CDATA    #REQUIRED 
+               wi  CDATA    #REQUIRED 
+               file  CDATA    #REQUIRED 
+               alt  CDATA    #IMPLIED 
+               img-content (drawing | photograph | character | dna | undefined | 
+               chem | table | math | program-listing | flowchart)  "drawing"
+               
+               img-format (jpg | tif | st33 | st35)   #REQUIRED 
+               orientation (portrait | landscape)  "portrait"
+               inline (yes | no)  "no" >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT imprint  (text | (address?,name,pubdate*)) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT ino  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT isbn  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT issn  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT issue  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT keyword  (#PCDATA) >
+
+<!--Document kind code; e.g. A1.-->
+<!ELEMENT kind  (#PCDATA) >
+
+<!--Last, family, surname.-->
+<!ELEMENT last-name  (#PCDATA) >
+
+<!--List item.-->
+<!ELEMENT li  (#PCDATA | b | i | o | u | sup | sub | smallcaps | br | pre | patcit | 
+               nplcit | bio-deposit | crossref | figref | img | dl | ul | ol | 
+               chemistry | maths)* >
+
+<!ATTLIST li
+               id  ID    #IMPLIED 
+               num  CDATA    #IMPLIED  >
+
+<!--Referenced line within cited work.-->
+<!ELEMENT line  (#PCDATA | linef | linel)* >
+
+<!--Cited document line, first.-->
+<!ELEMENT linef  (#PCDATA) >
+
+<!--Cited document line, last.-->
+<!ELEMENT linel  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT location  (text | (serpart?,sersect?,chapter?,pp?,column?,para?,line?)) >
+
+<!--Organizational mail code.-->
+<!ELEMENT mailcode  (#PCDATA) >
+
+
+<!--This is image data or coded according to mathml, version 2.-->
+<!ELEMENT maths  (img | (math,img?)) >
+
+<!ATTLIST maths
+               id  ID    #IMPLIED 
+               num  CDATA    #REQUIRED  >
+
+<!--Middle name(s) or initial(s).-->
+<!ELEMENT middle-name  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT misc  (#PCDATA | date)* >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT msn  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT mst  (#PCDATA) >
+
+<!--Name: if no distinction or detail can be given. Also to be used for: personal (natural person) and corporate (legal entity) names.-->
+<!ELEMENT name  (#PCDATA) >
+
+<!ATTLIST name
+               name-type (legal | natural)   #IMPLIED  >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT notes  (#PCDATA) >
+
+<!--Non-Patent Literature (NPL) CITation; (US: use text option ONLY. No structured data will be published.)-->
+<!ELEMENT nplcit  (text | article | book | online | othercit) >
+
+<!ATTLIST nplcit
+               id  ID    #IMPLIED 
+               num  CDATA    #IMPLIED 
+               lang  CDATA    #IMPLIED 
+               file  CDATA    #IMPLIED 
+               npl-type  CDATA    #IMPLIED 
+               medium  CDATA    #IMPLIED 
+               url  CDATA    #IMPLIED  >
+               <!--Overscore: style - single is default.-->
+<!ELEMENT o (#PCDATA | b | i | smallcaps | sub | sup)*>
+
+<!ATTLIST o  ostyle   (single | 
+                        double | 
+                        dots | 
+                        dash | 
+                        leftarrow | 
+                        rightarrow | 
+                        leftrightarrow )  'single' >
+<!--Ordered Lists: attribute 'ol-style' - recommded use: 1 arablic numbers 1, 2, 3, ... a lower alpha a, b, c, ... A upper alpha A, B, C, ... i lower roman i, ii, iii, ... I upper roman I, II, III, ...-->
+<!ELEMENT ol  (li+) >
+
+<!ATTLIST ol
+               id  ID    #IMPLIED 
+               compact (compact)   #IMPLIED 
+               ol-style  CDATA    #IMPLIED  >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT online  (text | (author*,online-title*,hosttitle?,subname*,edition?,(
+               serial | book)?,imprint?,pubdate?,history?,series?,hostno?,location?,
+               notes?,avail,class*,keyword*,cpyrt?,issn?,isbn?,datecit?,srchterm*,
+               srchdate?,refno*)) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT online-title  (#PCDATA) >
+
+<!--Organisation name or company name.-->
+<!ELEMENT orgname  (#PCDATA) >
+
+<!--Other citations. Format not defined.-->
+<!ELEMENT othercit  (#PCDATA | b | i | o | u | sup | sub)* >
+
+<!--Referenced paragraph within cited work.-->
+<!ELEMENT para  (#PCDATA | paraf | paral)* >
+
+<!--Cited paragraph, first.-->
+<!ELEMENT paraf  (#PCDATA) >
+
+<!--Cited paragraph, last.-->
+<!ELEMENT paral  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT passage  (#PCDATA) >
+
+<!--Patent Citation within abstract, description or claims.-->
+<!ELEMENT patcit  (text | (document-id,rel-passage*)) >
+
+<!ATTLIST patcit
+               id  ID    #IMPLIED 
+               num  CDATA    #IMPLIED 
+               dnum  CDATA    #IMPLIED 
+               dnum-type  CDATA    #IMPLIED 
+               file  CDATA    #IMPLIED 
+               url  CDATA    #IMPLIED  >
+
+<!--Telephone number, format undefined.-->
+<!ELEMENT phone  (#PCDATA) >
+
+<!--Post Office Box number.-->
+<!ELEMENT pobox  (#PCDATA) >
+
+<!--Postal code or zip code.-->
+<!ELEMENT postcode  (#PCDATA) >
+
+<!--Cited document page numbers.-->
+<!ELEMENT pp  (#PCDATA | ppf | ppl)* >
+
+<!--Cited document page , first.-->
+<!ELEMENT ppf  (#PCDATA) >
+
+<!--Cited document page, last.-->
+<!ELEMENT ppl  (#PCDATA) >
+
+<!--Indicates that the white space of the text should be preserved at rendering. In all cases, a fixed-width font should be used.-->
+<!ELEMENT pre  (#PCDATA) >
+
+<!ATTLIST pre
+               id  ID    #IMPLIED 
+               xml:space (preserve)   #FIXED "preserve"
+               listing-type (sequence | program-listing | other)   #REQUIRED  >
+
+<!--Title: e.g., Mr., Mrs., Dr. etc.-->
+<!ELEMENT prefix  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT pubdate  (#PCDATA | sdate | edate | time)* >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT pubid  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT received  (date) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT refno  (#PCDATA) >
+
+<!ATTLIST refno
+               id  ID    #IMPLIED  >
+
+<!--Registered number, format undefined.-->
+<!ELEMENT registered-number  (#PCDATA) >
+
+<!--(US: used for different data types depending on context.)-->
+<!ELEMENT rel-claims  (#PCDATA) >
+
+<!--Relevant passage within cited document.-->
+<!ELEMENT rel-passage  (text | (passage+,category*,rel-claims*)+) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT revised  (date) >
+
+<!--Role, e.g. President, Chairman, etc.-->
+<!ELEMENT role  (#PCDATA) >
+
+<!--Address room; e.g., Room 55B.-->
+<!ELEMENT room  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT sdate  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT serial  (sertitle,alttitle?,subname*,issue?,imprint?,pubdate?,descrip?,
+               notes?,issn?,isbn?,pubid?,vid?,ino?,cpyrt?) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT series  (text | (mst,msn?,issn?)) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT serpart  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT sersect  (#PCDATA) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT sertitle  (#PCDATA) >
+
+<!--Small capitals.-->
+<!ELEMENT smallcaps (#PCDATA | b | i | o | u)*>
+
+<!--(US: not used in publication.)-->
+<!ELEMENT srchdate  (date) >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT srchterm  (#PCDATA) >
+
+<!--Region of country eg. state, province, etc.-->
+<!ELEMENT state  (#PCDATA) >
+
+<!--Street may contain house number or house name.-->
+<!ELEMENT street  (#PCDATA) >
+
+<!--Subscripted text-->
+<!ELEMENT sub (#PCDATA | b | i | o | u | sup2 | sub2)*>
+
+<!--Second level subscripted text.-->
+
+<!ELEMENT sub2 (#PCDATA | b | i | o | u)*>
+
+<!--(US: not used in publication.)-->
+<!ELEMENT subname  (%name_group; | addressbook) >
+
+<!ATTLIST subname
+               subname-type (editor | translator | other-subname-type)  "editor"
+                >
+
+<!--(US: not used in publication.)-->
+<!ELEMENT subtitle  (#PCDATA) >
+
+<!--Name suffix (e.g., II, Jr., Dip., Ing., BA, etc.)-->
+<!ELEMENT suffix  (#PCDATA) >
+
+<!--Superscripted text-->
+<!ELEMENT sup (#PCDATA | b | i | o | u | sup2 | sub2)*>
+
+<!--Superscripted text.-->
+<!ELEMENT sup2 (#PCDATA | b | i | o | u)*>
+
+<!--Synonym.-->
+<!ELEMENT synonym  (#PCDATA) >
+
+<!--Identifies the period of time during which the depository must be able to furnish samples of the biological material.-->
+<!ELEMENT term  (#PCDATA) >
+
+<!--If no structure is possible, enter content verbatim.-->
+<!ELEMENT text  (#PCDATA) >
+
+<!--Time; format HHMM.-->
+<!ELEMENT time  (#PCDATA) >
+
+<!--Underscore: style - single is default.-->
+<!ELEMENT u (#PCDATA | b | i | o | smallcaps | sub | sup )*>
+
+<!ATTLIST u
+               style (single | double | dash | dots)  "single" >
+
+<!--Unordered Lists list-style may be empty for lists with no bullet or other symbol default list-style is 'bullets'.-->
+<!ELEMENT ul  (li+) >
+
+<!ATTLIST ul
+               id  ID    #IMPLIED 
+               list-style (bullet | dash | none)  "bullet"
+               compact (compact)   #IMPLIED  >
+
+<!--Universal Resource Locator; e.g. www.wipo.int.-->
+<!ELEMENT url  (#PCDATA) >
+
+<!--External files containing alternative formats of chemical structures.-->
+<!ELEMENT us-chemistry   EMPTY  >
+
+<!ATTLIST us-chemistry
+               idref  IDREF    #REQUIRED 
+               cdx-file  CDATA    #REQUIRED 
+               mol-file  CDATA    #REQUIRED  >
+
+<!--External files containing alternative formats of mathematical equations.-->
+<!ELEMENT us-math  (img?) >
+
+<!ATTLIST us-math
+               idrefs  IDREFS    #REQUIRED 
+               nb-file  CDATA    #REQUIRED  >
+
+
+<!--(US: not used in publication.)-->
+<!ELEMENT vid  (#PCDATA) >
+

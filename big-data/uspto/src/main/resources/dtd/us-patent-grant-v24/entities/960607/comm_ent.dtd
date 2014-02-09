@@ -1,0 +1,26 @@
+<!-- The following set of declarations may be referred  to using a public entity as follows:
+<!ENTITY % PTOent PUBLIC  "-//USA-PTO//DTD Common Entities 960607//EN">
+%PTOent;
+-->
+<!-- *************** PTO COMMON ENTITIES ******************         -->
+
+
+
+<!ENTITY forgnpri "I hereby claim foreign priority benefits under Title 35, United States Code Section 119 (a) - (d) or ;sect; 365 (b) of any foreign applications(s) for patent or inventor's certificate , or Section 365 (a) of any PCT International application which designated at least one country other than the United States of America, listed below and have also identified below, any foreign application for patent or inventor's certificate, or of any PCT applications having a filing date before that of the application on which priority is claimed.">
+
+<!ENTITY title35a "I hereby claim benefit under Title 35, United States Code Section 119(e) of any United States provisional application(s) listed below.">
+
+<!ENTITY title35b "I hereby claim the benefit under Title 35, United States Code section 120 of any United States application(s), or Section 365(c) of any PCT international application designating the United States of America, listed below, insofar as the subject matter of each of the claims of this application is not disclosed in the prior United States or PCT international application in the manner provided by the first paragraph of Title 35, United States Code, Section 112. I acknowledge the duty to disclose information which is material to patentability as defined in Title 37, Code of Federal Regulations Section 1.56 which became available between the filing date of the prior application and the national or PCT international filing date of this application.">
+
+<!ENTITY fnioath "I hereby declare that all statements made herein of my own knowledge are true and that all statements made on information and belief are believed to be true; and further that these statements were made with the knowledge that willful false statements and the like so made are punishable by fine or imprisonment, or both under Section 1001 of Title 18 of the United States Code and that such willful false statements may jeopardize the validity of the application or any patent issued therein.">
+
+<!ENTITY oath "As a below named inventor, I hereby declare that: My residence, post office address, and citizenship are as stated below.  I believe I am the original, first and sole inventor (if only one name is listed in this declaration) or an original, first and joint inventor (if plural names are listed in this declaration) of the subject matter which is claimed and for which a patent is sought on the invention as titled in this declaration, the specification of which is attached hereto, or was filed on the date indicated below as the as United States Application Number or PCT International Application Number as indicated in this declaration and was amended on the date indicated (if applicable). I hereby state that I have reviewed and understand the contents of the specification identified specification, including the claims, as amended by any amendment specifically referred to in this declaration. I acknowledge the duty to disclose information which is material to patentability as defined in Title 37 Code of Federal Regulations, Section 1.56.">
+
+<!ENTITY claimpr1 "I claim:">
+
+<!ENTITY claimpr2 "We claim:">
+
+<!ENTITY claimpr3 "What is claimed is:">
+
+<!ENTITY assign1 "To the best of my knowledge and belief, the foregoing information is true and correct and any attached copy is a true copy of the original document.">
+

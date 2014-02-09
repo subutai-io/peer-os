@@ -1,0 +1,80 @@
+<!-- ********************************************************************* -->
+<!-- *    WIPO CHARACTER ENTITY REFERENCES v1.0   2001 DECEMBER          * -->
+<!-- ********************************************************************* -->
+<!-- *    PUBLIC "-//WIPO//ENTITIES WIPO 1.0//EN" "wipo.ent"             * -->
+<!-- ********************************************************************* -->
+<!-- *    http://pcteasy.wipo.int/efiling_standards/schemaDocs/wipo.ent  * -->
+<!-- *                                                                   * -->
+<!-- ********************************************************************* -->
+<!-- *    Contacts:                                                      * -->
+<!-- *    Shiro Ankyu;  WIPO;  shiro.ankyu@wipo.int                      * -->
+<!-- *    John Dunning; WIPO;  john.dunning@wipo.int                     * -->
+<!-- ********************************************************************* -->
+<!-- *    This file maps office-specific character entities with no      * -->
+<!-- *    Unicode equivalent to the private use area of Unicode.         * -->
+<!-- ********************************************************************* -->
+
+
+<!-- ********************************************************************* -->
+<!-- ISO CHARACTER ENTITY REFERNENCES                                      -->
+<!-- ********************************************************************* -->
+<!-- All ISO Character Entity Sets, with the exception of:
+     	  isogrk1
+          isogrk2
+          isogrk4
+     are included by the MathML2 DTD                                       -->
+
+
+<!-- ********************************************************************* -->
+<!-- USPTO CHARACTER ENTITY REFERENCES Ver. 2.0 xml 2000/05/24             -->
+<!-- ********************************************************************* -->
+<!ENTITY  Dotbhalfcircle "&#xE000;" > <!-- dotted bottom half of a circle  -->
+<!ENTITY  Dotthalfcircle "&#xE001;" > <!-- dotted top half of a circle     -->
+<!ENTITY  Dotlhalfcircle "&#xE002;" > <!-- dotted left half of a circle    -->
+<!ENTITY  Dotrhalfcircle "&#xE003;" > <!-- dotted right half of a circle   -->
+<!ENTITY  Lhalfcircle    "&#xE005;" > <!-- left half of a circle           -->
+<!ENTITY  Quadbond       "&#xE006;" > <!-- quad bond                       -->
+<!ENTITY  Rhalfcircle    "&#xE007;" > <!-- right half of a circle          -->
+<!ENTITY  Ovalhollow     "&#xE008;" > <!-- oval hollow                     -->
+<!ENTITY  Ovalsolid      "&#xE00A;" > <!-- oval solid                      -->
+<!ENTITY  Linevertsplit  "&#xE00B;" > <!-- line verticle split             -->
+<!ENTITY  Parenopenst    "&#xE00C;" > <!-- parenthesis open st             -->
+<!ENTITY  Parenclosest   "&#xE00D;" > <!-- parenthesis close st            -->
+<!ENTITY  Brketopenst    "&#xE00E;" > <!-- bracket open st                 -->
+<!ENTITY  Brketclosest   "&#xE00F;" > <!-- bracket close st                -->
+
+
+<!-- ********************************************************************* -->
+<!-- EPO CHARACTER ENTITY REFERENCES                                       -->
+<!-- ********************************************************************* -->
+<!ENTITY ldurule   "&#xE011;"> <!-- Left - and +45 degree rule             -->
+<!ENTITY lhdurule  "&#xE012;"> <!-- Left horizontal, - and +45 degree rule -->
+<!ENTITY lparstr   "&#xE013;"> <!-- Left parenthesis, stroke               -->
+<!ENTITY lsqbstr   "&#xE014;"> <!-- Left square bracket, stroke            -->
+<!ENTITY rdurule   "&#xE015;"> <!-- Right - and +45 degree rule            -->
+<!ENTITY rhdurule  "&#xE016;"> <!-- Right horizontal, - and +45 degree rule-->
+<!ENTITY rparstr   "&#xE017;"> <!-- Right parenthesis, stroke              -->
+<!ENTITY rsqbstr   "&#xE018;"> <!-- Right square bracket, stroke           -->
+
+
+<!-- ********************************************************************* -->
+<!-- WIPO CHARACTER ENTITY REFERENCES                                      -->
+<!-- ********************************************************************* -->
+<!-- these are Japanese characters used in publications.  See              -->
+<!-- http://pcteasy.wipo.int/efiling_standards/schemaDocs/wipojpgaiji.pdf  -->
+<!-- ********************************************************************* -->
+<!ENTITY jpgkitsu        "&#xE0A0;"> 
+<!ENTITY jpgkou          "&#xE0A1;"> 
+<!ENTITY jpgsei2         "&#xE0A2;"> 
+<!ENTITY jpgro           "&#xE0A3;"> 
+<!ENTITY jpgkatsu        "&#xE0A4;"> 
+<!ENTITY jpgteki         "&#xE0A5;"> 
+<!ENTITY jpgro2          "&#xE0A6;"> 
+<!ENTITY jpghiji         "&#xE0A7;"> 
+<!ENTITY jpgshi          "&#xE0A8;"> 
+<!ENTITY jpgsei          "&#xE0A9;"> 
+<!ENTITY jpggyu          "&#xE0AA;"> 
+<!ENTITY jpgsou          "&#xE0AB;"> 
+<!ENTITY jpgshou         "&#xE0AC;"> 
+<!ENTITY jpghatsu        "&#xE0AD;"> 
+<!ENTITY jpgkiku         "&#xE0AE;"> 

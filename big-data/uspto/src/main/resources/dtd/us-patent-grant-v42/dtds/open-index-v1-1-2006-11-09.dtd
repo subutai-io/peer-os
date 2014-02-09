@@ -1,0 +1,85 @@
+<!--Document Type Definition for Open Index
+Reference this DTD as PUBLIC "-//USPTO//DTD open-index v1.1 2006-10-17//EN"
+Contact: Bruce B. Cox
+U.S. Patent and Trademark Office
+bruce.cox@uspto.gov
+***** Revision History *****
+2006-10-17
+.Bruce B Cox
+..Added withdrawn element as an alternative to doc-archive and doc-supp-folders
+2006-10-16
+.Bruce B Cox
+..Renamed main-path to main-archive-path; supplemental-path to supplemental-archive-path
+..Deleted s-path, s-file, m-path, m-file and replaced with path, file.
+..Changed content model of doc to (doc-number, doc-archive, doc-supp-folders?)
+..Added doc-archive (path,file*)
+..Added doc-supp-folders (doc-supp-folder+)
+..Added doc-supp-folder (path, file+)
+..Multiple folders in doc-supp-folders needed to accomodate multiple mega tables and a possible
+...mega sequence listing.
+2003-12-08
+.First public release.
+.Open-index concept from WIPO Standard ST.40.
+***** End Revision History *****
+A list of documents in the payload indicating their path.-->
+<!ELEMENT open-index  (from,volume-id,volume-label,main-archive-path,
+               supplemental-archive-path?,open-index-file,(image-content | 
+               xml-content)) >
+
+<!ATTLIST open-index
+               lang  CDATA    #REQUIRED 
+               dtd-version  CDATA    #IMPLIED 
+               file  CDATA    #IMPLIED 
+               status  CDATA    #IMPLIED 
+               date-produced  CDATA    #IMPLIED  >
+
+<!--the office that sends the document-->
+<!ELEMENT from  (country) >
+
+<!--WIPO Standard ST.3 two-letter country code for the office or organization issuing the documents.-->
+<!ELEMENT country  (#PCDATA) >
+
+<!--Volume identifier for the physical carrier of the payload described in this open index.-->
+<!ELEMENT volume-id  (#PCDATA) >
+
+<!ELEMENT volume-label  (#PCDATA) >
+
+<!--The full path and file name of the file containing either all the image files or all the XML instances and associated external entities.-->
+<!ELEMENT main-archive-path  (#PCDATA) >
+
+<!--The full path and file name of the file containing all the mega content supplementary files.-->
+<!ELEMENT supplemental-archive-path  (#PCDATA) >
+
+<!--The full path and file name of this open index file. The open index file points to itself.-->
+<!ELEMENT open-index-file  (#PCDATA) >
+
+<!ELEMENT image-content  (documents) >
+
+<!ELEMENT documents  (doc+) >
+
+<!--One doc record per document on the carrier.-->
+<!ELEMENT doc  (doc-number,((doc-archive,doc-supp-folders?) | withdrawn)) >
+
+<!--The number of the document. For US patent documents, the following formats are used:
+-->
+<!ELEMENT doc-number  (#PCDATA) >
+
+<!ELEMENT doc-archive  (path,file*) >
+
+<!--The full path to a file. Used primarily with archive files or dismountable physical volumes.-->
+<!ELEMENT path  (#PCDATA) >
+
+<!--File name without path information. Includes file name extension, if any, indicating file type.-->
+<!ELEMENT file  (#PCDATA) >
+
+<!ATTLIST file
+               file-original  CDATA    #IMPLIED  >
+
+<!ELEMENT doc-supp-folders  (doc-supp-folder+) >
+
+<!ELEMENT doc-supp-folder  (path,file+) >
+
+<!ELEMENT withdrawn   EMPTY  >
+
+<!ELEMENT xml-content  (documents) >
+
