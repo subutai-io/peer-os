@@ -1,0 +1,4 @@
+Contains the code for the agent system which is to be installed on target hosts.
+
+After the build, a custom tar.gz karaf distribution for the Agent can be found in:
+./agent-karaf/target/ directory.

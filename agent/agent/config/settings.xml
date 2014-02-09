@@ -1,0 +1,9 @@
+<Settings>
+<BrokerIP>yourBrokerIP</BrokerIP>
+<Port>yourBrokerSSLPort</Port>
+<reconnect>true</reconnect>
+<reconnect_timeout>10</reconnect_timeout>
+<reconnect_interval_max>10</reconnect_interval_max>
+<log_level>6</log_level>
+<clientpasswd>yourSSLpassword</clientpasswd>
+</Settings>

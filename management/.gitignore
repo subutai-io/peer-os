@@ -1,0 +1,18 @@
+*.class
+
+# IDE and Maven files and directories #
+*.iml
+*.ipr
+*.MF
+.idea
+.project
+.classpath
+.settings
+.metadata
+target
+
+# Package Files #
+*.jar
+*.war
+*.ear
+/server/server-karaf/nb-configuration.xml

@@ -1,0 +1,6 @@
+.idea
+*.log
+*.iml
+*.o
+*.mk
+*.classes

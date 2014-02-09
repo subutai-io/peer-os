@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!--test jira-->
+    <groupId>org.safehaus.kiskis.mgmt</groupId>
+    <artifactId>mgmt-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>Kiskis Management Server Project Parent</name>
+
+    <packaging>pom</packaging>
+
+    <!-- this is just a comment for testing -->
+    <properties>
+        <karaf.version>2.3.3</karaf.version>
+        <osgi.version>5.0.0</osgi.version>
+        <activemq.version>5.9.0</activemq.version>
+        <guava.version>15.0</guava.version>
+    </properties>
+
+    <modules>
+        <module>shared</module>
+        <module>server</module>
+    </modules>
+
+    <description>Parent project for the Kiskis Management Project Artifacts</description>
+    
+    <repositories>
+        <repository>
+            <id>apache-repo</id>
+            <name>apache-repo</name>
+            <url>https://repository.apache.org/content/groups/public</url>
+        </repository>
+        
+        <repository>
+            <id>com.springsource.repository.bundles.release</id>
+            <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/release</url>
+        </repository>
+
+        <repository>
+            <id>com.springsource.repository.bundles.external</id>
+            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/external</url>
+        </repository>        
+    </repositories>
+
+</project>
+
