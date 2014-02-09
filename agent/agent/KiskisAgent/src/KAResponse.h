@@ -19,8 +19,8 @@
  *  @details   KAResponse class is designed for marshaling and unmarshalling response messages.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.0.1
+ *  @date      Dec 17, 2013
  */
 #ifndef KARESPONSE_H_
 #define KARESPONSE_H_

@@ -45,9 +45,9 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 /**
  *
@@ -69,12 +69,12 @@ public class Manager {
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private DestroyClusterWindow destroyWindow;
     private AddNodeWindow addNodeWindow;
     private ClusterConfig config;
 
-    public Manager(final TaskRunner taskRunner) {
+    public Manager(final AsyncTaskRunner taskRunner) {
         this.taskRunner = taskRunner;
         agentManager = ServiceLocator.getService(AgentManager.class);
 
@@ -267,7 +267,7 @@ public class Manager {
                     Task checkStatusTask = Tasks.getCheckStatusTask(
                             new HashSet<Agent>(Arrays.asList(agent)),
                             nodeType);
-                    taskRunner.runTask(checkStatusTask, new CheckStatusCallback(taskRunner, progressIcon, startBtn, stopBtn, destroyBtn));
+                    taskRunner.executeTask(checkStatusTask, new CheckStatusCallback(taskRunner, progressIcon, startBtn, stopBtn, destroyBtn));
                 }
             });
 
@@ -292,7 +292,7 @@ public class Manager {
 
                     }
                     if (startNodeTask != null) {
-                        taskRunner.runTask(startNodeTask,
+                        taskRunner.executeTask(startNodeTask,
                                 new StartNodeCallback(taskRunner, progressIcon, checkBtn, startBtn, stopBtn, destroyBtn));
                     }
                 }
@@ -305,7 +305,7 @@ public class Manager {
                     Task stopNodeTask = Tasks.getStopMongoTask(
                             Util.wrapAgentToSet(agent));
 
-                    taskRunner.runTask(stopNodeTask,
+                    taskRunner.executeTask(stopNodeTask,
                             new StopNodeCallback(progressIcon, checkBtn, startBtn, stopBtn, destroyBtn));
                 }
             });
@@ -316,7 +316,7 @@ public class Manager {
                 public void buttonClick(Button.ClickEvent event) {
                     if (nodeType == NodeType.CONFIG_NODE) {
                         Operation destroyCfgSrvOperation = new DestroyNodeOperation(agent, config, nodeType);
-                        taskRunner.runTask(destroyCfgSrvOperation.getNextTask(),
+                        taskRunner.executeTask(destroyCfgSrvOperation.getNextTask(),
                                 new DestroyCfgSrvCallback(contentRoot.getWindow(),
                                         (MongoClusterInfo) clusterCombo.getValue(),
                                         config, agent,
@@ -328,7 +328,7 @@ public class Manager {
 
                     } else if (nodeType == NodeType.DATA_NODE) {
                         Operation destroyDataNodeOperation = new DestroyNodeOperation(agent, config, nodeType);
-                        taskRunner.runTask(destroyDataNodeOperation.getNextTask(),
+                        taskRunner.executeTask(destroyDataNodeOperation.getNextTask(),
                                 new DestroyDataNodeCallback(
                                         contentRoot.getWindow(), agentManager,
                                         (MongoClusterInfo) clusterCombo.getValue(),
@@ -341,7 +341,7 @@ public class Manager {
 
                     } else if (nodeType == NodeType.ROUTER_NODE) {
                         Operation destroyRouterOperation = new DestroyNodeOperation(agent, config, nodeType);
-                        taskRunner.runTask(destroyRouterOperation.getNextTask(),
+                        taskRunner.executeTask(destroyRouterOperation.getNextTask(),
                                 new DestroyRouterCallback(contentRoot.getWindow(),
                                         (MongoClusterInfo) clusterCombo.getValue(),
                                         config, agent,

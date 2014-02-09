@@ -8,10 +8,9 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -19,15 +18,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
+    private AsyncTaskRunner taskRunner;
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
+    }
+
+    public static class ModuleComponent extends CustomComponent {
 
         private final TextArea commandOutputTxtArea;
         private final AgentManager agentManager;
-        private final TaskRunner taskRunner = new TaskRunner();
+        private volatile int taskCount = 0;
 
-        public ModuleComponent() {
+        public ModuleComponent(final AsyncTaskRunner taskRunner) {
             agentManager = ServiceLocator.getService(AgentManager.class);
 
             setHeight("100%");
@@ -90,51 +93,55 @@ public class Terminal implements Module {
                     } else {
                         Task task = new Task();
                         for (Agent agent : agents) {
-                            Command cmd = getTemplate();
-                            cmd.getRequest().setUuid(agent.getUuid());
-                            cmd.getRequest().setProgram(programTxtFld.getValue().toString());
+                            Request request = getRequestTemplate();
+                            request.setUuid(agent.getUuid());
+                            request.setProgram(programTxtFld.getValue().toString());
                             if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
                                 int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
-                                if (timeout > 0) {
-                                    cmd.getRequest().setTimeout(timeout);
+                                if (timeout > 0 && timeout <= 3600) {
+                                    request.setTimeout(timeout);
                                 }
                             }
                             if (workDirTxtFld.getValue() != null && !Util.isStringEmpty(workDirTxtFld.getValue().toString())) {
-                                cmd.getRequest().setWorkingDirectory(workDirTxtFld.getValue().toString());
+                                request.setWorkingDirectory(workDirTxtFld.getValue().toString());
                             }
 
-                            task.addCommand(cmd);
+                            task.addRequest(request);
                         }
                         indicator.setVisible(true);
-                        taskRunner.runTask(task, new TaskCallback() {
+                        taskCount++;
+                        taskRunner.executeTask(task, new ChainedTaskCallback() {
 
                             @Override
-                            public void onResponse(Task task, Response response) {
-                                if (response != null && response.getUuid() != null) {
-                                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                                    String host = agent == null
-                                            ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                Agent agent = agentManager.getAgentByUUID(response.getUuid());
+                                String host = agent == null
+                                        ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
 
-                                    StringBuilder out = new StringBuilder(host).append(":\n");
-                                    if (!Util.isStringEmpty(response.getStdOut())) {
-                                        out.append(response.getStdOut()).append("\n");
+                                StringBuilder out = new StringBuilder(host).append(":\n");
+                                if (!Util.isStringEmpty(response.getStdOut())) {
+                                    out.append(response.getStdOut()).append("\n");
+                                }
+                                if (!Util.isStringEmpty(response.getStdErr())) {
+                                    out.append(response.getStdErr()).append("\n");
+                                }
+                                if (Util.isFinalResponse(response)) {
+                                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                        out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
+                                    } else {
+                                        out.append("Command timed out").append("\n\n");
                                     }
-                                    if (!Util.isStringEmpty(response.getStdErr())) {
-                                        out.append(response.getStdErr()).append("\n");
+                                }
+                                addOutput(out.toString());
+
+                                if (task.isCompleted()) {
+                                    taskCount--;
+                                    if (taskCount == 0) {
+                                        indicator.setVisible(false);
                                     }
-                                    if (Util.isFinalResponse(response)) {
-                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                            out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
-                                        } else {
-                                            out.append("Command timed out").append("\n\n");
-                                        }
-                                    }
-                                    addOutput(out.toString());
                                 }
 
-                                if (task.isCompleted() && taskRunner.getRemainingTaskCount() == 0) {
-                                    indicator.setVisible(false);
-                                }
+                                return null;
                             }
                         });
                     }
@@ -165,8 +172,8 @@ public class Terminal implements Module {
             getWindow().showNotification(notification);
         }
 
-        public static Command getTemplate() {
-            return CommandFactory.createRequest(
+        public static Request getRequestTemplate() {
+            return CommandFactory.newRequest(
                     RequestType.EXECUTE_REQUEST, // type
                     null, //                        !! agent uuid
                     MODULE_NAME, //     source
@@ -184,16 +191,6 @@ public class Terminal implements Module {
                     30); //  
         }
 
-        @Override
-        public void onCommand(Response response) {
-            taskRunner.feedResponse(response);
-        }
-
-        @Override
-        public String getName() {
-            return Terminal.MODULE_NAME;
-        }
-
     }
 
     @Override
@@ -203,7 +200,7 @@ public class Terminal implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(taskRunner);
     }
 
 }

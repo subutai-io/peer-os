@@ -5,67 +5,41 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.dao.LxcCloneInfo;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.dao.LxcCloneStatus;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.dao.LxcDao;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage.Manager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout implements TaskCallback {
-
-    private static final Logger LOG = Logger.getLogger(Cloner.class.getName());
+public class Cloner extends VerticalLayout implements ChainedTaskCallback {
 
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final Label indicator;
     private final TreeTable lxcTable;
-    private final Table tasksTable;
-    private final TaskRunner taskRunner;
+    private final AsyncTaskRunner taskRunner;
     private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
-    private final int timeout;
     private final String physicalHostLabel = "Physical Host";
     private final String statusLabel = "Status";
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
-    private final AsyncTaskRunner asyncTaskRunner;
-    private final AgentManager agentManager;
-    private final TabSheet tabSheet;
-    private final Manager manager;
-    private Thread operationTimeoutThread;
-    private Thread taskPollerThread;
+    private volatile int taskCount;
 
-    public Cloner(TabSheet tabSheet, TaskRunner taskRunner, Manager manager) {
+    public Cloner(AsyncTaskRunner taskRunner) {
         setSpacing(true);
         setMargin(true);
 
-        agentManager = ServiceLocator.getService(AgentManager.class);
-        asyncTaskRunner = ServiceLocator.getService(AsyncTaskRunner.class);
-        this.tabSheet = tabSheet;
-        this.manager = manager;
         this.taskRunner = taskRunner;
-        timeout = Commands.getCloneCommand().getRequest().getTimeout();
 
         textFieldLxcName = new TextField();
         slider = new Slider();
@@ -78,15 +52,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                startCloneTask(false);
-            }
-        });
-        Button asyncCloneBtn = new Button("Clone in background");
-        asyncCloneBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                startCloneTask(true);
+                startCloneTask();
             }
         });
 
@@ -117,34 +83,14 @@ public class Cloner extends VerticalLayout implements TaskCallback {
                         lxcTable.removeItem(rowId);
                     }
                 }
-                tasksTable.removeAllItems();
-            }
-        });
 
-        Button refreshTasksBtn = new Button("Refresh Background Tasks");
-        refreshTasksBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                Task task = new Task();
-                task.addCommand(Commands.getCloneCommand());
-                runTaskPollerThread(task);
-            }
-        });
-        Button truncateLxcInfosBtn = new Button("Delete Background Tasks");
-        truncateLxcInfosBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                LxcDao.truncateLxcInfos();
-                populateTasksTable();
             }
         });
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(10, 1);
+        GridLayout topContent = new GridLayout(7, 1);
         topContent.setSpacing(true);
 
         topContent.addComponent(new Label("Product name"));
@@ -152,42 +98,19 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         topContent.addComponent(new Label("Lxc count"));
         topContent.addComponent(slider);
         topContent.addComponent(cloneBtn);
-        topContent.addComponent(asyncCloneBtn);
-        topContent.addComponent(refreshTasksBtn);
         topContent.addComponent(clearBtn);
-        topContent.addComponent(truncateLxcInfosBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(topContent);
 
-        GridLayout bottomContent = new GridLayout(2, 1);
-        bottomContent.setSizeFull();
         lxcTable = createLxcTable("Lxc containers", 500);
-        bottomContent.addComponent(lxcTable);
-
-        tasksTable = createTasksTable("Background Clone Tasks", 500);
-        bottomContent.addComponent(tasksTable);
-
-        addComponent(bottomContent);
+        addComponent(lxcTable);
     }
 
     private TreeTable createLxcTable(String caption, int size) {
         TreeTable table = new TreeTable(caption);
         table.addContainerProperty(physicalHostLabel, String.class, null);
         table.addContainerProperty("Lxc Host", String.class, null);
-        table.addContainerProperty(statusLabel, Embedded.class, null);
-        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(size, Sizeable.UNITS_PIXELS);
-        table.setPageLength(10);
-        table.setSelectable(false);
-        table.setImmediate(true);
-        return table;
-    }
-
-    private Table createTasksTable(String caption, int size) {
-        Table table = new Table(caption);
-        table.addContainerProperty("Physical Hosts", String.class, null);
-        table.addContainerProperty("Check status", Button.class, null);
         table.addContainerProperty(statusLabel, Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
@@ -219,189 +142,46 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         }
     }
 
-    private boolean populateTasksTable() {
-        boolean allDone = true;
-        List<LxcCloneInfo> cloneInfos = LxcDao.getLxcCloneInfos();
-        tasksTable.removeAllItems();
-        if (!cloneInfos.isEmpty()) {
-            for (final LxcCloneInfo cloneInfo : cloneInfos) {
-                Button checkBtn = new Button("Check");
-                checkBtn.addListener(new Button.ClickListener() {
+    private void startCloneTask() {
+        Set<Agent> physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
 
-                    @Override
-                    public void buttonClick(Button.ClickEvent event) {
-                        Set<Agent> physicalAgents = new HashSet<Agent>();
-                        for (String physicalHost : cloneInfo.getPhysicalHosts()) {
-                            Agent agent = agentManager.getAgentByHostname(physicalHost);
-                            if (agent != null) {
-                                physicalAgents.add(agent);
-                            }
-                        }
-                        if (!physicalAgents.isEmpty()) {
-                            tabSheet.setSelectedTab(1);
-                            manager.sendGetLxcListCmd(physicalAgents);
-                        } else {
-                            show("All physical agents are offline");
-                        }
-                    }
-                });
-                Embedded statusIcon;
-                if (cloneInfo.getCloneStatus() == LxcCloneStatus.FAILED) {
-                    statusIcon = new Embedded("", new ThemeResource(errorIconSource));
-                } else if (cloneInfo.getCloneStatus() == LxcCloneStatus.SUCCEEDED) {
-                    statusIcon = new Embedded("", new ThemeResource(okIconSource));
-                } else {
-                    allDone = false;
-                    statusIcon = new Embedded("", new ThemeResource(loadIconSource));
-                }
-                tasksTable.addItem(new Object[]{cloneInfo.getPhysicalHosts(), checkBtn, statusIcon}, cloneInfo.getTaskUUID());
-            }
-        }
-
-        return allDone;
-    }
-
-    private void startCloneTask(boolean runInBackground) {
-        Set<Agent> agents = MgmtApplication.getSelectedAgents();
-        if (agents.size() > 0) {
-            Set<Agent> physicalAgents = new HashSet<Agent>();
-            //filter physical agents
-            for (Agent agent : agents) {
-                if (!agent.isIsLXC()) {
-                    physicalAgents.add(agent);
-                }
-            }
-
-            if (physicalAgents.isEmpty()) {
-                show("Select at least one physical agent");
-            } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
-                show("Enter product name");
-            } else {
-                //do the magic
-                String productName = textFieldLxcName.getValue().toString().trim();
-                Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
-                if (!runInBackground) {
-                    Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
-                    for (Agent physAgent : physicalAgents) {
-                        List<String> lxcNames = new ArrayList<String>();
-                        for (Command cmd : task.getCommands()) {
-                            if (cmd.getRequest().getUuid().compareTo(physAgent.getUuid()) == 0) {
-                                String lxcHostname
-                                        = cmd.getRequest().getArgs().get(cmd.getRequest().getArgs().size() - 1);
-                                requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequest().getRequestSequenceNumber(),
-                                        lxcHostname);
-
-                                lxcNames.add(lxcHostname);
-                            }
-                        }
-                        agentFamilies.put(physAgent, lxcNames);
-                    }
-                    populateLxcTable(agentFamilies);
-                    indicator.setVisible(true);
-                    runTimeoutThread();
-                    taskRunner.runTask(task, this);
-                } else {
-                    //run task in background
-                    List<String> physicalHosts = new ArrayList<String>();
-                    for (Agent agent : physicalAgents) {
-                        physicalHosts.add(agent.getHostname());
-                    }
-                    final LxcCloneInfo cloneInfo = new LxcCloneInfo(
-                            task.getUuid(), physicalHosts, new Date(), LxcCloneStatus.NEW);
-                    if (LxcDao.saveLxcCloneInfo(cloneInfo)) {
-                        asyncTaskRunner.executeTask(task, new TaskCallback() {
-
-                            @Override
-                            public void onResponse(Task task, Response response) {
-                                if (task.isCompleted()) {
-                                    //one could save task status to db here
-                                    //code here must not reference any UI specific objects
-
-                                    cloneInfo.setCloneStatus(
-                                            task.getTaskStatus() == TaskStatus.SUCCESS
-                                            ? LxcCloneStatus.SUCCEEDED : LxcCloneStatus.FAILED);
-                                    if (LxcDao.saveLxcCloneInfo(cloneInfo)) {
-                                        System.out.println("Background cloning is done");
-                                    }
-                                }
-                            }
-                        });
-                        runTaskPollerThread(task);
-                        show("Clone task is submitted for execution.<br/>Please, check later the status of nodes");
-                    } else {
-                        show("Error saving background task to DB");
-                    }
-                }
-            }
-        } else {
+        if (physicalAgents.isEmpty()) {
             show("Select at least one physical agent");
+        } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
+            show("Enter product name");
+        } else {
+            //do the magic
+            String productName = textFieldLxcName.getValue().toString().trim();
+            Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
+            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
+            for (Agent physAgent : physicalAgents) {
+                List<String> lxcNames = new ArrayList<String>();
+                for (Command cmd : task.getCommands()) {
+                    if (cmd.getRequest().getUuid().compareTo(physAgent.getUuid()) == 0) {
+                        String lxcHostname
+                                = cmd.getRequest().getArgs().get(cmd.getRequest().getArgs().size() - 1);
+                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequest().getRequestSequenceNumber(),
+                                lxcHostname);
+
+                        lxcNames.add(lxcHostname);
+                    }
+                }
+                agentFamilies.put(physAgent, lxcNames);
+            }
+            populateLxcTable(agentFamilies);
+            indicator.setVisible(true);
+            taskCount++;
+            taskRunner.executeTask(task, this);
         }
+
     }
 
     private void show(String msg) {
         getWindow().showNotification(msg);
     }
 
-//    private void show(String msg, int delayMs) {
-//        Window.Notification notification = new Window.Notification(msg);
-//        notification.setDelayMsec(delayMs);
-//        getWindow().showNotification(notification);
-//    }
-    private void runTimeoutThread() {
-        try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(timeout * 1000 + 5000);
-
-                        indicator.setVisible(false);
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            operationTimeoutThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
-        }
-    }
-
-    private void runTaskPollerThread(final Task task) {
-        try {
-            if (taskPollerThread != null && taskPollerThread.isAlive()) {
-                taskPollerThread.interrupt();
-            }
-            taskPollerThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    long startTs = System.currentTimeMillis();
-                    try {
-                        while (!Thread.interrupted()) {
-                            if (populateTasksTable() || task.isCompleted()
-                                    || System.currentTimeMillis() - startTs > task.getAvgTimeout() * 1000) {
-                                return;
-                            }
-                            Thread.sleep(1000);
-                        }
-
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            taskPollerThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runPollerThread", e);
-        }
-    }
-
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
         if (Util.isFinalResponse(response)) {
             String lxcHost = requestToLxcMatchMap.get(task.getUuid() + "-" + response.getRequestSequenceNumber());
             if (lxcHost != null) {
@@ -416,9 +196,14 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             }
             requestToLxcMatchMap.remove(task.getUuid() + "-" + response.getRequestSequenceNumber());
         }
-        if (task.isCompleted() && taskRunner.getRemainingTaskCount() == 0) {
-            indicator.setVisible(false);
-            requestToLxcMatchMap.clear();
+        if (task.isCompleted()) {
+            taskCount--;
+            if (taskCount == 0) {
+                indicator.setVisible(false);
+                requestToLxcMatchMap.clear();
+            }
         }
+
+        return null;
     }
 }

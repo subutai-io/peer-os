@@ -21,7 +21,7 @@ public class InstallStatusListener extends AbstractListener {
             return false;
         }
 
-        LOG.info("Hadoop installed - OK");
+        UILogger.info("Hadoop installed - OK");
 
         if (stdOut.contains("ksks-pig")) {
             UILogger.info("Pig ALREADY INSTALLED");

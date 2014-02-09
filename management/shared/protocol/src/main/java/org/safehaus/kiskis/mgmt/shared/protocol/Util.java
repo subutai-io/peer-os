@@ -79,6 +79,18 @@ public class Util {
         return filteredAgents;
     }
 
+    public static Set<Agent> filterPhysicalAgents(Set<Agent> agents) {
+        Set<Agent> filteredAgents = new HashSet<Agent>();
+        if (agents != null) {
+            for (Agent agent : agents) {
+                if (!agent.isIsLXC()) {
+                    filteredAgents.add(agent);
+                }
+            }
+        }
+        return filteredAgents;
+    }
+
     public static String removeAllWhitespace(String str) {
         if (!isStringEmpty(str)) {
             return str.replaceAll("\\s+", "");
@@ -109,7 +121,7 @@ public class Util {
         try {
             Double.parseDouble(str);
             return true;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
         }
 
         return false;

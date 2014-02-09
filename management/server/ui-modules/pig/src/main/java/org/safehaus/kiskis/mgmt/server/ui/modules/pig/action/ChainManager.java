@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.install.InstallList
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.remove.RemoveListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.remove.RemoveStatusListener;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.status.StatusListener;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UILogger;
 
 public class ChainManager {
 

@@ -1,0 +1,51 @@
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:amq="http://activemq.apache.org/schema/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+
+    <amq:broker 
+        useJmx="true" 
+        persistent="true" 
+        brokerName="sol" 
+        startAsync="true" 
+        schedulePeriodForDestinationPurge="30000"
+        offlineDurableSubscriberTimeout="300000" 
+        advisorySupport="true"
+    >
+ 
+        <amq:sslContext>
+            <amq:sslContext
+                keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
+                trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
+        </amq:sslContext>
+ 
+        <amq:transportConnectors>
+            <amq:transportConnector name="ssl" uri="nio+ssl://0.0.0.0:61616?needClientAuth=true" />
+        </amq:transportConnectors>
+        
+        <amq:destinationPolicy>
+            <amq:policyMap>
+                <amq:defaultEntry >
+                    <!--drop inactive queues after 5 min-->
+                    <amq:policyEntry  gcInactiveDestinations="true" inactiveTimoutBeforeGC="300000">
+                        
+                        <!--abort slow acking agent after 5 min-->
+                        <amq:slowConsumerStrategy>
+                            <amq:abortSlowAckConsumerStrategy maxTimeSinceLastAck="300000"/>
+                        </amq:slowConsumerStrategy>
+                        
+                        <!--ignore expired messages without storing them in DLQ-->
+                        <amq:deadLetterStrategy>
+                            <amq:sharedDeadLetterStrategy processExpired="false"/>
+                        </amq:deadLetterStrategy>
+                        
+                    </amq:policyEntry>
+                </amq:defaultEntry>
+            </amq:policyMap>
+        </amq:destinationPolicy>
+ 
+    </amq:broker>
+</beans>

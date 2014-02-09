@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClusterForm;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.logging.Logger;
@@ -33,6 +34,7 @@ public class HadoopModule implements Module {
 
         private HadoopWizard hadoopWizard;
         private ClusterForm hadoopManager;
+        private final TaskRunner taskRunner = new TaskRunner();
 
         public ModuleComponent() {
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -41,7 +43,7 @@ public class HadoopModule implements Module {
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-            hadoopWizard = new HadoopWizard();
+            hadoopWizard = new HadoopWizard(taskRunner);
             hadoopManager = new ClusterForm();
             sheet.addTab(hadoopWizard.getContent(), "Install");
             sheet.addTab(hadoopManager, "Manage");
@@ -53,9 +55,7 @@ public class HadoopModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            if (hadoopWizard != null) {
-                hadoopWizard.setOutput(response);
-            }
+            taskRunner.feedResponse(response);
 
             if (hadoopManager != null) {
                 hadoopManager.getClusterTable().onCommand(response);

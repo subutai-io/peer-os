@@ -2,15 +2,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Installation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +23,11 @@ public final class HadoopWizard {
     Step3 step3;
     int step = 0;
     private List<Agent> lxcList;
+    private TaskRunner taskRunner;
 
-    public HadoopWizard() {
-        hadoopInstallation = new Installation(getCommandManager());
+    public HadoopWizard(TaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
+        hadoopInstallation = new Installation(taskRunner);
 
         contentRoot = new GridLayout(1, 15);
         contentRoot.setSpacing(true);
@@ -108,10 +105,6 @@ public final class HadoopWizard {
         }
     }
 
-    public void setOutput(Response response) {
-        hadoopInstallation.onCommand(response, step3);
-    }
-
     public Installation getHadoopInstallation() {
         return hadoopInstallation;
     }
@@ -128,18 +121,5 @@ public final class HadoopWizard {
 
         lxcList = list;
         return list;
-    }
-
-    public CommandManager getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
-            if (serviceReference != null) {
-                return CommandManager.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
     }
 }

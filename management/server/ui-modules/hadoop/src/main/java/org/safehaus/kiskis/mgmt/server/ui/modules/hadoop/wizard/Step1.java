@@ -75,7 +75,7 @@ public class Step1 extends Panel {
         comboBoxNameNode.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                parent.getHadoopInstallation().setNameNode((Agent) event.getProperty().getValue());
+                parent.getHadoopInstallation().getConfig().setNameNode((Agent) event.getProperty().getValue());
                 comboBoxJobTracker.setContainerDataSource(getDataSourceMasters());
             }
         });
@@ -91,7 +91,7 @@ public class Step1 extends Panel {
         comboBoxJobTracker.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                parent.getHadoopInstallation().setJobTracker((Agent) event.getProperty().getValue());
+                parent.getHadoopInstallation().getConfig().setJobTracker((Agent) event.getProperty().getValue());
                 comboBoxSecondaryNameNode.setContainerDataSource(getDataSourceMasters());
             }
         });
@@ -107,7 +107,7 @@ public class Step1 extends Panel {
         comboBoxSecondaryNameNode.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                parent.getHadoopInstallation().setsNameNode((Agent) event.getProperty().getValue());
+                parent.getHadoopInstallation().getConfig().setsNameNode((Agent) event.getProperty().getValue());
             }
         });
         verticalLayoutForm.addComponent(comboBoxSecondaryNameNode);
@@ -123,7 +123,7 @@ public class Step1 extends Panel {
         comboBoxReplicationFactor.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                parent.getHadoopInstallation().setReplicationFactor((Integer) event.getProperty().getValue());
+                parent.getHadoopInstallation().getConfig().setReplicationFactor((Integer) event.getProperty().getValue());
             }
         });
         verticalLayoutForm.addComponent(comboBoxReplicationFactor);
@@ -136,8 +136,8 @@ public class Step1 extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                parent.getHadoopInstallation().setClusterName(textFieldClusterName.getValue().toString());
-                parent.getHadoopInstallation().setDomainName(textFieldDomainName.getValue().toString());
+                parent.getHadoopInstallation().getConfig().setClusterName(textFieldClusterName.getValue().toString());
+                parent.getHadoopInstallation().getConfig().setDomainName(textFieldDomainName.getValue().toString());
                 hadoopWizard.showNext();
 
             }
@@ -152,17 +152,17 @@ public class Step1 extends Panel {
     private BeanItemContainer getDataSourceMasters(){
         List<Agent> list = parent.getLxcList();
 
-        if(parent.getHadoopInstallation().getsNameNode() != null){
-            list.remove(parent.getHadoopInstallation().getsNameNode());
+       /* if(parent.getHadoopInstallation().getConfig().getsNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getConfig().getsNameNode());
         }
 
-        if(parent.getHadoopInstallation().getNameNode() != null){
-            list.remove(parent.getHadoopInstallation().getNameNode());
+        if(parent.getHadoopInstallation().getConfig().getNameNode() != null){
+            list.remove(parent.getHadoopInstallation().getConfig().getNameNode());
         }
 
-        if(parent.getHadoopInstallation().getJobTracker() != null){
-            list.remove(parent.getHadoopInstallation().getJobTracker());
-        }
+        if(parent.getHadoopInstallation().getConfig().getJobTracker() != null){
+            list.remove(parent.getHadoopInstallation().getConfig().getJobTracker());
+        }*/
 
         return new BeanItemContainer<Agent>(Agent.class, list);
     }

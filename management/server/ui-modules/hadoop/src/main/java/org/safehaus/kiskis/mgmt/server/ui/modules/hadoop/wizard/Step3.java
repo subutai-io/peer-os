@@ -78,7 +78,7 @@ public class Step3 extends Panel {
         addComponent(verticalLayout);
 
         parent.hadoopInstallation.setPanel(this);
-        parent.getHadoopInstallation().installHadoop();
+        parent.getHadoopInstallation().startInstallation();
     }
 
     public void addOutput(Task task, String stdResult) {

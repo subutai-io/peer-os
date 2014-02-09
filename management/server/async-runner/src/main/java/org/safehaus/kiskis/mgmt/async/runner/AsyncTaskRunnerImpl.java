@@ -13,36 +13,36 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 /**
  *
  * @author dilshat
  */
-public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
+public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
 
     private static final Logger LOG = Logger.getLogger(AsyncTaskRunnerImpl.class.getName());
 
     private static final String MODULE_NAME = "AsyncRunner";
-    private CommandManager commandManager;
-    private TaskRunner taskRunner;
+    private CommunicationService communicationService;
+    private ChainedTaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
 
-    public void setCommandManager(CommandManager commandManager) {
-        this.commandManager = commandManager;
+    public void setCommunicationService(CommunicationService communicationService) {
+        this.communicationService = communicationService;
     }
 
     public void init() {
         try {
-            if (commandManager != null) {
-                taskRunner = new TaskRunner(commandManager);
-                commandManager.addListener(this);
+            if (communicationService != null) {
+                taskRunner = new ChainedTaskRunner(communicationService);
+                communicationService.addListener(this);
                 LOG.info(MODULE_NAME + " started");
             } else {
                 throw new Exception("Missing CommandManager service");
@@ -57,8 +57,8 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
         try {
             executors.clear();
             taskRunner.removeAllTaskCallbacks();
-            if (commandManager != null) {
-                commandManager.removeListener(this);
+            if (communicationService != null) {
+                communicationService.removeListener(this);
             }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in destroy", e);
@@ -66,20 +66,51 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
     }
 
     @Override
-    public void onCommand(final Response response) {
-        ExecutorService executor = executors.get(response.getTaskUuid());
+    public void onResponse(Response response) {
+        switch (response.getType()) {
+            case EXECUTE_TIMEOUTED:
+            case EXECUTE_RESPONSE:
+            case EXECUTE_RESPONSE_DONE: {
+                processResponse(response);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+    }
+
+    private void processResponse(final Response response) {
+        final ExecutorService executor = executors.get(response.getTaskUuid());
         if (executor != null) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    taskRunner.feedResponse(response);
-                }
-            });
+            try {
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            ChainedTaskListener tl = taskRunner.feedResponse(response);
+                            if (tl == null || tl.getTask().isCompleted()) {
+                                executors.remove(response.getTaskUuid());
+                                executor.shutdown();
+                            } else if (tl.getTask().getUuid().compareTo(response.getTaskUuid()) != 0) {
+                                executors.remove(response.getTaskUuid());
+                                executor.shutdown();
+
+                                //run new task
+                                executeTask(tl.getTask(), tl.getTaskCallback());
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                });
+            } catch (Exception e) {
+            }
         }
     }
 
     @Override
-    public void executeTask(final Task task, final TaskCallback taskCallback) {
+    public void executeTask(final Task task, final ChainedTaskCallback taskCallback) {
         ExecutorService executor = executors.get(task.getUuid());
         if (executor == null) {
             executor = Executors.newSingleThreadExecutor();
@@ -88,6 +119,7 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
                 @Override
                 public void onEntryExpiry(ExecutorService entry) {
                     try {
+                        executors.remove(task.getUuid());
                         entry.shutdown();
                     } catch (Exception e) {
                     }
@@ -102,14 +134,33 @@ public class AsyncTaskRunnerImpl implements CommandListener, AsyncTaskRunner {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                taskRunner.runTask(task, taskCallback);
+                taskRunner.executeTask(task, taskCallback);
             }
         });
 
     }
 
     @Override
-    public String getName() {
-        return MODULE_NAME;
+    public void removeTaskCallback(UUID taskUUID) {
+        try {
+            taskRunner.removeTaskCallback(taskUUID);
+            ExecutorService executor = executors.remove(taskUUID);
+            if (executor != null) {
+                executor.shutdown();
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    @Override
+    public void executeTask(Task task, final TaskCallback taskCallback) {
+        executeTask(task, new ChainedTaskCallback() {
+
+            @Override
+            public Task onResponse(Task task, Response response, String stdOut, String stErr) {
+                taskCallback.onResponse(task, response);
+                return null;
+            }
+        });
     }
 }

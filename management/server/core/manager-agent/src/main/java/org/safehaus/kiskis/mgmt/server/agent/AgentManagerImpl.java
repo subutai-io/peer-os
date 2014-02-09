@@ -27,7 +27,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
@@ -49,11 +48,6 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
     private ExecutorService exec;
     private Cache<UUID, Agent> agents;
     private volatile boolean notifyAgentListeners = true;
-    private int agentFreshnessMin;
-
-    public void setAgentFreshnessMin(int agentFreshnessMin) {
-        this.agentFreshnessMin = agentFreshnessMin;
-    }
 
     public void setCommunicationService(CommunicationService communicationService) {
         this.communicationService = communicationService;
@@ -93,7 +87,7 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
         try {
             String cql = "select * from agents where islxc = true and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
             ResultSet rs = dbManagerService.executeQuery(cql, hostname,
-                    new Date(System.currentTimeMillis() - agentFreshnessMin * 60 * 1000));
+                    new Date(System.currentTimeMillis() - Common.AGENT_FRESHNESS_MIN * 60 * 1000));
             Row row = rs.one();
             if (row != null) {
                 agent = new Agent();
@@ -179,10 +173,12 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
     public void init() {
         try {
 
-            communicationService.addListener(this);
             agents = CacheBuilder.newBuilder().
-                    expireAfterWrite(agentFreshnessMin, TimeUnit.MINUTES).
+                    expireAfterWrite(Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES).
                     build();
+
+            communicationService.addListener(this);
+
             exec = Executors.newSingleThreadExecutor();
             exec.execute(new Runnable() {
 
@@ -246,64 +242,61 @@ public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.m
 
     private void addAgent(Response response, boolean register) {
         try {
-            if (response.getUuid() == null) {
-                throw new Exception("Error " + (register ? "registering" : "updating") + " agent: UUID is null " + response);
-            }
-            Agent checkAgent = agents.getIfPresent(response.getUuid());
-            if (checkAgent != null) {
-                //update timestamp of agent here
-                agents.put(response.getUuid(), checkAgent);
-                return;
-            }
-            Agent agent = new Agent();
-            agent.setUuid(response.getUuid());
-            agent.setHostname(response.getHostname());
-            agent.setMacAddress(response.getMacAddress());
-            agent.setTransportId(response.getTransportId());
-            if (response.isIsLxc() == null) {
-                agent.setIsLXC(false);
-            } else {
-                agent.setIsLXC(response.isIsLxc());
-            }
-            agent.setListIP(response.getIps());
-            if (agent.getHostname() == null || agent.getHostname().trim().isEmpty()) {
-                agent.setHostname(agent.getUuid().toString());
-            }
-            if (agent.isIsLXC()) {
-                if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
-                    agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
-                } else {
-                    agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
+            if (response != null) {
+                if (response.getUuid() == null) {
+                    throw new Exception("Error " + (register ? "registering" : "updating") + " agent: UUID is null " + response);
                 }
+                Agent checkAgent = agents.getIfPresent(response.getUuid());
+                if (checkAgent != null) {
+                    //update timestamp of agent here
+                    agents.put(response.getUuid(), checkAgent);
+                    return;
+                }
+                Agent agent = new Agent();
+                agent.setUuid(response.getUuid());
+                agent.setHostname(response.getHostname());
+                agent.setMacAddress(response.getMacAddress());
+                agent.setTransportId(response.getTransportId());
+                if (response.isIsLxc() == null) {
+                    agent.setIsLXC(false);
+                } else {
+                    agent.setIsLXC(response.isIsLxc());
+                }
+                agent.setListIP(response.getIps());
+                if (agent.getHostname() == null || agent.getHostname().trim().isEmpty()) {
+                    agent.setHostname(agent.getUuid().toString());
+                }
+                if (agent.isIsLXC()) {
+                    if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
+                        agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
+                    } else {
+                        agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
+                    }
+                }
+                sendAck(agent.getUuid());
+                agents.put(response.getUuid(), agent);
+                saveAgent(agent);
+                notifyAgentListeners = true;
             }
-            sendAck(agent.getUuid());
-            agents.put(response.getUuid(), agent);
-            saveAgent(agent);
-            notifyAgentListeners = true;
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in addAgent", e);
         }
     }
 
     private void sendAck(UUID agentUUID) {
-        Request request = new Request();
-        request.setType(RequestType.REGISTRATION_REQUEST_DONE);
-        request.setUuid(agentUUID);
-        request.setStdErr(OutputRedirection.NO);
-        request.setStdOut(OutputRedirection.NO);
-        Command command = CommandFactory.createRequest(
+        Request ack = CommandFactory.newRequest(
                 RequestType.REGISTRATION_REQUEST_DONE,
                 agentUUID,
                 null, null, null, null, null,
                 OutputRedirection.NO,
                 OutputRedirection.RETURN,
                 null, null, null, null, null, null);
-        communicationService.sendCommand(command);
+        communicationService.sendRequest(ack);
     }
 
     private void removeAgent(Response response) {
         try {
-            if (response.getTransportId() != null) {
+            if (response != null && response.getTransportId() != null) {
                 for (Agent agent : agents.asMap().values()) {
                     if (response.getTransportId().equalsIgnoreCase(agent.getTransportId())) {
                         agents.invalidate(agent.getUuid());

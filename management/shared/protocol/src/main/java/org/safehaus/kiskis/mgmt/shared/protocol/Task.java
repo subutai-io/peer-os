@@ -76,6 +76,14 @@ public class Task implements Serializable {
         }
     }
 
+    public void addRequest(Request request) {
+        if (request != null) {
+            request.setTaskUuid(uuid);
+            request.setRequestSequenceNumber(getIncrementedReqSeqNumber());
+            commands.add(new CommandImpl(request));
+        }
+    }
+
     public int getTotalTimeout() {
         int timeout = 0;
         for (Command cmd : commands) {
