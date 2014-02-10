@@ -26,7 +26,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -101,7 +101,6 @@ public class DestroyClusterWindow extends Window {
     void startOperation() {
         try {
             //stop any running installation
-//            taskRunner.removeAllTaskCallbacks();
             final Operation installOperation = new UninstallClusterOperation(config);
             runTimeoutThread(installOperation);
             showProgress();
@@ -109,10 +108,10 @@ public class DestroyClusterWindow extends Window {
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
+            taskRunner.executeTask(installOperation.getNextTask(), new ChainedTaskCallback() {
 
                 @Override
-                public void onResponse(Task task, Response response) {
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
                     Agent agent = agentManager.getAgentByUUID(response.getUuid());
                     addLog(String.format("%s:\n%s\n%s",
@@ -135,7 +134,7 @@ public class DestroyClusterWindow extends Window {
                             if (installOperation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-                                taskRunner.executeTask(installOperation.getNextTask(), this);
+                                return installOperation.getNextTask();
                             } else {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
@@ -150,6 +149,8 @@ public class DestroyClusterWindow extends Window {
                             hideProgress();
                         }
                     }
+
+                    return null;
                 }
             });
         } catch (Exception e) {

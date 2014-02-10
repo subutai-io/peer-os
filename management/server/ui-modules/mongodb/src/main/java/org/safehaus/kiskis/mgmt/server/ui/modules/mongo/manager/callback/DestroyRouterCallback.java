@@ -20,15 +20,14 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author dilshat
  */
-public class DestroyRouterCallback implements TaskCallback {
+public class DestroyRouterCallback implements ChainedTaskCallback {
 
     private final Window parentWindow;
     private final MongoClusterInfo clusterInfo;
@@ -37,12 +36,11 @@ public class DestroyRouterCallback implements TaskCallback {
     private final Table routersTable;
     private final Object rowId;
     private final Operation op;
-    private final AsyncTaskRunner taskRunner;
     private final Button checkButton;
     private final Button destroyButton;
     private final Embedded progressIcon;
 
-    public DestroyRouterCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table routersTable, Object rowId, Operation op, AsyncTaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyRouterCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table routersTable, Object rowId, Operation op, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
         this.clusterInfo = clusterInfo;
         this.config = config;
@@ -50,7 +48,6 @@ public class DestroyRouterCallback implements TaskCallback {
         this.routersTable = routersTable;
         this.rowId = rowId;
         this.op = op;
-        this.taskRunner = taskRunner;
         this.checkButton = checkButton;
         this.destroyButton = destroyButton;
         this.progressIcon = progressIcon;
@@ -62,11 +59,11 @@ public class DestroyRouterCallback implements TaskCallback {
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
         if (task.isCompleted()) {
             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                 if (op.hasNextTask()) {
-                    taskRunner.executeTask(op.getNextTask(), this);
+                    return op.getNextTask();
                 } else {
                     //update db
                     List<UUID> routers = new ArrayList<UUID>(clusterInfo.getRouters());
@@ -93,6 +90,8 @@ public class DestroyRouterCallback implements TaskCallback {
                 parentWindow.showNotification(String.format("Failed task %s", task.getDescription()));
             }
         }
+
+        return null;
     }
 
 }
