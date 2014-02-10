@@ -19,7 +19,7 @@
         <amq:sslContext>
             <amq:sslContext
                 keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
-                trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
+                trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="broker"/>
         </amq:sslContext>
  
         <amq:transportConnectors>

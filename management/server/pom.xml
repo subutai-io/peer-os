@@ -31,9 +31,9 @@
     <modules>
         <module>web-server</module>
         <module>core</module>
+        <module>async-runner</module>
         <module>ui</module>
         <module>ui-modules</module>
-        <module>async-runner</module>
         <module>server-karaf</module>
     </modules>
 
