@@ -36,7 +36,7 @@ public class HadoopDAO {
     public static boolean saveHadoopClusterInfo(HadoopClusterInfo cluster) {
         try {
             String cql = "insert into hadoop_cluster_info (uid, cluster_name, name_node, secondary_name_node, "
-                    + "job_tracker, replication_factor, data_nodes, task_trackers, ip_mask) "
+                    + "job_tracker, replicaton_factor, data_nodes, task_trackers, ip_mask) "
                     + "values (?,?,?,?,?,?,?,?,?)";
             dbManager.executeUpdate(cql, cluster.getUid(),
                     cluster.getClusterName(), cluster.getNameNode(),
