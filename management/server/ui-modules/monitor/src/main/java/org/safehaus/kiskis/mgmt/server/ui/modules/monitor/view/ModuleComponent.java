@@ -38,15 +38,15 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
             public void buttonClick(Button.ClickEvent event) {
                 loadScripts();
                 //getWindow().executeJavaScript("console.log( $('#subdiv') );");
-                getWindow().executeJavaScript("$('#subdiv').html('" + new Date() + "');");
+                //getWindow().executeJavaScript("$('#subdiv').html('" + new Date() + "');");
             }
         });
 
         layout.addComponent(button, "left: 30px; top: 50px;");
 
         AbsoluteLayout layout2 = new AbsoluteLayout();
-        layout2.setWidth(300, Sizeable.UNITS_PIXELS);
-        layout2.setHeight(300, Sizeable.UNITS_PIXELS);
+        layout2.setWidth(400, Sizeable.UNITS_PIXELS);
+        layout2.setHeight(400, Sizeable.UNITS_PIXELS);
         layout2.setDebugId("subdiv");
 
         layout.addComponent(layout2, "left: 200px; top: 10px;");
@@ -60,10 +60,16 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
             return;
         }
 
-        final String jquery = FileUtil.getContent("js/jquery.min.js");
-        getWindow().executeJavaScript(jquery);
+        //getWindow().executeJavaScript(FileUtil.getContent("js/jquery.min.js"));
+        loadScript("js/jquery.min.js");
+        loadScript("js/highcharts.js");
+        loadScript("js/text.js");
 
         loaded = true;
+    }
+
+    private void loadScript(String filePath) {
+        getWindow().executeJavaScript(FileUtil.getContent(filePath));
     }
 
     @Override
