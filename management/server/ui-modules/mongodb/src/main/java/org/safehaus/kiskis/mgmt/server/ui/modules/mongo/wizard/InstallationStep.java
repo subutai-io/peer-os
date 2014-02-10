@@ -29,7 +29,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -132,13 +132,13 @@ public class InstallationStep extends Panel {
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
+            taskRunner.executeTask(installOperation.getNextTask(), new ChainedTaskCallback() {
                 private final StringBuilder startConfigServersOutput = new StringBuilder();
                 private final StringBuilder startRoutersOutput = new StringBuilder();
                 private final StringBuilder startDataNodesOutput = new StringBuilder();
 
                 @Override
-                public void onResponse(Task task, Response response) {
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
                     if (task.getData() != null) {
                         boolean taskOk = false;
@@ -192,7 +192,7 @@ public class InstallationStep extends Panel {
                             if (installOperation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-                                taskRunner.executeTask(installOperation.getNextTask(), this);
+                                return installOperation.getNextTask();
                             } else {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
@@ -208,6 +208,8 @@ public class InstallationStep extends Panel {
                             hideProgress();
                         }
                     }
+
+                    return null;
                 }
             });
         } catch (Exception e) {

@@ -24,14 +24,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author dilshat
  */
-public class DestroyCfgSrvCallback implements TaskCallback {
+public class DestroyCfgSrvCallback implements ChainedTaskCallback {
 
     private final Window parentWindow;
     private final MongoClusterInfo clusterInfo;
@@ -68,7 +68,7 @@ public class DestroyCfgSrvCallback implements TaskCallback {
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
         if (task.getData() == TaskType.START_ROUTERS
                 && !Util.isStringEmpty(response.getStdOut())) {
             stdOutput.append(response.getStdOut());
@@ -83,7 +83,7 @@ public class DestroyCfgSrvCallback implements TaskCallback {
         if (task.isCompleted()) {
             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                 if (op.hasNextTask()) {
-                    taskRunner.executeTask(op.getNextTask(), this);
+                    return op.getNextTask();
                 } else {
                     //update db
                     List<UUID> configServers = new ArrayList<UUID>(clusterInfo.getConfigServers());
@@ -116,6 +116,8 @@ public class DestroyCfgSrvCallback implements TaskCallback {
                 Manager.checkNodesStatus(routersTable);
             }
         }
+
+        return null;
     }
 
 }

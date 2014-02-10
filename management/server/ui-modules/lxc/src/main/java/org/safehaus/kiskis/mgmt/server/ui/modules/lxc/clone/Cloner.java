@@ -17,6 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
 public class Cloner extends VerticalLayout implements ChainedTaskCallback {
@@ -33,6 +34,7 @@ public class Cloner extends VerticalLayout implements ChainedTaskCallback {
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
+    private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
     private volatile int taskCount;
 
     public Cloner(AsyncTaskRunner taskRunner) {
@@ -149,6 +151,12 @@ public class Cloner extends VerticalLayout implements ChainedTaskCallback {
             show("Select at least one physical agent");
         } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
             show("Enter product name");
+        } else if (!String.format("%s%s%s",
+                physicalAgents.iterator().next().getHostname(),
+                Common.PARENT_CHILD_LXC_SEPARATOR,
+                textFieldLxcName.getValue().toString().trim())
+                .matches(hostValidatorRegex)) {
+            show("Please, use only letters, digits, dots and hyphens in product name");
         } else {
             //do the magic
             String productName = textFieldLxcName.getValue().toString().trim();

@@ -27,15 +27,15 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author dilshat
  */
-public class DestroyDataNodeCallback implements TaskCallback {
+public class DestroyDataNodeCallback implements ChainedTaskCallback {
 
     private final Window parentWindow;
     private final AgentManager agentManager;
@@ -45,13 +45,11 @@ public class DestroyDataNodeCallback implements TaskCallback {
     private final Table dataNodesTable;
     private final Object rowId;
     private final Operation op;
-    private final AsyncTaskRunner taskRunner;
     private final Button checkButton;
     private final Button destroyButton;
     private final Embedded progressIcon;
-    private final StringBuilder stdOutput = new StringBuilder();
 
-    public DestroyDataNodeCallback(Window parentWindow, AgentManager agentManager, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table dataNodesTable, Object rowId, Operation op, AsyncTaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyDataNodeCallback(Window parentWindow, AgentManager agentManager, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table dataNodesTable, Object rowId, Operation op, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
         this.agentManager = agentManager;
         this.clusterInfo = clusterInfo;
@@ -60,7 +58,6 @@ public class DestroyDataNodeCallback implements TaskCallback {
         this.dataNodesTable = dataNodesTable;
         this.rowId = rowId;
         this.op = op;
-        this.taskRunner = taskRunner;
         this.progressIcon = progressIcon;
         this.checkButton = checkButton;
         this.destroyButton = destroyButton;
@@ -72,14 +69,11 @@ public class DestroyDataNodeCallback implements TaskCallback {
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
         if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
-            if (!Util.isStringEmpty(response.getStdOut())) {
-                stdOutput.append(response.getStdOut());
-            }
             if (task.isCompleted()) {
                 Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                Matcher m = p.matcher(stdOutput.toString());
+                Matcher m = p.matcher(stdOut.toString());
                 Agent primaryNodeAgent = null;
                 if (m.find()) {
                     String primaryNodeHost = m.group(1);
@@ -104,13 +98,13 @@ public class DestroyDataNodeCallback implements TaskCallback {
                     op.getNextTask();
                 }
 
-                taskRunner.executeTask(op.getNextTask(), this);
+                return op.getNextTask();
 //                }
             }
         } else if (task.isCompleted()) {
             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                 if (op.hasNextTask()) {
-                    taskRunner.executeTask(op.getNextTask(), this);
+                    return op.getNextTask();
                 } else {
                     //update db
                     List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
@@ -137,6 +131,8 @@ public class DestroyDataNodeCallback implements TaskCallback {
                 parentWindow.showNotification(String.format("Failed task %s", task.getDescription()));
             }
         }
+
+        return null;
     }
 
 }

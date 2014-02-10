@@ -10,13 +10,13 @@ import com.vaadin.ui.Embedded;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 
 /**
  *
  * @author dilshat
  */
-public class StopNodeCallback implements TaskCallback {
+public class StopNodeCallback implements ChainedTaskCallback {
 
     private final Button checkButton;
 
@@ -29,10 +29,12 @@ public class StopNodeCallback implements TaskCallback {
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
         if (Util.isFinalResponse(response)) {
             checkButton.click();
         }
+
+        return null;
     }
 
 }
