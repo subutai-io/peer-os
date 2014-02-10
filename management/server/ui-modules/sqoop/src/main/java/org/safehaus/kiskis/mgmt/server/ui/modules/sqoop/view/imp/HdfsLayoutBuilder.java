@@ -35,7 +35,7 @@ public class HdfsLayoutBuilder {
         layout.addComponent(passwordField, "left: 30px; top: 300px;");
 
         layout.addComponent(UIUtil.getButton("Back", 120, ImportLayoutBuilder.getListener(LayoutType.MAIN)), "left: 30px; top: 380px;");
-        layout.addComponent(UIUtil.getButton("Export", 120, chain), "left: 160px; top: 380px;");
+        layout.addComponent(UIUtil.getButton("Import", 120, chain), "left: 160px; top: 380px;");
         layout.addComponent(textArea, "left: 380px; top: 100px;");
 
         return layout;
