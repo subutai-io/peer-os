@@ -44,7 +44,7 @@ public class Manager extends VerticalLayout {
     private final Button stopAllBtn;
     private final Button destroyAllBtn;
     private final TreeTable lxcTable;
-    private final Map<UUID, StringBuilder> lxcMap = new HashMap<UUID, StringBuilder>();
+    private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
     private final AgentManager agentManager;
     private final static String physicalHostLabel = "Physical Host";
     private Set<Agent> physicalAgents;
@@ -176,21 +176,19 @@ public class Manager extends VerticalLayout {
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.getData() == TaskType.GET_LXC_LIST) {
-                    if (lxcMap.get(response.getUuid()) == null) {
-                        lxcMap.put(response.getUuid(), new StringBuilder());
-                    }
-                    if (!Util.isStringEmpty(response.getStdOut())) {
-                        lxcMap.get(response.getUuid()).append(response.getStdOut());
+                    
+                    if (Util.isFinalResponse(response)) {
+                        lxcMap.put(response.getUuid(), stdOut);
                     }
 
                     if (task.isCompleted()) {
                         Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
-                        for (Map.Entry<UUID, StringBuilder> parentEntry : lxcMap.entrySet()) {
+                        for (Map.Entry<UUID, String> parentEntry : lxcMap.entrySet()) {
                             Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
                             String parentHostname = agent == null
                                     ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
                             EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
-                            String[] lxcStrs = parentEntry.getValue().toString().split("\\n");
+                            String[] lxcStrs = parentEntry.getValue().split("\\n");
                             LxcState currState = null;
                             for (String lxcStr : lxcStrs) {
                                 if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
