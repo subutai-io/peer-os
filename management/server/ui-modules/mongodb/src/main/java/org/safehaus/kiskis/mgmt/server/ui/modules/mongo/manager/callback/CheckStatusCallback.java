@@ -11,21 +11,19 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 
 /**
  *
  * @author dilshat
  */
-public class CheckStatusCallback implements TaskCallback {
+public class CheckStatusCallback implements ChainedTaskCallback {
 
     private final AsyncTaskRunner taskRunner;
     private final Embedded progressIcon;
     private final Button startButton;
     private final Button stopButton;
     private final Button destroyButton;
-    private final StringBuilder stdOutput = new StringBuilder();
-    private final StringBuilder stdErr = new StringBuilder();
 
     public CheckStatusCallback(AsyncTaskRunner taskRunner, Embedded progressIcon, Button startButton, Button stopButton, Button destroyButton) {
         this.taskRunner = taskRunner;
@@ -40,20 +38,14 @@ public class CheckStatusCallback implements TaskCallback {
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
-        if (!Util.isStringEmpty(response.getStdOut())) {
-            stdOutput.append(response.getStdOut());
-        }
-        if (!Util.isStringEmpty(response.getStdErr())) {
-            stdErr.append(response.getStdErr());
-        }
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
-        if (stdOutput.indexOf("couldn't connect to server") > -1) {
+        if (stdOut.indexOf("couldn't connect to server") > -1) {
             startButton.setEnabled(true);
             destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
             taskRunner.removeTaskCallback(task.getUuid());
-        } else if (stdOutput.indexOf("connecting to") > -1) {
+        } else if (stdOut.indexOf("connecting to") > -1) {
             stopButton.setEnabled(true);
             destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
@@ -66,6 +58,8 @@ public class CheckStatusCallback implements TaskCallback {
             destroyButton.setEnabled(true);
             progressIcon.setVisible(false);
         }
+
+        return null;
     }
 
 }

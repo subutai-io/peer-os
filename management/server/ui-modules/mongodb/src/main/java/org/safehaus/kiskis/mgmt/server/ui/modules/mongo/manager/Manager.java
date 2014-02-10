@@ -55,11 +55,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
  *
  */
 public class Manager {
-    /*
-     TODO:
-     1) add node
-     2) add agent log to main manager window???
-     */
 
     private static final Logger LOG = Logger.getLogger(Manager.class.getName());
 
@@ -335,7 +330,7 @@ public class Manager {
                                         config, agent,
                                         dataNodesTable, rowId,
                                         destroyDataNodeOperation,
-                                        taskRunner, progressIcon,
+                                        progressIcon,
                                         checkBtn, startBtn,
                                         stopBtn, destroyBtn));
 
@@ -347,7 +342,7 @@ public class Manager {
                                         config, agent,
                                         routersTable,
                                         rowId, destroyRouterOperation,
-                                        taskRunner, progressIcon,
+                                        progressIcon,
                                         checkBtn, startBtn,
                                         stopBtn, destroyBtn));
                     }
