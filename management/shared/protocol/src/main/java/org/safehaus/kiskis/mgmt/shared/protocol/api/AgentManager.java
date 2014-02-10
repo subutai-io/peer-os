@@ -22,13 +22,15 @@ public interface AgentManager {
 
     public Agent getAgentByHostname(String hostname);
 
+    public Agent getPhysicalAgentByHostnameFromDB(String hostname);
+
+    public Agent getLxcAgentByHostnameFromDB(String hostname);
+
     public Agent getAgentByUUID(UUID uuid);
 
     public Set<Agent> getLxcAgents();
 
     public Set<Agent> getLxcAgentsByParentHostname(String parentHostname);
-
-    public Agent getAgentByHostnameFromDB(String hostname);
 
     public Agent getAgentByUUIDFromDB(UUID uuid);
 
