@@ -70,7 +70,7 @@ public class DbManagerImpl implements DbManager {
             }
             return session.execute(boundStatement);
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveHadoopClusterInfo", ex);
+            LOG.log(Level.SEVERE, "Error in executeQuery", ex);
             return null;
         }
     }
@@ -84,7 +84,7 @@ public class DbManagerImpl implements DbManager {
             }
             session.execute(boundStatement);
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveHadoopClusterInfo", ex);
+            LOG.log(Level.SEVERE, "Error in executeUpdate", ex);
         }
     }
 
