@@ -1,65 +1,54 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileUtil {
 
     private static final Logger log = Logger.getLogger(FileUtil.class.getName());
-
-    static URL urlToClass;
-
-    private FileUtil() {
-        urlToClass = this.getClass().getProtectionDomain().getCodeSource().getLocation();
-    }
+    private static URLClassLoader classLoader;
 
     public static String getContent(String filePath) {
-
-        new FileUtil();
-
-        log.info("urlToClass: " + urlToClass);
-
-
-        ClassLoader currentThreadClassLoader = Thread.currentThread().getContextClassLoader();
-        //ClazzL = new URLClassLoader(new URL[]{new File("/home/grant/plugins/MenuPlugin.jar").toURL()}, currentThreadClassLoader);
-        final URLClassLoader cl = new URLClassLoader(new URL[]{ urlToClass }, currentThreadClassLoader);
-
-/*        String script = ""
-                + " var s = document.createElement('script'); "
-                + " s.type = 'text/javascript'; "
-                + " var code = 'function hello(){console.log(123);}'; "
-                + " try { "
-                + " s.appendChild(document.createTextNode(code)); "
-                + " document.body.appendChild(s); hello();"   // <-
-                + " } catch (e) { "
-                + " s.text = code; "
-                + " document.body.appendChild(s); console.log(2);"
-                + " } ";*/
-
-        log.info("urlToClass: " + urlToClass);
-
-        String script2 = "";
+        String content = "";
 
         try {
-            InputStream is = cl.getResourceAsStream("js/text.js");
-            log.info("is: " + is);
-            log.info("size: " + is.available());
-
-             script2 = streamToString(is);
-
-            is.close();
-
+            content = readFile(filePath);
         } catch (Exception e) {
-            log.info("error: " + e);
+            log.log(Level.SEVERE, "Error while reading file: " + e);
         }
 
-        return script2;
+        return content;
+    }
+
+    private static String readFile(String filePath) throws IOException {
+
+        InputStream is = getClassLoader().getResourceAsStream(filePath);
+        String s = streamToString(is);
+        is.close();
+
+        return s;
+    }
+
+    private static URLClassLoader getClassLoader() {
+
+        if (classLoader != null) {
+            return classLoader;
+        }
+
+        // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
+        URL url = new FileUtil().getClass().getProtectionDomain().getCodeSource().getLocation();
+        classLoader = new URLClassLoader(new URL[]{ url }, Thread.currentThread().getContextClassLoader());
+
+        return classLoader;
     }
 
     private static String streamToString(InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        Scanner scanner = new Scanner(is).useDelimiter("\\A");
+        return scanner.hasNext() ? scanner.next() : "";
     }
 }
