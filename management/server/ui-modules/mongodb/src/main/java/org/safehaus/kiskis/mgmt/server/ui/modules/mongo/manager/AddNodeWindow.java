@@ -41,8 +41,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -193,7 +193,6 @@ public class AddNodeWindow extends Window {
     private void startOperation(final NodeType nodeType, final Agent agent) {
         try {
             //stop any running installation
-//            taskRunner.removeAllTaskCallbacks();
             final Operation operation
                     = (nodeType == NodeType.DATA_NODE)
                     ? new AddDataNodeOperation(config, agent)
@@ -206,21 +205,18 @@ public class AddNodeWindow extends Window {
             addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(operation.getNextTask(), new TaskCallback() {
+            taskRunner.executeTask(operation.getNextTask(), new ChainedTaskCallback() {
 
-                private final StringBuilder stdOutput = new StringBuilder();
+                private final StringBuilder routersOutput = new StringBuilder();
 
                 @Override
-                public void onResponse(Task task, Response response) {
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                     if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
-                        if (!Util.isStringEmpty(response.getStdOut())) {
-                            stdOutput.append(response.getStdOut());
-                        }
 
                         if (task.isCompleted()) {
                             Agent primaryNodeAgent = null;
                             Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                            Matcher m = p.matcher(stdOutput.toString());
+                            Matcher m = p.matcher(stdOut);
                             if (m.find()) {
                                 String primaryNodeHost = m.group(1);
                                 if (!Util.isStringEmpty(primaryNodeHost)) {
@@ -235,27 +231,25 @@ public class AddNodeWindow extends Window {
                             } else {
                                 task.setTaskStatus(TaskStatus.FAIL);
                             }
-                            stdOutput.setLength(0);
                         }
                     } else if (task.getData() == TaskType.START_REPLICA_SET
                             || task.getData() == TaskType.START_ROUTERS
                             || task.getData() == TaskType.START_CONFIG_SERVERS
                             || task.getData() == TaskType.RESTART_ROUTERS) {
-                        if (!Util.isStringEmpty(response.getStdOut())) {
-                            stdOutput.append(response.getStdOut());
+                        if (task.getData() == TaskType.RESTART_ROUTERS && !Util.isStringEmpty(response.getStdOut())) {
+                            routersOutput.append(response.getStdOut());
                         }
 
                         if ((task.getData() == TaskType.RESTART_ROUTERS
-                                && Util.countNumberOfOccurences(stdOutput.toString(),
+                                && Util.countNumberOfOccurences(routersOutput.toString(),
                                         "child process started successfully, parent exiting")
                                 == config.getRouterServers().size())
                                 || (task.getData() != TaskType.RESTART_ROUTERS
-                                && stdOutput.indexOf(
+                                && stdOut.indexOf(
                                         "child process started successfully, parent exiting") > -1)) {
                             task.setTaskStatus(TaskStatus.SUCCESS);
                             task.setCompleted(true);
                             taskRunner.removeTaskCallback(task.getUuid());
-                            stdOutput.setLength(0);
                         }
                     }
 
@@ -281,7 +275,8 @@ public class AddNodeWindow extends Window {
                             if (operation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
                                 addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
-                                taskRunner.executeTask(operation.getNextTask(), this);
+
+                                return operation.getNextTask();
                             } else {
                                 operation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", operation.getDescription()));
@@ -311,6 +306,8 @@ public class AddNodeWindow extends Window {
                             hideProgress();
                         }
                     }
+
+                    return null;
                 }
             });
         } catch (Exception e) {

@@ -39,7 +39,7 @@ public class HBaseLayoutBuilder {
         layout.addComponent(hbaseColumnField, "left: 30px; top: 400px;");
 
         layout.addComponent(UIUtil.getButton("Back", 120, ImportLayoutBuilder.getListener(LayoutType.MAIN)), "left: 30px; top: 500px;");
-        layout.addComponent(UIUtil.getButton("Export", 120, chain), "left: 160px; top: 500px;");
+        layout.addComponent(UIUtil.getButton("Import", 120, chain), "left: 160px; top: 500px;");
         layout.addComponent(textArea, "left: 380px; top: 100px;");
 
         return layout;
