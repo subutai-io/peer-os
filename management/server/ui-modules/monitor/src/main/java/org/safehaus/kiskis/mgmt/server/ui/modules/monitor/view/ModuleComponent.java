@@ -3,18 +3,15 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
-public class ModuleComponent extends CustomComponent implements CommandListener {
+public class ModuleComponent extends CustomComponent {
 
     private final Logger log = Logger.getLogger(ModuleComponent.class.getName());
     private final String moduleName;
 
-    private static boolean loaded;
+    private boolean loaded;
 
     public ModuleComponent(String moduleName) {
 
@@ -36,17 +33,18 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                getWindow().executeJavaScript("console.log(1)");
                 loadScripts();
-                //getWindow().executeJavaScript("console.log( $('#subdiv') );");
-                //getWindow().executeJavaScript("$('#subdiv').html('" + new Date() + "');");
+                loadScript("js/chart.js");
+                getWindow().executeJavaScript("console.log(2)");
             }
         });
 
         layout.addComponent(button, "left: 30px; top: 50px;");
 
         AbsoluteLayout layout2 = new AbsoluteLayout();
-        layout2.setWidth(400, Sizeable.UNITS_PIXELS);
-        layout2.setHeight(400, Sizeable.UNITS_PIXELS);
+        layout2.setWidth(800, Sizeable.UNITS_PIXELS);
+        layout2.setHeight(300, Sizeable.UNITS_PIXELS);
         layout2.setDebugId("subdiv");
 
         layout.addComponent(layout2, "left: 200px; top: 10px;");
@@ -55,15 +53,14 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
     }
 
     private void loadScripts() {
+        log.info("loaded: " + loaded);
 
         if (loaded) {
             return;
         }
 
-        //getWindow().executeJavaScript(FileUtil.getContent("js/jquery.min.js"));
         loadScript("js/jquery.min.js");
         loadScript("js/highcharts.js");
-        loadScript("js/text.js");
 
         loaded = true;
     }
@@ -71,15 +68,4 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
     private void loadScript(String filePath) {
         getWindow().executeJavaScript(FileUtil.getContent(filePath));
     }
-
-    @Override
-    public void onCommand(Response response) {
-        //CommandExecutor.INSTANCE.onResponse(response);
-    }
-
-    @Override
-    public String getName() {
-        return moduleName;
-    }
-
 }
