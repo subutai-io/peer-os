@@ -15,6 +15,6 @@ public class Monitor implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(MODULE_NAME);
+        return new ModuleComponent();
     }
 }

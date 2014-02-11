@@ -9,16 +9,13 @@ import java.util.logging.Logger;
 public class ModuleComponent extends CustomComponent {
 
     private final Logger log = Logger.getLogger(ModuleComponent.class.getName());
-    private final String moduleName;
 
     private boolean loaded;
 
-    public ModuleComponent(String moduleName) {
-
-        this.moduleName = moduleName;
-
+    public ModuleComponent() {
         setHeight("100%");
         setCompositionRoot(getLayout());
+        log.info("window: " + getWindow());
     }
 
     public Layout getLayout() {
