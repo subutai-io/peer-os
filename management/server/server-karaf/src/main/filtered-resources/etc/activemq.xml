@@ -10,7 +10,7 @@
         useJmx="true" 
         persistent="true" 
         brokerName="sol" 
-        startAsync="true" 
+        start="true" 
         schedulePeriodForDestinationPurge="60000"
         offlineDurableSubscriberTimeout="600000"
         advisorySupport="true"
