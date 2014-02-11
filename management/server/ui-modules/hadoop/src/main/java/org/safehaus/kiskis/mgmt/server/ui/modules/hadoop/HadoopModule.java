@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class HadoopModule implements Module {
 
-    public static final String MODULE_NAME = "HadoopModule";
+    public static final String MODULE_NAME = "Hadoop";
     private static final Logger LOG = Logger.getLogger(HadoopModule.class.getName());
 
     @Override

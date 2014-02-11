@@ -31,7 +31,7 @@ data_nodes list<uuid>,
 ip_mask text,
 job_tracker uuid,
 name_node uuid,
-replicaton_factor int,
+replication_factor int,
 secondary_name_node uuid,
 task_trackers list<uuid>,
 PRIMARY KEY (uid, cluster_name)

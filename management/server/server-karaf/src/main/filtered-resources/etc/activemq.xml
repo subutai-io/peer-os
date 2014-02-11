@@ -11,15 +11,15 @@
         persistent="true" 
         brokerName="sol" 
         startAsync="true" 
-        schedulePeriodForDestinationPurge="30000"
-        offlineDurableSubscriberTimeout="300000" 
+        schedulePeriodForDestinationPurge="60000"
+        offlineDurableSubscriberTimeout="600000"
         advisorySupport="true"
     >
  
         <amq:sslContext>
             <amq:sslContext
                 keyStore="${karaf.base}/certs/broker.ks" keyStorePassword="broker"
-                trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="client"/>
+                trustStore="${karaf.base}/certs/broker.ts" trustStorePassword="broker"/>
         </amq:sslContext>
  
         <amq:transportConnectors>

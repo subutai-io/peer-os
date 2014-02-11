@@ -62,21 +62,30 @@ public class DbManagerImpl implements DbManager {
     }
 
     public ResultSet executeQuery(String cql, Object... values) {
-        PreparedStatement stmt = session.prepare(cql);
-        BoundStatement boundStatement = new BoundStatement(stmt);
-        if (values != null && values.length > 0) {
-            boundStatement.bind(values);
+        try {
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            if (values != null && values.length > 0) {
+                boundStatement.bind(values);
+            }
+            return session.execute(boundStatement);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in executeQuery", ex);
+            return null;
         }
-        return session.execute(boundStatement);
     }
 
     public void executeUpdate(String cql, Object... values) {
-        PreparedStatement stmt = session.prepare(cql);
-        BoundStatement boundStatement = new BoundStatement(stmt);
-        if (values != null && values.length > 0) {
-            boundStatement.bind(values);
+        try {
+            PreparedStatement stmt = session.prepare(cql);
+            BoundStatement boundStatement = new BoundStatement(stmt);
+            if (values != null && values.length > 0) {
+                boundStatement.bind(values);
+            }
+            session.execute(boundStatement);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in executeUpdate", ex);
         }
-        session.execute(boundStatement);
     }
 
 }
