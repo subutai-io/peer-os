@@ -9,7 +9,7 @@ import java.util.UUID;
  * Used to define a physical host on the whole network. It could be management
  * server or the agent. It just defines a host in the network.
  */
-public class Agent implements Serializable {
+public class Agent implements Serializable, Comparable<Agent> {
 
     private UUID uuid;
     private String macAddress;
@@ -110,4 +110,13 @@ public class Agent implements Serializable {
         hash = 83 * hash + (this.uuid != null ? this.uuid.hashCode() : 0);
         return hash;
     }
+
+    public int compareTo(Agent o) {
+        if (hostname != null && o != null) {
+            return hostname.compareTo(o.getHostname());
+        }
+
+        return -1;
+    }
+
 }

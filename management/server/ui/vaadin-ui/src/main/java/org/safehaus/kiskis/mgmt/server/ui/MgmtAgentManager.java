@@ -238,6 +238,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
                 }
 
                 currentAgents = allFreshAgents;
+                container.sort(new Object[]{"value"}, new boolean[]{true});
 
             } catch (Property.ReadOnlyException ex) {
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
