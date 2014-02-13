@@ -5,11 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
@@ -105,9 +102,11 @@ public class MongoDAO {
 
     public static boolean deleteMongoClusterInfo(String clusterName) {
         try {
-            String cql = String.format("delete from %s where %s = ?",
-                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME);
-            dbManager.executeUpdate(cql, clusterName);
+//            String cql = String.format("delete from %s where %s = ?",
+//                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME);
+//            dbManager.executeUpdate(cql, clusterName);
+
+            dbManager.deleteInfo(MongoModule.MODULE_NAME, clusterName);
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in deleteMongoClusterInfo", ex);

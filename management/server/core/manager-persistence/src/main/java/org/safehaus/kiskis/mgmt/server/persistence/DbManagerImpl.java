@@ -14,13 +14,11 @@ import com.datastax.driver.core.Session;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 
 /**
@@ -124,6 +122,19 @@ public class DbManagerImpl implements DbManager {
             list.add(gson.fromJson(info, clazz));
         }
         return list;
+    }
+
+    public void deleteInfo(String source, String key) {
+        List<UUID> ids = new ArrayList<UUID>();
+        ResultSet rs = executeQuery("select id from product_info where source = ? and key = ? limit 9999 allow filtering", source, key);
+        for (Row row : rs) {
+            UUID id = row.getUUID("info");
+            ids.add(id);
+        }
+
+        for (UUID id : ids) {
+            executeUpdate("delete from product_info where id = ?", id);
+        }
     }
 
 }
