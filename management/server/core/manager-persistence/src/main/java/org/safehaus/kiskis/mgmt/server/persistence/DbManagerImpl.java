@@ -94,40 +94,40 @@ public class DbManagerImpl implements DbManager {
             LOG.log(Level.SEVERE, "Error in executeUpdate", ex);
         }
     }
-
-    public void saveInfo(String source, String key, Serializable info) throws IOException {
-        byte[] data = Util.serialize(info);
-        executeUpdate("insert into product_info(id,source,key,info) values (?,?,?,?)",
-                java.util.UUID.fromString(new com.eaio.uuid.UUID().toString()),
-                source,
-                key,
-                ByteBuffer.wrap(data));
-    }
-
-    public <T> List<T> getInfo(String source, String key, Class<T> clazz) throws ClassNotFoundException, IOException {
-        List<T> list = new ArrayList<T>();
-        ResultSet rs = executeQuery("select info from product_info where source = ? and key = ? limit 100 allow filtering", source, key);
-        for (Row row : rs) {
-            ByteBuffer info = row.getBytes("info");
-            byte[] result = new byte[info.remaining()];
-            info.get(result);
-
-            list.add(clazz.cast(Util.deserialize(result)));
-        }
-        return list;
-    }
-
-    public <T> List<T> getInfo(String source, Class<T> clazz) throws ClassNotFoundException, IOException {
-        List<T> list = new ArrayList<T>();
-        ResultSet rs = executeQuery("select info from product_info where source = ? limit 100 allow filtering", source);
-        for (Row row : rs) {
-            ByteBuffer info = row.getBytes("info");
-            byte[] result = new byte[info.remaining()];
-            info.get(result);
-
-            list.add(clazz.cast(Util.deserialize(result)));
-        }
-        return list;
-    }
+//
+//    public void saveInfo(String source, String key, Serializable info) throws IOException {
+//        byte[] data = Util.serialize(info);
+//        executeUpdate("insert into product_info(id,source,key,info) values (?,?,?,?)",
+//                java.util.UUID.fromString(new com.eaio.uuid.UUID().toString()),
+//                source,
+//                key,
+//                ByteBuffer.wrap(data));
+//    }
+//
+//    public <T> List<T> getInfo(String source, String key, Class<T> clazz) throws ClassNotFoundException, IOException {
+//        List<T> list = new ArrayList<T>();
+//        ResultSet rs = executeQuery("select info from product_info where source = ? and key = ? limit 100 allow filtering", source, key);
+//        for (Row row : rs) {
+//            ByteBuffer info = row.getBytes("info");
+//            byte[] result = new byte[info.remaining()];
+//            info.get(result);
+//
+//            list.add(clazz.cast(Util.deserialize(result)));
+//        }
+//        return list;
+//    }
+//
+//    public <T> List<T> getInfo(String source, Class<T> clazz) throws ClassNotFoundException, IOException {
+//        List<T> list = new ArrayList<T>();
+//        ResultSet rs = executeQuery("select info from product_info where source = ? limit 100 allow filtering", source);
+//        for (Row row : rs) {
+//            ByteBuffer info = row.getBytes("info");
+//            byte[] result = new byte[info.remaining()];
+//            info.get(result);
+//
+//            list.add(clazz.cast(Util.deserialize(result)));
+//        }
+//        return list;
+//    }
 
 }
