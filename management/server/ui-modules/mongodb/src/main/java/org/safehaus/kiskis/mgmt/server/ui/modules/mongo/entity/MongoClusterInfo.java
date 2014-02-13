@@ -18,8 +18,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class MongoClusterInfo implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String TABLE_NAME = "mongo_cluster_info",
             CLUSTER_NAME = "cluster_name",
             REPLICA_SET_NAME = "replica_set_name",

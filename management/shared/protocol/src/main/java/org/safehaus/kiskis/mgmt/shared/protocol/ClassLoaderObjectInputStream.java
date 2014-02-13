@@ -18,7 +18,7 @@ public class ClassLoaderObjectInputStream extends ObjectInputStream {
 
     private final Class clazz;
 
-    public ClassLoaderObjectInputStream(Class clazz, InputStream in) throws IOException {
+    public <T> ClassLoaderObjectInputStream(Class<T> clazz, InputStream in) throws IOException {
         super(in);
         this.clazz = clazz;
     }
