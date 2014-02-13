@@ -15,12 +15,12 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management;
  */
 public enum OozieCommandEnum {
 
-    START("service oozie-server start", 120),
-    STOP("service oozie-server stop", 120),
-    STATUS("service hbase status", 120),
+    START_SERVER("service oozie-server start", 120),
+    STOP_SERVER("service oozie-server stop", 120),
+    STATUS("service oozie status", 120),
     INSTALL_SERVER("apt-get --assume-yes --force-yes install ksks-oozie-server", 120),
     INSTALL_CLIENT("apt-get --assume-yes --force-yes install ksks-oozie-client", 120),
-    CONFIGURE("sh $OOZIE_HOME/bin/oozie-configure.sh configure", 120),
+    CONFIGURE(". /etc/profile && oozie-configure.sh configure", 120),
     PURGE_SERVER("apt-get --assume-yes --force-yes purge oozie-server", 120),
     PURGE_CLIENT("apt-get --assume-yes --force-yes purge oozie-client", 120);
 

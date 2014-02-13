@@ -15,16 +15,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum.START;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum.STATUS;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum.STOP;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
-/**
- * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
- */
 public class NodesWindow extends Window {
 
     private final Table table;
@@ -70,64 +64,68 @@ public class NodesWindow extends Window {
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
         container.addContainerProperty("Hostname", String.class, "");
-//        container.addContainerProperty("uuid", UUID.class, "");
+        container.addContainerProperty("Type", String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
         container.addContainerProperty("Status", Button.class, "");
 //        container.addContainerProperty("Destroy", Button.class, "");
-        for (Agent agent : config.getServers()) {
-            addOrderToContainer(container, agent);
+        addOrderToContainer(container, config.getServer(), "Server");
+        for (Agent agent : config.getClients()) {
+            addOrderToContainer(container, agent, "Client");
         }
+
         return container;
     }
 
-    private void addOrderToContainer(Container container, final Agent agent) {
+    private void addOrderToContainer(Container container, final Agent agent, String type) {
         Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
         item.getItemProperty("Hostname").setValue(agent.getHostname());
-//        item.getItemProperty("uuid").setValue(agent.getUuid());
+        item.getItemProperty("Type").setValue(type);
 
-        Button startButton = new Button("Start");
-        startButton.addListener(new Button.ClickListener() {
+        if (type.equals("Server")) {
+            Button startButton = new Button("Start");
+            startButton.addListener(new Button.ClickListener() {
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Starting instance: " + agent.getHostname());
-                cce = OozieCommandEnum.START;
-                selectedItem = item;
-                table.setEnabled(false);
-                serviceManager.runCommand(agent, cce);
-            }
-        });
-        Button stopButton = new Button("Stop");
-        stopButton.addListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    getWindow().showNotification("Starting instance: " + agent.getHostname());
+                    cce = OozieCommandEnum.START_SERVER;
+                    selectedItem = item;
+                    table.setEnabled(false);
+                    serviceManager.runCommand(agent, cce);
+                }
+            });
+            Button stopButton = new Button("Stop");
+            stopButton.addListener(new Button.ClickListener() {
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Stopping instance: " + agent.getHostname());
-                cce = OozieCommandEnum.STOP;
-                selectedItem = item;
-                table.setEnabled(false);
-                serviceManager.runCommand(agent, cce);
-            }
-        });
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    getWindow().showNotification("Stopping instance: " + agent.getHostname());
+                    cce = OozieCommandEnum.STOP_SERVER;
+                    selectedItem = item;
+                    table.setEnabled(false);
+                    serviceManager.runCommand(agent, cce);
+                }
+            });
 
-        Button statusButton = new Button("Status");
-        statusButton.addListener(new Button.ClickListener() {
+            Button statusButton = new Button("Status");
+            statusButton.addListener(new Button.ClickListener() {
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Checking the status: " + agent.getHostname());
-                cce = OozieCommandEnum.STATUS;
-                selectedItem = item;
-                table.setEnabled(false);
-                serviceManager.runCommand(agent, cce);
-            }
-        });
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    getWindow().showNotification("Checking the status: " + agent.getHostname());
+                    cce = OozieCommandEnum.STATUS;
+                    selectedItem = item;
+                    table.setEnabled(false);
+                    serviceManager.runCommand(agent, cce);
+                }
+            });
+            item.getItemProperty("Start").setValue(startButton);
+            item.getItemProperty("Stop").setValue(stopButton);
+            item.getItemProperty("Status").setValue(statusButton);
+        }
 
-        item.getItemProperty("Start").setValue(startButton);
-        item.getItemProperty("Stop").setValue(stopButton);
-        item.getItemProperty("Status").setValue(statusButton);
 //        item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
@@ -147,7 +145,7 @@ public class NodesWindow extends Window {
     public void updateUI(Task ts) {
         if (cce != null) {
             switch (cce) {
-                case START: {
+                case START_SERVER: {
                     switch (ts.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(false);
@@ -160,7 +158,7 @@ public class NodesWindow extends Window {
                     }
 
                 }
-                case STOP: {
+                case STOP_SERVER: {
                     switch (ts.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(true);

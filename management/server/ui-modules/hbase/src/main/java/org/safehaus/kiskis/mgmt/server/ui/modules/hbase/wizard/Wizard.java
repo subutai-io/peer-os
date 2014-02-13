@@ -8,7 +8,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 /**
  *
@@ -21,8 +21,10 @@ public class Wizard {
     private int step = 1;
     private final HBaseConfig config = new HBaseConfig();
     private StepFinish stepFinish;
+    private final AsyncTaskRunner asyncTaskRunner;
 
-    public Wizard() {
+    public Wizard(AsyncTaskRunner asyncTaskRunner) {
+        this.asyncTaskRunner = asyncTaskRunner;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin(true);
@@ -48,7 +50,7 @@ public class Wizard {
         putForm();
     }
 
-    protected HBaseConfig getConfig() {
+    public HBaseConfig getConfig() {
         return config;
     }
 
@@ -88,10 +90,8 @@ public class Wizard {
         }
     }
 
-    public void setOutput(Response response) {
-        if (stepFinish != null) {
-            stepFinish.getInstaller().onResponse(response);
-        }
+    public AsyncTaskRunner getRunner() {
+        return asyncTaskRunner;
     }
 
 }

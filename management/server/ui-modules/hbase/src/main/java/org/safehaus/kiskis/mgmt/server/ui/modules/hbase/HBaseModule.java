@@ -7,22 +7,25 @@ import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 public class HBaseModule implements Module {
 
     public static final String MODULE_NAME = "HBase";
     private static final Logger LOG = Logger.getLogger(HBaseModule.class.getName());
+    private AsyncTaskRunner asyncTaskRunner;
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    public void setAsyncTaskRunner(AsyncTaskRunner asyncTaskRunner) {
+        this.asyncTaskRunner = asyncTaskRunner;
+    }
+
+    public static class ModuleComponent extends CustomComponent {
 
         Wizard wizard;
         Manager manager;
 
-        public ModuleComponent() {
+        public ModuleComponent(AsyncTaskRunner asyncTaskRunner) {
             setSizeFull();
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -33,29 +36,14 @@ public class HBaseModule implements Module {
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
 
-            wizard = new Wizard();
-            manager = new Manager();
+            wizard = new Wizard(asyncTaskRunner);
+            manager = new Manager(asyncTaskRunner);
             sheet.addTab(wizard.getContent(), "Install");
             sheet.addTab(manager.getContent(), "Manage");
 
             verticalLayout.addComponent(sheet);
 
             setCompositionRoot(verticalLayout);
-        }
-
-        @Override
-        public void onCommand(Response response) {
-            if (wizard != null) {
-                wizard.setOutput(response);
-            }
-            if (manager != null) {
-                manager.setOutput(response);
-            }
-        }
-
-        @Override
-        public String getName() {
-            return MODULE_NAME;
         }
 
         public Iterable<Agent> getLxcList() {
@@ -71,7 +59,7 @@ public class HBaseModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(asyncTaskRunner);
     }
 
 }

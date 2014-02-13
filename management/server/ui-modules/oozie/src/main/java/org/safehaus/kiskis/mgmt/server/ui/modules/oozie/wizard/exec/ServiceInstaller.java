@@ -31,13 +31,11 @@ public class ServiceInstaller {
         OozieCommands oc = new OozieCommands();
 
         Task updateApt = RequestUtil.createTask("apt-get update");
-        for (Agent agent : config.getServers()) {
-            Command command = oc.getAptGetUpdate();
-            command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(updateApt.getUuid());
-            command.getRequest().setRequestSequenceNumber(updateApt.getIncrementedReqSeqNumber());
-            updateApt.addCommand(command);
-        }
+        Command commandServer = oc.getAptGetUpdate();
+        commandServer.getRequest().setUuid(config.getServer().getUuid());
+        commandServer.getRequest().setTaskUuid(updateApt.getUuid());
+        commandServer.getRequest().setRequestSequenceNumber(updateApt.getIncrementedReqSeqNumber());
+        updateApt.addCommand(commandServer);
         tasks.add(updateApt);
 
         Task updateAptClients = RequestUtil.createTask("apt-get update");
@@ -51,13 +49,11 @@ public class ServiceInstaller {
         tasks.add(updateAptClients);
 
         Task installServer = RequestUtil.createTask("Install Oozie Server");
-        for (Agent agent : config.getServers()) {
-            Command command = oc.getCommand(OozieCommandEnum.INSTALL_SERVER);
-            command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(installServer.getUuid());
-            command.getRequest().setRequestSequenceNumber(installServer.getIncrementedReqSeqNumber());
-            installServer.addCommand(command);
-        }
+        Command commandServerInstall = oc.getCommand(OozieCommandEnum.INSTALL_SERVER);
+        commandServerInstall.getRequest().setUuid(config.getServer().getUuid());
+        commandServerInstall.getRequest().setTaskUuid(installServer.getUuid());
+        commandServerInstall.getRequest().setRequestSequenceNumber(installServer.getIncrementedReqSeqNumber());
+        installServer.addCommand(commandServerInstall);
         tasks.add(installServer);
 
         Task installClient = RequestUtil.createTask("Install Oozie Client");
@@ -71,18 +67,16 @@ public class ServiceInstaller {
         tasks.add(installClient);
 
         Task configugeServer = RequestUtil.createTask("Configure server");
-        for (Agent agent : config.getServers()) {
-            Command command = oc.getSetConfigCommand("test");
-            command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(configugeServer.getUuid());
-            command.getRequest().setRequestSequenceNumber(configugeServer.getIncrementedReqSeqNumber());
-            configugeServer.addCommand(command);
-        }
+        Command commandConfigServer = oc.getSetConfigCommand(config.getServer().getListIP().get(0) + " root");
+        commandConfigServer.getRequest().setUuid(config.getServer().getUuid());
+        commandConfigServer.getRequest().setTaskUuid(configugeServer.getUuid());
+        commandConfigServer.getRequest().setRequestSequenceNumber(configugeServer.getIncrementedReqSeqNumber());
+        configugeServer.addCommand(commandConfigServer);
         tasks.add(configugeServer);
 
         Task configugeClients = RequestUtil.createTask("Configure client");
-        for (Agent agent : config.getServers()) {
-            Command command = oc.getSetConfigCommand("test");
+        for (Agent agent : config.getClients()) {
+            Command command = oc.getSetConfigCommand(config.getServer().getListIP().get(0) + " root");
             command.getRequest().setUuid(agent.getUuid());
             command.getRequest().setTaskUuid(configugeClients.getUuid());
             command.getRequest().setRequestSequenceNumber(configugeClients.getIncrementedReqSeqNumber());
@@ -109,7 +103,6 @@ public class ServiceInstaller {
     public void onResponse(Response response) {
         if (currentTask != null && response.getTaskUuid() != null
                 && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-
             List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
             Task task = RequestUtil.getTask(response.getTaskUuid());
             if (!list.isEmpty() && terminal != null) {
@@ -123,7 +116,6 @@ public class ServiceInstaller {
                         }
                     } else {
                         terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-//                        saveInfo();
                         saveHBaseInfo();
                     }
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
