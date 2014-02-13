@@ -15,6 +15,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
@@ -22,6 +24,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum;
@@ -62,6 +65,19 @@ public class ServiceManager {
         tasks.add(startTask);
         start();
     }
+
+//    public void purge(OozieConfig config) {
+//        Task startTask = RequestUtil.createTask("Run command");
+//        for (OozieCommandEnum ce : cce) {
+//            Command command = new OozieCommands().getCommand(c);
+//            command.getRequest().setUuid(agent.getUuid());
+//            command.getRequest().setTaskUuid(startTask.getUuid());
+//            command.getRequest().setRequestSequenceNumber(startTask.getIncrementedReqSeqNumber());
+//            startTask.addCommand(command);
+//            tasks.add(startTask);
+//        }
+//        start();
+//    }
 
     public void start() {
         moveToNextTask();

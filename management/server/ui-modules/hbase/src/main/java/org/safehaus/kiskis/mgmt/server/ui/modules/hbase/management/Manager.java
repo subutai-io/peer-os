@@ -10,7 +10,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 /**
  *
@@ -21,7 +21,7 @@ public class Manager {
     private final VerticalLayout content;
     private final HBaseTable table;
 
-    public Manager() {
+    public Manager(AsyncTaskRunner asyncTaskRunner) {
 
         content = new VerticalLayout();
         content.setMargin(true);
@@ -30,7 +30,7 @@ public class Manager {
 
         Label clusterNameLabel = new Label("Select the cluster");
 
-        table = new HBaseTable();
+        table = new HBaseTable(asyncTaskRunner);
         Button getClustersBtn = new Button("Get clusters");
         getClustersBtn.addListener(new Button.ClickListener() {
 
@@ -51,8 +51,7 @@ public class Manager {
         return content;
     }
 
-    public void setOutput(Response response) {
-        table.onResponse(response);
-    }
-
+//    public void setOutput(Response response) {
+//        table.onResponse(response);
+//    }
 }

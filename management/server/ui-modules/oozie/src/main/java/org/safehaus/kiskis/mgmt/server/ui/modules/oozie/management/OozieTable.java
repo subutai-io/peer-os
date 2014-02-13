@@ -6,6 +6,7 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
+import java.util.ArrayList;
 
 import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
@@ -32,7 +33,7 @@ public class OozieTable extends Table {
     public OozieTable() {
         setSizeFull();
         this.manager = new ServiceManager();
-        this.setCaption("HBase clusters");
+        this.setCaption("Oozie");
         this.setWidth("100%");
         this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         this.setPageLength(10);
@@ -44,8 +45,8 @@ public class OozieTable extends Table {
         IndexedContainer container = new IndexedContainer();
         container.addContainerProperty(OozieClusterInfo.UUID_LABEL, String.class, "");
 //        container.addContainerProperty(HBaseClusterInfo.DOMAINNAME_LABEL, String.class, "");
-        container.addContainerProperty("Start", Button.class, "");
-        container.addContainerProperty("Stop", Button.class, "");
+//        container.addContainerProperty("Start", Button.class, "");
+//        container.addContainerProperty("Stop", Button.class, "");
 //        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
@@ -60,42 +61,6 @@ public class OozieTable extends Table {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
         item.getItemProperty(OozieClusterInfo.UUID_LABEL).setValue(config.getUuid());
-//        item.getItemProperty(HBaseClusterInfo.DOMAINNAME_LABEL).setValue(config.get);
-
-        Button startButton = new Button("Start");
-        startButton.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Starting cluster: " + config.getUuid());
-                cce = OozieCommandEnum.START;
-                selectedItem = item;
-                manager.runCommand(config.getServers(), cce);
-            }
-        });
-
-        Button stopButton = new Button("Stop");
-        stopButton.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Stopping cluster: " + config.getUuid());
-                cce = OozieCommandEnum.STOP;
-                selectedItem = item;
-                manager.runCommand(config.getServers(), cce);
-
-            }
-        });
-
-//        Button statusButton = new Button("Status");
-//        statusButton.addListener(new Button.ClickListener() {
-//
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-//                cce = HBaseCommandEnum.STATUS;
-//                manager.runCommand(cci.getNodes(), cce);
-//            }
-//        });
         Button manageButton = new Button("Manage");
         manageButton.addListener(new Button.ClickListener() {
 
@@ -112,17 +77,14 @@ public class OozieTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Purging cluster: " + config.getUuid());
+                getWindow().showNotification("Purging: " + config.getUuid());
                 cce = OozieCommandEnum.PURGE_SERVER;
                 selectedItem = item;
                 selectedConfig = config;
-                manager.runCommand(config.getServers(), cce);
+//                manager.purge(config);
             }
         });
 
-        item.getItemProperty("Start").setValue(startButton);
-        item.getItemProperty("Stop").setValue(stopButton);
-//        item.getItemProperty("Status").setValue(statusButton);
         item.getItemProperty("Manage").setValue(manageButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
@@ -171,7 +133,7 @@ public class OozieTable extends Table {
     private void manageUI(TaskStatus ts) {
         if (cce != null) {
             switch (cce) {
-                case START: {
+                case START_SERVER: {
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Start success");
@@ -186,7 +148,7 @@ public class OozieTable extends Table {
                     break;
 
                 }
-                case STOP: {
+                case STOP_SERVER: {
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Stop success");
