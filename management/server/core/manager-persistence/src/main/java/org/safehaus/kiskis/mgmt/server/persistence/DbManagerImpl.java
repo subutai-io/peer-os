@@ -95,7 +95,7 @@ public class DbManagerImpl implements DbManager {
         }
     }
 
-    public void saveInfo(String source, String key, Serializable info) throws IOException {
+    public void saveInfo(String source, String key, Object info) throws IOException {
         byte[] data = Util.serialize(info);
         executeUpdate("insert into product_info(id,source,key,info) values (?,?,?,?)",
                 java.util.UUID.fromString(new com.eaio.uuid.UUID().toString()),

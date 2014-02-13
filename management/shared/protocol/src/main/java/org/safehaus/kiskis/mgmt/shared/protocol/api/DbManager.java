@@ -20,7 +20,7 @@ public interface DbManager {
 
     public void executeUpdate(String cql, Object... values);
 
-    public void saveInfo(String source, String key, Serializable info) throws IOException;
+    public void saveInfo(String source, String key, Object info) throws IOException;
 
     public <T> List<T> getInfo(String source, String key, Class<T> clazz) throws ClassNotFoundException, IOException;
 
