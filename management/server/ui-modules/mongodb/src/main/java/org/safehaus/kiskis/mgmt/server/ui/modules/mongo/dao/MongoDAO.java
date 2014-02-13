@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
@@ -44,8 +43,6 @@ public class MongoDAO {
                     clusterInfo.getReplicaSetName(), clusterInfo.getConfigServers(),
                     clusterInfo.getRouters(), clusterInfo.getDataNodes());
 
-//            dbManager.saveInfo(MongoModule.MODULE_NAME, clusterInfo.getClusterName(), clusterInfo);
-
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveMongoClusterInfo", ex);
@@ -68,11 +65,10 @@ public class MongoDAO {
                 list.add(mongoClusterInfo);
             }
 
-//            return dbManager.getInfo(MongoModule.MODULE_NAME, MongoClusterInfo.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClustersInfo", ex);
         }
-        return list;//new ArrayList<MongoClusterInfo>();
+        return list;
     }
 
     public static MongoClusterInfo getMongoClusterInfo(String clusterName) {
@@ -91,10 +87,6 @@ public class MongoDAO {
                 mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
                 mongoClusterInfo.setDataNodes(row.getList(MongoClusterInfo.DATA_NODES_NAME, UUID.class));
             }
-//            List<MongoClusterInfo> list = dbManager.getInfo(MongoModule.MODULE_NAME, clusterName, MongoClusterInfo.class);
-//            if (!list.isEmpty()) {
-//                mongoClusterInfo = list.get(0);
-//            }
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClusterInfo", ex);

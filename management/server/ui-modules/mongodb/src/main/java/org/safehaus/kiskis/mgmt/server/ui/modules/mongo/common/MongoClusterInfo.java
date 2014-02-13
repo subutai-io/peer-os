@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class MongoClusterInfo /*implements Serializable*/ {
+public class MongoClusterInfo {
 
     public static final String TABLE_NAME = "mongo_cluster_info",
             CLUSTER_NAME = "cluster_name",
