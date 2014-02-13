@@ -136,9 +136,9 @@ public class Util {
         return baos.toByteArray();
     }
 
-    public static Object deserialize(Class clazz, byte[] bytes) throws ClassNotFoundException, IOException {
+    public static Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ClassLoaderObjectInputStream(clazz, bais);
+        ObjectInputStream ois = new ObjectInputStream(bais);
         Object o = ois.readObject();
         ois.close();
         return o;

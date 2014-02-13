@@ -11,6 +11,8 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -27,6 +29,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
  */
 public class DbManagerImpl implements DbManager {
 
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
     private Cluster cluster;
     private Session session;
@@ -96,23 +99,19 @@ public class DbManagerImpl implements DbManager {
     }
 
     public void saveInfo(String source, String key, Object info) throws IOException {
-        byte[] data = Util.serialize(info);
         executeUpdate("insert into product_info(id,source,key,info) values (?,?,?,?)",
                 java.util.UUID.fromString(new com.eaio.uuid.UUID().toString()),
                 source,
                 key,
-                ByteBuffer.wrap(data));
+                gson.toJson(info));
     }
 
     public <T> List<T> getInfo(String source, String key, Class<T> clazz) throws ClassNotFoundException, IOException {
         List<T> list = new ArrayList<T>();
         ResultSet rs = executeQuery("select info from product_info where source = ? and key = ? limit 100 allow filtering", source, key);
         for (Row row : rs) {
-            ByteBuffer info = row.getBytes("info");
-            byte[] result = new byte[info.remaining()];
-            info.get(result);
-
-            list.add(clazz.cast(Util.deserialize(clazz, result)));
+            String info = row.getString("info");
+            list.add(gson.fromJson(info, clazz));
         }
         return list;
     }
@@ -121,11 +120,8 @@ public class DbManagerImpl implements DbManager {
         List<T> list = new ArrayList<T>();
         ResultSet rs = executeQuery("select info from product_info where source = ? limit 100 allow filtering", source);
         for (Row row : rs) {
-            ByteBuffer info = row.getBytes("info");
-            byte[] result = new byte[info.remaining()];
-            info.get(result);
-
-            list.add(clazz.cast(Util.deserialize(clazz, result)));
+            String info = row.getString("info");
+            list.add(gson.fromJson(info, clazz));
         }
         return list;
     }
