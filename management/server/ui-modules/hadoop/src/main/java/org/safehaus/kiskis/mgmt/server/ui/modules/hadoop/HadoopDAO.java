@@ -70,13 +70,13 @@ public class HadoopDAO {
                 list.add(cd);
             }
 
-            for (HadoopClusterInfo item : list) {
-                Agent master = agentManager.getAgentByUUIDFromDB(item.getNameNode());
-                if (master.getUuid() == null) {
-                    deleteHadoopClusterInfo(item.getUid());
-                    list.remove(item);
-                }
-            }
+//            for (HadoopClusterInfo item : list) {
+//                Agent master = agentManager.getAgentByUUIDFromDB(item.getNameNode());
+//                if (master.getUuid() == null) {
+//                    deleteHadoopClusterInfo(item.getUid());
+//                    list.remove(item);
+//                }
+//            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
