@@ -13,10 +13,8 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
@@ -96,17 +94,16 @@ public class DbManagerImpl implements DbManager {
         }
     }
 
-    public void saveInfo(String source, String key, Object info) throws IOException {
-        executeUpdate("insert into product_info(id,source,key,info) values (?,?,?,?)",
-                java.util.UUID.fromString(new com.eaio.uuid.UUID().toString()),
+    public void saveInfo(String source, String key, Object info) {
+        executeUpdate("insert into product_info(source,key,info) values (?,?,?)",
                 source,
                 key,
                 gson.toJson(info));
     }
 
-    public <T> List<T> getInfo(String source, String key, Class<T> clazz) throws ClassNotFoundException, IOException {
+    public <T> List<T> getInfo(String source, String key, Class<T> clazz) {
         List<T> list = new ArrayList<T>();
-        ResultSet rs = executeQuery("select info from product_info where source = ? and key = ? limit 100 allow filtering", source, key);
+        ResultSet rs = executeQuery("select info from product_info where source = ? and key = ?", source, key);
         for (Row row : rs) {
             String info = row.getString("info");
             list.add(gson.fromJson(info, clazz));
@@ -114,9 +111,9 @@ public class DbManagerImpl implements DbManager {
         return list;
     }
 
-    public <T> List<T> getInfo(String source, Class<T> clazz) throws ClassNotFoundException, IOException {
+    public <T> List<T> getInfo(String source, Class<T> clazz) {
         List<T> list = new ArrayList<T>();
-        ResultSet rs = executeQuery("select info from product_info where source = ? limit 100 allow filtering", source);
+        ResultSet rs = executeQuery("select info from product_info where source = ?", source);
         for (Row row : rs) {
             String info = row.getString("info");
             list.add(gson.fromJson(info, clazz));
@@ -125,16 +122,7 @@ public class DbManagerImpl implements DbManager {
     }
 
     public void deleteInfo(String source, String key) {
-        List<UUID> ids = new ArrayList<UUID>();
-        ResultSet rs = executeQuery("select id from product_info where source = ? and key = ? limit 9999 allow filtering", source, key);
-        for (Row row : rs) {
-            UUID id = row.getUUID("info");
-            ids.add(id);
-        }
-
-        for (UUID id : ids) {
-            executeUpdate("delete from product_info where id = ?", id);
-        }
+        executeUpdate("delete from product_info where source = ? and key = ?", source, key);
     }
 
 }

@@ -30,16 +30,6 @@ public class MongoDAO {
 
     public static boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo) {
         try {
-//            String cql = String.format(
-//                    "insert into %s"
-//                    + "(%s, %s, %s, %s, %s) "
-//                    + "values (?, ?, ?, ?, ?)",
-//                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME,
-//                    MongoClusterInfo.REPLICA_SET_NAME, MongoClusterInfo.CONFIG_SERVERS_NAME,
-//                    MongoClusterInfo.ROUTERS_NAME, MongoClusterInfo.DATA_NODES_NAME);
-//            dbManager.executeUpdate(cql, clusterInfo.getClusterName(),
-//                    clusterInfo.getReplicaSetName(), clusterInfo.getConfigServers(),
-//                    clusterInfo.getRouters(), clusterInfo.getDataNodes());
 
             dbManager.saveInfo(MongoModule.MODULE_NAME, clusterInfo.getClusterName(), clusterInfo);
 
@@ -51,19 +41,7 @@ public class MongoDAO {
     }
 
     public static List<MongoClusterInfo> getMongoClustersInfo() {
-//        List<MongoClusterInfo> list = new ArrayList<MongoClusterInfo>();
         try {
-//            String cql = String.format("select * from %s", MongoClusterInfo.TABLE_NAME);
-//            ResultSet rs = dbManager.executeQuery(cql);
-//            for (Row row : rs) {
-//                MongoClusterInfo mongoClusterInfo = new MongoClusterInfo();
-//                mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
-//                mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
-//                mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
-//                mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
-//                mongoClusterInfo.setDataNodes(row.getList(MongoClusterInfo.DATA_NODES_NAME, UUID.class));
-//                list.add(mongoClusterInfo);
-//            }
 
             return dbManager.getInfo(MongoModule.MODULE_NAME, MongoClusterInfo.class);
 
@@ -76,19 +54,6 @@ public class MongoDAO {
     public static MongoClusterInfo getMongoClusterInfo(String clusterName) {
         MongoClusterInfo mongoClusterInfo = null;
         try {
-//            String cql = String.format(
-//                    "select * from %s where %s = ? limit 1 allow filtering",
-//                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME);
-//            ResultSet rs = dbManager.executeQuery(cql, clusterName);
-//            Row row = rs.one();
-//            if (row != null) {
-//                mongoClusterInfo = new MongoClusterInfo();
-//                mongoClusterInfo.setClusterName(row.getString(MongoClusterInfo.CLUSTER_NAME));
-//                mongoClusterInfo.setReplicaSetName(row.getString(MongoClusterInfo.REPLICA_SET_NAME));
-//                mongoClusterInfo.setConfigServers(row.getList(MongoClusterInfo.CONFIG_SERVERS_NAME, UUID.class));
-//                mongoClusterInfo.setRouters(row.getList(MongoClusterInfo.ROUTERS_NAME, UUID.class));
-//                mongoClusterInfo.setDataNodes(row.getList(MongoClusterInfo.DATA_NODES_NAME, UUID.class));
-//            }
             List<MongoClusterInfo> list = dbManager.getInfo(MongoModule.MODULE_NAME, clusterName, MongoClusterInfo.class);
             if (!list.isEmpty()) {
                 mongoClusterInfo = list.get(0);
@@ -102,9 +67,6 @@ public class MongoDAO {
 
     public static boolean deleteMongoClusterInfo(String clusterName) {
         try {
-//            String cql = String.format("delete from %s where %s = ?",
-//                    MongoClusterInfo.TABLE_NAME, MongoClusterInfo.CLUSTER_NAME);
-//            dbManager.executeUpdate(cql, clusterName);
 
             dbManager.deleteInfo(MongoModule.MODULE_NAME, clusterName);
             return true;

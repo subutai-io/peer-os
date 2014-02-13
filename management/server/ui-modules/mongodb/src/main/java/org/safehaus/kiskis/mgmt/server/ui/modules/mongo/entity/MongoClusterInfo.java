@@ -18,13 +18,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class MongoClusterInfo implements Serializable {
 
-//    public static final String TABLE_NAME = "mongo_cluster_info",
-//            CLUSTER_NAME = "cluster_name",
-//            REPLICA_SET_NAME = "replica_set_name",
-//            CONFIG_SERVERS_NAME = "config_servers",
-//            ROUTERS_NAME = "routers",
-//            DATA_NODES_NAME = "data_nodes";
-
     private String clusterName;
     private String replicaSetName;
     private List<UUID> configServers;

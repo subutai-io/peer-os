@@ -19,11 +19,11 @@ public interface DbManager {
 
     public void executeUpdate(String cql, Object... values);
 
-    public void saveInfo(String source, String key, Object info) throws IOException;
+    public void saveInfo(String source, String key, Object info);
 
-    public <T> List<T> getInfo(String source, String key, Class<T> clazz) throws ClassNotFoundException, IOException;
+    public <T> List<T> getInfo(String source, String key, Class<T> clazz);
 
-    public <T> List<T> getInfo(String source, Class<T> clazz) throws ClassNotFoundException, IOException;
+    public <T> List<T> getInfo(String source, Class<T> clazz);
 
     public void deleteInfo(String source, String key);
 }
