@@ -112,7 +112,7 @@ public class DbManagerImpl implements DbManager {
             byte[] result = new byte[info.remaining()];
             info.get(result);
 
-            list.add(clazz.cast(Util.deserialize(clazz.getClassLoader(), result)));
+            list.add(clazz.cast(Util.deserialize(clazz, result)));
         }
         return list;
     }
@@ -125,7 +125,7 @@ public class DbManagerImpl implements DbManager {
             byte[] result = new byte[info.remaining()];
             info.get(result);
 
-            list.add(clazz.cast(Util.deserialize(clazz.getClassLoader(), result)));
+            list.add(clazz.cast(Util.deserialize(clazz, result)));
         }
         return list;
     }

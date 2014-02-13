@@ -16,20 +16,20 @@ import java.io.ObjectStreamClass;
  */
 public class ClassLoaderObjectInputStream extends ObjectInputStream {
 
-    private final ClassLoader classLoader;
+    private final Class clazz;
 
-    public ClassLoaderObjectInputStream(ClassLoader classLoader, InputStream in) throws IOException {
+    public ClassLoaderObjectInputStream(Class clazz, InputStream in) throws IOException {
         super(in);
-        this.classLoader = classLoader;
+        this.clazz = clazz;
     }
 
     @Override
-    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-        try {
-            String name = desc.getName();
-            return Class.forName(name, false, classLoader);
-        } catch (ClassNotFoundException e) {
-            return super.resolveClass(desc);
-        }
+    protected Class<?> resolveClass(ObjectStreamClass desc) {
+//        try {
+//            String name = desc.getName();
+        return clazz;
+//        } catch (ClassNotFoundException e) {
+//            return super.resolveClass(desc);
+//        }
     }
 }
