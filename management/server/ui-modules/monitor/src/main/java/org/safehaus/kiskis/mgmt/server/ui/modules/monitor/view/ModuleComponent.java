@@ -15,7 +15,6 @@ public class ModuleComponent extends CustomComponent {
     public ModuleComponent() {
         setHeight("100%");
         setCompositionRoot(getLayout());
-        log.info("window: " + getWindow());
     }
 
     public Layout getLayout() {
@@ -64,5 +63,15 @@ public class ModuleComponent extends CustomComponent {
 
     private void loadScript(String filePath) {
         getWindow().executeJavaScript(FileUtil.getContent(filePath));
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+
+        getWindow().executeJavaScript("console.log(1)");
+        loadScripts();
+        loadScript("js/chart.js");
+        getWindow().executeJavaScript("console.log(2)");
     }
 }
