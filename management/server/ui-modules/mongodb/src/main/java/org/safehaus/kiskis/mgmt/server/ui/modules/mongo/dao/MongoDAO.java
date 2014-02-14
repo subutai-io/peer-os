@@ -54,11 +54,7 @@ public class MongoDAO {
     public static MongoClusterInfo getMongoClusterInfo(String clusterName) {
         MongoClusterInfo mongoClusterInfo = null;
         try {
-            List<MongoClusterInfo> list = dbManager.getInfo(MongoModule.MODULE_NAME, clusterName, MongoClusterInfo.class);
-            if (!list.isEmpty()) {
-                mongoClusterInfo = list.get(0);
-            }
-
+            mongoClusterInfo = dbManager.getInfo(MongoModule.MODULE_NAME, clusterName, MongoClusterInfo.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClusterInfo", ex);
         }
