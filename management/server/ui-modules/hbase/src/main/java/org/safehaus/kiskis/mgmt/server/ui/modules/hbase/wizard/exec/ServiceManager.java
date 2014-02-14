@@ -13,7 +13,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseTable;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.NodesWindow;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
@@ -23,8 +28,12 @@ public class ServiceManager {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
+    private final AsyncTaskRunner asyncTaskRunner;
+    private final HBaseTable hBaseTable;
 
-    public ServiceManager() {
+    public ServiceManager(AsyncTaskRunner asyncTaskRunner, HBaseTable hBaseTable) {
+        this.asyncTaskRunner = asyncTaskRunner;
+        this.hBaseTable = hBaseTable;
     }
 
     public void runCommand(Set<Agent> agents, HBaseCommandEnum cce) {
@@ -54,9 +63,36 @@ public class ServiceManager {
     public void start() {
         moveToNextTask();
         if (currentTask != null) {
-            for (Command command : currentTask.getCommands()) {
-                executeCommand(command);
-            }
+//            for (Command command : currentTask.getCommands()) {
+//                executeCommand(command);
+//            }
+
+            asyncTaskRunner.executeTask(currentTask, new ChainedTaskCallback() {
+
+                @Override
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (task.isCompleted()) {
+                        if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                            moveToNextTask();
+                            if (currentTask != null) {
+                                return currentTask;
+                            } else {
+                                NodesWindow nodesWindow = hBaseTable.getNodesWindow();
+                                if (nodesWindow != null && nodesWindow.isVisible()) {
+                                    nodesWindow.updateUI(task);
+                                }
+//                            manageUI(task.getTaskStatus());
+                                hBaseTable.manageUI(task.getTaskStatus());
+                            }
+                        } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+//                    if (nodesWindow != null && nodesWindow.isVisible()) {
+//                        nodesWindow.updateUI(task);
+//                    }
+                        }
+                    }
+                    return null;
+                }
+            });
         }
     }
 

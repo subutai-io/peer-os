@@ -12,11 +12,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
-import org.safehaus.kiskis.mgmt.shared.protocol.RequestUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public class HBaseTable extends Table {
@@ -29,9 +25,9 @@ public class HBaseTable extends Table {
     Item selectedItem;
     HBaseConfig selectedConfig;
 
-    public HBaseTable() {
+    public HBaseTable(AsyncTaskRunner asyncTaskRunner) {
         setSizeFull();
-        this.manager = new ServiceManager();
+        this.manager = new ServiceManager(asyncTaskRunner, this);
         this.setCaption("HBase clusters");
         this.setWidth("100%");
         this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
@@ -141,34 +137,33 @@ public class HBaseTable extends Table {
         stop.setEnabled(!state);
     }
 
-    public void onResponse(Response response) {
-        if (manager.getCurrentTask() != null && response.getTaskUuid() != null
-                && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
-            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
-            Task task = RequestUtil.getTask(response.getTaskUuid());
-            if (!list.isEmpty()) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    manager.moveToNextTask();
-                    if (manager.getCurrentTask() != null) {
-                        for (Command command : manager.getCurrentTask().getCommands()) {
-                            manager.executeCommand(command);
-                        }
-                    } else {
-//                        if (nodesWindow != null && nodesWindow.isVisible()) {
-//                            nodesWindow.updateUI(task);
+//    public void onResponse(Response response) {
+//        if (manager.getCurrentTask() != null && response.getTaskUuid() != null
+//                && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
+//            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+//            Task task = RequestUtil.getTask(response.getTaskUuid());
+//            if (!list.isEmpty()) {
+//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+//                    manager.moveToNextTask();
+//                    if (manager.getCurrentTask() != null) {
+//                        for (Command command : manager.getCurrentTask().getCommands()) {
+//                            manager.executeCommand(command);
 //                        }
-                        manageUI(task.getTaskStatus());
-                    }
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-//                    if (nodesWindow != null && nodesWindow.isVisible()) {
-//                        nodesWindow.updateUI(task);
+//                    } else {
+////                        if (nodesWindow != null && nodesWindow.isVisible()) {
+////                            nodesWindow.updateUI(task);
+////                        }
+//                        manageUI(task.getTaskStatus());
 //                    }
-                }
-            }
-        }
-    }
-
-    private void manageUI(TaskStatus ts) {
+//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+////                    if (nodesWindow != null && nodesWindow.isVisible()) {
+////                        nodesWindow.updateUI(task);
+////                    }
+//                }
+//            }
+//        }
+//    }
+    public void manageUI(TaskStatus ts) {
         if (cce != null) {
             switch (cce) {
                 case START: {
@@ -222,4 +217,9 @@ public class HBaseTable extends Table {
         }
         cce = null;
     }
+
+    public NodesWindow getNodesWindow() {
+        return nodesWindow;
+    }
+
 }

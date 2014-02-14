@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -15,14 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class MongoClusterInfo {
-
-    public static final String TABLE_NAME = "mongo_cluster_info",
-            CLUSTER_NAME = "cluster_name",
-            REPLICA_SET_NAME = "replica_set_name",
-            CONFIG_SERVERS_NAME = "config_servers",
-            ROUTERS_NAME = "routers",
-            DATA_NODES_NAME = "data_nodes";
+public class MongoClusterInfo implements Serializable {
 
     private String clusterName;
     private String replicaSetName;
