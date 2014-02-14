@@ -75,9 +75,9 @@ public class OozieDAO {
                 list.add(config);
             }
         } catch (ClassNotFoundException ex) {
-            LOG.log(Level.SEVERE, "Error in getHBaseClusterInfo", ex);
+            LOG.log(Level.SEVERE, "Error ", ex);
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Error in getHBaseClusterInfo", ex);
+            LOG.log(Level.SEVERE, "Error ", ex);
         }
         return list;
     }

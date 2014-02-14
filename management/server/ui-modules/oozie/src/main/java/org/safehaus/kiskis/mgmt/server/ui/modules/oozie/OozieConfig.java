@@ -13,7 +13,7 @@ public class OozieConfig implements Serializable {
 
     private UUID uuid;
     String domainInfo;
-    private Set<Agent> servers;
+    private Agent server;
     private Set<Agent> clients;
 
     public OozieConfig() {
@@ -29,7 +29,7 @@ public class OozieConfig implements Serializable {
     }
 
     public void reset() {
-        this.servers = null;
+        this.server = null;
         this.clients = null;
         this.domainInfo = "";
     }
@@ -42,12 +42,12 @@ public class OozieConfig implements Serializable {
         this.domainInfo = domainInfo;
     }
 
-    public Set<Agent> getServers() {
-        return servers;
+    public Agent getServer() {
+        return server;
     }
 
-    public void setServers(Set<Agent> servers) {
-        this.servers = servers;
+    public void setServer(Agent server) {
+        this.server = server;
     }
 
     public Set<Agent> getClients() {

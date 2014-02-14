@@ -9,7 +9,12 @@ import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
@@ -20,6 +25,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
  */
 public class DbManagerImpl implements DbManager {
 
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
     private Cluster cluster;
     private Session session;
@@ -86,6 +92,38 @@ public class DbManagerImpl implements DbManager {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in executeUpdate", ex);
         }
+    }
+
+    public void saveInfo(String source, String key, Object info) {
+        executeUpdate("insert into product_info(source,key,info) values (?,?,?)",
+                source,
+                key,
+                gson.toJson(info));
+    }
+
+    public <T> T getInfo(String source, String key, Class<T> clazz) {
+        ResultSet rs = executeQuery("select info from product_info where source = ? and key = ?", source, key);
+        Row row = rs.one();
+        if (row != null) {
+
+            String info = row.getString("info");
+            return gson.fromJson(info, clazz);
+        }
+        return null;
+    }
+
+    public <T> List<T> getInfo(String source, Class<T> clazz) {
+        List<T> list = new ArrayList<T>();
+        ResultSet rs = executeQuery("select info from product_info where source = ?", source);
+        for (Row row : rs) {
+            String info = row.getString("info");
+            list.add(gson.fromJson(info, clazz));
+        }
+        return list;
+    }
+
+    public void deleteInfo(String source, String key) {
+        executeUpdate("delete from product_info where source = ? and key = ?", source, key);
     }
 
 }

@@ -87,7 +87,7 @@ public class StepStart extends Panel {
                     Set<Agent> clients = OozieDAO.getAgents(nodes);
 
                     wizard.getConfig().reset();
-                    wizard.getConfig().setServers(servers);
+                    wizard.getConfig().setServer(servers.iterator().next());
                     wizard.getConfig().setClients(clients);
                     wizard.next();
                 } else {

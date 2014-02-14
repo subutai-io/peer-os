@@ -8,15 +8,15 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.commands.HBaseCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 /**
@@ -29,17 +29,17 @@ public class ServiceInstaller {
     private final TextArea terminal;
     private Task currentTask;
     HBaseConfig config;
+    private AsyncTaskRunner asyncTaskRunner;
 
-    public ServiceInstaller(HBaseConfig config, TextArea terminal) {
+    public ServiceInstaller(Wizard wizard, TextArea terminal) {
         this.terminal = terminal;
-        this.config = config;
+        this.config = wizard.getConfig();
+        this.asyncTaskRunner = wizard.getRunner();
 
         Task updateApt = RequestUtil.createTask("apt-get update");
         for (Agent agent : config.getAgents()) {
             Command command = HBaseCommands.getAptGetUpdate();
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(updateApt.getUuid());
-            command.getRequest().setRequestSequenceNumber(updateApt.getIncrementedReqSeqNumber());
             updateApt.addCommand(command);
         }
         tasks.add(updateApt);
@@ -48,8 +48,6 @@ public class ServiceInstaller {
         for (Agent agent : config.getAgents()) {
             Command command = new HBaseCommands().getCommand(HBaseCommandEnum.INSTALL);
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(installTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(installTask.getIncrementedReqSeqNumber());
             installTask.addCommand(command);
         }
         tasks.add(installTask);
@@ -63,8 +61,6 @@ public class ServiceInstaller {
         for (Agent agent : config.getAgents()) {
             Command command = HBaseCommands.getSetMasterCommand(masterSB.toString());
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setMasterTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setMasterTask.getIncrementedReqSeqNumber());
             setMasterTask.addCommand(command);
         }
         tasks.add(setMasterTask);
@@ -77,8 +73,6 @@ public class ServiceInstaller {
         for (Agent agent : config.getAgents()) {
             Command command = HBaseCommands.getSetRegionCommand(regionSB.toString());
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setRegionTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setRegionTask.getIncrementedReqSeqNumber());
             setRegionTask.addCommand(command);
         }
         tasks.add(setRegionTask);
@@ -91,8 +85,6 @@ public class ServiceInstaller {
         for (Agent agent : config.getAgents()) {
             Command command = HBaseCommands.getSetQuorumCommand(quorumSB.toString());
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setQuorumTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setQuorumTask.getIncrementedReqSeqNumber());
             setQuorumTask.addCommand(command);
         }
         tasks.add(setQuorumTask);
@@ -105,8 +97,6 @@ public class ServiceInstaller {
         for (Agent agent : config.getAgents()) {
             Command command = HBaseCommands.getSetBackupMastersCommand(backupSB.toString());
             command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(setBackupMastersTask.getUuid());
-            command.getRequest().setRequestSequenceNumber(setBackupMastersTask.getIncrementedReqSeqNumber());
             setBackupMastersTask.addCommand(command);
         }
         tasks.add(setBackupMastersTask);
@@ -117,9 +107,40 @@ public class ServiceInstaller {
         terminal.setValue("Starting installation...\n");
         moveToNextTask();
         if (currentTask != null) {
-            for (Command command : currentTask.getCommands()) {
-                executeCommand(command);
-            }
+//            for (Command command : currentTask.getCommands()) {
+//                executeCommand(command);
+//            }
+
+            asyncTaskRunner.executeTask(currentTask, new ChainedTaskCallback() {
+
+                @Override
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+//                    List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+//                    Task task = RequestUtil.getTask(response.getTaskUuid());
+                    if (task.isCompleted()) {
+                        if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                            terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
+                            moveToNextTask();
+                            if (currentTask != null) {
+                                terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
+//                                for (Command command : currentTask.getCommands()) {
+//                                    executeCommand(command);
+//                                }
+                                return currentTask;
+                            } else {
+                                terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+//                        saveInfo();
+                                saveHBaseInfo();
+                            }
+                        } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                            terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+                        }
+                        terminal.setCursorPosition(terminal.getValue().toString().length());
+                    }
+                    return null;
+                }
+            });
+
         }
     }
 
@@ -127,35 +148,34 @@ public class ServiceInstaller {
         currentTask = tasks.poll();
     }
 
-    public void onResponse(Response response) {
-        if (currentTask != null && response.getTaskUuid() != null
-                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-
-            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
-            Task task = RequestUtil.getTask(response.getTaskUuid());
-            if (!list.isEmpty() && terminal != null) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
-                    moveToNextTask();
-                    if (currentTask != null) {
-                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
-                        for (Command command : currentTask.getCommands()) {
-                            executeCommand(command);
-                        }
-                    } else {
-                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-//                        saveInfo();
-                        saveHBaseInfo();
-                    }
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
-                }
-            }
-            terminal.setCursorPosition(terminal.getValue().toString().length());
-
-        }
-    }
-
+//    public void onResponse(Response response) {
+//        if (currentTask != null && response.getTaskUuid() != null
+//                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
+//            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+//            Task task = RequestUtil.getTask(response.getTaskUuid());
+//            if (!list.isEmpty() && terminal != null) {
+//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
+//                    moveToNextTask();
+//                    if (currentTask != null) {
+//                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
+//                        for (Command command : currentTask.getCommands()) {
+//                            executeCommand(command);
+//                        }
+//                    } else {
+//                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+////                        saveInfo();
+//                        saveHBaseInfo();
+//                    }
+//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+//                }
+//            }
+//            terminal.setCursorPosition(terminal.getValue().toString().length());
+//
+//        }
+//    }
+//    private static final Logger LOG = Logger.getLogger(ServiceInstaller.class.getName());
 //    private void saveInfo() {
 //        HBaseClusterInfo info = new HBaseClusterInfo();
 //        info.setDomainName(config.getDomainInfo());
@@ -175,9 +195,8 @@ public class ServiceInstaller {
         }
     }
 
-    private void executeCommand(Command command) {
-        terminal.setValue(terminal.getValue().toString() + command.getRequest().getProgram() + "\n");
-        ServiceLocator.getService(CommandManager.class).executeCommand(command);
-    }
-
+//    private void executeCommand(Command command) {
+//        terminal.setValue(terminal.getValue().toString() + command.getRequest().getProgram() + "\n");
+//        ServiceLocator.getService(CommandManager.class).executeCommand(command);
+//    }
 }

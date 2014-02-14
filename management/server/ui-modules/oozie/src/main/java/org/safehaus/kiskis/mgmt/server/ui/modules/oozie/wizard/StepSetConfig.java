@@ -56,19 +56,9 @@ public class StepSetConfig extends Panel {
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
-        final TwinColSelect selectServers = new TwinColSelect("", new ArrayList<Agent>());
-        selectServers.setItemCaptionPropertyId("hostname");
-        selectServers.setRows(7);
-        selectServers.setNullSelectionAllowed(true);
-        selectServers.setMultiSelect(true);
-        selectServers.setImmediate(true);
-        selectServers.setLeftColumnCaption("Task tracker nodes");
-        selectServers.setRightColumnCaption("Server nodes");
-        selectServers.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        selectServers.setRequired(true);
+        final Label server = new Label("Server");
+        verticalLayoutForm.addComponent(server);
 
-        verticalLayoutForm.addComponent(selectServers);
-        
         final TwinColSelect selectClients = new TwinColSelect("", new ArrayList<Agent>());
         selectClients.setItemCaptionPropertyId("hostname");
         selectClients.setRows(7);
@@ -90,11 +80,9 @@ public class StepSetConfig extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.getConfig().setServers((Set<Agent>) selectServers.getValue());
                 wizard.getConfig().setClients((Set<Agent>) selectClients.getValue());
 //
-                if (Util.isCollectionEmpty(wizard.getConfig().getServers())
-                        || Util.isCollectionEmpty(wizard.getConfig().getClients())) {
+                if (Util.isCollectionEmpty(wizard.getConfig().getClients())) {
                     show("Please select servers to install server and clients");
                 } else {
                     wizard.next();
@@ -119,11 +107,10 @@ public class StepSetConfig extends Panel {
 
         addComponent(verticalLayout);
 
-        selectServers.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getServers()));
         selectClients.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getClients()));
 
         //set values if this is a second visit
-        selectServers.setValue(wizard.getConfig().getServers());
+        server.setValue(wizard.getConfig().getServer().getHostname());
         selectClients.setValue(wizard.getConfig().getClients());
     }
 
