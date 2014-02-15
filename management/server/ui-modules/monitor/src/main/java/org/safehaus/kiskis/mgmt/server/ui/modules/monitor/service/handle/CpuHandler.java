@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
 import java.util.LinkedHashMap;
@@ -15,8 +14,8 @@ public class CpuHandler extends Handler {
         super("cpu_user", "");
     }
 
-    protected BoolQueryBuilder getQueryBuilder() {
-        return QueryBuilders.boolQuery()
+    protected void setQueryBuilder(BoolQueryBuilder queryBuilder) {
+        queryBuilder
                 .must(termQuery("name", "cpu_user"));
     }
 

@@ -18,9 +18,9 @@ class Chart {
         loadScripts();
     }
 
-    void load(Handler handler) {
+    void load(Handler handler, String node) {
 
-        Map<String, Double> data = handler.getData();
+        Map<String, Double> data = handler.getData(node);
 
         String chart = CHART
                 .replace("${mainTitle}", handler.getMainTitle())

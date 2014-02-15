@@ -12,11 +12,11 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 public class NetworkHandler extends Handler {
 
     public NetworkHandler () {
-        super("if_packets", "KB");
+        super("if_packets", "rx + tx");
     }
 
-    protected BoolQueryBuilder getQueryBuilder() {
-        return QueryBuilders.boolQuery()
+    protected void setQueryBuilder(BoolQueryBuilder queryBuilder) {
+        queryBuilder
                 .must(termQuery("host", "node1"))
                 .must(termQuery("collectd_type", "if_packets"));
     }
@@ -30,7 +30,7 @@ public class NetworkHandler extends Handler {
             Integer tx = (Integer) json.get("tx");
             map.put(
                     json.get("@timestamp").toString(),
-                    (double) (rx + tx) / 1024
+                    (double) (rx + tx)
             );
         }
 

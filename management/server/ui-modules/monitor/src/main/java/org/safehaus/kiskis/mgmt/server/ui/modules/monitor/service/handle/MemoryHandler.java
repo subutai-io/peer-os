@@ -12,12 +12,11 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 public class MemoryHandler extends Handler {
 
     public MemoryHandler() {
-        super("Memory Used", "KB");
+        super("memory_used", "KB");
     }
 
-    protected BoolQueryBuilder getQueryBuilder() {
-        return QueryBuilders.boolQuery()
-                .must(termQuery("host", "node1"))
+    protected void setQueryBuilder(BoolQueryBuilder queryBuilder) {
+        queryBuilder
                 .must(termQuery("collectd_type", "memory"))
                 .must(termQuery("plugin", "memory"))
                 .must(termQuery("type_instance", "used"));

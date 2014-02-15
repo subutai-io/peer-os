@@ -2,17 +2,20 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.JavaScript;
+import org.apache.commons.lang3.StringUtils;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
 
-import java.util.*;
 import java.util.logging.Logger;
 
 public class ModuleComponent extends CustomComponent {
 
+    private static final String DEFAULT_NODE = "node1";
+    private static final String DEFAULT_METRIC = "MEMORY";
     private final Logger log = Logger.getLogger(ModuleComponent.class.getName());
     private Chart chart;
+
+    private ComboBox nodeComboBox;
+    private ComboBox metricComboBox;
 
     public ModuleComponent() {
         setHeight("100%");
@@ -25,35 +28,46 @@ public class ModuleComponent extends CustomComponent {
         layout.setWidth(1000, Sizeable.UNITS_PIXELS);
         layout.setHeight(1000, Sizeable.UNITS_PIXELS);
 
-        Button button = new Button("Test");
-        button.setWidth(120, Sizeable.UNITS_PIXELS);
+        nodeComboBox = UIUtil.getComboBox("Nodes", DEFAULT_NODE, "node2", "172.16.10.109", "172.16.10.110", "bigdata");
+        layout.addComponent(nodeComboBox, "left: 10px; top: 50px;");
 
-        button.addListener(new Button.ClickListener() {
-            @Override
+        metricComboBox = UIUtil.getComboBox("Metric", MetricType.MEMORY.toString(), MetricType.CPU.toString(), MetricType.DISK.toString(), MetricType.NETWORK.toString());
+        layout.addComponent(metricComboBox, "left: 10px; top: 100px;");
+
+        Button submitButton = UIUtil.getButton("Submit", 150);
+        submitButton.addListener(new Button.ClickListener() {
             public void buttonClick(Button.ClickEvent event) {
-                handleButton();
+                handleSubmit();
             }
         });
 
-        layout.addComponent(button, "left: 30px; top: 50px;");
+        layout.addComponent(submitButton, "left: 10px; top: 150px;");
 
-        AbsoluteLayout layout2 = new AbsoluteLayout();
-        layout2.setWidth(800, Sizeable.UNITS_PIXELS);
-        layout2.setHeight(300, Sizeable.UNITS_PIXELS);
-        layout2.setDebugId("chart");
-
-        layout.addComponent(layout2, "left: 200px; top: 10px;");
+        AbsoluteLayout chartLayout = new AbsoluteLayout();
+        chartLayout.setWidth(800, Sizeable.UNITS_PIXELS);
+        chartLayout.setHeight(300, Sizeable.UNITS_PIXELS);
+        chartLayout.setDebugId("chart");
+        layout.addComponent(chartLayout, "left: 200px; top: 10px;");
 
         return layout;
     }
 
-    private void handleButton() {
+    private void handleSubmit() {
 
         if (chart == null) {
             chart = new Chart(getWindow());
         }
 
-        Handler handler = HandlerFactory.getHandler(null);
-        chart.load(handler);
+        Handler handler = HandlerFactory.getHandler(getSelectedMetric());
+        chart.load(handler, getSelectedNode());
+    }
+
+    private String getSelectedNode() {
+        return StringUtils.defaultIfEmpty((String) nodeComboBox.getValue(), DEFAULT_NODE);
+    }
+
+    private MetricType getSelectedMetric() {
+        String metric = StringUtils.defaultIfEmpty((String) metricComboBox.getValue(), DEFAULT_METRIC);
+        return MetricType.valueOf(metric);
     }
 }

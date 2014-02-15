@@ -19,11 +19,11 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 public class DiskHandler extends Handler {
 
     public DiskHandler () {
-        super("disk_time", "KB");
+        super("disk_time", "read + write");
     }
 
-    protected BoolQueryBuilder getQueryBuilder() {
-        return QueryBuilders.boolQuery()
+    protected void setQueryBuilder(BoolQueryBuilder queryBuilder) {
+        queryBuilder
                 .must(termQuery("host", "node1"))
                 .must(termQuery("collectd_type", "disk_time"));
     }
@@ -37,7 +37,7 @@ public class DiskHandler extends Handler {
             Integer write = (Integer) json.get("write");
             map.put(
                     json.get("@timestamp").toString(),
-                    (double) (read + write) / 1024
+                    (double) (read + write)
             );
         }
 

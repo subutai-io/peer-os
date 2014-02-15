@@ -1,5 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle;
 
-public enum DataType {
-    MEMORY
+public enum MetricType {
+    MEMORY, CPU, DISK, NETWORK
 }
