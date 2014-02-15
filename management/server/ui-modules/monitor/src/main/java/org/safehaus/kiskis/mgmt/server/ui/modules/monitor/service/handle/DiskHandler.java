@@ -1,26 +1,31 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle;
 
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
-public class MemoryHandler extends Handler {
+public class DiskHandler extends Handler {
 
-    public MemoryHandler() {
-        super("Memory Used", "KB");
+    public DiskHandler () {
+        super("disk_time", "KB");
     }
 
     protected BoolQueryBuilder getQueryBuilder() {
         return QueryBuilders.boolQuery()
                 .must(termQuery("host", "node1"))
-                .must(termQuery("collectd_type", "memory"))
-                .must(termQuery("plugin", "memory"))
-                .must(termQuery("type_instance", "used"));
+                .must(termQuery("collectd_type", "disk_time"));
     }
 
     protected Map<String, Double> parseHits(SearchHit hits[]) {
@@ -28,9 +33,11 @@ public class MemoryHandler extends Handler {
 
         for (int i = hits.length-1; i >= 0; i--) {
             Map<String, Object> json = hits[i].getSource();
+            Integer read = (Integer) json.get("read");
+            Integer write = (Integer) json.get("write");
             map.put(
                     json.get("@timestamp").toString(),
-                    (Double) json.get("value") / 1024
+                    (double) (read + write) / 1024
             );
         }
 

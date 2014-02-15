@@ -9,18 +9,16 @@ import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
-public class MemoryHandler extends Handler {
+public class NetworkHandler extends Handler {
 
-    public MemoryHandler() {
-        super("Memory Used", "KB");
+    public NetworkHandler () {
+        super("if_packets", "KB");
     }
 
     protected BoolQueryBuilder getQueryBuilder() {
         return QueryBuilders.boolQuery()
                 .must(termQuery("host", "node1"))
-                .must(termQuery("collectd_type", "memory"))
-                .must(termQuery("plugin", "memory"))
-                .must(termQuery("type_instance", "used"));
+                .must(termQuery("collectd_type", "if_packets"));
     }
 
     protected Map<String, Double> parseHits(SearchHit hits[]) {
@@ -28,9 +26,11 @@ public class MemoryHandler extends Handler {
 
         for (int i = hits.length-1; i >= 0; i--) {
             Map<String, Object> json = hits[i].getSource();
+            Integer rx = (Integer) json.get("rx");
+            Integer tx = (Integer) json.get("tx");
             map.put(
                     json.get("@timestamp").toString(),
-                    (Double) json.get("value") / 1024
+                    (double) (rx + tx) / 1024
             );
         }
 
