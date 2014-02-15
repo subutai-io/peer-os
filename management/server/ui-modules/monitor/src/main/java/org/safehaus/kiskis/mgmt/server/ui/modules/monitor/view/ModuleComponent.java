@@ -2,7 +2,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.*;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.JavaScript;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
 
 import java.util.*;
@@ -11,8 +12,7 @@ import java.util.logging.Logger;
 public class ModuleComponent extends CustomComponent {
 
     private final Logger log = Logger.getLogger(ModuleComponent.class.getName());
-
-    private boolean loaded;
+    private Chart chart;
 
     public ModuleComponent() {
         setHeight("100%");
@@ -40,7 +40,7 @@ public class ModuleComponent extends CustomComponent {
         AbsoluteLayout layout2 = new AbsoluteLayout();
         layout2.setWidth(800, Sizeable.UNITS_PIXELS);
         layout2.setHeight(300, Sizeable.UNITS_PIXELS);
-        layout2.setDebugId("subdiv");
+        layout2.setDebugId("chart");
 
         layout.addComponent(layout2, "left: 200px; top: 10px;");
 
@@ -49,64 +49,11 @@ public class ModuleComponent extends CustomComponent {
 
     private void handleButton() {
 
-        loadScripts();
-
-        String chart = FileUtil.getContent("js/chart.js");
-
-        Map<String, Double> data = new CpuHandler().getData();
-
-        chart = chart.replace("${mainTitle}", "cpu_user");
-        chart = chart.replace("${yTitle}", "");
-        chart = chart.replace("${categories}", formatData(data.keySet()));
-        chart = chart.replace("${values}", formatData(data.values()));
-
-        log.info("chart: " + chart);
-
-        getWindow().executeJavaScript(chart);
-    }
-
-    private static String formatData(Collection<Double> data) {
-        String s = "";
-
-        for (Object v : data) {
-            if (!s.isEmpty()) {
-                s += ",";
-            }
-
-            s += v;
+        if (chart == null) {
+            chart = new Chart(getWindow());
         }
 
-        return s;
-    }
-
-    private static String formatData(Set<String> set) {
-        String s = "";
-
-        for (String v : set) {
-            if (!s.isEmpty()) {
-                s += ",";
-            }
-
-            s += String.format("'%s'", v);
-        }
-
-        return s;
-    }
-
-    private void loadScripts() {
-        log.info("loaded: " + loaded);
-
-        if (loaded) {
-            return;
-        }
-
-        loadScript("js/jquery.min.js");
-        loadScript("js/highcharts.js");
-
-        loaded = true;
-    }
-
-    private void loadScript(String filePath) {
-        getWindow().executeJavaScript(FileUtil.getContent(filePath));
+        Handler handler = HandlerFactory.getHandler(null);
+        chart.load(handler);
     }
 }

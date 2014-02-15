@@ -1,4 +1,4 @@
-$('#subdiv').highcharts({
+$('#chart').highcharts({
     title: {
         text: '${mainTitle}'
     },
@@ -29,7 +29,6 @@ $('#subdiv').highcharts({
         borderWidth: 0
     },
     series: [{
-        //name: 'Bishkek',
         data: [${values}]
     }]
 });
