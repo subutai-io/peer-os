@@ -25,7 +25,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
  */
 public class DbManagerImpl implements DbManager {
 
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
     private Cluster cluster;
     private Session session;
@@ -101,14 +101,15 @@ public class DbManagerImpl implements DbManager {
                 gson.toJson(info));
     }
 
-    public <T> List<T> getInfo(String source, String key, Class<T> clazz) {
-        List<T> list = new ArrayList<T>();
+    public <T> T getInfo(String source, String key, Class<T> clazz) {
         ResultSet rs = executeQuery("select info from product_info where source = ? and key = ?", source, key);
-        for (Row row : rs) {
+        Row row = rs.one();
+        if (row != null) {
+
             String info = row.getString("info");
-            list.add(gson.fromJson(info, clazz));
+            return gson.fromJson(info, clazz);
         }
-        return list;
+        return null;
     }
 
     public <T> List<T> getInfo(String source, Class<T> clazz) {

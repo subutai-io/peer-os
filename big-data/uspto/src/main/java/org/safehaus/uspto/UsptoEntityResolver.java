@@ -56,28 +56,27 @@ public class UsptoEntityResolver implements EntityResolver2 {
 		lastFileName = null;
 	}
 	
+	public Version getCurrentVersion()
+	{
+		return currentVersion;
+	}
+	
 	public InputSource resolveEntity(String publicId, String systemId)
 	        throws SAXException, IOException {
-			System.out.println("publicId: "+publicId+" systemId: "+systemId);
-			File ff = new File(systemId);
+		logger.debug("getExternalSubset: publicId: {}, systemId: {}", publicId, systemId);
+		File ff = new File(systemId);
 			System.out.println("base: "+ff.getName());
 	    return null;
 	}
 	public InputSource getExternalSubset(String name, String baseURI)
 	        throws SAXException, IOException {
-	    System.out.print("getExternalSubset:");
-	    System.out.print(" - name = "+name);
-	    System.out.println(" - baseURI = "+baseURI);
+		logger.debug("getExternalSubset: name: {}, baseURI: {}, systemId: {}", name, baseURI);
 	    return null;
 	}
 	public InputSource resolveEntity(String name, String publicId,
 	        String baseURI, String systemId) throws SAXException, IOException {
 		
-//	    System.out.print("resolveEntity:");
-//	    System.out.print(" - name = "+name);
-//	    System.out.print(" - publicId = "+publicId);
-//	    System.out.print(" - baseURI = "+baseURI);
-//	    System.out.println(" - systemId = "+systemId);
+		logger.debug("resolveEntity: name: {}, publicId: {}, baseURI: {}, systemId: {}", name, publicId, baseURI, systemId);
 	    
 	    //correct directory separators for current system
 	    String fileName = systemId.replaceAll("\\\\", File.separator);
@@ -87,7 +86,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V24)
 	    	{
-	    		logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V24;
 	    }
@@ -95,7 +94,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V25)
 	    	{
-	    		logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V25;
 	    }
@@ -103,7 +102,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V24)
 	    	{
-	    		logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V30;
 	    }
@@ -112,7 +111,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V40
 	    			|| !lastFileName.equals(fileName))
 	    	{
-//	    		logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    		lastFileName = fileName;
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V40;
@@ -121,7 +120,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V41)
 	    	{
-//	    		logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V41;
 	    }
@@ -129,7 +128,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V42)
 	    	{
-	    		//logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V42;
 	    }
@@ -137,7 +136,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V43)
 	    	{
-	    		//logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V43;
 	    }
@@ -145,7 +144,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    {
 	    	if (currentVersion == null || currentVersion != Version.US_PATENT_GRANT_V44)
 	    	{
-	    		//logger.info("Found {}", fileName);
+	    		logger.debug("Found {}", fileName);
 	    	}
 	    	currentVersion = Version.US_PATENT_GRANT_V44;
 	    }
@@ -171,7 +170,7 @@ public class UsptoEntityResolver implements EntityResolver2 {
 	    	streamTable.put(fileName, cachedStream);
 	    }
 	    
-//	    System.out.println(" - returnPath = "+fileName);
+	    logger.debug("ReturnPath: {}",fileName);
 	    cachedStream.reset();
 	    return new InputSource(cachedStream);
 	}

@@ -6,10 +6,9 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.api;
 
 import com.datastax.driver.core.ResultSet;
-import java.io.IOException;
 import java.util.List;
 
-/**
+/**ы
  *
  * @author dilshat
  */
@@ -21,7 +20,7 @@ public interface DbManager {
 
     public void saveInfo(String source, String key, Object info);
 
-    public <T> List<T> getInfo(String source, String key, Class<T> clazz);
+    public <T> T getInfo(String source, String key, Class<T> clazz);
 
     public <T> List<T> getInfo(String source, Class<T> clazz);
 
