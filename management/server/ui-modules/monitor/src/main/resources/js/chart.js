@@ -1,25 +1,26 @@
 $('#subdiv').highcharts({
     title: {
-        text: 'Monthly Average Temperature'
-    },
-    subtitle: {
-        text: 'Source: WorldClimate.com'
+        text: '${mainTitle}'
     },
     xAxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        categories: [${categories}],
+        labels: {
+            rotation: -45,
+            align: 'right',
+            style: {
+                fontSize: '10px'
+            }
+        }
     },
     yAxis: {
         title: {
-            text: 'Temperature (C)'
+            text: '${yTitle}'
         },
         plotLines: [{
             value: 0,
             width: 1,
             color: '#808080'
         }]
-    },
-    tooltip: {
-        valueSuffix: 'C'
     },
     legend: {
         layout: 'vertical',
@@ -29,6 +30,6 @@ $('#subdiv').highcharts({
     },
     series: [{
         name: 'Bishkek',
-        data: [1.5, 2, 3, 4.5, 5, 6.5, 7, 8, 9, 8, 7.5, 6.5]
+        data: [${values}]
     }]
 });

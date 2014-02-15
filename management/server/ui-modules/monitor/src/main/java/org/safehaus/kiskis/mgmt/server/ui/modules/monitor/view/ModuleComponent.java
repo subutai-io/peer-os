@@ -2,18 +2,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.sort.SortOrder;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.MemoryHandler;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
 
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
@@ -41,11 +33,7 @@ public class ModuleComponent extends CustomComponent {
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                getWindow().executeJavaScript("console.log(1)");
-                loadScripts();
-                loadScript("js/chart.js");
-                getWindow().executeJavaScript("console.log(2)");
-                testData();
+                handleButton();
             }
         });
 
@@ -61,39 +49,50 @@ public class ModuleComponent extends CustomComponent {
         return layout;
     }
 
-    private void testData() {
+    private void handleButton() {
 
-        Settings settings = ImmutableSettings.settingsBuilder()
-                .put("client.transport.ignore_cluster_name", true)
-                .put("node.name", "TestNode")
-                .build();
+        loadScripts();
 
-        TransportClient client = new TransportClient(settings);
-        client = client.addTransportAddress(new InetSocketTransportAddress("172.16.10.103", 9300));
+        String chart = FileUtil.getContent("js/chart.js");
 
-        BoolQueryBuilder queryBuilder =  QueryBuilders.boolQuery()
-                .must(termQuery("host", "node1"))
-                .must(termQuery("collectd_type", "memory"))
-                .must(termQuery("plugin", "memory"))
-                .must(termQuery("type_instance", "used"));
+        Map<String, Double> data = new MemoryHandler().testData();
 
-        SearchResponse response = client.prepareSearch()
-                .setQuery(queryBuilder)
-                .setSize(10)
-                .addSort("@timestamp", SortOrder.DESC)
-                .execute().actionGet();
+        chart = chart.replace("${mainTitle}", "Memory Usage");
+        chart = chart.replace("${yTitle}", "KB");
+        chart = chart.replace("${categories}", formatData(data.keySet()));
+        chart = chart.replace("${values}", formatData(data.values()));
 
-        //System.out.println(response);
-        SearchHit hits[] = response.getHits().getHits();
-        log.info("count: " + hits.length);
+        log.info("chart: " + chart);
 
-        for (int i = hits.length-1; i >= 0; i--) {
-            //for (SearchHit hit : response.getHits().getHits()) {
-            Map<String, Object> json = hits[i].getSource();
-            log.info(json.get("@timestamp") + ": " + json.get("value"));
+        getWindow().executeJavaScript(chart);
+    }
+
+    private static String formatData(Collection<Double> data) {
+        String s = "";
+
+        for (Object v : data) {
+            if (!s.isEmpty()) {
+                s += ",";
+            }
+
+            s += v;
         }
 
-        client.close();
+        return s;
+    }
+
+    private static String formatData(Set<String> set) {
+        String s = "";
+
+        for (String v : set) {
+            if (!s.isEmpty()) {
+                s += ",";
+            }
+
+            s += String.format("'%s'", v);
+        }
+
+        return s;
     }
 
     private void loadScripts() {
