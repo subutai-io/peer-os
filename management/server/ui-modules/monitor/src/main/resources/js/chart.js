@@ -29,7 +29,7 @@ $('#subdiv').highcharts({
         borderWidth: 0
     },
     series: [{
-        name: 'Bishkek',
+        //name: 'Bishkek',
         data: [${values}]
     }]
 });

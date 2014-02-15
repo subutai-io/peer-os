@@ -2,13 +2,11 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.MemoryHandler;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
 
 import java.util.*;
 import java.util.logging.Logger;
-
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 public class ModuleComponent extends CustomComponent {
 
@@ -55,9 +53,9 @@ public class ModuleComponent extends CustomComponent {
 
         String chart = FileUtil.getContent("js/chart.js");
 
-        Map<String, Double> data = new MemoryHandler().testData();
+        Map<String, Double> data = new NetworkHandler().getData();
 
-        chart = chart.replace("${mainTitle}", "Memory Usage");
+        chart = chart.replace("${mainTitle}", "Network Usage");
         chart = chart.replace("${yTitle}", "KB");
         chart = chart.replace("${categories}", formatData(data.keySet()));
         chart = chart.replace("${values}", formatData(data.values()));
