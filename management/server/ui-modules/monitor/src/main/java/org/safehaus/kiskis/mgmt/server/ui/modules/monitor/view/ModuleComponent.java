@@ -53,9 +53,9 @@ public class ModuleComponent extends CustomComponent {
 
         String chart = FileUtil.getContent("js/chart.js");
 
-        Map<String, Double> data = new NetworkHandler().getData();
+        Map<String, Double> data = new DiskHandler().getData();
 
-        chart = chart.replace("${mainTitle}", "Network Usage");
+        chart = chart.replace("${mainTitle}", "Disk Access");
         chart = chart.replace("${yTitle}", "KB");
         chart = chart.replace("${categories}", formatData(data.keySet()));
         chart = chart.replace("${values}", formatData(data.values()));
