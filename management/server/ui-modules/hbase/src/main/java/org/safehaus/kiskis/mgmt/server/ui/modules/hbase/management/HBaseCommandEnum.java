@@ -19,7 +19,8 @@ public enum HBaseCommandEnum {
     SET_REGION("sh /opt/hbase-0.94.11/scripts/region.sh", 120),
     SET_QUORUM("sh /opt/hbase-0.94.11/scripts/quorum.sh", 120),
     SET_BACKUP_MASTERS("sh /opt/hbase-0.94.11/scripts/backUpMasters.sh", 120),
-    PURGE("apt-get --assume-yes --force-yes purge ksks-hbase", 120);
+    PURGE("apt-get --assume-yes --force-yes purge ksks-hbase", 120),
+    MANAGE("manage", 120);
 
     String program;
     String yaml = "/opt/cassandra-2.0.3/conf/cassandra.yaml";

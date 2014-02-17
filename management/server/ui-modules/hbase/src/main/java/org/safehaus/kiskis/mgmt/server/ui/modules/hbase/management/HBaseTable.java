@@ -12,8 +12,10 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
 public class HBaseTable extends Table {
 
@@ -97,6 +99,7 @@ public class HBaseTable extends Table {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                cce = HBaseCommandEnum.MANAGE;
                 nodesWindow = new NodesWindow(config, manager);
                 getApplication().getMainWindow().addWindow(nodesWindow);
 
@@ -163,11 +166,11 @@ public class HBaseTable extends Table {
 //            }
 //        }
 //    }
-    public void manageUI(TaskStatus ts) {
+    public void manageUI(Task task) {
         if (cce != null) {
             switch (cce) {
                 case START: {
-                    switch (ts) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             getWindow().showNotification("Start success");
                             switchState(false);
@@ -182,7 +185,7 @@ public class HBaseTable extends Table {
 
                 }
                 case STOP: {
-                    switch (ts) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             getWindow().showNotification("Stop success");
                             switchState(true);
@@ -196,7 +199,7 @@ public class HBaseTable extends Table {
                     break;
                 }
                 case PURGE: {
-                    switch (ts) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
                             if (HBaseDAO
@@ -212,6 +215,9 @@ public class HBaseTable extends Table {
                         }
                     }
                     break;
+                }
+                case MANAGE: {
+                    nodesWindow.updateUI(task);
                 }
             }
         }
