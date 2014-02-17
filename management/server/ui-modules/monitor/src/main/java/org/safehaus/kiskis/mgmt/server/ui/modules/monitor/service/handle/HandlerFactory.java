@@ -7,11 +7,11 @@ public class HandlerFactory {
     private static final Handler diskHandler = new DiskHandler();
     private static final Handler networkHandler = new NetworkHandler();
 
-    public static Handler getHandler(MetricType metricType) {
+    public static Handler getHandler(Metric metric) {
 
         Handler handler = memoryHandler;
 
-        switch (metricType) {
+        switch (metric) {
         case CPU:
             handler = cpuHandler;
             break;

@@ -3,8 +3,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
 
 public class UIUtil {
 

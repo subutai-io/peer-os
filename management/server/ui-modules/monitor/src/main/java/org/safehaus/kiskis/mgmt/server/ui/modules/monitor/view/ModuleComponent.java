@@ -31,7 +31,12 @@ public class ModuleComponent extends CustomComponent {
         nodeComboBox = UIUtil.getComboBox("Nodes", DEFAULT_NODE, "node2", "172.16.10.109", "172.16.10.110", "bigdata");
         layout.addComponent(nodeComboBox, "left: 10px; top: 50px;");
 
-        metricComboBox = UIUtil.getComboBox("Metric", MetricType.MEMORY.toString(), MetricType.CPU.toString(), MetricType.DISK.toString(), MetricType.NETWORK.toString());
+        metricComboBox = UIUtil.getComboBox("Metric",
+                Metric.MEMORY.toString(),
+                Metric.CPU.toString(),
+                Metric.DISK.toString(),
+                Metric.NETWORK.toString()
+        );
         layout.addComponent(metricComboBox, "left: 10px; top: 100px;");
 
         Button submitButton = UIUtil.getButton("Submit", 150);
@@ -66,8 +71,8 @@ public class ModuleComponent extends CustomComponent {
         return StringUtils.defaultIfEmpty((String) nodeComboBox.getValue(), DEFAULT_NODE);
     }
 
-    private MetricType getSelectedMetric() {
+    private Metric getSelectedMetric() {
         String metric = StringUtils.defaultIfEmpty((String) metricComboBox.getValue(), DEFAULT_METRIC);
-        return MetricType.valueOf(metric);
+        return Metric.valueOf(metric);
     }
 }
