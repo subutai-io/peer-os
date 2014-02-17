@@ -96,6 +96,7 @@ public class StepStart extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 table = getTable();
+                table.refreshDataSource();
             }
         });
 

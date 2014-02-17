@@ -30,6 +30,7 @@ public class ServiceManager {
     private Task currentTask;
     private final AsyncTaskRunner asyncTaskRunner;
     private final HBaseTable hBaseTable;
+    private NodesWindow nodesWindow;
 
     public ServiceManager(AsyncTaskRunner asyncTaskRunner, HBaseTable hBaseTable) {
         this.asyncTaskRunner = asyncTaskRunner;
@@ -76,19 +77,10 @@ public class ServiceManager {
                             moveToNextTask();
                             if (currentTask != null) {
                                 return currentTask;
-                            } else {
-                                NodesWindow nodesWindow = hBaseTable.getNodesWindow();
-                                if (nodesWindow != null && nodesWindow.isVisible()) {
-                                    nodesWindow.updateUI(task);
-                                }
-//                            manageUI(task.getTaskStatus());
-                                hBaseTable.manageUI(task.getTaskStatus());
                             }
                         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-//                    if (nodesWindow != null && nodesWindow.isVisible()) {
-//                        nodesWindow.updateUI(task);
-//                    }
                         }
+                        hBaseTable.manageUI(task);
                     }
                     return null;
                 }
