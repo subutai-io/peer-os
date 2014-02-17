@@ -298,6 +298,11 @@
                                     <artifactId>solr-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>monitor-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!--UI Modules-->
 
                                 <!--UI Dependencies-->
@@ -373,7 +378,6 @@
                                     <version>3.1</version>
                                     <type>jar</type>
                                 </artifactItem>
-
                                 <!--UI Dependencies-->
 
                                 <!--Core Dependencies-->
@@ -506,8 +510,113 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+
+                    <!--
+                        ElasticSearch has a problem to access classes in other jar files.
+                        To fix this we unpack all its dependencies and later create a single jar from.
+                    -->
+                    <execution>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/dependencies/elasticsearch</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch</artifactId>
+                                    <version>0.90.3</version>
+                                </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-analyzers-common</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-codecs</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-core</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-grouping</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-highlighter</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-join</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-memory</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-misc</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-queries</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-queryparser</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-sandbox</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-spatial</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.apache.lucene</groupId>
+                                     <artifactId>lucene-suggest</artifactId>
+                                     <version>4.4.0</version>
+                                 </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
+
+            <!-- Create a single jar with all elasticsearch dependencies -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <jar destfile="target/dependencies/kiskis-server/elasticsearch-bundle.jar" basedir="target/dependencies/elasticsearch"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
