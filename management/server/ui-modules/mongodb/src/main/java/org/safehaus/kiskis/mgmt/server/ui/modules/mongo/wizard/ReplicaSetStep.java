@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Alignment;
@@ -125,14 +126,22 @@ public class ReplicaSetStep extends Panel {
         grid.addComponent(buttons, 0, 9, 2, 9);
 
         addComponent(grid);
-
-        shardsColSel.setContainerDataSource(
-                new BeanItemContainer<Agent>(
-                        Agent.class, wizard.getConfig().getSelectedAgents()));
+        Container shardsSource = new BeanItemContainer<Agent>(
+                Agent.class, wizard.getConfig().getSelectedAgents());
+        shardsColSel.setContainerDataSource(shardsSource
+        );
 
         //set values if this is a second visit
         replicaNameTxtFld.setValue(wizard.getConfig().getReplicaSetName());
         shardsColSel.setValue(wizard.getConfig().getDataNodes());
+        //update sources
+        Set<Agent> agentList = new HashSet(wizard.getConfig().getSelectedAgents());
+        Util.removeValues(agentList, wizard.getConfig().getConfigServers());
+        Util.removeValues(agentList, wizard.getConfig().getRouterServers());
+        shardsSource.removeAllItems();
+        for (Agent agent : agentList) {
+            shardsSource.addItem(agent);
+        }
     }
 
     private void show(String notification) {
