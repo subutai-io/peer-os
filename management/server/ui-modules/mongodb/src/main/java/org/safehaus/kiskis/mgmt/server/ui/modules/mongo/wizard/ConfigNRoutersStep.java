@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Alignment;
@@ -68,7 +69,10 @@ public class ConfigNRoutersStep extends Panel {
                 + "(Recommended 3 nodes, choose 1 or 3 nodes)</strong>");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(configServersLabel, 2, 1, 9, 1);
-
+        final Container routersSource = new BeanItemContainer<Agent>(
+                Agent.class, wizard.getConfig().getSelectedAgents());
+        final Container configSrvSource = new BeanItemContainer<Agent>(
+                Agent.class, wizard.getConfig().getSelectedAgents());
         final TwinColSelect routersColSel = new TwinColSelect("", new ArrayList<Agent>());
         final TwinColSelect configServersColSel = new TwinColSelect("", new ArrayList<Agent>());
 
@@ -84,6 +88,14 @@ public class ConfigNRoutersStep extends Panel {
                     routersColSel.removeListener(routersChangeListener);
                     routersColSel.setValue(wizard.getConfig().getRouterServers());
                     routersColSel.addListener(routersChangeListener);
+                    //update source
+                    agentList = new HashSet(wizard.getConfig().getSelectedAgents());
+                    Util.removeValues(agentList, wizard.getConfig().getConfigServers());
+                    Util.removeValues(agentList, wizard.getConfig().getDataNodes());
+                    routersSource.removeAllItems();
+                    for (Agent agent : agentList) {
+                        routersSource.addItem(agent);
+                    }
                 }
             }
         };
@@ -99,6 +111,14 @@ public class ConfigNRoutersStep extends Panel {
                     configServersColSel.removeListener(configChangeListener);
                     configServersColSel.setValue(wizard.getConfig().getConfigServers());
                     configServersColSel.addListener(configChangeListener);
+                    //update source
+                    agentList = new HashSet(wizard.getConfig().getSelectedAgents());
+                    Util.removeValues(agentList, wizard.getConfig().getRouterServers());
+                    Util.removeValues(agentList, wizard.getConfig().getDataNodes());
+                    configSrvSource.removeAllItems();
+                    for (Agent agent : agentList) {
+                        configSrvSource.addItem(agent);
+                    }
                 }
             }
         };
@@ -172,18 +192,31 @@ public class ConfigNRoutersStep extends Panel {
 
         addComponent(grid);
 
-        routersColSel.setContainerDataSource(
-                new BeanItemContainer<Agent>(
-                        Agent.class, wizard.getConfig().getSelectedAgents()));
-        configServersColSel.setContainerDataSource(
-                new BeanItemContainer<Agent>(
-                        Agent.class, wizard.getConfig().getSelectedAgents()));
+        routersColSel.setContainerDataSource(routersSource);
+
+        configServersColSel.setContainerDataSource(configSrvSource);
 
         //set values if this is a second visit
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
 
         configServersColSel.setValue(wizard.getConfig().getConfigServers());
         routersColSel.setValue(wizard.getConfig().getRouterServers());
+
+        //update sources
+        Set<Agent> agentList = new HashSet(wizard.getConfig().getSelectedAgents());
+        Util.removeValues(agentList, wizard.getConfig().getConfigServers());
+        Util.removeValues(agentList, wizard.getConfig().getDataNodes());
+        routersSource.removeAllItems();
+        for (Agent agent : agentList) {
+            routersSource.addItem(agent);
+        }
+        agentList = new HashSet(wizard.getConfig().getSelectedAgents());
+        Util.removeValues(agentList, wizard.getConfig().getRouterServers());
+        Util.removeValues(agentList, wizard.getConfig().getDataNodes());
+        configSrvSource.removeAllItems();
+        for (Agent agent : agentList) {
+            configSrvSource.addItem(agent);
+        }
     }
 
     private void show(String notification) {
