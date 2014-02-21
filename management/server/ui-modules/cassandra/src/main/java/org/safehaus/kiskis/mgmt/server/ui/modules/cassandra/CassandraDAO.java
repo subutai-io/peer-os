@@ -23,7 +23,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager;
 public class CassandraDAO {
 
     private static final Logger LOG = Logger.getLogger(CassandraDAO.class.getName());
-    private static DbManager dbManager;
+    private static final DbManager dbManager;
 
     static {
         dbManager = ServiceLocator.getService(DbManager.class);

@@ -11,16 +11,16 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management;
  */
 public enum CassandraCommandEnum {
 
-    START("service cassandra start", 30),
-    STOP("service cassandra stop", 30),
-    STATUS("service cassandra status", 30),
-    INSTALL("apt-get --assume-yes --force-yes install ksks-cassandra", 30),
-    SET_SEED("", 30),
-    REMOVE_SEED("", 30),
-    PURGE("apt-get --assume-yes --force-yes purge ksks-cassandra", 30);
+    START("service cassandra start", 180),
+    STOP("service cassandra stop", 180),
+    STATUS("service cassandra status", 180),
+    INSTALL("apt-get --assume-yes --force-yes install ksks-cassandra", 180),
+    SET_SEED("", 180),
+    REMOVE_SEED("", 180),
+    PURGE("apt-get --assume-yes --force-yes purge ksks-cassandra", 180);
 
     String program;
-    String yaml = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
+    String yaml = "$CASSANDRA_HOME/conf/cassandra.yaml";
     int timeout;
 
     private CassandraCommandEnum(String program, int timeout) {

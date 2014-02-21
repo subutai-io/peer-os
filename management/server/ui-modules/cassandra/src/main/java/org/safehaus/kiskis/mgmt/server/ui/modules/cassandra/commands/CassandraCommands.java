@@ -21,6 +21,7 @@ public class CassandraCommands {
 
 //    private static final String conf = "/opt/cassandra-2.0.4/conf/cassandra.yaml";
     private static final String conf = "$CASSANDRA_HOME/conf/cassandra.yaml";
+    private static final String etcProfile = ". /etc/profile && ";
 
     // INSTALLATION COMMANDS ===================================================
     public static CommandImpl getTemplate() {
@@ -39,7 +40,7 @@ public class CassandraCommands {
                 "root", //                      runas
                 null, //                        arg
                 null, //                        env vars
-                60); //                        timeout (sec)
+                180); //                        timeout (sec)
     }
 
 //    public static Command getInstallCommand() {
@@ -73,7 +74,7 @@ public class CassandraCommands {
     public static CommandImpl getSetListenAddressCommand(String listenAddress) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/listen_address:/=' " + conf + ")`'s!.*!listen_address: %listenAddress!'";
+        String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/listen_address:/=' " + conf + ")`'s!.*!listen_address: %listenAddress!'";
         req.setProgram(program.replace("%listenAddress", listenAddress));
         return cmd;
     }
@@ -81,7 +82,7 @@ public class CassandraCommands {
     public static CommandImpl getSetRpcAddressCommand(String rpcAddress) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/rpc_address:/=' " + conf + ")`'s!.*!rpc_address: %rpcAddress!'";
+        String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/rpc_address:/=' " + conf + ")`'s!.*!rpc_address: %rpcAddress!'";
         req.setProgram(program.replace("%rpcAddress", rpcAddress));
         return cmd;
     }
@@ -89,7 +90,7 @@ public class CassandraCommands {
     public static CommandImpl getSetSeedsCommand(String seeds) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seedsIps!'";
+        String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seedsIps!'";
         req.setProgram(program.replace("%seedsIps", '"' + seeds + '"'));
         return cmd;
     }
@@ -97,7 +98,7 @@ public class CassandraCommands {
     public static CommandImpl getSetClusterNameCommand(String clusterName) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/cluster_name:/=' " + conf + ")`'s!.*!cluster_name: %clusterName!'";
+        String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/cluster_name:/=' " + conf + ")`'s!.*!cluster_name: %clusterName!'";
         req.setProgram(program.replace("%clusterName", clusterName));
         return cmd;
     }
@@ -105,7 +106,7 @@ public class CassandraCommands {
     public static CommandImpl getSetDataDirectoryCommand(String dir) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/data_file_directories:/=' " + conf + ") + 1`'s!.*!     - %dir!'";
+        String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/data_file_directories:/=' " + conf + ") + 1`'s!.*!     - %dir!'";
         req.setProgram(program.replace("%dir", dir));
         return cmd;
     }
@@ -113,7 +114,7 @@ public class CassandraCommands {
     public static CommandImpl getSetCommitLogDirectoryCommand(String dir) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory: %dir!'";
+        String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
         return cmd;
     }
@@ -121,7 +122,7 @@ public class CassandraCommands {
     public static CommandImpl getSetSavedCachesDirectoryCommand(String dir) {
         CommandImpl cmd = getTemplate();
         Request req = cmd.getRequest();
-        String program = "sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory: %dir!'";
+        String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
         return cmd;
     }
