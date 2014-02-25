@@ -14,17 +14,17 @@ public class ClientModule implements Module {
 
     public static final String MODULE_NAME = "Client";
     private static final Logger LOG = Logger.getLogger(ClientModule.class.getName());
-    private SomeApi someApi;
+    private SomeApi someapi;
 
-    public void setSomeApi(SomeApi someApi) {
-        this.someApi = someApi;
+    public void setSomeApi(SomeApi someapi) {
+        this.someapi = someapi;
     }
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
-        public ModuleComponent(final SomeApi someApi) {
-            
+        public ModuleComponent(final SomeApi someapi) {
+
             setSizeFull();
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -40,14 +40,12 @@ public class ClientModule implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
 
-                    String hello = someApi.sayHello("babahos");
+                    String hello = someapi.sayHello("babahos");
                     t.setValue(hello);
-                    
-                    
+
                 }
             });
-            
-            
+
             verticalLayout.addComponent(sheet);
 
             setCompositionRoot(verticalLayout);
@@ -75,7 +73,7 @@ public class ClientModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(someApi);
+        return new ModuleComponent(someapi);
     }
 
 }
