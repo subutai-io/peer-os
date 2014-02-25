@@ -34,9 +34,9 @@ public class ClientModule implements Module {
             verticalLayout.setSpacing(true);
             verticalLayout.setSizeFull();
 
-            TabSheet sheet = new TabSheet();
-            sheet.setStyleName(Runo.TABSHEET_SMALL);
-            sheet.setSizeFull();
+//            TabSheet sheet = new TabSheet();
+//            sheet.setStyleName(Runo.TABSHEET_SMALL);
+//            sheet.setSizeFull();
             final TextArea t = new TextArea();
             Button b = new Button("Say hello");
             b.addListener(new Button.ClickListener() {
@@ -50,7 +50,8 @@ public class ClientModule implements Module {
                 }
             });
 
-            verticalLayout.addComponent(sheet);
+            verticalLayout.addComponent(b);
+            verticalLayout.addComponent(t);
 
             setCompositionRoot(verticalLayout);
         }
