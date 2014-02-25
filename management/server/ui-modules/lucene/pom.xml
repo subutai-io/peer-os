@@ -81,7 +81,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.safehaus</groupId>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>task-runner-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
