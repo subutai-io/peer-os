@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <reference id="someapi" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.SomeApi"/>    
+    
+    <reference id="someApi" availability="mandatory" interface="org.safehaus.kiskis.mgmt.api.SomeApi"/>    
     
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
 
     <bean id="module" class="org.safehaus.kiskis.mgmt.server.ui.modules.client.ClientModule">
-        <property name="someapi" ref="someapi"/>                   
+        <property name="someApi" ref="someApi"/>                   
     </bean>  
       
 </blueprint>

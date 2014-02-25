@@ -14,20 +14,20 @@ public class ClientModule implements Module {
 
     public static final String MODULE_NAME = "Client";
     private static final Logger LOG = Logger.getLogger(ClientModule.class.getName());
-    private SomeApi someapi;
+    private SomeApi someApi;
 
-    public SomeApi getSomeapi() {
-        return someapi;
+    public SomeApi getSomeApi() {
+        return someApi;
     }
 
-    public void setSomeapi(SomeApi someapi) {
-        this.someapi = someapi;
+    public void setSomeApi(SomeApi someApi) {
+        this.someApi = someApi;
     }
 
     public static class ModuleComponent extends CustomComponent implements
             CommandListener {
 
-        public ModuleComponent(final SomeApi someapi) {
+        public ModuleComponent(final SomeApi someApi) {
 
             setSizeFull();
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -44,7 +44,7 @@ public class ClientModule implements Module {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
 
-                    String hello = someapi.sayHello("babahos");
+                    String hello = someApi.sayHello("babahos");
                     t.setValue(hello);
 
                 }
@@ -77,7 +77,7 @@ public class ClientModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(someapi);
+        return new ModuleComponent(someApi);
     }
 
 }
