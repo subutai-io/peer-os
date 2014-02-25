@@ -16,7 +16,7 @@ public class SomeImpl implements SomeApi {
 
     @Override
     public String sayHello(String name) {
-        return "hello " + name;
+        return "hello " + name + " new update.";
     }
     
 }

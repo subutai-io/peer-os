@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.client;
 
 import com.vaadin.ui.*;
-import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -38,13 +37,14 @@ public class ClientModule implements Module {
 //            sheet.setStyleName(Runo.TABSHEET_SMALL);
 //            sheet.setSizeFull();
             final TextArea t = new TextArea();
-            Button b = new Button("Say hello");
+            t.setSizeFull();
+            Button b = new Button("Get System Logs");
             b.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
 
-                    String hello = someApi.sayHello("babahos");
+                    String hello = someApi.sayHello("logs");
                     t.setValue(hello);
 
                 }
