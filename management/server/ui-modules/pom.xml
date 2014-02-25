@@ -28,8 +28,8 @@
         <module>lucene</module>
         <module>solr</module>
         <module>monitor</module>
-        <module>test_impl</module>
-        <module>test_api</module>
+        <!--<module>test_impl</module>-->
+        <!--<module>test_api</module>-->
         <module>test_client</module>
         <module>logs</module>
     </modules>

@@ -35,6 +35,8 @@
         <module>ui</module>
         <module>ui-modules</module>
         <module>server-karaf</module>
+        <module>test_api</module>
+        <module>test_impl</module>
     </modules>
 
     <description>Parent project for the Kiskis Management Server Artifacts</description>
