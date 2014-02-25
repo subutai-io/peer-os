@@ -5,10 +5,10 @@ import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Installation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public final class HadoopWizard {
 
@@ -23,7 +23,7 @@ public final class HadoopWizard {
     Step3 step3;
     int step = 0;
     private List<Agent> lxcList;
-    private TaskRunner taskRunner;
+    private final TaskRunner taskRunner;
 
     public HadoopWizard(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;

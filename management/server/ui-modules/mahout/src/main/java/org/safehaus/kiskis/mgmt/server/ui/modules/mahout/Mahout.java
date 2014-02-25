@@ -3,20 +3,20 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mahout;
 import com.vaadin.ui.*;
 import java.util.HashSet;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class Mahout implements Module {
 
     public static final String MODULE_NAME = "Mahout";
-    private AsyncTaskRunner taskRunner;
+    private TaskRunner taskRunner;
 
-    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+    public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
     }
 
@@ -25,13 +25,13 @@ public class Mahout implements Module {
         private final TextArea commandOutputTxtArea;
         private final AgentManager agentManager;
         private final Label indicator;
-        private final AsyncTaskRunner taskRunner;
+        private final TaskRunner taskRunner;
         private final Button checkBtn;
         private final Button installBtn;
         private final Button uninstallBtn;
         private volatile int taskCount = 0;
 
-        public ModuleComponent(final AsyncTaskRunner taskRunner) {
+        public ModuleComponent(final TaskRunner taskRunner) {
             agentManager = ServiceLocator.getService(AgentManager.class);
             this.taskRunner = taskRunner;
             setHeight("100%");
@@ -77,7 +77,7 @@ public class Mahout implements Module {
                     } else {
                         commandOutputTxtArea.setValue("\nInstalling Mahout ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
-                        executeTask(checkTask, new ChainedTaskCallback() {
+                        executeTask(checkTask, new TaskCallback() {
                             final Set<Agent> eligibleAgents = new HashSet<Agent>();
 
                             @Override
@@ -138,7 +138,7 @@ public class Mahout implements Module {
                     } else {
                         commandOutputTxtArea.setValue("\nChecking if Mahout is installed ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
-                        executeTask(checkTask, new ChainedTaskCallback() {
+                        executeTask(checkTask, new TaskCallback() {
 
                             @Override
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -169,7 +169,7 @@ public class Mahout implements Module {
                     } else {
                         commandOutputTxtArea.setValue("\nUninstalling Mahout ...\n");
                         Task uninstallTask = Tasks.getUninstallTask(agents);
-                        executeTask(uninstallTask, new ChainedTaskCallback() {
+                        executeTask(uninstallTask, new TaskCallback() {
 
                             @Override
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -205,13 +205,13 @@ public class Mahout implements Module {
                     ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
         }
 
-        private void executeTask(Task task, final ChainedTaskCallback callback) {
+        private void executeTask(Task task, final TaskCallback callback) {
             checkBtn.setEnabled(false);
             installBtn.setEnabled(false);
             uninstallBtn.setEnabled(false);
             indicator.setVisible(true);
             taskCount++;
-            taskRunner.executeTask(task, new ChainedTaskCallback() {
+            taskRunner.executeTask(task, new TaskCallback() {
 
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

@@ -5,16 +5,16 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.Manager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 public class MongoModule implements Module {
 
     private static final Logger LOG = Logger.getLogger(MongoModule.class.getName());
     public static final String MODULE_NAME = "MongoDB";
-    private AsyncTaskRunner taskRunner;
+    private TaskRunner taskRunner;
 
-    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+    public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
     }
 
@@ -23,7 +23,7 @@ public class MongoModule implements Module {
         private final Wizard wizard;
         private final Manager manager;
 
-        public ModuleComponent(AsyncTaskRunner taskRunner) {
+        public ModuleComponent(TaskRunner taskRunner) {
             setSizeFull();
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);

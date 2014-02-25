@@ -7,25 +7,25 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 
 /**
  *
  * @author dilshat
  */
-public class CheckStatusCallback implements ChainedTaskCallback {
+public class CheckStatusCallback implements TaskCallback {
 
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
     private final Embedded progressIcon;
     private final Button startButton;
     private final Button stopButton;
     private final Button destroyButton;
 
-    public CheckStatusCallback(AsyncTaskRunner taskRunner, Embedded progressIcon, Button startButton, Button stopButton, Button destroyButton) {
+    public CheckStatusCallback(TaskRunner taskRunner, Embedded progressIcon, Button startButton, Button stopButton, Button destroyButton) {
         this.taskRunner = taskRunner;
         this.progressIcon = progressIcon;
         this.startButton = startButton;

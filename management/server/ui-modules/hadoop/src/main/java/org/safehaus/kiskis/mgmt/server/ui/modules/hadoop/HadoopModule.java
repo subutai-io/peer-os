@@ -9,15 +9,20 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClusterForm;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public class HadoopModule implements Module {
 
     public static final String MODULE_NAME = "Hadoop";
     private static final Logger LOG = Logger.getLogger(HadoopModule.class.getName());
+    private TaskRunner taskRunner;
+
+    public void setTaskRunner(TaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
+    }
 
     @Override
     public String getName() {
@@ -26,7 +31,7 @@ public class HadoopModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(taskRunner);
     }
 
     public static class ModuleComponent extends CustomComponent implements
@@ -34,9 +39,8 @@ public class HadoopModule implements Module {
 
         private HadoopWizard hadoopWizard;
         private ClusterForm hadoopManager;
-        private final TaskRunner taskRunner = new TaskRunner();
 
-        public ModuleComponent() {
+        public ModuleComponent(TaskRunner taskRunner) {
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
@@ -55,7 +59,6 @@ public class HadoopModule implements Module {
 
         @Override
         public void onCommand(Response response) {
-            taskRunner.feedResponse(response);
 
             if (hadoopManager != null) {
                 hadoopManager.getClusterTable().onCommand(response);

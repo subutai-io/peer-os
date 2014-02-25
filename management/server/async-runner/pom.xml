@@ -28,10 +28,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>async-runner</artifactId>
+    <artifactId>task-runner-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Async Runner</name>
-    <description>async task runner bundle</description>
+    <name>Kiskis Management Task Runner</name>
+    <description>task runner impl</description>
 
     <build>
         <plugins>
@@ -50,7 +50,10 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.async.runner</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.impl.taskrunner</Bundle-SymbolicName>
+                        <Export-Package>
+                            {local-packages};version=${project.version};-noimport:=true
+                        </Export-Package>                        
                     </instructions>
                 </configuration>
             </plugin>
@@ -73,6 +76,11 @@
             <artifactId>junit</artifactId>
             <version>4.10</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus</groupId>
+            <artifactId>task-runner-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

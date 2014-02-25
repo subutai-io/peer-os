@@ -3,20 +3,20 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.solr;
 import com.vaadin.ui.*;
 import java.util.HashSet;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class Solr implements Module {
 
     public static final String MODULE_NAME = "Solr";
-    private AsyncTaskRunner taskRunner;
+    private TaskRunner taskRunner;
 
-    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+    public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
     }
 
@@ -25,7 +25,7 @@ public class Solr implements Module {
         private final TextArea commandOutputTxtArea;
         private final AgentManager agentManager;
         private final Label indicator;
-        private final AsyncTaskRunner taskRunner;
+        private final TaskRunner taskRunner;
         private final Button startBtn;
         private final Button stopBtn;
         private final Button checkBtn;
@@ -33,7 +33,7 @@ public class Solr implements Module {
         private final Button uninstallBtn;
         private volatile int taskCount = 0;
 
-        public ModuleComponent(final AsyncTaskRunner taskRunner) {
+        public ModuleComponent(final TaskRunner taskRunner) {
             agentManager = ServiceLocator.getService(AgentManager.class);
             this.taskRunner = taskRunner;
             setHeight("100%");
@@ -87,7 +87,7 @@ public class Solr implements Module {
                         commandOutputTxtArea.setValue("\nInstalling Solr ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
 
-                        executeTask(checkTask, new ChainedTaskCallback() {
+                        executeTask(checkTask, new TaskCallback() {
                             final Set<Agent> eligibleAgents = new HashSet<Agent>();
 
                             @Override
@@ -147,7 +147,7 @@ public class Solr implements Module {
                     } else {
                         commandOutputTxtArea.setValue("\nChecking if Solr is installed ...\n");
                         Task checkTask = Tasks.getCheckTask(agents);
-                        executeTask(checkTask, new ChainedTaskCallback() {
+                        executeTask(checkTask, new TaskCallback() {
 
                             @Override
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -178,7 +178,7 @@ public class Solr implements Module {
                     } else {
                         commandOutputTxtArea.setValue("\nUninstalling Solr ...\n");
                         Task uninstallTask = Tasks.getUninstallTask(agents);
-                        executeTask(uninstallTask, new ChainedTaskCallback() {
+                        executeTask(uninstallTask, new TaskCallback() {
 
                             @Override
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -218,7 +218,7 @@ public class Solr implements Module {
                         commandOutputTxtArea.setValue("\nStarting Solr ...\n");
                         Task startTask = Tasks.getStartTask(agents);
 
-                        executeTask(startTask, new ChainedTaskCallback() {
+                        executeTask(startTask, new TaskCallback() {
 
                             @Override
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -257,7 +257,7 @@ public class Solr implements Module {
                         commandOutputTxtArea.setValue("\nStopping Solr ...\n");
 
                         Task stopTask = Tasks.getStopTask(agents);
-                        executeTask(stopTask, new ChainedTaskCallback() {
+                        executeTask(stopTask, new TaskCallback() {
 
                             @Override
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -286,7 +286,7 @@ public class Solr implements Module {
                     ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
         }
 
-        private void executeTask(Task task, final ChainedTaskCallback callback) {
+        private void executeTask(Task task, final TaskCallback callback) {
             startBtn.setEnabled(false);
             stopBtn.setEnabled(false);
             checkBtn.setEnabled(false);
@@ -294,7 +294,7 @@ public class Solr implements Module {
             uninstallBtn.setEnabled(false);
             indicator.setVisible(true);
             taskCount++;
-            taskRunner.executeTask(task, new ChainedTaskCallback() {
+            taskRunner.executeTask(task, new TaskCallback() {
 
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

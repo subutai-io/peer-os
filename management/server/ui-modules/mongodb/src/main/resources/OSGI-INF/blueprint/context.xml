@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     
     <reference id="taskRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner"/>   
+               interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>   
         
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule">
         <property name="taskRunner" ref="taskRunner" />

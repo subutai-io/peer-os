@@ -5,12 +5,12 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
@@ -18,9 +18,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
-    private AsyncTaskRunner taskRunner;
+    private TaskRunner taskRunner;
 
-    public void setTaskRunner(AsyncTaskRunner taskRunner) {
+    public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
     }
 
@@ -30,7 +30,7 @@ public class Terminal implements Module {
         private final AgentManager agentManager;
         private volatile int taskCount = 0;
 
-        public ModuleComponent(final AsyncTaskRunner taskRunner) {
+        public ModuleComponent(final TaskRunner taskRunner) {
             agentManager = ServiceLocator.getService(AgentManager.class);
 
             setHeight("100%");
@@ -110,7 +110,7 @@ public class Terminal implements Module {
                         }
                         indicator.setVisible(true);
                         taskCount++;
-                        taskRunner.executeTask(task, new ChainedTaskCallback() {
+                        taskRunner.executeTask(task, new TaskCallback() {
 
                             @Override
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

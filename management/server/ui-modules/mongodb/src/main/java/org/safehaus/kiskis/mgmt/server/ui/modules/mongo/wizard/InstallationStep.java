@@ -14,6 +14,8 @@ import com.vaadin.ui.TextArea;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
@@ -28,8 +30,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -49,7 +49,7 @@ public class InstallationStep extends Panel {
 
     private final AgentManager agentManager;
     private final ClusterConfig config;
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
 
     public InstallationStep(final Wizard wizard) {
 
@@ -132,7 +132,7 @@ public class InstallationStep extends Panel {
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(installOperation.getNextTask(), new ChainedTaskCallback() {
+            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
                 private final StringBuilder startConfigServersOutput = new StringBuilder();
                 private final StringBuilder startRoutersOutput = new StringBuilder();
                 private final StringBuilder startDataNodesOutput = new StringBuilder();

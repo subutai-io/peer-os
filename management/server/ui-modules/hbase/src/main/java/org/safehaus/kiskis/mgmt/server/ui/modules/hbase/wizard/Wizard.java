@@ -7,8 +7,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 /**
  *
@@ -21,9 +21,9 @@ public class Wizard {
     private int step = 1;
     private final HBaseConfig config = new HBaseConfig();
     private StepFinish stepFinish;
-    private final AsyncTaskRunner asyncTaskRunner;
+    private final TaskRunner asyncTaskRunner;
 
-    public Wizard(AsyncTaskRunner asyncTaskRunner) {
+    public Wizard(TaskRunner asyncTaskRunner) {
         this.asyncTaskRunner = asyncTaskRunner;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
@@ -90,7 +90,7 @@ public class Wizard {
         }
     }
 
-    public AsyncTaskRunner getRunner() {
+    public TaskRunner getRunner() {
         return asyncTaskRunner;
     }
 

@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
@@ -40,8 +42,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -58,14 +58,14 @@ public class AddNodeWindow extends Window {
     private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
     private final AgentManager agentManager;
     private final ClusterConfig config;
     private final MongoClusterInfo clusterInfo;
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public AddNodeWindow(final ClusterConfig config, MongoClusterInfo clusterInfo, AsyncTaskRunner taskRunner) {
+    public AddNodeWindow(final ClusterConfig config, MongoClusterInfo clusterInfo, TaskRunner taskRunner) {
         super("Add New Node");
         setModal(true);
 
@@ -205,7 +205,7 @@ public class AddNodeWindow extends Window {
             addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(operation.getNextTask(), new ChainedTaskCallback() {
+            taskRunner.executeTask(operation.getNextTask(), new TaskCallback() {
 
                 private final StringBuilder routersOutput = new StringBuilder();
 

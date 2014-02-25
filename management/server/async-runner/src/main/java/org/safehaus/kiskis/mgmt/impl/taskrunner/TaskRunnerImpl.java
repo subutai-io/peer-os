@@ -3,33 +3,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.async.runner;
+package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 
 /**
  *
  * @author dilshat
  */
-public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
+public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
-    private static final Logger LOG = Logger.getLogger(AsyncTaskRunnerImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(TaskRunnerImpl.class.getName());
 
-    private static final String MODULE_NAME = "AsyncRunner";
+    private static final String MODULE_NAME = "TaskRunner";
     private CommunicationService communicationService;
     private ChainedTaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
@@ -110,7 +109,7 @@ public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
     }
 
     @Override
-    public void executeTask(final Task task, final ChainedTaskCallback taskCallback) {
+    public void executeTask(final Task task, final TaskCallback taskCallback) {
         ExecutorService executor = executors.get(task.getUuid());
         if (executor == null) {
             executor = Executors.newSingleThreadExecutor();
@@ -152,15 +151,4 @@ public class AsyncTaskRunnerImpl implements ResponseListener, AsyncTaskRunner {
         }
     }
 
-    @Override
-    public void executeTask(Task task, final TaskCallback taskCallback) {
-        executeTask(task, new ChainedTaskCallback() {
-
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stErr) {
-                taskCallback.onResponse(task, response);
-                return null;
-            }
-        });
-    }
 }

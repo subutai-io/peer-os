@@ -6,11 +6,8 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lucene.action.chain.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lucene.common.command.CommandBuilder;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lucene.common.command.CommandExecutor;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-public class ModuleComponent extends CustomComponent implements CommandListener {
+public class ModuleComponent extends CustomComponent {
 
     private final String moduleName;
 
@@ -37,16 +34,6 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
         layout.addComponent(textArea, "left: 200px; top: 50px;");
 
         return layout;
-    }
-
-    @Override
-    public void onCommand(Response response) {
-        CommandExecutor.INSTANCE.onResponse(response);
-    }
-
-    @Override
-    public String getName() {
-        return moduleName;
     }
 
 }

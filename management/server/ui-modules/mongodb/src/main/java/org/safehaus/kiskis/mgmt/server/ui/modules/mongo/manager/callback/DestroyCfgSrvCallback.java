@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
@@ -23,15 +25,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author dilshat
  */
-public class DestroyCfgSrvCallback implements ChainedTaskCallback {
+public class DestroyCfgSrvCallback implements TaskCallback {
 
     private final Window parentWindow;
     private final MongoClusterInfo clusterInfo;
@@ -41,13 +41,13 @@ public class DestroyCfgSrvCallback implements ChainedTaskCallback {
     private final Table routersTable;
     private final Object rowId;
     private final Operation op;
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
     private final Button checkButton;
     private final Button destroyButton;
     private final Embedded progressIcon;
     private final StringBuilder stdOutput = new StringBuilder();
 
-    public DestroyCfgSrvCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table cfgSrvTable, Table routersTable, Object rowId, Operation op, AsyncTaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyCfgSrvCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table cfgSrvTable, Table routersTable, Object rowId, Operation op, TaskRunner taskRunner, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
         this.clusterInfo = clusterInfo;
         this.config = config;

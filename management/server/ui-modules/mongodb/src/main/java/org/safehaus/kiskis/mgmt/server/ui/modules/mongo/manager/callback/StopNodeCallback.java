@@ -7,16 +7,16 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 
 /**
  *
  * @author dilshat
  */
-public class StopNodeCallback implements ChainedTaskCallback {
+public class StopNodeCallback implements TaskCallback {
 
     private final Button checkButton;
 
