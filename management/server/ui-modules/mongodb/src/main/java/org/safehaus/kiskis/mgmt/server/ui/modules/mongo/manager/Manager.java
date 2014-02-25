@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
@@ -47,7 +48,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 
 /**
  *
@@ -64,12 +64,12 @@ public class Manager {
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
     private DestroyClusterWindow destroyWindow;
     private AddNodeWindow addNodeWindow;
     private ClusterConfig config;
 
-    public Manager(final AsyncTaskRunner taskRunner) {
+    public Manager(final TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
         agentManager = ServiceLocator.getService(AgentManager.class);
 

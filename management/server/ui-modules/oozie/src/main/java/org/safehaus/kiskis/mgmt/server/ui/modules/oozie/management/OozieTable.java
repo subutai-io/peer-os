@@ -6,8 +6,6 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
-import java.util.ArrayList;
-
 import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;

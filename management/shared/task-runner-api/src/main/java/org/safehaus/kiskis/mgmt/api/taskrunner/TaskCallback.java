@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol.api;
+package org.safehaus.kiskis.mgmt.api.taskrunner;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -14,5 +14,5 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
  */
 public interface TaskCallback {
 
-    public void onResponse(Task task, Response response);
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr);
 }

@@ -8,15 +8,15 @@ import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public class HBaseModule implements Module {
 
     public static final String MODULE_NAME = "HBase";
     private static final Logger LOG = Logger.getLogger(HBaseModule.class.getName());
-    private AsyncTaskRunner asyncTaskRunner;
+    private TaskRunner asyncTaskRunner;
 
-    public void setAsyncTaskRunner(AsyncTaskRunner asyncTaskRunner) {
+    public void setAsyncTaskRunner(TaskRunner asyncTaskRunner) {
         this.asyncTaskRunner = asyncTaskRunner;
     }
 
@@ -25,7 +25,7 @@ public class HBaseModule implements Module {
         Wizard wizard;
         Manager manager;
 
-        public ModuleComponent(AsyncTaskRunner asyncTaskRunner) {
+        public ModuleComponent(TaskRunner asyncTaskRunner) {
             setSizeFull();
 
             VerticalLayout verticalLayout = new VerticalLayout();

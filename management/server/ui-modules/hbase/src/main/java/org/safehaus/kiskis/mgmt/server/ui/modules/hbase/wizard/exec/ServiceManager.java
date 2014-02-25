@@ -12,11 +12,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.NodesWindow;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -28,11 +28,11 @@ public class ServiceManager {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
-    private final AsyncTaskRunner asyncTaskRunner;
+    private final TaskRunner asyncTaskRunner;
     private final HBaseTable hBaseTable;
     private NodesWindow nodesWindow;
 
-    public ServiceManager(AsyncTaskRunner asyncTaskRunner, HBaseTable hBaseTable) {
+    public ServiceManager(TaskRunner asyncTaskRunner, HBaseTable hBaseTable) {
         this.asyncTaskRunner = asyncTaskRunner;
         this.hBaseTable = hBaseTable;
     }
@@ -68,7 +68,7 @@ public class ServiceManager {
 //                executeCommand(command);
 //            }
 
-            asyncTaskRunner.executeTask(currentTask, new ChainedTaskCallback() {
+            asyncTaskRunner.executeTask(currentTask, new TaskCallback() {
 
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

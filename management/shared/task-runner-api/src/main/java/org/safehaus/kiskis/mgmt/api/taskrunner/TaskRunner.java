@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol.api;
+package org.safehaus.kiskis.mgmt.api.taskrunner;
 
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -12,11 +12,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
  *
  * @author dilshat
  */
-public interface AsyncTaskRunner {
+public interface TaskRunner {
 
-    public void executeTask(Task task, ChainedTaskCallback taskCallback);
-
-    @Deprecated
     public void executeTask(Task task, TaskCallback taskCallback);
 
     public void removeTaskCallback(UUID taskUUID);

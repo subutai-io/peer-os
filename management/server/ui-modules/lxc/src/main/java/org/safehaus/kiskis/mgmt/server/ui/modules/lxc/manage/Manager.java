@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
@@ -28,8 +30,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
@@ -37,7 +37,7 @@ public class Manager extends VerticalLayout {
 
     private static final Logger LOG = Logger.getLogger(Manager.class.getName());
 
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
     private final Label indicator;
     private final Button infoBtn;
     private final Button startAllBtn;
@@ -51,7 +51,7 @@ public class Manager extends VerticalLayout {
     private volatile boolean isDestroyAllButtonClicked = false;
     private volatile int taskCount;
 
-    public Manager(AsyncTaskRunner taskRunner) {
+    public Manager(TaskRunner taskRunner) {
 
         setSpacing(true);
         setMargin(true);
@@ -171,12 +171,12 @@ public class Manager extends VerticalLayout {
         lxcMap.clear();
         lxcTable.setEnabled(false);
         Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
-        executeTask(getLxcListTask, new ChainedTaskCallback() {
+        executeTask(getLxcListTask, new TaskCallback() {
 
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.getData() == TaskType.GET_LXC_LIST) {
-                    
+
                     if (Util.isFinalResponse(response)) {
                         lxcMap.put(response.getUuid(), stdOut);
                     }
@@ -346,7 +346,7 @@ public class Manager extends VerticalLayout {
                                 startBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                executeTask(startLxcTask, new ChainedTaskCallback() {
+                                executeTask(startLxcTask, new TaskCallback() {
 
                                     @Override
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -385,7 +385,7 @@ public class Manager extends VerticalLayout {
                                 stopBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                executeTask(stopLxcTask, new ChainedTaskCallback() {
+                                executeTask(stopLxcTask, new TaskCallback() {
 
                                     @Override
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -432,7 +432,7 @@ public class Manager extends VerticalLayout {
                                                         stopBtn.setEnabled(false);
                                                         destroyBtn.setEnabled(false);
                                                         progressIcon.setVisible(true);
-                                                        executeTask(destroyLxcTask, new ChainedTaskCallback() {
+                                                        executeTask(destroyLxcTask, new TaskCallback() {
 
                                                             @Override
                                                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -470,7 +470,7 @@ public class Manager extends VerticalLayout {
                                     stopBtn.setEnabled(false);
                                     destroyBtn.setEnabled(false);
                                     progressIcon.setVisible(true);
-                                    executeTask(destroyLxcTask, new ChainedTaskCallback() {
+                                    executeTask(destroyLxcTask, new TaskCallback() {
 
                                         @Override
                                         public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -508,10 +508,10 @@ public class Manager extends VerticalLayout {
 
     }
 
-    private void executeTask(Task task, final ChainedTaskCallback callback) {
+    private void executeTask(Task task, final TaskCallback callback) {
         indicator.setVisible(true);
         taskCount++;
-        taskRunner.executeTask(task, new ChainedTaskCallback() {
+        taskRunner.executeTask(task, new TaskCallback() {
 
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

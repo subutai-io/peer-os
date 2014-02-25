@@ -8,12 +8,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 
 import java.util.List;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
@@ -27,7 +27,7 @@ public class HBaseTable extends Table {
     Item selectedItem;
     HBaseConfig selectedConfig;
 
-    public HBaseTable(AsyncTaskRunner asyncTaskRunner) {
+    public HBaseTable(TaskRunner asyncTaskRunner) {
         setSizeFull();
         this.manager = new ServiceManager(asyncTaskRunner, this);
         this.setCaption("HBase clusters");

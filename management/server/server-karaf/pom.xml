@@ -401,17 +401,22 @@
                                     <artifactId>mgmt-server-communication</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>async-runner</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
                                 <!--Core Dependencies-->
 
                                 <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>task-runner-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>task-runner-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Shared Dependencies-->
@@ -527,71 +532,71 @@
                                     <artifactId>elasticsearch</artifactId>
                                     <version>0.90.3</version>
                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-analyzers-common</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-codecs</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-core</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-grouping</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-highlighter</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-join</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-memory</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-misc</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-queries</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-queryparser</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-sandbox</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-spatial</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.apache.lucene</groupId>
-                                     <artifactId>lucene-suggest</artifactId>
-                                     <version>4.4.0</version>
-                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-analyzers-common</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-codecs</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-core</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-grouping</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-highlighter</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-join</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-memory</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-misc</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-queries</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-queryparser</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-sandbox</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-spatial</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-suggest</artifactId>
+                                    <version>4.4.0</version>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>

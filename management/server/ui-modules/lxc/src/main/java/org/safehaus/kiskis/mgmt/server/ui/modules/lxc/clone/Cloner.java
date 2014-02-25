@@ -12,22 +12,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout implements ChainedTaskCallback {
+public class Cloner extends VerticalLayout implements TaskCallback {
 
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final Label indicator;
     private final TreeTable lxcTable;
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
     private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
     private final String physicalHostLabel = "Physical Host";
     private final String statusLabel = "Status";
@@ -37,7 +37,7 @@ public class Cloner extends VerticalLayout implements ChainedTaskCallback {
     private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
     private volatile int taskCount;
 
-    public Cloner(AsyncTaskRunner taskRunner) {
+    public Cloner(TaskRunner taskRunner) {
         setSpacing(true);
         setMargin(true);
 
