@@ -429,6 +429,16 @@
                                     <artifactId>task-runner-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>api-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>impl-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!--Shared Dependencies-->
 
                                 <artifactItem>
