@@ -245,6 +245,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>test-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
