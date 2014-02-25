@@ -3,14 +3,11 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.chain.Chain;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandBuilder;
-import org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command.CommandExecutor;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.action.ChainManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UILogger;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.view.UIStateManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
-public class ModuleComponent extends CustomComponent implements CommandListener {
+public class ModuleComponent extends CustomComponent {
 
     private final String moduleName;
 
@@ -76,16 +73,6 @@ public class ModuleComponent extends CustomComponent implements CommandListener 
         grid.setSpacing(true);
 
         return grid;
-    }
-
-    @Override
-    public void onCommand(Response response) {
-        CommandExecutor.INSTANCE.onResponse(response);
-    }
-
-    @Override
-    public String getName() {
-        return moduleName;
     }
 
 }

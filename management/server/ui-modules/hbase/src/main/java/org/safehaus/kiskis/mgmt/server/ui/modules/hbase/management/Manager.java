@@ -10,7 +10,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 /**
  *
@@ -21,7 +21,7 @@ public class Manager {
     private final VerticalLayout content;
     private final HBaseTable table;
 
-    public Manager(AsyncTaskRunner asyncTaskRunner) {
+    public Manager(TaskRunner asyncTaskRunner) {
 
         content = new VerticalLayout();
         content.setMargin(true);

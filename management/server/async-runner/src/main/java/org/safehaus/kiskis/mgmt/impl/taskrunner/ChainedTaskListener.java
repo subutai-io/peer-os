@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.async.runner;
+package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
@@ -21,11 +21,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public class ChainedTaskListener {
 
     private final Task task;
-    private final ChainedTaskCallback taskCallback;
+    private final TaskCallback taskCallback;
     private final Map<UUID, StringBuilder> stdOut;
     private final Map<UUID, StringBuilder> stdErr;
 
-    public ChainedTaskListener(Task task, ChainedTaskCallback taskCallback) {
+    public ChainedTaskListener(Task task, TaskCallback taskCallback) {
         this.task = task;
         this.taskCallback = taskCallback;
         stdOut = new HashMap<UUID, StringBuilder>();
@@ -36,7 +36,7 @@ public class ChainedTaskListener {
         return task;
     }
 
-    public ChainedTaskCallback getTaskCallback() {
+    public TaskCallback getTaskCallback() {
         return taskCallback;
     }
 

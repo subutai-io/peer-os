@@ -14,6 +14,8 @@ import com.vaadin.ui.Window;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
@@ -25,8 +27,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -42,13 +42,13 @@ public class DestroyClusterWindow extends Window {
     private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
-    private final AsyncTaskRunner taskRunner;
+    private final TaskRunner taskRunner;
     private final AgentManager agentManager;
     private final ClusterConfig config;
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public DestroyClusterWindow(ClusterConfig config, AsyncTaskRunner taskRunner) {
+    public DestroyClusterWindow(ClusterConfig config, TaskRunner taskRunner) {
         super("Cluster uninstallation");
         setModal(true);
 
@@ -108,7 +108,7 @@ public class DestroyClusterWindow extends Window {
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(installOperation.getNextTask(), new ChainedTaskCallback() {
+            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
 
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

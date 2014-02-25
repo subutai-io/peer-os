@@ -1,12 +1,11 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command;
 
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.pig.Pig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 
 public class CommandExecutor implements TaskCallback {
-
-    private static final TaskRunner TASK_RUNNER = new TaskRunner();
 
     private StringBuilder stdOut;
     private StringBuilder stdErr;
@@ -29,13 +28,13 @@ public class CommandExecutor implements TaskCallback {
         Task task = new Task();
         task.addCommand(command);
 
-        TASK_RUNNER.runTask(task, INSTANCE);
+        Pig.getTaskRunner().executeTask(task, this);
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
         if (response == null || response.getUuid() == null) {
-            return;
+            return null;
         }
 
         if (!Util.isStringEmpty(response.getStdOut())) {
@@ -49,10 +48,8 @@ public class CommandExecutor implements TaskCallback {
         if (Util.isFinalResponse(response)) {
             commandAction.handleResponse(stdOut.toString(), stdErr.toString(), response);
         }
+
+        return null;
     }
 
-    public void onResponse(Response response) {
-        TASK_RUNNER.feedResponse(response);
-    }
 }
-

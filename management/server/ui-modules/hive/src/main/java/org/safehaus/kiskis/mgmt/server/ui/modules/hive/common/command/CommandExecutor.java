@@ -1,16 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command;
 
 import org.apache.commons.lang3.StringUtils;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hive.Hive;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 
 public class CommandExecutor implements TaskCallback {
-
-    private static final TaskRunner TASK_RUNNER = new TaskRunner();
 
     private StringBuilder stdOut;
     private StringBuilder stdErr;
@@ -33,13 +31,13 @@ public class CommandExecutor implements TaskCallback {
         Task task = new Task();
         task.addCommand(command);
 
-        TASK_RUNNER.runTask(task, INSTANCE);
+        Hive.getTaskRunner().executeTask(task, INSTANCE);
     }
 
     @Override
-    public void onResponse(Task task, Response response) {
+    public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
         if (response == null || response.getUuid() == null) {
-            return;
+            return null;
         }
 
         if (!StringUtils.isEmpty(response.getStdOut())) {
@@ -55,10 +53,8 @@ public class CommandExecutor implements TaskCallback {
         if (Util.isFinalResponse(response)) {
             commandAction.onComplete(stdOut.toString(), stdErr.toString(), response);
         }
+
+        return null;
     }
 
-    public void onResponse(Response response) {
-        TASK_RUNNER.feedResponse(response);
-    }
 }
-

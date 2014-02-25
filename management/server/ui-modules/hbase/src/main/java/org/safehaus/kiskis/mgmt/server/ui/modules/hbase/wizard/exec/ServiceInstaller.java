@@ -11,12 +11,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.LinkedList;
 import java.util.Queue;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.commands.HBaseCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Wizard;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AsyncTaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ChainedTaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 /**
@@ -29,7 +29,7 @@ public class ServiceInstaller {
     private final TextArea terminal;
     private Task currentTask;
     HBaseConfig config;
-    private AsyncTaskRunner asyncTaskRunner;
+    private TaskRunner asyncTaskRunner;
 
     public ServiceInstaller(Wizard wizard, TextArea terminal) {
         this.terminal = terminal;
@@ -111,7 +111,7 @@ public class ServiceInstaller {
 //                executeCommand(command);
 //            }
 
-            asyncTaskRunner.executeTask(currentTask, new ChainedTaskCallback() {
+            asyncTaskRunner.executeTask(currentTask, new TaskCallback() {
 
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

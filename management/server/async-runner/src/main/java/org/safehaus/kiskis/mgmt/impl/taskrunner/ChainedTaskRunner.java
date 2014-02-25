@@ -3,44 +3,42 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol;
+package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
  * @author dilshat
  */
-public class TaskRunner {
+public class ChainedTaskRunner {
 
-    private static final Logger LOG = Logger.getLogger(TaskRunner.class.getName());
+    private static final Logger LOG = Logger.getLogger(ChainedTaskRunner.class.getName());
 
-    private final ExpiringCache<UUID, TaskListener> taskListenerCache = new ExpiringCache<UUID, TaskListener>();
-    private CommandManager commandManager;
-    private CommunicationService communicationService;
+    private final ExpiringCache<UUID, ChainedTaskListener> taskListenerCache = new ExpiringCache<UUID, ChainedTaskListener>();
+    private final CommunicationService communicationService;
 
-    public TaskRunner() {
-        this.commandManager = ServiceLocator.getService(CommandManager.class);
-        if (commandManager == null) {
-            throw new RuntimeException("Command manager is not available");
-        }
-    }
-
-    public TaskRunner(CommunicationService communicationService) {
+    public ChainedTaskRunner(CommunicationService communicationService) {
         this.communicationService = communicationService;
     }
 
-    public Task feedResponse(Response response) {
+    public ChainedTaskListener feedResponse(Response response) {
         try {
-            if (response != null && response.getTaskUuid() != null) {
-                TaskListener tl = taskListenerCache.get(response.getTaskUuid());
+            if (response != null && response.getTaskUuid() != null && response.getUuid() != null && response.getType() != null) {
+                ChainedTaskListener tl = taskListenerCache.get(response.getTaskUuid());
                 if (tl != null) {
+
+                    tl.appendStreams(response);
+
                     if (Util.isFinalResponse(response)) {
                         tl.getTask().incrementCompletedCommandsCount();
                         if (response.getExitCode() != null && response.getExitCode() == 0) {
@@ -58,20 +56,20 @@ public class TaskRunner {
                         }
                     }
 
-                    tl.getTaskCallback().onResponse(tl.getTask(), response);
+                    Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(response), tl.getStdErr(response));
 
-                    return tl.getTask();
+                    return nextTask == null ? tl : new ChainedTaskListener(nextTask, tl.getTaskCallback());
                 }
             }
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error processing response: {0}", e);
+            LOG.log(Level.SEVERE, String.format("Error processing response: %s"), e);
         }
         return null;
     }
 
     public Task getTask(UUID taskUUID) {
         if (taskUUID != null) {
-            TaskListener tl = taskListenerCache.get(taskUUID);
+            ChainedTaskListener tl = taskListenerCache.get(taskUUID);
             if (tl != null) {
                 return tl.getTask();
             }
@@ -89,31 +87,23 @@ public class TaskRunner {
         taskListenerCache.clear();
     }
 
-    public int getRemainingTaskCount() {
-        return taskListenerCache.size();
-    }
-
-    public void runTask(Task task, TaskCallback taskCallback) {
+    public void executeTask(Task task, TaskCallback taskCallback) {
         try {
             if (task != null && task.getUuid() != null) {
                 if (taskListenerCache.get(task.getUuid()) == null && task.hasNextCommand()) {
                     if (taskCallback != null) {
                         taskListenerCache.put(task.getUuid(),
-                                new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
+                                new ChainedTaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
                     }
                     while (task.hasNextCommand()) {
-                        if (commandManager != null) {
-                            commandManager.executeCommand(task.getNextCommand());
-                        } else {
-                            communicationService.sendCommand(task.getNextCommand());
-                        }
+                        communicationService.sendCommand(task.getNextCommand());
                     }
                 } else {
-                    throw new RuntimeException("This task is already queued or has no more commands");
+                    throw new Exception("This task is already queued or has no more commands");
                 }
             }
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error running task: {0}", e);
+            LOG.log(Level.SEVERE, String.format("Error running task: %s"), e);
         }
     }
 
