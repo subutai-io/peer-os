@@ -3,9 +3,8 @@
     <reference id="someapi" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.SomeApi"/>    
     
-    <bean id="module" class="org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule">
-        <property name = "someapi" ref="someapi"/>
-                   
+    <bean id="module" class="org.safehaus.kiskis.mgmt.server.ui.modules.client.ClientModule">
+        <property name="someapi" ref="someapi"/>                   
     </bean>  
       
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>

@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
+package org.safehaus.kiskis.mgmt.server.ui.modules.client;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
@@ -10,10 +10,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.SomeApi;
 
-public class CassandraModule implements Module {
+public class ClientModule implements Module {
 
     public static final String MODULE_NAME = "Client";
-    private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
+    private static final Logger LOG = Logger.getLogger(ClientModule.class.getName());
     private SomeApi someApi;
 
     public void setSomeApi(SomeApi someApi) {
@@ -70,7 +70,7 @@ public class CassandraModule implements Module {
 
     @Override
     public String getName() {
-        return CassandraModule.MODULE_NAME;
+        return ClientModule.MODULE_NAME;
     }
 
     @Override
