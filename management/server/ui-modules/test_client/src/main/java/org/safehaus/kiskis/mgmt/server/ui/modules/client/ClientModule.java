@@ -16,7 +16,11 @@ public class ClientModule implements Module {
     private static final Logger LOG = Logger.getLogger(ClientModule.class.getName());
     private SomeApi someapi;
 
-    public void setSomeApi(SomeApi someapi) {
+    public SomeApi getSomeapi() {
+        return someapi;
+    }
+
+    public void setSomeapi(SomeApi someapi) {
         this.someapi = someapi;
     }
 
