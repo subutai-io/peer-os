@@ -250,7 +250,7 @@
                                 </artifactItem>                                
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>api-module</artifactId>
+                                    <artifactId>logs-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>                                
                                 <artifactItem>

@@ -31,6 +31,7 @@
         <module>test_impl</module>
         <module>test_api</module>
         <module>test_client</module>
+        <module>logs</module>
     </modules>
    
 </project>
