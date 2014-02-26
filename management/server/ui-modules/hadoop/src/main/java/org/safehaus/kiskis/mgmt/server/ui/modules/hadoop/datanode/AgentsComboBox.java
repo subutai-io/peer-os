@@ -9,7 +9,7 @@ import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 
 import java.util.Set;

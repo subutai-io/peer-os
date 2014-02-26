@@ -14,8 +14,9 @@
 
     <modules>
         <module>protocol</module>
-    <module>task-runner-api</module>
-  </modules>
+        <module>task-runner-api</module>
+        <module>agent-manager-api</module>
+    </modules>
 
     <description>Parent project for the Kiskis Management Shared Artifacts</description>
 

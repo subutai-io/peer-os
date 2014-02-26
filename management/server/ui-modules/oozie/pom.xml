@@ -85,6 +85,11 @@
             <version>3.1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>agent-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

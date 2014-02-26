@@ -19,5 +19,6 @@
         <module>manager-command</module>
         <module>manager-persistence</module>
         <module>communication</module>
+        <module>task-runner</module>
     </modules>
 </project>

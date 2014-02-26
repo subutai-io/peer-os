@@ -14,12 +14,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
 
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager.getAgentManager;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 

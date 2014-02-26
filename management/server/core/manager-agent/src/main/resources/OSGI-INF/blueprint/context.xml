@@ -9,14 +9,14 @@
                interface="org.safehaus.kiskis.mgmt.shared.protocol.api.DbManager"/>
 
     <bean id="agentManager"
-          class="org.safehaus.kiskis.mgmt.server.agent.AgentManagerImpl"
+          class="org.safehaus.kiskis.mgmt.impl.agentmanager.AgentManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton">
         <property name="communicationService" ref="communicationService"/>
         <property name="dbManagerService" ref="dbManagerService"/>
     </bean>
     
     <service ref="agentManager"
-             interface="org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager">
+             interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>
