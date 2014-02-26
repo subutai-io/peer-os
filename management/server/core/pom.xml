@@ -15,10 +15,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>manager-agent</module>
+        <module>agent-manager-impl</module>
         <module>manager-command</module>
-        <module>manager-persistence</module>
+        <module>db-manager-impl</module>
         <module>communication</module>
-        <module>task-runner</module>
+        <module>task-runner-impl</module>
     </modules>
 </project>
