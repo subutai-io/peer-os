@@ -9,9 +9,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mgmt-server-agent</artifactId>
-    <name>Kiskis Management Server Agent</name>
-    <description>Kiskis Management Server Agent</description>
+    <artifactId>agent-manager-impl</artifactId>
+    <name>Kiskis Management Agent Manager</name>
+    <description>agent manager impl</description>
 
     <packaging>bundle</packaging>
 
@@ -32,6 +32,11 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>agent-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,9 +51,9 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.server.agent</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.impl.agentmanager</Bundle-SymbolicName>
                         <Export-Package>
-                            {local-packages};{local-packages}.impl;version=${project.version};-noimport:=true
+                            {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
                         <Import-Package>*</Import-Package>
                     </instructions>

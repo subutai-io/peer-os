@@ -29,7 +29,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.LxcState;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")

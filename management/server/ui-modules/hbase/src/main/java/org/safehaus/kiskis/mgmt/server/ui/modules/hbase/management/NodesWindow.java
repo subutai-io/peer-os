@@ -12,7 +12,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import static org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum.START;

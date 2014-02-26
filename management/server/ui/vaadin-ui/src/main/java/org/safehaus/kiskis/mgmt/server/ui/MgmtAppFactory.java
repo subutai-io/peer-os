@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui;
 import com.vaadin.Application;
 import com.vaadin.Application.SystemMessages;
 import org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 
 public class MgmtAppFactory implements ApplicationFactory {
 

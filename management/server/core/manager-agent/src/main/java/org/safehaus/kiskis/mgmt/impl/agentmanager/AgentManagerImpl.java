@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.agent;
+package org.safehaus.kiskis.mgmt.impl.agentmanager;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -38,7 +39,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  */
-public class AgentManagerImpl implements ResponseListener, org.safehaus.kiskis.mgmt.shared.protocol.api.AgentManager {
+public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     private static final Logger LOG = Logger.getLogger(AgentManagerImpl.class.getName());
 
