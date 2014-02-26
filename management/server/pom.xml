@@ -31,12 +31,11 @@
     <modules>
         <module>web-server</module>
         <module>core</module>
-        <module>async-runner</module>
         <module>ui</module>
         <module>ui-modules</module>
-        <module>server-karaf</module>
         <module>test_api</module>
         <module>test_impl</module>
+        <module>server-karaf</module>
     </modules>
 
     <description>Parent project for the Kiskis Management Server Artifacts</description>
