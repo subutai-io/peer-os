@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol.api;
+package org.safehaus.kiskis.mgmt.api.dbmanager;
 
 import com.datastax.driver.core.ResultSet;
 import java.util.List;

@@ -9,9 +9,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mgmt-server-persistence</artifactId>
-    <name>Kiskis Management Server Persistence</name>
-    <description>Kiskis Management Server Persistence</description>
+    <artifactId>db-manager-impl</artifactId>
+    <name>Kiskis Management DB Manager</name>
+    <description>db manager impl</description>
 
     <packaging>bundle</packaging>
 
@@ -82,8 +82,11 @@
             <artifactId>snappy-java</artifactId>
             <version>1.0.5</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>db-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -98,9 +101,9 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.server.persistence</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.impl.dbmanager</Bundle-SymbolicName>
                         <Export-Package>
-                            {local-packages};{local-packages}.impl;version=${project.version};-noimport:=true
+                            {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
                         <Import-Package>*</Import-Package>
                     </instructions>
