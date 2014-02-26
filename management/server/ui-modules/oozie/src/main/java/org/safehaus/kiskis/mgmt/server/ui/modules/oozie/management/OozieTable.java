@@ -11,11 +11,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.OozieClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ParseResult;
-import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public class OozieTable extends Table {
@@ -30,7 +25,7 @@ public class OozieTable extends Table {
 
     public OozieTable() {
         setSizeFull();
-        this.manager = new ServiceManager();
+        this.manager = new ServiceManager(this);
         this.setCaption("Oozie");
         this.setWidth("100%");
         this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
@@ -101,34 +96,34 @@ public class OozieTable extends Table {
         stop.setEnabled(!state);
     }
 
-    public void onResponse(Response response) {
-        if (manager.getCurrentTask() != null && response.getTaskUuid() != null
-                && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
-            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
-            Task task = RequestUtil.getTask(response.getTaskUuid());
-            if (!list.isEmpty()) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    manager.moveToNextTask();
-                    if (manager.getCurrentTask() != null) {
-                        for (Command command : manager.getCurrentTask().getCommands()) {
-                            manager.executeCommand(command);
-                        }
-                    } else {
-//                        if (nodesWindow != null && nodesWindow.isVisible()) {
-//                            nodesWindow.updateUI(task);
+//    public void onResponse(Response response) {
+//        if (manager.getCurrentTask() != null && response.getTaskUuid() != null
+//                && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
+//            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+//            Task task = RequestUtil.getTask(response.getTaskUuid());
+//            if (!list.isEmpty()) {
+//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+//                    manager.moveToNextTask();
+//                    if (manager.getCurrentTask() != null) {
+//                        for (Command command : manager.getCurrentTask().getCommands()) {
+//                            manager.executeCommand(command);
 //                        }
-                        manageUI(task.getTaskStatus());
-                    }
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-//                    if (nodesWindow != null && nodesWindow.isVisible()) {
-//                        nodesWindow.updateUI(task);
+//                    } else {
+////                        if (nodesWindow != null && nodesWindow.isVisible()) {
+////                            nodesWindow.updateUI(task);
+////                        }
+//                        manageUI(task.getTaskStatus());
 //                    }
-                }
-            }
-        }
-    }
+//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+////                    if (nodesWindow != null && nodesWindow.isVisible()) {
+////                        nodesWindow.updateUI(task);
+////                    }
+//                }
+//            }
+//        }
+//    }
 
-    private void manageUI(TaskStatus ts) {
+    public void manageUI(TaskStatus ts) {
         if (cce != null) {
             switch (cce) {
                 case START_SERVER: {

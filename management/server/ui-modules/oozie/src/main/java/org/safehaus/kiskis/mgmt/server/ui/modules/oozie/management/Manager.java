@@ -10,7 +10,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
  *
@@ -51,8 +50,8 @@ public class Manager {
         return content;
     }
 
-    public void setOutput(Response response) {
-        table.onResponse(response);
-    }
+//    public void setOutput(Response response) {
+//        table.onResponse(response);
+//    }
 
 }

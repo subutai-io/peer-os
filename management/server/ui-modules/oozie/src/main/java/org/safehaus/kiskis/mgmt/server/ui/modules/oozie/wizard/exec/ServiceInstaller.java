@@ -1,25 +1,23 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
-import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 /**
  *
  * @author bahadyr
  */
-public class ServiceInstaller {
+public class ServiceInstaller implements TaskCallback {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
@@ -31,57 +29,46 @@ public class ServiceInstaller {
         this.config = config;
         OozieCommands oc = new OozieCommands();
 
-        Task updateApt = RequestUtil.createTask("apt-get update");
-        Command commandServer = oc.getAptGetUpdate();
-        commandServer.getRequest().setUuid(config.getServer().getUuid());
-        commandServer.getRequest().setTaskUuid(updateApt.getUuid());
-        commandServer.getRequest().setRequestSequenceNumber(updateApt.getIncrementedReqSeqNumber());
-        updateApt.addCommand(commandServer);
+        Task updateApt = new Task("apt-get update");
+        Request commandServer = oc.getAptGetUpdate();
+        commandServer.setUuid(config.getServer().getUuid());
+
+        updateApt.addRequest(commandServer);
         tasks.add(updateApt);
 
-        Task updateAptClients = RequestUtil.createTask("apt-get update");
+        Task updateAptClients = new Task("apt-get update");
         for (Agent agent : config.getClients()) {
-            Command command = oc.getAptGetUpdate();
-            command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(updateAptClients.getUuid());
-            command.getRequest().setRequestSequenceNumber(updateAptClients.getIncrementedReqSeqNumber());
-            updateAptClients.addCommand(command);
+            Request command = oc.getAptGetUpdate();
+            command.setUuid(agent.getUuid());
+            updateAptClients.addRequest(command);
         }
         tasks.add(updateAptClients);
 
-        Task installServer = RequestUtil.createTask("Install Oozie Server");
-        Command commandServerInstall = oc.getCommand(OozieCommandEnum.INSTALL_SERVER);
-        commandServerInstall.getRequest().setUuid(config.getServer().getUuid());
-        commandServerInstall.getRequest().setTaskUuid(installServer.getUuid());
-        commandServerInstall.getRequest().setRequestSequenceNumber(installServer.getIncrementedReqSeqNumber());
-        installServer.addCommand(commandServerInstall);
+        Task installServer = new Task("Install Oozie Server");
+        Request commandServerInstall = oc.getCommand(OozieCommandEnum.INSTALL_SERVER);
+        commandServerInstall.setUuid(config.getServer().getUuid());
+        installServer.addRequest(commandServerInstall);
         tasks.add(installServer);
 
-        Task installClient = RequestUtil.createTask("Install Oozie Client");
+        Task installClient = new Task("Install Oozie Client");
         for (Agent agent : config.getClients()) {
-            Command command = oc.getCommand(OozieCommandEnum.INSTALL_CLIENT);
-            command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(installClient.getUuid());
-            command.getRequest().setRequestSequenceNumber(installClient.getIncrementedReqSeqNumber());
-            installClient.addCommand(command);
+            Request command = oc.getCommand(OozieCommandEnum.INSTALL_CLIENT);
+            command.setUuid(agent.getUuid());
+            installClient.addRequest(command);
         }
         tasks.add(installClient);
 
-        Task configugeServer = RequestUtil.createTask("Configure server");
-        Command commandConfigServer = oc.getSetConfigCommand(config.getServer().getListIP().get(0) + " root");
-        commandConfigServer.getRequest().setUuid(config.getServer().getUuid());
-        commandConfigServer.getRequest().setTaskUuid(configugeServer.getUuid());
-        commandConfigServer.getRequest().setRequestSequenceNumber(configugeServer.getIncrementedReqSeqNumber());
-        configugeServer.addCommand(commandConfigServer);
+        Task configugeServer = new Task("Configure server");
+        Request commandConfigServer = oc.getSetConfigCommand(config.getServer().getListIP().get(0) + " root");
+        commandConfigServer.setUuid(config.getServer().getUuid());
+        configugeServer.addRequest(commandConfigServer);
         tasks.add(configugeServer);
 
-        Task configugeClients = RequestUtil.createTask("Configure client");
+        Task configugeClients = new Task("Configure client");
         for (Agent agent : config.getClients()) {
-            Command command = oc.getSetConfigCommand(config.getServer().getListIP().get(0) + " root");
-            command.getRequest().setUuid(agent.getUuid());
-            command.getRequest().setTaskUuid(configugeClients.getUuid());
-            command.getRequest().setRequestSequenceNumber(configugeClients.getIncrementedReqSeqNumber());
-            configugeClients.addCommand(command);
+            Request command = oc.getSetConfigCommand(config.getServer().getListIP().get(0) + " root");
+            command.setUuid(agent.getUuid());
+            configugeClients.addRequest(command);
         }
         tasks.add(configugeClients);
 
@@ -91,9 +78,10 @@ public class ServiceInstaller {
         terminal.setValue("Starting installation...\n");
         moveToNextTask();
         if (currentTask != null) {
-            for (Command command : currentTask.getCommands()) {
-                executeCommand(command);
-            }
+//            for (Request command : currentTask.getCommands()) {
+//                executeCommand(command);
+//            }
+            OozieModule.getTaskRunner().executeTask(currentTask, this);
         }
     }
 
@@ -101,42 +89,59 @@ public class ServiceInstaller {
         currentTask = tasks.poll();
     }
 
-    public void onResponse(Response response) {
-        if (currentTask != null && response.getTaskUuid() != null
-                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
-            Task task = RequestUtil.getTask(response.getTaskUuid());
-            if (!list.isEmpty() && terminal != null) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
-                    moveToNextTask();
-                    if (currentTask != null) {
-                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
-                        for (Command command : currentTask.getCommands()) {
-                            executeCommand(command);
-                        }
-                    } else {
-                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-                        saveHBaseInfo();
-                    }
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
-                }
-            }
-            terminal.setCursorPosition(terminal.getValue().toString().length());
-
-        }
-    }
-
+//    public void onResponse(Response response) {
+//        if (currentTask != null && response.getTaskUuid() != null
+//                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
+//            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
+//            Task task = RequestUtil.getTask(response.getTaskUuid());
+//            if (!list.isEmpty() && terminal != null) {
+//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
+//                    moveToNextTask();
+//                    if (currentTask != null) {
+//                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
+//                        for (Request command : currentTask.getCommands()) {
+//                            executeCommand(command);
+//                        }
+//                    } else {
+//                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+//                        saveHBaseInfo();
+//                    }
+//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+//                }
+//            }
+//            terminal.setCursorPosition(terminal.getValue().toString().length());
+//
+//        }
+//    }
     private void saveHBaseInfo() {
         if (OozieDAO.saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");
         }
     }
 
-    private void executeCommand(Command command) {
-        terminal.setValue(terminal.getValue().toString() + command.getRequest().getProgram() + "\n");
-        ServiceLocator.getService(CommandManager.class).executeCommand(command);
+//    private void executeCommand(Request command) {
+//        terminal.setValue(terminal.getValue().toString() + command.getProgram() + "\n");
+//        ServiceLocator.getService(CommandManager.class).executeCommand(command);
+//    }
+    @Override
+    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+        if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+            terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
+            moveToNextTask();
+            if (currentTask != null) {
+                terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
+                return currentTask;
+            } else {
+                terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+                saveHBaseInfo();
+            }
+        } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+            terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+        }
+
+        return null;
     }
 
 }

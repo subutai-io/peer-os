@@ -9,7 +9,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
  *
@@ -88,10 +87,10 @@ public class CassandraWizard {
         }
     }
 
-    public void setOutput(Response response) {
-        if (stepFinish != null) {
-            stepFinish.getInstaller().onResponse(response);
-        }
-    }
+//    public void setOutput(Response response) {
+//        if (stepFinish != null) {
+//            stepFinish.getInstaller().onResponse(response);
+//        }
+//    }
 
 }

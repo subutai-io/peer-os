@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraCommandEnum;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -24,8 +23,8 @@ public class CassandraCommands {
     private static final String etcProfile = ". /etc/profile && ";
 
     // INSTALLATION COMMANDS ===================================================
-    public static CommandImpl getTemplate() {
-        return (CommandImpl) CommandFactory.createRequest(
+    public static Request getTemplate() {
+        return CommandFactory.newRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
                 CassandraModule.MODULE_NAME, //     source
@@ -45,7 +44,7 @@ public class CassandraCommands {
 
 //    public static Command getInstallCommand() {
 //        Command cmd = getTemplate();
-//        Request req = cmd.getRequest();
+//        Request req = getTemplate();
 //        req.setProgram("/usr/bin/apt-get");
 //        req.setArgs(Arrays.asList(
 //                "--force-yes",
@@ -54,12 +53,12 @@ public class CassandraCommands {
 //                "ksks-cassandra"
 //        ));
 //        req.setTimeout(180);
-//        return cmd;
+//        return req;
 //    }
 
 //    public static Command getUninstallCommand() {
 //        Command cmd = getTemplate();
-//        Request req = cmd.getRequest();
+//        Request req = getTemplate();
 //        req.setProgram("/usr/bin/apt-get");
 //        req.setArgs(Arrays.asList(
 //                "--force-yes",
@@ -68,126 +67,126 @@ public class CassandraCommands {
 //                "ksks-cassandra"
 //        ));
 //        req.setTimeout(180);
-//        return cmd;
+//        return req;
 //    }
 
-    public static CommandImpl getSetListenAddressCommand(String listenAddress) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetListenAddressCommand(String listenAddress) {
+        
+        Request req = getTemplate();
         String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/listen_address:/=' " + conf + ")`'s!.*!listen_address: %listenAddress!'";
         req.setProgram(program.replace("%listenAddress", listenAddress));
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetRpcAddressCommand(String rpcAddress) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetRpcAddressCommand(String rpcAddress) {
+        
+        Request req = getTemplate();
         String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/rpc_address:/=' " + conf + ")`'s!.*!rpc_address: %rpcAddress!'";
         req.setProgram(program.replace("%rpcAddress", rpcAddress));
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetSeedsCommand(String seeds) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetSeedsCommand(String seeds) {
+        
+        Request req = getTemplate();
         String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/- seeds:/=' " + conf + ")`'s!.*!             - seeds: %seedsIps!'";
         req.setProgram(program.replace("%seedsIps", '"' + seeds + '"'));
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetClusterNameCommand(String clusterName) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetClusterNameCommand(String clusterName) {
+        
+        Request req = getTemplate();
         String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/cluster_name:/=' " + conf + ")`'s!.*!cluster_name: %clusterName!'";
         req.setProgram(program.replace("%clusterName", clusterName));
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetDataDirectoryCommand(String dir) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetDataDirectoryCommand(String dir) {
+        
+        Request req = getTemplate();
         String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/data_file_directories:/=' " + conf + ") + 1`'s!.*!     - %dir!'";
         req.setProgram(program.replace("%dir", dir));
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetCommitLogDirectoryCommand(String dir) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetCommitLogDirectoryCommand(String dir) {
+        
+        Request req = getTemplate();
         String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/commitlog_directory:/=' " + conf + ")`'s!.*!commitlog_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetSavedCachesDirectoryCommand(String dir) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetSavedCachesDirectoryCommand(String dir) {
+        
+        Request req = getTemplate();
         String program = etcProfile + "sed -i " + conf + " -e `expr $(sed -n '/saved_caches_directory:/=' " + conf + ")`'s!.*!saved_caches_directory: %dir!'";
         req.setProgram(program.replace("%dir", dir));
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getDeleteDataDirectoryCommand() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getDeleteDataDirectoryCommand() {
+        
+        Request req = getTemplate();
         req.setProgram("rm -rf /var/lib/cassandra/data/*");
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getDeleteCommitLogDirectoryCommand() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getDeleteCommitLogDirectoryCommand() {
+        
+        Request req = getTemplate();
         req.setProgram("rm -rf /var/lib/cassandra/commitlog/*");
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getDeleteSavedCachesDirectoryCommand() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getDeleteSavedCachesDirectoryCommand() {
+        
+        Request req = getTemplate();
         req.setProgram("rm -rf /var/lib/cassandra/saved_caches/*");
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSourceEtcProfileUpdateCommand() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSourceEtcProfileUpdateCommand() {
+        
+        Request req = getTemplate();
         req.setProgram(". /etc/profile");
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getServiceCassandraStartCommand() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getServiceCassandraStartCommand() {
+        
+        Request req = getTemplate();
         req.setProgram("service cassandra start");
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getServiceCassandraStopCommand() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getServiceCassandraStopCommand() {
+        
+        Request req = getTemplate();
         req.setProgram("service cassandra stop");
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getServiceCassandraStatusCommand() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getServiceCassandraStatusCommand() {
+        
+        Request req = getTemplate();
         req.setProgram("service cassandra status");
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getAptGetUpdate() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getAptGetUpdate() {
+        
+        Request req = getTemplate();
         req.setProgram("apt-get update");
-        return cmd;
+        return req;
     }
 
-    public CommandImpl getCommand(CassandraCommandEnum cce) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public Request getCommand(CassandraCommandEnum cce) {
+        
+        Request req = getTemplate();
         req.setProgram(cce.getProgram());
-        return cmd;
+        return req;
     }
 
 }

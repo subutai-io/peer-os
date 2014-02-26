@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.commands;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -21,8 +20,8 @@ public class HBaseCommands {
 
 //    private static final String conf = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
     // INSTALLATION COMMANDS ===================================================
-    public static CommandImpl getTemplate() {
-        return (CommandImpl) CommandFactory.createRequest(
+    public static Request getTemplate() {
+        return CommandFactory.newRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
                 HBaseModule.MODULE_NAME, //     source
@@ -40,46 +39,46 @@ public class HBaseCommands {
                 120); //                        timeout (sec)
     }
 
-    public static CommandImpl getSetMasterCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetMasterCommand(String param) {
+        
+        Request req = getTemplate();
         req.setProgram(HBaseCommandEnum.SET_MASTER.getProgram() + " " + param);
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetRegionCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetRegionCommand(String param) {
+        
+        Request req = getTemplate();
         req.setProgram(HBaseCommandEnum.SET_REGION.getProgram() + " " + param);
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetQuorumCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetQuorumCommand(String param) {
+        
+        Request req = getTemplate();
         req.setProgram(HBaseCommandEnum.SET_QUORUM.getProgram() + " " + param);
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getSetBackupMastersCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getSetBackupMastersCommand(String param) {
+        
+        Request req = getTemplate();
         req.setProgram(HBaseCommandEnum.SET_BACKUP_MASTERS.getProgram() + " " + param);
-        return cmd;
+        return req;
     }
 
-    public static CommandImpl getAptGetUpdate() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public static Request getAptGetUpdate() {
+        
+        Request req = getTemplate();
         req.setProgram("apt-get update");
-        return cmd;
+        return req;
     }
 
-    public CommandImpl getCommand(HBaseCommandEnum cce) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public Request getCommand(HBaseCommandEnum cce) {
+        
+        Request req = getTemplate();
         req.setProgram(cce.getProgram());
-        return cmd;
+        return req;
     }
 
 }

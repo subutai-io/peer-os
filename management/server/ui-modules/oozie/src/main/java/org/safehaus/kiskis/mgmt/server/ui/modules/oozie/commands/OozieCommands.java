@@ -31,11 +31,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+
+
+
+
+
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -49,8 +54,8 @@ public class OozieCommands {
 
 //    private static final String conf = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
     // INSTALLATION COMMANDS ===================================================
-    public static CommandImpl getTemplate() {
-        return (CommandImpl) CommandFactory.createRequest(
+    public static Request getTemplate() {
+        return CommandFactory.newRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
                 OozieModule.MODULE_NAME, //     source
@@ -68,25 +73,25 @@ public class OozieCommands {
                 120); //                        timeout (sec)
     }
 
-    public CommandImpl getSetConfigCommand(String param) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public Request getSetConfigCommand(String param) {
+
+        Request req = getTemplate();
         req.setProgram(OozieCommandEnum.CONFIGURE.getProgram() + " " + param);
-        return cmd;
+        return req;
     }
 
-    public CommandImpl getAptGetUpdate() {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public Request getAptGetUpdate() {
+
+        Request req = getTemplate();
         req.setProgram("apt-get update");
-        return cmd;
+        return req;
     }
 
-    public CommandImpl getCommand(OozieCommandEnum cce) {
-        CommandImpl cmd = getTemplate();
-        Request req = cmd.getRequest();
+    public Request getCommand(OozieCommandEnum cce) {
+
+        Request req = getTemplate();
         req.setProgram(cce.getProgram());
-        return cmd;
+        return req;
     }
 
 }

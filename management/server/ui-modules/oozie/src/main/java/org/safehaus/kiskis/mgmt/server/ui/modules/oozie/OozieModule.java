@@ -1,28 +1,35 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.Wizard;
-import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.Manager;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.Manager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.Wizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
-import java.util.logging.Logger;
 
 public class OozieModule implements Module {
 
     public static final String MODULE_NAME = "Oozie";
     private static final Logger LOG = Logger.getLogger(OozieModule.class.getName());
+    private static TaskRunner taskRunner;
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    public void setTaskRunner(TaskRunner taskRunner) {
+        OozieModule.taskRunner = taskRunner;
+    }
+
+    public static TaskRunner getTaskRunner() {
+        return taskRunner;
+    }
+
+    public static class ModuleComponent extends CustomComponent {
 
         Wizard wizard;
         Manager manager;
 
-        public ModuleComponent() {
+        public ModuleComponent(TaskRunner taskRunner) {
             setSizeFull();
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -43,21 +50,15 @@ public class OozieModule implements Module {
             setCompositionRoot(verticalLayout);
         }
 
-        @Override
-        public void onCommand(Response response) {
-            if (wizard != null) {
-                wizard.setOutput(response);
-            }
-            if (manager != null) {
-                manager.setOutput(response);
-            }
-        }
-
-        @Override
-        public String getName() {
-            return MODULE_NAME;
-        }
-
+//        @Override
+//        public void onCommand(Response response) {
+//            if (wizard != null) {
+//                wizard.setOutput(response);
+//            }
+//            if (manager != null) {
+//                manager.setOutput(response);
+//            }
+//        }
         public Iterable<Agent> getLxcList() {
             return MgmtApplication.getSelectedAgents();
         }
@@ -71,7 +72,7 @@ public class OozieModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleComponent(taskRunner);
     }
 
 }

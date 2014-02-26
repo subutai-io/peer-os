@@ -45,21 +45,6 @@
             <version>${osgi.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>ui-vaadin-services</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>ui-vaadin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>1.0</version>
@@ -70,15 +55,24 @@
             <version>${servlet.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>api-module</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ui-vaadin</artifactId>
+                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ui-vaadin-services</artifactId>
+                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>mgmt-shared-protocol</artifactId>
+                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
