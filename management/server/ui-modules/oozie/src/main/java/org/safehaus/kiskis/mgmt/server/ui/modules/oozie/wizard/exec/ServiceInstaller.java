@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;

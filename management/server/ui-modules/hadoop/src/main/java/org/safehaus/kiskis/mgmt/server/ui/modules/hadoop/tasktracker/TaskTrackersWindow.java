@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker;
 
+import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;

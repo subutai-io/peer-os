@@ -19,6 +19,7 @@
 
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;

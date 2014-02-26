@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker;
 
+import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;

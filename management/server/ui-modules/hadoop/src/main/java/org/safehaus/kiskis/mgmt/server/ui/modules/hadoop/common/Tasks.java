@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common;
 
+import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
