@@ -20,7 +20,7 @@ public class CassandraModule implements Module {
         return taskRunner;
     }
 
-    public static void setTaskRunner(TaskRunner taskRunner) {
+    public void setTaskRunner(TaskRunner taskRunner) {
         CassandraModule.taskRunner = taskRunner;
     }
 
