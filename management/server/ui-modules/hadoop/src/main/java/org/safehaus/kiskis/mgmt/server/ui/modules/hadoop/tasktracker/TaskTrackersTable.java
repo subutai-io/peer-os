@@ -1,25 +1,22 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker;
 
-import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
@@ -29,10 +26,9 @@ public class TaskTrackersTable extends Table {
     public static final String HOSTNAME = "hostname",
             STATUS = "status",
             REMOVE = "remove";
-    private String clusterName;
+    private final String clusterName;
     private IndexedContainer container;
     private HadoopClusterInfo cluster;
-    private Task removeTask, statusTask;
 
     public TaskTrackersTable(String clusterName) {
         this.clusterName = clusterName;
@@ -57,7 +53,6 @@ public class TaskTrackersTable extends Table {
         container.addContainerProperty(STATUS, String.class, "");
 //        container.addContainerProperty(REMOVE, Button.class, "");
 
-        statusTask = RequestUtil.createTask("Status data node from Hadoop Cluster");
         // Create some orders
         List<UUID> list = cluster.getTaskTrackers();
         for (UUID item : list) {
@@ -67,7 +62,25 @@ public class TaskTrackersTable extends Table {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", agent.getUuid().toString());
-            RequestUtil.createRequest(getCommandManager(), Commands.STATUS_DATA_NODE, statusTask, map);
+            TaskUtil.createRequest(Commands.STATUS_DATA_NODE, "Status data node from Hadoop Cluster", map, new TaskCallback() {
+
+                Map<UUID, String> statuses = new HashMap<UUID, String>();
+
+                @Override
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+
+                    if (Util.isFinalResponse(response)) {
+                        statuses.put(response.getUuid(), stdOut);
+                    }
+                    if (task.isCompleted() && task.getTaskStatus() == TaskStatus.SUCCESS) {
+                        for (Map.Entry<UUID, String> status : statuses.entrySet()) {
+                            findRow(status.getKey(), status.getValue());
+                        }
+                    }
+
+                    return null;
+                }
+            });
         }
 
         return container;
@@ -122,33 +135,8 @@ public class TaskTrackersTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-    public void onCommand(Response response) {
-
-        List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
-        Task task = RequestUtil.getTask(response.getTaskUuid());
-
-        if (removeTask != null) {
-            if (task.equals(removeTask)) {
-                if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-                    HadoopDAO.saveHadoopClusterInfo(cluster);
-                }
-                refreshDataSource();
-            }
-        }
-
-        if (statusTask != null) {
-            if (task.equals(statusTask)) {
-                if (task.getTaskStatus().compareTo(TaskStatus.SUCCESS) == 0) {
-                    for (ParseResult pr : list) {
-                        findRow(pr);
-                    }
-                }
-            }
-        }
-    }
-
-    private void findRow(ParseResult parseResult) {
-        Agent agent = getAgentManager().getAgentByUUID(parseResult.getRequest().getUuid());
+    private void findRow(UUID uuid, String stdOut) {
+        Agent agent = getAgentManager().getAgentByUUID(uuid);
 
         for (Object itemId : container.getItemIds()) {
             Item item = container.getItem(itemId);
@@ -156,7 +144,7 @@ public class TaskTrackersTable extends Table {
             String name = (String) item.getItemProperty(HOSTNAME).getValue();
 
             if (name.equals(agent.getHostname())) {
-                item.getItemProperty(STATUS).setValue(parseDataNodeStatus(parseResult.getResponse().getStdOut()));
+                item.getItemProperty(STATUS).setValue(parseDataNodeStatus(stdOut));
             }
         }
     }
@@ -173,29 +161,20 @@ public class TaskTrackersTable extends Table {
         return "";
     }
 
-    public CommandManager getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
-            if (serviceReference != null) {
-                return CommandManager.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
-    }
-
+//    public CommandManager getCommandManager() {
+//        // get bundle instance via the OSGi Framework Util class
+//        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
+//        if (ctx != null) {
+//            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
+//            if (serviceReference != null) {
+//                return CommandManager.class.cast(ctx.getService(serviceReference));
+//            }
+//        }
+//
+//        return null;
+//    }
     public AgentManager getAgentManager() {
         // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
-            if (serviceReference != null) {
-                return AgentManager.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
+        return ServiceLocator.getService(AgentManager.class);
     }
 }

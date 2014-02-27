@@ -6,19 +6,14 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode.DataNodesWindow;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker.TaskTrackersWindow;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 
 import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
@@ -110,39 +105,19 @@ public class ClusterTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-    public void onCommand(Response response) {
-        if (dataNodesWindow != null && dataNodesWindow.isVisible()) {
-            dataNodesWindow.onCommand(response);
-        }
-
-        if (taskTrackersWindow != null && taskTrackersWindow.isVisible()) {
-            taskTrackersWindow.onCommand(response);
-        }
-    }
-
-    public CommandManager getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
-            if (serviceReference != null) {
-                return CommandManager.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
-    }
-
+//    public CommandManager getCommandManager() {
+//        // get bundle instance via the OSGi Framework Util class
+//        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
+//        if (ctx != null) {
+//            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
+//            if (serviceReference != null) {
+//                return CommandManager.class.cast(ctx.getService(serviceReference));
+//            }
+//        }
+//
+//        return null;
+//    }
     public AgentManager getAgentManager() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(AgentManager.class.getName());
-            if (serviceReference != null) {
-                return AgentManager.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
+        return ServiceLocator.getService(AgentManager.class);
     }
 }

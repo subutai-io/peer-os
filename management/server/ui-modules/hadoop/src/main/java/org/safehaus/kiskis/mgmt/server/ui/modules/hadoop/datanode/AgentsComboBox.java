@@ -10,7 +10,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommandManager;
 
 import java.util.Set;
 import java.util.UUID;
@@ -77,16 +76,16 @@ public class AgentsComboBox extends ComboBox {
         return null;
     }
 
-    public CommandManager getCommandManager() {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
-        if (ctx != null) {
-            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
-            if (serviceReference != null) {
-                return CommandManager.class.cast(ctx.getService(serviceReference));
-            }
-        }
-
-        return null;
-    }
+//    public CommandManager getCommandManager() {
+//        // get bundle instance via the OSGi Framework Util class
+//        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
+//        if (ctx != null) {
+//            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
+//            if (serviceReference != null) {
+//                return CommandManager.class.cast(ctx.getService(serviceReference));
+//            }
+//        }
+//
+//        return null;
+//    }
 }
