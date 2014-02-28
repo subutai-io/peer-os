@@ -31,7 +31,15 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.impl</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>org.safehaus.kiskis.mgmt*;version=${project.version}</Export-Package>
+                        <Import-Package>!${project.artifactId}*,
+                            org.apache.felix.service.command,
+                            org.apache.felix.gogo.commands,
+                            org.apache.karaf.shell.console,
+                            *
+                        </Import-Package>
+                        <Private-Package>!*</Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
