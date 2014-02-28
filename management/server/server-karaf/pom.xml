@@ -464,6 +464,11 @@
                                     <artifactId>impl-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>cli-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!--Shared Dependencies-->
 
                                 <artifactItem>
