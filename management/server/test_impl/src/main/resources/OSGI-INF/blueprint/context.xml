@@ -2,4 +2,11 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     <service ref="someApi" interface="org.safehaus.kiskis.mgmt.api.SomeApi"/>
     <bean id="someApi" class="org.safehaus.kiskis.mgmt.impl.SomeImpl"/>    
+    
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="LAK/commandname">
+            <action class="org.safehaus.kiskis.mgmt.impl.CommandName">
+            </action>
+        </command>
+    </command-bundle>
 </blueprint>
