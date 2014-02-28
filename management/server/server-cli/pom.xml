@@ -9,10 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>impl-module</artifactId>
+    <artifactId>cli-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Impl</name>
-    <description>Kiskis Management Impl</description>
+    <name>Kiskis Management CLI</name>
+    <description>Kiskis Management CLI</description>
 
     <build>
         <plugins>
@@ -55,24 +55,15 @@
             <version>${servlet.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>api-module</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <version>2.3.3</version>
             <type>jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>ui-vaadin</artifactId>
-                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>ui-vaadin-services</artifactId>
-                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>mgmt-shared-protocol</artifactId>
-                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix.gogo</groupId>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>0.4.0</version>
         </dependency>
     </dependencies>
 
