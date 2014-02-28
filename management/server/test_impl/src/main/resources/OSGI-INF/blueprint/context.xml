@@ -7,6 +7,11 @@
         <command name="LAK/commandname">
             <action class="org.safehaus.kiskis.mgmt.impl.CommandName">
             </action>
+            <completers>
+                <ref component-id="ourCommandCompleter" />
+                <null />
+            </completers>
         </command>
     </command-bundle>
+    <bean id="ourCommandCompleter" class="org.safehaus.kiskis.mgmt.impl.CommandCompleter" />
 </blueprint>
