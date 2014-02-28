@@ -110,23 +110,18 @@ public class OozieDAO {
         return list;
     }
 
-    public static HadoopClusterInfo getHadoopClusterInfo(UUID uuid) {
+    public static HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
-            String cql = "select * from hadoop_cluster_info where uid = ? limit 1 allow filtering";
-            ResultSet rs = dbManager.executeQuery(cql, uuid);
+            String cql = "select * from hadoop_cluster_info where cluster_name = ? limit 1 allow filtering";
+            ResultSet rs = dbManager.executeQuery(cql, clusterName.trim());
             Row row = rs.one();
             if (row != null) {
-                hadoopClusterInfo = new HadoopClusterInfo();
-                hadoopClusterInfo.setUid(row.getUUID("uid"));
-                hadoopClusterInfo.setClusterName(row.getString("cluster_name"));
-                hadoopClusterInfo.setNameNode(row.getUUID("name_node"));
-                hadoopClusterInfo.setSecondaryNameNode(row.getUUID("secondary_name_node"));
-                hadoopClusterInfo.setJobTracker(row.getUUID("job_tracker"));
-                hadoopClusterInfo.setReplicationFactor(row.getInt("replication_factor"));
-                hadoopClusterInfo.setDataNodes(row.getList("data_nodes", UUID.class));
-                hadoopClusterInfo.setTaskTrackers(row.getList("task_trackers", UUID.class));
-                hadoopClusterInfo.setIpMask(row.getString("ip_mask"));
+                ByteBuffer data = row.getBytes("info");
+                byte[] result = new byte[data.remaining()];
+                data.get(result);
+
+                hadoopClusterInfo = (HadoopClusterInfo) deserialize(result);
             }
 
         } catch (Exception ex) {
@@ -134,5 +129,4 @@ public class OozieDAO {
         }
         return hadoopClusterInfo;
     }
-
 }

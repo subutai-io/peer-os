@@ -33,7 +33,7 @@ public class HadoopModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner);
+        return new ModuleComponent();
     }
 
     public static class ModuleComponent extends CustomComponent {
@@ -41,14 +41,14 @@ public class HadoopModule implements Module {
         private final HadoopWizard hadoopWizard;
         private final ClusterForm hadoopManager;
 
-        public ModuleComponent(TaskRunner taskRunner) {
+        public ModuleComponent() {
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-            hadoopWizard = new HadoopWizard(taskRunner);
+            hadoopWizard = new HadoopWizard();
             hadoopManager = new ClusterForm();
             sheet.addTab(hadoopWizard.getContent(), "Install");
             sheet.addTab(hadoopManager, "Manage");
@@ -57,7 +57,6 @@ public class HadoopModule implements Module {
 
             setCompositionRoot(verticalLayout);
         }
-
     }
 
 }

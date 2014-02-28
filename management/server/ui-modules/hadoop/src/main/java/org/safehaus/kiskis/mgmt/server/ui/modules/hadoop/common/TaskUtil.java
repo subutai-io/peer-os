@@ -53,4 +53,21 @@ public class TaskUtil {
 
         return CommandJson.getRequest(json);
     }
+
+    public static Task getTask(final String command, HashMap<String, String> map) {
+        Task task = new Task();
+        String json = command;
+
+        json = json.replaceAll(":taskUuid", task.getUuid().toString());
+        json = json.replaceAll(":requestSequenceNumber", task.getIncrementedReqSeqNumber().toString());
+
+        for (String key : map.keySet()) {
+            json = json.replaceAll(key, map.get(key));
+        }
+
+        Request req = CommandJson.getRequest(json);
+        task.addRequest(req);
+
+        return task;
+    }
 }

@@ -74,7 +74,7 @@ public final class DataNodesWindow extends Window implements TaskCallback {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Agent master = getAgentManager().getAgentByUUID(cluster.getNameNode());
+                Agent master = cluster.getNameNode();
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
@@ -97,7 +97,7 @@ public final class DataNodesWindow extends Window implements TaskCallback {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Agent master = getAgentManager().getAgentByUUID(cluster.getNameNode());
+                Agent master = cluster.getNameNode();
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
@@ -120,7 +120,7 @@ public final class DataNodesWindow extends Window implements TaskCallback {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Agent master = getAgentManager().getAgentByUUID(cluster.getNameNode());
+                Agent master = cluster.getNameNode();
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put(":source", HadoopModule.MODULE_NAME);
@@ -160,9 +160,9 @@ public final class DataNodesWindow extends Window implements TaskCallback {
                 Agent agent = (Agent) agentsComboBox.getValue();
 
 //                cluster.getDataNodes().add(agent.getUuid());
-                List<UUID> list = new ArrayList<UUID>();
+                List<Agent> list = new ArrayList<Agent>();
                 list.addAll(cluster.getDataNodes());
-                list.add(agent.getUuid());
+                list.add(agent);
 
                 cluster.setDataNodes(list);
                 addButton.setEnabled(false);
@@ -175,7 +175,7 @@ public final class DataNodesWindow extends Window implements TaskCallback {
     }
 
     private void getStatus() {
-        Agent master = getAgentManager().getAgentByUUID(cluster.getNameNode());
+        Agent master = cluster.getNameNode();
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
@@ -228,15 +228,14 @@ public final class DataNodesWindow extends Window implements TaskCallback {
 
         map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", getAgentManager().getAgentByUUID(cluster.getNameNode()).getUuid().toString());
+        map.put(":uuid", cluster.getNameNode().getUuid().toString());
         map.put(":slave-hostname", agent.getHostname());
         TaskUtil.createRequest(Commands.ADD_DATA_NODE, "Adding data node to Hadoop Cluster", map, INSTANCE, TaskType.ADD);
 
-        for (UUID uuid : cluster.getDataNodes()) {
-            Agent agentDataNode = getAgentManager().getAgentByUUID(uuid);
+        for (Agent agentDataNode : cluster.getDataNodes()) {
             map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
-            map.put(":uuid", getAgentManager().getAgentByUUID(cluster.getNameNode()).getUuid().toString());
+            map.put(":uuid", cluster.getNameNode().getUuid().toString());
             map.put(":IP", agentDataNode.getHostname());
             TaskUtil.createRequest(Commands.INCLUDE_DATA_NODE, "Adding data node to Hadoop Cluster", map, INSTANCE, TaskType.ADD);
         }
@@ -250,8 +249,7 @@ public final class DataNodesWindow extends Window implements TaskCallback {
 
     public void readHosts() {
         hostss = new HashMap<UUID, String>();
-        for (UUID uuid : getAllNodes()) {
-            Agent agent = getAgentManager().getAgentByUUID(uuid);
+        for (Agent agent : getAllNodes()) {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", agent.getUuid().toString());
@@ -285,8 +283,7 @@ public final class DataNodesWindow extends Window implements TaskCallback {
         for (String host : hosts) {
             host = host.trim();
             boolean isContains = false;
-            for (UUID uuid : getAllNodes()) {
-                Agent agent = getAgentManager().getAgentByUUID(uuid);
+            for (Agent agent : getAllNodes()) {
                 if (host.contains(agent.getHostname())
                         || host.contains("localhost")
                         || host.contains(localAgent.getHostname())
@@ -301,8 +298,7 @@ public final class DataNodesWindow extends Window implements TaskCallback {
             }
         }
 
-        for (UUID uuid : getAllNodes()) {
-            Agent agent = getAgentManager().getAgentByUUID(uuid);
+        for (Agent agent : getAllNodes()) {
             result.append(agent.getListIP().get(0));
             result.append("\t");
             result.append(agent.getHostname());
@@ -325,8 +321,8 @@ public final class DataNodesWindow extends Window implements TaskCallback {
         return statusLabel;
     }
 
-    private List<UUID> getAllNodes() {
-        List<UUID> list = new ArrayList<UUID>();
+    private List<Agent> getAllNodes() {
+        List<Agent> list = new ArrayList<Agent>();
         list.addAll(cluster.getDataNodes());
         list.addAll(cluster.getTaskTrackers());
         list.add(cluster.getNameNode());

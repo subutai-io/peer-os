@@ -8,12 +8,12 @@ import com.vaadin.ui.Table;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
@@ -53,16 +53,28 @@ public class TaskTrackersTable extends Table {
         container.addContainerProperty(STATUS, String.class, "");
 //        container.addContainerProperty(REMOVE, Button.class, "");
 
-        // Create some orders
-        List<UUID> list = cluster.getTaskTrackers();
-        for (UUID item : list) {
-            Agent agent = getAgentManager().getAgentByUUID(item);
+//        statusTask = RequestUtil.createTask("Status data node from Hadoop Cluster");
+//        // Create some orders
+//        List<Agent> list = cluster.getTaskTrackers();
+//        for (Agent agent : list) {
+//            addOrderToContainer(container, agent);
+//
+//            HashMap<String, String> map = new HashMap<String, String>();
+//            map.put(":source", HadoopModule.MODULE_NAME);
+//            map.put(":uuid", agent.getUuid().toString());
+//            RequestUtil.createRequest(getCommandManager(), Commands.STATUS_DATA_NODE, statusTask, map);
+//        }
+//        
+        List<Agent> list = cluster.getTaskTrackers();
+        for (Agent agent : list) {
             addOrderToContainer(container, agent);
 
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", agent.getUuid().toString());
-            TaskUtil.createRequest(Commands.STATUS_DATA_NODE, "Status data node from Hadoop Cluster", map, new TaskCallback() {
+            Task statusTask = TaskUtil.getTask(Commands.STATUS_DATA_NODE, map);
+
+            HadoopModule.getTaskRunner().executeTask(statusTask, new TaskCallback() {
 
                 Map<UUID, String> statuses = new HashMap<UUID, String>();
 
@@ -161,20 +173,7 @@ public class TaskTrackersTable extends Table {
         return "";
     }
 
-//    public CommandManager getCommandManager() {
-//        // get bundle instance via the OSGi Framework Util class
-//        BundleContext ctx = FrameworkUtil.getBundle(HadoopModule.class).getBundleContext();
-//        if (ctx != null) {
-//            ServiceReference serviceReference = ctx.getServiceReference(CommandManager.class.getName());
-//            if (serviceReference != null) {
-//                return CommandManager.class.cast(ctx.getService(serviceReference));
-//            }
-//        }
-//
-//        return null;
-//    }
     public AgentManager getAgentManager() {
-        // get bundle instance via the OSGi Framework Util class
         return ServiceLocator.getService(AgentManager.class);
     }
 }

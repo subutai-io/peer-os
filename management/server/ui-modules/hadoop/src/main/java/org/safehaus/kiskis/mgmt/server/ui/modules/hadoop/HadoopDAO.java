@@ -7,47 +7,54 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+
 /**
- *
  * @author dilshat
  */
 public class HadoopDAO {
 
     private static final Logger LOG = Logger.getLogger(HadoopDAO.class.getName());
     private static final DbManager dbManager;
-    private static final AgentManager agentManager;
 
     static {
         dbManager = ServiceLocator.getService(DbManager.class);
-        agentManager = ServiceLocator.getService(AgentManager.class);
+    }
+
+    private static Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object o = ois.readObject();
+        ois.close();
+        return o;
     }
 
     public static boolean saveHadoopClusterInfo(HadoopClusterInfo cluster) {
         try {
-            String cql = "insert into hadoop_cluster_info (uid, cluster_name, name_node, secondary_name_node, "
-                    + "job_tracker, replication_factor, data_nodes, task_trackers, ip_mask) "
-                    + "values (?,?,?,?,?,?,?,?,?)";
-            dbManager.executeUpdate(cql, cluster.getUid(),
-                    cluster.getClusterName(), cluster.getNameNode(),
-                    cluster.getSecondaryNameNode(), cluster.getJobTracker(),
-                    cluster.getReplicationFactor(), cluster.getDataNodes(),
-                    cluster.getTaskTrackers(), cluster.getIpMask());
-            return true;
+            byte[] data = Util.serialize(cluster);
 
-        } catch (Exception ex) {
+            String cql = "insert into hadoop_cluster_info (uid, cluster_name, info) values (?,?,?)";
+            dbManager.executeUpdate(cql, cluster.getUuid(), cluster.getClusterName(), ByteBuffer.wrap(data));
+
+            return true;
+        } catch (IOException ex) {
             LOG.log(Level.SEVERE, "Error in saveHadoopClusterInfo", ex);
+            return false;
         }
-        return false;
     }
 
     public static List<HadoopClusterInfo> getHadoopClusterInfo() {
@@ -56,26 +63,13 @@ public class HadoopDAO {
             String cql = "select * from hadoop_cluster_info";
             ResultSet rs = dbManager.executeQuery(cql);
             for (Row row : rs) {
-                HadoopClusterInfo cd = new HadoopClusterInfo();
-                cd.setUid(row.getUUID("uid"));
-                cd.setClusterName(row.getString("cluster_name"));
-                cd.setNameNode(row.getUUID("name_node"));
-                cd.setSecondaryNameNode(row.getUUID("secondary_name_node"));
-                cd.setJobTracker(row.getUUID("job_tracker"));
-                cd.setReplicationFactor(row.getInt("replication_factor"));
-                cd.setDataNodes(row.getList("data_nodes", UUID.class));
-                cd.setTaskTrackers(row.getList("task_trackers", UUID.class));
-                cd.setIpMask(row.getString("ip_mask"));
+                ByteBuffer data = row.getBytes("info");
+                byte[] result = new byte[data.remaining()];
+                data.get(result);
+
+                HadoopClusterInfo cd = (HadoopClusterInfo) deserialize(result);
                 list.add(cd);
             }
-
-//            for (HadoopClusterInfo item : list) {
-//                Agent master = agentManager.getAgentByUUIDFromDB(item.getNameNode());
-//                if (master.getUuid() == null) {
-//                    deleteHadoopClusterInfo(item.getUid());
-//                    list.remove(item);
-//                }
-//            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
@@ -89,16 +83,11 @@ public class HadoopDAO {
             ResultSet rs = dbManager.executeQuery(cql, clusterName.trim());
             Row row = rs.one();
             if (row != null) {
-                hadoopClusterInfo = new HadoopClusterInfo();
-                hadoopClusterInfo.setUid(row.getUUID("uid"));
-                hadoopClusterInfo.setClusterName(row.getString("cluster_name"));
-                hadoopClusterInfo.setNameNode(row.getUUID("name_node"));
-                hadoopClusterInfo.setSecondaryNameNode(row.getUUID("secondary_name_node"));
-                hadoopClusterInfo.setJobTracker(row.getUUID("job_tracker"));
-                hadoopClusterInfo.setReplicationFactor(row.getInt("replication_factor"));
-                hadoopClusterInfo.setDataNodes(row.getList("data_nodes", UUID.class));
-                hadoopClusterInfo.setTaskTrackers(row.getList("task_trackers", UUID.class));
-                hadoopClusterInfo.setIpMask(row.getString("ip_mask"));
+                ByteBuffer data = row.getBytes("info");
+                byte[] result = new byte[data.remaining()];
+                data.get(result);
+
+                hadoopClusterInfo = (HadoopClusterInfo) deserialize(result);
             }
 
         } catch (Exception ex) {

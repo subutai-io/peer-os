@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 1/31/14
- * Time: 8:24 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 1/31/14 Time: 8:24 PM
  */
 public class Tasks {
+
     public static Task getInstallTask(List<Agent> agents) {
         Task task = new Task("Setup hadoop deb packages");
 
@@ -32,7 +30,7 @@ public class Tasks {
         return task;
     }
 
-    public static Task getSetMastersTask(List<Agent> agents, Agent nameNode, Agent jobTracker, Integer replicationFactor){
+    public static Task getSetMastersTask(List<Agent> agents, Agent nameNode, Agent jobTracker, Integer replicationFactor) {
         Task task = new Task("Configure hadoop master nodes");
 
         for (Agent agent : agents) {
@@ -73,7 +71,7 @@ public class Tasks {
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", nameNode.getUuid().toString());
 
-        map.put(":secondarynamenode", secondaryNameNode.getUuid().toString());
+        map.put(":secondarynamenode", secondaryNameNode.getHostname());
 
         Request request = TaskUtil.createRequest(Commands.SET_SECONDARY_NAME_NODE, task, map);
         task.addRequest(request);
@@ -241,10 +239,10 @@ public class Tasks {
         return task;
     }
 
-    public static Task getPasteHostsTask(HashMap<UUID, String> hosts){
+    public static Task getPasteHostsTask(HashMap<UUID, String> hosts) {
         Task task = new Task("Configuring environment");
 
-        for(UUID id : hosts.keySet()){
+        for (UUID id : hosts.keySet()) {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", id.toString());
@@ -253,6 +251,20 @@ public class Tasks {
             Request request = TaskUtil.createRequest(Commands.WRITE_HOSTNAME, task, map);
             task.addRequest(request);
         }
+
+        return task;
+    }
+
+    public static Task getJobTrackerCommand(HadoopClusterInfo cluster, String command) {
+        Task task = new Task(command + "for Hadoop Job Tracker");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        map.put(":command", command);
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_JOB_TRACKER, task, map);
+        task.addRequest(request);
 
         return task;
     }

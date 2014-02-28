@@ -55,19 +55,19 @@ public class HadoopConfig {
         cluster.setIpMask(domainName);
         cluster.setReplicationFactor(replicationFactor);
 
-        cluster.setNameNode(nameNode.getUuid());
-        cluster.setSecondaryNameNode(sNameNode.getUuid());
-        cluster.setJobTracker(jobTracker.getUuid());
+        cluster.setNameNode(nameNode);
+        cluster.setSecondaryNameNode(sNameNode);
+        cluster.setJobTracker(jobTracker);
 
-        List<UUID> list = new ArrayList<UUID>();
+        List<Agent> list = new ArrayList<Agent>();
         for (Agent agent : dataNodes) {
-            list.add(agent.getUuid());
+            list.add(agent);
         }
         cluster.setDataNodes(list);
 
-        list = new ArrayList<UUID>();
+        list = new ArrayList<Agent>();
         for (Agent agent : taskTrackers) {
-            list.add(agent.getUuid());
+            list.add(agent);
         }
         cluster.setTaskTrackers(list);
     }

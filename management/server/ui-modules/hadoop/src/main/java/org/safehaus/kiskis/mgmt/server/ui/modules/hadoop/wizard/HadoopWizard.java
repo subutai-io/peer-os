@@ -8,7 +8,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public final class HadoopWizard {
 
@@ -22,12 +21,9 @@ public final class HadoopWizard {
     Step2 step2;
     Step3 step3;
     int step = 0;
-    private List<Agent> lxcList;
-    private final TaskRunner taskRunner;
 
-    public HadoopWizard(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
-        hadoopInstallation = new Installation(taskRunner);
+    public HadoopWizard() {
+        hadoopInstallation = new Installation();
 
         contentRoot = new GridLayout(1, 15);
         contentRoot.setSpacing(true);
@@ -119,7 +115,6 @@ public final class HadoopWizard {
             }
         }
 
-        lxcList = list;
         return list;
     }
 }

@@ -8,13 +8,12 @@ import com.vaadin.ui.Table;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
@@ -56,15 +55,17 @@ public class DataNodesTable extends Table {
 //        container.addContainerProperty(REMOVE, Button.class, "");
 
         // Create some orders
-        List<UUID> list = cluster.getDataNodes();
-        for (UUID item : list) {
-            Agent agent = getAgentManager().getAgentByUUID(item);
+        List<Agent> list = cluster.getDataNodes();
+        for (Agent agent : list) {
             addOrderToContainer(container, agent);
 
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", agent.getUuid().toString());
-            TaskUtil.createRequest(Commands.STATUS_DATA_NODE, "Status data node from Hadoop Cluster", map, new TaskCallback() {
+
+            Task statusTask = TaskUtil.getTask(Commands.STATUS_DATA_NODE, map);
+
+            HadoopModule.getTaskRunner().executeTask(statusTask, new TaskCallback() {
                 Map<UUID, String> statuses = new HashMap<UUID, String>();
 
                 @Override
