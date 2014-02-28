@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.impl;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.osgi.service.command.CommandSession;
 
 /**
  *
@@ -19,12 +18,6 @@ public class CommandName extends OsgiCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         System.out.println("doExecute run");
-        return null;
-    }
-
-    @Override
-    public Object execute(CommandSession cs) throws Exception {
-        cs.getConsole().print("Wellcome to Hell!");
         return null;
     }
 

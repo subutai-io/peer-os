@@ -74,16 +74,21 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.commands</artifactId>
             <version>0.4.0</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.karaf.shell</groupId>
             <artifactId>org.apache.karaf.shell.console</artifactId>
             <version>2.3.3</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix.gogo</groupId>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>0.4.0</version>
         </dependency>
     </dependencies>
 
