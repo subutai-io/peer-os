@@ -12,12 +12,13 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  *
  * @author bahadyr
  */
-@Command(scope = "myscope", name = "mycommand", description = "mydescription")
-public class mycommand extends OsgiCommandSupport {
+@Command(scope = "subutai", name = "purge", description = "mydescription")
+public class PurgeCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-         System.out.println("Executing command mycommand");
-         return null;
+        System.out.println("Executing purge command");
+        return null;
+
     }
 }
