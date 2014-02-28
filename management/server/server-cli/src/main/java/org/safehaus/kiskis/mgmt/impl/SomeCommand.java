@@ -20,27 +20,18 @@ import org.safehaus.kiskis.mgmt.api.SomeApi;
 @Command(scope = "subutai", name = "somecommand", description = "mydescription")
 public class SomeCommand extends OsgiCommandSupport {
 
-    private final SomeApi someApi;
-//
+    private SomeApi sa;
 
-    public SomeApi getSomeApi() {
-        return someApi;
-    }
-//
-//    public void setSomeApi(SomeApi someApi) {
-//        this.someApi = someApi;
-//    }
-//
-
-    public SomeCommand(SomeApi someApi) {
-        this.someApi = someApi;
+    public void setSa(SomeApi sa) {
+        this.sa = sa;
     }
 
     @Override
     protected Object doExecute() throws Exception {
         System.out.println("Executqqing some command");
-        String hello = someApi.sayHello("Bahadyr");
+        String hello = sa.sayHello("Bahadyr");
         System.out.println(hello);
+
         return null;
 
     }

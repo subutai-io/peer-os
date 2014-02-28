@@ -2,9 +2,9 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-    <reference id="someApi" availability="mandatory" interface="org.safehaus.kiskis.mgmt.api.SomeApi"/>  
-    
-    <!--    <bean id="module" class="org.safehaus.kiskis.mgmt.api.SomeApi">
+    <reference id="sa" availability="mandatory" interface="org.safehaus.kiskis.mgmt.api.SomeApi"/> 
+        
+    <!--    <bean id="someCommand" class="org.safehaus.kiskis.mgmt.impl.SomeCommand">
         <property name="someApi" ref="someApi"/>                   
     </bean>-->
     
@@ -12,7 +12,7 @@
         
         <command name="subutai/somecommand" >
             <action class="org.safehaus.kiskis.mgmt.impl.SomeCommand" >
-                <property name="someApi" ref="someApi"/>
+                <property name="sa" ref="sa"/>
             </action>
         </command>
         <command name="subutai/install" >
