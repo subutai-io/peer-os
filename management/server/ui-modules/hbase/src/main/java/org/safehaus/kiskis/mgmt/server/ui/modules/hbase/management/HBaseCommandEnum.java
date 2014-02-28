@@ -15,6 +15,7 @@ public enum HBaseCommandEnum {
     STOP("service hbase stop", 120),
     STATUS("service hbase status", 120),
     INSTALL("apt-get --assume-yes --force-yes install ksks-hbase", 120),
+    // Should be replaced with HBASE_HOME!
     SET_MASTER("sh /opt/hbase-0.94.11/scripts/master.sh", 120),
     SET_REGION("sh /opt/hbase-0.94.11/scripts/region.sh", 120),
     SET_QUORUM("sh /opt/hbase-0.94.11/scripts/quorum.sh", 120),
@@ -23,7 +24,6 @@ public enum HBaseCommandEnum {
     MANAGE("manage", 120);
 
     String program;
-    String yaml = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
     int timeout;
 
     private HBaseCommandEnum(String program, int timeout) {
