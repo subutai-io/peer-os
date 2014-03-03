@@ -12,7 +12,6 @@ package org.safehaus.kiskis.mgmt.impl;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.kiskis.mgmt.api.SomeApi;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 /**
  *
@@ -26,11 +25,6 @@ public class SomeCommand extends OsgiCommandSupport {
     public void setSomeApi(SomeApi someApi) {
         this.someApi = someApi;
     }
-//    private static SomeApi someApi;
-//    
-//    static {
-//        someApi = ServiceLocator.getService(SomeApi.class);
-//    }
     
     public SomeCommand() {
         System.out.println("constructor");
@@ -38,8 +32,7 @@ public class SomeCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        System.out.println("Executqqing some command");
-//        SomeApi someApi = ServiceLocator.getService(SomeApi.class);
+        System.out.println("Executing some command");
         String hello = someApi.sayHello("Bahadyr");
         System.out.println(hello);
 
