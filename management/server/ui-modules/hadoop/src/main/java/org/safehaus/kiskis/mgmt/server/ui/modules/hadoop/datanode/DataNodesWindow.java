@@ -384,9 +384,9 @@ public final class DataNodesWindow extends Window implements TaskCallback {
                 String status = parseNameNodeStatus(stdOut);
                 statusLabel.setValue(status);
                 if (status.trim().equalsIgnoreCase("Running")) {
-                    disableButtons(2);
-                } else {
                     disableButtons(1);
+                } else {
+                    disableButtons(2);
                 }
             }
 
