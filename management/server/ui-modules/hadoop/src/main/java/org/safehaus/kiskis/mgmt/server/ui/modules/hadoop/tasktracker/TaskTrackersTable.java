@@ -51,20 +51,7 @@ public class TaskTrackersTable extends Table {
         // Create the container properties
         container.addContainerProperty(HOSTNAME, String.class, "");
         container.addContainerProperty(STATUS, String.class, "");
-//        container.addContainerProperty(REMOVE, Button.class, "");
-
-//        statusTask = RequestUtil.createTask("Status data node from Hadoop Cluster");
-//        // Create some orders
-//        List<Agent> list = cluster.getTaskTrackers();
-//        for (Agent agent : list) {
-//            addOrderToContainer(container, agent);
-//
-//            HashMap<String, String> map = new HashMap<String, String>();
-//            map.put(":source", HadoopModule.MODULE_NAME);
-//            map.put(":uuid", agent.getUuid().toString());
-//            RequestUtil.createRequest(getCommandManager(), Commands.STATUS_DATA_NODE, statusTask, map);
-//        }
-//        
+        
         List<Agent> list = cluster.getTaskTrackers();
         for (Agent agent : list) {
             addOrderToContainer(container, agent);
@@ -104,43 +91,6 @@ public class TaskTrackersTable extends Table {
 
         item.getItemProperty(HOSTNAME).setValue(agent.getHostname());
         item.getItemProperty(STATUS).setValue("");
-
-        /*Button buttonRemove = new Button("Remove");
-         buttonRemove.addListener(new Button.ClickListener() {
-         @Override
-         public void buttonClick(Button.ClickEvent event) {
-         Agent master = getAgentManager().getAgent(cluster.getNameNode());
-         cluster = getCommandManager().getHadoopClusterData(clusterName);
-         cluster.getDataNodes().remove(agent.getUuid());
-
-         removeTask = RequestUtil.createTask(getCommandManager(), "Remove data node from Hadoop Cluster");
-
-         HashMap<String, String> map = new HashMap<String, String>();
-         map.put(":source", HadoopModule.MODULE_NAME);
-         map.put(":uuid", master.getUuid().toString());
-         map.put(":slave-hostname", agent.getUuid().toString());
-         RequestUtil.createRequest(getCommandManager(), Commands.REMOVE_DATA_NODE, removeTask, map);
-
-         if (!agent.getListIP().isEmpty()) {
-         map = new HashMap<String, String>();
-         map.put(":source", HadoopModule.MODULE_NAME);
-         map.put(":uuid", master.getUuid().toString());
-         map.put(":IP", agent.getHostname());
-         RequestUtil.createRequest(getCommandManager(), Commands.EXCLUDE_DATA_NODE, removeTask, map);
-         }
-
-         map = new HashMap<String, String>();
-         map.put(":source", HadoopModule.MODULE_NAME);
-         map.put(":uuid", master.getUuid().toString());
-         RequestUtil.createRequest(getCommandManager(), Commands.REFRESH_DATA_NODES, removeTask, map);
-
-         map = new HashMap<String, String>();
-         map.put(":source", HadoopModule.MODULE_NAME);
-         map.put(":uuid", agent.getUuid().toString());
-         RequestUtil.createRequest(getCommandManager(), Commands.STOP_DATA_NODE, removeTask, map);
-         }
-         });
-         item.getItemProperty(REMOVE).setValue(buttonRemove);*/
     }
 
     public void refreshDataSource() {

@@ -274,7 +274,7 @@ public class Tasks {
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
-        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        map.put(":uuid", cluster.getNameNode().getUuid().toString());
         map.put(":command", command);
 
         Request request = TaskUtil.createRequest(Commands.COMMAND_NAME_NODE, task, map);

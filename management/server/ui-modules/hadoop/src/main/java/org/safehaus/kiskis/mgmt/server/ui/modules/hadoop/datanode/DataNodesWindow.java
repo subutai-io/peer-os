@@ -168,7 +168,7 @@ public final class DataNodesWindow extends Window {
                             disableButtons(2);
                         }
                         indicator.setVisible(false);
-                        //taskTrackersTable.refreshDataSource();
+                        //dataNodesTable.refreshDataSource();
                     }
                 }
 
