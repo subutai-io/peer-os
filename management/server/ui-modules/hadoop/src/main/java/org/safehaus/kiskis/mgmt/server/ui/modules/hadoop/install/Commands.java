@@ -417,7 +417,7 @@ public class Commands {
             "\t    \"args\": [\n" +
             "\t      \"hadoop-dfs\",\":command\"\n" +
             "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
+            "\t    \"timeout\": 30\n" +
             "\t  }\n" +
             "\t}";
 
@@ -436,7 +436,7 @@ public class Commands {
             "\t    \"args\": [\n" +
             "\t      \"hadoop-mapred\",\":command\"\n" +
             "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
+            "\t    \"timeout\": 30\n" +
             "\t  }\n" +
             "\t}";
 }
