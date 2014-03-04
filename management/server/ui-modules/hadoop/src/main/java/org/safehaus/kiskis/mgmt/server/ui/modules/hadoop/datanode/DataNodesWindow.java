@@ -206,8 +206,9 @@ public final class DataNodesWindow extends Window {
 
         for (String status : array) {
             if (status.contains("NameNode")) {
-                return status.replaceAll("NameNode is ", "");
-                        //.replaceAll("\\(SecondaryNameNode is NOT Running\\)", "");
+                return status.
+                        replaceAll("\\(SecondaryNameNode is NOT Running\\)", "").
+                        replaceAll("NameNode is ", "");
             }
         }
 
