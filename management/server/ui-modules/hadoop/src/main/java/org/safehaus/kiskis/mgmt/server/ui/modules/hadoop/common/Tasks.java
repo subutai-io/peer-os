@@ -268,4 +268,18 @@ public class Tasks {
 
         return task;
     }
+    
+    public static Task getNameNodeCommand(HadoopClusterInfo cluster, String command) {
+        Task task = new Task(command + "for Hadoop Name Node");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        map.put(":command", command);
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_NAME_NODE, task, map);
+        task.addRequest(request);
+
+        return task;
+    }
 }
