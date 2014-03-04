@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -207,7 +208,7 @@ public final class DataNodesWindow extends Window {
         for (String status : array) {
             if (status.contains("NameNode")) {
                 return status.
-                        replaceAll("\\(SecondaryNameNode is NOT Running\\)", "").
+                        replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
                         replaceAll("NameNode is ", "");
             }
         }
