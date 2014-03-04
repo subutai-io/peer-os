@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraClusterInfo;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -17,7 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.*;
 
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;

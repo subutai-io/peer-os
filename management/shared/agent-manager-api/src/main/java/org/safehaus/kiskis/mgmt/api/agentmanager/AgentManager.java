@@ -8,7 +8,6 @@ package org.safehaus.kiskis.mgmt.api.agentmanager;
 import java.util.Set;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.AgentListener;
 
 /**
  *
