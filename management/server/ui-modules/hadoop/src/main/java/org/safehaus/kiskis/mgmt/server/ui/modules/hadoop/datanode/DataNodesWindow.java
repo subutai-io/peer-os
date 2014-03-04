@@ -202,12 +202,12 @@ public final class DataNodesWindow extends Window {
     }
 
     private String parseStatus(String response) {
-        String[] array = response.split("\n");
+        String[] array = response.split("\\n");
 
         for (String status : array) {
             if (status.contains("NameNode")) {
-                return status.replaceAll("NameNode is ", "")
-                        .replaceAll("\\\\(SecondaryNOT Running on this machine\\\\)", "");
+                return status.replaceAll("NameNode is ", "");
+                        //.replaceAll("\\(SecondaryNameNode is NOT Running\\)", "");
             }
         }
 
