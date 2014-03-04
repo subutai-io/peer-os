@@ -171,7 +171,7 @@ public final class TaskTrackersWindow extends Window {
                             disableButtons(2);
                         }
                         indicator.setVisible(false);
-                        //taskTrackersTable.refreshDataSource();
+                        taskTrackersTable.refreshDataSource();
                     }
                 }
 

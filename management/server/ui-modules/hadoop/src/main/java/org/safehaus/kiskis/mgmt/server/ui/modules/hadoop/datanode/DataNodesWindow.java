@@ -168,7 +168,7 @@ public final class DataNodesWindow extends Window {
                             disableButtons(2);
                         }
                         indicator.setVisible(false);
-                        //dataNodesTable.refreshDataSource();
+                        dataNodesTable.refreshDataSource();
                     }
                 }
 
@@ -207,7 +207,7 @@ public final class DataNodesWindow extends Window {
         for (String status : array) {
             if (status.contains("NameNode")) {
                 return status.replaceAll("NameNode is ", "")
-                        .replaceAll("\\(SecondaryNOT Running on this machine\\)", "");
+                        .replaceAll("\\\\(SecondaryNOT Running on this machine\\\\)", "");
             }
         }
 
