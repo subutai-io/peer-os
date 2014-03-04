@@ -33,14 +33,20 @@ public class ModuleNotifierImpl implements ModuleNotifier {
     public void setModule(Module module) {
         modules.add(module);
         for (ModuleServiceListener moduleServiceListener : moduleListeners) {
-            moduleServiceListener.moduleRegistered(module);
+            try {
+                moduleServiceListener.moduleRegistered(module);
+            } catch (Exception e) {
+            }
         }
     }
 
     public void unsetModule(Module module) {
         modules.remove(module);
         for (ModuleServiceListener moduleServiceListener : moduleListeners) {
-            moduleServiceListener.moduleUnregistered(module);
+            try {
+                moduleServiceListener.moduleUnregistered(module);
+            } catch (Exception e) {
+            }
         }
     }
 
