@@ -1,15 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
-//import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseConfig;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import java.io.ByteArrayInputStream;
@@ -113,16 +103,7 @@ public class OozieDAO {
     public static HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
-            String cql = "select * from hadoop_cluster_info where cluster_name = ? limit 1 allow filtering";
-            ResultSet rs = dbManager.executeQuery(cql, clusterName.trim());
-            Row row = rs.one();
-            if (row != null) {
-                ByteBuffer data = row.getBytes("info");
-                byte[] result = new byte[data.remaining()];
-                data.get(result);
-
-                hadoopClusterInfo = (HadoopClusterInfo) deserialize(result);
-            }
+            return dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);

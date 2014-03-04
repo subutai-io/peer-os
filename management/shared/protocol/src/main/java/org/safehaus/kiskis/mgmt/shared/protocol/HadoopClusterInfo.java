@@ -13,7 +13,8 @@ import java.util.UUID;
  */
 public class HadoopClusterInfo implements Serializable {
 
-    public static final String UUID_LABEL = "UUID",
+    public static final String SOURCE = "Hadoop",
+            UUID_LABEL = "UUID",
             CLUSTER_NAME_LABEL = "Cluster name",
             NAME_NODE_LABEL = "Name Node",
             SECONDARY_NAME_NODE_LABEL = "Secondary Name Node",
@@ -111,15 +112,15 @@ public class HadoopClusterInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "HadoopClusterInfo{" +
-                "uuid=" + uuid +
-                ", clusterName=" + clusterName +
-                ", nameNode=" + nameNode +
-                ", secondaryNameNode=" + secondaryNameNode +
-                ", jobTracker=" + jobTracker +
-                ", replicationFactor=" + replicationFactor +
-                ", dataNodes=" + dataNodes +
-                ", taskTrackers=" + taskTrackers +
-                ", ipMask=" + ipMask + '}';
+        return "HadoopClusterInfo{"
+                + "uuid=" + uuid
+                + ", clusterName=" + clusterName
+                + ", nameNode=" + nameNode
+                + ", secondaryNameNode=" + secondaryNameNode
+                + ", jobTracker=" + jobTracker
+                + ", replicationFactor=" + replicationFactor
+                + ", dataNodes=" + dataNodes
+                + ", taskTrackers=" + taskTrackers
+                + ", ipMask=" + ipMask + '}';
     }
 }
