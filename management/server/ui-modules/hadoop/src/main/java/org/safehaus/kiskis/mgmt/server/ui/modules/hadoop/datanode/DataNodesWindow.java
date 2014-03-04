@@ -202,7 +202,7 @@ public final class DataNodesWindow extends Window {
     }
 
     private String parseStatus(String response) {
-        String[] array = response.split("\\n");
+        String[] array = response.split("\n");
 
         for (String status : array) {
             if (status.contains("NameNode")) {
