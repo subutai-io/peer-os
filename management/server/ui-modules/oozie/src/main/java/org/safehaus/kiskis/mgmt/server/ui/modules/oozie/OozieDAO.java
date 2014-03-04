@@ -1,11 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +10,6 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
@@ -38,13 +31,14 @@ public class OozieDAO {
     public static boolean saveClusterInfo(OozieConfig cluster) {
         try {
 
-            byte[] data = Util.serialize(cluster);
+//            byte[] data = Util.serialize(cluster);
+//
+//            String cql = "insert into oozie_info (uid, info) values (?,?)";
+//            dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
+            dbManager.saveInfo(OozieModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
 
-            String cql = "insert into oozie_info (uid, info) values (?,?)";
-            dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
-
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Error in saveHBaseClusterInfo", ex);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in saveClusterInfo", ex);
             return false;
         }
         return true;
@@ -53,44 +47,44 @@ public class OozieDAO {
     public static List<OozieConfig> getClusterInfo() {
         List<OozieConfig> list = new ArrayList<OozieConfig>();
         try {
-            String cql = "select * from oozie_info";
-            ResultSet results = dbManager.executeQuery(cql);
-            for (Row row : results) {
+//            String cql = "select * from oozie_info";
+//            ResultSet results = dbManager.executeQuery(cql);
+//            for (Row row : results) {
+//
+//                ByteBuffer data = row.getBytes("info");
+//
+//                byte[] result = new byte[data.remaining()];
+//                data.get(result);
+//                OozieConfig config = (OozieConfig) deserialize(result);
+//                list.add(config);
+//            }
 
-                ByteBuffer data = row.getBytes("info");
-
-                byte[] result = new byte[data.remaining()];
-                data.get(result);
-                OozieConfig config = (OozieConfig) deserialize(result);
-                list.add(config);
-            }
-        } catch (ClassNotFoundException ex) {
-            LOG.log(Level.SEVERE, "Error ", ex);
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Error ", ex);
+            return dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getClusterInfo", ex);
         }
         return list;
     }
 
     public static boolean deleteClusterInfo(UUID uuid) {
         try {
-            String cql = "delete from oozie_info where uid = ?";
-            dbManager.executeUpdate(cql, uuid);
+//            String cql = "delete from oozie_info where uid = ?";
+//            dbManager.executeUpdate(cql, uuid);
+            dbManager.deleteInfo(OozieModule.MODULE_NAME, uuid.toString());
             return true;
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error ", ex);
+            LOG.log(Level.SEVERE, "Error in deleteClusterInfo", ex);
         }
         return false;
     }
 
-    public static Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Object o = ois.readObject();
-        ois.close();
-        return o;
-    }
-
+//    public static Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
+//        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+//        ObjectInputStream ois = new ObjectInputStream(bais);
+//        Object o = ois.readObject();
+//        ois.close();
+//        return o;
+//    }
     public static Set<Agent> getAgents(Set<UUID> uuids) {
         Set<Agent> list = new HashSet<Agent>();
         for (UUID uuid : uuids) {
