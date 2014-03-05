@@ -245,7 +245,7 @@
                                 <artifactItem>
                                     <groupId>com.eaio.uuid</groupId>
                                     <artifactId>uuid</artifactId>
-                                    <version>3.2</version>
+                                    <version>${uuid.version}</version>
                                 </artifactItem>
 
                                 <!--UI Modules-->
@@ -361,22 +361,22 @@
                                 <artifactItem>
                                     <groupId>com.datastax.cassandra</groupId>
                                     <artifactId>cassandra-driver-core</artifactId>
-                                    <version>2.0.0</version>
+                                    <version>${cassandra-driver-core.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.cassandra</groupId>
                                     <artifactId>cassandra-all</artifactId>
-                                    <version>2.0.5</version>
+                                    <version>${cassandra-all.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.cassandra</groupId>
                                     <artifactId>cassandra-thrift</artifactId>
-                                    <version>2.0.5</version>
+                                    <version>${cassandra-thrift.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>net.jpountz.lz4</groupId>
                                     <artifactId>lz4</artifactId>
-                                    <version>1.2.0</version>
+                                    <version>${lz4.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.google.guava</groupId>
@@ -386,27 +386,27 @@
                                 <artifactItem>
                                     <groupId>io.netty</groupId>
                                     <artifactId>netty</artifactId>
-                                    <version>3.9.0.Final</version>
+                                    <version>${netty.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.codahale.metrics</groupId>
                                     <artifactId>metrics-core</artifactId>
-                                    <version>3.0.2</version>
+                                    <version>${metrics-core.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-core-asl</artifactId>
-                                    <version>1.9.13</version>
+                                    <version>${jackson-core-asl.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-mapper-asl</artifactId>
-                                    <version>1.9.13</version>
+                                    <version>${jackson-mapper-asl.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.commons</groupId>
                                     <artifactId>commons-lang3</artifactId>
-                                    <version>3.1</version>
+                                    <version>${commons-lang3.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <!--UI Dependencies-->
@@ -500,7 +500,7 @@
                                 <artifactItem>
                                     <groupId>commons-pool</groupId>
                                     <artifactId>commons-pool</artifactId>
-                                    <version>1.6</version>
+                                    <version>${commons-pool.version}</version>
                                 </artifactItem>                                                    
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
@@ -545,17 +545,17 @@
                                 <artifactItem>
                                     <groupId>org.apache.karaf.shell</groupId>
                                     <artifactId>org.apache.karaf.shell.console</artifactId>
-                                    <version>2.3.3</version>
+                                    <version>${org.apache.karaf.shell.console.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.runtime</artifactId>
-                                    <version>0.4.0</version>
+                                    <version>${org.apache.felix.gogo.runtime.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
-                                    <version>1.18.1</version>
+                                    <version>${jersey-core.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 
