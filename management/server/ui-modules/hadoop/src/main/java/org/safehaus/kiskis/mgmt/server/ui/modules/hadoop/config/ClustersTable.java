@@ -50,7 +50,7 @@ public class ClustersTable extends Table {
         Item item = container.getItem(itemId);
 
         item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).setValue(cluster.getClusterName());
-        item.getItemProperty(HadoopClusterInfo.UUID_LABEL).setValue(cluster.getUid());
+        item.getItemProperty(HadoopClusterInfo.UUID_LABEL).setValue(cluster.getUuid());
     }
 
     public void refreshDataSource() {

@@ -16,7 +16,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClustersTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
@@ -68,20 +67,19 @@ public class StepStart extends Panel {
 //                }
 
                 if (selectedItem != null) {
-                    UUID uid = (UUID) selectedItem.getItemProperty(HadoopClusterInfo.UUID_LABEL).getValue();
-                    HadoopClusterInfo cluster = HBaseDAO.getHadoopClusterInfo(uid);
+                    String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
+                    HadoopClusterInfo cluster = HBaseDAO.getHadoopClusterInfo(clusterName);
 
-                    Set<UUID> dataNodes = new HashSet<UUID>(cluster.getDataNodes());
-                    Set<UUID> taskTrackers = new HashSet<UUID>(cluster.getTaskTrackers());
+                    Set<Agent> dataNodes = new HashSet<Agent>(cluster.getDataNodes());
+                    Set<Agent> taskTrackers = new HashSet<Agent>(cluster.getTaskTrackers());
                     dataNodes.addAll(taskTrackers);
                     dataNodes.add(cluster.getJobTracker());
                     dataNodes.add(cluster.getNameNode());
                     dataNodes.add(cluster.getSecondaryNameNode());
 
-                    Set<Agent> set = HBaseDAO.getAgents(dataNodes);
-
+//                    Set<Agent> set = HBaseDAO.getAgents(dataNodes);
                     wizard.getConfig().reset();
-                    wizard.getConfig().setAgents(set);
+                    wizard.getConfig().setAgents(dataNodes);
                     wizard.next();
                 } else {
                     show("Please select Hadoop cluster first");
@@ -102,7 +100,7 @@ public class StepStart extends Panel {
 
         hl.addComponent(refresh);
         hl.addComponent(next);
-        
+
         gridLayout.addComponent(hl, 6, 4, 6, 4);
         gridLayout.setComponentAlignment(refresh, Alignment.BOTTOM_RIGHT);
         addComponent(gridLayout);

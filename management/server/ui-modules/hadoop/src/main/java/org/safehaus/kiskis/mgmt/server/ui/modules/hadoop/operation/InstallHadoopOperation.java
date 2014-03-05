@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
  * Time: 10:08 PM
  */
 public class InstallHadoopOperation extends Operation {
-    private HadoopConfig config;
+    private final HadoopConfig config;
 
     public InstallHadoopOperation(HadoopConfig config) {
         super("Install Hadoop cluster");

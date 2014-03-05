@@ -6,15 +6,15 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.InstallHadoopOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/7/13 Time: 5:55 PM
@@ -22,13 +22,10 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 public class Installation {
 
     private Step3 panel;
-    private final TaskRunner taskRunner;
     private final HadoopConfig config;
     private final AgentManager agentManager;
 
-    public Installation(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
-
+    public Installation() {
         config = new HadoopConfig();
         agentManager = ServiceLocator.getService(AgentManager.class);
     }
@@ -41,9 +38,9 @@ public class Installation {
         final Operation installOperation = new InstallHadoopOperation(config);
 
         panel.addOutput(installOperation.peekNextTask(), " started.");
-        taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
+        HadoopModule.getTaskRunner().executeTask(installOperation.getNextTask(), new TaskCallback() {
             @Override
-            public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                         panel.addOutput(task, " succeeded.");
@@ -56,6 +53,7 @@ public class Installation {
                     } else {
                         installOperation.setCompleted(true);
                         panel.addOutput(task, " failed.");
+                        panel.addOutput(task, stdErr);
                     }
                 }
 
@@ -67,11 +65,11 @@ public class Installation {
     private void copySSH() {
         Task task = Tasks.getCopySSHKeyTask(config.getAllNodes());
 
-        taskRunner.executeTask(task, new TaskCallback() {
+        HadoopModule.getTaskRunner().executeTask(task, new TaskCallback() {
             HashMap<UUID, String> keys = new HashMap<UUID, String>();
 
             @Override
-            public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 StringBuilder value = new StringBuilder();
                 if (keys.containsKey(response.getUuid())) {
                     value.append(keys.get(response.getUuid()));
@@ -87,6 +85,7 @@ public class Installation {
                         pasteSSH(keys);
                     } else {
                         panel.addOutput(task, " failed.");
+                        panel.addOutput(task, stdErr);
                     }
                 }
 
@@ -102,18 +101,18 @@ public class Installation {
         }
 
         Task task = Tasks.getPasteSSHKeyTask(config.getAllNodes(), arg);
-        taskRunner.executeTask(task, new TaskCallback() {
+        HadoopModule.getTaskRunner().executeTask(task, new TaskCallback() {
             @Override
-            public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                         panel.addOutput(task, " succeeded.");
                         configSSH();
                     } else {
                         panel.addOutput(task, " failed.");
+                        panel.addOutput(task, stdErr);
                     }
                 }
-
                 return null;
             }
         });
@@ -122,15 +121,16 @@ public class Installation {
     private void configSSH() {
         Task task = Tasks.getConfigSSHFolderTask(config.getAllNodes());
 
-        taskRunner.executeTask(task, new TaskCallback() {
+        HadoopModule.getTaskRunner().executeTask(task, new TaskCallback() {
             @Override
-            public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                         panel.addOutput(task, " succeeded.");
                         copyHosts();
                     } else {
                         panel.addOutput(task, " failed.");
+                        panel.addOutput(task, stdErr);
                     }
                 }
 
@@ -142,12 +142,11 @@ public class Installation {
     private void copyHosts() {
         Task task = Tasks.getCopyHostsTask(config.getAllNodes());
 
-        taskRunner.executeTask(task, new TaskCallback() {
-
+        HadoopModule.getTaskRunner().executeTask(task, new TaskCallback() {
             HashMap<UUID, String> hosts = new HashMap<UUID, String>();
 
             @Override
-            public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 StringBuilder value = new StringBuilder();
                 if (hosts.containsKey(response.getUuid())) {
                     value.append(hosts.get(response.getUuid()));
@@ -163,6 +162,7 @@ public class Installation {
                         pasteHost(hosts);
                     } else {
                         panel.addOutput(task, " failed.");
+                        panel.addOutput(task, stdErr);
                     }
                 }
 
@@ -179,9 +179,9 @@ public class Installation {
         }
 
         Task task = Tasks.getPasteHostsTask(hosts);
-        taskRunner.executeTask(task, new TaskCallback() {
+        HadoopModule.getTaskRunner().executeTask(task, new TaskCallback() {
             @Override
-            public Task onResponse(Task task, Response response, String stdOut2, String stdErr2) {
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                         panel.addOutput(task, " succeeded.");

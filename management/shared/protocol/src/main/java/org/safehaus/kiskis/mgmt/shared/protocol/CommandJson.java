@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class CommandJson {
 
     private static final Logger LOG = Logger.getLogger(CommandJson.class.getName());
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static Request getRequest(String json) {
         try {

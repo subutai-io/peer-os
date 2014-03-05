@@ -4,16 +4,17 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
-public class HadoopClusterInfo {
+public class HadoopClusterInfo implements Serializable {
 
-    public static final String UUID_LABEL = "UUID",
+    public static final String SOURCE = "Hadoop",
+            UUID_LABEL = "UUID",
             CLUSTER_NAME_LABEL = "Cluster name",
             NAME_NODE_LABEL = "Name Node",
             SECONDARY_NAME_NODE_LABEL = "Secondary Name Node",
@@ -22,26 +23,27 @@ public class HadoopClusterInfo {
             DATA_NODES_LABEL = "Data Nodes",
             TASK_TRACKERS_LABEL = "Task Trackers",
             IP_MASK_LABEL = "IP Mask";
-    private UUID uid;
+
+    private UUID uuid;
     private String clusterName;
-    private UUID nameNode;
-    private UUID secondaryNameNode;
-    private UUID jobTracker;
+    private Agent nameNode;
+    private Agent secondaryNameNode;
+    private Agent jobTracker;
     private int replicationFactor;
-    private List<UUID> dataNodes;
-    private List<UUID> taskTrackers;
+    private List<Agent> dataNodes;
+    private List<Agent> taskTrackers;
     private String ipMask;
 
     public HadoopClusterInfo() {
-        this.uid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
     }
 
-    public UUID getUid() {
-        return uid;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setUid(UUID uid) {
-        this.uid = uid;
+    public void setUuid(UUID uid) {
+        this.uuid = uid;
     }
 
     public String getClusterName() {
@@ -52,27 +54,27 @@ public class HadoopClusterInfo {
         this.clusterName = clusterName;
     }
 
-    public UUID getNameNode() {
+    public Agent getNameNode() {
         return nameNode;
     }
 
-    public void setNameNode(UUID nameNode) {
+    public void setNameNode(Agent nameNode) {
         this.nameNode = nameNode;
     }
 
-    public UUID getSecondaryNameNode() {
+    public Agent getSecondaryNameNode() {
         return secondaryNameNode;
     }
 
-    public void setSecondaryNameNode(UUID secondaryNameNode) {
+    public void setSecondaryNameNode(Agent secondaryNameNode) {
         this.secondaryNameNode = secondaryNameNode;
     }
 
-    public UUID getJobTracker() {
+    public Agent getJobTracker() {
         return jobTracker;
     }
 
-    public void setJobTracker(UUID jobTracker) {
+    public void setJobTracker(Agent jobTracker) {
         this.jobTracker = jobTracker;
     }
 
@@ -84,19 +86,19 @@ public class HadoopClusterInfo {
         this.replicationFactor = replicationFactor;
     }
 
-    public List<UUID> getDataNodes() {
+    public List<Agent> getDataNodes() {
         return dataNodes;
     }
 
-    public void setDataNodes(List<UUID> dataNodes) {
+    public void setDataNodes(List<Agent> dataNodes) {
         this.dataNodes = dataNodes;
     }
 
-    public List<UUID> getTaskTrackers() {
+    public List<Agent> getTaskTrackers() {
         return taskTrackers;
     }
 
-    public void setTaskTrackers(List<UUID> taskTrackers) {
+    public void setTaskTrackers(List<Agent> taskTrackers) {
         this.taskTrackers = taskTrackers;
     }
 
@@ -110,6 +112,15 @@ public class HadoopClusterInfo {
 
     @Override
     public String toString() {
-        return "HadoopClusterInfo{" + "uid=" + uid + ", clusterName=" + clusterName + ", nameNode=" + nameNode + ", secondaryNameNode=" + secondaryNameNode + ", jobTracker=" + jobTracker + ", replicationFactor=" + replicationFactor + ", dataNodes=" + dataNodes + ", taskTrackers=" + taskTrackers + ", ipMask=" + ipMask + '}';
+        return "HadoopClusterInfo{"
+                + "uuid=" + uuid
+                + ", clusterName=" + clusterName
+                + ", nameNode=" + nameNode
+                + ", secondaryNameNode=" + secondaryNameNode
+                + ", jobTracker=" + jobTracker
+                + ", replicationFactor=" + replicationFactor
+                + ", dataNodes=" + dataNodes
+                + ", taskTrackers=" + taskTrackers
+                + ", ipMask=" + ipMask + '}';
     }
 }

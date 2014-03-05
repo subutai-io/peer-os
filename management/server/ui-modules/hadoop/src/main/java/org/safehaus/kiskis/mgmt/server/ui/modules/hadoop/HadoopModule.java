@@ -8,8 +8,6 @@ import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClusterForm;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
@@ -18,10 +16,14 @@ public class HadoopModule implements Module {
 
     public static final String MODULE_NAME = "Hadoop";
     private static final Logger LOG = Logger.getLogger(HadoopModule.class.getName());
-    private TaskRunner taskRunner;
+    private static TaskRunner taskRunner;
 
     public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+        HadoopModule.taskRunner = taskRunner;
+    }
+
+    public static TaskRunner getTaskRunner() {
+        return taskRunner;
     }
 
     @Override
@@ -31,23 +33,22 @@ public class HadoopModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner);
+        return new ModuleComponent();
     }
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    public static class ModuleComponent extends CustomComponent {
 
-        private HadoopWizard hadoopWizard;
-        private ClusterForm hadoopManager;
+        private final HadoopWizard hadoopWizard;
+        private final ClusterForm hadoopManager;
 
-        public ModuleComponent(TaskRunner taskRunner) {
+        public ModuleComponent() {
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
 
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-            hadoopWizard = new HadoopWizard(taskRunner);
+            hadoopWizard = new HadoopWizard();
             hadoopManager = new ClusterForm();
             sheet.addTab(hadoopWizard.getContent(), "Install");
             sheet.addTab(hadoopManager, "Manage");
@@ -55,19 +56,6 @@ public class HadoopModule implements Module {
             verticalLayout.addComponent(sheet);
 
             setCompositionRoot(verticalLayout);
-        }
-
-        @Override
-        public void onCommand(Response response) {
-
-            if (hadoopManager != null) {
-                hadoopManager.getClusterTable().onCommand(response);
-            }
-        }
-
-        @Override
-        public String getName() {
-            return HadoopModule.MODULE_NAME;
         }
     }
 
