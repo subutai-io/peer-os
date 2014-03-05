@@ -16,7 +16,6 @@
 
     <modules>
         <module>agent-manager-impl</module>
-        <module>manager-command</module>
         <module>db-manager-impl</module>
         <module>communication</module>
         <module>task-runner-impl</module>

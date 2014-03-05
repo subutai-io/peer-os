@@ -14,6 +14,7 @@ public class ClusterForm extends Panel {
     private ClusterTable table;
 
     public ClusterForm() {
+
         setSizeFull();
         addComponent(getButtonRefresh());
         addComponent(getTable());
@@ -33,10 +34,6 @@ public class ClusterForm extends Panel {
 
     private ClusterTable getTable() {
         table = new ClusterTable();
-        return table;
-    }
-
-    public ClusterTable getClusterTable(){
         return table;
     }
 }

@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common;
 
-import org.safehaus.kiskis.mgmt.server.command.RequestUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -10,12 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 1/31/14
- * Time: 8:24 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 1/31/14 Time: 8:24 PM
  */
 public class Tasks {
+
     public static Task getInstallTask(List<Agent> agents) {
         Task task = new Task("Setup hadoop deb packages");
 
@@ -25,15 +22,15 @@ public class Tasks {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", agent.getUuid().toString());
 
-                Request request = RequestUtil.getRequest(Commands.INSTALL_DEB, task, map);
-                task.addCommand(new CommandImpl(request));
+                Request request = TaskUtil.createRequest(Commands.INSTALL_DEB, task, map);
+                task.addRequest(request);
             }
         }
 
         return task;
     }
 
-    public static Task getSetMastersTask(List<Agent> agents, Agent nameNode, Agent jobTracker, Integer replicationFactor){
+    public static Task getSetMastersTask(List<Agent> agents, Agent nameNode, Agent jobTracker, Integer replicationFactor) {
         Task task = new Task("Configure hadoop master nodes");
 
         for (Agent agent : agents) {
@@ -46,8 +43,8 @@ public class Tasks {
                 map.put(":jobtracker", jobTracker.getHostname());
                 map.put(":replicationfactor", replicationFactor.toString());
 
-                Request request = RequestUtil.getRequest(Commands.SET_MASTERS, task, map);
-                task.addCommand(new CommandImpl(request));
+                Request request = TaskUtil.createRequest(Commands.SET_MASTERS, task, map);
+                task.addRequest(request);
             }
         }
 
@@ -61,8 +58,8 @@ public class Tasks {
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", nameNode.getUuid().toString());
 
-        Request request = RequestUtil.getRequest(Commands.CLEAR_MASTER, task, map);
-        task.addCommand(new CommandImpl(request));
+        Request request = TaskUtil.createRequest(Commands.CLEAR_MASTER, task, map);
+        task.addRequest(request);
 
         return task;
     }
@@ -74,10 +71,10 @@ public class Tasks {
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", nameNode.getUuid().toString());
 
-        map.put(":secondarynamenode", secondaryNameNode.getUuid().toString());
+        map.put(":secondarynamenode", secondaryNameNode.getHostname());
 
-        Request request = RequestUtil.getRequest(Commands.SET_SECONDARY_NAME_NODE, task, map);
-        task.addCommand(new CommandImpl(request));
+        Request request = TaskUtil.createRequest(Commands.SET_SECONDARY_NAME_NODE, task, map);
+        task.addRequest(request);
 
         return task;
     }
@@ -89,8 +86,8 @@ public class Tasks {
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", nameNode.getUuid().toString());
 
-        Request request = RequestUtil.getRequest(Commands.CLEAR_SLAVES, task, map);
-        task.addCommand(new CommandImpl(request));
+        Request request = TaskUtil.createRequest(Commands.CLEAR_SLAVES, task, map);
+        task.addRequest(request);
 
         return task;
     }
@@ -104,8 +101,8 @@ public class Tasks {
 
         map.put(":slave-hostname", agent.getHostname());
 
-        Request request = RequestUtil.getRequest(Commands.SET_SLAVES, task, map);
-        task.addCommand(new CommandImpl(request));
+        Request request = TaskUtil.createRequest(Commands.SET_SLAVES, task, map);
+        task.addRequest(request);
 
         return task;
     }
@@ -117,8 +114,8 @@ public class Tasks {
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", jobTracker.getUuid().toString());
 
-        Request request = RequestUtil.getRequest(Commands.CLEAR_SLAVES, task, map);
-        task.addCommand(new CommandImpl(request));
+        Request request = TaskUtil.createRequest(Commands.CLEAR_SLAVES, task, map);
+        task.addRequest(request);
 
         return task;
     }
@@ -132,8 +129,8 @@ public class Tasks {
 
         map.put(":slave-hostname", agent.getHostname());
 
-        Request request = RequestUtil.getRequest(Commands.SET_SLAVES, task, map);
-        task.addCommand(new CommandImpl(request));
+        Request request = TaskUtil.createRequest(Commands.SET_SLAVES, task, map);
+        task.addRequest(request);
 
         return task;
     }
@@ -147,8 +144,8 @@ public class Tasks {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", agent.getUuid().toString());
 
-                Request request = RequestUtil.getRequest(Commands.SET_MASTER_KEY, task, map);
-                task.addCommand(new CommandImpl(request));
+                Request request = TaskUtil.createRequest(Commands.SET_MASTER_KEY, task, map);
+                task.addRequest(request);
             }
         }
 
@@ -164,8 +161,8 @@ public class Tasks {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", agent.getUuid().toString());
 
-                Request request = RequestUtil.getRequest(Commands.COPY_MASTER_KEY, task, map);
-                task.addCommand(new CommandImpl(request));
+                Request request = TaskUtil.createRequest(Commands.COPY_MASTER_KEY, task, map);
+                task.addRequest(request);
             }
         }
 
@@ -185,8 +182,8 @@ public class Tasks {
 
                         map.put(":PUB_KEY", key);
 
-                        Request request = RequestUtil.getRequest(Commands.PASTE_MASTER_KEY, task, map);
-                        task.addCommand(new CommandImpl(request));
+                        Request request = TaskUtil.createRequest(Commands.PASTE_MASTER_KEY, task, map);
+                        task.addRequest(request);
                     }
                 }
             }
@@ -204,8 +201,8 @@ public class Tasks {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", agent.getUuid().toString());
 
-                Request request = RequestUtil.getRequest(Commands.SET_MASTER_CONFIG, task, map);
-                task.addCommand(new CommandImpl(request));
+                Request request = TaskUtil.createRequest(Commands.SET_MASTER_CONFIG, task, map);
+                task.addRequest(request);
             }
         }
 
@@ -219,8 +216,8 @@ public class Tasks {
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", nameNode.getUuid().toString());
 
-        Request request = RequestUtil.getRequest(Commands.FORMAT_NAME_NODE, task, map);
-        task.addCommand(new CommandImpl(request));
+        Request request = TaskUtil.createRequest(Commands.FORMAT_NAME_NODE, task, map);
+        task.addRequest(request);
 
         return task;
     }
@@ -234,26 +231,54 @@ public class Tasks {
                 map.put(":source", HadoopModule.MODULE_NAME);
                 map.put(":uuid", agent.getUuid().toString());
 
-                Request request = RequestUtil.getRequest(Commands.READ_HOSTNAME, task, map);
-                task.addCommand(new CommandImpl(request));
+                Request request = TaskUtil.createRequest(Commands.READ_HOSTNAME, task, map);
+                task.addRequest(request);
             }
         }
 
         return task;
     }
 
-    public static Task getPasteHostsTask(HashMap<UUID, String> hosts){
+    public static Task getPasteHostsTask(HashMap<UUID, String> hosts) {
         Task task = new Task("Configuring environment");
 
-        for(UUID id : hosts.keySet()){
+        for (UUID id : hosts.keySet()) {
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", id.toString());
             map.put(":hosts", hosts.get(id));
 
-            Request request = RequestUtil.getRequest(Commands.WRITE_HOSTNAME, task, map);
-            task.addCommand(new CommandImpl(request));
+            Request request = TaskUtil.createRequest(Commands.WRITE_HOSTNAME, task, map);
+            task.addRequest(request);
         }
+
+        return task;
+    }
+
+    public static Task getJobTrackerCommand(HadoopClusterInfo cluster, String command) {
+        Task task = new Task(command + "for Hadoop Job Tracker");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        map.put(":command", command);
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_JOB_TRACKER, task, map);
+        task.addRequest(request);
+
+        return task;
+    }
+    
+    public static Task getNameNodeCommand(HadoopClusterInfo cluster, String command) {
+        Task task = new Task(command + "for Hadoop Name Node");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getNameNode().getUuid().toString());
+        map.put(":command", command);
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_NAME_NODE, task, map);
+        task.addRequest(request);
 
         return task;
     }

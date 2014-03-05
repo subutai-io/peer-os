@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraClusterInfo;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraConfig;
@@ -13,7 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.LinkedList;
 import java.util.Queue;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.CassandraModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraCommandEnum;
 

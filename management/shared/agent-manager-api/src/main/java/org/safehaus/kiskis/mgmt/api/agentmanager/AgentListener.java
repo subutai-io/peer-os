@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.protocol.api.ui;
+package org.safehaus.kiskis.mgmt.api.agentmanager;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;

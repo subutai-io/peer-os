@@ -4,8 +4,6 @@ import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ui.CommandListener;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.SomeApi;
 
@@ -23,8 +21,7 @@ public class ClientModule implements Module {
         this.someApi = someApi;
     }
 
-    public static class ModuleComponent extends CustomComponent implements
-            CommandListener {
+    public static class ModuleComponent extends CustomComponent {
 
         public ModuleComponent(final SomeApi someApi) {
 
@@ -54,15 +51,6 @@ public class ClientModule implements Module {
             verticalLayout.addComponent(t);
 
             setCompositionRoot(verticalLayout);
-        }
-
-        @Override
-        public void onCommand(Response response) {
-        }
-
-        @Override
-        public String getName() {
-            return MODULE_NAME;
         }
 
         public Iterable<Agent> getLxcList() {

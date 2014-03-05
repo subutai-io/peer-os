@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol;
+package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao;
 
 import java.util.List;
 import java.util.UUID;

@@ -20,7 +20,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClustersTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
@@ -72,23 +71,20 @@ public class StepStart extends Panel {
 //                }
 
                 if (selectedItem != null) {
-                    UUID uid = (UUID) selectedItem.getItemProperty(HadoopClusterInfo.UUID_LABEL).getValue();
-                    HadoopClusterInfo cluster = OozieDAO.getHadoopClusterInfo(uid);
+                    String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
+                    HadoopClusterInfo cluster = OozieDAO.getHadoopClusterInfo(clusterName);
 
-                    Set<UUID> taskTrackers = new HashSet<UUID>();
+                    Set<Agent> taskTrackers = new HashSet<Agent>();
                     taskTrackers.add(cluster.getJobTracker());
 
-                    Set<UUID> nodes = new HashSet<UUID>(cluster.getDataNodes());
+                    Set<Agent> nodes = new HashSet<Agent>(cluster.getDataNodes());
                     nodes.add(cluster.getNameNode());
                     nodes.add(cluster.getSecondaryNameNode());
                     nodes.addAll(cluster.getTaskTrackers());
-                    
-                    Set<Agent> servers = OozieDAO.getAgents(taskTrackers);
-                    Set<Agent> clients = OozieDAO.getAgents(nodes);
 
                     wizard.getConfig().reset();
-                    wizard.getConfig().setServer(servers.iterator().next());
-                    wizard.getConfig().setClients(clients);
+                    wizard.getConfig().setServer(taskTrackers.iterator().next());
+                    wizard.getConfig().setClients(nodes);
                     wizard.next();
                 } else {
                     show("Please select Hadoop cluster first");
@@ -108,7 +104,7 @@ public class StepStart extends Panel {
 
         hl.addComponent(refresh);
         hl.addComponent(next);
-        
+
         gridLayout.addComponent(hl, 6, 4, 6, 4);
         gridLayout.setComponentAlignment(refresh, Alignment.BOTTOM_RIGHT);
         addComponent(gridLayout);

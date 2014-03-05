@@ -15,11 +15,10 @@ public enum HBaseCommandEnum {
     STOP("service hbase stop", 120),
     STATUS("service hbase status", 120),
     INSTALL("apt-get --assume-yes --force-yes install ksks-hbase", 120),
-    // Should be replaced with HBASE_HOME!
-    SET_MASTER("sh /opt/hbase-0.94.11/scripts/master.sh", 120),
-    SET_REGION("sh /opt/hbase-0.94.11/scripts/region.sh", 120),
-    SET_QUORUM("sh /opt/hbase-0.94.11/scripts/quorum.sh", 120),
-    SET_BACKUP_MASTERS("sh /opt/hbase-0.94.11/scripts/backUpMasters.sh", 120),
+    SET_MASTER(". /etc/profile && $HBASE_HOME/scripts/master.sh", 120),
+    SET_REGION(". /etc/profile && $HBASE_HOME/scripts/region.sh", 120),
+    SET_QUORUM(". /etc/profile && $HBASE_HOME/scripts/quorum.sh", 120),
+    SET_BACKUP_MASTERS(". /etc/profile && $HBASE_HOME/scripts/backUpMasters.sh", 120),
     PURGE("apt-get --assume-yes --force-yes purge ksks-hbase", 120),
     MANAGE("manage", 120);
 

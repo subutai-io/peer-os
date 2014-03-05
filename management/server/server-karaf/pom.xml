@@ -408,11 +408,6 @@
                                 <!--Core Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-command</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-server-communication</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
