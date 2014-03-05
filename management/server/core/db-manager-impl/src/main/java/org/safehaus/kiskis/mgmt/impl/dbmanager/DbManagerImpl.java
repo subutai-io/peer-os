@@ -57,11 +57,11 @@ public class DbManagerImpl implements DbManager {
 
     public void destroy() {
         try {
-            session.shutdown();
+            session.close();
         } catch (Exception e) {
         }
         try {
-            cluster.shutdown();
+            cluster.close();
         } catch (Exception e) {
         }
         LOG.log(Level.INFO, "DbManager stopped");
