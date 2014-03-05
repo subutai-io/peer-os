@@ -169,6 +169,11 @@
             <artifactId>jersey-core</artifactId>
             <version>1.18.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.18.1</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -554,6 +559,11 @@
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
+                                    <version>1.18.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-server</artifactId>
                                     <version>1.18.1</version>
                                 </artifactItem>
                                 
