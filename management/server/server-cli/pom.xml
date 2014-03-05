@@ -32,7 +32,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>org.safehaus.kiskis.mgmt*;version=${project.version}</Export-Package>
+                        <Export-Package>org.safehaus.kiskis.mgmt.impl*;version=${project.version}</Export-Package>
                         <Import-Package>!${project.artifactId}*,
                             org.apache.felix.service.command,
                             org.apache.felix.gogo.commands,

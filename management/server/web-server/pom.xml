@@ -47,7 +47,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Version>${project.version}</Bundle-Version>
-                        <Export-Package>org.safehaus.kiskis.mgmt*;version=${project.version}</Export-Package>
+                        <Export-Package>org.safehaus.kiskis.mgmt.web.server*;version=${project.version}</Export-Package>
                         <Import-Package>*</Import-Package>
                     </instructions>
                 </configuration>
