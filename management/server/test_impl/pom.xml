@@ -58,8 +58,8 @@
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>api-module</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <type>jar</type>
-            <exclusions>
+            <!--<type>jar</type>-->
+<!--            <exclusions>
                 <exclusion>
                     <artifactId>ui-vaadin</artifactId>
                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -72,7 +72,7 @@
                     <artifactId>mgmt-shared-protocol</artifactId>
                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                 </exclusion>
-            </exclusions>
+            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
