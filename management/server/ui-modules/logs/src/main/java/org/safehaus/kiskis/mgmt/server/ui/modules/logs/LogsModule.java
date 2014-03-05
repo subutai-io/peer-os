@@ -36,8 +36,8 @@ public class LogsModule implements Module {
 //            sheet.setSizeFull();
             final TextArea t = new TextArea();
             t.setSizeFull();
-            Button b = new Button("Get System Logs");
-            b.addListener(new Button.ClickListener() {
+            Button getlogs = new Button("Get System Logs");
+            getlogs.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
@@ -52,7 +52,17 @@ public class LogsModule implements Module {
                 }
             });
 
-            verticalLayout.addComponent(b);
+            Button putlogs = new Button("Put logs");
+            putlogs.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    someApi.writeLog("some new logs");
+                }
+            });
+
+            verticalLayout.addComponent(putlogs);
+            verticalLayout.addComponent(getlogs);
             verticalLayout.addComponent(t);
 
             setCompositionRoot(verticalLayout);

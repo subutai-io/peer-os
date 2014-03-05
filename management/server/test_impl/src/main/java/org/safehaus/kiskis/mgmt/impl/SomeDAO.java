@@ -32,7 +32,6 @@ public class SomeDAO {
 
     public void writeLog(String log) {
         saveLog(log);
-
     }
 
     public void saveLog(String log) {
@@ -49,14 +48,6 @@ public class SomeDAO {
             list.add(data);
         }
         return list;
-    }
-
-    public Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Object o = ois.readObject();
-        ois.close();
-        return o;
     }
 
 }
