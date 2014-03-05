@@ -555,7 +555,7 @@
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
-                                    <version>${jersey-core.version}</version>
+                                    <version>1.18.1</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 
