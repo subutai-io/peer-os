@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.api;
 
+import java.util.List;
+
 /**
  *
  * @author bahadyr
@@ -24,5 +26,9 @@ public interface SomeApi {
     public boolean purge(String serviceName);
     
     public boolean runCommand(String program);
+    
+    public void writeLog(String log);
+    
+    public List<String> getLogs();
 
 }

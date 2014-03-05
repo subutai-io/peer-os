@@ -19,6 +19,6 @@ public class PurgeCommand extends OsgiCommandSupport {
     protected Object doExecute() throws Exception {
         System.out.println("Executing purge command");
         return null;
-
-    }
+ 
+   }
 }
