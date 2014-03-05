@@ -376,7 +376,7 @@
                                 <artifactItem>
                                     <groupId>net.jpountz.lz4</groupId>
                                     <artifactId>lz4</artifactId>
-                                    <version>${lz4.version}</version>
+                                    <version>1.2.0</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.google.guava</groupId>
@@ -386,22 +386,22 @@
                                 <artifactItem>
                                     <groupId>io.netty</groupId>
                                     <artifactId>netty</artifactId>
-                                    <version>${netty.version}</version>
+                                    <version>3.9.0.Final</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.codahale.metrics</groupId>
                                     <artifactId>metrics-core</artifactId>
-                                    <version>${metrics-core.version}</version>
+                                    <version>3.0.2</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-core-asl</artifactId>
-                                    <version>${jackson-core-asl.version}</version>
+                                    <version>1.9.13</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-mapper-asl</artifactId>
-                                    <version>${jackson-mapper-asl.version}</version>
+                                    <version>1.9.13</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.commons</groupId>
@@ -480,47 +480,47 @@
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin</artifactId>
-                                    <version>${vaadin.version}</version>
+                                    <version>6.8.14</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-all</artifactId>
-                                    <version>${activemq.version}</version>
+                                    <version>5.9.0</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-pool</artifactId>
-                                    <version>${activemq.version}</version>
+                                    <version>5.9.0</version>
                                 </artifactItem>                                
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-jms-pool</artifactId>
-                                    <version>${activemq.version}</version>
+                                    <version>5.9.0</version>
                                 </artifactItem>              
                                 <artifactItem>
                                     <groupId>commons-pool</groupId>
                                     <artifactId>commons-pool</artifactId>
-                                    <version>${commons-pool.version}</version>
+                                    <version>1.6</version>
                                 </artifactItem>                                                    
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-jaas</artifactId>
-                                    <version>${activemq.version}</version>
+                                    <version>5.9.0</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>commons-net</groupId>
                                     <artifactId>commons-net</artifactId>
-                                    <version>${commons-net.version}</version>
+                                    <version>3.3</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.geronimo.specs</groupId>
                                     <artifactId>geronimo-jms_1.1_spec</artifactId>
-                                    <version>${geronimo.version}</version>
+                                    <version>1.1.1</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>geronimo-spec</groupId>
                                     <artifactId>geronimo-spec-ejb</artifactId>
-                                    <version>${geronimo-spec.version}</version>
+                                    <version>2.1-rc4</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>javax.jmdns</groupId>
@@ -545,12 +545,12 @@
                                 <artifactItem>
                                     <groupId>org.apache.karaf.shell</groupId>
                                     <artifactId>org.apache.karaf.shell.console</artifactId>
-                                    <version>${org.apache.karaf.shell.console.version}</version>
+                                    <version>2.3.3</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.runtime</artifactId>
-                                    <version>${org.apache.felix.gogo.runtime.version}</version>
+                                    <version>0.4.0</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
