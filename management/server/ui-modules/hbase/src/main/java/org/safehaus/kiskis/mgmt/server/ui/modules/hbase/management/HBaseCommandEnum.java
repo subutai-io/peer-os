@@ -23,7 +23,6 @@ public enum HBaseCommandEnum {
     MANAGE("manage", 120);
 
     String program;
-    //String yaml = "/opt/cassandra-2.0.3/conf/cassandra.yaml";
     int timeout;
 
     private HBaseCommandEnum(String program, int timeout) {

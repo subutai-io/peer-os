@@ -115,7 +115,7 @@ public class ServiceInstaller implements TaskCallback {
 //
 //        }
 //    }
-    private void saveHBaseInfo() {
+    private void saveInfo() {
         if (OozieDAO.saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");
         }
@@ -135,7 +135,7 @@ public class ServiceInstaller implements TaskCallback {
                 return currentTask;
             } else {
                 terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-                saveHBaseInfo();
+                saveInfo();
             }
         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
             terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");

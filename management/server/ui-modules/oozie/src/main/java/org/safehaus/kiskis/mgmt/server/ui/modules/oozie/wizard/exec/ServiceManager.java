@@ -38,7 +38,7 @@ public class ServiceManager {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
-    private OozieTable oozieTable;
+    private final OozieTable oozieTable;
 
     public ServiceManager(OozieTable oozieTable) {
         this.oozieTable = oozieTable;
