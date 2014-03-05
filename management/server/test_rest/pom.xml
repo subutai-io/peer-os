@@ -32,7 +32,8 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.impl</Bundle-SymbolicName>
-                        
+                        <!--test-->
+                        <Export-Package>org.safehaus.kiskis.mgmt.rest*</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>

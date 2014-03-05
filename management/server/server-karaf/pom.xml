@@ -479,11 +479,11 @@
                                     <artifactId>cli-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--                                <artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>rest-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
                                 <!--Shared Dependencies-->
 
                                 <artifactItem>

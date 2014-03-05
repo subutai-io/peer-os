@@ -36,7 +36,7 @@
         <module>test_api</module>
         <module>test_impl</module>
         <module>server-cli</module>
-        <!--<module>test_rest</module>-->
+        <module>test_rest</module>
         <module>server-karaf</module>
     </modules>
 
