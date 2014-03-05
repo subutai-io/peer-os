@@ -95,11 +95,6 @@ public class CommunicationServiceImpl implements CommunicationService {
         this.amqInactiveQueuesDropTimeoutSec = amqInactiveQueuesDropTimeoutSec;
     }
 
-    @Override
-    public void sendCommand(Command command) {
-        exec.submit(new CommandProducer(command));
-    }
-
     public void sendRequest(Request request) {
         exec.submit(new CommandProducer(new CommandImpl(request)));
     }

@@ -27,7 +27,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
@@ -90,8 +90,8 @@ public class DestroyDataNodeCallback implements TaskCallback {
 //                    parentWindow.showNotification("Failed: Could not find primary node");
 //                } else {
                 if (primaryNodeAgent != null && primaryNodeAgent.getUuid().compareTo(nodeAgent.getUuid()) != 0) {
-                    Command unregisterSecondaryFromPrimaryCmd = op.peekNextTask().getCommands().iterator().next();
-                    unregisterSecondaryFromPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
+                    Request unregisterSecondaryFromPrimaryCmd = op.peekNextTask().getRequests().iterator().next();
+                    unregisterSecondaryFromPrimaryCmd.setUuid(primaryNodeAgent.getUuid());
                 } else {
                     //skip unregister command
                     op.getNextTask();

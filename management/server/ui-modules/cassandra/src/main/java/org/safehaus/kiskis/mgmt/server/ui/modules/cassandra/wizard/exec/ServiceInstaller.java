@@ -142,7 +142,7 @@ public class ServiceInstaller {
         terminal.setValue("Cassandra cluster installation started...\n");
         moveToNextTask();
         if (currentTask != null) {
-            terminal.setValue(terminal.getValue() + currentTask.peekNextCommand().getRequest().getProgram() + "\n");
+            terminal.setValue(terminal.getValue() + currentTask.peekNextRequest().getProgram() + "\n");
 
             CassandraModule.getTaskRunner().executeTask(currentTask, new TaskCallback() {
 
@@ -154,7 +154,7 @@ public class ServiceInstaller {
                         if (currentTask != null) {
 
                             terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
-                            terminal.setValue(terminal.getValue() + currentTask.peekNextCommand().getRequest().getProgram() + "\n");
+                            terminal.setValue(terminal.getValue() + currentTask.peekNextRequest().getProgram() + "\n");
 //                            for (Request command : currentTask.getCommands()) {
 //                                executeCommand(command);
 //                            }

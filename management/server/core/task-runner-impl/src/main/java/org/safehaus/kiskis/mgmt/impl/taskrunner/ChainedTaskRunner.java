@@ -40,14 +40,14 @@ public class ChainedTaskRunner {
                     tl.appendStreams(response);
 
                     if (Util.isFinalResponse(response)) {
-                        tl.getTask().incrementCompletedCommandsCount();
+                        tl.getTask().incrementCompletedRequestsCount();
                         if (response.getExitCode() != null && response.getExitCode() == 0) {
-                            tl.getTask().incrementSucceededCommandsCount();
+                            tl.getTask().incrementSucceededRequestsCount();
                         }
-                        if (tl.getTask().getCompletedCommandsCount() == tl.getTask().getLaunchedCommandsCount()) {
+                        if (tl.getTask().getCompletedRequestsCount() == tl.getTask().getLaunchedRequestsCount()) {
                             tl.getTask().setCompleted(true);
                             if (tl.getTask().isIgnoreExitCode()
-                                    || tl.getTask().getCompletedCommandsCount() == tl.getTask().getSucceededCommandsCount()) {
+                                    || tl.getTask().getCompletedRequestsCount() == tl.getTask().getSucceededRequestsCount()) {
                                 tl.getTask().setTaskStatus(TaskStatus.SUCCESS);
                             } else {
                                 tl.getTask().setTaskStatus(TaskStatus.FAIL);
@@ -90,13 +90,13 @@ public class ChainedTaskRunner {
     public void executeTask(Task task, TaskCallback taskCallback) {
         try {
             if (task != null && task.getUuid() != null) {
-                if (taskListenerCache.get(task.getUuid()) == null && task.hasNextCommand()) {
+                if (taskListenerCache.get(task.getUuid()) == null && task.hasNextRequest()) {
                     if (taskCallback != null) {
                         taskListenerCache.put(task.getUuid(),
                                 new ChainedTaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
                     }
-                    while (task.hasNextCommand()) {
-                        communicationService.sendCommand(task.getNextCommand());
+                    while (task.hasNextRequest()) {
+                        communicationService.sendRequest(task.getNextRequest());
                     }
                 } else {
                     throw new Exception("This task is already queued or has no more commands");
