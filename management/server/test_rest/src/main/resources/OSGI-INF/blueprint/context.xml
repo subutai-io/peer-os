@@ -33,7 +33,7 @@
     <!-- 4 -->
     <!-- This has to point to the service registered through serviceimpl.xml in the service.impl project -->
 
-    
     <reference id="someApi" availability="mandatory" interface="org.safehaus.kiskis.mgmt.api.SomeApi"/>    
+    
 
 </blueprint>
