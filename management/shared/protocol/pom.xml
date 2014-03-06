@@ -45,17 +45,17 @@
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>2.0.0-rc1</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>2.0.3</version>
+            <version>2.0.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-thrift</artifactId>
-            <version>2.0.3</version>
+            <version>2.0.5</version>
         </dependency>
         <dependency>
             <groupId>net.jpountz.lz4</groupId>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>3.7.0.Final</version>
+            <version>3.9.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.2</version>
         </dependency>
         <!-- Compression libraries for the protocol. -->
         <!-- Each of them is only a mandatory runtime dependency if you want to use the compression it offers -->
@@ -96,9 +96,9 @@
     <build>
         <plugins>
             <plugin>
-                <version>2.4.0</version>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.7</version>
                 <inherited>true</inherited>
                 <extensions>true</extensions>
                 <configuration>

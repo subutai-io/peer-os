@@ -9,10 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>cli-module</artifactId>
+    <artifactId>rest-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management CLI</name>
-    <description>Kiskis Management CLI</description>
+    <name>Kiskis Management REST</name>
+    <description>Kiskis Management REST</description>
 
     <build>
         <plugins>
@@ -31,15 +31,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>org.safehaus.kiskis.mgmt.impl*;version=${project.version}</Export-Package>
-                        <Import-Package>!${project.artifactId}*,
-                            org.apache.felix.service.command,
-                            org.apache.felix.gogo.commands,
-                            org.apache.karaf.shell.console,
-                            *
-                        </Import-Package>
-                        <Private-Package>!*</Private-Package>
+                        <Bundle-SymbolicName>${project.groupId}.impl</Bundle-SymbolicName>
+                        <!--test-->
+                        <!--<Export-Package>org.safehaus.kiskis.mgmt.rest*</Export-Package>-->
                     </instructions>
                 </configuration>
             </plugin>
@@ -50,7 +44,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${osgi.version}</version>
+            <version>4.3.1</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -60,29 +54,37 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>${servlet.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.shell</groupId>
-            <artifactId>org.apache.karaf.shell.console</artifactId>
-            <version>2.3.3</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix.gogo</groupId>
-            <artifactId>org.apache.felix.gogo.runtime</artifactId>
-            <version>0.4.0</version>
+            <version>2.5</version>
         </dependency>
         <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>api-module</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <type>jar</type>
+<!--            <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ui-vaadin</artifactId>
+                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ui-vaadin-services</artifactId>
+                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>mgmt-shared-protocol</artifactId>
+                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                </exclusion>
+            </exclusions>-->
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.18.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.18.1</version>
         </dependency>
     </dependencies>
 

@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vaadin.version>6.8.12</vaadin.version>
+        <vaadin.version>6.8.14</vaadin.version>
         <gwt.version>2.3.0</gwt.version>
         <gwt.plugin.version>2.2.0</gwt.plugin.version>
         <servlet.version>2.5</servlet.version>
@@ -35,6 +35,7 @@
         <module>ui-modules</module>
         <module>test_api</module>
         <module>test_impl</module>
+        <module>test_rest</module>
         <module>server-cli</module>
         <module>server-karaf</module>
     </modules>
