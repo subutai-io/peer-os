@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 //import java.util.ListIterator;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 /**
  * @author bahadyr
@@ -24,7 +23,7 @@ public class Task implements Serializable {
     private String description;
     private volatile TaskStatus taskStatus;
     private Integer reqSeqNumber;
-    private final List<Command> commands;
+    private final List<Request> requests;
     private boolean ignoreExitCode = false;
     private volatile boolean completed = false;
     private int currentCmdId = -1;
@@ -36,7 +35,7 @@ public class Task implements Serializable {
         taskStatus = TaskStatus.NEW;
         uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
         reqSeqNumber = 0;
-        commands = new ArrayList<Command>();
+        requests = new ArrayList<Request>();
     }
 
     public Task(String description) {
@@ -52,84 +51,76 @@ public class Task implements Serializable {
         this.data = data;
     }
 
-    public void incrementCompletedCommandsCount() {
+    public void incrementCompletedRequestsCount() {
         completedCommandsCount++;
     }
 
-    public void incrementSucceededCommandsCount() {
+    public void incrementSucceededRequestsCount() {
         succeededCommandsCount++;
     }
 
-    public int getCompletedCommandsCount() {
+    public int getCompletedRequestsCount() {
         return completedCommandsCount;
     }
 
-    public int getSucceededCommandsCount() {
+    public int getSucceededRequestsCount() {
         return succeededCommandsCount;
-    }
-
-    public void addCommand(Command command) {
-        if (command != null) {
-            command.getRequest().setTaskUuid(uuid);
-            command.getRequest().setRequestSequenceNumber(getIncrementedReqSeqNumber());
-            commands.add(command);
-        }
     }
 
     public void addRequest(Request request) {
         if (request != null) {
             request.setTaskUuid(uuid);
             request.setRequestSequenceNumber(getIncrementedReqSeqNumber());
-            commands.add(new CommandImpl(request));
+            requests.add(request);
         }
     }
 
     public int getTotalTimeout() {
         int timeout = 0;
-        for (Command cmd : commands) {
-            timeout += cmd.getRequest().getTimeout();
+        for (Request cmd : requests) {
+            timeout += cmd.getTimeout();
         }
         return timeout;
     }
 
     public int getAvgTimeout() {
-        return commands.size() > 0 ? getTotalTimeout() / commands.size() : 0;
+        return requests.size() > 0 ? getTotalTimeout() / requests.size() : 0;
     }
 
-    public Command getNextCommand() {
-        if (hasNextCommand()) {
-            return commands.get(++currentCmdId);
+    public Request getNextRequest() {
+        if (hasNextRequest()) {
+            return requests.get(++currentCmdId);
         }
 
         return null;
     }
 
-    public Command peekNextCommand() {
-        if (hasNextCommand()) {
-            return commands.get(currentCmdId + 1);
+    public Request peekNextRequest() {
+        if (hasNextRequest()) {
+            return requests.get(currentCmdId + 1);
         }
         return null;
     }
 
-    public Command peekPreviousCommand() {
+    public Request peekPreviousRequest() {
         if (currentCmdId > 0) {
-            return commands.get(currentCmdId - 1);
+            return requests.get(currentCmdId - 1);
         }
         return null;
     }
 
-    public Command peekCurrentCommand() {
+    public Request peekCurrentRequest() {
         if (currentCmdId >= 0) {
-            return commands.get(currentCmdId);
+            return requests.get(currentCmdId);
         }
         return null;
     }
 
-    public boolean hasNextCommand() {
-        return currentCmdId < commands.size() - 1;
+    public boolean hasNextRequest() {
+        return currentCmdId < requests.size() - 1;
     }
 
-    public int getLaunchedCommandsCount() {
+    public int getLaunchedRequestsCount() {
         return currentCmdId + 1;
     }
 
@@ -149,8 +140,8 @@ public class Task implements Serializable {
         this.completed = completed;
     }
 
-    public List<Command> getCommands() {
-        return Collections.unmodifiableList(commands);
+    public List<Request> getRequests() {
+        return Collections.unmodifiableList(requests);
     }
 
     public Integer getIncrementedReqSeqNumber() {

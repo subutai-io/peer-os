@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
@@ -126,8 +126,8 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             });
         }
 
-        for (Command cmd : task.getCommands()) {
-            cmd.getRequest().setSource(MODULE_NAME);
+        for (Request cmd : task.getRequests()) {
+            cmd.setSource(MODULE_NAME);
         }
 
         executor.execute(new Runnable() {

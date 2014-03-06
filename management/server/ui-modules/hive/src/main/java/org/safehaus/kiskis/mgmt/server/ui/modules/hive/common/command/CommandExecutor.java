@@ -3,10 +3,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command;
 import org.apache.commons.lang3.StringUtils;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.Hive;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 public class CommandExecutor implements TaskCallback {
 
@@ -16,7 +16,7 @@ public class CommandExecutor implements TaskCallback {
 
     public static final CommandExecutor INSTANCE = new CommandExecutor();
 
-    public void execute(Command command, CommandAction commandAction) {
+    public void execute(Request command, CommandAction commandAction) {
         reset(commandAction);
         execute(command);
     }
@@ -27,9 +27,9 @@ public class CommandExecutor implements TaskCallback {
         this.commandAction = commandAction;
     }
 
-    private void execute(Command command) {
+    private void execute(Request command) {
         Task task = new Task();
-        task.addCommand(command);
+        task.addRequest(command);
 
         Hive.getTaskRunner().executeTask(task, INSTANCE);
     }

@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.command;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.chain.Context;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
@@ -15,11 +15,11 @@ public class CommandBuilder {
         CommandBuilder.source = source;
     }
 
-    public static Command getCommand(Context context, String commandLine) {
+    public static Request getCommand(Context context, String commandLine) {
 
         Agent agent = context.get("agent");
 
-        return CommandFactory.createRequest(
+        return CommandFactory.newRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 agent.getUuid(), // agent uuid
                 source, // source
@@ -34,7 +34,7 @@ public class CommandBuilder {
                 "root", // runas
                 null, // arg
                 null, // env vars
-                30  // timeout
+                30 // timeout
         );
     }
 }

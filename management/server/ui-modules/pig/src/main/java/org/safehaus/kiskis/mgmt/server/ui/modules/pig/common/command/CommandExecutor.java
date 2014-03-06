@@ -3,7 +3,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.pig.common.command;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.pig.Pig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 public class CommandExecutor implements TaskCallback {
 
@@ -13,7 +12,7 @@ public class CommandExecutor implements TaskCallback {
 
     public static final CommandExecutor INSTANCE = new CommandExecutor();
 
-    public void execute(Command command, CommandAction commandAction) {
+    public void execute(Request command, CommandAction commandAction) {
         reset(commandAction);
         execute(command);
     }
@@ -24,9 +23,9 @@ public class CommandExecutor implements TaskCallback {
         this.commandAction = commandAction;
     }
 
-    private void execute(Command command) {
+    private void execute(Request command) {
         Task task = new Task();
-        task.addCommand(command);
+        task.addRequest(command);
 
         Pig.getTaskRunner().executeTask(task, this);
     }

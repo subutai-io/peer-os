@@ -15,7 +15,6 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
@@ -164,11 +163,11 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
             for (Agent physAgent : physicalAgents) {
                 List<String> lxcNames = new ArrayList<String>();
-                for (Command cmd : task.getCommands()) {
-                    if (cmd.getRequest().getUuid().compareTo(physAgent.getUuid()) == 0) {
+                for (Request cmd : task.getRequests()) {
+                    if (cmd.getUuid().compareTo(physAgent.getUuid()) == 0) {
                         String lxcHostname
-                                = cmd.getRequest().getArgs().get(cmd.getRequest().getArgs().size() - 1);
-                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequest().getRequestSequenceNumber(),
+                                = cmd.getArgs().get(cmd.getArgs().size() - 1);
+                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequestSequenceNumber(),
                                 lxcHostname);
 
                         lxcNames.add(lxcHostname);

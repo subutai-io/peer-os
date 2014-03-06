@@ -8,8 +8,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
  */
 public interface CommunicationService {
 
-    public void sendCommand(Command command);
-
     public void sendRequest(Request request);
 
     public void addListener(ResponseListener listener);

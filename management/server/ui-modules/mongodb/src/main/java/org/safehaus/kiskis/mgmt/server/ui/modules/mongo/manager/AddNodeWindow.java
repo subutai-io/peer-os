@@ -42,7 +42,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -226,8 +226,8 @@ public class AddNodeWindow extends Window {
                             }
 
                             if (primaryNodeAgent != null) {
-                                Command registerSecondaryWithPrimaryCmd = operation.peekNextTask().getCommands().iterator().next();
-                                registerSecondaryWithPrimaryCmd.getRequest().setUuid(primaryNodeAgent.getUuid());
+                                Request registerSecondaryWithPrimaryCmd = operation.peekNextTask().getRequests().iterator().next();
+                                registerSecondaryWithPrimaryCmd.setUuid(primaryNodeAgent.getUuid());
                             } else {
                                 task.setTaskStatus(TaskStatus.FAIL);
                             }
