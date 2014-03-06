@@ -585,11 +585,6 @@
                                 </artifactItem>
                                 <!--Web Server-->
                                 
-                                <!--  <artifactItem>
-                                    <groupId>org.xerial.snappy</groupId>
-                                    <artifactId>snappy-java</artifactId>
-                                    <version>1.1.0-M4</version>
-                                </artifactItem>                                -->
                             </artifactItems>
                         </configuration>
                     </execution>
