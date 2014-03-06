@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${osgi.version}</version>
+            <version>4.3.1</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -60,8 +60,8 @@
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>api-module</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <!--<type>jar</type>-->
-<!--            <exclusions>
+<!--            <type>jar</type>
+            <exclusions>
                 <exclusion>
                     <artifactId>ui-vaadin</artifactId>
                     <groupId>org.safehaus.kiskis.mgmt</groupId>
