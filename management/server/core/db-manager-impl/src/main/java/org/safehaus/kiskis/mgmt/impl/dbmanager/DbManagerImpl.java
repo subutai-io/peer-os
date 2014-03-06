@@ -15,6 +15,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -32,6 +34,7 @@ public class DbManagerImpl implements DbManager {
     private String cassandraHost;
     private String cassandraKeyspace;
     private int cassandraPort;
+    private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
 
     public void setCassandraKeyspace(String cassandraKeyspace) {
         this.cassandraKeyspace = cassandraKeyspace;
@@ -69,7 +72,11 @@ public class DbManagerImpl implements DbManager {
 
     public ResultSet executeQuery(String cql, Object... values) {
         try {
-            PreparedStatement stmt = session.prepare(cql);
+            PreparedStatement stmt = statements.get(cql);
+            if (stmt == null) {
+                stmt = session.prepare(cql);
+                statements.put(cql, stmt);
+            }
             BoundStatement boundStatement = new BoundStatement(stmt);
             if (values != null && values.length > 0) {
                 boundStatement.bind(values);
@@ -83,7 +90,11 @@ public class DbManagerImpl implements DbManager {
 
     public void executeUpdate(String cql, Object... values) {
         try {
-            PreparedStatement stmt = session.prepare(cql);
+            PreparedStatement stmt = statements.get(cql);
+            if (stmt == null) {
+                stmt = session.prepare(cql);
+                statements.put(cql, stmt);
+            }
             BoundStatement boundStatement = new BoundStatement(stmt);
             if (values != null && values.length > 0) {
                 boundStatement.bind(values);
