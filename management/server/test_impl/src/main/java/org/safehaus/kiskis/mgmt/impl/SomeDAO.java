@@ -36,7 +36,11 @@ public class SomeDAO {
 
     public void saveLog(String log) {
         String cql = "insert into logs (id, log) values (?,?)";
-        dbManager.executeUpdate(cql, System.currentTimeMillis() + "", log);
+        try {
+            dbManager.executeUpdate(cql, System.currentTimeMillis() + "", log);
+        } catch (Exception e) {
+            System.out.println("can not write to cassandra");
+        }
     }
 
     public List<String> getLogs() {
