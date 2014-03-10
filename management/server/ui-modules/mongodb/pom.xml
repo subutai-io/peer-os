@@ -85,9 +85,9 @@
             <version>${javax.annotation.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${javax.servlet.version}</version>
+            <groupId>org.eclipse.jetty.orbit</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>${org.eclipse.jetty.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>

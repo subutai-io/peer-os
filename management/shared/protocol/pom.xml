@@ -25,9 +25,9 @@
             <version>${com.google.code.gson.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.eaio.uuid</groupId>
-            <artifactId>uuid</artifactId>
-            <version>${com.eaio.uuid.version}</version>
+            <groupId>org.doomdark</groupId>
+            <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+            <version>${org.doomdark.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -43,11 +43,6 @@
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>${org.apache.cassandra.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-thrift</artifactId>
             <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
@@ -70,15 +65,11 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>${org.codehaus.jackson.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${com.codahale.metrics.metrics-core.version}</version>
         </dependency>
-        <!-- Compression libraries for the protocol. -->
-        <!-- Each of them is only a mandatory runtime dependency if you want to use the compression it offers -->
-
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>

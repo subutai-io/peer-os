@@ -47,16 +47,10 @@
             <artifactId>javax.annotation-api</artifactId>
             <version>${javax.annotation.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${javax.servlet.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>org.eclipse.jetty.orbit</groupId>
             <artifactId>javax.servlet</artifactId>
-            <version>3.0.0.v201112011016</version>
+            <version>${org.eclipse.jetty.orbit.version}</version>
         </dependency>
     </dependencies>
-
 </project>

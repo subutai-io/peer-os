@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.io.Serializable;
@@ -34,7 +35,7 @@ public class Task implements Serializable {
 
     public Task() {
         taskStatus = TaskStatus.NEW;
-        uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
         reqSeqNumber = 0;
         requests = new ArrayList<>();
     }

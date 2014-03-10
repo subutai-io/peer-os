@@ -5,14 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop;
 
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-
-import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 /**
  * @author dilshat

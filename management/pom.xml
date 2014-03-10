@@ -33,6 +33,18 @@
             <id>eaio.com</id>
             <url>http://eaio.com/maven2</url>
         </repository>
+
+        <repository>
+            <id>repository.springsource.com.release</id>
+            <name>SpringSource OBR - Release</name>
+            <url>http://repository.springsource.com/maven/bundles/release</url>
+        </repository>
+
+        <repository>
+            <id>repository.springsource.com.external</id>
+            <name>SpringSource OBR - External</name>
+            <url>http://repository.springsource.com/maven/bundles/external</url>
+        </repository>
     </repositories>
 
     <properties>
@@ -50,25 +62,26 @@
         <io.netty.version>3.9.0.Final</io.netty.version>
         <javax.annotation.version>1.2</javax.annotation.version>
         <javax.jmdns.version>3.4.1</javax.jmdns.version>
-        <javax.servlet.version>2.5</javax.servlet.version>
-        <junit.version>4.10</junit.version>
+        <junit.version>4.11</junit.version>
         <karaf.version>2.3.3</karaf.version>
         <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
         <net.jpountz.lz4.version>1.2.0</net.jpountz.lz4.version>
         <org.apache.activemq.version>5.9.0</org.apache.activemq.version>
         <org.apache.cassandra.version>2.0.5</org.apache.cassandra.version>
-        <org.apache.commons.version>3.1</org.apache.commons.version>
+        <org.apache.commons.version>3.2.1</org.apache.commons.version>
         <org.apache.felix.gogo.version>0.4.0</org.apache.felix.gogo.version>
-        <org.apache.felix.version>2.3.7</org.apache.felix.version>
+        <org.apache.felix.version>2.4.0</org.apache.felix.version>
         <org.apache.geronimo.specs.ejb.version>1.0.2</org.apache.geronimo.specs.ejb.version>
         <org.apache.geronimo.specs.jms.version>1.1.1</org.apache.geronimo.specs.jms.version>
         <org.apache.geronimo.specs.jpa.version>1.1</org.apache.geronimo.specs.jpa.version>
-        <org.apache.lucene.version>4.4.0</org.apache.lucene.version>
+        <org.apache.lucene.version>4.7.0</org.apache.lucene.version>
         <org.apache.maven.plugins.version>3.1</org.apache.maven.plugins.version>
         <org.codehaus.jackson.version>1.9.13</org.codehaus.jackson.version>
-        <org.elasticsearch.version>0.90.3</org.elasticsearch.version>
+        <org.doomdark.version>1.1.2</org.doomdark.version>
+        <org.eclipse.jetty.orbit.version>3.0.0.v201112011016</org.eclipse.jetty.orbit.version>
+        <org.elasticsearch.version>1.0.1</org.elasticsearch.version>
         <org.osgi.version>4.3.1</org.osgi.version>
-        <org.xerial.snappy.version>1.1.1-M1</org.xerial.snappy.version>
+        <org.xerial.snappy.version>1.1.0.1</org.xerial.snappy.version>
         <xalan.version>2.7.1</xalan.version>
     </properties>
 

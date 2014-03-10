@@ -5,11 +5,11 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
-import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM

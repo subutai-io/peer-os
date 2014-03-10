@@ -2,7 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop;
+
+import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.io.Serializable;
 import java.util.List;
@@ -35,7 +38,7 @@ public class HadoopClusterInfo implements Serializable {
     private String ipMask;
 
     public HadoopClusterInfo() {
-        this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
     public UUID getUuid() {
