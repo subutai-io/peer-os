@@ -11,8 +11,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-//import java.util.ListIterator;
 import java.util.UUID;
+
+//import java.util.ListIterator;
 
 /**
  * @author bahadyr
@@ -35,7 +36,7 @@ public class Task implements Serializable {
         taskStatus = TaskStatus.NEW;
         uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
         reqSeqNumber = 0;
-        requests = new ArrayList<Request>();
+        requests = new ArrayList<>();
     }
 
     public Task(String description) {
@@ -102,7 +103,7 @@ public class Task implements Serializable {
         return null;
     }
 
-    public Request peekPreviousRequest() {
+    /*public Request peekPreviousRequest() {
         if (currentCmdId > 0) {
             return requests.get(currentCmdId - 1);
         }
@@ -114,7 +115,7 @@ public class Task implements Serializable {
             return requests.get(currentCmdId);
         }
         return null;
-    }
+    }*/
 
     public boolean hasNextRequest() {
         return currentCmdId < requests.size() - 1;
@@ -148,13 +149,13 @@ public class Task implements Serializable {
         return ++reqSeqNumber;
     }
 
-    public Integer getReqSeqNumber() {
+    /*public Integer getReqSeqNumber() {
         return reqSeqNumber;
     }
 
     public void setReqSeqNumber(Integer reqSeqNumber) {
         this.reqSeqNumber = reqSeqNumber;
-    }
+    }*/
 
     public UUID getUuid() {
         return uuid;
@@ -201,10 +202,7 @@ public class Task implements Serializable {
             return false;
         }
         final Task other = (Task) obj;
-        if (this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid))) {
-            return false;
-        }
-        return true;
+        return !(this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid)));
     }
 
 }

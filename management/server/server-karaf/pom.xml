@@ -18,167 +18,167 @@
         <dependency>
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
-            <version>3.2</version>
+            <version>${com.eaio.uuid.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf</groupId>
             <artifactId>apache-karaf</artifactId>
-            <version>2.3.3</version>
+            <version>${karaf.version}</version>
             <type>tar.gz</type>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.assemblies.features</groupId>
             <artifactId>standard</artifactId>
-            <version>2.3.3</version>
+            <version>${karaf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
-            <version>6.8.14</version>
+            <version>${com.vaadin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-all</artifactId>
-            <version>5.9.0</version>
+            <version>${org.apache.activemq.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-jaas</artifactId>
-            <version>5.9.0</version>
+            <version>${org.apache.activemq.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-pool</artifactId>
-            <version>5.9.0</version>
-        </dependency>        
+            <version>${org.apache.activemq.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-jms-pool</artifactId>
-            <version>5.9.0</version>
-        </dependency>        
+            <version>${org.apache.activemq.version}</version>
+        </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
-            <version>1.6</version>
-        </dependency>        
+            <version>${commons-pool.version}</version>
+        </dependency>
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.3</version>
+            <version>${commons-net.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>
-            <version>1.1.1</version>
+            <version>${org.apache.geronimo.specs.jms.version}</version>
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-ejb</artifactId>
-            <version>2.1-rc4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-ejb_3.1_spec</artifactId>
+            <version>${org.apache.geronimo.specs.ejb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jpa_2.0_spec</artifactId>
-            <version>1.1</version>
+            <version>${org.apache.geronimo.specs.jpa.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.jmdns</groupId>
             <artifactId>jmdns</artifactId>
-            <version>3.4.1</version>
+            <version>${javax.jmdns.version}</version>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.1</version>
+            <version>${xalan.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.4</version>
+            <version>${com.google.code.gson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>2.0.0</version>
+            <version>${com.datastax.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>2.0.5</version>
+            <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-thrift</artifactId>
-            <version>2.0.5</version>
+            <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>net.jpountz.lz4</groupId>
             <artifactId>lz4</artifactId>
-            <version>1.2.0</version>
+            <version>${net.jpountz.lz4.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>16.0.1</version>
+            <version>${com.google.guava.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>3.9.0.Final</version>
+            <version>${io.netty.version}</version>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>3.0.2</version>
+            <version>${com.codahale.metrics.metrics-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>1.9.13</version>
+            <version>${org.codehaus.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
+            <version>${org.codehaus.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.1</version>
+            <version>${org.apache.commons.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
-            <version>1.1.1-M1</version>
-        </dependency>        
+            <version>${org.xerial.snappy.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.commands</artifactId>
-            <version>0.4.0</version>
+            <version>${org.apache.felix.gogo.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.shell</groupId>
             <artifactId>org.apache.karaf.shell.console</artifactId>
-            <version>2.3.3</version>
+            <version>${karaf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.runtime</artifactId>
-            <version>0.4.0</version>
+            <version>${org.apache.felix.gogo.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
-            <version>1.18.1</version>
+            <version>${com.sun.jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.18.1</version>
-        </dependency>        
+            <version>${com.sun.jersey.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -204,7 +204,6 @@
         </resources>
         <plugins>
             <plugin>
-                <version>2.6</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -254,7 +253,7 @@
                                 <artifactItem>
                                     <groupId>com.eaio.uuid</groupId>
                                     <artifactId>uuid</artifactId>
-                                    <version>3.2</version>
+                                    <version>${com.eaio.uuid.version}</version>
                                 </artifactItem>
 
                                 <!--UI Modules-->
@@ -277,12 +276,12 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>client-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>                                
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>logs-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>                                
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
@@ -370,52 +369,52 @@
                                 <artifactItem>
                                     <groupId>com.datastax.cassandra</groupId>
                                     <artifactId>cassandra-driver-core</artifactId>
-                                    <version>2.0.0</version>
+                                    <version>${com.datastax.cassandra.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.cassandra</groupId>
                                     <artifactId>cassandra-all</artifactId>
-                                    <version>2.0.5</version>
+                                    <version>${org.apache.cassandra.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.cassandra</groupId>
                                     <artifactId>cassandra-thrift</artifactId>
-                                    <version>2.0.5</version>
+                                    <version>${org.apache.cassandra.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>net.jpountz.lz4</groupId>
                                     <artifactId>lz4</artifactId>
-                                    <version>1.2.0</version>
+                                    <version>${net.jpountz.lz4.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava</artifactId>
-                                    <version>16.0.1</version>
+                                    <version>${com.google.guava.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>io.netty</groupId>
                                     <artifactId>netty</artifactId>
-                                    <version>3.9.0.Final</version>
+                                    <version>${io.netty.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.codahale.metrics</groupId>
                                     <artifactId>metrics-core</artifactId>
-                                    <version>3.0.2</version>
+                                    <version>${com.codahale.metrics.metrics-core.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-core-asl</artifactId>
-                                    <version>1.9.13</version>
+                                    <version>${org.codehaus.jackson.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-mapper-asl</artifactId>
-                                    <version>1.9.13</version>
+                                    <version>${org.codehaus.jackson.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.commons</groupId>
                                     <artifactId>commons-lang3</artifactId>
-                                    <version>3.1</version>
+                                    <version>${org.apache.commons.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <!--UI Dependencies-->
@@ -479,104 +478,104 @@
                                     <artifactId>cli-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-<!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>rest-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
+                                <!--                                <artifactItem>
+                                                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                                                    <artifactId>rest-module</artifactId>
+                                                                    <version>${project.version}</version>
+                                                                </artifactItem>-->
                                 <!--Shared Dependencies-->
 
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin</artifactId>
-                                    <version>6.8.14</version>
+                                    <version>${com.vaadin.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-all</artifactId>
-                                    <version>5.9.0</version>
+                                    <version>${org.apache.activemq.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-pool</artifactId>
-                                    <version>5.9.0</version>
-                                </artifactItem>                                
+                                    <version>${org.apache.activemq.version}</version>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-jms-pool</artifactId>
-                                    <version>5.9.0</version>
-                                </artifactItem>              
+                                    <version>${org.apache.activemq.version}</version>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>commons-pool</groupId>
                                     <artifactId>commons-pool</artifactId>
-                                    <version>1.6</version>
-                                </artifactItem>                                                    
+                                    <version>${commons-pool.version}</version>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-jaas</artifactId>
-                                    <version>5.9.0</version>
+                                    <version>${org.apache.activemq.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>commons-net</groupId>
                                     <artifactId>commons-net</artifactId>
-                                    <version>3.3</version>
+                                    <version>${commons-net.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.geronimo.specs</groupId>
                                     <artifactId>geronimo-jms_1.1_spec</artifactId>
-                                    <version>1.1.1</version>
+                                    <version>${org.apache.geronimo.specs.jms.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>geronimo-spec</groupId>
-                                    <artifactId>geronimo-spec-ejb</artifactId>
-                                    <version>2.1-rc4</version>
+                                    <groupId>org.apache.geronimo.specs</groupId>
+                                    <artifactId>geronimo-ejb_3.1_spec</artifactId>
+                                    <version>${org.apache.geronimo.specs.ejb.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.geronimo.specs</groupId>
                                     <artifactId>geronimo-jpa_2.0_spec</artifactId>
-                                    <version>1.1</version>
+                                    <version>${org.apache.geronimo.specs.jpa.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>javax.jmdns</groupId>
                                     <artifactId>jmdns</artifactId>
-                                    <version>3.4.1</version>
+                                    <version>${javax.jmdns.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>xalan</groupId>
                                     <artifactId>xalan</artifactId>
-                                    <version>2.7.1</version>
+                                    <version>${xalan.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.google.code.gson</groupId>
                                     <artifactId>gson</artifactId>
-                                    <version>2.2.4</version>
+                                    <version>${com.google.code.gson.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.commands</artifactId>
-                                    <version>0.4.0</version>
+                                    <version>${org.apache.felix.gogo.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.karaf.shell</groupId>
                                     <artifactId>org.apache.karaf.shell.console</artifactId>
-                                    <version>2.3.3</version>
+                                    <version>${karaf.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.runtime</artifactId>
-                                    <version>0.4.0</version>
+                                    <version>${org.apache.felix.gogo.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
-                                    <version>1.18.1</version>
+                                    <version>${com.sun.jersey.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-server</artifactId>
-                                    <version>1.18.1</version>
+                                    <version>${com.sun.jersey.version}</version>
                                 </artifactItem>
-                                
+
                                 <!--Web Server-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -584,7 +583,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Web Server-->
-                                
+
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -620,72 +619,72 @@
                                 <artifactItem>
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
-                                    <version>0.90.3</version>
+                                    <version>${org.elasticsearch.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-analyzers-common</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-codecs</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-core</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-grouping</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-highlighter</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-join</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-memory</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-misc</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-queries</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-queryparser</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-sandbox</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-spatial</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.lucene</groupId>
                                     <artifactId>lucene-suggest</artifactId>
-                                    <version>4.4.0</version>
+                                    <version>${org.apache.lucene.version}</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -696,7 +695,7 @@
             <!-- Create a single jar with all elasticsearch dependencies -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <version>${maven-antrun-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -705,7 +704,8 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <jar destfile="target/dependencies/kiskis-server/elasticsearch-bundle.jar" basedir="target/dependencies/elasticsearch"/>
+                                <jar destfile="target/dependencies/kiskis-server/elasticsearch-bundle.jar"
+                                     basedir="target/dependencies/elasticsearch"/>
                             </tasks>
                         </configuration>
                     </execution>
