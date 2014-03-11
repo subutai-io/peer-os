@@ -154,7 +154,7 @@
             <artifactId>snappy-java</artifactId>
             <version>1.1.0.1</version>
         </dependency>        
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.commands</artifactId>
             <version>0.4.0</version>
@@ -178,7 +178,12 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>1.18.1</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-soap</artifactId>
+            <version>2.7.10</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -479,7 +484,7 @@
                                     <artifactId>cli-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-<!--                                <artifactItem>
+                                <!--                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>rest-module</artifactId>
                                     <version>${project.version}</version>
@@ -551,7 +556,7 @@
                                     <artifactId>gson</artifactId>
                                     <version>2.2.4</version>
                                 </artifactItem>
-<!--                                <artifactItem>
+                                <!--                                <artifactItem>
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.commands</artifactId>
                                     <version>0.4.0</version>
@@ -575,6 +580,11 @@
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-server</artifactId>
                                     <version>1.18.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.cxf</groupId>
+                                    <artifactId>cxf-rt-bindings-soap</artifactId>
+                                    <version>2.7.10</version>
                                 </artifactItem>
                                 
                                 <!--Web Server-->
