@@ -169,7 +169,7 @@
             <artifactId>org.apache.felix.gogo.runtime</artifactId>
             <version>0.4.0</version>
         </dependency>-->
-        <dependency>
+<!--        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
             <version>1.18.1</version>
@@ -178,7 +178,7 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>1.18.1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
@@ -571,7 +571,7 @@
                                     <artifactId>org.apache.felix.gogo.runtime</artifactId>
                                     <version>0.4.0</version>
                                 </artifactItem>-->
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
                                     <version>1.18.1</version>
@@ -580,7 +580,7 @@
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-server</artifactId>
                                     <version>1.18.1</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.apache.cxf</groupId>
                                     <artifactId>cxf-rt-bindings-soap</artifactId>

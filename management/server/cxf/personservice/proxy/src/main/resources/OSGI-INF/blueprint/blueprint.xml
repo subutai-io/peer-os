@@ -26,9 +26,9 @@
  
     <cm:property-placeholder persistent-id="org.safehaus.kiskis.mgmt.cxf.personservice.proxy"
         update-strategy="reload">
-<!--        <cm:default-properties>
-            <cm:property name="personServiceSoap.URL" value="http://localhost:8181/cxf/personService" />
-        </cm:default-properties>-->
+        <cm:default-properties>
+            <cm:property name="personServiceSoap.URL" value="http://localhost:8181/cxf/personService?wsdl" />
+        </cm:default-properties>
     </cm:property-placeholder>
     
 
