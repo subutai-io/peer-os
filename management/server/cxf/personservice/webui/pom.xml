@@ -26,7 +26,7 @@
     <name>Kiskis Management CXF REST webui</name>
     
     <parent>
-        <groupId>net.lr.tutorial.karaf.cxf.personservice</groupId>
+        <groupId>org.safehaus.kiskis.mgmt.cxf.personservice</groupId>
         <artifactId>personservice-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>

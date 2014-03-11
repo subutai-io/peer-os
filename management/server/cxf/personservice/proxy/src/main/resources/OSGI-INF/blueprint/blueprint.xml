@@ -24,7 +24,7 @@
   http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
   ">
  
-    <cm:property-placeholder persistent-id="net.lr.tutorial.karaf.cxf.personservice.proxy"
+    <cm:property-placeholder persistent-id="org.safehaus.kiskis.mgmt.cxf.personservice.proxy"
         update-strategy="reload">
         <cm:default-properties>
             <cm:property name="personServiceSoap.URL" value="http://localhost:8181/cxf/personService" />
@@ -32,9 +32,9 @@
     </cm:property-placeholder>
     
 
-    <jaxws:client id="personServiceProxy" serviceClass="net.lr.tutorial.karaf.cxf.personservice.person.PersonService"
+    <jaxws:client id="personServiceProxy" serviceClass="org.safehaus.kiskis.mgmt.cxf.personservice.person.PersonService"
         address="${personServiceSoap.URL}" />
 
-    <service ref="personServiceProxy" interface="net.lr.tutorial.karaf.cxf.personservice.person.PersonService" />
+    <service ref="personServiceProxy" interface="org.safehaus.kiskis.mgmt.cxf.personservice.person.PersonService" />
 
 </blueprint>

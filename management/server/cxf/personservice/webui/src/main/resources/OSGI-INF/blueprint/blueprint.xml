@@ -9,12 +9,12 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <bean id="personServlet"
-        class="net.lr.tutorial.karaf.cxf.personservice.webui.PersonServlet">
+        class="org.safehaus.kiskis.mgmt.cxf.personservice.webui.PersonServlet">
         <property name="personService" ref="personService" />
     </bean>
 
     <reference id="personService"
-        interface="net.lr.tutorial.karaf.cxf.personservice.person.PersonService" />
+        interface="org.safehaus.kiskis.mgmt.cxf.personservice.person.PersonService" />
 
     <service interface="javax.servlet.http.HttpServlet" ref="personServlet">
         <service-properties>

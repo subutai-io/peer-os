@@ -21,7 +21,7 @@
   http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
   http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
   ">
-    <cm:property-placeholder persistent-id="net.lr.tutorial.karaf.cxf.personservice"
+    <cm:property-placeholder persistent-id="org.safehaus.kiskis.mgmt.cxf.personservice"
         update-strategy="reload">
     </cm:property-placeholder>
 
@@ -36,6 +36,6 @@
 
     <jaxws:endpoint implementor="#personServiceImpl" address="/personService"/>
 
-    <bean id="personServiceImpl" class="net.lr.tutorial.karaf.cxf.personservice.impl.PersonServiceImpl"/>
+    <bean id="personServiceImpl" class="org.safehaus.kiskis.mgmt.cxf.personservice.impl.PersonServiceImpl"/>
 
 </blueprint>
