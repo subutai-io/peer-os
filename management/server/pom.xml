@@ -33,10 +33,11 @@
         <module>core</module>
         <module>ui</module>
         <module>ui-modules</module>
-        <!--<module>test_api</module>-->
-<!--        <module>test_impl</module>
+        <module>test_api</module>
+        <module>test_impl</module>
         <module>test_rest</module>
-        <module>server-cli</module>-->
+        <module>server-cli</module>
+        <module>cxf</module>
         <module>server-karaf</module>
     </modules>
 
