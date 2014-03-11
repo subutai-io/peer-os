@@ -154,7 +154,7 @@
             <artifactId>snappy-java</artifactId>
             <version>1.1.1-M1</version>
         </dependency>        
-        <dependency>
+<!--        <dependency>
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.commands</artifactId>
             <version>0.4.0</version>
@@ -168,7 +168,7 @@
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.runtime</artifactId>
             <version>0.4.0</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
@@ -551,7 +551,7 @@
                                     <artifactId>gson</artifactId>
                                     <version>2.2.4</version>
                                 </artifactItem>
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.commands</artifactId>
                                     <version>0.4.0</version>
@@ -565,7 +565,7 @@
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.runtime</artifactId>
                                     <version>0.4.0</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
