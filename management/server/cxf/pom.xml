@@ -8,7 +8,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>net.lr.tutorial.karaf.cxf</groupId>
+    <groupId>org.safehaus.kiskis.mgmt.cxf</groupId>
     <artifactId>karaf-tutorial-cxf</artifactId>
     <name>Kiskis Management CXF REST</name>
     <version>1.0</version>
