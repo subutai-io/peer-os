@@ -10,14 +10,14 @@
 
            http://www.apache.org/licenses/LICENSE-2.0
 
-        Unless required by applicable law or agreed to in writing, software
-        distributed under the License is distributed on an "AS IS" BASIS,
-        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        See the License for the specific language governing permissions and
-        limitations under the License.
-    -->
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -35,16 +35,16 @@
         <cxf.version>2.5.0</cxf.version>
         <log4j-version>1.2.16</log4j-version>
         <slf4j-version>1.6.1</slf4j-version>
-		<ops4j.paxwicket.version>0.7.5</ops4j.paxwicket.version>
+        <ops4j.paxwicket.version>0.7.5</ops4j.paxwicket.version>
     </properties>
 
     <dependencies>
-	    <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>personservice-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>4.2.0</version>
@@ -55,7 +55,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.7</version>
-			<scope>test</scope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -95,11 +95,11 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Import-Package>
-							javax.servlet;version="[2.5,4)",
-							javax.servlet.http;version="[2.5,4)",
-							*
-						</Import-Package>
+                        <Import-Package>
+                            javax.servlet;version="[2.5,4)",
+                            javax.servlet.http;version="[2.5,4)",
+                            *
+                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

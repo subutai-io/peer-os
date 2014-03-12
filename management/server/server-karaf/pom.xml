@@ -194,6 +194,11 @@
             <artifactId>spring-osgi-annotation</artifactId>
             <version>1.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>7.6.8.v20121106</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -605,6 +610,11 @@
                                     <groupId>org.springframework.osgi</groupId>
                                     <artifactId>spring-osgi-annotation</artifactId>
                                     <version>1.2.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-util</artifactId>
+                                    <version>7.6.8.v20121106</version>
                                 </artifactItem>
                                 
                                 <!--Web Server-->
