@@ -5,6 +5,8 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.Manager;
 
@@ -12,10 +14,32 @@ public class MongoModule implements Module {
 
     private static final Logger LOG = Logger.getLogger(MongoModule.class.getName());
     public static final String MODULE_NAME = "MongoDB";
-    private TaskRunner taskRunner;
+    private static TaskRunner taskRunner;
+    private static AgentManager agentManager;
+    private static DbManager dbManager;
+
+    public void setAgentManager(AgentManager agentManager) {
+        MongoModule.agentManager = agentManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        MongoModule.dbManager = dbManager;
+    }
 
     public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+        MongoModule.taskRunner = taskRunner;
+    }
+
+    public static TaskRunner getTaskRunner() {
+        return taskRunner;
+    }
+
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public static DbManager getDbManager() {
+        return dbManager;
     }
 
     public static class ModuleComponent extends CustomComponent {
@@ -32,8 +56,8 @@ public class MongoModule implements Module {
             TabSheet mongoSheet = new TabSheet();
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
-            wizard = new Wizard(taskRunner);
-            manager = new Manager(taskRunner);
+            wizard = new Wizard();
+            manager = new Manager();
             mongoSheet.addTab(wizard.getContent(), "Install");
             mongoSheet.addTab(manager.getContent(), "Manage");
 

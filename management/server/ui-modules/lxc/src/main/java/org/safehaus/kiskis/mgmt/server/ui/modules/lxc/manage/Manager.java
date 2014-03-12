@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
@@ -35,8 +34,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 @SuppressWarnings("serial")
 public class Manager extends VerticalLayout {
 
-    private static final Logger LOG = Logger.getLogger(Manager.class.getName());
-
     private final TaskRunner taskRunner;
     private final Label indicator;
     private final Button infoBtn;
@@ -51,13 +48,13 @@ public class Manager extends VerticalLayout {
     private volatile boolean isDestroyAllButtonClicked = false;
     private volatile int taskCount;
 
-    public Manager(TaskRunner taskRunner) {
+    public Manager(TaskRunner taskRunner, AgentManager agentManager) {
 
         setSpacing(true);
         setMargin(true);
 
         this.taskRunner = taskRunner;
-        this.agentManager = ServiceLocator.getService(AgentManager.class);
+        this.agentManager = agentManager;
 
         lxcTable = createTableTemplate("Lxc containers", 500);
 

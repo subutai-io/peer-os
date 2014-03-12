@@ -27,7 +27,7 @@ public class Installation {
 
     public Installation() {
         config = new HadoopConfig();
-        agentManager = ServiceLocator.getService(AgentManager.class);
+        agentManager = HadoopModule.getAgentManager();
     }
 
     public void setPanel(Step3 step) {

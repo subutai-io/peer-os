@@ -1,13 +1,13 @@
-package org.safehaus.kiskis.mgmt.server.communication;
+package org.safehaus.kiskis.mgmt.impl.communication;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
+import org.safehaus.kiskis.mgmt.api.communication.CommandJson;
+import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.communication.Communication;
 import javax.jms.*;
 import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.broker.BrokerService;
@@ -17,14 +17,12 @@ import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-public class CommunicationServiceImpl implements CommunicationService {
+public class CommunicationImpl implements Communication {
 
-    private static final Logger LOG = Logger.getLogger(CommunicationServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(CommunicationImpl.class.getName());
     private BrokerService broker;
     private PooledConnectionFactory pooledConnectionFactory;
     private CommunicationMessageListener communicationMessageListener;
@@ -96,14 +94,14 @@ public class CommunicationServiceImpl implements CommunicationService {
     }
 
     public void sendRequest(Request request) {
-        exec.submit(new CommandProducer(new CommandImpl(request)));
+        exec.submit(new CommandProducer(request));
     }
 
     public class CommandProducer implements Runnable {
 
-        Command command;
+        Request command;
 
-        public CommandProducer(Command command) {
+        public CommandProducer(Request command) {
             this.command = command;
         }
 
@@ -115,12 +113,12 @@ public class CommunicationServiceImpl implements CommunicationService {
                 connection = pooledConnectionFactory.createConnection();
                 connection.start();
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                Destination destination = session.createQueue(command.getRequest().getUuid().toString());
+                Destination destination = session.createQueue(command.getUuid().toString());
                 producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);
                 String json = CommandJson.getJson(command);
-                if (command.getRequest().getType() != RequestType.HEARTBEAT_REQUEST) {
+                if (command.getType() != RequestType.HEARTBEAT_REQUEST) {
                     LOG.log(Level.INFO, "\nSending: {0}", json);
                 }
                 TextMessage message = session.createTextMessage(json);

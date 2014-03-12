@@ -441,11 +441,7 @@
                                 <!--UI Dependencies-->
 
                                 <!--Core Dependencies-->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-communication</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
+
                                 <!--Core Dependencies-->
 
                                 <!--Shared Dependencies-->
@@ -454,6 +450,16 @@
                                     <artifactId>mgmt-shared-protocol</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>communication-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>communication-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>task-runner-api</artifactId>

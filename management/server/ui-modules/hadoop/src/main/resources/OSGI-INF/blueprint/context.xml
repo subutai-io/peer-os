@@ -3,9 +3,15 @@
     
     <reference id="taskRunner" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/> 
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>  
+    <reference id="dbManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>      
 
     <bean id="module" class="org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule">
         <property name="taskRunner" ref="taskRunner"/>
+        <property name="agentManager" ref="agentManager" />
+        <property name="dbManager" ref="dbManager" />        
     </bean>
 
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>

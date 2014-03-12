@@ -15,9 +15,14 @@ public class Solr implements Module {
 
     public static final String MODULE_NAME = "Solr";
     private TaskRunner taskRunner;
+    private AgentManager agentManager;
 
     public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
+    }
+
+    public void setAgentManager(AgentManager agentManager) {
+        this.agentManager = agentManager;
     }
 
     public static class ModuleComponent extends CustomComponent {
@@ -33,8 +38,8 @@ public class Solr implements Module {
         private final Button uninstallBtn;
         private volatile int taskCount = 0;
 
-        public ModuleComponent(final TaskRunner taskRunner) {
-            agentManager = ServiceLocator.getService(AgentManager.class);
+        public ModuleComponent(final TaskRunner taskRunner, final AgentManager agentManager) {
+            this.agentManager = agentManager;
             this.taskRunner = taskRunner;
             setHeight("100%");
             GridLayout grid = new GridLayout(20, 10);
@@ -336,7 +341,7 @@ public class Solr implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner);
+        return new ModuleComponent(taskRunner, agentManager);
     }
 
 }

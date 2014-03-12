@@ -12,13 +12,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.EntryExpiryCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.communication.Communication;
+import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
 
 /**
  *
@@ -29,11 +27,11 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
     private static final Logger LOG = Logger.getLogger(TaskRunnerImpl.class.getName());
 
     private static final String MODULE_NAME = "TaskRunner";
-    private CommunicationService communicationService;
+    private Communication communicationService;
     private ChainedTaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
 
-    public void setCommunicationService(CommunicationService communicationService) {
+    public void setCommunicationService(Communication communicationService) {
         this.communicationService = communicationService;
     }
 

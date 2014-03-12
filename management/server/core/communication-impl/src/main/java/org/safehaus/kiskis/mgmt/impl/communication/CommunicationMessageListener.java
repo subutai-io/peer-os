@@ -1,9 +1,9 @@
-package org.safehaus.kiskis.mgmt.server.communication;
+package org.safehaus.kiskis.mgmt.impl.communication;
 
 import java.util.Iterator;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
+import org.safehaus.kiskis.mgmt.api.communication.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
 
 import javax.jms.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -14,9 +14,6 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-/**
- * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 12:13 AM
- */
 public class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());

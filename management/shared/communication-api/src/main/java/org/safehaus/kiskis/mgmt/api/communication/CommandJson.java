@@ -2,14 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol;
+package org.safehaus.kiskis.mgmt.api.communication;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.Command;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
  * @author dilshat
@@ -18,6 +20,31 @@ public class CommandJson {
 
     private static final Logger LOG = Logger.getLogger(CommandJson.class.getName());
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private static class CommandImpl implements Command {
+
+        Request command;
+        Response response;
+
+        public CommandImpl(Object message) {
+            if (message instanceof Request) {
+                this.command = (Request) message;
+            } else if (message instanceof Response) {
+                this.response = (Response) message;
+            }
+        }
+
+        @Override
+        public Response getResponse() {
+            return response;
+        }
+
+        @Override
+        public Request getRequest() {
+            return command;
+        }
+
+    }
 
     public static Request getRequest(String json) {
         try {
@@ -52,6 +79,15 @@ public class CommandJson {
             LOG.log(Level.SEVERE, "Error in getRequest", ex);
         }
 
+        return null;
+    }
+
+    public static String getJson(Request cmd) {
+        try {
+            return gson.toJson(new CommandImpl(cmd));
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getRequest", ex);
+        }
         return null;
     }
 

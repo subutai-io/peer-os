@@ -10,6 +10,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.HadoopWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public class HadoopModule implements Module {
@@ -17,6 +19,16 @@ public class HadoopModule implements Module {
     public static final String MODULE_NAME = "Hadoop";
     private static final Logger LOG = Logger.getLogger(HadoopModule.class.getName());
     private static TaskRunner taskRunner;
+    private static AgentManager agentManager;
+    private static DbManager dbManager;
+
+    public void setAgentManager(AgentManager agentManager) {
+        HadoopModule.agentManager = agentManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        HadoopModule.dbManager = dbManager;
+    }
 
     public void setTaskRunner(TaskRunner taskRunner) {
         HadoopModule.taskRunner = taskRunner;
@@ -24,6 +36,14 @@ public class HadoopModule implements Module {
 
     public static TaskRunner getTaskRunner() {
         return taskRunner;
+    }
+
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public static DbManager getDbManager() {
+        return dbManager;
     }
 
     @Override
