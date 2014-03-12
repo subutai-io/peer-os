@@ -5,14 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
 /**
  *
@@ -22,16 +21,10 @@ public class MongoDAO {
 
     private static final Logger LOG = Logger.getLogger(MongoDAO.class.getName());
 
-    private static final DbManager dbManager;
-
-    static {
-        dbManager = ServiceLocator.getService(DbManager.class);
-    }
-
     public static boolean saveMongoClusterInfo(MongoClusterInfo clusterInfo) {
         try {
 
-            dbManager.saveInfo(MongoModule.MODULE_NAME, clusterInfo.getClusterName(), clusterInfo);
+            MongoModule.getDbManager().saveInfo(MongoModule.MODULE_NAME, clusterInfo.getClusterName(), clusterInfo);
 
             return true;
         } catch (Exception ex) {
@@ -43,7 +36,7 @@ public class MongoDAO {
     public static List<MongoClusterInfo> getMongoClustersInfo() {
         try {
 
-            return dbManager.getInfo(MongoModule.MODULE_NAME, MongoClusterInfo.class);
+            return MongoModule.getDbManager().getInfo(MongoModule.MODULE_NAME, MongoClusterInfo.class);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClustersInfo", ex);
@@ -54,7 +47,7 @@ public class MongoDAO {
     public static MongoClusterInfo getMongoClusterInfo(String clusterName) {
         MongoClusterInfo mongoClusterInfo = null;
         try {
-            mongoClusterInfo = dbManager.getInfo(MongoModule.MODULE_NAME, clusterName, MongoClusterInfo.class);
+            mongoClusterInfo = MongoModule.getDbManager().getInfo(MongoModule.MODULE_NAME, clusterName, MongoClusterInfo.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getMongoClusterInfo", ex);
         }
@@ -64,7 +57,7 @@ public class MongoDAO {
     public static boolean deleteMongoClusterInfo(String clusterName) {
         try {
 
-            dbManager.deleteInfo(MongoModule.MODULE_NAME, clusterName);
+            MongoModule.getDbManager().deleteInfo(MongoModule.MODULE_NAME, clusterName);
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in deleteMongoClusterInfo", ex);

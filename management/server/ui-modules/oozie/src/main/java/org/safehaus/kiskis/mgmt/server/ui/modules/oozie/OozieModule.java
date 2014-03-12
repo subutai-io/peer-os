@@ -1,8 +1,12 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
-import com.vaadin.ui.*;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.Manager;
@@ -13,8 +17,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 public class OozieModule implements Module {
 
     public static final String MODULE_NAME = "Oozie";
-    private static final Logger LOG = Logger.getLogger(OozieModule.class.getName());
     private static TaskRunner taskRunner;
+    private static AgentManager agentManager;
+    private static DbManager dbManager;
+
+    public void setAgentManager(AgentManager agentManager) {
+        OozieModule.agentManager = agentManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        OozieModule.dbManager = dbManager;
+    }
 
     public void setTaskRunner(TaskRunner taskRunner) {
         OozieModule.taskRunner = taskRunner;
@@ -22,6 +35,14 @@ public class OozieModule implements Module {
 
     public static TaskRunner getTaskRunner() {
         return taskRunner;
+    }
+
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public static DbManager getDbManager() {
+        return dbManager;
     }
 
     public static class ModuleComponent extends CustomComponent {

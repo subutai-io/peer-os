@@ -1,8 +1,11 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
-import com.vaadin.ui.*;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.CassandraManager;
@@ -10,11 +13,14 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWiza
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
+import java.util.logging.Logger;
+
 public class CassandraModule implements Module {
 
     public static final String MODULE_NAME = "Cassandra";
     private static final Logger LOG = Logger.getLogger(CassandraModule.class.getName());
     private static TaskRunner taskRunner;
+    private static DbManager dbManager;
 
     public static TaskRunner getTaskRunner() {
         return taskRunner;
@@ -22,6 +28,14 @@ public class CassandraModule implements Module {
 
     public void setTaskRunner(TaskRunner taskRunner) {
         CassandraModule.taskRunner = taskRunner;
+    }
+
+    public static DbManager getDbManager() {
+        return dbManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        CassandraModule.dbManager = dbManager;
     }
 
     public static class ModuleComponent extends CustomComponent {

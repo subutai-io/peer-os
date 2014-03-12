@@ -5,14 +5,15 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.HashMap;
@@ -101,7 +102,7 @@ public class DataNodesTable extends Table {
     }
 
     private void findRow(UUID uuid, String stdOut) {
-        Agent agent = getAgentManager().getAgentByUUID(uuid);
+        Agent agent = HadoopModule.getAgentManager().getAgentByUUID(uuid);
 
         for (Object itemId : container.getItemIds()) {
             Item item = container.getItem(itemId);
@@ -126,7 +127,4 @@ public class DataNodesTable extends Table {
         return "";
     }
 
-    public AgentManager getAgentManager() {
-        return ServiceLocator.getService(AgentManager.class);
-    }
 }

@@ -5,16 +5,16 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.communication.Communication;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.ExpiringCache;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,9 +25,9 @@ public class ChainedTaskRunner {
     private static final Logger LOG = Logger.getLogger(ChainedTaskRunner.class.getName());
 
     private final ExpiringCache<UUID, ChainedTaskListener> taskListenerCache = new ExpiringCache<UUID, ChainedTaskListener>();
-    private final CommunicationService communicationService;
+    private final Communication communicationService;
 
-    public ChainedTaskRunner(CommunicationService communicationService) {
+    public ChainedTaskRunner(Communication communicationService) {
         this.communicationService = communicationService;
     }
 

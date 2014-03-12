@@ -4,10 +4,10 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.ComboBox;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
+import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 
 import java.util.Set;
 
@@ -22,7 +22,7 @@ public final class AgentsComboBox extends ComboBox {
 
     public AgentsComboBox(String clusterName) {
         this.clusterName = clusterName;
-        agentManager = ServiceLocator.getService(AgentManager.class);
+        agentManager = HadoopModule.getAgentManager();
 
         refreshDataSource();
         setItemCaptionPropertyId("hostname");

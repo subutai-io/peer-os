@@ -1,23 +1,32 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mahout;
 
 import com.vaadin.ui.*;
-import java.util.HashSet;
-import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class Mahout implements Module {
 
     public static final String MODULE_NAME = "Mahout";
     private TaskRunner taskRunner;
+    private AgentManager agentManager;
 
     public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
+    }
+
+    public void setAgentManager(AgentManager agentManager) {
+        this.agentManager = agentManager;
     }
 
     public static class ModuleComponent extends CustomComponent {
@@ -31,8 +40,8 @@ public class Mahout implements Module {
         private final Button uninstallBtn;
         private volatile int taskCount = 0;
 
-        public ModuleComponent(final TaskRunner taskRunner) {
-            agentManager = ServiceLocator.getService(AgentManager.class);
+        public ModuleComponent(final TaskRunner taskRunner, final AgentManager agentManager) {
+            this.agentManager = agentManager;
             this.taskRunner = taskRunner;
             setHeight("100%");
             GridLayout grid = new GridLayout(20, 10);
@@ -250,7 +259,7 @@ public class Mahout implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner);
+        return new ModuleComponent(taskRunner, agentManager);
     }
 
 }

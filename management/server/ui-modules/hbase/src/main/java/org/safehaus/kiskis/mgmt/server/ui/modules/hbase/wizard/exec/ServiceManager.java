@@ -5,18 +5,20 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.commands.HBaseCommands;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseTable;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseTable;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.NodesWindow;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
@@ -26,12 +28,9 @@ public class ServiceManager {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private Task currentTask;
-    private final TaskRunner asyncTaskRunner;
     private final HBaseTable hBaseTable;
-    private NodesWindow nodesWindow;
 
-    public ServiceManager(TaskRunner asyncTaskRunner, HBaseTable hBaseTable) {
-        this.asyncTaskRunner = asyncTaskRunner;
+    public ServiceManager(HBaseTable hBaseTable) {
         this.hBaseTable = hBaseTable;
     }
 
@@ -64,7 +63,7 @@ public class ServiceManager {
 //                executeCommand(command);
 //            }
 
-            asyncTaskRunner.executeTask(currentTask, new TaskCallback() {
+            HBaseModule.getTaskRunner().executeTask(currentTask, new TaskCallback() {
 
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -91,6 +90,5 @@ public class ServiceManager {
     public Task getCurrentTask() {
         return currentTask;
     }
-
 
 }

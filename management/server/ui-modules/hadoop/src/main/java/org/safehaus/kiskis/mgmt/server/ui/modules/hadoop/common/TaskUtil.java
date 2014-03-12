@@ -5,10 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common;
 
-import java.util.HashMap;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandJson;
+import org.safehaus.kiskis.mgmt.api.communication.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+
+import java.util.HashMap;
 
 /**
  *

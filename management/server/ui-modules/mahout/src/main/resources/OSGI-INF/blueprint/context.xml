@@ -3,9 +3,12 @@
     
     <reference id="taskRunner" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>  
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>        
     
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.mahout.Mahout">
         <property name="taskRunner" ref="taskRunner"/>
+        <property name="agentManager" ref="agentManager"/>
     </bean>    
        
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>

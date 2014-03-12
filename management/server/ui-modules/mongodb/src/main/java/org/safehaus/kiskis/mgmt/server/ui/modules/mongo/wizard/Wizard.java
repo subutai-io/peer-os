@@ -5,14 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 /**
  *
@@ -26,11 +26,9 @@ public class Wizard {
     private final ProgressIndicator progressBar;
     private final ClusterConfig config = new ClusterConfig();
     private final GridLayout grid;
-    private final TaskRunner taskRunner;
     private int step = 1;
 
-    public Wizard(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+    public Wizard() {
         grid = new GridLayout(1, 20);
         grid.setMargin(true);
         grid.setSizeFull();
@@ -108,10 +106,6 @@ public class Wizard {
         if (component != null) {
             grid.addComponent(component, 0, 1, 0, 19);
         }
-    }
-
-    public TaskRunner getTaskRunner() {
-        return taskRunner;
     }
 
 }
