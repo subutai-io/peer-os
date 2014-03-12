@@ -6,13 +6,15 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 import java.util.List;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
 public class HBaseTable extends Table {
 

@@ -5,10 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.impl;
 
+import java.util.List;
 import org.safehaus.kiskis.mgmt.api.SomeApi;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-
-import java.util.List;
 
 /**
  *

@@ -1,14 +1,15 @@
 package org.safehaus.kiskis.mgmt.cxf.personservice.webui;
 
-import org.safehaus.kiskis.mgmt.cxf.personservice.person.Person;
-import org.safehaus.kiskis.mgmt.cxf.personservice.person.PersonService;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.safehaus.kiskis.mgmt.cxf.personservice.person.Person;
+import org.safehaus.kiskis.mgmt.cxf.personservice.person.PersonService;
 
 public class PersonServlet extends HttpServlet {
     private static final long serialVersionUID = -8444651625768440903L;

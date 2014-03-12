@@ -5,16 +5,15 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
-import org.safehaus.kiskis.mgmt.api.communication.Communication;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.api.communication.Communication;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
-
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

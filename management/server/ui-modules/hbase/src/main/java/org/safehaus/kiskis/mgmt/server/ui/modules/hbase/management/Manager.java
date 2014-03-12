@@ -5,7 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management;
 
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  *

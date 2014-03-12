@@ -1,21 +1,18 @@
 package org.safehaus.kiskis.mgmt.impl.communication;
 
-import org.apache.activemq.command.ActiveMQMessage;
-import org.apache.activemq.command.ActiveMQTextMessage;
-import org.apache.activemq.command.RemoveInfo;
-import org.safehaus.kiskis.mgmt.api.communication.CommandJson;
-import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.TextMessage;
 import java.util.Iterator;
+import org.safehaus.kiskis.mgmt.api.communication.CommandJson;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
+
+import javax.jms.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.activemq.command.ActiveMQMessage;
+import org.apache.activemq.command.ActiveMQTextMessage;
+import org.apache.activemq.command.RemoveInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class CommunicationMessageListener implements MessageListener {
 

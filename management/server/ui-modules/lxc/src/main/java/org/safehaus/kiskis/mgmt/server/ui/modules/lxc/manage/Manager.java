@@ -3,8 +3,22 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage;
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.VerticalLayout;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
@@ -13,13 +27,9 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.LxcState;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
-
-import java.util.*;
 
 @SuppressWarnings("serial")
 public class Manager extends VerticalLayout {

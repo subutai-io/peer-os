@@ -16,12 +16,12 @@
  */
 package org.safehaus.kiskis.mgmt.cxf.personservice.impl;
 
+import java.io.IOException;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
-
-import java.io.IOException;
 
 /**
  * Start the rest service to test in the IDE

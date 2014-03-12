@@ -1,10 +1,8 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -12,8 +10,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.Cassandra
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraWizard;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-
-import java.util.logging.Logger;
 
 public class CassandraModule implements Module {
 

@@ -1,12 +1,14 @@
 package org.safehaus.kiskis.mgmt.cxf.personservice.impl;
 
+import org.safehaus.kiskis.mgmt.cxf.personservice.impl.PersonServiceImpl;
+import org.safehaus.kiskis.mgmt.cxf.personservice.person.Person;
+import org.safehaus.kiskis.mgmt.cxf.personservice.person.PersonService;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.Assert;
 import org.junit.Test;
-import org.safehaus.kiskis.mgmt.cxf.personservice.person.Person;
-import org.safehaus.kiskis.mgmt.cxf.personservice.person.PersonService;
 
 public class PersonServiceSOAPTest {
     

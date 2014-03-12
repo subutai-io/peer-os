@@ -5,30 +5,48 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyCfgSrvCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.CheckStatusCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyDataNodeCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StopNodeCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyRouterCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StartNodeCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.DestroyNodeOperation;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.DestroyNodeOperation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-
-import java.util.*;
-import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 
 /**
  *

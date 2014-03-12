@@ -2,8 +2,8 @@ package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
 import com.vaadin.Application.SystemMessages;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 
 public class MgmtAppFactory implements ApplicationFactory {

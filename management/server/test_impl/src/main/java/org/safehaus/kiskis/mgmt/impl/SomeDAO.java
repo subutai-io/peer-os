@@ -7,11 +7,10 @@ package org.safehaus.kiskis.mgmt.impl;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
 /**
  *

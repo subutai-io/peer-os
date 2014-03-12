@@ -5,21 +5,20 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import java.util.Collections;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener, HttpServletRequestListener {

@@ -1,18 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
+import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.Manager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-
-import java.util.logging.Logger;
 
 public class MongoModule implements Module {
 
