@@ -428,7 +428,7 @@
                                 <!--Core Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-server-communication</artifactId>
+                                    <artifactId>communication-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!--Core Dependencies-->

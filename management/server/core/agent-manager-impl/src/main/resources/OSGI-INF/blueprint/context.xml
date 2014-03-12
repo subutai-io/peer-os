@@ -4,7 +4,7 @@
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
     <reference id="communicationService" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.shared.protocol.api.CommunicationService"/>
+               interface="org.safehaus.kiskis.mgmt.api.communication.Communication"/>
     <reference id="dbManagerService" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
 
