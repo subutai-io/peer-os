@@ -5,14 +5,22 @@
  */
 package org.safehaus.kiskis.mgmt.impl;
 
-import java.util.List;
 import org.safehaus.kiskis.mgmt.api.SomeApi;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+
+import java.util.List;
 
 /**
  *
  * @author bahadyr
  */
 public class SomeImpl implements SomeApi {
+
+    private DbManager dbManager;
+
+    public void setDbManager(DbManager dbManager) {
+        this.dbManager = dbManager;
+    }
 
     @Override
     public String sayHello(String name) {
@@ -49,15 +57,15 @@ public class SomeImpl implements SomeApi {
         return true;
     }
 
-    SomeDAO someDAO = new SomeDAO();
-
     @Override
     public void writeLog(String log) {
+        SomeDAO someDAO = new SomeDAO(dbManager);
         someDAO.writeLog(log);
     }
 
     @Override
     public List<String> getLogs() {
+        SomeDAO someDAO = new SomeDAO(dbManager);
         return someDAO.getLogs();
     }
 
