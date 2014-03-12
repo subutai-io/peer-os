@@ -169,7 +169,7 @@
             <artifactId>org.apache.felix.gogo.runtime</artifactId>
             <version>0.4.0</version>
         </dependency>-->
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
             <version>1.18.1</version>
@@ -183,6 +183,21 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>2.7.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.osgi</artifactId>
+            <version>2.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-annotation</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>7.6.8.v20121106</version>
         </dependency>
     </dependencies>
     <build>
@@ -577,7 +592,7 @@
                                     <artifactId>org.apache.felix.gogo.runtime</artifactId>
                                     <version>0.4.0</version>
                                 </artifactItem>-->
-<!--                                <artifactItem>
+                                <!--                                <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
                                     <version>1.18.1</version>
@@ -591,6 +606,21 @@
                                     <groupId>org.apache.cxf</groupId>
                                     <artifactId>cxf-rt-bindings-soap</artifactId>
                                     <version>2.7.10</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.karaf.shell</groupId>
+                                    <artifactId>org.apache.karaf.shell.osgi</artifactId>
+                                    <version>2.3.3</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.springframework.osgi</groupId>
+                                    <artifactId>spring-osgi-annotation</artifactId>
+                                    <version>1.2.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-util</artifactId>
+                                    <version>7.6.8.v20121106</version>
                                 </artifactItem>
                                 
                                 <!--Web Server-->
