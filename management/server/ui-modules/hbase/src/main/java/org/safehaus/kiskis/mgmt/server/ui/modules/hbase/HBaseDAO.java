@@ -5,8 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 
 import java.util.*;
 import java.util.logging.Level;
