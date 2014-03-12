@@ -18,12 +18,11 @@ import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-public class CommunicationServiceImpl implements Communication {
+public class CommunicationImpl implements Communication {
 
-    private static final Logger LOG = Logger.getLogger(CommunicationServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(CommunicationImpl.class.getName());
     private BrokerService broker;
     private PooledConnectionFactory pooledConnectionFactory;
     private CommunicationMessageListener communicationMessageListener;
