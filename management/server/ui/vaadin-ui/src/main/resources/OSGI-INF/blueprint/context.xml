@@ -14,6 +14,8 @@
 
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
+    <reference id="moduleNotifier" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier"/>
 
 
     <service interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory">
@@ -22,6 +24,7 @@
         </service-properties>
         <bean class="org.safehaus.kiskis.mgmt.server.ui.MgmtAppFactory">
             <property name="agentManager" ref="agentManager"/>
+            <property name="moduleNotifier" ref="moduleNotifier"/>
             <argument value="${title}"/>
         </bean>
     </service>

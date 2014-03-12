@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener, HttpServletRequestListener {
@@ -32,9 +31,9 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private Set<Agent> selectedAgents = new HashSet<Agent>();
     private MgmtAgentManager agentList;
 
-    public MgmtApplication(String title, AgentManager agentManager) {
+    public MgmtApplication(String title, AgentManager agentManager, ModuleNotifier moduleNotifier) {
         this.agentManager = agentManager;
-        this.moduleNotifier = ServiceLocator.getService(ModuleNotifier.class);
+        this.moduleNotifier = moduleNotifier;
         this.title = title;
     }
     private final String title;

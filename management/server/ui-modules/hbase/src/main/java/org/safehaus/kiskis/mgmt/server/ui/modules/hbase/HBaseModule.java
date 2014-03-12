@@ -7,17 +7,39 @@ import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public class HBaseModule implements Module {
 
     public static final String MODULE_NAME = "HBase";
-    private static final Logger LOG = Logger.getLogger(HBaseModule.class.getName());
-    private TaskRunner asyncTaskRunner;
+    private static TaskRunner taskRunner;
+    private static AgentManager agentManager;
+    private static DbManager dbManager;
 
-    public void setAsyncTaskRunner(TaskRunner asyncTaskRunner) {
-        this.asyncTaskRunner = asyncTaskRunner;
+    public void setAgentManager(AgentManager agentManager) {
+        HBaseModule.agentManager = agentManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        HBaseModule.dbManager = dbManager;
+    }
+
+    public void setTaskRunner(TaskRunner taskRunner) {
+        HBaseModule.taskRunner = taskRunner;
+    }
+
+    public static TaskRunner getTaskRunner() {
+        return taskRunner;
+    }
+
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public static DbManager getDbManager() {
+        return dbManager;
     }
 
     public static class ModuleComponent extends CustomComponent {
@@ -25,7 +47,7 @@ public class HBaseModule implements Module {
         Wizard wizard;
         Manager manager;
 
-        public ModuleComponent(TaskRunner asyncTaskRunner) {
+        public ModuleComponent() {
             setSizeFull();
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -36,8 +58,8 @@ public class HBaseModule implements Module {
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
 
-            wizard = new Wizard(asyncTaskRunner);
-            manager = new Manager(asyncTaskRunner);
+            wizard = new Wizard();
+            manager = new Manager();
             sheet.addTab(wizard.getContent(), "Install");
             sheet.addTab(manager.getContent(), "Manage");
 
@@ -59,7 +81,7 @@ public class HBaseModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(asyncTaskRunner);
+        return new ModuleComponent();
     }
 
 }

@@ -26,10 +26,10 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
@@ -54,8 +54,8 @@ public class InstallationStep extends Panel {
     public InstallationStep(final Wizard wizard) {
 
         this.config = wizard.getConfig();
-        this.taskRunner = wizard.getTaskRunner();
-        agentManager = ServiceLocator.getService(AgentManager.class);
+        this.taskRunner = MongoModule.getTaskRunner();
+        agentManager = MongoModule.getAgentManager();
 
         setSizeFull();
 

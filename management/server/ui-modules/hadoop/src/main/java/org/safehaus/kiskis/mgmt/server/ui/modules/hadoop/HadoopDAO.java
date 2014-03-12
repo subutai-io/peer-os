@@ -9,10 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 
 /**
  * @author dilshat
@@ -20,15 +17,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
 public class HadoopDAO {
 
     private static final Logger LOG = Logger.getLogger(HadoopDAO.class.getName());
-    private static final DbManager dbManager;
-
-    static {
-        dbManager = ServiceLocator.getService(DbManager.class);
-    }
 
     public static boolean saveHadoopClusterInfo(HadoopClusterInfo cluster) {
         try {
-            dbManager.saveInfo(HadoopClusterInfo.SOURCE, cluster.getClusterName(), cluster);
+            HadoopModule.getDbManager().saveInfo(HadoopClusterInfo.SOURCE, cluster.getClusterName(), cluster);
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveHadoopClusterInfo", ex);
@@ -40,7 +32,7 @@ public class HadoopDAO {
         List<HadoopClusterInfo> list = new ArrayList<HadoopClusterInfo>();
         try {
 
-            return dbManager.getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
+            return HadoopModule.getDbManager().getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo", ex);
         }
@@ -50,7 +42,7 @@ public class HadoopDAO {
     public static HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
-            return dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
+            return HadoopModule.getDbManager().getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);
@@ -60,7 +52,7 @@ public class HadoopDAO {
 
     public static boolean deleteHadoopClusterInfo(String clusterName) {
         try {
-            dbManager.deleteInfo(HadoopClusterInfo.SOURCE, clusterName);
+            HadoopModule.getDbManager().deleteInfo(HadoopClusterInfo.SOURCE, clusterName);
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in deleteHadoopClusterInfo", ex);

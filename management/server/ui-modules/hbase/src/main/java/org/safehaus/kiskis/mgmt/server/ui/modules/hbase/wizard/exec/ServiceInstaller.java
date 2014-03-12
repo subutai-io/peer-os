@@ -12,8 +12,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.LinkedList;
 import java.util.Queue;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.commands.HBaseCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.Wizard;
@@ -28,12 +28,10 @@ public class ServiceInstaller {
     private final TextArea terminal;
     private Task currentTask;
     HBaseConfig config;
-    private TaskRunner asyncTaskRunner;
 
     public ServiceInstaller(Wizard wizard, TextArea terminal) {
         this.terminal = terminal;
         this.config = wizard.getConfig();
-        this.asyncTaskRunner = wizard.getRunner();
 
         Task updateApt = new Task("apt-get update");
         for (Agent agent : config.getAgents()) {
@@ -110,7 +108,7 @@ public class ServiceInstaller {
 //                executeCommand(command);
 //            }
 
-            asyncTaskRunner.executeTask(currentTask, new TaskCallback() {
+            HBaseModule.getTaskRunner().executeTask(currentTask, new TaskCallback() {
 
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

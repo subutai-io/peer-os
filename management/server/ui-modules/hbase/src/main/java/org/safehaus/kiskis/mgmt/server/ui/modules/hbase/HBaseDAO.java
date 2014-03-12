@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
-//import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseConfig;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,9 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.ServiceLocator;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
 /**
  *
@@ -26,22 +22,10 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 public class HBaseDAO {
 
     private static final Logger LOG = Logger.getLogger(HBaseDAO.class.getName());
-    private static final DbManager dbManager;
-    private static final AgentManager agentManager;
-
-    static {
-        dbManager = ServiceLocator.getService(DbManager.class);
-        agentManager = ServiceLocator.getService(AgentManager.class);
-    }
 
     public static boolean saveClusterInfo(HBaseConfig cluster) {
         try {
-
-//            byte[] data = Util.serialize(cluster);
-//
-//            String cql = "insert into hbase_info (uid, info) values (?,?)";
-//            dbManager.executeUpdate(cql, cluster.getUuid(), ByteBuffer.wrap(data));
-            dbManager.saveInfo(HBaseModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
+            HBaseModule.getDbManager().saveInfo(HBaseModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveHBaseClusterInfo", ex);
             return false;
@@ -52,19 +36,7 @@ public class HBaseDAO {
     public static List<HBaseConfig> getClusterInfo() {
         List<HBaseConfig> list = new ArrayList<HBaseConfig>();
         try {
-//            String cql = "select * from hbase_info";
-//            ResultSet results = dbManager.executeQuery(cql);
-//            for (Row row : results) {
-//
-//                ByteBuffer data = row.getBytes("info");
-//
-//                byte[] result = new byte[data.remaining()];
-//                data.get(result);
-//                HBaseConfig config = (HBaseConfig) deserialize(result);
-//                list.add(config);
-//            }
-
-            return dbManager.getInfo(HBaseModule.MODULE_NAME, HBaseConfig.class);
+            return HBaseModule.getDbManager().getInfo(HBaseModule.MODULE_NAME, HBaseConfig.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHBaseClusterInfo", ex);
         }
@@ -73,9 +45,7 @@ public class HBaseDAO {
 
     public static boolean deleteClusterInfo(UUID uuid) {
         try {
-//            String cql = "delete from hbase_info where uid = ?";
-//            dbManager.executeUpdate(cql, uuid);
-            dbManager.deleteInfo(HBaseModule.MODULE_NAME, uuid.toString());
+            HBaseModule.getDbManager().deleteInfo(HBaseModule.MODULE_NAME, uuid.toString());
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in deleteHBaseClusterInfo(name)", ex);
@@ -83,17 +53,10 @@ public class HBaseDAO {
         return false;
     }
 
-//    public static Object deserialize(byte[] bytes) throws ClassNotFoundException, IOException {
-//        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-//        ObjectInputStream ois = new ObjectInputStream(bais);
-//        Object o = ois.readObject();
-//        ois.close();
-//        return o;
-//    }
     public static Set<Agent> getAgents(Set<UUID> uuids) {
         Set<Agent> list = new HashSet<Agent>();
         for (UUID uuid : uuids) {
-            Agent agent = agentManager.getAgentByUUIDFromDB(uuid);
+            Agent agent = HBaseModule.getAgentManager().getAgentByUUIDFromDB(uuid);
             list.add(agent);
         }
         return list;
@@ -102,7 +65,7 @@ public class HBaseDAO {
     public static HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
-            return dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
+            return HBaseModule.getDbManager().getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
@@ -99,7 +98,7 @@ public class DataNodesTable extends Table {
     }
 
     private void findRow(UUID uuid, String stdOut) {
-        Agent agent = getAgentManager().getAgentByUUID(uuid);
+        Agent agent = HadoopModule.getAgentManager().getAgentByUUID(uuid);
 
         for (Object itemId : container.getItemIds()) {
             Item item = container.getItem(itemId);
@@ -124,7 +123,4 @@ public class DataNodesTable extends Table {
         return "";
     }
 
-    public AgentManager getAgentManager() {
-        return ServiceLocator.getService(AgentManager.class);
-    }
 }
