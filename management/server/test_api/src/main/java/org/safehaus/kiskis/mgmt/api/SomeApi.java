@@ -27,7 +27,7 @@ public interface SomeApi {
     
     public boolean runCommand(String program);
     
-    public void writeLog(String log);
+    public boolean writeLog(String log);
     
     public List<String> getLogs();
 

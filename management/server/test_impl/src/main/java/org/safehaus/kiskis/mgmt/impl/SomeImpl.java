@@ -5,6 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.impl;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import java.util.ArrayList;
 import java.util.List;
 import org.safehaus.kiskis.mgmt.api.SomeApi;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -15,9 +18,9 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
  */
 public class SomeImpl implements SomeApi {
 
-    private DbManager dbManager;
+    private final DbManager dbManager;
 
-    public void setDbManager(DbManager dbManager) {
+    public SomeImpl(DbManager dbManager) {
         this.dbManager = dbManager;
     }
 
@@ -57,15 +60,26 @@ public class SomeImpl implements SomeApi {
     }
 
     @Override
-    public void writeLog(String log) {
-        SomeDAO someDAO = new SomeDAO(dbManager);
-        someDAO.writeLog(log);
+    public boolean writeLog(String log) {
+        String cql = "insert into logs (id, log) values (?,?)";
+        try {
+            dbManager.executeUpdate(cql, System.currentTimeMillis() + "", log);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public List<String> getLogs() {
-        SomeDAO someDAO = new SomeDAO(dbManager);
-        return someDAO.getLogs();
+        List<String> list = new ArrayList<String>();
+        String cql = "select * from logs";
+        ResultSet results = dbManager.executeQuery(cql);
+        for (Row row : results) {
+            String data = row.getString("log");
+            list.add(data);
+        }
+        return list;
     }
 
 }

@@ -137,4 +137,12 @@ public class DbManagerImpl implements DbManager {
         executeUpdate("delete from product_info where source = ? and key = ?", source, key);
     }
 
+    public void truncate(String table) {
+        try {
+            session.execute("truncate " + table);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in executeQuery", ex);
+        }
+    }
+
 }
