@@ -42,6 +42,11 @@
             <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.doomdark</groupId>
+            <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+            <version>${org.doomdark.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>ui-vaadin-services</artifactId>
             <version>${project.version}</version>

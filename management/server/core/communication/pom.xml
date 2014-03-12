@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-ejb_3.1_spec</artifactId>
+            <artifactId>geronimo-ejb_3.0_spec</artifactId>
             <version>${org.apache.geronimo.specs.ejb.version}</version>
         </dependency>
         <dependency>

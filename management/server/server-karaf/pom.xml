@@ -16,11 +16,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.eaio.uuid</groupId>
-            <artifactId>uuid</artifactId>
-            <version>${com.eaio.uuid.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.karaf</groupId>
             <artifactId>apache-karaf</artifactId>
             <version>${karaf.version}</version>
@@ -75,7 +70,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-ejb_3.1_spec</artifactId>
+            <artifactId>geronimo-ejb_3.0_spec</artifactId>
             <version>${org.apache.geronimo.specs.ejb.version}</version>
         </dependency>
         <dependency>
@@ -179,6 +174,16 @@
             <artifactId>jersey-server</artifactId>
             <version>${com.sun.jersey.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.orbit</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>${org.eclipse.jetty.orbit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.doomdark</groupId>
+            <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+            <version>${org.doomdark.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -251,9 +256,19 @@
                             <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>com.eaio.uuid</groupId>
-                                    <artifactId>uuid</artifactId>
-                                    <version>${com.eaio.uuid.version}</version>
+                                    <groupId>org.doomdark</groupId>
+                                    <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+                                    <version>${org.doomdark.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty.orbit</groupId>
+                                    <artifactId>javax.servlet</artifactId>
+                                    <version>${org.eclipse.jetty.orbit.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch</artifactId>
+                                    <version>${org.elasticsearch.version}</version>
                                 </artifactItem>
 
                                 <!--UI Modules-->
@@ -527,7 +542,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.geronimo.specs</groupId>
-                                    <artifactId>geronimo-ejb_3.1_spec</artifactId>
+                                    <artifactId>geronimo-ejb_3.0_spec</artifactId>
                                     <version>${org.apache.geronimo.specs.ejb.version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -616,6 +631,16 @@
                         <configuration>
                             <outputDirectory>target/dependencies/elasticsearch</outputDirectory>
                             <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty.orbit</groupId>
+                                    <artifactId>javax.servlet</artifactId>
+                                    <version>${org.eclipse.jetty.orbit.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.doomdark</groupId>
+                                    <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+                                    <version>${org.doomdark.version}</version>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
