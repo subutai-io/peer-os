@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.protocol.api;
+package org.safehaus.kiskis.mgmt.api.communication;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 

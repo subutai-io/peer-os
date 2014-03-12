@@ -7,9 +7,9 @@
         <artifactId>mgmt-server-core-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mgmt-server-communication</artifactId>
-    <name>Kiskis Management Server Communication</name>
-    <description>Server Communication Bundle</description>
+    <artifactId>communication-impl</artifactId>
+    <name>Kiskis Management Communication</name>
+    <description>Communication</description>
 
     <packaging>bundle</packaging>
 
@@ -54,6 +54,11 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-pool</artifactId>
             <version>${activemq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>communication-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
