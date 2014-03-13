@@ -11,10 +11,8 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -23,6 +21,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
@@ -48,44 +47,73 @@ public class LxcManagerImpl implements LxcManager {
 
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
         final Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
-        Task getLxcListTask = Tasks.getLxcListTask(agentManager.getPhysicalAgents());
+        Set<Agent> pAgents = agentManager.getPhysicalAgents();
+        if (!pAgents.isEmpty()) {
 
-        taskRunner.executeTask(getLxcListTask, new TaskCallback() {
-            private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
+            Task getLxcListTask = Tasks.getLxcListTask(agentManager.getPhysicalAgents());
 
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+            taskRunner.executeTask(getLxcListTask, new TaskCallback() {
+                private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
 
-                if (Util.isFinalResponse(response)) {
-                    lxcMap.put(response.getUuid(), stdOut);
-                }
+                @Override
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
-                if (task.isCompleted()) {
-                    for (Map.Entry<UUID, String> parentEntry : lxcMap.entrySet()) {
-                        Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
-                        String parentHostname = agent == null
-                                ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
-                        EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
-                        String[] lxcStrs = parentEntry.getValue().split("\\n");
-                        LxcState currState = null;
-                        for (String lxcStr : lxcStrs) {
-                            if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
-                                if (lxcs.get(LxcState.RUNNING) == null) {
-                                    lxcs.put(LxcState.RUNNING, new ArrayList<String>());
-                                }
-                                currState = LxcState.RUNNING;
-                            } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
-                                if (lxcs.get(LxcState.STOPPED) == null) {
-                                    lxcs.put(LxcState.STOPPED, new ArrayList<String>());
-                                }
-                                currState = LxcState.STOPPED;
-                            } else if (currState != null
-                                    && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                                lxcs.get(currState).add(lxcStr);
-                            }
-                        }
-                        agentFamilies.put(parentHostname, lxcs);
+                    if (Util.isFinalResponse(response)) {
+                        lxcMap.put(response.getUuid(), stdOut);
                     }
+
+                    if (task.isCompleted()) {
+                        for (Map.Entry<UUID, String> parentEntry : lxcMap.entrySet()) {
+                            Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
+                            String parentHostname = agent == null
+                                    ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
+                            EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
+                            String[] lxcStrs = parentEntry.getValue().split("\\n");
+                            LxcState currState = null;
+                            for (String lxcStr : lxcStrs) {
+                                if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
+                                    if (lxcs.get(LxcState.RUNNING) == null) {
+                                        lxcs.put(LxcState.RUNNING, new ArrayList<String>());
+                                    }
+                                    currState = LxcState.RUNNING;
+                                } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
+                                    if (lxcs.get(LxcState.STOPPED) == null) {
+                                        lxcs.put(LxcState.STOPPED, new ArrayList<String>());
+                                    }
+                                    currState = LxcState.STOPPED;
+                                } else if (currState != null
+                                        && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                                    lxcs.get(currState).add(lxcStr);
+                                }
+                            }
+                            agentFamilies.put(parentHostname, lxcs);
+                        }
+                        synchronized (task) {
+                            task.notifyAll();
+                        }
+                    }
+
+                    return null;
+                }
+            });
+
+            synchronized (getLxcListTask) {
+                try {
+                    getLxcListTask.wait(getLxcListTask.getAvgTimeout() * 1000 + 1000);
+                } catch (InterruptedException ex) {
+                }
+            }
+        }
+
+        return agentFamilies;
+    }
+
+    public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostName) {
+        Task cloneTask = Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostName);
+        taskRunner.executeTask(cloneTask, new TaskCallback() {
+
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                if (task.isCompleted()) {
                     synchronized (task) {
                         task.notifyAll();
                     }
@@ -95,14 +123,14 @@ public class LxcManagerImpl implements LxcManager {
             }
         });
 
-        synchronized (getLxcListTask) {
+        synchronized (cloneTask) {
             try {
-                getLxcListTask.wait(getLxcListTask.getAvgTimeout() * 1000 + 1000);
+                cloneTask.wait(cloneTask.getAvgTimeout() * 1000 + 1000);
             } catch (InterruptedException ex) {
             }
         }
 
-        return agentFamilies;
+        return cloneTask.getTaskStatus() == TaskStatus.SUCCESS;
     }
 
 }

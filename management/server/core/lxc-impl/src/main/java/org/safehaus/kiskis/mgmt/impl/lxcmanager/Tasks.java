@@ -9,7 +9,6 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
@@ -17,20 +16,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Tasks {
 
-    public static Task getCloneTask(Set<Agent> physicalAgents, String productName, double lxcCount) {
+    public static Task getCloneSingleLxcTask(Agent physicalAgent, String lxcHostName) {
         Task task = new Task();
-        task.setData(TaskType.CLONE_LXC);
-        for (Agent physAgent : physicalAgents) {
-            StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
-            lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName);
-            for (int i = 1; i <= lxcCount; i++) {
-                Request cmd = Commands.getCloneCommand();
-                cmd.setUuid(physAgent.getUuid());
-                String lxcHostFull = lxcHost.toString() + i;
-                cmd.getArgs().set(cmd.getArgs().size() - 1, lxcHostFull);
-                task.addRequest(cmd);
-            }
-        }
+        Request cmd = Commands.getCloneCommand();
+        cmd.setUuid(physicalAgent.getUuid());
+        cmd.setProgram(cmd.getProgram() + lxcHostName);
+        task.addRequest(cmd);
         return task;
     }
 

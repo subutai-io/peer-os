@@ -44,7 +44,7 @@ public class LxcModule implements Module {
             commandsSheet.setSizeFull();
 
             commandsSheet.addTab(new Cloner(taskRunner, lxcManager), "Clone");
-            commandsSheet.addTab(new Manager(taskRunner, agentManager), "Manage");
+            commandsSheet.addTab(new Manager(taskRunner, agentManager, lxcManager), "Manage");
 
             verticalLayout.addComponent(commandsSheet);
 

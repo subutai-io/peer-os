@@ -37,7 +37,7 @@ public class Commands {
 
     public static Request getCloneCommand() {
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-clone -o base-container -n");
+        req.setProgram("/usr/bin/lxc-clone -o base-container -n ");
         req.setTimeout(360);
         return req;
     }

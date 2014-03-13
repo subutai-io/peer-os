@@ -19,4 +19,6 @@ public interface LxcManager {
     public Map<Agent, Integer> getBestHostServers(int numberOfLxcsRequired);
 
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers();
+
+    public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname);
 }

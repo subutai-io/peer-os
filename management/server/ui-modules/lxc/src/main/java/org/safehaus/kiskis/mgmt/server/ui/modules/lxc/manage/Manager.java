@@ -29,12 +29,12 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
 public class Manager extends VerticalLayout {
 
-    private final TaskRunner taskRunner;
     private final Label indicator;
     private final Button infoBtn;
     private final Button startAllBtn;
@@ -42,19 +42,22 @@ public class Manager extends VerticalLayout {
     private final Button destroyAllBtn;
     private final TreeTable lxcTable;
     private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
+    private final TaskRunner taskRunner;
+    private final LxcManager lxcManager;
     private final AgentManager agentManager;
     private final static String physicalHostLabel = "Physical Host";
     private Set<Agent> physicalAgents;
     private volatile boolean isDestroyAllButtonClicked = false;
     private volatile int taskCount;
 
-    public Manager(TaskRunner taskRunner, AgentManager agentManager) {
+    public Manager(TaskRunner taskRunner, AgentManager agentManager, LxcManager lxcManager) {
 
         setSpacing(true);
         setMargin(true);
 
         this.taskRunner = taskRunner;
         this.agentManager = agentManager;
+        this.lxcManager = lxcManager;
 
         lxcTable = createTableTemplate("Lxc containers", 500);
 
@@ -63,14 +66,16 @@ public class Manager extends VerticalLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
+//                physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
+//
+//                if (physicalAgents.isEmpty()) {
+//                    getWindow().showNotification("Select at least one physical agent");
+//                } else {
+//                    //do the magic
+//                    sendGetLxcListCmd(physicalAgents);
+//                }
 
-                if (physicalAgents.isEmpty()) {
-                    getWindow().showNotification("Select at least one physical agent");
-                } else {
-                    //do the magic
-                    sendGetLxcListCmd(physicalAgents);
-                }
+                getLxcInfo();
             }
         });
 
@@ -164,59 +169,73 @@ public class Manager extends VerticalLayout {
         return table;
     }
 
-    public void sendGetLxcListCmd(Set<Agent> physicalAgents) {
-        lxcMap.clear();
+    public void getLxcInfo() {
         lxcTable.setEnabled(false);
-        Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
-        executeTask(getLxcListTask, new TaskCallback() {
+        Thread t = new Thread(new Runnable() {
 
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.getData() == TaskType.GET_LXC_LIST) {
+            public void run() {
+                Map<String, EnumMap<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>>> agentFamilies = lxcManager.getLxcOnPhysicalServers();
+                populateTable(agentFamilies);
+                clearEmptyParents();
+                lxcTable.setEnabled(true);
 
-                    if (Util.isFinalResponse(response)) {
-                        lxcMap.put(response.getUuid(), stdOut);
-                    }
-
-                    if (task.isCompleted()) {
-                        Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
-                        for (Map.Entry<UUID, String> parentEntry : lxcMap.entrySet()) {
-                            Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
-                            String parentHostname = agent == null
-                                    ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
-                            EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
-                            String[] lxcStrs = parentEntry.getValue().split("\\n");
-                            LxcState currState = null;
-                            for (String lxcStr : lxcStrs) {
-                                if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
-                                    if (lxcs.get(LxcState.RUNNING) == null) {
-                                        lxcs.put(LxcState.RUNNING, new ArrayList<String>());
-                                    }
-                                    currState = LxcState.RUNNING;
-                                } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
-                                    if (lxcs.get(LxcState.STOPPED) == null) {
-                                        lxcs.put(LxcState.STOPPED, new ArrayList<String>());
-                                    }
-                                    currState = LxcState.STOPPED;
-                                } else if (currState != null
-                                        && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                                    lxcs.get(currState).add(lxcStr);
-                                }
-                            }
-                            agentFamilies.put(parentHostname, lxcs);
-                        }
-
-                        populateTable(agentFamilies);
-                        clearEmptyParents();
-                        lxcTable.setEnabled(true);
-                    }
-                }
-
-                return null;
             }
         });
+        t.start();
     }
 
+//    public void sendGetLxcListCmd(Set<Agent> physicalAgents) {
+//        lxcMap.clear();
+//        lxcTable.setEnabled(false);
+//        Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
+//        executeTask(getLxcListTask, new TaskCallback() {
+//
+//            @Override
+//            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+//                if (task.getData() == TaskType.GET_LXC_LIST) {
+//
+//                    if (Util.isFinalResponse(response)) {
+//                        lxcMap.put(response.getUuid(), stdOut);
+//                    }
+//
+//                    if (task.isCompleted()) {
+//                        Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
+//                        for (Map.Entry<UUID, String> parentEntry : lxcMap.entrySet()) {
+//                            Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
+//                            String parentHostname = agent == null
+//                                    ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
+//                            EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
+//                            String[] lxcStrs = parentEntry.getValue().split("\\n");
+//                            LxcState currState = null;
+//                            for (String lxcStr : lxcStrs) {
+//                                if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
+//                                    if (lxcs.get(LxcState.RUNNING) == null) {
+//                                        lxcs.put(LxcState.RUNNING, new ArrayList<String>());
+//                                    }
+//                                    currState = LxcState.RUNNING;
+//                                } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
+//                                    if (lxcs.get(LxcState.STOPPED) == null) {
+//                                        lxcs.put(LxcState.STOPPED, new ArrayList<String>());
+//                                    }
+//                                    currState = LxcState.STOPPED;
+//                                } else if (currState != null
+//                                        && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+//                                    lxcs.get(currState).add(lxcStr);
+//                                }
+//                            }
+//                            agentFamilies.put(parentHostname, lxcs);
+//                        }
+//
+//                        populateTable(agentFamilies);
+//                        clearEmptyParents();
+//                        lxcTable.setEnabled(true);
+//                    }
+//                }
+//
+//                return null;
+//            }
+//        });
+//    }
     private void clearEmptyParents() {
         //clear empty parents
         for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
@@ -229,10 +248,10 @@ public class Manager extends VerticalLayout {
         }
     }
 
-    private void populateTable(Map<String, EnumMap<LxcState, List<String>>> agentFamilies) {
+    private void populateTable(Map<String, EnumMap<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>>> agentFamilies) {
         lxcTable.removeAllItems();
 
-        for (Map.Entry<String, EnumMap<LxcState, List<String>>> agentFamily : agentFamilies.entrySet()) {
+        for (Map.Entry<String, EnumMap<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>>> agentFamily : agentFamilies.entrySet()) {
             final String parentHostname = agentFamily.getKey();
             final Button startAllChildrenBtn = new Button(Buttons.START.getButtonLabel());
             final Button stopAllChildrenBtn = new Button(Buttons.STOP.getButtonLabel());
@@ -305,7 +324,7 @@ public class Manager extends VerticalLayout {
                 }
             });
 
-            for (Map.Entry<LxcState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
+            for (Map.Entry<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
 
                 for (final String lxcHostname : lxcs.getValue()) {
                     final Button startBtn = new Button(Buttons.START.getButtonLabel());
@@ -314,9 +333,9 @@ public class Manager extends VerticalLayout {
                     final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
                     progressIcon.setVisible(false);
 
-                    if (lxcs.getKey() == LxcState.RUNNING) {
+                    if (lxcs.getKey() == org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING) {
                         startBtn.setEnabled(false);
-                    } else if (lxcs.getKey() == LxcState.STOPPED) {
+                    } else if (lxcs.getKey() == org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.STOPPED) {
                         stopBtn.setEnabled(false);
                     }
                     final Object rowId = lxcTable.addItem(new Object[]{

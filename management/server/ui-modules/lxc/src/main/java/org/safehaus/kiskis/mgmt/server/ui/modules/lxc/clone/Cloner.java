@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
@@ -28,6 +29,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final Label indicator;
     private final TreeTable lxcTable;
     private final TaskRunner taskRunner;
+    private final LxcManager lxcManager;
     private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
     private final String physicalHostLabel = "Physical Host";
     private final String statusLabel = "Status";
@@ -37,11 +39,12 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
     private volatile int taskCount;
 
-    public Cloner(TaskRunner taskRunner, final LxcManager lxcManager) {
+    public Cloner(TaskRunner taskRunner, LxcManager lxcManager) {
         setSpacing(true);
         setMargin(true);
 
         this.taskRunner = taskRunner;
+        this.lxcManager = lxcManager;
 
         textFieldLxcName = new TextField();
         slider = new Slider();
@@ -89,18 +92,10 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             }
         });
 
-        Button testBtn = new Button("Test Lxc Api");
-        testBtn.addListener(new Button.ClickListener() {
-
-            public void buttonClick(Button.ClickEvent event) {
-                System.out.println(lxcManager.getLxcOnPhysicalServers());
-            }
-        });
-
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(8, 1);
+        GridLayout topContent = new GridLayout(7, 1);
         topContent.setSpacing(true);
 
         topContent.addComponent(new Label("Product name"));
@@ -109,7 +104,6 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         topContent.addComponent(slider);
         topContent.addComponent(cloneBtn);
         topContent.addComponent(clearBtn);
-        topContent.addComponent(testBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(topContent);
@@ -168,27 +162,65 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             show("Please, use only letters, digits, dots and hyphens in product name");
         } else {
             //do the magic
-            String productName = textFieldLxcName.getValue().toString().trim();
-            Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
-            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
-            for (Agent physAgent : physicalAgents) {
-                List<String> lxcNames = new ArrayList<String>();
-                for (Request cmd : task.getRequests()) {
-                    if (cmd.getUuid().compareTo(physAgent.getUuid()) == 0) {
-                        String lxcHostname
-                                = cmd.getArgs().get(cmd.getArgs().size() - 1);
-                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequestSequenceNumber(),
-                                lxcHostname);
+//            String productName = textFieldLxcName.getValue().toString().trim();
+//            Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
+//            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
+//            for (Agent physAgent : physicalAgents) {
+//                List<String> lxcNames = new ArrayList<String>();
+//                for (Request cmd : task.getRequests()) {
+//                    if (cmd.getUuid().compareTo(physAgent.getUuid()) == 0) {
+//                        String lxcHostname
+//                                = cmd.getArgs().get(cmd.getArgs().size() - 1);
+//                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequestSequenceNumber(),
+//                                lxcHostname);
+//
+//                        lxcNames.add(lxcHostname);
+//                    }
+//                }
+//                agentFamilies.put(physAgent, lxcNames);
+//            }
+//            populateLxcTable(agentFamilies);
+//            indicator.setVisible(true);
+//            taskCount++;
+//            taskRunner.executeTask(task, this);
 
-                        lxcNames.add(lxcHostname);
-                    }
+            String productName = textFieldLxcName.getValue().toString().trim();
+            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
+            double count = (Double) slider.getValue();
+            for (Agent physAgent : physicalAgents) {
+                List<String> lxcHostNames = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
+                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
+                    lxcHostNames.add(lxcHost.toString());
                 }
-                agentFamilies.put(physAgent, lxcNames);
+                agentFamilies.put(physAgent, lxcHostNames);
             }
+
             populateLxcTable(agentFamilies);
             indicator.setVisible(true);
-            taskCount++;
-            taskRunner.executeTask(task, this);
+            final AtomicInteger countProcessed = new AtomicInteger((int) (count * physicalAgents.size()));
+            for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
+                for (final String lxcHostname : agg.getValue()) {
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            boolean result = lxcManager.cloneLxcOnHost(agg.getKey(), lxcHostname);
+                            Item row = lxcTable.getItem(lxcHostname);
+                            if (row != null) {
+                                if (result) {
+                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
+                                } else {
+                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                                }
+                            }
+                            if (countProcessed.decrementAndGet() == 0) {
+                                indicator.setVisible(false);
+                            }
+                        }
+                    });
+                    t.start();
+                }
+            }
         }
 
     }
