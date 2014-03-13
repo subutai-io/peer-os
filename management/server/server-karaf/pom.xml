@@ -198,7 +198,7 @@
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-annotation</artifactId>
-            <version>org.springframework.osgi.version</version>
+            <version>${org.springframework.osgi.version}</version>
         </dependency>
     </dependencies>
     <build>
