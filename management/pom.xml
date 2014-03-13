@@ -85,6 +85,7 @@
         <org.elasticsearch.version>1.0.1</org.elasticsearch.version>
         <org.osgi.version>4.3.1</org.osgi.version>
         <org.slf4j.version>1.7.6</org.slf4j.version>
+        <org.springframework.osgi.version>1.2.1</org.springframework.osgi.version>
         <org.xerial.snappy.version>1.1.0.1</org.xerial.snappy.version>
         <xalan.version>2.7.1</xalan.version>
     </properties>

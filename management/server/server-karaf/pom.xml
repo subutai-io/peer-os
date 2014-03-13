@@ -188,17 +188,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>2.7.10</version>
+            <version>${org.apache.cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.shell</groupId>
             <artifactId>org.apache.karaf.shell.osgi</artifactId>
-            <version>2.3.3</version>
+            <version>${karaf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-annotation</artifactId>
-            <version>1.2.1</version>
+            <version>org.springframework.osgi.version</version>
         </dependency>
     </dependencies>
     <build>
@@ -618,17 +618,17 @@
                                 <artifactItem>
                                     <groupId>org.apache.cxf</groupId>
                                     <artifactId>cxf-rt-bindings-soap</artifactId>
-                                    <version>2.7.10</version>
+                                    <version>${org.apache.cxf.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.karaf.shell</groupId>
                                     <artifactId>org.apache.karaf.shell.osgi</artifactId>
-                                    <version>2.3.3</version>
+                                    <version>${karaf.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.springframework.osgi</groupId>
                                     <artifactId>spring-osgi-annotation</artifactId>
-                                    <version>1.2.1</version>
+                                    <version>${org.springframework.osgi.version}</version>
                                 </artifactItem>
 
                             </artifactItems>
