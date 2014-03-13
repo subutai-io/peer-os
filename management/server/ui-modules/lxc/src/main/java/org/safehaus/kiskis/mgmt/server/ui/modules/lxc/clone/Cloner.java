@@ -153,28 +153,6 @@ public class Cloner extends VerticalLayout {
                 .matches(hostValidatorRegex)) {
             show("Please, use only letters, digits, dots and hyphens in product name");
         } else {
-            //do the magic
-//            String productName = textFieldLxcName.getValue().toString().trim();
-//            Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
-//            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
-//            for (Agent physAgent : physicalAgents) {
-//                List<String> lxcNames = new ArrayList<String>();
-//                for (Request cmd : task.getRequests()) {
-//                    if (cmd.getUuid().compareTo(physAgent.getUuid()) == 0) {
-//                        String lxcHostname
-//                                = cmd.getArgs().get(cmd.getArgs().size() - 1);
-//                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequestSequenceNumber(),
-//                                lxcHostname);
-//
-//                        lxcNames.add(lxcHostname);
-//                    }
-//                }
-//                agentFamilies.put(physAgent, lxcNames);
-//            }
-//            populateLxcTable(agentFamilies);
-//            indicator.setVisible(true);
-//            taskCount++;
-//            taskRunner.executeTask(task, this);
 
             String productName = textFieldLxcName.getValue().toString().trim();
             Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
@@ -221,30 +199,4 @@ public class Cloner extends VerticalLayout {
         getWindow().showNotification(msg);
     }
 
-//    @Override
-//    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-//        if (Util.isFinalResponse(response)) {
-//            String lxcHost = requestToLxcMatchMap.get(task.getUuid() + "-" + response.getRequestSequenceNumber());
-//            if (lxcHost != null) {
-//                Item row = lxcTable.getItem(lxcHost);
-//                if (row != null) {
-//                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE && response.getExitCode() == 0) {
-//                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
-//                    } else {
-//                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
-//                    }
-//                }
-//            }
-//            requestToLxcMatchMap.remove(task.getUuid() + "-" + response.getRequestSequenceNumber());
-//        }
-//        if (task.isCompleted()) {
-//            taskCount--;
-//            if (taskCount == 0) {
-//                indicator.setVisible(false);
-//                requestToLxcMatchMap.clear();
-//            }
-//        }
-//
-//        return null;
-//    }
 }

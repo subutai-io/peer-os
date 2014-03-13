@@ -11,8 +11,8 @@
 
     <artifactId>lxc-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management LXC</name>
-    <description>Kiskis Management LXC</description>
+    <name>Kiskis Management LXC UI</name>
+    <description>Kiskis Management LXC UI</description>
 
     <build>
         <plugins>

@@ -14,7 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  *
- * TODO: 1) add async analogs 2) add batch operation analogs
+ * TODO: add async analogs
  */
 public interface LxcManager {
 

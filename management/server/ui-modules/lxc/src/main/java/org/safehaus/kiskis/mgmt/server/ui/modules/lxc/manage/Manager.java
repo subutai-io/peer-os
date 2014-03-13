@@ -51,15 +51,6 @@ public class Manager extends VerticalLayout {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-//                physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
-//
-//                if (physicalAgents.isEmpty()) {
-//                    getWindow().showNotification("Select at least one physical agent");
-//                } else {
-//                    //do the magic
-//                    sendGetLxcListCmd(physicalAgents);
-//                }
-
                 getLxcInfo();
             }
         });
@@ -169,58 +160,6 @@ public class Manager extends VerticalLayout {
         t.start();
     }
 
-//    public void sendGetLxcListCmd(Set<Agent> physicalAgents) {
-//        lxcMap.clear();
-//        lxcTable.setEnabled(false);
-//        Task getLxcListTask = Tasks.getLxcListTask(physicalAgents);
-//        executeTask(getLxcListTask, new TaskCallback() {
-//
-//            @Override
-//            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-//                if (task.getData() == TaskType.GET_LXC_LIST) {
-//
-//                    if (Util.isFinalResponse(response)) {
-//                        lxcMap.put(response.getUuid(), stdOut);
-//                    }
-//
-//                    if (task.isCompleted()) {
-//                        Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
-//                        for (Map.Entry<UUID, String> parentEntry : lxcMap.entrySet()) {
-//                            Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
-//                            String parentHostname = agent == null
-//                                    ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
-//                            EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
-//                            String[] lxcStrs = parentEntry.getValue().split("\\n");
-//                            LxcState currState = null;
-//                            for (String lxcStr : lxcStrs) {
-//                                if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
-//                                    if (lxcs.get(LxcState.RUNNING) == null) {
-//                                        lxcs.put(LxcState.RUNNING, new ArrayList<String>());
-//                                    }
-//                                    currState = LxcState.RUNNING;
-//                                } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
-//                                    if (lxcs.get(LxcState.STOPPED) == null) {
-//                                        lxcs.put(LxcState.STOPPED, new ArrayList<String>());
-//                                    }
-//                                    currState = LxcState.STOPPED;
-//                                } else if (currState != null
-//                                        && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
-//                                    lxcs.get(currState).add(lxcStr);
-//                                }
-//                            }
-//                            agentFamilies.put(parentHostname, lxcs);
-//                        }
-//
-//                        populateTable(agentFamilies);
-//                        clearEmptyParents();
-//                        lxcTable.setEnabled(true);
-//                    }
-//                }
-//
-//                return null;
-//            }
-//        });
-//    }
     private void clearEmptyParents() {
         //clear empty parents
         for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
@@ -343,7 +282,6 @@ public class Manager extends VerticalLayout {
 
                             final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                             if (physicalAgent != null) {
-//                                Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
                                 startBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
@@ -361,31 +299,6 @@ public class Manager extends VerticalLayout {
                                     }
                                 });
                                 t.start();
-//                                executeTask(startLxcTask, new TaskCallback() {
-                                //
-                                //                                    @Override
-                                //                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                //
-                                //                                        if (task.getData() == TaskType.START_LXC) {
-                                //                                            //send lxc-info cmd
-                                //                                            if (task.isCompleted()) {
-                                //                                                return Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
-                                //                                            }
-                                //                                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                //                                            if (task.isCompleted()) {
-                                //                                                if (stdOut.indexOf("RUNNING") != -1) {
-                                //                                                    stopBtn.setEnabled(true);
-                                //                                                } else {
-                                //                                                    startBtn.setEnabled(true);
-                                //                                                }
-                                //                                                destroyBtn.setEnabled(true);
-                                //                                                progressIcon.setVisible(false);
-                                //                                            }
-                                //                                        }
-                                //
-                                //                                        return null;
-                                //                                    }
-                                //                                });
                             }
                         }
                     });
@@ -396,7 +309,6 @@ public class Manager extends VerticalLayout {
 
                             final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                             if (physicalAgent != null) {
-//                                Task stopLxcTask = Tasks.getLxcStopTask(physicalAgent, lxcHostname);
                                 stopBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
@@ -414,30 +326,6 @@ public class Manager extends VerticalLayout {
                                     }
                                 });
                                 t.start();
-//                                executeTask(stopLxcTask, new TaskCallback() {
-//
-//                                    @Override
-//                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-//                                        if (task.getData() == TaskType.STOP_LXC) {
-//                                            //send lxc-info cmd
-//                                            if (task.isCompleted()) {
-//                                                return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-//                                            }
-//                                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
-//                                            if (task.isCompleted()) {
-//                                                if (stdOut.indexOf("RUNNING") != -1) {
-//                                                    stopBtn.setEnabled(true);
-//                                                } else {
-//                                                    startBtn.setEnabled(true);
-//                                                }
-//                                                destroyBtn.setEnabled(true);
-//                                                progressIcon.setVisible(false);
-//                                            }
-//                                        }
-//
-//                                        return null;
-//                                    }
-//                                });
                             }
                         }
                     });
@@ -456,7 +344,6 @@ public class Manager extends VerticalLayout {
                                                 if (ok) {
                                                     final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                                                     if (physicalAgent != null) {
-//                                                        Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
                                                         startBtn.setEnabled(false);
                                                         stopBtn.setEnabled(false);
                                                         destroyBtn.setEnabled(false);
@@ -477,31 +364,6 @@ public class Manager extends VerticalLayout {
                                                             }
                                                         });
                                                         t.start();
-//                                                        executeTask(destroyLxcTask, new TaskCallback() {
-//
-//                                                            @Override
-//                                                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-//                                                                if (task.getData() == TaskType.DESTROY_LXC) {
-//                                                                    //send lxc-info cmd
-//                                                                    if (task.isCompleted()) {
-//                                                                        return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-//                                                                    }
-//                                                                } else if (task.getData() == TaskType.GET_LXC_INFO) {
-//                                                                    if (task.isCompleted()) {
-//                                                                        if (stdOut.indexOf("RUNNING") != -1) {
-//                                                                            stopBtn.setEnabled(true);
-//                                                                            destroyBtn.setEnabled(true);
-//                                                                            progressIcon.setVisible(false);
-//                                                                        } else {
-//                                                                            //remove row
-//                                                                            lxcTable.removeItem(rowId);
-//                                                                            clearEmptyParents();
-//                                                                        }
-//                                                                    }
-//                                                                }
-//                                                                return null;
-//                                                            }
-//                                                        });
                                                     }
                                                 }
                                             }
@@ -510,7 +372,6 @@ public class Manager extends VerticalLayout {
 
                                 final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                                 if (physicalAgent != null) {
-//                                    Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
                                     startBtn.setEnabled(false);
                                     stopBtn.setEnabled(false);
                                     destroyBtn.setEnabled(false);
@@ -531,32 +392,6 @@ public class Manager extends VerticalLayout {
                                         }
                                     });
                                     t.start();
-//                                    executeTask(destroyLxcTask, new TaskCallback() {
-//
-//                                        @Override
-//                                        public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-//                                            if (task.getData() == TaskType.DESTROY_LXC) {
-//                                                //send lxc-info cmd
-//                                                if (task.isCompleted()) {
-//                                                    return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-//                                                }
-//                                            } else if (task.getData() == TaskType.GET_LXC_INFO) {
-//                                                if (task.isCompleted()) {
-//                                                    if (stdOut.indexOf("RUNNING") != -1) {
-//                                                        stopBtn.setEnabled(true);
-//                                                        destroyBtn.setEnabled(true);
-//                                                        progressIcon.setVisible(false);
-//                                                    } else {
-//                                                        //remove row
-//                                                        lxcTable.removeItem(rowId);
-//                                                        clearEmptyParents();
-//                                                    }
-//                                                }
-//                                            }
-//
-//                                            return null;
-//                                        }
-//                                    });
                                 }
                             }
 
@@ -569,23 +404,4 @@ public class Manager extends VerticalLayout {
 
     }
 
-//    private void executeTask(Task task, final TaskCallback callback) {
-//        indicator.setVisible(true);
-//        taskCount++;
-//        taskRunner.executeTask(task, new TaskCallback() {
-//
-//            @Override
-//            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-//                Task nextTask = callback.onResponse(task, response, stdOut, stdErr);
-//                if (task.isCompleted() && nextTask == null) {
-//                    taskCount--;
-//                    if (taskCount == 0) {
-//                        indicator.setVisible(false);
-//                    }
-//                }
-//
-//                return nextTask;
-//            }
-//        });
-//    }
 }

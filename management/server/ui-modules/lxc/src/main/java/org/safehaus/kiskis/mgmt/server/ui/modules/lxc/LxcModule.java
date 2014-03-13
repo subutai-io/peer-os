@@ -10,18 +10,12 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage.Manager;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public class LxcModule implements Module {
 
     public static final String MODULE_NAME = "LXC";
-    private TaskRunner taskRunner;
     private AgentManager agentManager;
     private LxcManager lxcManager;
-
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
-    }
 
     public void setAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
@@ -33,7 +27,7 @@ public class LxcModule implements Module {
 
     public static class ModuleComponent extends CustomComponent {
 
-        public ModuleComponent(TaskRunner taskRunner, AgentManager agentManager, LxcManager lxcManager) {
+        public ModuleComponent(AgentManager agentManager, LxcManager lxcManager) {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -61,7 +55,7 @@ public class LxcModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner, agentManager, lxcManager);
+        return new ModuleComponent(agentManager, lxcManager);
     }
 
 }
