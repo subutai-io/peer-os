@@ -17,19 +17,16 @@ import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
  */
 public class OozieDAO {
 
-    private DbManager dbManager;
+    private static final Logger LOG = Logger.getLogger(OozieDAO.class.getName());
+    private final DbManager dbManager;
 
     public OozieDAO(DbManager dbManager) {
         this.dbManager = dbManager;
     }
 
-    private static final Logger LOG = Logger.getLogger(OozieDAO.class.getName());
-
     public boolean saveClusterInfo(OozieConfig cluster) {
         try {
-
             dbManager.saveInfo(OozieModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
-
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveClusterInfo", ex);
             return false;
@@ -37,17 +34,18 @@ public class OozieDAO {
         return true;
     }
 
-    public  List<OozieConfig> getClusterInfo() {
+    public List<OozieConfig> getClusterInfo() {
         List<OozieConfig> list = new ArrayList<OozieConfig>();
         try {
-            dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
+            list = dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getClusterInfo", ex);
+            return null;
         }
         return list;
     }
 
-    public  boolean deleteClusterInfo(UUID uuid) {
+    public boolean deleteClusterInfo(UUID uuid) {
         try {
             dbManager.deleteInfo(OozieModule.MODULE_NAME, uuid.toString());
             return true;
@@ -57,7 +55,7 @@ public class OozieDAO {
         return false;
     }
 
-    public  Set<Agent> getAgents(Set<UUID> uuids) {
+    public Set<Agent> getAgents(Set<UUID> uuids) {
         Set<Agent> list = new HashSet<Agent>();
         for (UUID uuid : uuids) {
             Agent agent = OozieModule.getAgentManager().getAgentByUUIDFromDB(uuid);
@@ -69,7 +67,7 @@ public class OozieDAO {
     public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
-            dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
+            return dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);

@@ -120,13 +120,9 @@ public class ServiceInstaller {
                             moveToNextTask();
                             if (currentTask != null) {
                                 terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
-//                                for (Request command : currentTask.getCommands()) {
-//                                    executeCommand(command);
-//                                }
                                 return currentTask;
                             } else {
                                 terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-//                        saveInfo();
                                 saveHBaseInfo();
                             }
                         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
@@ -145,55 +141,10 @@ public class ServiceInstaller {
         currentTask = tasks.poll();
     }
 
-//    public void onResponse(Response response) {
-//        if (currentTask != null && response.getTaskUuid() != null
-//                && currentTask.getUuid().compareTo(response.getTaskUuid()) == 0) {
-//            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
-//            Task task = RequestUtil.getTask(response.getTaskUuid());
-//            if (!list.isEmpty() && terminal != null) {
-//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " successfully finished.\n");
-//                    moveToNextTask();
-//                    if (currentTask != null) {
-//                        terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
-//                        for (Request command : currentTask.getCommands()) {
-//                            executeCommand(command);
-//                        }
-//                    } else {
-//                        terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
-////                        saveInfo();
-//                        saveHBaseInfo();
-//                    }
-//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-//                    terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
-//                }
-//            }
-//            terminal.setCursorPosition(terminal.getValue().toString().length());
-//
-//        }
-//    }
-//    private static final Logger LOG = Logger.getLogger(ServiceInstaller.class.getName());
-//    private void saveInfo() {
-//        HBaseClusterInfo info = new HBaseClusterInfo();
-//        info.setDomainName(config.getDomainInfo());
-//        info.setMaster(config.getMasterUUIDset());
-//        info.setRegion(config.getRegionSet());
-//        info.setQuorum(config.getQuorumSet());
-//        info.setBmasters(config.getBackupMastersSet());
-//        info.setAllnodes(config.getAgentsSet());
-//
-//        if (HBaseDAO.saveHBaseClusterInfo(info)) {
-//            terminal.setValue(terminal.getValue().toString() + info.getUuid() + " cluster saved into keyspace.\n");
-//        }
-//    }
     private void saveHBaseInfo() {
         if (HBaseDAO.saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");
         }
     }
 
-//    private void executeCommand(Request command) {
-//        terminal.setValue(terminal.getValue().toString() + command.getProgram() + "\n");
-//        ServiceLocator.getService(CommandManager.class).executeCommand(command);
-//    }
 }

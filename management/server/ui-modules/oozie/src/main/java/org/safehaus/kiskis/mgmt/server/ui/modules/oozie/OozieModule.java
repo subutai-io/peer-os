@@ -2,6 +2,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
@@ -13,10 +15,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class OozieModule implements Module {
 
+    private static final Logger LOG = Logger.getLogger(OozieModule.class.getName());
+
     public static final String MODULE_NAME = "Oozie";
     private static TaskRunner taskRunner;
     private static AgentManager agentManager;
     private DbManager dbManager;
+    private OozieDAO oozieDAO;
 
     public void setAgentManager(AgentManager agentManager) {
         OozieModule.agentManager = agentManager;
@@ -47,7 +52,7 @@ public class OozieModule implements Module {
         Wizard wizard;
         Manager manager;
 
-        public ModuleComponent(TaskRunner taskRunner, DbManager dbManager) {
+        public ModuleComponent(TaskRunner taskRunner, OozieDAO oozieDAO) {
             setSizeFull();
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -57,7 +62,7 @@ public class OozieModule implements Module {
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-            OozieDAO oozieDAO = new OozieDAO(dbManager);
+            LOG.log(Level.INFO, "OOZIEDAO: {0}", oozieDAO);
             wizard = new Wizard(oozieDAO);
             manager = new Manager(oozieDAO);
             sheet.addTab(wizard.getContent(), "Install");
@@ -81,7 +86,8 @@ public class OozieModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner, dbManager);
+        oozieDAO = new OozieDAO(dbManager);
+        return new ModuleComponent(taskRunner, oozieDAO);
     }
 
 }

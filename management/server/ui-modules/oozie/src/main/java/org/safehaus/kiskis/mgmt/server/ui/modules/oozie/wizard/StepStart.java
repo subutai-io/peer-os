@@ -20,6 +20,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClustersTable;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -32,12 +34,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class StepStart extends Panel {
 
+    private static final Logger LOG = Logger.getLogger(StepStart.class.getName());
+
     private ClustersTable table;
     private Item selectedItem;
-//    private OozieDAO oozieDAO;
 
     public StepStart(final Wizard wizard) {
-//        this.oozieDAO = oozieDAO;
         setSizeFull();
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
@@ -62,31 +64,30 @@ public class StepStart extends Panel {
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-//                Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
-//                if (Util.isCollectionEmpty(selectedAgents)) {
-//                    show("Select nodes in the tree on the left first");
-//                } else {
-//                    wizard.getConfig().reset();
-//                    wizard.getConfig().setAgents(selectedAgents);
-//                    wizard.next();
-//                }
 
                 if (selectedItem != null) {
                     String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
+
+                    LOG.log(Level.INFO, "CLUSTER NAME: {0}", clusterName);
+                    LOG.log(Level.INFO, "OOZIEDAO: {0}", wizard.getOozieDAO());
                     HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
+                    if (cluster != null) {
+                        LOG.log(Level.INFO, "CLUSTER:{0} ", cluster);
+                        Set<Agent> taskTrackers = new HashSet<Agent>();
+                        taskTrackers.add(cluster.getJobTracker());
 
-                    Set<Agent> taskTrackers = new HashSet<Agent>();
-                    taskTrackers.add(cluster.getJobTracker());
+                        Set<Agent> nodes = new HashSet<Agent>(cluster.getDataNodes());
+                        nodes.add(cluster.getNameNode());
+                        nodes.add(cluster.getSecondaryNameNode());
+                        nodes.addAll(cluster.getTaskTrackers());
 
-                    Set<Agent> nodes = new HashSet<Agent>(cluster.getDataNodes());
-                    nodes.add(cluster.getNameNode());
-                    nodes.add(cluster.getSecondaryNameNode());
-                    nodes.addAll(cluster.getTaskTrackers());
-
-                    wizard.getConfig().reset();
-                    wizard.getConfig().setServer(taskTrackers.iterator().next());
-                    wizard.getConfig().setClients(nodes);
-                    wizard.next();
+                        wizard.getConfig().reset();
+                        wizard.getConfig().setServer(taskTrackers.iterator().next());
+                        wizard.getConfig().setClients(nodes);
+                        wizard.next();
+                    } else {
+                        LOG.log(Level.INFO, "Error while attemtp to get Hadoop cluster info");
+                    }
                 } else {
                     show("Please select Hadoop cluster first");
                 }

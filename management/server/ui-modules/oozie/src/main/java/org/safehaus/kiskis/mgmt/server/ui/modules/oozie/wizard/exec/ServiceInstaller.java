@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
 import com.vaadin.ui.TextArea;
+import java.util.HashSet;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -29,6 +30,7 @@ public class ServiceInstaller implements TaskCallback {
     public ServiceInstaller(Wizard wizard, TextArea terminal) {
         this.terminal = terminal;
         this.config = wizard.getConfig();
+        this.wizard = wizard;
         OozieCommands oc = new OozieCommands();
 
         Task updateApt = new Task("apt-get update");
@@ -60,24 +62,25 @@ public class ServiceInstaller implements TaskCallback {
         }
         tasks.add(installClient);
 
-        Set<Agent> allHadoopNodes = config.getClients();
+        Set<Agent> allHadoopNodes = new HashSet<Agent>();
+        allHadoopNodes.addAll(config.getClients());
         allHadoopNodes.add(config.getServer());
 
-        Task configugeRootHostClients = new Task("Configure client");
+        Task configugeRootHost = new Task("Configure root host");
         for (Agent agent : allHadoopNodes) {
             Request command = oc.getSetRootHost(" " + config.getServer().getListIP().get(0));
             command.setUuid(agent.getUuid());
-            configugeRootHostClients.addRequest(command);
+            configugeRootHost.addRequest(command);
         }
-        tasks.add(configugeRootHostClients);
+        tasks.add(configugeRootHost);
 
-        Task configugeRootGroupsClients = new Task("Configure client");
+        Task configugeRootGroups = new Task("Configure root groups");
         for (Agent agent : allHadoopNodes) {
             Request command = oc.getSetRootGroups();
             command.setUuid(agent.getUuid());
-            configugeRootGroupsClients.addRequest(command);
+            configugeRootGroups.addRequest(command);
         }
-        tasks.add(configugeRootGroupsClients);
+        tasks.add(configugeRootGroups);
 
     }
 
@@ -96,6 +99,8 @@ public class ServiceInstaller implements TaskCallback {
     private void saveInfo() {
         if (wizard.getOozieDAO().saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");
+        } else {
+            terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster is not saved into keyspace.\n");
         }
     }
 
