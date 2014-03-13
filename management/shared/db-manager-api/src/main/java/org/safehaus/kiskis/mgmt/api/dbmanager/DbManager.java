@@ -8,11 +8,18 @@ package org.safehaus.kiskis.mgmt.api.dbmanager;
 import com.datastax.driver.core.ResultSet;
 import java.util.List;
 
-/**ы
+/**
+ * ы
  *
  * @author dilshat
  */
 public interface DbManager {
+
+    public void setCassandraKeyspace(String cassandraKeyspace);
+
+    public void setCassandraHost(String cassandraHost);
+
+    public void setCassandraPort(int cassandraPort);
 
     public ResultSet executeQuery(String cql, Object... values);
 
@@ -25,4 +32,10 @@ public interface DbManager {
     public <T> List<T> getInfo(String source, Class<T> clazz);
 
     public void deleteInfo(String source, String key);
+    
+    public void init();
+    
+    public String executeCqlQuery(String cql);
+
+    public List<String> getLogs();
 }

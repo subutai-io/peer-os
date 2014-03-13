@@ -9,6 +9,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard;
 
+import org.doomdark.uuid.UUIDGenerator;
+
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,7 +34,7 @@ public class OozieClusterInfo {
     private Set<UUID> allnodes;
 
     public OozieClusterInfo() {
-        this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
     public UUID getUuid() {

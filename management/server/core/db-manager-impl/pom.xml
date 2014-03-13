@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${osgi.version}</version>
+            <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -30,49 +30,49 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>2.0.0</version>
+            <version>${com.datastax.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>2.0.5</version>
+            <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-thrift</artifactId>
-            <version>2.0.5</version>
+            <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>net.jpountz.lz4</groupId>
             <artifactId>lz4</artifactId>
-            <version>1.2.0</version>
+            <version>${net.jpountz.lz4.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>3.9.0.Final</version>
+            <version>${io.netty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>1.9.13</version>
+            <version>${org.codehaus.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
+            <version>${org.codehaus.jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>3.0.2</version>
+            <version>${com.codahale.metrics.metrics-core.version}</version>
         </dependency>
         <!-- Compression libraries for the protocol. -->
         <!-- Each of them is only a mandatory runtime dependency if you want to use the compression it offers -->
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
-            <version>1.1.0.1</version>
+            <version>${org.xerial.snappy.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -94,7 +94,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
+                <version>${org.apache.felix.version}</version>
                 <inherited>true</inherited>
                 <extensions>true</extensions>
                 <configuration>

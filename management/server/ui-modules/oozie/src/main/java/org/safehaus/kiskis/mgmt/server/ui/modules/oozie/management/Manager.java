@@ -10,6 +10,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 
 /**
  *
@@ -20,8 +21,7 @@ public class Manager {
     private final VerticalLayout content;
     private final OozieTable table;
 
-    public Manager() {
-
+    public Manager(OozieDAO oozieDAO) {
         content = new VerticalLayout();
         content.setMargin(true);
 
@@ -29,7 +29,7 @@ public class Manager {
 
         Label clusterNameLabel = new Label("Select the cluster");
 
-        table = new OozieTable();
+        table = new OozieTable(oozieDAO);
         Button getClustersBtn = new Button("Get clusters");
         getClustersBtn.addListener(new Button.ClickListener() {
 
@@ -49,9 +49,5 @@ public class Manager {
     public Component getContent() {
         return content;
     }
-
-//    public void setOutput(Response response) {
-//        table.onResponse(response);
-//    }
 
 }

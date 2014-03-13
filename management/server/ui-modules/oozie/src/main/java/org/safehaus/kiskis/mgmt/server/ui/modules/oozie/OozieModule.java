@@ -1,6 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
-import com.vaadin.ui.*;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -16,14 +19,14 @@ public class OozieModule implements Module {
     public static final String MODULE_NAME = "Oozie";
     private static TaskRunner taskRunner;
     private static AgentManager agentManager;
-    private static DbManager dbManager;
+    private DbManager dbManager;
 
     public void setAgentManager(AgentManager agentManager) {
         OozieModule.agentManager = agentManager;
     }
 
     public void setDbManager(DbManager dbManager) {
-        OozieModule.dbManager = dbManager;
+        this.dbManager = dbManager;
     }
 
     public void setTaskRunner(TaskRunner taskRunner) {
@@ -38,7 +41,7 @@ public class OozieModule implements Module {
         return agentManager;
     }
 
-    public static DbManager getDbManager() {
+    public DbManager getDbManager() {
         return dbManager;
     }
 
@@ -47,7 +50,7 @@ public class OozieModule implements Module {
         Wizard wizard;
         Manager manager;
 
-        public ModuleComponent(TaskRunner taskRunner) {
+        public ModuleComponent(TaskRunner taskRunner, DbManager dbManager) {
             setSizeFull();
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -57,9 +60,9 @@ public class OozieModule implements Module {
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-
-            wizard = new Wizard();
-            manager = new Manager();
+            OozieDAO oozieDAO = new OozieDAO(dbManager);
+            wizard = new Wizard(oozieDAO);
+            manager = new Manager(oozieDAO);
             sheet.addTab(wizard.getContent(), "Install");
             sheet.addTab(manager.getContent(), "Manage");
 
@@ -68,15 +71,6 @@ public class OozieModule implements Module {
             setCompositionRoot(verticalLayout);
         }
 
-//        @Override
-//        public void onCommand(Response response) {
-//            if (wizard != null) {
-//                wizard.setOutput(response);
-//            }
-//            if (manager != null) {
-//                manager.setOutput(response);
-//            }
-//        }
         public Iterable<Agent> getLxcList() {
             return MgmtApplication.getSelectedAgents();
         }
@@ -90,7 +84,7 @@ public class OozieModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner);
+        return new ModuleComponent(taskRunner, dbManager);
     }
 
 }

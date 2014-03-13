@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 
+import org.doomdark.uuid.UUIDGenerator;
+
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,7 +30,7 @@ public class HBaseClusterInfo {
     private Set<UUID> allnodes;
 
     public HBaseClusterInfo() {
-        this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
     public UUID getUuid() {

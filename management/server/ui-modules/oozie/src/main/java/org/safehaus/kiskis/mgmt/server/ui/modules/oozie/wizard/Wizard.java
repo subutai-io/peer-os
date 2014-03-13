@@ -12,6 +12,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 
 /**
  *
@@ -23,8 +24,10 @@ public class Wizard {
     private int step = 1;
     private final OozieConfig config = new OozieConfig();
     private StepFinish stepFinish;
+    private final OozieDAO oozieDAO;
 
-    public Wizard() {
+    public Wizard(OozieDAO oozieDAO) {
+        this.oozieDAO = oozieDAO;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin(true);
@@ -50,7 +53,7 @@ public class Wizard {
         putForm();
     }
 
-    protected OozieConfig getConfig() {
+    public OozieConfig getConfig() {
         return config;
     }
 
@@ -78,10 +81,8 @@ public class Wizard {
         }
     }
 
-//    public void setOutput(Response response) {
-//        if (stepFinish != null) {
-//            stepFinish.getInstaller().onResponse(response);
-//        }
-//    }
+    public OozieDAO getOozieDAO() {
+        return oozieDAO;
+    }
 
 }

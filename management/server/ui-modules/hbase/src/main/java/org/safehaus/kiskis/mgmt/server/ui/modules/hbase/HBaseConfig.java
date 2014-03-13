@@ -5,10 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
+import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
 import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  *
@@ -25,7 +27,7 @@ public class HBaseConfig implements Serializable {
     String domainInfo;
 
     public HBaseConfig() {
-        this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
     public UUID getUuid() {

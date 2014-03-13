@@ -32,9 +32,8 @@ public class SomeCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        String hello = someApi.sayHello("say Hello method executed");
+        String hello = someApi.sayHello("some command executed");
         System.out.println(hello);
-        someApi.writeLog("log test hello people");
         return null;
     }
 }
