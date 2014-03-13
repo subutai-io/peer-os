@@ -5,15 +5,12 @@
                interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>    
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>     
-    <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>     
     
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule">
+    <bean id="lxcmanager" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.lxcmanager.LxcManagerImpl">
         <property name="taskRunner" ref="taskRunner"/>
         <property name="agentManager" ref="agentManager"/>
-        <property name="lxcManager" ref="lxcManager"/>
     </bean>     
     
-    <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
+    <service ref="lxcmanager" interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>
     
 </blueprint>

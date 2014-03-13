@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.clone.Cloner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage.Manager;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 
 public class LxcModule implements Module {
@@ -17,7 +16,6 @@ public class LxcModule implements Module {
     public static final String MODULE_NAME = "LXC";
     private TaskRunner taskRunner;
     private AgentManager agentManager;
-    private LxcManager lxcManager;
 
     public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
@@ -27,13 +25,9 @@ public class LxcModule implements Module {
         this.agentManager = agentManager;
     }
 
-    public void setLxcManager(LxcManager lxcManager) {
-        this.lxcManager = lxcManager;
-    }
-
     public static class ModuleComponent extends CustomComponent {
 
-        public ModuleComponent(TaskRunner taskRunner, AgentManager agentManager, LxcManager lxcManager) {
+        public ModuleComponent(TaskRunner taskRunner, AgentManager agentManager) {
 
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -43,7 +37,7 @@ public class LxcModule implements Module {
             commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
             commandsSheet.setSizeFull();
 
-            commandsSheet.addTab(new Cloner(taskRunner, lxcManager), "Clone");
+            commandsSheet.addTab(new Cloner(taskRunner), "Clone");
             commandsSheet.addTab(new Manager(taskRunner, agentManager), "Manage");
 
             verticalLayout.addComponent(commandsSheet);
@@ -61,7 +55,7 @@ public class LxcModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner, agentManager, lxcManager);
+        return new ModuleComponent(taskRunner, agentManager);
     }
 
 }

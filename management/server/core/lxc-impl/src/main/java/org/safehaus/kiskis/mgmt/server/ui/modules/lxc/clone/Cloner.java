@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
@@ -37,7 +36,7 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
     private volatile int taskCount;
 
-    public Cloner(TaskRunner taskRunner, final LxcManager lxcManager) {
+    public Cloner(TaskRunner taskRunner) {
         setSpacing(true);
         setMargin(true);
 
@@ -89,18 +88,10 @@ public class Cloner extends VerticalLayout implements TaskCallback {
             }
         });
 
-        Button testBtn = new Button("Test Lxc Api");
-        testBtn.addListener(new Button.ClickListener() {
-
-            public void buttonClick(Button.ClickEvent event) {
-                System.out.println(lxcManager.getLxcOnPhysicalServers());
-            }
-        });
-
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(8, 1);
+        GridLayout topContent = new GridLayout(7, 1);
         topContent.setSpacing(true);
 
         topContent.addComponent(new Label("Product name"));
@@ -109,7 +100,6 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         topContent.addComponent(slider);
         topContent.addComponent(cloneBtn);
         topContent.addComponent(clearBtn);
-        topContent.addComponent(testBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(topContent);
