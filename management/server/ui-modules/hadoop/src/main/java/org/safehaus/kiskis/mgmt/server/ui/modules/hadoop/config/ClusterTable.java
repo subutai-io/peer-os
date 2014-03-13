@@ -6,10 +6,10 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode.DataNodesWindow;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker.TaskTrackersWindow;
-import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 
 import java.util.List;
 

@@ -1,12 +1,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
+import org.doomdark.uuid.UUIDGenerator;
+
+
 import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
- *
  * @author dilshat
  */
 public class OozieConfig implements Serializable {
@@ -17,7 +19,7 @@ public class OozieConfig implements Serializable {
     private Set<Agent> clients;
 
     public OozieConfig() {
-        this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
     public UUID getUuid() {

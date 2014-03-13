@@ -5,17 +5,22 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM

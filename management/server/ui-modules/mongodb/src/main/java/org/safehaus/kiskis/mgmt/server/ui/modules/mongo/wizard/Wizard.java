@@ -5,12 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+
 import java.util.logging.Logger;
 
 /**

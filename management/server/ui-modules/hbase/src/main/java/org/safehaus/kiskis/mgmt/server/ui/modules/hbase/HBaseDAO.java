@@ -5,15 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 
 /**
  *
