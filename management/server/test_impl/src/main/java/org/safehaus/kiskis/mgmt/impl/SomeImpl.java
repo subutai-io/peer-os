@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl;
 
 import org.safehaus.kiskis.mgmt.api.SomeApi;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
 /**
  *
@@ -13,11 +14,11 @@ import org.safehaus.kiskis.mgmt.api.SomeApi;
  */
 public class SomeImpl implements SomeApi {
 
-//    private final DbManager dbManager;
-//
-//    public SomeImpl(DbManager dbManager) {
-//        this.dbManager = dbManager;
-//    }
+    private DbManager dbManager;
+
+    public void setDbManager(DbManager dbManager) {
+        this.dbManager = dbManager;
+    }
 
     @Override
     public String sayHello(String name) {
