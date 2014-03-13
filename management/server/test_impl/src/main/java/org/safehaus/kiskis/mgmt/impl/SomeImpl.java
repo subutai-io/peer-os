@@ -5,12 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import java.util.ArrayList;
-import java.util.List;
 import org.safehaus.kiskis.mgmt.api.SomeApi;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
 /**
  *
@@ -18,11 +13,11 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
  */
 public class SomeImpl implements SomeApi {
 
-    private final DbManager dbManager;
-
-    public SomeImpl(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
+//    private final DbManager dbManager;
+//
+//    public SomeImpl(DbManager dbManager) {
+//        this.dbManager = dbManager;
+//    }
 
     @Override
     public String sayHello(String name) {
@@ -57,29 +52,6 @@ public class SomeImpl implements SomeApi {
     @Override
     public boolean runCommand(String program) {
         return true;
-    }
-
-    @Override
-    public boolean writeLog(String log) {
-        String cql = "insert into logs (id, log) values (?,?)";
-        try {
-            dbManager.executeUpdate(cql, System.currentTimeMillis() + "", log);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public List<String> getLogs() {
-        List<String> list = new ArrayList<String>();
-        String cql = "select * from logs";
-        ResultSet results = dbManager.executeQuery(cql);
-        for (Row row : results) {
-            String data = row.getString("log");
-            list.add(data);
-        }
-        return list;
     }
 
 }

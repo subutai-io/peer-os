@@ -35,5 +35,7 @@ public interface DbManager {
     
     public void init();
     
-    public void truncate(String table);
+    public String executeCqlQuery(String cql);
+
+    public List<String> getLogs();
 }
