@@ -164,7 +164,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         return new HashSet<Agent>();
     }
 
-    public static void setSelectedAgents(Set<Agent> agents) {
+    static void setSelectedAgents(Set<Agent> agents) {
         if (getInstance() != null && agents != null) {
             getInstance().selectedAgents = agents;
         }
