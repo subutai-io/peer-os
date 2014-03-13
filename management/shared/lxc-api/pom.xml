@@ -40,7 +40,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.api.lxc</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.lxcmanager</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

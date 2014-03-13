@@ -27,9 +27,10 @@
                 <version>${org.apache.felix.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.server.ui.modules</Bundle-SymbolicName>
-                    </instructions>
+                        <Bundle-SymbolicName>${project.groupId}.impl.lxcmanager</Bundle-SymbolicName>
+                        <Export-Package>
+                            {local-packages};version=${project.version};-noimport:=true
+                        </Export-Package>
                 </configuration>
             </plugin>
         </plugins>
