@@ -11,7 +11,6 @@
     <artifactId>communication-api</artifactId>
     <name>Kiskis Management Communication Api</name>
     <description>Communication Api</description>
-
     <packaging>bundle</packaging>
 
     <dependencies>
