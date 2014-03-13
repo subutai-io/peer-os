@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 
@@ -16,12 +17,18 @@ import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
  */
 public class OozieDAO {
 
+    private DbManager dbManager;
+
+    public OozieDAO(DbManager dbManager) {
+        this.dbManager = dbManager;
+    }
+
     private static final Logger LOG = Logger.getLogger(OozieDAO.class.getName());
 
-    public static boolean saveClusterInfo(OozieConfig cluster) {
+    public boolean saveClusterInfo(OozieConfig cluster) {
         try {
 
-            OozieModule.getDbManager().saveInfo(OozieModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
+            dbManager.saveInfo(OozieModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveClusterInfo", ex);
@@ -30,19 +37,19 @@ public class OozieDAO {
         return true;
     }
 
-    public static List<OozieConfig> getClusterInfo() {
+    public  List<OozieConfig> getClusterInfo() {
         List<OozieConfig> list = new ArrayList<OozieConfig>();
         try {
-            return OozieModule.getDbManager().getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
+            dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getClusterInfo", ex);
         }
         return list;
     }
 
-    public static boolean deleteClusterInfo(UUID uuid) {
+    public  boolean deleteClusterInfo(UUID uuid) {
         try {
-            OozieModule.getDbManager().deleteInfo(OozieModule.MODULE_NAME, uuid.toString());
+            dbManager.deleteInfo(OozieModule.MODULE_NAME, uuid.toString());
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in deleteClusterInfo", ex);
@@ -50,7 +57,7 @@ public class OozieDAO {
         return false;
     }
 
-    public static Set<Agent> getAgents(Set<UUID> uuids) {
+    public  Set<Agent> getAgents(Set<UUID> uuids) {
         Set<Agent> list = new HashSet<Agent>();
         for (UUID uuid : uuids) {
             Agent agent = OozieModule.getAgentManager().getAgentByUUIDFromDB(uuid);
@@ -59,10 +66,10 @@ public class OozieDAO {
         return list;
     }
 
-    public static HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
+    public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
-            return OozieModule.getDbManager().getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
+            dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);

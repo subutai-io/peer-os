@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClustersTable;
-import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -35,8 +34,10 @@ public class StepStart extends Panel {
 
     private ClustersTable table;
     private Item selectedItem;
+//    private OozieDAO oozieDAO;
 
     public StepStart(final Wizard wizard) {
+//        this.oozieDAO = oozieDAO;
         setSizeFull();
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();
@@ -72,7 +73,7 @@ public class StepStart extends Panel {
 
                 if (selectedItem != null) {
                     String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
-                    HadoopClusterInfo cluster = OozieDAO.getHadoopClusterInfo(clusterName);
+                    HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
 
                     Set<Agent> taskTrackers = new HashSet<Agent>();
                     taskTrackers.add(cluster.getJobTracker());

@@ -1,42 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
-
-
-
-
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule;
@@ -73,22 +34,25 @@ public class OozieCommands {
                 120); //                        timeout (sec)
     }
 
-    public Request getSetConfigCommand(String param) {
-
+    public Request getSetRootHost(String ip) {
         Request req = getTemplate();
-        req.setProgram(OozieCommandEnum.CONFIGURE.getProgram() + " " + param);
+        req.setProgram(OozieCommandEnum.CONFIGURE_ROOT_HOST.getProgram() + " " + ip);
+        return req;
+    }
+    
+    public Request getSetRootGroups() {
+        Request req = getTemplate();
+        req.setProgram(OozieCommandEnum.CONFIGURE_ROOT_HOST.getProgram());
         return req;
     }
 
     public Request getAptGetUpdate() {
-
         Request req = getTemplate();
         req.setProgram("apt-get update");
         return req;
     }
 
     public Request getCommand(OozieCommandEnum cce) {
-
         Request req = getTemplate();
         req.setProgram(cce.getProgram());
         return req;
