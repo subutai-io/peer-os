@@ -10,27 +10,17 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.LxcState;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.TaskType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
 public class Manager extends VerticalLayout {
@@ -41,21 +31,16 @@ public class Manager extends VerticalLayout {
     private final Button stopAllBtn;
     private final Button destroyAllBtn;
     private final TreeTable lxcTable;
-    private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
-    private final TaskRunner taskRunner;
     private final LxcManager lxcManager;
     private final AgentManager agentManager;
     private final static String physicalHostLabel = "Physical Host";
-    private Set<Agent> physicalAgents;
     private volatile boolean isDestroyAllButtonClicked = false;
-    private volatile int taskCount;
 
-    public Manager(TaskRunner taskRunner, AgentManager agentManager, LxcManager lxcManager) {
+    public Manager(AgentManager agentManager, LxcManager lxcManager) {
 
         setSpacing(true);
         setMargin(true);
 
-        this.taskRunner = taskRunner;
         this.agentManager = agentManager;
         this.lxcManager = lxcManager;
 
@@ -411,34 +396,48 @@ public class Manager extends VerticalLayout {
 
                             final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                             if (physicalAgent != null) {
-                                Task stopLxcTask = Tasks.getLxcStopTask(physicalAgent, lxcHostname);
+//                                Task stopLxcTask = Tasks.getLxcStopTask(physicalAgent, lxcHostname);
                                 stopBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                executeTask(stopLxcTask, new TaskCallback() {
+                                Thread t = new Thread(new Runnable() {
 
-                                    @Override
-                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        if (task.getData() == TaskType.STOP_LXC) {
-                                            //send lxc-info cmd
-                                            if (task.isCompleted()) {
-                                                return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                            }
-                                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                            if (task.isCompleted()) {
-                                                if (stdOut.indexOf("RUNNING") != -1) {
-                                                    stopBtn.setEnabled(true);
-                                                } else {
-                                                    startBtn.setEnabled(true);
-                                                }
-                                                destroyBtn.setEnabled(true);
-                                                progressIcon.setVisible(false);
-                                            }
+                                    public void run() {
+                                        org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.stopLxcOnHost(physicalAgent, lxcHostname);
+                                        if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                            stopBtn.setEnabled(true);
+                                        } else {
+                                            startBtn.setEnabled(true);
                                         }
-
-                                        return null;
+                                        destroyBtn.setEnabled(true);
+                                        progressIcon.setVisible(false);
                                     }
                                 });
+                                t.start();
+//                                executeTask(stopLxcTask, new TaskCallback() {
+//
+//                                    @Override
+//                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+//                                        if (task.getData() == TaskType.STOP_LXC) {
+//                                            //send lxc-info cmd
+//                                            if (task.isCompleted()) {
+//                                                return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
+//                                            }
+//                                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
+//                                            if (task.isCompleted()) {
+//                                                if (stdOut.indexOf("RUNNING") != -1) {
+//                                                    stopBtn.setEnabled(true);
+//                                                } else {
+//                                                    startBtn.setEnabled(true);
+//                                                }
+//                                                destroyBtn.setEnabled(true);
+//                                                progressIcon.setVisible(false);
+//                                            }
+//                                        }
+//
+//                                        return null;
+//                                    }
+//                                });
                             }
                         }
                     });
@@ -457,36 +456,52 @@ public class Manager extends VerticalLayout {
                                                 if (ok) {
                                                     final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                                                     if (physicalAgent != null) {
-                                                        Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
+//                                                        Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
                                                         startBtn.setEnabled(false);
                                                         stopBtn.setEnabled(false);
                                                         destroyBtn.setEnabled(false);
                                                         progressIcon.setVisible(true);
-                                                        executeTask(destroyLxcTask, new TaskCallback() {
+                                                        Thread t = new Thread(new Runnable() {
 
-                                                            @Override
-                                                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                                                if (task.getData() == TaskType.DESTROY_LXC) {
-                                                                    //send lxc-info cmd
-                                                                    if (task.isCompleted()) {
-                                                                        return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                                    }
-                                                                } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                                                    if (task.isCompleted()) {
-                                                                        if (stdOut.indexOf("RUNNING") != -1) {
-                                                                            stopBtn.setEnabled(true);
-                                                                            destroyBtn.setEnabled(true);
-                                                                            progressIcon.setVisible(false);
-                                                                        } else {
-                                                                            //remove row
-                                                                            lxcTable.removeItem(rowId);
-                                                                            clearEmptyParents();
-                                                                        }
-                                                                    }
+                                                            public void run() {
+                                                                org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
+                                                                if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                                                    stopBtn.setEnabled(true);
+                                                                    destroyBtn.setEnabled(true);
+                                                                    progressIcon.setVisible(false);
+                                                                } else {
+                                                                    //remove row
+                                                                    lxcTable.removeItem(rowId);
+                                                                    clearEmptyParents();
                                                                 }
-                                                                return null;
                                                             }
                                                         });
+                                                        t.start();
+//                                                        executeTask(destroyLxcTask, new TaskCallback() {
+//
+//                                                            @Override
+//                                                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+//                                                                if (task.getData() == TaskType.DESTROY_LXC) {
+//                                                                    //send lxc-info cmd
+//                                                                    if (task.isCompleted()) {
+//                                                                        return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
+//                                                                    }
+//                                                                } else if (task.getData() == TaskType.GET_LXC_INFO) {
+//                                                                    if (task.isCompleted()) {
+//                                                                        if (stdOut.indexOf("RUNNING") != -1) {
+//                                                                            stopBtn.setEnabled(true);
+//                                                                            destroyBtn.setEnabled(true);
+//                                                                            progressIcon.setVisible(false);
+//                                                                        } else {
+//                                                                            //remove row
+//                                                                            lxcTable.removeItem(rowId);
+//                                                                            clearEmptyParents();
+//                                                                        }
+//                                                                    }
+//                                                                }
+//                                                                return null;
+//                                                            }
+//                                                        });
                                                     }
                                                 }
                                             }
@@ -495,37 +510,53 @@ public class Manager extends VerticalLayout {
 
                                 final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                                 if (physicalAgent != null) {
-                                    Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
+//                                    Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
                                     startBtn.setEnabled(false);
                                     stopBtn.setEnabled(false);
                                     destroyBtn.setEnabled(false);
                                     progressIcon.setVisible(true);
-                                    executeTask(destroyLxcTask, new TaskCallback() {
+                                    Thread t = new Thread(new Runnable() {
 
-                                        @Override
-                                        public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                            if (task.getData() == TaskType.DESTROY_LXC) {
-                                                //send lxc-info cmd
-                                                if (task.isCompleted()) {
-                                                    return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
-                                                }
-                                            } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                                if (task.isCompleted()) {
-                                                    if (stdOut.indexOf("RUNNING") != -1) {
-                                                        stopBtn.setEnabled(true);
-                                                        destroyBtn.setEnabled(true);
-                                                        progressIcon.setVisible(false);
-                                                    } else {
-                                                        //remove row
-                                                        lxcTable.removeItem(rowId);
-                                                        clearEmptyParents();
-                                                    }
-                                                }
+                                        public void run() {
+                                            org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
+                                            if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                                stopBtn.setEnabled(true);
+                                                destroyBtn.setEnabled(true);
+                                                progressIcon.setVisible(false);
+                                            } else {
+                                                //remove row
+                                                lxcTable.removeItem(rowId);
+                                                clearEmptyParents();
                                             }
-
-                                            return null;
                                         }
                                     });
+                                    t.start();
+//                                    executeTask(destroyLxcTask, new TaskCallback() {
+//
+//                                        @Override
+//                                        public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+//                                            if (task.getData() == TaskType.DESTROY_LXC) {
+//                                                //send lxc-info cmd
+//                                                if (task.isCompleted()) {
+//                                                    return Tasks.getLxcInfoTask(physicalAgent, lxcHostname);
+//                                                }
+//                                            } else if (task.getData() == TaskType.GET_LXC_INFO) {
+//                                                if (task.isCompleted()) {
+//                                                    if (stdOut.indexOf("RUNNING") != -1) {
+//                                                        stopBtn.setEnabled(true);
+//                                                        destroyBtn.setEnabled(true);
+//                                                        progressIcon.setVisible(false);
+//                                                    } else {
+//                                                        //remove row
+//                                                        lxcTable.removeItem(rowId);
+//                                                        clearEmptyParents();
+//                                                    }
+//                                                }
+//                                            }
+//
+//                                            return null;
+//                                        }
+//                                    });
                                 }
                             }
 
@@ -538,24 +569,23 @@ public class Manager extends VerticalLayout {
 
     }
 
-    private void executeTask(Task task, final TaskCallback callback) {
-        indicator.setVisible(true);
-        taskCount++;
-        taskRunner.executeTask(task, new TaskCallback() {
-
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                Task nextTask = callback.onResponse(task, response, stdOut, stdErr);
-                if (task.isCompleted() && nextTask == null) {
-                    taskCount--;
-                    if (taskCount == 0) {
-                        indicator.setVisible(false);
-                    }
-                }
-
-                return nextTask;
-            }
-        });
-    }
-
+//    private void executeTask(Task task, final TaskCallback callback) {
+//        indicator.setVisible(true);
+//        taskCount++;
+//        taskRunner.executeTask(task, new TaskCallback() {
+//
+//            @Override
+//            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+//                Task nextTask = callback.onResponse(task, response, stdOut, stdErr);
+//                if (task.isCompleted() && nextTask == null) {
+//                    taskCount--;
+//                    if (taskCount == 0) {
+//                        indicator.setVisible(false);
+//                    }
+//                }
+//
+//                return nextTask;
+//            }
+//        });
+//    }
 }

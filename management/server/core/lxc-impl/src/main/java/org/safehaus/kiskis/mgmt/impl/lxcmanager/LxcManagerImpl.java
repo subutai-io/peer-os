@@ -136,16 +136,17 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
-    public LxcState startLxcOnHost(final Agent physicalAgent, final String lxcHostname) {
+    public LxcState startLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
+            final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
             taskRunner.executeTask(startLxcTask, new TaskCallback() {
 
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                     if (task.isCompleted()) {
                         if (task.getData() == TaskType.START_LXC) {
                             //send lxc-info cmd
-                            return Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
+                            return getLxcInfoTask;
                         } else if (task.getData() == TaskType.GET_LXC_INFO) {
                             if (stdOut.indexOf("RUNNING") != -1) {
                                 task.setData(LxcState.RUNNING);
@@ -159,14 +160,86 @@ public class LxcManagerImpl implements LxcManager {
                     return null;
                 }
             });
-            synchronized (startLxcTask) {
+            synchronized (getLxcInfoTask) {
                 try {
-                    startLxcTask.wait(startLxcTask.getAvgTimeout() * 1000 + 1000);
+                    getLxcInfoTask.wait((startLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 1000);
                 } catch (InterruptedException ex) {
                 }
             }
 
-            return LxcState.RUNNING.equals(startLxcTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
+            return LxcState.RUNNING.equals(getLxcInfoTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
+        }
+        return LxcState.STOPPED;
+    }
+
+    public LxcState stopLxcOnHost(Agent physicalAgent, String lxcHostname) {
+        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+            Task stopLxcTask = Tasks.getLxcStopTask(physicalAgent, lxcHostname);
+            final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
+            taskRunner.executeTask(stopLxcTask, new TaskCallback() {
+
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (task.isCompleted()) {
+                        if (task.getData() == TaskType.STOP_LXC) {
+                            //send lxc-info cmd
+                            return getLxcInfoTask;
+                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
+                            if (stdOut.indexOf("RUNNING") != -1) {
+                                task.setData(LxcState.RUNNING);
+                            }
+                            synchronized (task) {
+                                task.notifyAll();
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            });
+            synchronized (getLxcInfoTask) {
+                try {
+                    getLxcInfoTask.wait((stopLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 1000);
+                } catch (InterruptedException ex) {
+                }
+            }
+
+            return LxcState.RUNNING.equals(getLxcInfoTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
+        }
+        return LxcState.STOPPED;
+    }
+
+    public LxcState destroyLxcOnHost(Agent physicalAgent, String lxcHostname) {
+        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+            Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
+            final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
+            taskRunner.executeTask(destroyLxcTask, new TaskCallback() {
+
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (task.isCompleted()) {
+                        if (task.getData() == TaskType.DESTROY_LXC) {
+                            //send lxc-info cmd
+                            return getLxcInfoTask;
+                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
+                            if (stdOut.indexOf("RUNNING") != -1) {
+                                task.setData(LxcState.RUNNING);
+                            }
+                            synchronized (task) {
+                                task.notifyAll();
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            });
+            synchronized (getLxcInfoTask) {
+                try {
+                    getLxcInfoTask.wait((destroyLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 1000);
+                } catch (InterruptedException ex) {
+                }
+            }
+
+            return LxcState.RUNNING.equals(getLxcInfoTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
         }
         return LxcState.STOPPED;
     }

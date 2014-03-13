@@ -43,8 +43,8 @@ public class LxcModule implements Module {
             commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
             commandsSheet.setSizeFull();
 
-            commandsSheet.addTab(new Cloner(taskRunner, lxcManager), "Clone");
-            commandsSheet.addTab(new Manager(taskRunner, agentManager, lxcManager), "Manage");
+            commandsSheet.addTab(new Cloner(lxcManager), "Clone");
+            commandsSheet.addTab(new Manager(agentManager, lxcManager), "Manage");
 
             verticalLayout.addComponent(commandsSheet);
 

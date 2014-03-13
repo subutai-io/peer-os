@@ -14,9 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  *
- * TODO: 
- * 1) add async analogs
- * 2) add batch operation analogs
+ * TODO: 1) add async analogs 2) add batch operation analogs
  */
 public interface LxcManager {
 
@@ -27,4 +25,8 @@ public interface LxcManager {
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname);
 
     public LxcState startLxcOnHost(Agent physicalAgent, String lxcHostname);
+
+    public LxcState stopLxcOnHost(Agent physicalAgent, String lxcHostname);
+
+    public LxcState destroyLxcOnHost(Agent physicalAgent, String lxcHostname);
 }

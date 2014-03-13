@@ -14,36 +14,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout implements TaskCallback {
+public class Cloner extends VerticalLayout {
 
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final Label indicator;
     private final TreeTable lxcTable;
-    private final TaskRunner taskRunner;
     private final LxcManager lxcManager;
-    private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
     private final String physicalHostLabel = "Physical Host";
     private final String statusLabel = "Status";
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
-    private volatile int taskCount;
 
-    public Cloner(TaskRunner taskRunner, LxcManager lxcManager) {
+    public Cloner(LxcManager lxcManager) {
         setSpacing(true);
         setMargin(true);
 
-        this.taskRunner = taskRunner;
         this.lxcManager = lxcManager;
 
         textFieldLxcName = new TextField();
@@ -229,30 +221,30 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         getWindow().showNotification(msg);
     }
 
-    @Override
-    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-        if (Util.isFinalResponse(response)) {
-            String lxcHost = requestToLxcMatchMap.get(task.getUuid() + "-" + response.getRequestSequenceNumber());
-            if (lxcHost != null) {
-                Item row = lxcTable.getItem(lxcHost);
-                if (row != null) {
-                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE && response.getExitCode() == 0) {
-                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
-                    } else {
-                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
-                    }
-                }
-            }
-            requestToLxcMatchMap.remove(task.getUuid() + "-" + response.getRequestSequenceNumber());
-        }
-        if (task.isCompleted()) {
-            taskCount--;
-            if (taskCount == 0) {
-                indicator.setVisible(false);
-                requestToLxcMatchMap.clear();
-            }
-        }
-
-        return null;
-    }
+//    @Override
+//    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+//        if (Util.isFinalResponse(response)) {
+//            String lxcHost = requestToLxcMatchMap.get(task.getUuid() + "-" + response.getRequestSequenceNumber());
+//            if (lxcHost != null) {
+//                Item row = lxcTable.getItem(lxcHost);
+//                if (row != null) {
+//                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE && response.getExitCode() == 0) {
+//                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
+//                    } else {
+//                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
+//                    }
+//                }
+//            }
+//            requestToLxcMatchMap.remove(task.getUuid() + "-" + response.getRequestSequenceNumber());
+//        }
+//        if (task.isCompleted()) {
+//            taskCount--;
+//            if (taskCount == 0) {
+//                indicator.setVisible(false);
+//                requestToLxcMatchMap.clear();
+//            }
+//        }
+//
+//        return null;
+//    }
 }
