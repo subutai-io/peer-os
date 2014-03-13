@@ -291,6 +291,11 @@ public class Manager extends VerticalLayout {
                                         org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.startLxcOnHost(physicalAgent, lxcHostname);
                                         if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
                                             stopBtn.setEnabled(true);
+                                            //-------------------
+                                            MgmtApplication.setSelectedAgents(
+                                                    Util.wrapAgentToSet(
+                                                            agentManager.getAgentByHostname(lxcHostname)));
+                                            //-------------------
                                         } else {
                                             startBtn.setEnabled(true);
                                         }
