@@ -22,8 +22,10 @@ public class OozieTable extends Table {
     Button selectedStopButton;
     Item selectedItem;
     OozieConfig selectedConfig;
+    OozieDAO oozieDAO;
 
-    public OozieTable() {
+    public OozieTable(OozieDAO oozieDAO) {
+        this.oozieDAO = oozieDAO;
         setSizeFull();
         this.manager = new ServiceManager(this);
         this.setCaption("Oozie");
@@ -43,7 +45,7 @@ public class OozieTable extends Table {
 //        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
-        List<OozieConfig> cdList = OozieDAO.getClusterInfo();
+        List<OozieConfig> cdList = oozieDAO.getClusterInfo();
         for (OozieConfig config : cdList) {
             addClusterDataToContainer(container, config);
         }
@@ -86,42 +88,12 @@ public class OozieTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-//    public NodesWindow getNodesWindow() {
-//        return nodesWindow;
-//    }
     private void switchState(Boolean state) {
         Button start = (Button) selectedItem.getItemProperty("Start").getValue();
         start.setEnabled(state);
         Button stop = (Button) selectedItem.getItemProperty("Stop").getValue();
         stop.setEnabled(!state);
     }
-
-//    public void onResponse(Response response) {
-//        if (manager.getCurrentTask() != null && response.getTaskUuid() != null
-//                && manager.getCurrentTask().getUuid().compareTo(response.getTaskUuid()) == 0) {
-//            List<ParseResult> list = RequestUtil.parseTask(response.getTaskUuid(), true);
-//            Task task = RequestUtil.getTask(response.getTaskUuid());
-//            if (!list.isEmpty()) {
-//                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-//                    manager.moveToNextTask();
-//                    if (manager.getCurrentTask() != null) {
-//                        for (Command command : manager.getCurrentTask().getCommands()) {
-//                            manager.executeCommand(command);
-//                        }
-//                    } else {
-////                        if (nodesWindow != null && nodesWindow.isVisible()) {
-////                            nodesWindow.updateUI(task);
-////                        }
-//                        manageUI(task.getTaskStatus());
-//                    }
-//                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-////                    if (nodesWindow != null && nodesWindow.isVisible()) {
-////                        nodesWindow.updateUI(task);
-////                    }
-//                }
-//            }
-//        }
-//    }
 
     public void manageUI(TaskStatus ts) {
         if (cce != null) {
@@ -159,7 +131,7 @@ public class OozieTable extends Table {
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
-                            if (OozieDAO
+                            if (oozieDAO
                                     .deleteClusterInfo(selectedConfig.getUuid())) {
 //                    container.removeItem(itemId);
                                 refreshDatasource();

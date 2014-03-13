@@ -52,7 +52,7 @@ public class StepFinish extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                installer = new ServiceInstaller(wizard.getConfig(), terminal);
+                installer = new ServiceInstaller(wizard, terminal);
                 installer.start();
                 next.setCaption("Installing...");
                 next.setEnabled(false);
