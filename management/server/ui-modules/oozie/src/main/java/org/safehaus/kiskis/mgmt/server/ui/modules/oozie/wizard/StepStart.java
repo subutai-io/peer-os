@@ -28,6 +28,8 @@ import java.util.Set;
  */
 public class StepStart extends Panel {
 
+    private static final Logger LOG = Logger.getLogger(StepStart.class.getName());
+
     private ClustersTable table;
     private Item selectedItem;
 //    private OozieDAO oozieDAO;
@@ -58,31 +60,31 @@ public class StepStart extends Panel {
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-//                Set<Agent> selectedAgents = MgmtApplication.getSelectedAgents();
-//                if (Util.isCollectionEmpty(selectedAgents)) {
-//                    show("Select nodes in the tree on the left first");
-//                } else {
-//                    wizard.getConfig().reset();
-//                    wizard.getConfig().setAgents(selectedAgents);
-//                    wizard.next();
-//                }
 
                 if (selectedItem != null) {
                     String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
                     HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
 
-                    Set<Agent> taskTrackers = new HashSet<Agent>();
-                    taskTrackers.add(cluster.getJobTracker());
+                    LOG.log(Level.INFO, "CLUSTER NAME: {0}", clusterName);
+                    LOG.log(Level.INFO, "OOZIEDAO: {0}", wizard.getOozieDAO());
+                    HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
+                    if (cluster != null) {
+                        LOG.log(Level.INFO, "CLUSTER:{0} ", cluster);
+                        Set<Agent> taskTrackers = new HashSet<Agent>();
+                        taskTrackers.add(cluster.getJobTracker());
 
-                    Set<Agent> nodes = new HashSet<Agent>(cluster.getDataNodes());
-                    nodes.add(cluster.getNameNode());
-                    nodes.add(cluster.getSecondaryNameNode());
-                    nodes.addAll(cluster.getTaskTrackers());
+                        Set<Agent> nodes = new HashSet<Agent>(cluster.getDataNodes());
+                        nodes.add(cluster.getNameNode());
+                        nodes.add(cluster.getSecondaryNameNode());
+                        nodes.addAll(cluster.getTaskTrackers());
 
-                    wizard.getConfig().reset();
-                    wizard.getConfig().setServer(taskTrackers.iterator().next());
-                    wizard.getConfig().setClients(nodes);
-                    wizard.next();
+                        wizard.getConfig().reset();
+                        wizard.getConfig().setServer(taskTrackers.iterator().next());
+                        wizard.getConfig().setClients(nodes);
+                        wizard.next();
+                    } else {
+                        LOG.log(Level.INFO, "Error while attemtp to get Hadoop cluster info");
+                    }
                 } else {
                     show("Please select Hadoop cluster first");
                 }

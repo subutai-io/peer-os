@@ -21,6 +21,7 @@ public class OozieDAO {
     }
 
     private static final Logger LOG = Logger.getLogger(OozieDAO.class.getName());
+    private final DbManager dbManager;
 
     public boolean saveClusterInfo(OozieConfig cluster) {
         try {
@@ -40,6 +41,7 @@ public class OozieDAO {
             dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getClusterInfo", ex);
+            return null;
         }
         return list;
     }

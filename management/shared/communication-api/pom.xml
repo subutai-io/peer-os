@@ -11,6 +11,7 @@
     <artifactId>communication-api</artifactId>
     <name>Kiskis Management Communication Api</name>
     <description>Communication Api</description>
+
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -22,7 +23,7 @@
         <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -31,7 +32,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
+                <version>${org.apache.felix.version}</version>
                 <inherited>true</inherited>
                 <extensions>true</extensions>
                 <configuration>

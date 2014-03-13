@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
 import com.vaadin.ui.TextArea;
+import java.util.HashSet;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
@@ -96,6 +97,8 @@ public class ServiceInstaller implements TaskCallback {
     private void saveInfo() {
         if (wizard.getOozieDAO().saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");
+        } else {
+            terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster is not saved into keyspace.\n");
         }
     }
 
