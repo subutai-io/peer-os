@@ -5,7 +5,6 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -24,7 +23,6 @@ public class OozieModule implements Module {
     private static TaskRunner taskRunner;
     private static AgentManager agentManager;
     private DbManager dbManager;
-    private OozieDAO oozieDAO;
 
     public void setAgentManager(AgentManager agentManager) {
         OozieModule.agentManager = agentManager;
@@ -55,7 +53,7 @@ public class OozieModule implements Module {
         Wizard wizard;
         Manager manager;
 
-        public ModuleComponent(TaskRunner taskRunner, OozieDAO oozieDAO) {
+        public ModuleComponent(TaskRunner taskRunner, DbManager dbManager) {
             setSizeFull();
 
             VerticalLayout verticalLayout = new VerticalLayout();
@@ -65,7 +63,7 @@ public class OozieModule implements Module {
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-            LOG.log(Level.INFO, "OOZIEDAO: {0}", oozieDAO);
+            OozieDAO oozieDAO = new OozieDAO(dbManager);
             wizard = new Wizard(oozieDAO);
             manager = new Manager(oozieDAO);
             sheet.addTab(wizard.getContent(), "Install");
@@ -89,8 +87,7 @@ public class OozieModule implements Module {
 
     @Override
     public Component createComponent() {
-        oozieDAO = new OozieDAO(dbManager);
-        return new ModuleComponent(taskRunner, oozieDAO);
+        return new ModuleComponent(taskRunner, dbManager);
     }
 
 }

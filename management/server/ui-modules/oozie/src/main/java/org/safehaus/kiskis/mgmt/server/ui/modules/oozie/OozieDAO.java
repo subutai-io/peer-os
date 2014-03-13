@@ -14,16 +14,19 @@ import java.util.logging.Logger;
  */
 public class OozieDAO {
 
-    private static final Logger LOG = Logger.getLogger(OozieDAO.class.getName());
     private final DbManager dbManager;
 
     public OozieDAO(DbManager dbManager) {
         this.dbManager = dbManager;
     }
 
+    private static final Logger LOG = Logger.getLogger(OozieDAO.class.getName());
+
     public boolean saveClusterInfo(OozieConfig cluster) {
         try {
+
             dbManager.saveInfo(OozieModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
+
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in saveClusterInfo", ex);
             return false;
@@ -34,7 +37,7 @@ public class OozieDAO {
     public List<OozieConfig> getClusterInfo() {
         List<OozieConfig> list = new ArrayList<OozieConfig>();
         try {
-            list = dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
+            dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getClusterInfo", ex);
             return null;
@@ -64,7 +67,7 @@ public class OozieDAO {
     public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
         HadoopClusterInfo hadoopClusterInfo = null;
         try {
-            return dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
+            dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
 
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);

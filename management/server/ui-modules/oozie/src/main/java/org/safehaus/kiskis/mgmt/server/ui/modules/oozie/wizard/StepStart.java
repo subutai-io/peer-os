@@ -12,14 +12,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard;
 import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClustersTable;
@@ -28,6 +21,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -39,8 +34,10 @@ public class StepStart extends Panel {
 
     private ClustersTable table;
     private Item selectedItem;
+//    private OozieDAO oozieDAO;
 
     public StepStart(final Wizard wizard) {
+//        this.oozieDAO = oozieDAO;
         setSizeFull();
         GridLayout gridLayout = new GridLayout(10, 6);
         gridLayout.setSizeFull();

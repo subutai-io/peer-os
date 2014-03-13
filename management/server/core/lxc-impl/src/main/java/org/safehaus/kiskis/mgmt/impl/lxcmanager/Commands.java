@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common;
+package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
-import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -22,7 +20,7 @@ public class Commands {
         return CommandFactory.newRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
-                LxcModule.MODULE_NAME, //     source
+                null, //                        source
                 null, //                        !! task uuid 
                 1, //                           !! request sequence number
                 "/", //                         cwd
@@ -39,13 +37,7 @@ public class Commands {
 
     public static Request getCloneCommand() {
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-clone");
-        req.setArgs(Arrays.asList(
-                "-o",
-                "base-container",
-                "-n",
-                ""
-        ));
+        req.setProgram("/usr/bin/lxc-clone -o base-container -n ");
         req.setTimeout(360);
         return req;
     }
@@ -61,11 +53,7 @@ public class Commands {
     public static Request getLxcInfoCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-info");
-        req.setArgs(Arrays.asList(
-                "-n",
-                lxcHostname
-        ));
+        req.setProgram("/usr/bin/lxc-info -n " + lxcHostname);
         req.setTimeout(60);
         return req;
     }
@@ -73,12 +61,7 @@ public class Commands {
     public static Request getLxcInfoWithWaitCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("sleep 5;");
-        req.setArgs(Arrays.asList(
-                "/usr/bin/lxc-info",
-                "-n",
-                lxcHostname
-        ));
+        req.setProgram("sleep 5;/usr/bin/lxc-info -n " + lxcHostname);
         req.setTimeout(60);
         return req;
     }
@@ -86,12 +69,7 @@ public class Commands {
     public static Request getLxcStartCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-start");
-        req.setArgs(Arrays.asList(
-                "-n",
-                lxcHostname,
-                "-d"
-        ));
+        req.setProgram("/usr/bin/lxc-start -n " + lxcHostname + " -d");
         req.setTimeout(120);
         return req;
     }
@@ -99,11 +77,7 @@ public class Commands {
     public static Request getLxcStopCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-stop");
-        req.setArgs(Arrays.asList(
-                "-n",
-                lxcHostname
-        ));
+        req.setProgram("/usr/bin/lxc-stop -n " + lxcHostname);
         req.setTimeout(120);
         return req;
     }
@@ -111,15 +85,7 @@ public class Commands {
     public static Request getLxcDestroyCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-stop");
-        req.setArgs(Arrays.asList(
-                "-n",
-                lxcHostname,
-                "&&",
-                "/usr/bin/lxc-destroy",
-                "-n",
-                lxcHostname
-        ));
+        req.setProgram("/usr/bin/lxc-stop -n " + lxcHostname + " && /usr/bin/lxc-destroy -n " + lxcHostname);
         req.setTimeout(180);
         return req;
     }

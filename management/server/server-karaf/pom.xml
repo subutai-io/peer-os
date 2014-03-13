@@ -450,20 +450,27 @@
                                 </artifactItem>
                                 <!--UI Dependencies-->
 
-                                <!--Core Dependencies-->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>communication-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <!--Core Dependencies-->
-
                                 <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>communication-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>communication-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lxc-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lxc-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>

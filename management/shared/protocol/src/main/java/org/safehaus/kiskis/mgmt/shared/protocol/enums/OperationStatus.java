@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common;
+package org.safehaus.kiskis.mgmt.shared.protocol.enums;
 
 /**
  *
  * @author dilshat
  */
-public enum LxcState {
+public enum OperationStatus {
 
-    RUNNING, STOPPED
+    SUCCESS, FAILURE
 }
