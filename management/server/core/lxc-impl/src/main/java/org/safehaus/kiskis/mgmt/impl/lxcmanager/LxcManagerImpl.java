@@ -108,29 +108,67 @@ public class LxcManagerImpl implements LxcManager {
         return agentFamilies;
     }
 
-    public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostName) {
-        Task cloneTask = Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostName);
-        taskRunner.executeTask(cloneTask, new TaskCallback() {
+    public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
+        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+            Task cloneTask = Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostname);
+            taskRunner.executeTask(cloneTask, new TaskCallback() {
 
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (task.isCompleted()) {
+                        synchronized (task) {
+                            task.notifyAll();
+                        }
                     }
+
+                    return null;
                 }
+            });
 
-                return null;
+            synchronized (cloneTask) {
+                try {
+                    cloneTask.wait(cloneTask.getAvgTimeout() * 1000 + 1000);
+                } catch (InterruptedException ex) {
+                }
             }
-        });
 
-        synchronized (cloneTask) {
-            try {
-                cloneTask.wait(cloneTask.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-            }
+            return cloneTask.getTaskStatus() == TaskStatus.SUCCESS;
         }
+        return false;
+    }
 
-        return cloneTask.getTaskStatus() == TaskStatus.SUCCESS;
+    public LxcState startLxcOnHost(final Agent physicalAgent, final String lxcHostname) {
+        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+            Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
+            taskRunner.executeTask(startLxcTask, new TaskCallback() {
+
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (task.isCompleted()) {
+                        if (task.getData() == TaskType.START_LXC) {
+                            //send lxc-info cmd
+                            return Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
+                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
+                            if (stdOut.indexOf("RUNNING") != -1) {
+                                task.setData(LxcState.RUNNING);
+                            }
+                            synchronized (task) {
+                                task.notifyAll();
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            });
+            synchronized (startLxcTask) {
+                try {
+                    startLxcTask.wait(startLxcTask.getAvgTimeout() * 1000 + 1000);
+                } catch (InterruptedException ex) {
+                }
+            }
+
+            return LxcState.RUNNING.equals(startLxcTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
+        }
+        return LxcState.STOPPED;
     }
 
 }

@@ -358,35 +358,49 @@ public class Manager extends VerticalLayout {
 
                             final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                             if (physicalAgent != null) {
-                                Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
+//                                Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
                                 startBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                executeTask(startLxcTask, new TaskCallback() {
+                                Thread t = new Thread(new Runnable() {
 
-                                    @Override
-                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                                        if (task.getData() == TaskType.START_LXC) {
-                                            //send lxc-info cmd
-                                            if (task.isCompleted()) {
-                                                return Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
-                                            }
-                                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                                            if (task.isCompleted()) {
-                                                if (stdOut.indexOf("RUNNING") != -1) {
-                                                    stopBtn.setEnabled(true);
-                                                } else {
-                                                    startBtn.setEnabled(true);
-                                                }
-                                                destroyBtn.setEnabled(true);
-                                                progressIcon.setVisible(false);
-                                            }
+                                    public void run() {
+                                        org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.startLxcOnHost(physicalAgent, lxcHostname);
+                                        if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                            stopBtn.setEnabled(true);
+                                        } else {
+                                            startBtn.setEnabled(true);
                                         }
-
-                                        return null;
+                                        destroyBtn.setEnabled(true);
+                                        progressIcon.setVisible(false);
                                     }
                                 });
+                                t.start();
+//                                executeTask(startLxcTask, new TaskCallback() {
+                                //
+                                //                                    @Override
+                                //                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                //
+                                //                                        if (task.getData() == TaskType.START_LXC) {
+                                //                                            //send lxc-info cmd
+                                //                                            if (task.isCompleted()) {
+                                //                                                return Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
+                                //                                            }
+                                //                                        } else if (task.getData() == TaskType.GET_LXC_INFO) {
+                                //                                            if (task.isCompleted()) {
+                                //                                                if (stdOut.indexOf("RUNNING") != -1) {
+                                //                                                    stopBtn.setEnabled(true);
+                                //                                                } else {
+                                //                                                    startBtn.setEnabled(true);
+                                //                                                }
+                                //                                                destroyBtn.setEnabled(true);
+                                //                                                progressIcon.setVisible(false);
+                                //                                            }
+                                //                                        }
+                                //
+                                //                                        return null;
+                                //                                    }
+                                //                                });
                             }
                         }
                     });
