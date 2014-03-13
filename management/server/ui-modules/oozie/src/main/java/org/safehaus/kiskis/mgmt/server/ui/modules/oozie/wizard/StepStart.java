@@ -21,6 +21,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -63,7 +65,6 @@ public class StepStart extends Panel {
 
                 if (selectedItem != null) {
                     String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
-                    HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
 
                     LOG.log(Level.INFO, "CLUSTER NAME: {0}", clusterName);
                     LOG.log(Level.INFO, "OOZIEDAO: {0}", wizard.getOozieDAO());
