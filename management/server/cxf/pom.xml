@@ -11,7 +11,7 @@
     <groupId>org.safehaus.kiskis.mgmt.cxf</groupId>
     <artifactId>karaf-tutorial-cxf</artifactId>
     <name>Kiskis Management CXF REST</name>
-    <version>1.0</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

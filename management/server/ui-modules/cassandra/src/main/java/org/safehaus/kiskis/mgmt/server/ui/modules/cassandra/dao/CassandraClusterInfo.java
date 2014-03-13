@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao;
 
+import org.doomdark.uuid.UUIDGenerator;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +34,7 @@ public class CassandraClusterInfo {
     private String domainName;
 
     public CassandraClusterInfo() {
-        this.uuid = java.util.UUID.fromString(new com.eaio.uuid.UUID().toString());
+        this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
     public UUID getUuid() {
