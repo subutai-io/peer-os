@@ -163,6 +163,8 @@ public class Cloner extends VerticalLayout {
                             show(String.format("Only %s lxc containers can be created", count));
                         } else {
                             //need to figure out how to place lxc containers across given servers
+                            Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+                            System.out.println(sortedBestServers);
                             show(String.format("%s lxc containers can be created", numOfLxcSlots));
                         }
 
