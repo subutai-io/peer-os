@@ -145,7 +145,6 @@ public class LxcManagerImpl implements LxcManager {
                                 int numOfLxcByRam = (int) ((freeRamMb - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
                                 int numOfLxcByHdd = (int) ((freeHddMb - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
                                 int numOfLxcByCpu = (int) (((100 - cpuLoadPercent) - (MIN_CPU_IN_RESERVE_PERCENT / numOfProc)) / (MIN_CPU_LXC_PERCENT / numOfProc));
-                                System.out.println("RAM " + numOfLxcByRam + " HDD " + numOfLxcByHdd + " CPU " + numOfLxcByCpu);
                                 if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
                                     int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
                                     bestServers.put(agentManager.getAgentByUUID(out.getKey()), minNumOfLxcs);
