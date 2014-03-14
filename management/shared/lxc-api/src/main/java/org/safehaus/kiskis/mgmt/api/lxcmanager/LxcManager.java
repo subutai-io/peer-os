@@ -18,7 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public interface LxcManager {
 
-    public Map<Agent, Integer> getBestHostServers(int numberOfLxcsRequired);
+    public Map<Agent, Integer> getBestHostServers();
 
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers();
 

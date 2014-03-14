@@ -90,4 +90,12 @@ public class Commands {
         return req;
     }
 
+    public static Request getMetricsCommand() {
+
+        Request req = getTemplate();
+        req.setProgram("free -m | grep buffers/cache ; df /dev/sda1 | grep /dev/sda1 ; uptime ; nproc");
+        req.setTimeout(30);
+        return req;
+    }
+
 }

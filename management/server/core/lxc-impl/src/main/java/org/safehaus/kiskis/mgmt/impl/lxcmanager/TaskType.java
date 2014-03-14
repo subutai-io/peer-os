@@ -11,5 +11,5 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
  */
 public enum TaskType {
 
-    CLONE_LXC, GET_LXC_LIST, START_LXC, STOP_LXC, DESTROY_LXC, GET_LXC_INFO
+    CLONE_LXC, GET_LXC_LIST, START_LXC, STOP_LXC, DESTROY_LXC, GET_LXC_INFO, GET_METRICS
 }

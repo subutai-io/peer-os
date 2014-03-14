@@ -31,22 +31,28 @@ public class ModuleNotifierImpl implements ModuleNotifier {
     }
 
     public void setModule(Module module) {
-        modules.add(module);
-        for (ModuleServiceListener moduleServiceListener : moduleListeners) {
-            try {
-                moduleServiceListener.moduleRegistered(module);
-            } catch (Exception e) {
+        try {
+            modules.add(module);
+            for (ModuleServiceListener moduleServiceListener : moduleListeners) {
+                try {
+                    moduleServiceListener.moduleRegistered(module);
+                } catch (Exception e) {
+                }
             }
+        } catch (Exception e) {
         }
     }
 
     public void unsetModule(Module module) {
-        modules.remove(module);
-        for (ModuleServiceListener moduleServiceListener : moduleListeners) {
-            try {
-                moduleServiceListener.moduleUnregistered(module);
-            } catch (Exception e) {
+        try {
+            modules.remove(module);
+            for (ModuleServiceListener moduleServiceListener : moduleListeners) {
+                try {
+                    moduleServiceListener.moduleUnregistered(module);
+                } catch (Exception e) {
+                }
             }
+        } catch (Exception e) {
         }
     }
 
