@@ -147,13 +147,12 @@ public class Cloner extends VerticalLayout {
         } else if (!textFieldLxcName.getValue().toString().trim().matches(hostValidatorRegex)) {
             show("Please, use only letters, digits, dots and hyphens in product name");
         } else if (physicalAgents.isEmpty()) {
-//            show("Select at least one physical agent");
             final double count = (Double) slider.getValue();
             Thread t = new Thread(new Runnable() {
                 public void run() {
                     Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
                     if (bestServers.isEmpty()) {
-                        System.out.println("No servers available to accomodate new lxc containers");
+                        show("No servers available to accomodate new lxc containers");
                     } else {
                         int numOfLxcSlots = 0;
                         for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
@@ -161,10 +160,10 @@ public class Cloner extends VerticalLayout {
                         }
 
                         if (numOfLxcSlots < count) {
-                            System.out.println(String.format("Only %s lxc containers can be created", count));
+                            show(String.format("Only %s lxc containers can be created", count));
                         } else {
                             //need to figure out how to place lxc containers across given servers
-                            System.out.println(String.format("%s lxc containers can be created", numOfLxcSlots));
+                            show(String.format("%s lxc containers can be created", numOfLxcSlots));
                         }
 
                     }

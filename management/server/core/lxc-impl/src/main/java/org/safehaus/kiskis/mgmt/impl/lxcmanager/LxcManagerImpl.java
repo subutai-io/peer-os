@@ -34,12 +34,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public class LxcManagerImpl implements LxcManager {
 
     private final Pattern p = Pattern.compile("load average: (.*)");
-    private final double MIN_HDD_LXC_MB = 0.5 * 1024; // 0.5G
-    private final double MIN_HDD_IN_RESERVE_MB = 3 * 1024; // 3G
+    private final double MIN_HDD_LXC_MB = 1.5 * 1024; // 1.5G
+    private final double MIN_HDD_IN_RESERVE_MB = 10 * 1024; // 10G
     private final double MIN_RAM_LXC_MB = 1024;// 1G
     private final double MIN_RAM_IN_RESERVE_MB = 1.5 * 1024;// 1.5G
-    private final double MIN_CPU_LXC_PERCENT = 15;// 10%
-    private final double MIN_CPU_IN_RESERVE_PERCENT = 25;// 25%
+    private final double MIN_CPU_LXC_PERCENT = 20;// 20%
+    private final double MIN_CPU_IN_RESERVE_PERCENT = 30;// 30%
 
     private TaskRunner taskRunner;
     private AgentManager agentManager;
