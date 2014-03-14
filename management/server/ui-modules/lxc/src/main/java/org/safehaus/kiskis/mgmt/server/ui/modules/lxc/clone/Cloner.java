@@ -162,7 +162,7 @@ public class Cloner extends VerticalLayout {
                         }
 
                         if (numOfLxcSlots < count) {
-                            show(String.format("Only %s lxc containers can be created", count));
+                            show(String.format("Only %s lxc containers can be created", numOfLxcSlots));
                             indicator.setVisible(false);
                         } else {
                             //need to figure out how to place lxc containers across given servers
