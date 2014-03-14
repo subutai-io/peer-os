@@ -81,4 +81,15 @@ public class Tasks {
         task.addRequest(cmd);
         return task;
     }
+
+    public static Task getMetricsTask(Set<Agent> physicalAgents) {
+        Task task = new Task();
+        task.setData(TaskType.GET_METRICS);
+        for (Agent physicalAgent : physicalAgents) {
+            Request cmd = Commands.getMetricsCommand();
+            cmd.setUuid(physicalAgent.getUuid());
+            task.addRequest(cmd);
+        }
+        return task;
+    }
 }

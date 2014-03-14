@@ -32,7 +32,7 @@ public class Cloner extends VerticalLayout {
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
 
-    public Cloner(LxcManager lxcManager) {
+    public Cloner(final LxcManager lxcManager) {
         setSpacing(true);
         setMargin(true);
 
@@ -84,10 +84,19 @@ public class Cloner extends VerticalLayout {
             }
         });
 
+        Button metricsBtn = new Button("Get metrics");
+        metricsBtn.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
+                System.out.println(bestServers);
+            }
+        });
+
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(7, 1);
+        GridLayout topContent = new GridLayout(8, 1);
         topContent.setSpacing(true);
 
         topContent.addComponent(new Label("Product name"));
@@ -96,6 +105,7 @@ public class Cloner extends VerticalLayout {
         topContent.addComponent(slider);
         topContent.addComponent(cloneBtn);
         topContent.addComponent(clearBtn);
+        topContent.addComponent(metricsBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(topContent);

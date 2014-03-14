@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,54 @@ public class LxcManagerImpl implements LxcManager {
     }
 
     public Map<Agent, Integer> getBestHostServers() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
+        Set<Agent> pAgents = agentManager.getPhysicalAgents();
+        //omit management server
+        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext();) {
+            Agent agent = it.next();
+            if (!agent.getHostname().matches("^py")) {
+                it.remove();
+            }
+        }
+        if (!pAgents.isEmpty()) {
+
+            Task getMetricsTask = Tasks.getMetricsTask(pAgents);
+
+            taskRunner.executeTask(getMetricsTask, new TaskCallback() {
+                private final Map<UUID, String> stdOuts = new HashMap<UUID, String>();
+
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (Util.isFinalResponse(response)) {
+                        stdOuts.put(response.getUuid(), stdOut);
+                    }
+
+                    if (task.isCompleted()) {
+
+                        for (Map.Entry<UUID, String> out : stdOuts.entrySet()) {
+                            String[] metrics = out.getValue().split("\n");
+                            System.out.println(metrics);
+                            //filter HDD
+
+                            //filter by RAM
+                            //filter by CPU
+                        }
+
+                        synchronized (task) {
+                            task.notifyAll();
+                        }
+                    }
+                    return null;
+                }
+            });
+            synchronized (getMetricsTask) {
+                try {
+                    getMetricsTask.wait(getMetricsTask.getAvgTimeout() * 1000 + 1000);
+                } catch (InterruptedException ex) {
+                }
+            }
+
+        }
+        return bestServers;
     }
 
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
@@ -50,7 +98,7 @@ public class LxcManagerImpl implements LxcManager {
         Set<Agent> pAgents = agentManager.getPhysicalAgents();
         if (!pAgents.isEmpty()) {
 
-            Task getLxcListTask = Tasks.getLxcListTask(agentManager.getPhysicalAgents());
+            Task getLxcListTask = Tasks.getLxcListTask(pAgents);
 
             taskRunner.executeTask(getLxcListTask, new TaskCallback() {
                 private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
