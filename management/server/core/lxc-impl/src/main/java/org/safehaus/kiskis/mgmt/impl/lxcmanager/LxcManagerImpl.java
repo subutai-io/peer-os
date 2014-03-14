@@ -31,6 +31,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  *
+ * TODO in dynamic placement for wizards check existing hostnames with new ones
+ * for name clash
  *
  */
 public class LxcManagerImpl implements LxcManager {
@@ -170,6 +172,7 @@ public class LxcManagerImpl implements LxcManager {
             }
 
         }
+
         if (!bestServers.isEmpty()) {
             Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
             for (Iterator<Map.Entry<Agent, Integer>> it = bestServers.entrySet().iterator(); it.hasNext();) {
