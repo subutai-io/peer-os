@@ -52,7 +52,7 @@ public class StepSetConfig extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
-        Label configServersLabel = new Label("<strong>Choose hosts that will act as NameNode");
+        Label configServersLabel = new Label("<strong>Oozie Server");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
@@ -65,7 +65,7 @@ public class StepSetConfig extends Panel {
         selectClients.setNullSelectionAllowed(true);
         selectClients.setMultiSelect(true);
         selectClients.setImmediate(true);
-        selectClients.setLeftColumnCaption("Other nodes");
+        selectClients.setLeftColumnCaption("Not selected nodes");
         selectClients.setRightColumnCaption("Client nodes");
         selectClients.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         selectClients.setRequired(true);

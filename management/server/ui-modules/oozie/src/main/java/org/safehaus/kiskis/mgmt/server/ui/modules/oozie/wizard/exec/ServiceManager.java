@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum;
@@ -67,9 +68,7 @@ public class ServiceManager {
     public void start() {
         moveToNextTask();
         if (currentTask != null) {
-
             OozieModule.getTaskRunner().executeTask(currentTask, new TaskCallback() {
-
                 @Override
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
@@ -86,12 +85,58 @@ public class ServiceManager {
         }
     }
 
+    public void startPurge() {
+        moveToNextTask();
+        if (currentTask != null) {
+            OozieModule.getTaskRunner().executeTask(currentTask, new TaskCallback() {
+                @Override
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                        moveToNextTask();
+                        if (currentTask != null) {
+                            return currentTask;
+                        } else {
+                            oozieTable.manageUI(task.getTaskStatus());
+                            deleteInfo();
+                        }
+                    }
+                    return null;
+                }
+            });
+        }
+    }
+
     public void moveToNextTask() {
         currentTask = tasks.poll();
     }
 
     public Task getCurrentTask() {
         return currentTask;
+    }
+    OozieConfig config;
+
+    public void purge(OozieConfig config) {
+        this.config = config;
+        OozieCommands oc = new OozieCommands();
+
+        Task purgeServer = new Task("Purge Oozie Server");
+        Request commandServerPurge = oc.getCommand(OozieCommandEnum.PURGE_SERVER);
+        commandServerPurge.setUuid(config.getServer().getUuid());
+        purgeServer.addRequest(commandServerPurge);
+        tasks.add(purgeServer);
+
+        Task purgeClient = new Task("Purge Client command");
+        for (Agent agent : config.getClients()) {
+            Request command = oc.getCommand(OozieCommandEnum.PURGE_CLIENT);
+            command.setUuid(agent.getUuid());
+            purgeClient.addRequest(command);
+        }
+        tasks.add(purgeClient);
+        startPurge();
+    }
+
+    private void deleteInfo() {
+        oozieTable.getOozieDAO().deleteClusterInfo(config.getUuid());
     }
 
 }

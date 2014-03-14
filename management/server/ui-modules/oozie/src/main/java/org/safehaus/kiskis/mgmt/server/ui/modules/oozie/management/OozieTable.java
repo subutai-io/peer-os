@@ -39,10 +39,6 @@ public class OozieTable extends Table {
     private IndexedContainer getContainer() {
         IndexedContainer container = new IndexedContainer();
         container.addContainerProperty(OozieClusterInfo.UUID_LABEL, String.class, "");
-//        container.addContainerProperty(HBaseClusterInfo.DOMAINNAME_LABEL, String.class, "");
-//        container.addContainerProperty("Start", Button.class, "");
-//        container.addContainerProperty("Stop", Button.class, "");
-//        container.addContainerProperty("Status", Button.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
         List<OozieConfig> cdList = oozieDAO.getClusterInfo();
@@ -76,7 +72,7 @@ public class OozieTable extends Table {
                 cce = OozieCommandEnum.PURGE_SERVER;
                 selectedItem = item;
                 selectedConfig = config;
-//                manager.purge(config);
+                manager.purge(config);
             }
         });
 
@@ -88,54 +84,14 @@ public class OozieTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-    private void switchState(Boolean state) {
-        Button start = (Button) selectedItem.getItemProperty("Start").getValue();
-        start.setEnabled(state);
-        Button stop = (Button) selectedItem.getItemProperty("Stop").getValue();
-        stop.setEnabled(!state);
-    }
-
     public void manageUI(TaskStatus ts) {
         if (cce != null) {
             switch (cce) {
-                case START_SERVER: {
-                    switch (ts) {
-                        case SUCCESS: {
-                            getWindow().showNotification("Start success");
-                            switchState(false);
-                            break;
-                        }
-                        case FAIL: {
-                            getWindow().showNotification("Start failed. Please use Terminal to check the problem");
-                            break;
-                        }
-                    }
-                    break;
-
-                }
-                case STOP_SERVER: {
-                    switch (ts) {
-                        case SUCCESS: {
-                            getWindow().showNotification("Stop success");
-                            switchState(true);
-                            break;
-                        }
-                        case FAIL: {
-                            getWindow().showNotification("Stop failed. Please use Terminal to check the problem");
-                            break;
-                        }
-                    }
-                    break;
-                }
                 case PURGE_SERVER: {
                     switch (ts) {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
-                            if (oozieDAO
-                                    .deleteClusterInfo(selectedConfig.getUuid())) {
-//                    container.removeItem(itemId);
-                                refreshDatasource();
-                            }
+                            refreshDatasource();
                             break;
                         }
                         case FAIL: {
@@ -149,4 +105,9 @@ public class OozieTable extends Table {
         }
         cce = null;
     }
+
+    public OozieDAO getOozieDAO() {
+        return oozieDAO;
+    }
+
 }

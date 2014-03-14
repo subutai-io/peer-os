@@ -23,8 +23,8 @@ public enum OozieCommandEnum {
 //    CONFIGURE(". /etc/profile && $OOZIE_HOME/oozie-configure.sh configure", 120),
     CONFIGURE_ROOT_HOST(". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser.root.hosts", 120),
     CONFIGURE_ROOT_GROUPS(". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser.root.groups '\\*'", 120),
-    PURGE_SERVER("apt-get --assume-yes --force-yes purge oozie-server", 120),
-    PURGE_CLIENT("apt-get --assume-yes --force-yes purge oozie-client", 120);
+    PURGE_SERVER("apt-get --assume-yes --force-yes purge ksks-oozie-server", 120),
+    PURGE_CLIENT("apt-get --assume-yes --force-yes purge ksks-oozie-client", 120);
 
     String program;
     int timeout;

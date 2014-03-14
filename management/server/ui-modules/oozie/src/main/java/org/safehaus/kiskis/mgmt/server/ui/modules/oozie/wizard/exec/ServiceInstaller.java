@@ -63,8 +63,8 @@ public class ServiceInstaller implements TaskCallback {
         tasks.add(installClient);
 
         Set<Agent> allHadoopNodes = new HashSet<Agent>();
-        allHadoopNodes.addAll(config.getClients());
         allHadoopNodes.add(config.getServer());
+        allHadoopNodes.addAll(config.getClients());
 
         Task configugeRootHost = new Task("Configure root host");
         for (Agent agent : allHadoopNodes) {

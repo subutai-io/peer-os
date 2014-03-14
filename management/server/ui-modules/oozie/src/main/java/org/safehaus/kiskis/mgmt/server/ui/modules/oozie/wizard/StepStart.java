@@ -18,6 +18,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -37,8 +38,9 @@ public class StepStart extends Panel {
 
     private static final Logger LOG = Logger.getLogger(StepStart.class.getName());
 
-    private ClustersTable table;
+//    private ClustersTable table;
     private Item selectedItem;
+    VerticalLayout vLayout;
 
     public StepStart(final Wizard wizard) {
         setSizeFull();
@@ -69,11 +71,8 @@ public class StepStart extends Panel {
                 if (selectedItem != null) {
                     String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
 
-                    LOG.log(Level.INFO, "CLUSTER NAME: {0}", clusterName);
-                    LOG.log(Level.INFO, "OOZIEDAO: {0}", wizard.getOozieDAO());
                     HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
                     if (cluster != null) {
-                        LOG.log(Level.INFO, "CLUSTER:{0} ", cluster);
                         Set<Agent> taskTrackers = new HashSet<Agent>();
                         taskTrackers.add(cluster.getJobTracker());
 
@@ -101,7 +100,18 @@ public class StepStart extends Panel {
         refresh.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                table = getTable();
+//                table = getTable();
+                ClustersTable table = new ClustersTable();
+                table.addListener(new ItemClickEvent.ItemClickListener() {
+
+                    @Override
+                    public void itemClick(ItemClickEvent event) {
+                        selectedItem = event.getItem();
+                    }
+
+                });
+                vLayout.removeAllComponents();
+                vLayout.addComponent(table);
             }
         });
 
@@ -111,25 +121,27 @@ public class StepStart extends Panel {
         gridLayout.addComponent(hl, 6, 4, 6, 4);
         gridLayout.setComponentAlignment(refresh, Alignment.BOTTOM_RIGHT);
         addComponent(gridLayout);
-        table = getTable();
-        addComponent(table);
+        vLayout = new VerticalLayout();
+        addComponent(vLayout);
+//        table = getTable();
+//        addComponent(table);
     }
 
     private void show(String notification) {
         getWindow().showNotification(notification);
     }
 
-    private ClustersTable getTable() {
-        table = new ClustersTable();
-        table.addListener(new ItemClickEvent.ItemClickListener() {
-
-            @Override
-            public void itemClick(ItemClickEvent event) {
-                selectedItem = event.getItem();
-            }
-
-        });
-        return table;
-    }
+//    private ClustersTable getTable() {
+//        table = new ClustersTable();
+//        table.addListener(new ItemClickEvent.ItemClickListener() {
+//
+//            @Override
+//            public void itemClick(ItemClickEvent event) {
+//                selectedItem = event.getItem();
+//            }
+//
+//        });
+//        return table;
+//}
 
 }
