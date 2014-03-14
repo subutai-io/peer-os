@@ -165,27 +165,35 @@ public class Cloner extends VerticalLayout {
                             show(String.format("Only %s lxc containers can be created", numOfLxcSlots));
                             indicator.setVisible(false);
                         } else {
-                            //need to figure out how to place lxc containers across given servers
 
                             String productName = textFieldLxcName.getValue().toString().trim();
                             Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
                             Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
                             int numOfLxcsToClone = (int) count;
                             final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
-                            for (Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
+                            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
                                 for (int i = 1; i <= entry.getValue(); i++) {
                                     List<String> lxcHostNames = agentFamilies.get(entry.getKey());
                                     if (lxcHostNames == null) {
                                         lxcHostNames = new ArrayList<String>();
                                         agentFamilies.put(entry.getKey(), lxcHostNames);
                                     }
-                                    StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
+                                    final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
                                     lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
                                     lxcHostNames.add(lxcHost.toString());
 
                                     //start clone task
                                     Thread t = new Thread(new Runnable() {
                                         public void run() {
+                                            boolean result = lxcManager.cloneLxcOnHost(entry.getKey(), lxcHost.toString());
+                                            Item row = lxcTable.getItem(lxcHost.toString());
+                                            if (row != null) {
+                                                if (result) {
+                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
+                                                } else {
+                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                                                }
+                                            }
                                             if (countProcessed.decrementAndGet() == 0) {
                                                 indicator.setVisible(false);
                                             }

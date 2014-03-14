@@ -30,6 +30,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 /**
  *
  * @author dilshat
+ *
+ *
  */
 public class LxcManagerImpl implements LxcManager {
 
@@ -40,6 +42,7 @@ public class LxcManagerImpl implements LxcManager {
     private final double MIN_RAM_IN_RESERVE_MB = 2 * 1024;  // 2G
     private final double MIN_CPU_LXC_PERCENT = 25;          // 20%
     private final double MIN_CPU_IN_RESERVE_PERCENT = 30;   // 30%
+    private final int MAX_NUMBER_OF_LXCS_PER_HOST = 10;   // 30%
 
     private TaskRunner taskRunner;
     private AgentManager agentManager;
@@ -163,6 +166,25 @@ public class LxcManagerImpl implements LxcManager {
                 try {
                     getMetricsTask.wait(getMetricsTask.getAvgTimeout() * 1000 + 1000);
                 } catch (InterruptedException ex) {
+                }
+            }
+
+        }
+        if (!bestServers.isEmpty()) {
+            Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
+            for (Iterator<Map.Entry<Agent, Integer>> it = bestServers.entrySet().iterator(); it.hasNext();) {
+                Map.Entry<Agent, Integer> entry = it.next();
+                EnumMap<LxcState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
+                if (info != null) {
+                    int numOfExistingLxcs = info.get(LxcState.RUNNING).size() + info.get(LxcState.STOPPED).size();
+                    if (MAX_NUMBER_OF_LXCS_PER_HOST > numOfExistingLxcs) {
+                        entry.setValue(Math.min(entry.getValue(), MAX_NUMBER_OF_LXCS_PER_HOST - numOfExistingLxcs));
+                    } else {
+                        it.remove();
+                    }
+
+                } else {
+                    it.remove();
                 }
             }
 
