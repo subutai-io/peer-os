@@ -199,6 +199,12 @@ public class LxcManagerImpl implements LxcManager {
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
         final Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
         Set<Agent> pAgents = agentManager.getPhysicalAgents();
+        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext();) {
+            Agent agent = it.next();
+            if (!agent.getHostname().matches("^py.*")) {
+                it.remove();
+            }
+        }
         if (!pAgents.isEmpty()) {
 
             Task getLxcListTask = Tasks.getLxcListTask(pAgents);
