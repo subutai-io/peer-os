@@ -41,7 +41,7 @@ public class LxcManagerImpl implements LxcManager {
         this.agentManager = agentManager;
     }
 
-    public Map<Agent, Integer> getBestHostServers(int numberOfLxcsRequired) {
+    public Map<Agent, Integer> getBestHostServers() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
