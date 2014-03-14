@@ -153,7 +153,7 @@ public class Cloner extends VerticalLayout {
                 public void run() {
                     Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
                     if (bestServers.isEmpty()) {
-                        show("No servers available to accomodate new lxc containers");
+                        show("No servers available to accommodate new lxc containers");
                         indicator.setVisible(false);
                     } else {
                         int numOfLxcSlots = 0;
