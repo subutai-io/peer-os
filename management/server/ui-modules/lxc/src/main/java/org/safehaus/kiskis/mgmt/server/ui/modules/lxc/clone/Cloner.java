@@ -84,19 +84,10 @@ public class Cloner extends VerticalLayout {
             }
         });
 
-        Button metricsBtn = new Button("Get metrics");
-        metricsBtn.addListener(new Button.ClickListener() {
-
-            public void buttonClick(Button.ClickEvent event) {
-                Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
-                System.out.println(bestServers);
-            }
-        });
-
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(8, 1);
+        GridLayout topContent = new GridLayout(7, 1);
         topContent.setSpacing(true);
 
         topContent.addComponent(new Label("Product name"));
@@ -105,7 +96,6 @@ public class Cloner extends VerticalLayout {
         topContent.addComponent(slider);
         topContent.addComponent(cloneBtn);
         topContent.addComponent(clearBtn);
-        topContent.addComponent(metricsBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(topContent);
@@ -152,16 +142,37 @@ public class Cloner extends VerticalLayout {
     private void startCloneTask() {
         Set<Agent> physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
 
-        if (physicalAgents.isEmpty()) {
-            show("Select at least one physical agent");
-        } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
+        if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
             show("Enter product name");
-        } else if (!String.format("%s%s%s",
-                physicalAgents.iterator().next().getHostname(),
-                Common.PARENT_CHILD_LXC_SEPARATOR,
-                textFieldLxcName.getValue().toString().trim())
-                .matches(hostValidatorRegex)) {
+        } else if (!textFieldLxcName.getValue().toString().trim().matches(hostValidatorRegex)) {
             show("Please, use only letters, digits, dots and hyphens in product name");
+        } else if (physicalAgents.isEmpty()) {
+//            show("Select at least one physical agent");
+            final double count = (Double) slider.getValue();
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
+                    if (bestServers.isEmpty()) {
+                        System.out.println("No servers available to accomodate new lxc containers");
+                    } else {
+                        int numOfLxcSlots = 0;
+                        for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
+                            numOfLxcSlots += srv.getValue();
+                        }
+
+                        if (numOfLxcSlots < count) {
+                            System.out.println(String.format("Only %s lxc containers can be created", count));
+                        } else {
+                            //need to figure out how to place lxc containers across given servers
+                            System.out.println(String.format("%s lxc containers can be created", numOfLxcSlots));
+                        }
+
+                    }
+                }
+            });
+
+            t.start();
+
         } else {
 
             String productName = textFieldLxcName.getValue().toString().trim();
