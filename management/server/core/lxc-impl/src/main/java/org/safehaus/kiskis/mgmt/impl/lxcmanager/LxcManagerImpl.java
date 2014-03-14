@@ -176,7 +176,8 @@ public class LxcManagerImpl implements LxcManager {
                 Map.Entry<Agent, Integer> entry = it.next();
                 EnumMap<LxcState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
                 if (info != null) {
-                    int numOfExistingLxcs = info.get(LxcState.RUNNING).size() + info.get(LxcState.STOPPED).size();
+                    int numOfExistingLxcs = (info.get(LxcState.RUNNING) != null ? info.get(LxcState.RUNNING).size() : 0)
+                            + (info.get(LxcState.STOPPED) != null ? info.get(LxcState.STOPPED).size() : 0);
                     if (MAX_NUMBER_OF_LXCS_PER_HOST > numOfExistingLxcs) {
                         entry.setValue(Math.min(entry.getValue(), MAX_NUMBER_OF_LXCS_PER_HOST - numOfExistingLxcs));
                     } else {
