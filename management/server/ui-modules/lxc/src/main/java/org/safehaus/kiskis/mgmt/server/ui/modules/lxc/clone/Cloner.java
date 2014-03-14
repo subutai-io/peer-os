@@ -147,12 +147,14 @@ public class Cloner extends VerticalLayout {
         } else if (!textFieldLxcName.getValue().toString().trim().matches(hostValidatorRegex)) {
             show("Please, use only letters, digits, dots and hyphens in product name");
         } else if (physicalAgents.isEmpty()) {
+            indicator.setVisible(true);
             final double count = (Double) slider.getValue();
             Thread t = new Thread(new Runnable() {
                 public void run() {
                     Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
                     if (bestServers.isEmpty()) {
                         show("No servers available to accomodate new lxc containers");
+                        indicator.setVisible(false);
                     } else {
                         int numOfLxcSlots = 0;
                         for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
@@ -161,11 +163,47 @@ public class Cloner extends VerticalLayout {
 
                         if (numOfLxcSlots < count) {
                             show(String.format("Only %s lxc containers can be created", count));
+                            indicator.setVisible(false);
                         } else {
                             //need to figure out how to place lxc containers across given servers
+
+                            String productName = textFieldLxcName.getValue().toString().trim();
+                            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
                             Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
-                            System.out.println(sortedBestServers);
-                            show(String.format("%s lxc containers can be created", numOfLxcSlots));
+                            int numOfLxcsToClone = (int) count;
+                            final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
+                            for (Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
+                                for (int i = 1; i <= entry.getValue(); i++) {
+                                    List<String> lxcHostNames = agentFamilies.get(entry.getKey());
+                                    if (lxcHostNames == null) {
+                                        lxcHostNames = new ArrayList<String>();
+                                        agentFamilies.put(entry.getKey(), lxcHostNames);
+                                    }
+                                    StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
+                                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
+                                    lxcHostNames.add(lxcHost.toString());
+
+                                    //start clone task
+                                    Thread t = new Thread(new Runnable() {
+                                        public void run() {
+                                            if (countProcessed.decrementAndGet() == 0) {
+                                                indicator.setVisible(false);
+                                            }
+                                        }
+                                    });
+                                    t.start();
+                                    //
+                                    numOfLxcsToClone--;
+                                    if (numOfLxcsToClone == 0) {
+                                        break;
+                                    }
+                                }
+                                if (numOfLxcsToClone == 0) {
+                                    break;
+                                }
+                            }
+
+                            populateLxcTable(agentFamilies);
                         }
 
                     }
