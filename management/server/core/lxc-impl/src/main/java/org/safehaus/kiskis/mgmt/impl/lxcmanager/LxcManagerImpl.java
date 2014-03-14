@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -31,6 +33,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class LxcManagerImpl implements LxcManager {
 
+    private final Pattern p = Pattern.compile("load average: (.*)");
+    private final double MIN_HDD_LXC_MB = 0.5 * 1024; // 0.5G
+    private final double MIN_HDD_IN_RESERVE_MB = 3 * 1024; // 3G
+    private final double MIN_RAM_LXC_MB = 1024;// 1G
+    private final double MIN_RAM_IN_RESERVE_MB = 1.5 * 1024;// 1.5G
+    private final double MIN_CPU_LXC_PERCENT = 15;// 10%
+    private final double MIN_CPU_IN_RESERVE_PERCENT = 25;// 25%
+
     private TaskRunner taskRunner;
     private AgentManager agentManager;
 
@@ -43,12 +53,12 @@ public class LxcManagerImpl implements LxcManager {
     }
 
     public Map<Agent, Integer> getBestHostServers() {
-        Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
+        final Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
         Set<Agent> pAgents = agentManager.getPhysicalAgents();
         //omit management server
         for (Iterator<Agent> it = pAgents.iterator(); it.hasNext();) {
             Agent agent = it.next();
-            if (!agent.getHostname().matches("^py")) {
+            if (!agent.getHostname().matches("^py.*")) {
                 it.remove();
             }
         }
@@ -68,11 +78,78 @@ public class LxcManagerImpl implements LxcManager {
 
                         for (Map.Entry<UUID, String> out : stdOuts.entrySet()) {
                             String[] metrics = out.getValue().split("\n");
-                            System.out.println(metrics);
-                            //filter HDD
+                            int freeRamMb = 0;
+                            int freeHddMb = 0;
+                            int numOfProc = 0;
+                            double load15Min = 0;
+                            double cpuLoadPercent = 100;
+                            if (metrics.length == 4) {
+                                int line = 0;
+                                for (String metric : metrics) {
+                                    line++;
+                                    if (line == 1) {
+                                        //   -/+ buffers/cache:       1829       5810
+                                        String[] ramMetric = metric.split("\\s+");
+                                        String freeRamMbStr = ramMetric[ramMetric.length - 1];
+                                        if (Util.isNumeric(freeRamMbStr)) {
+                                            freeRamMb = Integer.parseInt(freeRamMbStr);
+                                        } else {
+                                            break;
+                                        }
+                                    } else if (line == 2) {
+                                        //   /dev/sda1       449G  3.8G  422G   1% /
+                                        String[] hddMetric = metric.split("\\s+");
+                                        if (hddMetric.length == 6) {
+                                            String hddMetricKbStr = hddMetric[3];
+                                            if (Util.isNumeric(hddMetricKbStr)) {
+                                                freeHddMb = Integer.parseInt(hddMetricKbStr) / 1024;
+                                            } else {
+                                                break;
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    } else if (line == 3) {
+                                        //    15:10:33 up 18:51,  0 users,  load average: 0.03, 0.08, 0.06
 
-                            //filter by RAM
-                            //filter by CPU
+                                        Matcher m = p.matcher(metric);
+                                        if (m.find()) {
+                                            String[] loads = m.group(1).split(",");
+                                            if (loads.length == 3) {
+                                                if (Util.isNumeric(loads[0]) && Util.isNumeric(loads[1]) && Util.isNumeric(loads[2])) {
+                                                    load15Min = Double.parseDouble(loads[2]);
+                                                } else {
+                                                    break;
+                                                }
+                                            } else {
+                                                break;
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    } else if (line == 4) {
+                                        if (Util.isNumeric(metric)) {
+                                            numOfProc = Integer.parseInt(metric);
+                                            if (numOfProc > 0) {
+                                                cpuLoadPercent = (load15Min / numOfProc) * 100;
+                                            } else {
+                                                break;
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (freeHddMb > 0 && freeRamMb > 0 && cpuLoadPercent < 100) {
+                                int numOfLxcByRam = (int) ((freeRamMb - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
+                                int numOfLxcByHdd = (int) ((freeRamMb - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
+                                int numOfLxcByCpu = (int) (((100 - cpuLoadPercent) - (MIN_CPU_IN_RESERVE_PERCENT / numOfProc)) / (MIN_CPU_LXC_PERCENT / numOfProc));
+                                if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
+                                    int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
+                                    bestServers.put(agentManager.getAgentByUUID(out.getKey()), minNumOfLxcs);
+                                }
+                            }
                         }
 
                         synchronized (task) {

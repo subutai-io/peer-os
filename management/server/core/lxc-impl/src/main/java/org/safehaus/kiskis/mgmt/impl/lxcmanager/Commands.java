@@ -93,7 +93,7 @@ public class Commands {
     public static Request getMetricsCommand() {
 
         Request req = getTemplate();
-        req.setProgram("free -m | grep buffers/cache ; df -h /dev/sda1 | grep /dev/sda1 ; uptime ; nproc");
+        req.setProgram("free -m | grep buffers/cache ; df /dev/sda1 | grep /dev/sda1 ; uptime ; nproc");
         req.setTimeout(30);
         return req;
     }
