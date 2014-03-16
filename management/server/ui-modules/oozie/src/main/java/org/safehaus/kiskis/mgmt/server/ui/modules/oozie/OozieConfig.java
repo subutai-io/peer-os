@@ -2,11 +2,12 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie;
 
 import org.doomdark.uuid.UUIDGenerator;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  * @author dilshat
@@ -17,6 +18,7 @@ public class OozieConfig implements Serializable {
     String domainInfo;
     private Agent server;
     private Set<Agent> clients;
+    HadoopClusterInfo cluster;
 
     public OozieConfig() {
         this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
@@ -58,6 +60,14 @@ public class OozieConfig implements Serializable {
 
     public void setClients(Set<Agent> clients) {
         this.clients = clients;
+    }
+
+    public HadoopClusterInfo getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(HadoopClusterInfo cluster) {
+        this.cluster = cluster;
     }
 
 }

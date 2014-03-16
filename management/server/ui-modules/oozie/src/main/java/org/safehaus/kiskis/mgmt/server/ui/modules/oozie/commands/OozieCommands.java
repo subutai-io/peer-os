@@ -42,7 +42,7 @@ public class OozieCommands {
     
     public Request getSetRootGroups() {
         Request req = getTemplate();
-        req.setProgram(OozieCommandEnum.CONFIGURE_ROOT_GROUPS.getProgram());
+        req.setProgram(OozieCommandEnum.CONFIGURE_ROOT_HOST.getProgram());
         return req;
     }
 

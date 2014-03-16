@@ -12,35 +12,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Tasks;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout implements TaskCallback {
+public class Cloner extends VerticalLayout {
 
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final Label indicator;
     private final TreeTable lxcTable;
-    private final TaskRunner taskRunner;
-    private final Map<String, String> requestToLxcMatchMap = new HashMap<String, String>();
+    private final LxcManager lxcManager;
     private final String physicalHostLabel = "Physical Host";
     private final String statusLabel = "Status";
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
-    private volatile int taskCount;
 
-    public Cloner(TaskRunner taskRunner) {
+    public Cloner(final LxcManager lxcManager) {
         setSpacing(true);
         setMargin(true);
 
-        this.taskRunner = taskRunner;
+        this.lxcManager = lxcManager;
 
         textFieldLxcName = new TextField();
         slider = new Slider();
@@ -146,39 +142,123 @@ public class Cloner extends VerticalLayout implements TaskCallback {
     private void startCloneTask() {
         Set<Agent> physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
 
-        if (physicalAgents.isEmpty()) {
-            show("Select at least one physical agent");
-        } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
+        if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
             show("Enter product name");
-        } else if (!String.format("%s%s%s",
-                physicalAgents.iterator().next().getHostname(),
-                Common.PARENT_CHILD_LXC_SEPARATOR,
-                textFieldLxcName.getValue().toString().trim())
-                .matches(hostValidatorRegex)) {
+        } else if (!textFieldLxcName.getValue().toString().trim().matches(hostValidatorRegex)) {
             show("Please, use only letters, digits, dots and hyphens in product name");
-        } else {
-            //do the magic
-            String productName = textFieldLxcName.getValue().toString().trim();
-            Task task = Tasks.getCloneTask(physicalAgents, productName, (Double) slider.getValue());
-            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
-            for (Agent physAgent : physicalAgents) {
-                List<String> lxcNames = new ArrayList<String>();
-                for (Request cmd : task.getRequests()) {
-                    if (cmd.getUuid().compareTo(physAgent.getUuid()) == 0) {
-                        String lxcHostname
-                                = cmd.getArgs().get(cmd.getArgs().size() - 1);
-                        requestToLxcMatchMap.put(task.getUuid() + "-" + cmd.getRequestSequenceNumber(),
-                                lxcHostname);
+        } else if (physicalAgents.isEmpty()) {
+            indicator.setVisible(true);
+            final double count = (Double) slider.getValue();
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
+                    if (bestServers.isEmpty()) {
+                        show("No servers available to accommodate new lxc containers");
+                        indicator.setVisible(false);
+                    } else {
+                        int numOfLxcSlots = 0;
+                        for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
+                            numOfLxcSlots += srv.getValue();
+                        }
 
-                        lxcNames.add(lxcHostname);
+                        if (numOfLxcSlots < count) {
+                            show(String.format("Only %s lxc containers can be created", numOfLxcSlots));
+                            indicator.setVisible(false);
+                        } else {
+
+                            String productName = textFieldLxcName.getValue().toString().trim();
+                            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
+                            Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+                            int numOfLxcsToClone = (int) count;
+                            final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
+                            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
+                                for (int i = 1; i <= entry.getValue(); i++) {
+                                    List<String> lxcHostNames = agentFamilies.get(entry.getKey());
+                                    if (lxcHostNames == null) {
+                                        lxcHostNames = new ArrayList<String>();
+                                        agentFamilies.put(entry.getKey(), lxcHostNames);
+                                    }
+                                    final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
+                                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
+                                    lxcHostNames.add(lxcHost.toString());
+
+                                    //start clone task
+                                    Thread t = new Thread(new Runnable() {
+                                        public void run() {
+                                            boolean result = lxcManager.cloneLxcOnHost(entry.getKey(), lxcHost.toString());
+                                            Item row = lxcTable.getItem(lxcHost.toString());
+                                            if (row != null) {
+                                                if (result) {
+                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
+                                                } else {
+                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                                                }
+                                            }
+                                            if (countProcessed.decrementAndGet() == 0) {
+                                                indicator.setVisible(false);
+                                            }
+                                        }
+                                    });
+                                    t.start();
+                                    //
+                                    numOfLxcsToClone--;
+                                    if (numOfLxcsToClone == 0) {
+                                        break;
+                                    }
+                                }
+                                if (numOfLxcsToClone == 0) {
+                                    break;
+                                }
+                            }
+
+                            populateLxcTable(agentFamilies);
+                        }
+
                     }
                 }
-                agentFamilies.put(physAgent, lxcNames);
+            });
+
+            t.start();
+
+        } else {
+
+            String productName = textFieldLxcName.getValue().toString().trim();
+            Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
+            double count = (Double) slider.getValue();
+            for (Agent physAgent : physicalAgents) {
+                List<String> lxcHostNames = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
+                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
+                    lxcHostNames.add(lxcHost.toString());
+                }
+                agentFamilies.put(physAgent, lxcHostNames);
             }
+
             populateLxcTable(agentFamilies);
             indicator.setVisible(true);
-            taskCount++;
-            taskRunner.executeTask(task, this);
+            final AtomicInteger countProcessed = new AtomicInteger((int) (count * physicalAgents.size()));
+            for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
+                for (final String lxcHostname : agg.getValue()) {
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            boolean result = lxcManager.cloneLxcOnHost(agg.getKey(), lxcHostname);
+                            Item row = lxcTable.getItem(lxcHostname);
+                            if (row != null) {
+                                if (result) {
+                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
+                                } else {
+                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                                }
+                            }
+                            if (countProcessed.decrementAndGet() == 0) {
+                                indicator.setVisible(false);
+                            }
+                        }
+                    });
+                    t.start();
+                }
+            }
         }
 
     }
@@ -187,30 +267,4 @@ public class Cloner extends VerticalLayout implements TaskCallback {
         getWindow().showNotification(msg);
     }
 
-    @Override
-    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-        if (Util.isFinalResponse(response)) {
-            String lxcHost = requestToLxcMatchMap.get(task.getUuid() + "-" + response.getRequestSequenceNumber());
-            if (lxcHost != null) {
-                Item row = lxcTable.getItem(lxcHost);
-                if (row != null) {
-                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE && response.getExitCode() == 0) {
-                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
-                    } else {
-                        row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
-                    }
-                }
-            }
-            requestToLxcMatchMap.remove(task.getUuid() + "-" + response.getRequestSequenceNumber());
-        }
-        if (task.isCompleted()) {
-            taskCount--;
-            if (taskCount == 0) {
-                indicator.setVisible(false);
-                requestToLxcMatchMap.clear();
-            }
-        }
-
-        return null;
-    }
 }

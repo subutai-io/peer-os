@@ -19,5 +19,6 @@
         <module>db-manager-impl</module>
         <module>communication-impl</module>
         <module>task-runner-impl</module>
+	<module>lxc-impl</module>
     </modules>
 </project>

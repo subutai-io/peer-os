@@ -11,8 +11,8 @@
 
     <artifactId>lxc-module</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management LXC</name>
-    <description>Kiskis Management LXC</description>
+    <name>Kiskis Management LXC UI</name>
+    <description>Kiskis Management LXC UI</description>
 
     <build>
         <plugins>
@@ -84,6 +84,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>agent-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lxc-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -30,7 +30,6 @@ public class ServiceInstaller implements TaskCallback {
     public ServiceInstaller(Wizard wizard, TextArea terminal) {
         this.terminal = terminal;
         this.config = wizard.getConfig();
-        this.wizard = wizard;
         OozieCommands oc = new OozieCommands();
 
         Task updateApt = new Task("apt-get update");
@@ -66,21 +65,21 @@ public class ServiceInstaller implements TaskCallback {
         allHadoopNodes.add(config.getServer());
         allHadoopNodes.addAll(config.getClients());
 
-        Task configugeRootHost = new Task("Configure root host");
+        Task configugeRootHostClients = new Task("Configure client");
         for (Agent agent : allHadoopNodes) {
             Request command = oc.getSetRootHost(" " + config.getServer().getListIP().get(0));
             command.setUuid(agent.getUuid());
-            configugeRootHost.addRequest(command);
+            configugeRootHostClients.addRequest(command);
         }
-        tasks.add(configugeRootHost);
+        tasks.add(configugeRootHostClients);
 
-        Task configugeRootGroups = new Task("Configure root groups");
+        Task configugeRootGroupsClients = new Task("Configure client");
         for (Agent agent : allHadoopNodes) {
             Request command = oc.getSetRootGroups();
             command.setUuid(agent.getUuid());
-            configugeRootGroups.addRequest(command);
+            configugeRootGroupsClients.addRequest(command);
         }
-        tasks.add(configugeRootGroups);
+        tasks.add(configugeRootGroupsClients);
 
     }
 
