@@ -12,8 +12,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -149,8 +151,7 @@ public class InstallationStep extends Panel {
                 return;
             }
 
-            //clone lxc containers
-            clone(bestServers);
+            start(bestServers);
 
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in startOperation", e);
@@ -207,88 +208,163 @@ public class InstallationStep extends Panel {
         }
     }
 
-    private void clone(final Map<Agent, Integer> bestServers) {
+    private class Starter implements Callable<CloneInfo> {
+
+        private final CloneInfo cloneInfo;
+
+        public Starter(CloneInfo cloneInfo) {
+            this.cloneInfo = cloneInfo;
+        }
+
+        public CloneInfo call() throws Exception {
+            cloneInfo.setResult(lxcManager.startLxcOnHost(cloneInfo.physicalAgent, cloneInfo.getLxcHostname()));
+            return cloneInfo;
+        }
+    }
+
+    private void start(final Map<Agent, Integer> bestServers) {
         Thread t = new Thread(new Runnable() {
 
             public void run() {
-
-                Set<String> configSrvsHostnames = new HashSet<String>();
-                Set<String> routersHostnames = new HashSet<String>();
-                Set<String> dataNodesHostnames = new HashSet<String>();
-
-                int numOfLxcs = 0;
-                for (int i = 1; i <= config.getNumberOfConfigServers(); i++) {
-                    numOfLxcs++;
-                    configSrvsHostnames.add("mongo-config-" + Util.generateTimeBasedUUID());
-                }
-                for (int i = 1; i <= config.getNumberOfRouters(); i++) {
-                    numOfLxcs++;
-                    routersHostnames.add("mongo-router-" + Util.generateTimeBasedUUID());
-                }
-                for (int i = 1; i <= config.getNumberOfDataNodes(); i++) {
-                    numOfLxcs++;
-                    dataNodesHostnames.add("mongo-data-" + Util.generateTimeBasedUUID());
-                }
-
-                Iterator<String> configSrvsHostnamesIterator = configSrvsHostnames.iterator();
-                Iterator<String> routersHostnamesIterator = routersHostnames.iterator();
-                Iterator<String> dataNodesHostnamesIterator = dataNodesHostnames.iterator();
-
-                Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
-
-                ExecutorService executor = Executors.newCachedThreadPool();
-                CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
-
-                try {
-                    outerloop:
-                    for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
-                        for (int i = 1; i <= entry.getValue(); i++) {
-                            if (configSrvsHostnamesIterator.hasNext()) {
-                                final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                        .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                        .append(configSrvsHostnamesIterator.next()).toString();
-                                addOutput(String.format("Cloning lxc %s", lxcHostname));
-                                completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.CONFIG_NODE)));
-                            } else if (routersHostnamesIterator.hasNext()) {
-                                final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                        .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                        .append(routersHostnamesIterator.next()).toString();
-                                addOutput(String.format("Cloning lxc %s", lxcHostname));
-                                completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.ROUTER_NODE)));
-                            } else if (dataNodesHostnamesIterator.hasNext()) {
-                                final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                        .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                        .append(dataNodesHostnamesIterator.next()).toString();
-                                addOutput(String.format("Cloning lxc %s", lxcHostname));
-                                completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.DATA_NODE)));
-                            } else {
-                                break outerloop;
-                            }
-                        }
-                    }
-                    boolean result = true;
-                    for (int i = 0; i < numOfLxcs; i++) {
-                        Future<CloneInfo> future = completer.take();
-                        CloneInfo cloneInfo = future.get();
-                        result &= cloneInfo.isResult();
-                    }
-                    if (result) {
-                        addOutput("CLONE SUCCEEDED");
+                List<CloneInfo> cloneInfoList = new ArrayList<CloneInfo>();
+                if (cloneLxcs(bestServers, cloneInfoList)) {
+                    addOutput("Lxc containers cloned successfully");
+                    //start lxc containers
+                    if (startLxcs(cloneInfoList)) {
+                        addOutput("Lxc containers started successfully");
                     } else {
-                        addOutput("CLONE FAILED");
+                        addOutput("Starting of lxc containers failed. Use LXC module to cleanup");
+                        hideProgress();
                     }
-                } catch (InterruptedException e) {
-                } catch (ExecutionException e) {
-                } finally {
-                    try {
-                        executor.shutdown();
-                    } catch (Exception e) {
-                    }
+                } else {
+                    addOutput("Cloning of lxc containers failed. Use LXC module to cleanup");
+                    hideProgress();
                 }
             }
         });
 
         t.start();
+    }
+
+    private boolean startLxcs(List<CloneInfo> cloneInfoList) {
+        if (!cloneInfoList.isEmpty()) {
+            ExecutorService executor = Executors.newCachedThreadPool();
+            CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+            try {
+                for (CloneInfo cloneInfo : cloneInfoList) {
+                    addOutput(String.format("Starting lxc %s", cloneInfo.lxcHostname));
+                    cloneInfo.setResult(false);
+                    completer.submit(new Starter(cloneInfo));
+                }
+
+                boolean result = true;
+                for (int i = 0; i < cloneInfoList.size(); i++) {
+                    Future<CloneInfo> future = completer.take();
+                    CloneInfo cloneInfo = future.get();
+                    result &= cloneInfo.isResult();
+                }
+
+                return result;
+            } catch (InterruptedException e) {
+            } catch (ExecutionException e) {
+            } finally {
+                try {
+                    executor.shutdown();
+                } catch (Exception e) {
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean cloneLxcs(final Map<Agent, Integer> bestServers, final List<CloneInfo> cloneInfoList) {
+
+        Set<String> configSrvsHostnames = new HashSet<String>();
+        Set<String> routersHostnames = new HashSet<String>();
+        Set<String> dataNodesHostnames = new HashSet<String>();
+
+        int numOfLxcs = 0;
+        for (int i = 1; i <= config.getNumberOfConfigServers(); i++) {
+            numOfLxcs++;
+            StringBuilder lxcHostname = new StringBuilder("mongo-cfg-").append(Util.generateTimeBasedUUID());
+            if (lxcHostname.length() > 64) {
+                lxcHostname.setLength(64);
+            }
+            configSrvsHostnames.add(lxcHostname.toString());
+        }
+        for (int i = 1; i <= config.getNumberOfRouters(); i++) {
+            numOfLxcs++;
+            StringBuilder lxcHostname = new StringBuilder("mongo-rout-").append(Util.generateTimeBasedUUID());
+            if (lxcHostname.length() > 64) {
+                lxcHostname.setLength(64);
+            }
+            routersHostnames.add(lxcHostname.toString());
+        }
+        for (int i = 1; i <= config.getNumberOfDataNodes(); i++) {
+            numOfLxcs++;
+            StringBuilder lxcHostname = new StringBuilder("mongo-data-").append(Util.generateTimeBasedUUID());
+            if (lxcHostname.length() > 64) {
+                lxcHostname.setLength(64);
+            }
+            dataNodesHostnames.add(lxcHostname.toString());
+        }
+
+        Iterator<String> configSrvsHostnamesIterator = configSrvsHostnames.iterator();
+        Iterator<String> routersHostnamesIterator = routersHostnames.iterator();
+        Iterator<String> dataNodesHostnamesIterator = dataNodesHostnames.iterator();
+
+        Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+        CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+
+        try {
+            outerloop:
+            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
+                for (int i = 1; i <= entry.getValue(); i++) {
+                    if (configSrvsHostnamesIterator.hasNext()) {
+                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                                .append(configSrvsHostnamesIterator.next()).toString();
+                        addOutput(String.format("Cloning lxc %s", lxcHostname));
+                        completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.CONFIG_NODE)));
+                    } else if (routersHostnamesIterator.hasNext()) {
+                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                                .append(routersHostnamesIterator.next()).toString();
+                        addOutput(String.format("Cloning lxc %s", lxcHostname));
+                        completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.ROUTER_NODE)));
+                    } else if (dataNodesHostnamesIterator.hasNext()) {
+                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                                .append(dataNodesHostnamesIterator.next()).toString();
+                        addOutput(String.format("Cloning lxc %s", lxcHostname));
+                        completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.DATA_NODE)));
+                    } else {
+                        break outerloop;
+                    }
+                }
+            }
+            boolean result = true;
+            for (int i = 0; i < numOfLxcs; i++) {
+                Future<CloneInfo> future = completer.take();
+                CloneInfo cloneInfo = future.get();
+                cloneInfoList.add(cloneInfo);
+                result &= cloneInfo.isResult();
+            }
+
+            return result;
+
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        } finally {
+            try {
+                executor.shutdown();
+            } catch (Exception e) {
+            }
+        }
+
+        return false;
 
     }
 

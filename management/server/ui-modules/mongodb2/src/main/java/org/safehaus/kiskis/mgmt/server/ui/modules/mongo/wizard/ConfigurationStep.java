@@ -91,7 +91,7 @@ public class ConfigurationStep extends Panel {
         grid.addComponent(routersCombo, 2, 2, 9, 2);
 
         //datanodes number
-        ComboBox dataNodesCombo = new ComboBox("Choose number of datanodes ( At least 3 recommended)", Arrays.asList(1, 3, 5, 7));
+        ComboBox dataNodesCombo = new ComboBox("Choose number of datanodes", Arrays.asList(3, 5, 7));
         dataNodesCombo.setMultiSelect(false);
         dataNodesCombo.setImmediate(true);
         dataNodesCombo.setTextInputAllowed(false);
