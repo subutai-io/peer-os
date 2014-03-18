@@ -622,11 +622,11 @@
                                     <artifactId>cxf-rt-bindings-soap</artifactId>
                                     <version>${org.apache.cxf.version}</version>
                                 </artifactItem>-->
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.apache.karaf.shell</groupId>
                                     <artifactId>org.apache.karaf.shell.osgi</artifactId>
                                     <version>${karaf.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
 <!--                                <artifactItem>
                                     <groupId>org.springframework.osgi</groupId>
                                     <artifactId>spring-osgi-annotation</artifactId>
