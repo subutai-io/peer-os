@@ -288,8 +288,8 @@ public class Manager extends VerticalLayout {
                                 Thread t = new Thread(new Runnable() {
 
                                     public void run() {
-                                        org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.startLxcOnHost(physicalAgent, lxcHostname);
-                                        if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                        boolean success = lxcManager.startLxcOnHost(physicalAgent, lxcHostname);
+                                        if (success) {
                                             stopBtn.setEnabled(true);
                                         } else {
                                             startBtn.setEnabled(true);
@@ -315,8 +315,8 @@ public class Manager extends VerticalLayout {
                                 Thread t = new Thread(new Runnable() {
 
                                     public void run() {
-                                        org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.stopLxcOnHost(physicalAgent, lxcHostname);
-                                        if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                        boolean success = lxcManager.stopLxcOnHost(physicalAgent, lxcHostname);
+                                        if (!success) {
                                             stopBtn.setEnabled(true);
                                         } else {
                                             startBtn.setEnabled(true);
@@ -351,8 +351,8 @@ public class Manager extends VerticalLayout {
                                                         Thread t = new Thread(new Runnable() {
 
                                                             public void run() {
-                                                                org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
-                                                                if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                                                boolean success = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
+                                                                if (!success) {
                                                                     stopBtn.setEnabled(true);
                                                                     destroyBtn.setEnabled(true);
                                                                     progressIcon.setVisible(false);
@@ -379,8 +379,8 @@ public class Manager extends VerticalLayout {
                                     Thread t = new Thread(new Runnable() {
 
                                         public void run() {
-                                            org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState lxcState = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
-                                            if (org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING.equals(lxcState)) {
+                                            boolean success = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
+                                            if (!success) {
                                                 stopBtn.setEnabled(true);
                                                 destroyBtn.setEnabled(true);
                                                 progressIcon.setVisible(false);

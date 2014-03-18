@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -57,19 +58,19 @@ public class LxcManagerImpl implements LxcManager {
         this.agentManager = agentManager;
     }
 
-    public Map<Agent, Integer> getBestHostServers() {
-        final Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
-        Set<Agent> pAgents = agentManager.getPhysicalAgents();
+    public Map<Agent, ServerMetric> getPhysicalServerMetrics() {
+        final Map<Agent, ServerMetric> serverMetrics = new HashMap<Agent, ServerMetric>();
+        Set<Agent> agents = agentManager.getPhysicalAgents();
         //omit management server
-        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext();) {
+        for (Iterator<Agent> it = agents.iterator(); it.hasNext();) {
             Agent agent = it.next();
             if (!agent.getHostname().matches("^py.*")) {
                 it.remove();
             }
         }
-        if (!pAgents.isEmpty()) {
+        if (!agents.isEmpty()) {
 
-            Task getMetricsTask = Tasks.getMetricsTask(pAgents);
+            Task getMetricsTask = Tasks.getMetricsTask(agents);
 
             taskRunner.executeTask(getMetricsTask, new TaskCallback() {
                 private final Map<UUID, String> stdOuts = new HashMap<UUID, String>();
@@ -86,8 +87,9 @@ public class LxcManagerImpl implements LxcManager {
                             int freeRamMb = 0;
                             int freeHddMb = 0;
                             int numOfProc = 0;
-                            double load15Min = 0;
+                            double loadAvg = 0;
                             double cpuLoadPercent = 100;
+                            boolean serverOK = false;
                             if (metrics.length == 4) {
                                 int line = 0;
                                 for (String metric : metrics) {
@@ -122,7 +124,7 @@ public class LxcManagerImpl implements LxcManager {
                                             String[] loads = m.group(1).split(",");
                                             if (loads.length == 3) {
                                                 if (Util.isNumeric(loads[0]) && Util.isNumeric(loads[1]) && Util.isNumeric(loads[2])) {
-                                                    load15Min = Double.parseDouble(loads[2]);
+                                                    loadAvg = (Double.parseDouble(loads[0]) + Double.parseDouble(loads[1]) + Double.parseDouble(loads[2])) / 3;
                                                 } else {
                                                     break;
                                                 }
@@ -136,7 +138,8 @@ public class LxcManagerImpl implements LxcManager {
                                         if (Util.isNumeric(metric)) {
                                             numOfProc = Integer.parseInt(metric);
                                             if (numOfProc > 0) {
-                                                cpuLoadPercent = (load15Min / numOfProc) * 100;
+                                                cpuLoadPercent = (loadAvg / numOfProc) * 100;
+                                                serverOK = true;
                                             } else {
                                                 break;
                                             }
@@ -146,13 +149,11 @@ public class LxcManagerImpl implements LxcManager {
                                     }
                                 }
                             }
-                            if (freeHddMb > 0 && freeRamMb > 0 && cpuLoadPercent < 100) {
-                                int numOfLxcByRam = (int) ((freeRamMb - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
-                                int numOfLxcByHdd = (int) ((freeHddMb - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
-                                int numOfLxcByCpu = (int) (((100 - cpuLoadPercent) - (MIN_CPU_IN_RESERVE_PERCENT / numOfProc)) / (MIN_CPU_LXC_PERCENT / numOfProc));
-                                if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
-                                    int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
-                                    bestServers.put(agentManager.getAgentByUUID(out.getKey()), minNumOfLxcs);
+                            if (serverOK) {
+                                ServerMetric serverMetric = new ServerMetric(freeHddMb, freeRamMb, (int) cpuLoadPercent, numOfProc);
+                                Agent agent = agentManager.getAgentByUUID(out.getKey());
+                                if (agent != null) {
+                                    serverMetrics.put(agent, serverMetric);
                                 }
                             }
                         }
@@ -171,27 +172,42 @@ public class LxcManagerImpl implements LxcManager {
                 }
             }
 
-        }
+            if (!serverMetrics.isEmpty()) {
+                Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
+                for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext();) {
+                    Map.Entry<Agent, ServerMetric> entry = it.next();
+                    EnumMap<LxcState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
+                    if (info != null) {
+                        int numOfExistingLxcs = (info.get(LxcState.RUNNING) != null ? info.get(LxcState.RUNNING).size() : 0)
+                                + (info.get(LxcState.STOPPED) != null ? info.get(LxcState.STOPPED).size() : 0)
+                                + (info.get(LxcState.FROZEN) != null ? info.get(LxcState.FROZEN).size() : 0);
+                        entry.getValue().setNumOfLxcs(numOfExistingLxcs);
 
-        if (!bestServers.isEmpty()) {
-            Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
-            for (Iterator<Map.Entry<Agent, Integer>> it = bestServers.entrySet().iterator(); it.hasNext();) {
-                Map.Entry<Agent, Integer> entry = it.next();
-                EnumMap<LxcState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
-                if (info != null) {
-                    int numOfExistingLxcs = (info.get(LxcState.RUNNING) != null ? info.get(LxcState.RUNNING).size() : 0)
-                            + (info.get(LxcState.STOPPED) != null ? info.get(LxcState.STOPPED).size() : 0);
-                    if (MAX_NUMBER_OF_LXCS_PER_HOST > numOfExistingLxcs) {
-                        entry.setValue(Math.min(entry.getValue(), MAX_NUMBER_OF_LXCS_PER_HOST - numOfExistingLxcs));
                     } else {
                         it.remove();
                     }
-
-                } else {
-                    it.remove();
                 }
             }
+        }
+        return serverMetrics;
+    }
 
+    public Map<Agent, Integer> getPhysicalServersWithLxcSlots() {
+        final Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
+        Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
+
+        if (!metrics.isEmpty()) {
+            for (Map.Entry<Agent, ServerMetric> entry : metrics.entrySet()) {
+                ServerMetric metric = entry.getValue();
+                int numOfLxcByLxcLimit = MAX_NUMBER_OF_LXCS_PER_HOST - metric.getNumOfLxcs();
+                int numOfLxcByRam = (int) ((metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
+                int numOfLxcByHdd = (int) ((metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
+                int numOfLxcByCpu = (int) (((100 - metric.getCpuLoadPercent()) - (MIN_CPU_IN_RESERVE_PERCENT / metric.getNumOfProcessors())) / (MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors()));
+                if (numOfLxcByLxcLimit > 0 && numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
+                    int minNumOfLxcs = Math.min(Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam), numOfLxcByLxcLimit);
+                    bestServers.put(entry.getKey(), minNumOfLxcs);
+                }
+            }
         }
         return bestServers;
     }
@@ -238,6 +254,11 @@ public class LxcManagerImpl implements LxcManager {
                                         lxcs.put(LxcState.STOPPED, new ArrayList<String>());
                                     }
                                     currState = LxcState.STOPPED;
+                                } else if (LxcState.FROZEN.name().equalsIgnoreCase(lxcStr)) {
+                                    if (lxcs.get(LxcState.FROZEN) == null) {
+                                        lxcs.put(LxcState.FROZEN, new ArrayList<String>());
+                                    }
+                                    currState = LxcState.FROZEN;
                                 } else if (currState != null
                                         && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
                                     lxcs.get(currState).add(lxcStr);
@@ -293,7 +314,7 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
-    public LxcState startLxcOnHost(Agent physicalAgent, String lxcHostname) {
+    public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
             final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
@@ -324,12 +345,12 @@ public class LxcManagerImpl implements LxcManager {
                 }
             }
 
-            return LxcState.RUNNING.equals(getLxcInfoTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
+            return LxcState.RUNNING.equals(getLxcInfoTask.getData());
         }
-        return LxcState.STOPPED;
+        return false;
     }
 
-    public LxcState stopLxcOnHost(Agent physicalAgent, String lxcHostname) {
+    public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task stopLxcTask = Tasks.getLxcStopTask(physicalAgent, lxcHostname);
             final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
@@ -341,8 +362,8 @@ public class LxcManagerImpl implements LxcManager {
                             //send lxc-info cmd
                             return getLxcInfoTask;
                         } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                            if (stdOut.indexOf("RUNNING") != -1) {
-                                task.setData(LxcState.RUNNING);
+                            if (stdOut.indexOf("STOPPED") != -1) {
+                                task.setData(LxcState.STOPPED);
                             }
                             synchronized (task) {
                                 task.notifyAll();
@@ -360,12 +381,12 @@ public class LxcManagerImpl implements LxcManager {
                 }
             }
 
-            return LxcState.RUNNING.equals(getLxcInfoTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
+            return LxcState.STOPPED.equals(getLxcInfoTask.getData());
         }
-        return LxcState.STOPPED;
+        return false;
     }
 
-    public LxcState destroyLxcOnHost(Agent physicalAgent, String lxcHostname) {
+    public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
             final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
@@ -377,8 +398,8 @@ public class LxcManagerImpl implements LxcManager {
                             //send lxc-info cmd
                             return getLxcInfoTask;
                         } else if (task.getData() == TaskType.GET_LXC_INFO) {
-                            if (stdOut.indexOf("RUNNING") != -1) {
-                                task.setData(LxcState.RUNNING);
+                            if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                                task.setData(LxcState.STOPPED);
                             }
                             synchronized (task) {
                                 task.notifyAll();
@@ -396,9 +417,9 @@ public class LxcManagerImpl implements LxcManager {
                 }
             }
 
-            return LxcState.RUNNING.equals(getLxcInfoTask.getData()) ? LxcState.RUNNING : LxcState.STOPPED;
+            return LxcState.STOPPED.equals(getLxcInfoTask.getData());
         }
-        return LxcState.STOPPED;
+        return false;
     }
 
 }

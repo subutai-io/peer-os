@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.api.lxcmanager;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 
 /**
  *
  * @author dilshat
  */
-public enum LxcState {
+public enum NodeType {
 
-    RUNNING, STOPPED, FROZEN
+    CONFIG_NODE, ROUTER_NODE, DATA_NODE
 }
