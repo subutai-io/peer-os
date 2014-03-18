@@ -151,7 +151,7 @@ public class Cloner extends VerticalLayout {
             final double count = (Double) slider.getValue();
             Thread t = new Thread(new Runnable() {
                 public void run() {
-                    Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
+                    Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
                     if (bestServers.isEmpty()) {
                         show("No servers available to accommodate new lxc containers");
                         indicator.setVisible(false);

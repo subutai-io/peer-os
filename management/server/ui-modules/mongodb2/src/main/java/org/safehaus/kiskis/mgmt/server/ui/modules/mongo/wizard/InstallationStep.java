@@ -17,14 +17,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -44,8 +41,8 @@ public class InstallationStep extends Panel {
     private static final Logger LOG = Logger.getLogger(InstallationStep.class.getName());
     private final TextArea outputTxtArea;
     private final TextArea logTextArea;
-    private final Button ok;
-    private final Button cancel;
+    private final Button done;
+    private final Button back;
     private final Label indicator;
     private Thread operationTimeoutThread;
 
@@ -75,41 +72,29 @@ public class InstallationStep extends Panel {
 
         grid.addComponent(outputTxtArea, 0, 0, 18, 3);
 
-        ok = new Button("Ok");
-        ok.setEnabled(false);
-        ok.addListener(new Button.ClickListener() {
+        done = new Button("Done");
+        done.setEnabled(false);
+        done.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 wizard.init();
             }
         });
-        cancel = new Button("Cancel");
-        cancel.addListener(new Button.ClickListener() {
+        back = new Button("Back");
+        back.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                MgmtApplication.showConfirmationDialog(
-                        "Undo cluster installation",
-                        "Do you want to revert cluster installation?\nWarning: If 'Install mongo' task is currently running,\ndpkg process might be locked and uninstallation would fail", "Yes", "No", new ConfirmationDialogCallback() {
-
-                            @Override
-                            public void response(boolean ok) {
-                                if (ok) {
-                                    cancel.setEnabled(false);
-                                    startOperation(false);
-                                }
-                            }
-                        });
-
+                wizard.back();
             }
         });
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
         HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(ok);
-        buttons.addComponent(cancel);
+        buttons.addComponent(back);
+        buttons.addComponent(done);
         grid.addComponent(buttons, 0, 9, 5, 9);
         grid.addComponent(indicator, 19, 0, 19, 0);
 
@@ -125,34 +110,52 @@ public class InstallationStep extends Panel {
 
     }
 
-    public void startOperation(final boolean install) {
+    public void startOperation() {
         try {
-            if (install) {
-                //perform lxc container installation and bootstrap here
-
-                Map<Agent, Integer> bestServers = lxcManager.getBestHostServers();
-
-                if (bestServers.isEmpty()) {
-                    addOutput("No servers available to accommodate new lxc containers");
-                    return;
-                }
-                //check number if available lxc slots
-
-                int numberOfLxcsNeeded = config.getNumberOfConfigServers() + config.getNumberOfDataNodes() + config.getNumberOfRouters();
-
-                int numOfAvailableLxcSlots = 0;
-                for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
-                    numOfAvailableLxcSlots += srv.getValue();
-                }
-
-                if (numOfAvailableLxcSlots < numberOfLxcsNeeded) {
-                    addOutput(String.format("Only %s lxc containers can be created", numOfAvailableLxcSlots));
-                    return;
-                }
-            }
-            final Operation installOperation = install ? new InstallClusterOperation(config) : new UninstallClusterOperation(config);
-            runTimeoutThread(installOperation);
             showProgress();
+
+            //perform lxc container installation and bootstrap here
+            Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
+
+            if (bestServers.isEmpty()) {
+                addOutput("No servers available to accommodate new lxc containers");
+                hideProgress();
+                return;
+            }
+
+            //check number if available lxc slots
+            int numberOfLxcsNeeded = config.getNumberOfConfigServers() + config.getNumberOfDataNodes() + config.getNumberOfRouters();
+
+            int numOfAvailableLxcSlots = 0;
+            for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
+                numOfAvailableLxcSlots += srv.getValue();
+            }
+
+            if (numOfAvailableLxcSlots < numberOfLxcsNeeded) {
+                addOutput(String.format("Only %s lxc containers can be created", numOfAvailableLxcSlots));
+                hideProgress();
+                return;
+            }
+
+            //clone lxc containers
+            clone(bestServers);
+            install();
+
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error in startOperation", e);
+        }
+
+    }
+
+    private void clone(Map<Agent, Integer> bestServers) {
+
+    }
+
+    private void install() {
+        try {
+
+            final Operation installOperation = new InstallClusterOperation(config);
+            runTimeoutThread(installOperation);
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
@@ -222,9 +225,6 @@ public class InstallationStep extends Panel {
                                 installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
                                 hideProgress();
-                                if (!install) {
-                                    MongoDAO.deleteMongoClusterInfo(config.getClusterName());
-                                }
                             }
                         } else {
                             installOperation.setCompleted(true);
@@ -238,8 +238,9 @@ public class InstallationStep extends Panel {
                 }
             });
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in startOperation", e);
+            LOG.log(Level.SEVERE, "Error in install", e);
         }
+
     }
 
     private void runTimeoutThread(final Operation operation) {
@@ -272,13 +273,14 @@ public class InstallationStep extends Panel {
 
     private void showProgress() {
         indicator.setVisible(true);
-        ok.setEnabled(false);
+        done.setEnabled(false);
+        back.setEnabled(false);
     }
 
     private void hideProgress() {
         indicator.setVisible(false);
-        ok.setEnabled(true);
-        cancel.setEnabled(true);
+        done.setEnabled(true);
+        back.setEnabled(true);
     }
 
     private void addOutput(String output) {

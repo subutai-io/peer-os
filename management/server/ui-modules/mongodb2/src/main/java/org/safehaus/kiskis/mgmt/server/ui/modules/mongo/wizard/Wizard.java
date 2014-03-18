@@ -86,7 +86,7 @@ public class Wizard {
             case 4: {
                 progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
                 component = new InstallationStep(this);
-                ((InstallationStep) component).startOperation(true);
+                ((InstallationStep) component).startOperation();
                 break;
             }
             default: {

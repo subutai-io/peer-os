@@ -18,15 +18,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public interface LxcManager {
 
-    public Map<Agent, Integer> getBestHostServers();
+    public Map<Agent, Integer> getPhysicalServersWithLxcSlots();
+
+    public Map<Agent, ServerMetric> getPhysicalServerMetrics();
 
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers();
 
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname);
 
-    public LxcState startLxcOnHost(Agent physicalAgent, String lxcHostname);
+    public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname);
 
-    public LxcState stopLxcOnHost(Agent physicalAgent, String lxcHostname);
+    public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname);
 
-    public LxcState destroyLxcOnHost(Agent physicalAgent, String lxcHostname);
+    public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname);
 }
