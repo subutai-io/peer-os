@@ -303,11 +303,11 @@
                                     <artifactId>cassandra-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>logs-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
