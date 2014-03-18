@@ -34,7 +34,7 @@ public class CommunicationMessageListener implements MessageListener {
                 if (response != null) {
                     if (response.getType() != ResponseType.HEARTBEAT_RESPONSE) {
 //                        LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(CommandJson.getCommand(jsonCmd)));
-                        if (response.getExitCode() != 0) {
+                        if (response.getExitCode() != null && response.getExitCode() != 0) {
                             LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(CommandJson.getCommand(jsonCmd)));
                         }
                     }
