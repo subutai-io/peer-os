@@ -87,7 +87,7 @@ public class LxcManagerImpl implements LxcManager {
                             int freeRamMb = 0;
                             int freeHddMb = 0;
                             int numOfProc = 0;
-                            double load15Min = 0;
+                            double loadAvg = 0;
                             double cpuLoadPercent = 100;
                             boolean serverOK = false;
                             if (metrics.length == 4) {
@@ -124,7 +124,7 @@ public class LxcManagerImpl implements LxcManager {
                                             String[] loads = m.group(1).split(",");
                                             if (loads.length == 3) {
                                                 if (Util.isNumeric(loads[0]) && Util.isNumeric(loads[1]) && Util.isNumeric(loads[2])) {
-                                                    load15Min = Double.parseDouble(loads[2]);
+                                                    loadAvg = (Double.parseDouble(loads[0]) + Double.parseDouble(loads[1]) + Double.parseDouble(loads[2])) / 3;
                                                 } else {
                                                     break;
                                                 }
@@ -138,7 +138,7 @@ public class LxcManagerImpl implements LxcManager {
                                         if (Util.isNumeric(metric)) {
                                             numOfProc = Integer.parseInt(metric);
                                             if (numOfProc > 0) {
-                                                cpuLoadPercent = (load15Min / numOfProc) * 100;
+                                                cpuLoadPercent = (loadAvg / numOfProc) * 100;
                                                 serverOK = true;
                                             } else {
                                                 break;

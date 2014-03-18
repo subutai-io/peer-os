@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
@@ -22,6 +24,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
  * @author dilshat
  */
 public class Util {
+
+    public static UUID generateTimeBasedUUID() {
+        return java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
+    }
 
     public static boolean isStringEmpty(String str) {
         return str == null || str.trim().isEmpty();
