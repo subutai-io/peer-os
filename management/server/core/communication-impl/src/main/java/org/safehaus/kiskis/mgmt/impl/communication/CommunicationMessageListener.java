@@ -33,7 +33,12 @@ public class CommunicationMessageListener implements MessageListener {
                 Response response = CommandJson.getResponse(jsonCmd);
                 if (response != null) {
                     if (response.getType() != ResponseType.HEARTBEAT_RESPONSE) {
-                        LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(CommandJson.getCommand(jsonCmd)));
+//                        LOG.log(Level.INFO, "\nReceived {0}", CommandJson.getJson(CommandJson.getCommand(jsonCmd)));
+                        if (response.getExitCode() != null && response.getExitCode() != 0) {
+                            LOG.log(Level.INFO, "\nReceived ERROR {0}", CommandJson.getJson(CommandJson.getCommand(jsonCmd)));
+                        } else {
+                            LOG.log(Level.INFO, "\nReceived OK for {0}", response.getType());
+                        }
                     }
                     response.setTransportId(((ActiveMQTextMessage) message).getProducerId().toString());
                     notifyListeners(response);

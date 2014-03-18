@@ -5,16 +5,20 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
+import java.util.HashMap;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
  */
 public class ClustersTable extends Table {
+    
+    Map<String, HadoopClusterInfo> hadoops = new HashMap<String, HadoopClusterInfo>();
 
     public ClustersTable() {
         this.setCaption(" Hadoop Clusters");
@@ -51,10 +55,15 @@ public class ClustersTable extends Table {
 
         item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).setValue(cluster.getClusterName());
         item.getItemProperty(HadoopClusterInfo.UUID_LABEL).setValue(cluster.getUuid());
+        hadoops.put(cluster.getClusterName(), cluster);
     }
 
     public void refreshDataSource() {
         this.setContainerDataSource(getContainer());
+    }
+    
+    public HadoopClusterInfo getHCI(String name){
+        return hadoops.get(name);
     }
 
 }

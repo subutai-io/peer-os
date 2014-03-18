@@ -125,10 +125,15 @@ public class DbManagerImpl implements DbManager {
 
     public <T> List<T> getInfo(String source, Class<T> clazz) {
         List<T> list = new ArrayList<T>();
-        ResultSet rs = executeQuery("select info from product_info where source = ?", source);
-        for (Row row : rs) {
-            String info = row.getString("info");
-            list.add(gson.fromJson(info, clazz));
+        try {
+            ResultSet rs = executeQuery("select info from product_info where source = ?", source);
+            for (Row row : rs) {
+                String info = row.getString("info");
+                list.add(gson.fromJson(info, clazz));
+            }
+        } catch (Exception e) {
+            LOG.info(e.getMessage());
+            return null;
         }
         return list;
     }

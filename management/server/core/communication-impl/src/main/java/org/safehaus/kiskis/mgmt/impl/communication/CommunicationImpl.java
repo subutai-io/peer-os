@@ -99,10 +99,10 @@ public class CommunicationImpl implements Communication {
 
     public class CommandProducer implements Runnable {
 
-        Request command;
+        Request request;
 
-        public CommandProducer(Request command) {
-            this.command = command;
+        public CommandProducer(Request request) {
+            this.request = request;
         }
 
         public void run() {
@@ -113,13 +113,13 @@ public class CommunicationImpl implements Communication {
                 connection = pooledConnectionFactory.createConnection();
                 connection.start();
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                Destination destination = session.createQueue(command.getUuid().toString());
+                Destination destination = session.createQueue(request.getUuid().toString());
                 producer = session.createProducer(destination);
                 producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
                 producer.setTimeToLive(amqMaxMessageToAgentTtlSec * 1000);
-                String json = CommandJson.getJson(command);
-                if (command.getType() != RequestType.HEARTBEAT_REQUEST) {
-                    LOG.log(Level.INFO, "\nSending: {0}", json);
+                String json = CommandJson.getJson(request);
+                if (request.getType() != RequestType.HEARTBEAT_REQUEST) {
+                    LOG.log(Level.INFO, "\nSending: {0}", request.toString());
                 }
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
@@ -129,19 +129,19 @@ public class CommunicationImpl implements Communication {
                 if (producer != null) {
                     try {
                         producer.close();
-                    } catch (Exception e) {
+                    } catch (JMSException e) {
                     }
                 }
                 if (session != null) {
                     try {
                         session.close();
-                    } catch (Exception e) {
+                    } catch (JMSException e) {
                     }
                 }
                 if (connection != null) {
                     try {
                         connection.close();
-                    } catch (Exception e) {
+                    } catch (JMSException e) {
                     }
                 }
             }

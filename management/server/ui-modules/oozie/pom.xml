@@ -77,11 +77,6 @@
             <version>${com.vaadin.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hadoop-module</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${org.apache.commons.version}</version>
@@ -95,6 +90,17 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>db-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <artifactId>task-runner-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hadoop-module</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

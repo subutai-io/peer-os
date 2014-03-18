@@ -44,6 +44,7 @@ public class StepStart extends Panel {
 //    private ClustersTable table;
     private Item selectedItem;
     VerticalLayout vLayout;
+    ClustersTable table;
 //    private OozieDAO oozieDAO;
 
     public StepStart(final Wizard wizard) {
@@ -75,16 +76,17 @@ public class StepStart extends Panel {
 
                 if (selectedItem != null) {
                     String clusterName = (String) selectedItem.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue();
-
-                    HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
-                    if (cluster != null) {
+                    
+//                    HadoopClusterInfo cluster = wizard.getOozieDAO().getHadoopClusterInfo(clusterName);
+                    HadoopClusterInfo hci = table.getHCI(clusterName);
+                    if (hci != null) {
                         Set<Agent> taskTrackers = new HashSet<Agent>();
-                        taskTrackers.add(cluster.getJobTracker());
+                        taskTrackers.add(hci.getJobTracker());
 
-                        Set<Agent> nodes = new HashSet<Agent>(cluster.getDataNodes());
-                        nodes.add(cluster.getNameNode());
-                        nodes.add(cluster.getSecondaryNameNode());
-                        nodes.addAll(cluster.getTaskTrackers());
+                        Set<Agent> nodes = new HashSet<Agent>(hci.getDataNodes());
+                        nodes.add(hci.getNameNode());
+                        nodes.add(hci.getSecondaryNameNode());
+                        nodes.addAll(hci.getTaskTrackers());
 
                         wizard.getConfig().reset();
                         wizard.getConfig().setServer(taskTrackers.iterator().next());
@@ -106,7 +108,7 @@ public class StepStart extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 //                table = getTable();
-                ClustersTable table = new ClustersTable();
+                table = new ClustersTable();
                 table.addListener(new ItemClickEvent.ItemClickListener() {
 
                     @Override
