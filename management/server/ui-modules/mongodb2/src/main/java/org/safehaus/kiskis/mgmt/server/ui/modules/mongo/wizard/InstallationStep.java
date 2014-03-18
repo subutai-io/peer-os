@@ -266,9 +266,11 @@ public class InstallationStep extends Panel {
                                 installMongoCluster();
                             } else {
                                 addOutput("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup");
+                                hideProgress();
                             }
                         } else {
                             addOutput("Waiting timeout for lxc agents to connect is up. Giving up!. Use LXC module to cleanup");
+                            hideProgress();
                         }
 
                     } else {
