@@ -71,7 +71,7 @@ public class InstallationStep extends Panel {
     private final AgentManager agentManager;
     private final TaskRunner taskRunner;
     private final LxcManager lxcManager;
-    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 30;
+    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 60;
 
     public InstallationStep(final Wizard wizard) {
 
