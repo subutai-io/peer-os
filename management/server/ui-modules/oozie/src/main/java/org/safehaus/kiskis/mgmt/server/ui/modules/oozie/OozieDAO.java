@@ -24,11 +24,9 @@ public class OozieDAO {
 
     public boolean saveClusterInfo(OozieConfig cluster) {
         try {
-
             dbManager.saveInfo(OozieModule.MODULE_NAME, cluster.getUuid().toString(), cluster);
-
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in saveClusterInfo", ex);
+            LOG.log(Level.INFO, "Error in saveClusterInfo", ex);
             return false;
         }
         return true;
@@ -39,7 +37,7 @@ public class OozieDAO {
         try {
             dbManager.getInfo(OozieModule.MODULE_NAME, OozieConfig.class);
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getClusterInfo", ex);
+            LOG.log(Level.INFO, "Error in getClusterInfo", ex);
             return null;
         }
         return list;
