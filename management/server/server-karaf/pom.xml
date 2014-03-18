@@ -149,7 +149,7 @@
             <artifactId>snappy-java</artifactId>
             <version>${org.xerial.snappy.version}</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.commands</artifactId>
             <version>${org.apache.felix.gogo.version}</version>
@@ -163,7 +163,7 @@
             <groupId>org.apache.felix.gogo</groupId>
             <artifactId>org.apache.felix.gogo.runtime</artifactId>
             <version>${org.apache.felix.gogo.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
@@ -185,21 +185,21 @@
             <version>${org.doomdark.version}</version>
         </dependency>
 
-        <dependency>
+<!--        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>${org.apache.cxf.version}</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+<!--        <dependency>
             <groupId>org.apache.karaf.shell</groupId>
             <artifactId>org.apache.karaf.shell.osgi</artifactId>
             <version>${karaf.version}</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+<!--        <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-annotation</artifactId>
             <version>${org.springframework.osgi.version}</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
     <build>
         <resources>
@@ -588,7 +588,7 @@
                                     <artifactId>gson</artifactId>
                                     <version>${com.google.code.gson.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.commands</artifactId>
                                     <version>${org.apache.felix.gogo.version}</version>
@@ -602,7 +602,7 @@
                                     <groupId>org.apache.felix.gogo</groupId>
                                     <artifactId>org.apache.felix.gogo.runtime</artifactId>
                                     <version>${org.apache.felix.gogo.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
@@ -622,21 +622,21 @@
                                 </artifactItem>
                                 <!--Web Server-->
 
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.apache.cxf</groupId>
                                     <artifactId>cxf-rt-bindings-soap</artifactId>
                                     <version>${org.apache.cxf.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.apache.karaf.shell</groupId>
                                     <artifactId>org.apache.karaf.shell.osgi</artifactId>
                                     <version>${karaf.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.springframework.osgi</groupId>
                                     <artifactId>spring-osgi-annotation</artifactId>
                                     <version>${org.springframework.osgi.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
 
                             </artifactItems>
                         </configuration>
