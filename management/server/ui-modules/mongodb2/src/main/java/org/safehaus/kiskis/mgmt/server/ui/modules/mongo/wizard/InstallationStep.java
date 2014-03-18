@@ -53,7 +53,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * @author dilshat
  * @todo add domain, ports and paths to user configuration
  * @todo remove unnecessary commands like uninstall prev mongo
- * @todo disable output of commands like apt-get update
  * @todo add/delete node also go via lxc clone/destroy
  * @todo uninstall cluster via lxc-destroy
  */
