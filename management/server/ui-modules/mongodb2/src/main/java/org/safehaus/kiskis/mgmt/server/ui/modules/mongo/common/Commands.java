@@ -44,24 +44,6 @@ public class Commands {
         Request req = getTemplate();
         req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
-                "update",
-                "&&",
-                "/usr/bin/apt-get",
-                "--force-yes",
-                "--assume-yes",
-                "install",
-                "ksks-mongo"
-        ));
-        req.setTimeout(180);
-        return req;
-    }
-
-    //execute on each selected lxc node
-    public static Request getInstallCommand2() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get");
-        req.setArgs(Arrays.asList(
                 "--force-yes",
                 "--assume-yes",
                 "install",
@@ -79,6 +61,7 @@ public class Commands {
         req.setArgs(Arrays.asList(
                 "update"
         ));
+        req.setStdOut(OutputRedirection.NO);
         req.setTimeout(180);
         return req;
     }
@@ -153,20 +136,6 @@ public class Commands {
 
         Request req = getTemplate();
         req.setProgram(ipHostPair);
-        req.setTimeout(30);
-        return req;
-    }
-
-    //execute on each replica
-    public static Request getCheckReplicaSetMasterCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/bin/echo");
-        req.setArgs(Arrays.asList(
-                "'db.isMaster()'",
-                "|",
-                "mongo"//primary replica's output will contain ["ismaster" : true]
-        ));
         req.setTimeout(30);
         return req;
     }
@@ -272,28 +241,6 @@ public class Commands {
         Request req = getTemplate();
         req.setProgram("mongos");
         req.setArgs(Arrays.asList(
-                "--configdb",
-                configServersArg,
-                "--port",
-                Constants.ROUTER_PORT + "",
-                "--fork",
-                "--logpath",
-                String.format("%s/mongodb.log", Constants.LOG_DIR)
-        ));
-        req.setTimeout(180);
-        return req;
-    }
-
-    //execute on router
-    public static Request getRestartRouterCommand(String configServersArg) {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/pkill");
-        req.setArgs(Arrays.asList(
-                "-2",
-                "mongo",
-                ";",
-                "mongos",
                 "--configdb",
                 configServersArg,
                 "--port",

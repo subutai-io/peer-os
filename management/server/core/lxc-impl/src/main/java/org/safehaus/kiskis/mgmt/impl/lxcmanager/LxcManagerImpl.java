@@ -32,8 +32,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  *
- * TODO in dynamic placement for wizards check existing hostnames with new ones
- * for name clash
  *
  */
 public class LxcManagerImpl implements LxcManager {

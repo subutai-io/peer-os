@@ -68,7 +68,7 @@ public class Tasks {
     public static Task getInstallMongoTask(Set<Agent> agents) {
         Task task = new Task("Install mongo");
         for (Agent agent : agents) {
-            Request req = Commands.getInstallCommand2();
+            Request req = Commands.getInstallCommand();
             req.setUuid(agent.getUuid());
             task.addRequest(req);
         }
