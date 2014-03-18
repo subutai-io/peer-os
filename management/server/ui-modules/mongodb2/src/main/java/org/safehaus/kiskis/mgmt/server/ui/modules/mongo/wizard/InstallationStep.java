@@ -42,6 +42,8 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -49,6 +51,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 /**
  *
  * @author dilshat
+ * @todo add domain, ports and paths to user configuration
+ * @todo remove unnecessary commands like uninstall prev mongo
+ * @todo disable output of commands like apt-get update
+ * @todo add/delete node also go via lxc clone/destroy
+ * @todo uninstall cluster via lxc-destroy
  */
 public class InstallationStep extends Panel {
 
@@ -64,6 +71,7 @@ public class InstallationStep extends Panel {
     private final AgentManager agentManager;
     private final TaskRunner taskRunner;
     private final LxcManager lxcManager;
+    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 30;
 
     public InstallationStep(final Wizard wizard) {
 
@@ -227,11 +235,42 @@ public class InstallationStep extends Panel {
 
             public void run() {
                 List<CloneInfo> cloneInfoList = new ArrayList<CloneInfo>();
+                //clone lxc containers
                 if (cloneLxcs(bestServers, cloneInfoList)) {
                     addOutput("Lxc containers cloned successfully");
                     //start lxc containers
                     if (startLxcs(cloneInfoList)) {
                         addOutput("Lxc containers started successfully");
+
+                        //wait until all lxc agents connect
+                        if (waitAllLxcAgents(cloneInfoList)) {
+
+                            //install mongo
+                            Set<Agent> cfgServers = new HashSet<Agent>();
+                            Set<Agent> routers = new HashSet<Agent>();
+                            Set<Agent> dataNodes = new HashSet<Agent>();
+                            for (CloneInfo cloneInfo : cloneInfoList) {
+                                if (cloneInfo.getNodeType() == NodeType.CONFIG_NODE) {
+                                    cfgServers.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
+                                } else if (cloneInfo.getNodeType() == NodeType.ROUTER_NODE) {
+                                    routers.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
+                                } else if (cloneInfo.getNodeType() == NodeType.DATA_NODE) {
+                                    dataNodes.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
+                                }
+                            }
+                            config.setConfigServers(cfgServers);
+                            config.setDataNodes(dataNodes);
+                            config.setRouterServers(routers);
+
+                            if (persistConfigurationToDb()) {
+                                installMongoCluster();
+                            } else {
+                                addOutput("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup");
+                            }
+                        } else {
+                            addOutput("Waiting timeout for lxc agents to connect is up. Giving up!. Use LXC module to cleanup");
+                        }
+
                     } else {
                         addOutput("Starting of lxc containers failed. Use LXC module to cleanup");
                         hideProgress();
@@ -244,6 +283,45 @@ public class InstallationStep extends Panel {
         });
 
         t.start();
+    }
+
+    private boolean waitAllLxcAgents(List<CloneInfo> cloneInfoList) {
+        long waitStart = System.currentTimeMillis();
+        while (!Thread.interrupted()) {
+            boolean allConnected = true;
+            for (CloneInfo cloneInfo : cloneInfoList) {
+                if (agentManager.getAgentByHostname(cloneInfo.getLxcHostname()) == null) {
+                    allConnected = false;
+                    break;
+                }
+            }
+            if (allConnected) {
+                return true;
+            } else {
+                if (System.currentTimeMillis() - waitStart > LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
+                    break;
+                } else {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean persistConfigurationToDb() {
+        MongoClusterInfo mongoClusterInfo
+                = new MongoClusterInfo(
+                        config.getClusterName(),
+                        config.getReplicaSetName(),
+                        config.getConfigServers(),
+                        config.getRouterServers(),
+                        config.getDataNodes());
+
+        return MongoDAO.saveMongoClusterInfo(mongoClusterInfo);
     }
 
     private boolean startLxcs(List<CloneInfo> cloneInfoList) {
@@ -368,7 +446,7 @@ public class InstallationStep extends Panel {
 
     }
 
-    private void install() {
+    private void installMongoCluster() {
         try {
 
             final Operation installOperation = new InstallClusterOperation(config);

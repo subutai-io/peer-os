@@ -23,7 +23,6 @@ public class ClusterConfig {
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
     private Set<Agent> dataNodes;
-    private Set<Agent> selectedAgents;
 
     public int getNumberOfConfigServers() {
         return numberOfConfigServers;
@@ -89,17 +88,9 @@ public class ClusterConfig {
         this.dataNodes = dataNodes;
     }
 
-    public Set<Agent> getSelectedAgents() {
-        return selectedAgents;
-    }
-
-    public void setSelectedAgents(Set<Agent> selectedAgents) {
-        this.selectedAgents = selectedAgents;
-    }
-
     @Override
     public String toString() {
-        return "ClusterConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", numberOfConfigServers=" + numberOfConfigServers + ", numberOfRouters=" + numberOfRouters + ", numberOfDataNodes=" + numberOfDataNodes + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + ", selectedAgents=" + selectedAgents + '}';
+        return "ClusterConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", numberOfConfigServers=" + numberOfConfigServers + ", numberOfRouters=" + numberOfRouters + ", numberOfDataNodes=" + numberOfDataNodes + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + '}';
     }
 
     public void reset() {
@@ -108,7 +99,6 @@ public class ClusterConfig {
         configServers = null;
         routerServers = null;
         dataNodes = null;
-        selectedAgents = null;
         numberOfConfigServers = 3;
         numberOfRouters = 2;
         numberOfDataNodes = 3;
