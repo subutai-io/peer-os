@@ -150,12 +150,7 @@ public class InstallationStep extends Panel {
             }
 
             //clone lxc containers
-            if (clone(bestServers)) {
-//                install();
-                addOutput("CLONE SUCCEEDED");
-            } else {
-                addOutput("CLONE FAILED");
-            }
+            clone(bestServers);
 
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in startOperation", e);
@@ -165,9 +160,9 @@ public class InstallationStep extends Panel {
 
     private class CloneInfo {
 
-        private Agent physicalAgent;
-        private String lxcHostname;
-        private NodeType nodeType;
+        private final Agent physicalAgent;
+        private final String lxcHostname;
+        private final NodeType nodeType;
         private boolean result;
 
         public CloneInfo(Agent physicalAgent, String lxcHostname, NodeType nodeType) {
@@ -200,7 +195,7 @@ public class InstallationStep extends Panel {
 
     private class Cloner implements Callable<CloneInfo> {
 
-        private CloneInfo cloneInfo;
+        private final CloneInfo cloneInfo;
 
         public Cloner(CloneInfo cloneInfo) {
             this.cloneInfo = cloneInfo;
@@ -212,89 +207,89 @@ public class InstallationStep extends Panel {
         }
     }
 
-    private boolean clone(Map<Agent, Integer> bestServers) {
-        boolean result = true;
-        Set<String> configSrvsHostnames = new HashSet<String>();
-        Set<String> routersHostnames = new HashSet<String>();
-        Set<String> dataNodesHostnames = new HashSet<String>();
+    private void clone(final Map<Agent, Integer> bestServers) {
+        Thread t = new Thread(new Runnable() {
 
-        int numOfLxcs = 0;
-        for (int i = 1; i <= config.getNumberOfConfigServers(); i++) {
-            numOfLxcs++;
-            configSrvsHostnames.add("mongo-config-" + Util.generateTimeBasedUUID());
-        }
-        for (int i = 1; i <= config.getNumberOfRouters(); i++) {
-            numOfLxcs++;
-            routersHostnames.add("mongo-router-" + Util.generateTimeBasedUUID());
-        }
-        for (int i = 1; i <= config.getNumberOfDataNodes(); i++) {
-            numOfLxcs++;
-            dataNodesHostnames.add("mongo-data-" + Util.generateTimeBasedUUID());
-        }
+            public void run() {
 
-        Iterator<String> configSrvsHostnamesIterator = configSrvsHostnames.iterator();
-        Iterator<String> routersHostnamesIterator = routersHostnames.iterator();
-        Iterator<String> dataNodesHostnamesIterator = dataNodesHostnames.iterator();
+                Set<String> configSrvsHostnames = new HashSet<String>();
+                Set<String> routersHostnames = new HashSet<String>();
+                Set<String> dataNodesHostnames = new HashSet<String>();
 
-        Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+                int numOfLxcs = 0;
+                for (int i = 1; i <= config.getNumberOfConfigServers(); i++) {
+                    numOfLxcs++;
+                    configSrvsHostnames.add("mongo-config-" + Util.generateTimeBasedUUID());
+                }
+                for (int i = 1; i <= config.getNumberOfRouters(); i++) {
+                    numOfLxcs++;
+                    routersHostnames.add("mongo-router-" + Util.generateTimeBasedUUID());
+                }
+                for (int i = 1; i <= config.getNumberOfDataNodes(); i++) {
+                    numOfLxcs++;
+                    dataNodesHostnames.add("mongo-data-" + Util.generateTimeBasedUUID());
+                }
 
-        ExecutorService executor = Executors.newCachedThreadPool();
-        CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+                Iterator<String> configSrvsHostnamesIterator = configSrvsHostnames.iterator();
+                Iterator<String> routersHostnamesIterator = routersHostnames.iterator();
+                Iterator<String> dataNodesHostnamesIterator = dataNodesHostnames.iterator();
 
-        try {
-            outerloop:
-            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
-                for (int i = 1; i <= entry.getValue(); i++) {
-                    if (configSrvsHostnamesIterator.hasNext()) {
-                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                .append(configSrvsHostnamesIterator.next()).toString();
-                        addOutput(String.format("Cloning lxc %s", lxcHostname));
-                        completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.CONFIG_NODE)));
-                    } else if (routersHostnamesIterator.hasNext()) {
-                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                .append(routersHostnamesIterator.next()).toString();
-                        addOutput(String.format("Cloning lxc %s", lxcHostname));
-                        completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.ROUTER_NODE)));
-                    } else if (dataNodesHostnamesIterator.hasNext()) {
-                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                .append(dataNodesHostnamesIterator.next()).toString();
-                        addOutput(String.format("Cloning lxc %s", lxcHostname));
-                        completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.DATA_NODE)));
+                Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+
+                ExecutorService executor = Executors.newCachedThreadPool();
+                CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+
+                try {
+                    outerloop:
+                    for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
+                        for (int i = 1; i <= entry.getValue(); i++) {
+                            if (configSrvsHostnamesIterator.hasNext()) {
+                                final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                                        .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                                        .append(configSrvsHostnamesIterator.next()).toString();
+                                addOutput(String.format("Cloning lxc %s", lxcHostname));
+                                completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.CONFIG_NODE)));
+                            } else if (routersHostnamesIterator.hasNext()) {
+                                final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                                        .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                                        .append(routersHostnamesIterator.next()).toString();
+                                addOutput(String.format("Cloning lxc %s", lxcHostname));
+                                completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.ROUTER_NODE)));
+                            } else if (dataNodesHostnamesIterator.hasNext()) {
+                                final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                                        .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                                        .append(dataNodesHostnamesIterator.next()).toString();
+                                addOutput(String.format("Cloning lxc %s", lxcHostname));
+                                completer.submit(new Cloner(new CloneInfo(entry.getKey(), lxcHostname, NodeType.DATA_NODE)));
+                            } else {
+                                break outerloop;
+                            }
+                        }
+                    }
+                    boolean result = true;
+                    for (int i = 0; i < numOfLxcs; i++) {
+                        Future<CloneInfo> future = completer.take();
+                        CloneInfo cloneInfo = future.get();
+                        result &= cloneInfo.isResult();
+                    }
+                    if (result) {
+                        addOutput("CLONE SUCCEEDED");
                     } else {
-                        break outerloop;
+                        addOutput("CLONE FAILED");
+                    }
+                } catch (InterruptedException e) {
+                } catch (ExecutionException e) {
+                } finally {
+                    try {
+                        executor.shutdown();
+                    } catch (Exception e) {
                     }
                 }
             }
-//            Set<UUID> configServers = new HashSet<UUID>();
-//            Set<UUID> routers = new HashSet<UUID>();
-//            Set<UUID> dataNodes = new HashSet<UUID>();
-            for (int i = 0; i < numOfLxcs; i++) {
-                Future<CloneInfo> future = completer.take();
-                CloneInfo cloneInfo = future.get();
-                result &= cloneInfo.isResult();
-//                if (cloneInfo.isResult()) {
-//                    if (cloneInfo.getNodeType() == NodeType.CONFIG_NODE) {
-//                        configServers.add(cloneInfo.);
-//                    } else if (cloneInfo.getNodeType() == NodeType.ROUTER_NODE) {
-//                    } else if (cloneInfo.getNodeType() == NodeType.DATA_NODE) {
-//                    }
-//                }
-            }
-        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-//            Thread.currentThread().interrupt();
-        } finally {
-            try {
-                executor.shutdown();
-            } catch (Exception e) {
-            }
-        }
+        });
 
-        return result;
+        t.start();
+
     }
 
     private void install() {
