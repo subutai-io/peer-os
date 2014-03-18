@@ -305,11 +305,6 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>client-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>logs-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
