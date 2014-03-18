@@ -62,14 +62,4 @@ public class OozieDAO {
         return list;
     }
 
-//    public HadoopClusterInfo getHadoopClusterInfo(String clusterName) {
-//        HadoopClusterInfo hadoopClusterInfo = null;
-//        try {
-//            dbManager.getInfo(HadoopClusterInfo.SOURCE, clusterName, HadoopClusterInfo.class);
-//
-//        } catch (Exception ex) {
-//            LOG.log(Level.SEVERE, "Error in getHadoopClusterInfo(name)", ex);
-//        }
-//        return hadoopClusterInfo;
-//    }
 }

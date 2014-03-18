@@ -96,6 +96,7 @@ public class ServiceInstaller implements TaskCallback {
     }
 
     private void saveInfo() {
+        terminal.setValue(terminal.getValue().toString() + config.getUuid() + " saving cluster info.\n");
         if (wizard.getOozieDAO().saveClusterInfo(config)) {
             terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");
         } else {
