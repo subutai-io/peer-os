@@ -50,10 +50,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * @author dilshat
  * @todo remove unnecessary commands like uninstall prev mongo
  * @todo add/delete node also go via lxc clone/destroy
- * @todo place properly process indicator
+ * @todo place properly process indicator here and in addNodeWindow,
+ * destroyNodeWindow (look to destroyClusterWindow)
  * @todo show all config fields in manager UI
  * @todo all empty execute_response messages from agents shud be indicated as
  * RUNNING
+ * @todo add window for destroy node operation
+ *
  */
 public class InstallationStep extends Panel {
 
