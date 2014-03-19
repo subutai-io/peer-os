@@ -142,25 +142,4 @@ public class DbManagerImpl implements DbManager {
         executeUpdate("delete from product_info where source = ? and key = ?", source, key);
     }
 
-    public String executeCqlQuery(String cql) {
-        try {
-            session.execute(cql);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in executeQuery", ex);
-            return ex.getMessage();
-        }
-        return "Query executed successfully";
-    }
-
-    public List<String> getLogs() {
-        List<String> list = new ArrayList<String>();
-        String cql = "select * from logs";
-        ResultSet results = executeQuery(cql);
-        for (Row row : results) {
-            String data = row.getString("log");
-            list.add(data);
-        }
-        return list;
-    }
-
 }
