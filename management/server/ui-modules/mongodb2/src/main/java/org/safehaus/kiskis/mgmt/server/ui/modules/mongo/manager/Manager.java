@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
@@ -41,6 +43,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 
 /**
@@ -306,23 +309,7 @@ public class Manager {
                         public void run() {
 
                             if (nodeType == NodeType.CONFIG_NODE) {
-                                //destroy lxc
-                                Agent physicalAgent = MongoModule.getAgentManager().getAgentByHostname(agent.getParentHostName());
-                                if (physicalAgent == null) {
-                                    show(
-                                            String.format("Could not determine physical parent of %s. Use LXC module to cleanup",
-                                                    agent.getHostname()));
-                                } else {
-                                    if (!MongoModule.getLxcManager().destroyLxcOnHost(physicalAgent, agent.getHostname())) {
-                                        show("Could not destroy lxc container. Use LXC module to cleanup");
-                                    }
-                                }
                                 config.getConfigServers().remove(agent);
-                                //update db
-                                if (!MongoDAO.saveMongoClusterInfo(config)) {
-                                    show(String.format("Error while updating cluster info [%s] in DB. Check logs",
-                                            config.getClusterName()));
-                                }
                                 //restart routers
                                 Task stopMongoTask = MongoModule.getTaskRunner().
                                         executeTask(Tasks.getStopMongoTask(config.getRouterServers()));
@@ -353,54 +340,65 @@ public class Manager {
                                 }
 
                             } else if (nodeType == NodeType.DATA_NODE) {
-                                //destroy lxc
-                                //update db
+                                config.getDataNodes().remove(agent);
                                 //unregister from primary
+                                Task findPrimaryNodeTask = MongoModule.getTaskRunner().
+                                        executeTask(Tasks.getFindPrimaryNodeTask(agent, config));
+
+                                if (findPrimaryNodeTask.isCompleted()) {
+                                    Pattern p = Pattern.compile("primary\" : \"(.*)\"");
+                                    Matcher m = p.matcher(findPrimaryNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut());
+                                    Agent primaryNodeAgent = null;
+                                    if (m.find()) {
+                                        String primaryNodeHost = m.group(1);
+                                        if (!Util.isStringEmpty(primaryNodeHost)) {
+                                            String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
+                                            primaryNodeAgent = agentManager.getAgentByHostname(hostname);
+                                        }
+                                    }
+                                    if (primaryNodeAgent != null) {
+                                        if (primaryNodeAgent != agent) {
+                                            Task unregisterSecondaryNodeFromPrimaryTask
+                                                    = MongoModule.getTaskRunner().
+                                                    executeTask(
+                                                            Tasks.getUnregisterSecondaryFromPrimaryTask(
+                                                                    primaryNodeAgent, agent, config));
+                                            if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                                                show("Could not unregister this node from replica set, skipping...");
+                                            }
+                                        }
+                                    } else {
+                                        show("Could not determine primary node for unregistering from replica set, skipping...");
+                                    }
+                                } else {
+                                    show("Could not determine primary node for unregistering from replica set, skipping...");
+                                }
+
                             } else if (nodeType == NodeType.ROUTER_NODE) {
-                                //destroy lxc
-                                //update db
+                                config.getRouterServers().remove(agent);
+                            }
+                            //destroy lxc
+                            Agent physicalAgent = MongoModule.getAgentManager().getAgentByHostname(agent.getParentHostName());
+                            if (physicalAgent == null) {
+                                show(
+                                        String.format("Could not determine physical parent of %s. Use LXC module to cleanup",
+                                                agent.getHostname()));
+                            } else {
+                                if (!MongoModule.getLxcManager().destroyLxcOnHost(physicalAgent, agent.getHostname())) {
+                                    show("Could not destroy lxc container. Use LXC module to cleanup");
+                                }
+                            }
+                            //update db
+                            if (!MongoDAO.saveMongoClusterInfo(config)) {
+                                show(String.format("Error while updating cluster info [%s] in DB. Check logs",
+                                        config.getClusterName()));
                             }
                             Table table = nodeType == NodeType.CONFIG_NODE ? configServersTable
                                     : nodeType == NodeType.DATA_NODE ? dataNodesTable : routersTable;
                             table.removeItem(rowId);
-                            progressIcon.setVisible(false);
-
                         }
                     });
-//                    if (nodeType == NodeType.CONFIG_NODE) {
-//                        Operation destroyCfgSrvOperation = new DestroyNodeOperation(agent, config, nodeType);
-//                        MongoModule.getTaskRunner().executeTask(destroyCfgSrvOperation.getNextTask(),
-//                                new DestroyCfgSrvCallback(contentRoot.getWindow(),
-//                                        config, agent,
-//                                        configServersTable, routersTable,
-//                                        rowId, destroyCfgSrvOperation,
-//                                        MongoModule.getTaskRunner(), progressIcon,
-//                                        checkBtn, startBtn,
-//                                        stopBtn, destroyBtn));
-//
-//                    } else if (nodeType == NodeType.DATA_NODE) {
-//                        Operation destroyDataNodeOperation = new DestroyNodeOperation(agent, config, nodeType);
-//                        MongoModule.getTaskRunner().executeTask(destroyDataNodeOperation.getNextTask(),
-//                                new DestroyDataNodeCallback(
-//                                        contentRoot.getWindow(), agentManager,
-//                                        config, agent,
-//                                        dataNodesTable, rowId,
-//                                        destroyDataNodeOperation,
-//                                        progressIcon,
-//                                        checkBtn, startBtn,
-//                                        stopBtn, destroyBtn));
-//
-//                    } else if (nodeType == NodeType.ROUTER_NODE) {
-//                        Operation destroyRouterOperation = new DestroyNodeOperation(agent, config, nodeType);
-//                        MongoModule.getTaskRunner().executeTask(destroyRouterOperation.getNextTask(),
-//                                new DestroyRouterCallback(contentRoot.getWindow(),
-//                                        config, agent,
-//                                        routersTable,
-//                                        rowId, destroyRouterOperation,
-//                                        progressIcon,
-//                                        checkBtn, startBtn,
-//                                        stopBtn, destroyBtn));
-//                    }
+
                 }
             });
         }
