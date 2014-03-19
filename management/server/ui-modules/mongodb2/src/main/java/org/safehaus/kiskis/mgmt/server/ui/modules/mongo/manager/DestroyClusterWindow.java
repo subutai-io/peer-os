@@ -18,8 +18,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,7 +88,7 @@ public class DestroyClusterWindow extends Window {
     }
 
     private void start() {
-        Thread t = new Thread(new Runnable() {
+        MongoModule.getExecutor().execute(new Runnable() {
 
             public void run() {
                 if (destroyLxcs()) {
@@ -106,7 +104,6 @@ public class DestroyClusterWindow extends Window {
                 hideProgress();
             }
         });
-        t.start();
 
     }
 
@@ -154,8 +151,7 @@ public class DestroyClusterWindow extends Window {
     }
 
     private boolean destroyLxcs() {
-        ExecutorService executor = Executors.newCachedThreadPool();
-        CompletionService<DestroyInfo> completer = new ExecutorCompletionService<DestroyInfo>(executor);
+        CompletionService<DestroyInfo> completer = new ExecutorCompletionService<DestroyInfo>(MongoModule.getExecutor());
         try {
             Set<Agent> agents = new HashSet<Agent>();
             agents.addAll(config.getConfigServers());
@@ -166,7 +162,7 @@ public class DestroyClusterWindow extends Window {
                 addOutput(String.format("Destroying lxc %s", agent.getHostname()));
                 Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
                 if (physicalAgent == null) {
-                    addOutput(String.format("Could not determine physical parent of %. Use LXC module to cleanup"));
+                    addOutput(String.format("Could not determine physical parent of %s. Use LXC module to cleanup", agent.getHostname()));
                 } else {
                     tasks++;
                     completer.submit(new Destroyer(new DestroyInfo(physicalAgent, agent.getHostname())));
@@ -183,11 +179,6 @@ public class DestroyClusterWindow extends Window {
             return result;
         } catch (InterruptedException e) {
         } catch (ExecutionException e) {
-        } finally {
-            try {
-                executor.shutdown();
-            } catch (Exception e) {
-            }
         }
         return false;
     }

@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.api.taskrunner;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
  *

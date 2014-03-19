@@ -7,9 +7,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  * @author bahadyr

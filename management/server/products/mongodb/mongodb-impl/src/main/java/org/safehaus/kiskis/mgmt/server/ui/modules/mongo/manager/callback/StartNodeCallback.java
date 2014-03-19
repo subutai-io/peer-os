@@ -7,10 +7,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**

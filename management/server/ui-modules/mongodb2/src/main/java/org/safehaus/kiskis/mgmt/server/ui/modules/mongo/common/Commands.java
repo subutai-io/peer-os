@@ -232,6 +232,23 @@ public class Commands {
         return req;
     }
 
+    public static Request getStartRouterCommand2(String configServersArg, Config cfg) {
+
+        Request req = getTemplate();
+        req.setProgram("mongos");
+        req.setArgs(Arrays.asList(
+                "--configdb",
+                configServersArg,
+                "--port",
+                cfg.getRouterPort() + "",
+                "--fork",
+                "--logpath",
+                String.format("%s/mongodb.log", Constants.LOG_DIR)
+        ));
+        req.setTimeout(60);
+        return req;
+    }
+
     //execute on shard
     public static Request getStartNodeCommand(Config cfg) {
 

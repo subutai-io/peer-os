@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.OozieClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 public class OozieTable extends Table {
 

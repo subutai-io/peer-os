@@ -23,16 +23,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.communication.Communication;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.AGENT_DISCONNECT;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.HEARTBEAT_RESPONSE;
+import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.REGISTRATION_REQUEST;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**

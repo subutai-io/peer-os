@@ -3,19 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol;
+package org.safehaus.kiskis.mgmt.api.taskrunner;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.doomdark.uuid.UUIDGenerator;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 //import java.util.ListIterator;
-
 /**
  * @author bahadyr
  */
@@ -32,17 +33,23 @@ public class Task implements Serializable {
     private int completedCommandsCount = 0;
     private int succeededCommandsCount = 0;
     private Object data;
+    private Map<UUID, Result> results;
 
     public Task() {
         taskStatus = TaskStatus.NEW;
         uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
         reqSeqNumber = 0;
-        requests = new ArrayList<>();
+        requests = new ArrayList<Request>();
+        results = new HashMap<UUID, Result>();
     }
 
     public Task(String description) {
         this();
         this.description = description;
+    }
+
+    public Map<UUID, Result> getResults() {
+        return results;
     }
 
     public Object getData() {
@@ -105,19 +112,18 @@ public class Task implements Serializable {
     }
 
     /*public Request peekPreviousRequest() {
-        if (currentCmdId > 0) {
-            return requests.get(currentCmdId - 1);
-        }
-        return null;
-    }
+     if (currentCmdId > 0) {
+     return requests.get(currentCmdId - 1);
+     }
+     return null;
+     }
 
-    public Request peekCurrentRequest() {
-        if (currentCmdId >= 0) {
-            return requests.get(currentCmdId);
-        }
-        return null;
-    }*/
-
+     public Request peekCurrentRequest() {
+     if (currentCmdId >= 0) {
+     return requests.get(currentCmdId);
+     }
+     return null;
+     }*/
     public boolean hasNextRequest() {
         return currentCmdId < requests.size() - 1;
     }
@@ -151,13 +157,12 @@ public class Task implements Serializable {
     }
 
     /*public Integer getReqSeqNumber() {
-        return reqSeqNumber;
-    }
+     return reqSeqNumber;
+     }
 
-    public void setReqSeqNumber(Integer reqSeqNumber) {
-        this.reqSeqNumber = reqSeqNumber;
-    }*/
-
+     public void setReqSeqNumber(Integer reqSeqNumber) {
+     this.reqSeqNumber = reqSeqNumber;
+     }*/
     public UUID getUuid() {
         return uuid;
     }

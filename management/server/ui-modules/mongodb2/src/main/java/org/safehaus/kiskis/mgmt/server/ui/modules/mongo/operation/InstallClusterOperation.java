@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;

@@ -14,9 +14,10 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.communication.Communication;
 import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  *
@@ -147,6 +148,32 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             }
         } catch (Exception e) {
         }
+    }
+
+    public Task executeTask(Task task) {
+        executeTask(task, new TaskCallback() {
+
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                if (task.isCompleted()) {
+                    synchronized (task) {
+                        task.notifyAll();
+                    }
+                }
+                return null;
+            }
+        });
+        synchronized (task) {
+            try {
+                task.wait(task.getAvgTimeout() * 1000 + 3000);
+            } catch (InterruptedException ex) {
+            }
+        }
+
+        if (!task.isCompleted()) {
+            task.setTaskStatus(TaskStatus.FAIL);
+        }
+
+        return task;
     }
 
 }

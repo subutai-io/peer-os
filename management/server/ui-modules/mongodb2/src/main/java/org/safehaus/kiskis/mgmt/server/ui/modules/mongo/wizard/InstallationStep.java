@@ -22,8 +22,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,11 +30,11 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
@@ -44,7 +42,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
@@ -52,10 +50,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * @author dilshat
  * @todo remove unnecessary commands like uninstall prev mongo
  * @todo add/delete node also go via lxc clone/destroy
- * @todo uninstall cluster via lxc-destroy
  * @todo place properly process indicator
  * @todo show all config fields in manager UI
- * @todo all empty execute_response messages from agents shud be indicated as RUNNING
+ * @todo all empty execute_response messages from agents shud be indicated as
+ * RUNNING
  */
 public class InstallationStep extends Panel {
 
@@ -65,8 +63,6 @@ public class InstallationStep extends Panel {
     private final Button done;
     private final Button back;
     private final Label indicator;
-    private Thread operationTimeoutThread;
-
     private final Config config;
     private final AgentManager agentManager;
     private final TaskRunner taskRunner;
@@ -231,7 +227,7 @@ public class InstallationStep extends Panel {
     }
 
     private void start(final Map<Agent, Integer> bestServers) {
-        Thread t = new Thread(new Runnable() {
+        MongoModule.getExecutor().execute(new Runnable() {
 
             public void run() {
                 List<CloneInfo> cloneInfoList = new ArrayList<CloneInfo>();
@@ -284,7 +280,6 @@ public class InstallationStep extends Panel {
             }
         });
 
-        t.start();
     }
 
     private boolean waitAllLxcAgents(List<CloneInfo> cloneInfoList) {
@@ -320,8 +315,7 @@ public class InstallationStep extends Panel {
 
     private boolean startLxcs(List<CloneInfo> cloneInfoList) {
         if (!cloneInfoList.isEmpty()) {
-            ExecutorService executor = Executors.newCachedThreadPool();
-            CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+            CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(MongoModule.getExecutor());
             try {
                 for (CloneInfo cloneInfo : cloneInfoList) {
                     addOutput(String.format("Starting lxc %s", cloneInfo.lxcHostname));
@@ -339,11 +333,6 @@ public class InstallationStep extends Panel {
                 return result;
             } catch (InterruptedException e) {
             } catch (ExecutionException e) {
-            } finally {
-                try {
-                    executor.shutdown();
-                } catch (Exception e) {
-                }
             }
         }
         return false;
@@ -387,8 +376,7 @@ public class InstallationStep extends Panel {
 
         Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
 
-        ExecutorService executor = Executors.newCachedThreadPool();
-        CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+        CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(MongoModule.getExecutor());
 
         try {
             outerloop:
@@ -429,11 +417,6 @@ public class InstallationStep extends Panel {
 
         } catch (InterruptedException e) {
         } catch (ExecutionException e) {
-        } finally {
-            try {
-                executor.shutdown();
-            } catch (Exception e) {
-            }
         }
 
         return false;
@@ -444,7 +427,6 @@ public class InstallationStep extends Panel {
         try {
 
             final Operation installOperation = new InstallClusterOperation(config);
-            runTimeoutThread(installOperation);
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
@@ -530,34 +512,6 @@ public class InstallationStep extends Panel {
             LOG.log(Level.SEVERE, "Error in install", e);
         }
 
-    }
-
-    private void runTimeoutThread(final Operation operation) {
-        try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(operation.getTotalTimeout() * 1000 + 5000);
-                        if (!operation.isCompleted()) {
-                            addOutput(String.format(
-                                    "Operation %s timed out!!!",
-                                    operation.getDescription()));
-                            hideProgress();
-                        }
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            operationTimeoutThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
-        }
     }
 
     private void showProgress() {

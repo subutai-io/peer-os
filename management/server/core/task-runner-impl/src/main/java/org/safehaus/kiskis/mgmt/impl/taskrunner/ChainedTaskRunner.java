@@ -10,10 +10,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.communication.Communication;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  *
@@ -53,6 +54,8 @@ public class ChainedTaskRunner {
                             }
                             taskListenerCache.remove(tl.getTask().getUuid());
                         }
+
+                        tl.getTask().getResults().put(response.getUuid(), new Result(tl.getStdOut(response), tl.getStdErr(response), response.getExitCode()));
                     }
 
                     Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(response), tl.getStdErr(response));

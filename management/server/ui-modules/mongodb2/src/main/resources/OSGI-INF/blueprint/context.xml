@@ -10,7 +10,8 @@
     <reference id="lxcManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>            
         
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule">
+    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule"
+          init-method="init" destroy-method="destroy">
         <property name="taskRunner" ref="taskRunner" />
         <property name="agentManager" ref="agentManager" />
         <property name="dbManager" ref="dbManager" />

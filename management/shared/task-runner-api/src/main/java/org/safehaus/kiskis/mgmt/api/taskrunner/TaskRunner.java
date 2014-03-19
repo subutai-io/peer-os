@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.api.taskrunner;
 
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
  *
@@ -15,6 +14,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 public interface TaskRunner {
 
     public void executeTask(Task task, TaskCallback taskCallback);
+
+    public Task executeTask(Task task);
 
     public void removeTaskCallback(UUID taskUUID);
 }

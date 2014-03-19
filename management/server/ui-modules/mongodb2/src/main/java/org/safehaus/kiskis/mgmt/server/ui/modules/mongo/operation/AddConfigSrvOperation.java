@@ -11,8 +11,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
