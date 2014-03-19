@@ -93,7 +93,7 @@ public class NodesWindow extends Window {
                     getWindow().showNotification("Starting instance: " + agent.getHostname());
                     cce = OozieCommandEnum.START_SERVER;
                     selectedItem = item;
-                    table.setEnabled(false);
+//                    table.setEnabled(false);
                     serviceManager.runCommand(agent, cce);
                 }
             });
@@ -105,7 +105,7 @@ public class NodesWindow extends Window {
                     getWindow().showNotification("Stopping instance: " + agent.getHostname());
                     cce = OozieCommandEnum.STOP_SERVER;
                     selectedItem = item;
-                    table.setEnabled(false);
+//                    table.setEnabled(false);
                     serviceManager.runCommand(agent, cce);
                 }
             });
@@ -118,7 +118,7 @@ public class NodesWindow extends Window {
                     getWindow().showNotification("Checking the status: " + agent.getHostname());
                     cce = OozieCommandEnum.STATUS;
                     selectedItem = item;
-                    table.setEnabled(false);
+//                    table.setEnabled(false);
                     serviceManager.runCommand(agent, cce);
                 }
             });
@@ -143,51 +143,62 @@ public class NodesWindow extends Window {
         return null;
     }
 
-    public void updateUI(Task ts) {
+    public void updateUI(Task task, String stdOut, String stdErr) {
         if (cce != null) {
             switch (cce) {
                 case START_SERVER: {
-                    switch (ts.getTaskStatus()) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(false);
+                            getWindow().showNotification("Start success.");
                             break;
                         }
                         case FAIL: {
-                            getWindow().showNotification("Start failed. Please use Terminal to check the problem");
-                            break;
-                        }
-                    }
-
-                }
-                case STOP_SERVER: {
-                    switch (ts.getTaskStatus()) {
-                        case SUCCESS: {
-                            switchState(true);
-                            break;
-                        }
-                        case FAIL: {
-                            getWindow().showNotification("Stop failed. Please use Terminal to check the problem");
-                            break;
-                        }
-                    }
-                }
-                case STATUS: {
-                    switch (ts.getTaskStatus()) {
-                        case SUCCESS: {
-                            switchState(false);
-                            break;
-                        }
-                        case FAIL: {
-                            switchState(true);
+                            getWindow().showNotification("Start failed.");
                             break;
                         }
                     }
                     break;
                 }
+                case STOP_SERVER: {
+                    switch (task.getTaskStatus()) {
+                        case SUCCESS: {
+                            switchState(true);
+                            getWindow().showNotification("Stop success.");
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Stop failed.");
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case STATUS: {
+//                    switch (task.getTaskStatus()) {
+//                        case SUCCESS: {
+                    
+                    if (stdOut.contains("Oozie Server is running")) {
+                        getWindow().showNotification("Oozie Server is running");
+                        switchState(false);
+                    } else {
+                        getWindow().showNotification("Oozie Server is not running");
+                        switchState(true);
+                    }
+//                            break;
+//                        }
+//                        case FAIL: {
+//                            getWindow().showNotification(" Oozie Server is not running");
+//                            switchState(true);
+//                            break;
+//                        }
+//                    }
+                    break;
+                }
 
             }
         }
-        table.setEnabled(true);
+//        table.setEnabled(true);
     }
 
     private void switchState(Boolean state) {
@@ -196,4 +207,5 @@ public class NodesWindow extends Window {
         Button stop = (Button) selectedItem.getItemProperty("Stop").getValue();
         stop.setEnabled(!state);
     }
+
 }

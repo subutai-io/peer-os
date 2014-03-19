@@ -27,6 +27,7 @@ import java.util.Queue;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum;
@@ -79,8 +80,10 @@ public class ServiceManager {
                         if (currentTask != null) {
                             return currentTask;
                         } else {
-                            oozieTable.manageUI(task.getTaskStatus());
+                            oozieTable.manageUI(task, stdOut, stdErr);
                         }
+                    } else {
+                        oozieTable.manageUI(task, stdOut, stdErr);
                     }
                     return null;
                 }
@@ -99,7 +102,7 @@ public class ServiceManager {
                         if (currentTask != null) {
                             return currentTask;
                         } else {
-                            oozieTable.manageUI(task.getTaskStatus());
+                            oozieTable.manageUI(task, stdOut, stdErr);
                             deleteInfo();
                         }
                     }
@@ -139,7 +142,7 @@ public class ServiceManager {
     }
 
     private void deleteInfo() {
-        oozieTable.getOozieDAO().deleteClusterInfo(config.getUuid());
+        OozieDAO.deleteClusterInfo(config.getUuid());
     }
 
 }
