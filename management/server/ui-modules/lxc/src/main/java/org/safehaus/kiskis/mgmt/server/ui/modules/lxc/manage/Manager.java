@@ -21,6 +21,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
 
 @SuppressWarnings("serial")
 public class Manager extends VerticalLayout {
@@ -147,7 +148,7 @@ public class Manager extends VerticalLayout {
 
     public void getLxcInfo() {
         lxcTable.setEnabled(false);
-        Thread t = new Thread(new Runnable() {
+        LxcModule.getExecutor().execute(new Runnable() {
 
             public void run() {
                 Map<String, EnumMap<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>>> agentFamilies = lxcManager.getLxcOnPhysicalServers();
@@ -157,7 +158,7 @@ public class Manager extends VerticalLayout {
 
             }
         });
-        t.start();
+
     }
 
     private void clearEmptyParents() {
@@ -285,7 +286,7 @@ public class Manager extends VerticalLayout {
                                 startBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                Thread t = new Thread(new Runnable() {
+                                LxcModule.getExecutor().execute(new Runnable() {
 
                                     public void run() {
                                         boolean success = lxcManager.startLxcOnHost(physicalAgent, lxcHostname);
@@ -298,7 +299,7 @@ public class Manager extends VerticalLayout {
                                         progressIcon.setVisible(false);
                                     }
                                 });
-                                t.start();
+
                             }
                         }
                     });
@@ -312,7 +313,7 @@ public class Manager extends VerticalLayout {
                                 stopBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                Thread t = new Thread(new Runnable() {
+                                LxcModule.getExecutor().execute(new Runnable() {
 
                                     public void run() {
                                         boolean success = lxcManager.stopLxcOnHost(physicalAgent, lxcHostname);
@@ -325,7 +326,7 @@ public class Manager extends VerticalLayout {
                                         progressIcon.setVisible(false);
                                     }
                                 });
-                                t.start();
+
                             }
                         }
                     });
@@ -348,7 +349,7 @@ public class Manager extends VerticalLayout {
                                                         stopBtn.setEnabled(false);
                                                         destroyBtn.setEnabled(false);
                                                         progressIcon.setVisible(true);
-                                                        Thread t = new Thread(new Runnable() {
+                                                        LxcModule.getExecutor().execute(new Runnable() {
 
                                                             public void run() {
                                                                 boolean success = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
@@ -363,7 +364,7 @@ public class Manager extends VerticalLayout {
                                                                 }
                                                             }
                                                         });
-                                                        t.start();
+
                                                     }
                                                 }
                                             }
@@ -376,7 +377,7 @@ public class Manager extends VerticalLayout {
                                     stopBtn.setEnabled(false);
                                     destroyBtn.setEnabled(false);
                                     progressIcon.setVisible(true);
-                                    Thread t = new Thread(new Runnable() {
+                                    LxcModule.getExecutor().execute(new Runnable() {
 
                                         public void run() {
                                             boolean success = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
@@ -391,7 +392,7 @@ public class Manager extends VerticalLayout {
                                             }
                                         }
                                     });
-                                    t.start();
+
                                 }
                             }
 
