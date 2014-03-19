@@ -31,7 +31,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.InstallClusterOperation;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -43,7 +43,6 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -51,10 +50,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 /**
  *
  * @author dilshat
- * @todo add domain, ports and paths to user configuration
  * @todo remove unnecessary commands like uninstall prev mongo
  * @todo add/delete node also go via lxc clone/destroy
  * @todo uninstall cluster via lxc-destroy
+ * @todo place properly process indicator
+ * @todo show all config fields in manager UI
+ * @todo all empty execute_response messages from agents shud be indicated as RUNNING
  */
 public class InstallationStep extends Panel {
 
@@ -66,7 +67,7 @@ public class InstallationStep extends Panel {
     private final Label indicator;
     private Thread operationTimeoutThread;
 
-    private final ClusterConfig config;
+    private final Config config;
     private final AgentManager agentManager;
     private final TaskRunner taskRunner;
     private final LxcManager lxcManager;
@@ -314,15 +315,7 @@ public class InstallationStep extends Panel {
     }
 
     private boolean persistConfigurationToDb() {
-        MongoClusterInfo mongoClusterInfo
-                = new MongoClusterInfo(
-                        config.getClusterName(),
-                        config.getReplicaSetName(),
-                        config.getConfigServers(),
-                        config.getRouterServers(),
-                        config.getDataNodes());
-
-        return MongoDAO.saveMongoClusterInfo(mongoClusterInfo);
+        return MongoDAO.saveMongoClusterInfo(config);
     }
 
     private boolean startLxcs(List<CloneInfo> cloneInfoList) {

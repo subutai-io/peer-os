@@ -107,18 +107,79 @@ public class ConfigurationStep extends Panel {
         grid.addComponent(dataNodesCombo, 2, 3, 9, 3);
 
         TextField replicaSetName = new TextField("Enter replica set name");
-        replicaSetName.setInputPrompt("Replica set name");
-        replicaSetName.setRequired(true);
+        replicaSetName.setInputPrompt(wizard.getConfig().getReplicaSetName());
         replicaSetName.setMaxLength(20);
-        replicaSetName.setValue(wizard.getConfig().getReplicaSetName());
         replicaSetName.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                wizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
+                String value = event.getProperty().getValue().toString().trim();
+                if (!Util.isStringEmpty(value)) {
+                    wizard.getConfig().setReplicaSetName(value);
+                }
             }
         });
 
         grid.addComponent(replicaSetName, 2, 4, 9, 4);
+
+        TextField cfgSrvPort = new TextField("Enter port for configuration servers");
+        cfgSrvPort.setInputPrompt(wizard.getConfig().getCfgSrvPort() + "");
+        cfgSrvPort.setMaxLength(5);
+        cfgSrvPort.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (Util.isNumeric(value)) {
+                    wizard.getConfig().setCfgSrvPort(Integer.parseInt(value));
+                }
+            }
+        });
+
+        grid.addComponent(cfgSrvPort, 2, 5, 9, 5);
+
+        TextField routerPort = new TextField("Enter port for routers");
+        routerPort.setInputPrompt(wizard.getConfig().getRouterPort() + "");
+        routerPort.setMaxLength(5);
+        routerPort.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (Util.isNumeric(value)) {
+                    wizard.getConfig().setRouterPort(Integer.parseInt(value));
+                }
+            }
+        });
+
+        grid.addComponent(routerPort, 2, 6, 9, 6);
+
+        TextField dataNodePort = new TextField("Enter port for data nodes");
+        dataNodePort.setInputPrompt(wizard.getConfig().getDataNodePort() + "");
+        dataNodePort.setMaxLength(5);
+        dataNodePort.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (Util.isNumeric(value)) {
+                    wizard.getConfig().setDataNodePort(Integer.parseInt(value));
+                }
+            }
+        });
+
+        grid.addComponent(dataNodePort, 2, 7, 9, 7);
+
+        TextField domain = new TextField("Enter domain name");
+        domain.setInputPrompt(wizard.getConfig().getDomainName());
+        domain.setMaxLength(20);
+        domain.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (!Util.isStringEmpty(value)) {
+                    wizard.getConfig().setDomainName(value);
+                }
+            }
+        });
+
+        grid.addComponent(domain, 2, 8, 9, 8);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -128,8 +189,6 @@ public class ConfigurationStep extends Panel {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
-                } else if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
-                    show("Please provide replica set name");
                 } else if (MongoDAO.getMongoClusterInfo(wizard.getConfig().getClusterName()) != null) {
                     show(String.format("Cluster with name '%s' already exists", wizard.getConfig().getClusterName()));
                 } else {

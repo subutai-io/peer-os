@@ -32,16 +32,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -65,7 +63,7 @@ public class Manager {
     private final Table dataNodesTable;
     private DestroyClusterWindow destroyWindow;
     private AddNodeWindow addNodeWindow;
-    private ClusterConfig config;
+    private Config config;
 
     public Manager() {
         agentManager = MongoModule.getAgentManager();
@@ -104,7 +102,7 @@ public class Manager {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                config = constructClusterConfig((MongoClusterInfo) event.getProperty().getValue());
+                config = (Config) event.getProperty().getValue();
                 refreshUI();
             }
         });
@@ -150,16 +148,13 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        destroyWindow = new DestroyClusterWindow(config, MongoModule.getTaskRunner());
+                                        destroyWindow = new DestroyClusterWindow(config);
                                         MgmtApplication.addCustomWindow(destroyWindow);
                                         destroyWindow.addListener(new Window.CloseListener() {
 
                                             @Override
                                             public void windowClose(Window.CloseEvent e) {
-                                                if (destroyWindow.isSucceeded()) {
-                                                    refreshClustersInfo();
-                                                }
-//                                                MongoModule.getTaskRunner().removeAllTaskCallbacks();
+                                                refreshClustersInfo();
                                             }
                                         });
                                         destroyWindow.startOperation();
@@ -183,7 +178,7 @@ public class Manager {
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
                     addNodeWindow = new AddNodeWindow(
-                            config, (MongoClusterInfo) clusterCombo.getValue(), MongoModule.getTaskRunner());
+                            config, MongoModule.getTaskRunner());
                     MgmtApplication.addCustomWindow(addNodeWindow);
                     addNodeWindow.addListener(new Window.CloseListener() {
 
@@ -193,7 +188,6 @@ public class Manager {
                             if (addNodeWindow.isSucceeded()) {
                                 refreshClustersInfo();
                             }
-//                            MongoModule.getTaskRunner().removeAllTaskCallbacks();
                         }
                     });
                 } else {
@@ -258,7 +252,7 @@ public class Manager {
                 public void buttonClick(Button.ClickEvent event) {
                     Task checkStatusTask = Tasks.getCheckStatusTask(
                             new HashSet<Agent>(Arrays.asList(agent)),
-                            nodeType);
+                            nodeType, config);
                     MongoModule.getTaskRunner().executeTask(checkStatusTask, new CheckStatusCallback(MongoModule.getTaskRunner(), progressIcon, startBtn, stopBtn, destroyBtn));
                 }
             });
@@ -270,17 +264,18 @@ public class Manager {
                     Task startNodeTask = null;
                     if (nodeType == NodeType.CONFIG_NODE) {
                         startNodeTask = Tasks.getStartConfigServersTask(
-                                Util.wrapAgentToSet(agent));
+                                Util.wrapAgentToSet(agent), config);
 
                     } else if (nodeType == NodeType.DATA_NODE) {
 
                         startNodeTask = Tasks.getStartReplicaSetTask(
-                                Util.wrapAgentToSet(agent));
+                                Util.wrapAgentToSet(agent), config);
 
                     } else if (nodeType == NodeType.ROUTER_NODE) {
                         startNodeTask = Tasks.getStartRoutersTask(
                                 Util.wrapAgentToSet(agent),
-                                config.getConfigServers());
+                                config.getConfigServers(),
+                                config);
 
                     }
                     if (startNodeTask != null) {
@@ -310,7 +305,6 @@ public class Manager {
                         Operation destroyCfgSrvOperation = new DestroyNodeOperation(agent, config, nodeType);
                         MongoModule.getTaskRunner().executeTask(destroyCfgSrvOperation.getNextTask(),
                                 new DestroyCfgSrvCallback(contentRoot.getWindow(),
-                                        (MongoClusterInfo) clusterCombo.getValue(),
                                         config, agent,
                                         configServersTable, routersTable,
                                         rowId, destroyCfgSrvOperation,
@@ -323,7 +317,6 @@ public class Manager {
                         MongoModule.getTaskRunner().executeTask(destroyDataNodeOperation.getNextTask(),
                                 new DestroyDataNodeCallback(
                                         contentRoot.getWindow(), agentManager,
-                                        (MongoClusterInfo) clusterCombo.getValue(),
                                         config, agent,
                                         dataNodesTable, rowId,
                                         destroyDataNodeOperation,
@@ -335,7 +328,6 @@ public class Manager {
                         Operation destroyRouterOperation = new DestroyNodeOperation(agent, config, nodeType);
                         MongoModule.getTaskRunner().executeTask(destroyRouterOperation.getNextTask(),
                                 new DestroyRouterCallback(contentRoot.getWindow(),
-                                        (MongoClusterInfo) clusterCombo.getValue(),
                                         config, agent,
                                         routersTable,
                                         rowId, destroyRouterOperation,
@@ -346,39 +338,6 @@ public class Manager {
                 }
             });
         }
-    }
-
-    private ClusterConfig constructClusterConfig(MongoClusterInfo clusterInfo) {
-        ClusterConfig cfg = null;
-
-        if (clusterInfo != null) {
-            cfg = new ClusterConfig();
-            cfg.setConfigServers(new HashSet<Agent>());
-            cfg.setRouterServers(new HashSet<Agent>());
-            cfg.setDataNodes(new HashSet<Agent>());
-            cfg.setClusterName(clusterInfo.getClusterName());
-            cfg.setReplicaSetName(clusterInfo.getReplicaSetName());
-
-            for (UUID agentUUID : clusterInfo.getConfigServers()) {
-                Agent agent = agentManager.getAgentByUUID(agentUUID);
-                if (agent != null) {
-                    cfg.getConfigServers().add(agent);
-                }
-            }
-            for (UUID agentUUID : clusterInfo.getRouters()) {
-                Agent agent = agentManager.getAgentByUUID(agentUUID);
-                if (agent != null) {
-                    cfg.getRouterServers().add(agent);
-                }
-            }
-            for (UUID agentUUID : clusterInfo.getDataNodes()) {
-                Agent agent = agentManager.getAgentByUUID(agentUUID);
-                if (agent != null) {
-                    cfg.getDataNodes().add(agent);
-                }
-            }
-        }
-        return cfg;
     }
 
     private void refreshUI() {
@@ -394,17 +353,17 @@ public class Manager {
     }
 
     private void refreshClustersInfo() {
-        List<MongoClusterInfo> mongoClusterInfos = MongoDAO.getMongoClustersInfo();
-        MongoClusterInfo clusterInfo = (MongoClusterInfo) clusterCombo.getValue();
+        List<Config> mongoClusterInfos = MongoDAO.getMongoClustersInfo();
+        Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
-            for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
+            for (Config mongoClusterInfo : mongoClusterInfos) {
                 clusterCombo.addItem(mongoClusterInfo);
                 clusterCombo.setItemCaption(mongoClusterInfo,
                         String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
             }
             if (clusterInfo != null) {
-                for (MongoClusterInfo mongoClusterInfo : mongoClusterInfos) {
+                for (Config mongoClusterInfo : mongoClusterInfos) {
                     if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
                         clusterCombo.setValue(mongoClusterInfo);
                         return;

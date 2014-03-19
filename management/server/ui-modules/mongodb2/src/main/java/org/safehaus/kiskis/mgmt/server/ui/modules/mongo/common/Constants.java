@@ -11,14 +11,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
  */
 public class Constants {
 
-    public static final int CONFIG_SRV_PORT = 27019;
-    public static final int ROUTER_PORT = 27018;
-    public static final int DATA_NODE_PORT = 27017;
-    public static final String DOMAIN = ".intra.lan";
     public static final String DATA_NODE_CONF_FILE = "/etc/mongodb.conf";
     public static final String LOG_DIR = "/var/log/mongodb";
     public static final String CONFIG_DIR = "/data/configdb";
-    public static final String MONGO_DIR = "/var/lib/mongodb";
     public static final String TABLE_HOST_PROPERTY = "Host";
     public static final String TABLE_CHECK_PROPERTY = "Check";
     public static final String TABLE_START_PROPERTY = "Start";

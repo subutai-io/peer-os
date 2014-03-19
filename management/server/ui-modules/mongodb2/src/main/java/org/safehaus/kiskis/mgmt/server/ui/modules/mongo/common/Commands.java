@@ -102,9 +102,6 @@ public class Commands {
         Request req = getTemplate();
         req.setProgram("/bin/rm -R");
         req.setArgs(Arrays.asList(
-                Constants.MONGO_DIR,
-                "&",
-                "/bin/rm -R",
                 Constants.CONFIG_DIR,
                 "&",
                 "/bin/rm",
@@ -140,38 +137,20 @@ public class Commands {
         return req;
     }
 
-    //execute on any one replica
-    public static Request getFindReplicaSetMasterCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/bin/echo");
-        req.setArgs(Arrays.asList(
-                "'rs.status()'",
-                "|",
-                "mongo"
-        //output will contain json object containing property [members] 
-        //which is json array with info on each replica where primary 
-        //replica has property ["stateStr" : "PRIMARY"] 
-        //and hostname is ["name" : "mongoTestShard1:27017"]
-        ));
-        req.setTimeout(30);
-        return req;
-    }
-
     //execute on primary replica
-    public static Request getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
+    public static Request getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--eval",
                 "\"rs.initiate();\"",
                 ";sleep 30;",
                 "mongo",
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--eval",
                 String.format("\"%s\"", secondaryNodes)
         ));
@@ -180,29 +159,29 @@ public class Commands {
     }
 
     //execute on primary data node
-    public static Request getUnregisterSecondaryNodeFromPrimaryCommand(String host) {
+    public static Request getUnregisterSecondaryNodeFromPrimaryCommand(String host, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--eval",
-                String.format("\"rs.remove('%s:%s');\"", host, Constants.DATA_NODE_PORT)
+                String.format("\"rs.remove('%s:%s');\"", host, cfg.getDataNodePort())
         ));
         req.setTimeout(30);
         return req;
     }
 
     //execute on any router member
-    public static Request getRegisterShardsWithRouterCommand(String shards) {
+    public static Request getRegisterShardsWithRouterCommand(String shards, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("sleep 30;");
         req.setArgs(Arrays.asList(
                 "mongo",
                 "--port",
-                Constants.ROUTER_PORT + "",
+                cfg.getRouterPort() + "",
                 "--eval",
                 String.format("\"%s\"", shards)
         ));
@@ -212,7 +191,7 @@ public class Commands {
 
     // LIFECYCLE COMMANDS =======================================================
     //execute on config server
-    public static Request getStartConfigServerCommand() {
+    public static Request getStartConfigServerCommand(Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("/bin/mkdir");
@@ -225,7 +204,7 @@ public class Commands {
                 "--dbpath",
                 Constants.CONFIG_DIR,
                 "--port",
-                Constants.CONFIG_SRV_PORT + "", // this might be user-supplied
+                cfg.getCfgSrvPort() + "", // this might be user-supplied
                 "--fork",
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
@@ -236,7 +215,7 @@ public class Commands {
     }
 
     //execute on router
-    public static Request getStartRouterCommand(String configServersArg) {
+    public static Request getStartRouterCommand(String configServersArg, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongos");
@@ -244,7 +223,7 @@ public class Commands {
                 "--configdb",
                 configServersArg,
                 "--port",
-                Constants.ROUTER_PORT + "",
+                cfg.getRouterPort() + "",
                 "--fork",
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
@@ -254,7 +233,7 @@ public class Commands {
     }
 
     //execute on shard
-    public static Request getStartNodeCommand() {
+    public static Request getStartNodeCommand(Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongod");
@@ -262,7 +241,7 @@ public class Commands {
                 "--config",
                 Constants.DATA_NODE_CONF_FILE,
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--fork",
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
@@ -286,16 +265,16 @@ public class Commands {
         return req;
     }
 
-    public static Request getCheckConfigSrvStatusCommand(String host) {
-        return getCheckInstanceRunningCommand(host, Constants.CONFIG_SRV_PORT + "");
+    public static Request getCheckConfigSrvStatusCommand(String host, Config cfg) {
+        return getCheckInstanceRunningCommand(host, cfg.getCfgSrvPort() + "");
     }
 
-    public static Request getCheckRouterStatusCommand(String host) {
-        return getCheckInstanceRunningCommand(host, Constants.ROUTER_PORT + "");
+    public static Request getCheckRouterStatusCommand(String host, Config cfg) {
+        return getCheckInstanceRunningCommand(host, cfg.getRouterPort() + "");
     }
 
-    public static Request getCheckDataNodeStatusCommand(String host) {
-        return getCheckInstanceRunningCommand(host, Constants.DATA_NODE_PORT + "");
+    public static Request getCheckDataNodeStatusCommand(String host, Config cfg) {
+        return getCheckInstanceRunningCommand(host, cfg.getDataNodePort() + "");
     }
 
     // RECONFIGURATION COMMANDS
@@ -311,7 +290,7 @@ public class Commands {
         return req;
     }
 
-    public static Request getFindPrimaryNodeCommand() {
+    public static Request getFindPrimaryNodeCommand(Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("/bin/echo");
@@ -320,7 +299,7 @@ public class Commands {
                 "|",
                 "mongo",
                 "--port",
-                Constants.DATA_NODE_PORT + ""
+                cfg.getDataNodePort() + ""
         ));
         req.setTimeout(30);
         return req;

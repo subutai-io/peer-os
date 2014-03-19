@@ -9,19 +9,13 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -38,8 +32,7 @@ public class DestroyDataNodeCallback implements TaskCallback {
 
     private final Window parentWindow;
     private final AgentManager agentManager;
-    private final MongoClusterInfo clusterInfo;
-    private final ClusterConfig config;
+    private final Config config;
     private final Agent nodeAgent;
     private final Table dataNodesTable;
     private final Object rowId;
@@ -48,10 +41,9 @@ public class DestroyDataNodeCallback implements TaskCallback {
     private final Button destroyButton;
     private final Embedded progressIcon;
 
-    public DestroyDataNodeCallback(Window parentWindow, AgentManager agentManager, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table dataNodesTable, Object rowId, Operation op, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyDataNodeCallback(Window parentWindow, AgentManager agentManager, Config config, Agent nodeAgent, Table dataNodesTable, Object rowId, Operation op, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
         this.agentManager = agentManager;
-        this.clusterInfo = clusterInfo;
         this.config = config;
         this.nodeAgent = nodeAgent;
         this.dataNodesTable = dataNodesTable;
@@ -77,7 +69,7 @@ public class DestroyDataNodeCallback implements TaskCallback {
                 if (m.find()) {
                     String primaryNodeHost = m.group(1);
                     if (!Util.isStringEmpty(primaryNodeHost)) {
-                        String hostname = primaryNodeHost.split(":")[0].replace(Constants.DOMAIN, "");
+                        String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                         primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                     }
                 }
@@ -106,17 +98,8 @@ public class DestroyDataNodeCallback implements TaskCallback {
                     return op.getNextTask();
                 } else {
                     //update db
-                    List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
-                    for (Iterator<UUID> it = dataNodes.iterator(); it.hasNext();) {
-                        UUID agentUUID = it.next();
-                        if (agentUUID.compareTo(nodeAgent.getUuid()) == 0) {
-                            it.remove();
-                            break;
-                        }
-                    }
-                    clusterInfo.setDataNodes(dataNodes);
-                    MongoDAO.saveMongoClusterInfo(clusterInfo);
                     config.getDataNodes().remove(nodeAgent);
+                    MongoDAO.saveMongoClusterInfo(config);
 
                     //update UI
                     dataNodesTable.removeItem(rowId);

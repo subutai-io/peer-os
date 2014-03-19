@@ -12,17 +12,72 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  */
-public class ClusterConfig {
+public class Config {
 
-    private String clusterName = "";
-    private String replicaSetName = "";
-    private int numberOfConfigServers = 3;
-    private int numberOfRouters = 2;
-    private int numberOfDataNodes = 3;
+    private String clusterName;
+    private String replicaSetName;
+    private String domainName;
+    private int numberOfConfigServers;
+    private int numberOfRouters;
+    private int numberOfDataNodes;
+    private int cfgSrvPort;
+    private int routerPort;
+    private int dataNodePort;
 
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
     private Set<Agent> dataNodes;
+
+    public Config() {
+        reset();
+    }
+
+    public final void reset() {
+        configServers = null;
+        routerServers = null;
+        dataNodes = null;
+        clusterName = "";
+        replicaSetName = "repl";
+        domainName = "intra.lan";
+        numberOfConfigServers = 3;
+        numberOfRouters = 2;
+        numberOfDataNodes = 3;
+        cfgSrvPort = 27019;
+        routerPort = 27018;
+        dataNodePort = 27017;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public int getCfgSrvPort() {
+        return cfgSrvPort;
+    }
+
+    public void setCfgSrvPort(int cfgSrvPort) {
+        this.cfgSrvPort = cfgSrvPort;
+    }
+
+    public int getRouterPort() {
+        return routerPort;
+    }
+
+    public void setRouterPort(int routerPort) {
+        this.routerPort = routerPort;
+    }
+
+    public int getDataNodePort() {
+        return dataNodePort;
+    }
+
+    public void setDataNodePort(int dataNodePort) {
+        this.dataNodePort = dataNodePort;
+    }
 
     public int getNumberOfConfigServers() {
         return numberOfConfigServers;
@@ -90,18 +145,7 @@ public class ClusterConfig {
 
     @Override
     public String toString() {
-        return "ClusterConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", numberOfConfigServers=" + numberOfConfigServers + ", numberOfRouters=" + numberOfRouters + ", numberOfDataNodes=" + numberOfDataNodes + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + '}';
-    }
-
-    public void reset() {
-        clusterName = "";
-        replicaSetName = "";
-        configServers = null;
-        routerServers = null;
-        dataNodes = null;
-        numberOfConfigServers = 3;
-        numberOfRouters = 2;
-        numberOfDataNodes = 3;
+        return "ClusterConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", domainName=" + domainName + ", numberOfConfigServers=" + numberOfConfigServers + ", numberOfRouters=" + numberOfRouters + ", numberOfDataNodes=" + numberOfDataNodes + ", cfgSrvPort=" + cfgSrvPort + ", routerPort=" + routerPort + ", dataNodePort=" + dataNodePort + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + '}';
     }
 
 }

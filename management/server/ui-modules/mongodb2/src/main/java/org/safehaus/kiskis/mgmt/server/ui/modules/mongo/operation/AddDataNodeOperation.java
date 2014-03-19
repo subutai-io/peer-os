@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class AddDataNodeOperation extends Operation {
 
-    public AddDataNodeOperation(ClusterConfig config, Agent agent) {
+    public AddDataNodeOperation(Config config, Agent agent) {
         super("Add New Data Node");
 
         Set<Agent> clusterMembers = new HashSet<Agent>();
@@ -41,21 +41,21 @@ public class AddDataNodeOperation extends Operation {
 
         addTask(Tasks.getStopMongoTask(Util.wrapAgentToSet(agent)));
 
-        addTask(Tasks.getRegisterIpsTask(clusterMembers));
+        addTask(Tasks.getRegisterIpsTask(clusterMembers, config));
 
         addTask(Tasks.getSetReplicaSetNameTask(
                 config.getReplicaSetName(),
                 Util.wrapAgentToSet(agent)));
 
         addTask(Tasks.getStartReplicaSetTask(
-                Util.wrapAgentToSet(agent)));
+                Util.wrapAgentToSet(agent), config));
 
         //find primary node task
-        addTask(Tasks.getFindPrimaryNodeTask(config.getDataNodes().iterator().next()));
+        addTask(Tasks.getFindPrimaryNodeTask(config.getDataNodes().iterator().next(), config));
 
         //adjust uuid with real primary agent uuid during the operation
-        addTask(Tasks.getRegisterSecondaryNodeWithPrimaryTask(agent,
-                agent));
+        addTask(Tasks.getRegisterSecondaryNodeWithPrimaryTask(
+                agent, agent, config));
 
     }
 

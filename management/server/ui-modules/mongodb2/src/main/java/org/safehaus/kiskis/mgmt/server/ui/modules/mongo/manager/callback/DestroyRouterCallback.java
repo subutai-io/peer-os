@@ -9,15 +9,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -30,8 +25,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 public class DestroyRouterCallback implements TaskCallback {
 
     private final Window parentWindow;
-    private final MongoClusterInfo clusterInfo;
-    private final ClusterConfig config;
+    private final Config config;
     private final Agent nodeAgent;
     private final Table routersTable;
     private final Object rowId;
@@ -40,9 +34,8 @@ public class DestroyRouterCallback implements TaskCallback {
     private final Button destroyButton;
     private final Embedded progressIcon;
 
-    public DestroyRouterCallback(Window parentWindow, MongoClusterInfo clusterInfo, ClusterConfig config, Agent nodeAgent, Table routersTable, Object rowId, Operation op, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
+    public DestroyRouterCallback(Window parentWindow, Config config, Agent nodeAgent, Table routersTable, Object rowId, Operation op, Embedded progressIcon, Button checkButton, Button startButton, Button stopButton, Button destroyButton) {
         this.parentWindow = parentWindow;
-        this.clusterInfo = clusterInfo;
         this.config = config;
         this.nodeAgent = nodeAgent;
         this.routersTable = routersTable;
@@ -66,17 +59,8 @@ public class DestroyRouterCallback implements TaskCallback {
                     return op.getNextTask();
                 } else {
                     //update db
-                    List<UUID> routers = new ArrayList<UUID>(clusterInfo.getRouters());
-                    for (Iterator<UUID> it = routers.iterator(); it.hasNext();) {
-                        UUID agentUUID = it.next();
-                        if (agentUUID.compareTo(nodeAgent.getUuid()) == 0) {
-                            it.remove();
-                            break;
-                        }
-                    }
-                    clusterInfo.setRouters(routers);
-                    MongoDAO.saveMongoClusterInfo(clusterInfo);
                     config.getRouterServers().remove(nodeAgent);
+                    MongoDAO.saveMongoClusterInfo(config);
 
                     //update UI
                     routersTable.removeItem(rowId);
