@@ -7,10 +7,13 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import java.util.List;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.OozieClusterInfo;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
 
 public class OozieTable extends Table {
 
