@@ -12,7 +12,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.OozieClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public class OozieTable extends Table {
 
@@ -84,7 +83,7 @@ public class OozieTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-    public void manageUI(Task task) {
+    public void manageUI(Task task, String stdOut, String stdErr) {
         if (cce != null) {
             switch (cce) {
                 case PURGE_SERVER: {
@@ -103,7 +102,7 @@ public class OozieTable extends Table {
                 }
                 case MANAGE: {
                     if (nodesWindow.isVisible()) {
-                        nodesWindow.updateUI(task);
+                        nodesWindow.updateUI(task, stdOut, stdErr);
                     }
                     break;
                 }

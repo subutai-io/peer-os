@@ -77,7 +77,7 @@ public class ServiceManager {
                         if (currentTask != null) {
                             return currentTask;
                         } else {
-                            oozieTable.manageUI(task);
+                            oozieTable.manageUI(task, stdOut, stdErr);
                         }
                     }
                     return null;
@@ -97,7 +97,7 @@ public class ServiceManager {
                         if (currentTask != null) {
                             return currentTask;
                         } else {
-                            oozieTable.manageUI(task);
+                            oozieTable.manageUI(task, stdOut, stdErr);
                             deleteInfo();
                         }
                     }
