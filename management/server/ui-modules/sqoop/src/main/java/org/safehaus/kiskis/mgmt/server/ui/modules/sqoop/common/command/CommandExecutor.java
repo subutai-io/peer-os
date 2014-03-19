@@ -1,5 +1,8 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.common.command;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.Sqoop;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;

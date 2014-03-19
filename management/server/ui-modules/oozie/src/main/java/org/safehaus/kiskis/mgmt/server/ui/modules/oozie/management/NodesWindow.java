@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management;
 
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -16,6 +17,8 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
 
 public class NodesWindow extends Window {
 

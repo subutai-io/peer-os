@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management;
 
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -19,8 +20,8 @@ import static org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseC
 import static org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum.STATUS;
 import static org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum.STOP;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM

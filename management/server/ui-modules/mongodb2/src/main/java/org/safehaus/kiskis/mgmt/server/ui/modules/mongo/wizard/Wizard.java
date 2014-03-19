@@ -10,7 +10,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 
 /**
  *
@@ -20,7 +20,7 @@ public class Wizard {
 
     private static final int NUMBER_OF_STEPS = 4;
     private final ProgressIndicator progressBar;
-    private final ClusterConfig config = new ClusterConfig();
+    private final Config config = new Config();
     private final GridLayout grid;
     private int step = 1;
 
@@ -60,7 +60,7 @@ public class Wizard {
         putForm();
     }
 
-    public ClusterConfig getConfig() {
+    public Config getConfig() {
         return config;
     }
 

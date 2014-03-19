@@ -4,13 +4,13 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 
 /**
  * @author Dilshat

@@ -12,23 +12,23 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
@@ -39,26 +39,23 @@ public class DestroyClusterWindow extends Window {
     private static final Logger LOG = Logger.getLogger(DestroyClusterWindow.class.getName());
 
     private final TextArea outputTxtArea;
-    private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
-    private final TaskRunner taskRunner;
     private final AgentManager agentManager;
-    private final ClusterConfig config;
-    private Thread operationTimeoutThread;
-    private boolean succeeded = false;
+    private final Config config;
+    private final LxcManager lxcManager;
 
-    public DestroyClusterWindow(ClusterConfig config, TaskRunner taskRunner) {
+    public DestroyClusterWindow(Config config) {
         super("Cluster uninstallation");
         setModal(true);
 
-        this.taskRunner = taskRunner;
         this.config = config;
-        agentManager = MongoModule.getAgentManager();
+        this.agentManager = MongoModule.getAgentManager();
+        this.lxcManager = MongoModule.getLxcManager();
 
         setWidth(650, DestroyClusterWindow.UNITS_PIXELS);
 
-        GridLayout content = new GridLayout(20, 3);
+        GridLayout content = new GridLayout(10, 2);
         content.setSizeFull();
         content.setMargin(true);
         content.setSpacing(true);
@@ -69,7 +66,7 @@ public class DestroyClusterWindow extends Window {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea, 0, 0, 18, 0);
+        content.addComponent(outputTxtArea, 0, 0, 9, 0);
         ok = new Button("Ok");
         ok.addListener(new Button.ClickListener() {
 
@@ -82,107 +79,116 @@ public class DestroyClusterWindow extends Window {
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
-        content.addComponent(ok, 18, 2, 18, 2);
-        content.addComponent(indicator, 19, 0, 19, 0);
-        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
-        content.setComponentAlignment(ok, Alignment.MIDDLE_RIGHT);
-
-        logTextArea = new TextArea("Node output");
-        logTextArea.setRows(13);
-        logTextArea.setColumns(43);
-        logTextArea.setImmediate(true);
-        logTextArea.setWordwrap(true);
-
-        content.addComponent(logTextArea, 0, 1, 18, 1);
+        content.addComponent(ok, 9, 1, 9, 1);
+        content.addComponent(indicator, 7, 1, 8, 1);
+        content.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        content.setComponentAlignment(ok, Alignment.MIDDLE_LEFT);
 
         addComponent(content);
     }
 
-    void startOperation() {
-        try {
-            //stop any running installation
-            final Operation installOperation = new UninstallClusterOperation(config);
-            runTimeoutThread(installOperation);
-            showProgress();
-            addOutput(String.format("Operation %s started", installOperation.getDescription()));
-            addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
-            addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
+    private void start() {
+        MongoModule.getExecutor().execute(new Runnable() {
 
-            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
-
-                @Override
-                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                    addLog(String.format("%s:\n%s\n%s",
-                            agent != null
-                            ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
-                            Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
-                            Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
-
-                    if (Util.isFinalResponse(response)) {
-                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                            addLog(String.format("Exit code: %d", response.getExitCode()));
-                        } else {
-                            addLog("Command timed out");
-                        }
-                    }
-
-                    if (task.isCompleted()) {
-                        if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                            addOutput(String.format("Task %s succeeded", task.getDescription()));
-                            if (installOperation.hasNextTask()) {
-                                addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
-                                addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
-                                return installOperation.getNextTask();
-                            } else {
-                                installOperation.setCompleted(true);
-                                addOutput(String.format("Operation %s completed", installOperation.getDescription()));
-                                hideProgress();
-                                MongoDAO.deleteMongoClusterInfo(config.getClusterName());
-                                succeeded = true;
-                            }
-                        } else {
-                            installOperation.setCompleted(true);
-                            addOutput(String.format("Task %s failed", task.getDescription()));
-                            addOutput(String.format("Operation %s failed", installOperation.getDescription()));
-                            hideProgress();
-                        }
-                    }
-
-                    return null;
+            public void run() {
+                if (destroyLxcs()) {
+                    addOutput("Lxc containers successfully destroyed");
+                } else {
+                    addOutput("Not all lxc containers destroyed. Use LXC module to cleanup");
                 }
-            });
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in startOperation", e);
+                if (MongoDAO.deleteMongoClusterInfo(config.getClusterName())) {
+                    addOutput("Cluster info deleted from DB");
+                } else {
+                    addOutput("Error while deleting cluster info from DB. Check logs");
+                }
+                hideProgress();
+            }
+        });
+
+    }
+
+    private class DestroyInfo {
+
+        private final Agent physicalAgent;
+        private final String lxcHostname;
+        private boolean result;
+
+        public DestroyInfo(Agent physicalAgent, String lxcHostname) {
+            this.physicalAgent = physicalAgent;
+            this.lxcHostname = lxcHostname;
+        }
+
+        public boolean isResult() {
+            return result;
+        }
+
+        public void setResult(boolean result) {
+            this.result = result;
+        }
+
+        public Agent getPhysicalAgent() {
+            return physicalAgent;
+        }
+
+        public String getLxcHostname() {
+            return lxcHostname;
+        }
+
+    }
+
+    private class Destroyer implements Callable<DestroyInfo> {
+
+        private final DestroyInfo info;
+
+        public Destroyer(DestroyInfo cloneInfo) {
+            this.info = cloneInfo;
+        }
+
+        public DestroyInfo call() throws Exception {
+            info.setResult(lxcManager.destroyLxcOnHost(info.physicalAgent, info.getLxcHostname()));
+            return info;
         }
     }
 
-    private void runTimeoutThread(final Operation operation) {
+    private boolean destroyLxcs() {
+        CompletionService<DestroyInfo> completer = new ExecutorCompletionService<DestroyInfo>(MongoModule.getExecutor());
         try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(operation.getTotalTimeout() * 1000 + 5000);
-                        if (!operation.isCompleted()) {
-                            addOutput(String.format(
-                                    "Operation %s timed out!!!",
-                                    operation.getDescription()));
-                            hideProgress();
-                        }
-                    } catch (InterruptedException ex) {
-                    }
+            Set<Agent> agents = new HashSet<Agent>();
+            agents.addAll(config.getConfigServers());
+            agents.addAll(config.getRouterServers());
+            agents.addAll(config.getDataNodes());
+            int tasks = 0;
+            for (Agent agent : agents) {
+                addOutput(String.format("Destroying lxc %s", agent.getHostname()));
+                Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
+                if (physicalAgent == null) {
+                    addOutput(String.format("Could not determine physical parent of %s. Use LXC module to cleanup", agent.getHostname()));
+                } else {
+                    tasks++;
+                    completer.submit(new Destroyer(new DestroyInfo(physicalAgent, agent.getHostname())));
                 }
-            });
-            operationTimeoutThread.start();
+            }
 
+            boolean result = true;
+            for (int i = 0; i < tasks; i++) {
+                Future<DestroyInfo> future = completer.take();
+                DestroyInfo info = future.get();
+                result &= info.isResult();
+            }
+
+            return result;
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        }
+        return false;
+    }
+
+    void startOperation() {
+        try {
+            showProgress();
+            start();
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
+            LOG.log(Level.SEVERE, "Error in startOperation", e);
         }
     }
 
@@ -196,10 +202,6 @@ public class DestroyClusterWindow extends Window {
         ok.setEnabled(true);
     }
 
-    public boolean isSucceeded() {
-        return succeeded;
-    }
-
     private void addOutput(String output) {
         if (!Util.isStringEmpty(output)) {
             outputTxtArea.setValue(
@@ -207,16 +209,6 @@ public class DestroyClusterWindow extends Window {
                             outputTxtArea.getValue(),
                             output));
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-        }
-    }
-
-    private void addLog(String log) {
-        if (!Util.isStringEmpty(log)) {
-            logTextArea.setValue(
-                    MessageFormat.format("{0}\n\n{1}",
-                            logTextArea.getValue(),
-                            log));
-            logTextArea.setCursorPosition(logTextArea.getValue().toString().length() - 1);
         }
     }
 

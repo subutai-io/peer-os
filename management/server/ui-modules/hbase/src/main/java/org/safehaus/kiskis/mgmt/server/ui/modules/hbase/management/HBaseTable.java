@@ -12,9 +12,9 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.HBaseClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
 
 public class HBaseTable extends Table {
 

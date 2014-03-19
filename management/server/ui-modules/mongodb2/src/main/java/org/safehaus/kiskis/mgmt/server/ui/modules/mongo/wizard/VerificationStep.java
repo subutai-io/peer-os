@@ -34,9 +34,13 @@ public class VerificationStep extends Panel {
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
         cfgView.addStringCfg("Replica Set Name", wizard.getConfig().getReplicaSetName());
+        cfgView.addStringCfg("Domain Name", wizard.getConfig().getDomainName());
         cfgView.addStringCfg("Number of configuration servers", wizard.getConfig().getNumberOfConfigServers() + "");
         cfgView.addStringCfg("Number of routers", wizard.getConfig().getNumberOfRouters() + "");
         cfgView.addStringCfg("Number of data nodes", wizard.getConfig().getNumberOfDataNodes() + "");
+        cfgView.addStringCfg("Configuration servers port", wizard.getConfig().getCfgSrvPort() + "");
+        cfgView.addStringCfg("Routers port", wizard.getConfig().getRouterPort() + "");
+        cfgView.addStringCfg("Data nodes port", wizard.getConfig().getDataNodePort() + "");
 
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {

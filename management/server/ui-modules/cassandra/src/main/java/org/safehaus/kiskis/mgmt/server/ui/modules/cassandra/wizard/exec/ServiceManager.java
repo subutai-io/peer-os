@@ -5,6 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -21,7 +24,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.Cassandra
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management.NodesWindow;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  *

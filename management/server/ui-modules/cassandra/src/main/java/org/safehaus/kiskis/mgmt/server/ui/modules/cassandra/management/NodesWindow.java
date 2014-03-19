@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.management;
 
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraClusterInfo;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -20,8 +21,8 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.FAIL;
+import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM

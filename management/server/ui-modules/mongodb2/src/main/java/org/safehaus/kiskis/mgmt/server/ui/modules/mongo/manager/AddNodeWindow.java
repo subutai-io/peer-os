@@ -19,10 +19,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -30,21 +27,19 @@ import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  *
@@ -60,18 +55,16 @@ public class AddNodeWindow extends Window {
     private final Label indicator;
     private final TaskRunner taskRunner;
     private final AgentManager agentManager;
-    private final ClusterConfig config;
-    private final MongoClusterInfo clusterInfo;
+    private final Config config;
     private Thread operationTimeoutThread;
     private boolean succeeded = false;
 
-    public AddNodeWindow(final ClusterConfig config, MongoClusterInfo clusterInfo, TaskRunner taskRunner) {
+    public AddNodeWindow(final Config config, TaskRunner taskRunner) {
         super("Add New Node");
         setModal(true);
 
         this.taskRunner = taskRunner;
         this.config = config;
-        this.clusterInfo = clusterInfo;
         agentManager = MongoModule.getAgentManager();
 
         setWidth(650, AddNodeWindow.UNITS_PIXELS);
@@ -220,7 +213,7 @@ public class AddNodeWindow extends Window {
                             if (m.find()) {
                                 String primaryNodeHost = m.group(1);
                                 if (!Util.isStringEmpty(primaryNodeHost)) {
-                                    String hostname = primaryNodeHost.split(":")[0].replace(Constants.DOMAIN, "");
+                                    String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                                     primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                                 }
                             }
@@ -283,20 +276,14 @@ public class AddNodeWindow extends Window {
                                 hideProgress();
                                 succeeded = true;
                                 if (nodeType == NodeType.DATA_NODE) {
-                                    List<UUID> dataNodes = new ArrayList<UUID>(clusterInfo.getDataNodes());
-                                    dataNodes.add(agent.getUuid());
-                                    clusterInfo.setDataNodes(dataNodes);
-                                    MongoDAO.saveMongoClusterInfo(clusterInfo);
+                                    config.getDataNodes().add(agent);
+                                    MongoDAO.saveMongoClusterInfo(config);
                                 } else if (nodeType == NodeType.CONFIG_NODE) {
-                                    List<UUID> cfgServers = new ArrayList<UUID>(clusterInfo.getConfigServers());
-                                    cfgServers.add(agent.getUuid());
-                                    clusterInfo.setConfigServers(cfgServers);
-                                    MongoDAO.saveMongoClusterInfo(clusterInfo);
+                                    config.getConfigServers().add(agent);
+                                    MongoDAO.saveMongoClusterInfo(config);
                                 } else if (nodeType == NodeType.ROUTER_NODE) {
-                                    List<UUID> routers = new ArrayList<UUID>(clusterInfo.getRouters());
-                                    routers.add(agent.getUuid());
-                                    clusterInfo.setRouters(routers);
-                                    MongoDAO.saveMongoClusterInfo(clusterInfo);
+                                    config.getRouterServers().add(agent);
+                                    MongoDAO.saveMongoClusterInfo(config);
                                 }
                             }
                         } else {

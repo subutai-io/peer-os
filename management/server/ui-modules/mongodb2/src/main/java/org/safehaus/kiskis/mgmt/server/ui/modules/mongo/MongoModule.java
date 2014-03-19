@@ -3,6 +3,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard.Wizard;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -17,6 +19,7 @@ public class MongoModule implements Module {
     private static AgentManager agentManager;
     private static DbManager dbManager;
     private static LxcManager lxcManager;
+    private static ExecutorService executor;
 
     public void setLxcManager(LxcManager lxcManager) {
         MongoModule.lxcManager = lxcManager;
@@ -48,6 +51,22 @@ public class MongoModule implements Module {
 
     public static LxcManager getLxcManager() {
         return lxcManager;
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
+    }
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+    public void destroy() {
+        MongoModule.taskRunner = null;
+        MongoModule.agentManager = null;
+        MongoModule.dbManager = null;
+        MongoModule.lxcManager = null;
+        executor.shutdown();
     }
 
     public static class ModuleComponent extends CustomComponent {
