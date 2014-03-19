@@ -79,6 +79,8 @@ public class ServiceManager {
                         } else {
                             oozieTable.manageUI(task, stdOut, stdErr);
                         }
+                    } else {
+                        oozieTable.manageUI(task, stdOut, stdErr);
                     }
                     return null;
                 }

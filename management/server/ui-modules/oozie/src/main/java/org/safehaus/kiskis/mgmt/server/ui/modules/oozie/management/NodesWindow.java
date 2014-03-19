@@ -174,11 +174,12 @@ public class NodesWindow extends Window {
                 case STATUS: {
 //                    switch (task.getTaskStatus()) {
 //                        case SUCCESS: {
+                    
                     if (stdOut.contains("Oozie Server is running")) {
                         getWindow().showNotification("Oozie Server is running");
                         switchState(false);
                     } else {
-                        getWindow().showNotification(" Oozie Server is not running");
+                        getWindow().showNotification("Oozie Server is not running");
                         switchState(true);
                     }
 //                            break;

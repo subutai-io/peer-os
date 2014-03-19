@@ -18,7 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 public class Manager {
 
     private final VerticalLayout content;
-    private final OozieTable table;
+    private final OozieTable oozieTable;
 
     public Manager() {
         content = new VerticalLayout();
@@ -28,20 +28,20 @@ public class Manager {
 
         Label clusterNameLabel = new Label("Select the cluster");
 
-        table = new OozieTable();
+        oozieTable = new OozieTable();
         Button getClustersBtn = new Button("Get clusters");
         getClustersBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                table.refreshDatasource();
+                oozieTable.refreshDatasource();
             }
         });
         buttons.addComponent(getClustersBtn);
 
         content.addComponent(clusterNameLabel);
         content.addComponent(buttons);
-        content.addComponent(table);
+        content.addComponent(oozieTable);
 
     }
 

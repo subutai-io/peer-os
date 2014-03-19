@@ -60,7 +60,6 @@ public class OozieModule implements Module {
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-//            oozieDAO = new OozieDAO(dbManager);
             wizard = new Wizard();
             manager = new Manager();
             sheet.addTab(wizard.getContent(), "Install");
