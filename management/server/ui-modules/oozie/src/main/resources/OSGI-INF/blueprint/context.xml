@@ -7,6 +7,7 @@
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>  
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>       
+    <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
     
     <bean id="module" class="org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule">
         <property name="taskRunner" ref="taskRunner"/>
@@ -14,5 +15,4 @@
         <property name="dbManager" ref="dbManager" />        
     </bean>  
       
-    <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
 </blueprint>

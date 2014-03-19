@@ -7,10 +7,11 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import java.util.List;
-import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
-import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.OozieClusterInfo;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 public class OozieTable extends Table {
@@ -22,10 +23,8 @@ public class OozieTable extends Table {
     Button selectedStopButton;
     Item selectedItem;
     OozieConfig selectedConfig;
-    OozieDAO oozieDAO;
 
-    public OozieTable(OozieDAO oozieDAO) {
-        this.oozieDAO = oozieDAO;
+    public OozieTable() {
         setSizeFull();
         this.manager = new ServiceManager(this);
         this.setCaption("Oozie");
@@ -41,7 +40,7 @@ public class OozieTable extends Table {
         container.addContainerProperty(OozieClusterInfo.UUID_LABEL, String.class, "");
         container.addContainerProperty("Manage", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
-        List<OozieConfig> cdList = oozieDAO.getClusterInfo();
+        List<OozieConfig> cdList = OozieDAO.getClusterInfo();
         for (OozieConfig config : cdList) {
             addClusterDataToContainer(container, config);
         }
@@ -58,6 +57,7 @@ public class OozieTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 nodesWindow = new NodesWindow(config, manager);
+                cce = OozieCommandEnum.MANAGE;
                 getApplication().getMainWindow().addWindow(nodesWindow);
 
             }
@@ -84,11 +84,11 @@ public class OozieTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-    public void manageUI(TaskStatus ts) {
+    public void manageUI(Task task) {
         if (cce != null) {
             switch (cce) {
                 case PURGE_SERVER: {
-                    switch (ts) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
                             refreshDatasource();
@@ -101,13 +101,14 @@ public class OozieTable extends Table {
                     }
                     break;
                 }
+                case MANAGE: {
+                    if (nodesWindow.isVisible()) {
+                        nodesWindow.updateUI(task);
+                    }
+                    break;
+                }
             }
         }
-        cce = null;
-    }
-
-    public OozieDAO getOozieDAO() {
-        return oozieDAO;
     }
 
 }

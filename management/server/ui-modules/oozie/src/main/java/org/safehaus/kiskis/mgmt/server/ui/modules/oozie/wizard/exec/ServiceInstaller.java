@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
@@ -24,8 +25,7 @@ public class ServiceInstaller implements TaskCallback {
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
     private Task currentTask;
-    OozieConfig config;
-    Wizard wizard;
+    private final OozieConfig config;
 
     public ServiceInstaller(Wizard wizard, TextArea terminal) {
         this.terminal = terminal;
@@ -96,13 +96,10 @@ public class ServiceInstaller implements TaskCallback {
     }
 
     private void saveInfo() {
-        terminal.setValue(terminal.getValue().toString() + config.getUuid() + " saving cluster info.\n");
-        if (wizard.getOozieDAO().saveClusterInfo(config)) {
-            terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster saved into keyspace.\n");
-        } else {
-            terminal.setValue(terminal.getValue().toString() + config.getUuid() + " cluster is not saved into keyspace.\n");
-        }
+        OozieModule.dbManager.saveInfo(OozieModule.MODULE_NAME, config.getUuid().toString(), config);
+        terminal.setValue(terminal.getValue().toString() + config.getUuid() + " saved cluster info.\n");
     }
+    private static final Logger LOG = Logger.getLogger(ServiceInstaller.class.getName());
 
     @Override
     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -113,8 +110,8 @@ public class ServiceInstaller implements TaskCallback {
                 terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
                 return currentTask;
             } else {
-                terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
                 saveInfo();
+                terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
             }
         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
             terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");

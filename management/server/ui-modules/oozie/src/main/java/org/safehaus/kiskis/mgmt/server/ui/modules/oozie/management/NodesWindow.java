@@ -16,8 +16,6 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.FAIL;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
 public class NodesWindow extends Window {
 
@@ -156,7 +154,7 @@ public class NodesWindow extends Window {
                             break;
                         }
                     }
-
+                    break;
                 }
                 case STOP_SERVER: {
                     switch (ts.getTaskStatus()) {
@@ -169,6 +167,7 @@ public class NodesWindow extends Window {
                             break;
                         }
                     }
+                    break;
                 }
                 case STATUS: {
                     switch (ts.getTaskStatus()) {
@@ -195,4 +194,5 @@ public class NodesWindow extends Window {
         Button stop = (Button) selectedItem.getItemProperty("Stop").getValue();
         stop.setEnabled(!state);
     }
+
 }

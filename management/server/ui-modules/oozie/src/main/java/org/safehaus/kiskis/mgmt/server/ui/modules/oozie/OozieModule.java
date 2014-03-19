@@ -22,14 +22,14 @@ public class OozieModule implements Module {
     public static final String MODULE_NAME = "Oozie";
     private static TaskRunner taskRunner;
     private static AgentManager agentManager;
-    private DbManager dbManager;
+    public static DbManager dbManager;
 
     public void setAgentManager(AgentManager agentManager) {
         OozieModule.agentManager = agentManager;
     }
 
     public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
+        OozieModule.dbManager = dbManager;
     }
 
     public void setTaskRunner(TaskRunner taskRunner) {
@@ -44,14 +44,11 @@ public class OozieModule implements Module {
         return agentManager;
     }
 
-    public DbManager getDbManager() {
-        return dbManager;
-    }
-
     public static class ModuleComponent extends CustomComponent {
 
         Wizard wizard;
         Manager manager;
+        OozieDAO oozieDAO;
 
         public ModuleComponent(TaskRunner taskRunner, DbManager dbManager) {
             setSizeFull();
@@ -63,9 +60,9 @@ public class OozieModule implements Module {
             TabSheet sheet = new TabSheet();
             sheet.setStyleName(Runo.TABSHEET_SMALL);
             sheet.setSizeFull();
-            OozieDAO oozieDAO = new OozieDAO(dbManager);
-            wizard = new Wizard(oozieDAO);
-            manager = new Manager(oozieDAO);
+//            oozieDAO = new OozieDAO(dbManager);
+            wizard = new Wizard();
+            manager = new Manager();
             sheet.addTab(wizard.getContent(), "Install");
             sheet.addTab(manager.getContent(), "Manage");
 
