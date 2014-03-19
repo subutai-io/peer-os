@@ -6,13 +6,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyCfgSrvCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.CheckStatusCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyDataNodeCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StopNodeCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.DestroyRouterCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StartNodeCallback;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.DestroyNodeOperation;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
@@ -41,13 +37,11 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  *
