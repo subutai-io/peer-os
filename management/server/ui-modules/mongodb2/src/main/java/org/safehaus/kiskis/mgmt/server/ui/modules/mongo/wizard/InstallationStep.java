@@ -47,8 +47,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 /**
  *
  * @author dilshat
- * @todo remove unnecessary commands like uninstall prev mongo
  * @todo show all config fields in manager UI
+ * @todo fix UI of config step
  *
  */
 public class InstallationStep extends Panel {

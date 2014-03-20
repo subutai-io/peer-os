@@ -54,6 +54,11 @@ public class Manager {
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
+    private final Label replicaSetName;
+    private final Label domainName;
+    private final Label cfgSrvPort;
+    private final Label routerPort;
+    private final Label dataNodePort;
     private Config config;
 
     public Manager() {
@@ -74,14 +79,14 @@ public class Manager {
         //tables go here
         configServersTable = createTableTemplate("Config Servers", 150);
         routersTable = createTableTemplate("Query Routers", 150);
-        dataNodesTable = createTableTemplate("Data Nodes", 270);
+        dataNodesTable = createTableTemplate("Data Nodes", 200);
         //tables go here
 
-        Label clusterNameLabel = new Label("Select the cluster");
-        content.addComponent(clusterNameLabel);
+        HorizontalLayout controlsContent = new HorizontalLayout();
+        controlsContent.setSpacing(true);
 
-        HorizontalLayout topContent = new HorizontalLayout();
-        topContent.setSpacing(true);
+        Label clusterNameLabel = new Label("Select the cluster");
+        controlsContent.addComponent(clusterNameLabel);
 
         clusterCombo = new ComboBox();
         clusterCombo.setMultiSelect(false);
@@ -97,7 +102,7 @@ public class Manager {
             }
         });
 
-        topContent.addComponent(clusterCombo);
+        controlsContent.addComponent(clusterCombo);
 
         Button refreshClustersBtn = new Button("Refresh clusters");
         refreshClustersBtn.addListener(new Button.ClickListener() {
@@ -108,7 +113,7 @@ public class Manager {
             }
         });
 
-        topContent.addComponent(refreshClustersBtn);
+        controlsContent.addComponent(refreshClustersBtn);
 
         Button checkAllBtn = new Button("Check all");
         checkAllBtn.addListener(new Button.ClickListener() {
@@ -122,7 +127,7 @@ public class Manager {
 
         });
 
-        topContent.addComponent(checkAllBtn);
+        controlsContent.addComponent(checkAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -158,7 +163,7 @@ public class Manager {
 
         });
 
-        topContent.addComponent(destroyClusterBtn);
+        controlsContent.addComponent(destroyClusterBtn);
 
         Button addNodeBtn = new Button("Add New Node");
 
@@ -183,18 +188,35 @@ public class Manager {
             }
         });
 
-        topContent.addComponent(addNodeBtn);
+        controlsContent.addComponent(addNodeBtn);
 
-        content.addComponent(topContent);
+        content.addComponent(controlsContent);
 
-        HorizontalLayout midContent = new HorizontalLayout();
-        midContent.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        HorizontalLayout configContent = new HorizontalLayout();
+        configContent.setSpacing(true);
 
-        midContent.addComponent(configServersTable);
+        replicaSetName = new Label();
+        domainName = new Label();
+        cfgSrvPort = new Label();
+        routerPort = new Label();
+        dataNodePort = new Label();
 
-        midContent.addComponent(routersTable);
+        configContent.addComponent(new Label("Replica Set:"));
+        configContent.addComponent(replicaSetName);
+        configContent.addComponent(new Label("Domain:"));
+        configContent.addComponent(domainName);
+        configContent.addComponent(new Label("Config server port:"));
+        configContent.addComponent(cfgSrvPort);
+        configContent.addComponent(new Label("Router port:"));
+        configContent.addComponent(routerPort);
+        configContent.addComponent(new Label("Data node port:"));
+        configContent.addComponent(dataNodePort);
 
-        content.addComponent(midContent);
+        content.addComponent(configContent);
+
+        content.addComponent(configServersTable);
+
+        content.addComponent(routersTable);
 
         content.addComponent(dataNodesTable);
 
@@ -323,10 +345,20 @@ public class Manager {
             populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
             populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
             populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
+            replicaSetName.setValue(config.getReplicaSetName());
+            domainName.setValue(config.getDomainName());
+            cfgSrvPort.setValue(config.getCfgSrvPort());
+            routerPort.setValue(config.getRouterPort());
+            dataNodePort.setValue(config.getDataNodePort());
         } else {
             configServersTable.removeAllItems();
             routersTable.removeAllItems();
             dataNodesTable.removeAllItems();
+            replicaSetName.setValue("");
+            domainName.setValue("");
+            cfgSrvPort.setValue("");
+            routerPort.setValue("");
+            dataNodePort.setValue("");
         }
     }
 
@@ -338,7 +370,7 @@ public class Manager {
             for (Config mongoClusterInfo : mongoClusterInfos) {
                 clusterCombo.addItem(mongoClusterInfo);
                 clusterCombo.setItemCaption(mongoClusterInfo,
-                        String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
+                        mongoClusterInfo.getClusterName());
             }
             if (clusterInfo != null) {
                 for (Config mongoClusterInfo : mongoClusterInfos) {
