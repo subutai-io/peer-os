@@ -17,5 +17,7 @@ public interface TaskRunner {
 
     public Task executeTask(Task task);
 
+    public void executeTaskNForget(Task task);
+
     public void removeTaskCallback(UUID taskUUID);
 }
