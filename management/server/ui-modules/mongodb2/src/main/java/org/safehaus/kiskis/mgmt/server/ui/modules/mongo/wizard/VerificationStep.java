@@ -48,18 +48,7 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-//                MongoClusterInfo mongoClusterInfo
-//                        = new MongoClusterInfo(
-//                                wizard.getConfig().getClusterName(),
-//                                wizard.getConfig().getReplicaSetName(),
-//                                wizard.getConfig().getConfigServers(),
-//                                wizard.getConfig().getRouterServers(),
-//                                wizard.getConfig().getDataNodes());
-//                if (MongoDAO.saveMongoClusterInfo(mongoClusterInfo)) {
                 wizard.next();
-//                } else {
-//                    show("Could not save new cluster configuration! Please see logs.");
-//                }
             }
         });
 

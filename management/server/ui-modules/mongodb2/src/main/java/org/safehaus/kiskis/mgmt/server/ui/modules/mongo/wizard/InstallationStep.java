@@ -99,6 +99,7 @@ public class InstallationStep extends Panel {
             }
         });
         back = new Button("Back");
+        back.setEnabled(false);
         back.addListener(new Button.ClickListener() {
 
             @Override
@@ -110,11 +111,11 @@ public class InstallationStep extends Panel {
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
         HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(indicator);
         buttons.addComponent(back);
         buttons.addComponent(done);
-        grid.addComponent(indicator, 0, 9, 3, 9);
-        grid.addComponent(buttons, 4, 9, 9, 9);
-        grid.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        buttons.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        grid.addComponent(buttons, 0, 9, 9, 9);
         grid.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
 
         addComponent(grid);
