@@ -11,7 +11,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management;
  */
 public enum HBaseCommandEnum {
 
-    START("service hbase start", 120),
+    START("service hbase start > /dev/null &", 120),
     STOP("service hbase stop", 120),
     STATUS("service hbase status", 120),
     INSTALL("apt-get --assume-yes --force-yes install ksks-hbase", 120),

@@ -32,6 +32,20 @@
                     </instructions>
                 </configuration>
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.servicemix.tooling</groupId>
+                <artifactId>depends-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>generate-depends-file</id>
+                        <goals>
+                            <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -102,6 +116,29 @@
             <artifactId>db-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <!-- Karaf Test Framework Version -->
+        <dependency>
+            <groupId>org.apache.karaf.tooling.exam</groupId>
+            <artifactId>org.apache.karaf.tooling.exam.container</artifactId>
+            <version>2.3.3</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Pax Exam version you would like to use. At least 2.2.x is required. -->
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>2.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf</groupId>
+            <artifactId>apache-karaf</artifactId>
+            <version>2.3.3</version>
+            <type>zip</type>
+            <scope>test</scope>
+        </dependency>
+        
     </dependencies>
 
 </project>
