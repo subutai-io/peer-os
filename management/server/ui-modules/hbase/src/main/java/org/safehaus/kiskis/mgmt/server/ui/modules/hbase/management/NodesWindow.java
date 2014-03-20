@@ -145,11 +145,11 @@ public class NodesWindow extends Window {
         return null;
     }
 
-    public void updateUI(Task ts) {
+    public void updateUI(Task task) {
         if (cce != null) {
             switch (cce) {
                 case START: {
-                    switch (ts.getTaskStatus()) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(false);
                             break;
@@ -159,10 +159,10 @@ public class NodesWindow extends Window {
                             break;
                         }
                     }
-
+                    break;
                 }
                 case STOP: {
-                    switch (ts.getTaskStatus()) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(true);
                             break;
@@ -172,9 +172,10 @@ public class NodesWindow extends Window {
                             break;
                         }
                     }
+                    break;
                 }
                 case STATUS: {
-                    switch (ts.getTaskStatus()) {
+                    switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(false);
                             break;

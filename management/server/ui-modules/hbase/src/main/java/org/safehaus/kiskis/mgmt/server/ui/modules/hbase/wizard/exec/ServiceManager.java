@@ -39,7 +39,6 @@ public class ServiceManager {
         for (Agent agent : agents) {
             Request command = new HBaseCommands().getCommand(cce);
             command.setUuid(agent.getUuid());
-
             startTask.addRequest(command);
         }
         tasks.add(startTask);
@@ -59,10 +58,6 @@ public class ServiceManager {
     public void start() {
         moveToNextTask();
         if (currentTask != null) {
-//            for (Request command : currentTask.getCommands()) {
-//                executeCommand(command);
-//            }
-
             HBaseModule.getTaskRunner().executeTask(currentTask, new TaskCallback() {
 
                 @Override
@@ -74,8 +69,9 @@ public class ServiceManager {
                                 return currentTask;
                             }
                         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                            hBaseTable.manageUI(task, response, stdOut, stdErr);
                         }
-                        hBaseTable.manageUI(task);
+                        hBaseTable.manageUI(task, response, stdOut, stdErr);
                     }
                     return null;
                 }
