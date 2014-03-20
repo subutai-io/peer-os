@@ -50,11 +50,9 @@ public class Installation {
                         if (installOperation.hasNextTask()) {
                             return installOperation.getNextTask();
                         } else {
-                            installOperation.setCompleted(true);
                             copySSH();
                         }
                     } else {
-                        installOperation.setCompleted(true);
                         panel.addOutput(task, " failed.");
                         panel.addOutput(task, stdErr);
                     }

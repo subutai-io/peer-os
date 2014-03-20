@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -26,8 +26,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 
 /**
@@ -41,17 +39,13 @@ public class DestroyClusterWindow extends Window {
     private final TextArea outputTxtArea;
     private final Button ok;
     private final Label indicator;
-    private final AgentManager agentManager;
     private final Config config;
-    private final LxcManager lxcManager;
 
     public DestroyClusterWindow(Config config) {
         super("Cluster uninstallation");
         setModal(true);
 
         this.config = config;
-        this.agentManager = MongoModule.getAgentManager();
-        this.lxcManager = MongoModule.getLxcManager();
 
         setWidth(650, DestroyClusterWindow.UNITS_PIXELS);
 
@@ -80,7 +74,7 @@ public class DestroyClusterWindow extends Window {
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
         content.addComponent(ok, 9, 1, 9, 1);
-        content.addComponent(indicator, 7, 1, 8, 1);
+        content.addComponent(indicator, 5, 1, 8, 1);
         content.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
         content.setComponentAlignment(ok, Alignment.MIDDLE_LEFT);
 
@@ -145,7 +139,7 @@ public class DestroyClusterWindow extends Window {
         }
 
         public DestroyInfo call() throws Exception {
-            info.setResult(lxcManager.destroyLxcOnHost(info.physicalAgent, info.getLxcHostname()));
+            info.setResult(MongoModule.getLxcManager().destroyLxcOnHost(info.physicalAgent, info.getLxcHostname()));
             return info;
         }
     }
@@ -160,7 +154,7 @@ public class DestroyClusterWindow extends Window {
             int tasks = 0;
             for (Agent agent : agents) {
                 addOutput(String.format("Destroying lxc %s", agent.getHostname()));
-                Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
+                Agent physicalAgent = MongoModule.getAgentManager().getAgentByHostname(agent.getParentHostName());
                 if (physicalAgent == null) {
                     addOutput(String.format("Could not determine physical parent of %s. Use LXC module to cleanup", agent.getHostname()));
                 } else {
@@ -183,7 +177,7 @@ public class DestroyClusterWindow extends Window {
         return false;
     }
 
-    void startOperation() {
+    public void startOperation() {
         try {
             showProgress();
             start();

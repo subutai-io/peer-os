@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window.AddNodeWindow;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window.DestroyClusterWindow;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.CheckStatusCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StopNodeCallback;
@@ -41,7 +43,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
@@ -54,7 +55,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 public class Manager {
 
     private final VerticalLayout contentRoot;
-    private final AgentManager agentManager;
     private final ComboBox clusterCombo;
     private final Table configServersTable;
     private final Table routersTable;
@@ -64,7 +64,6 @@ public class Manager {
     private Config config;
 
     public Manager() {
-        agentManager = MongoModule.getAgentManager();
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
@@ -175,17 +174,14 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    addNodeWindow = new AddNodeWindow(
-                            config, MongoModule.getTaskRunner());
+                    addNodeWindow = new AddNodeWindow(config);
                     MgmtApplication.addCustomWindow(addNodeWindow);
                     addNodeWindow.addListener(new Window.CloseListener() {
 
                         @Override
                         public void windowClose(Window.CloseEvent e) {
                             //refresh clusters and show the current one again
-                            if (addNodeWindow.isSucceeded()) {
-                                refreshClustersInfo();
-                            }
+                            refreshClustersInfo();
                         }
                     });
                 } else {
@@ -353,7 +349,7 @@ public class Manager {
                                         String primaryNodeHost = m.group(1);
                                         if (!Util.isStringEmpty(primaryNodeHost)) {
                                             String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
-                                            primaryNodeAgent = agentManager.getAgentByHostname(hostname);
+                                            primaryNodeAgent = MongoModule.getAgentManager().getAgentByHostname(hostname);
                                         }
                                     }
                                     if (primaryNodeAgent != null) {

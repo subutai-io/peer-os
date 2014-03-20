@@ -16,19 +16,10 @@ public class Operation {
     private int currentTaskId = -1;
     private final List<Task> tasks;
     private final String description;
-    private volatile boolean completed;
 
     public Operation(String description) {
         this.description = description;
         tasks = new ArrayList<Task>();
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
     }
 
     public String getDescription() {

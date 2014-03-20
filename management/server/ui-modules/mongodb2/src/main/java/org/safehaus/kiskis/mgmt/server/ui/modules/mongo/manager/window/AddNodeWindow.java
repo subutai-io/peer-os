@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
+package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.AddConfigSrvOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.AddRouterOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.AddDataNodeOperation;
 import com.vaadin.terminal.Sizeable;
@@ -19,13 +18,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.text.MessageFormat;
-import java.util.Set;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
@@ -35,11 +33,12 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
@@ -53,23 +52,17 @@ public class AddNodeWindow extends Window {
     private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
-    private final TaskRunner taskRunner;
-    private final AgentManager agentManager;
     private final Config config;
-    private Thread operationTimeoutThread;
-    private boolean succeeded = false;
 
-    public AddNodeWindow(final Config config, TaskRunner taskRunner) {
+    public AddNodeWindow(final Config config) {
         super("Add New Node");
         setModal(true);
 
-        this.taskRunner = taskRunner;
         this.config = config;
-        agentManager = MongoModule.getAgentManager();
 
         setWidth(650, AddNodeWindow.UNITS_PIXELS);
 
-        GridLayout content = new GridLayout(20, 4);
+        GridLayout content = new GridLayout(10, 4);
         content.setSizeFull();
         content.setMargin(true);
         content.setSpacing(true);
@@ -77,46 +70,19 @@ public class AddNodeWindow extends Window {
         HorizontalLayout topContent = new HorizontalLayout();
         topContent.setSpacing(true);
 
-        content.addComponent(topContent, 0, 0, 18, 0);
-
-        Label label = new Label("Select node:");
-
-        topContent.addComponent(label);
-
-        final ComboBox nodesCombo = new ComboBox();
-        nodesCombo.setMultiSelect(false);
-        nodesCombo.setImmediate(true);
-        nodesCombo.setTextInputAllowed(false);
-        nodesCombo.setWidth(200, Sizeable.UNITS_PIXELS);
-
-        Set<Agent> agents = agentManager.getLxcAgents();
-
-        agents.removeAll(config.getConfigServers());
-        agents.removeAll(config.getRouterServers());
-        agents.removeAll(config.getDataNodes());
-
-        if (agents.size() > 0) {
-            for (Agent agent : agents) {
-                nodesCombo.addItem(agent);
-                nodesCombo.setItemCaption(agent, agent.getHostname());
-            }
-            nodesCombo.setValue(agents.iterator().next());
-        }
-
-        topContent.addComponent(nodesCombo);
+        content.addComponent(topContent, 0, 0, 9, 0);
 
         final ComboBox nodeTypeCombo = new ComboBox();
         nodeTypeCombo.setMultiSelect(false);
         nodeTypeCombo.setImmediate(true);
+        nodeTypeCombo.setNullSelectionAllowed(false);
         nodeTypeCombo.setTextInputAllowed(false);
         nodeTypeCombo.setWidth(150, Sizeable.UNITS_PIXELS);
 
-//        nodeTypeCombo.addItem(NodeType.CONFIG_NODE);
-//        nodeTypeCombo.setItemCaption(NodeType.CONFIG_NODE, "Add as Config Server");
         nodeTypeCombo.addItem(NodeType.ROUTER_NODE);
-        nodeTypeCombo.setItemCaption(NodeType.ROUTER_NODE, "Add as Router Server");
+        nodeTypeCombo.setItemCaption(NodeType.ROUTER_NODE, "Add Router Server");
         nodeTypeCombo.addItem(NodeType.DATA_NODE);
-        nodeTypeCombo.setItemCaption(NodeType.DATA_NODE, "Add as Data Node");
+        nodeTypeCombo.setItemCaption(NodeType.DATA_NODE, "Add Data Node");
         nodeTypeCombo.setValue(NodeType.DATA_NODE);
         topContent.addComponent(nodeTypeCombo);
 
@@ -128,16 +94,11 @@ public class AddNodeWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 NodeType nodeType = (NodeType) nodeTypeCombo.getValue();
-                Agent agent = (Agent) nodesCombo.getValue();
-                if (agent == null) {
-                    show("Please, select node");
-                } else if (nodeType == null) {
-                    show("Please, select node type");
-                } else if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7) {
+                if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7) {
                     show("Replica set cannot have more than 7 members");
                 } else {
                     addNodeBtn.setEnabled(false);
-                    startOperation(nodeType, agent);
+                    start(nodeType);
                 }
             }
         });
@@ -148,13 +109,7 @@ public class AddNodeWindow extends Window {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea, 0, 1, 18, 1);
-
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
-        indicator.setVisible(false);
-
-        content.addComponent(indicator, 19, 1, 19, 1);
-        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
+        content.addComponent(outputTxtArea, 0, 1, 9, 1);
 
         logTextArea = new TextArea("Node output");
         logTextArea.setRows(13);
@@ -162,7 +117,12 @@ public class AddNodeWindow extends Window {
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
-        content.addComponent(logTextArea, 0, 2, 18, 2);
+        content.addComponent(logTextArea, 0, 2, 9, 2);
+
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+        indicator.setVisible(false);
+
+        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
         ok = new Button("Ok");
         ok.addListener(new Button.ClickListener() {
@@ -174,7 +134,10 @@ public class AddNodeWindow extends Window {
             }
         });
 
-        content.addComponent(ok, 18, 3, 18, 3);
+        content.addComponent(ok, 9, 3, 9, 3);
+        content.addComponent(indicator, 5, 3, 8, 3);
+        content.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        content.setComponentAlignment(ok, Alignment.MIDDLE_LEFT);
 
         addComponent(content);
     }
@@ -183,22 +146,107 @@ public class AddNodeWindow extends Window {
         getWindow().showNotification(notification);
     }
 
+    private void start(final NodeType nodeType) {
+        showProgress();
+        MongoModule.getExecutor().execute(new Runnable() {
+
+            public void run() {
+                Map<Agent, Integer> bestServers = MongoModule.getLxcManager().getPhysicalServersWithLxcSlots();
+
+                if (bestServers.isEmpty()) {
+                    addOutput("No servers available to accommodate new lxc containers");
+                    hideProgress();
+                    return;
+                }
+                Agent physicalAgent = bestServers.entrySet().iterator().next().getKey();
+
+                //clone lxc
+                StringBuilder lxcHostname;
+                if (nodeType == NodeType.DATA_NODE) {
+                    lxcHostname = new StringBuilder(physicalAgent.getHostname()).
+                            append(Common.PARENT_CHILD_LXC_SEPARATOR).
+                            append("mongo-data-").append(Util.generateTimeBasedUUID());
+                } else {
+                    lxcHostname = new StringBuilder(physicalAgent.getHostname()).
+                            append(Common.PARENT_CHILD_LXC_SEPARATOR).
+                            append("mongo-rout-").append(Util.generateTimeBasedUUID());
+                }
+                if (lxcHostname.length() > 64) {
+                    lxcHostname.setLength(64);
+                }
+                boolean result = MongoModule.getLxcManager().cloneLxcOnHost(physicalAgent, lxcHostname.toString());
+                if (!result) {
+                    addOutput(String.format(
+                            "Cloning of lxc container %s failed. Use LXC module to cleanup. Operation aborted",
+                            lxcHostname.toString()));
+                    hideProgress();
+                    return;
+                } else {
+                    addOutput(String.format(
+                            "Successfuly cloned %s lxc container",
+                            lxcHostname.toString()));
+                }
+
+                //start lxc
+                result = MongoModule.getLxcManager().startLxcOnHost(physicalAgent, lxcHostname.toString());
+                if (!result) {
+                    addOutput(String.format(
+                            "Starting of lxc container %s failed. Use LXC module to cleanup. Operation aborted",
+                            lxcHostname.toString()));
+                    hideProgress();
+                    return;
+                } else {
+                    addOutput(String.format(
+                            "Successfuly started %s lxc container",
+                            lxcHostname.toString()));
+                }
+                //wait for the new lxc agent to connect
+                Agent lxcAgent = waitLxcAgent(lxcHostname.toString());
+                if (lxcAgent == null) {
+                    addOutput("Waiting timeout for lxc agent to connect is up. Giving up!. Use LXC module to cleanup");
+                    hideProgress();
+                    return;
+                }
+                //install node
+                startOperation(nodeType, lxcAgent);
+            }
+        });
+
+    }
+
+    private Agent waitLxcAgent(String lxcHostname) {
+        long waitStart = System.currentTimeMillis();
+        while (!Thread.interrupted()) {
+            Agent lxcAgent = MongoModule.getAgentManager().getAgentByHostname(lxcHostname);
+            if (lxcAgent != null) {
+                return lxcAgent;
+            }
+            if (System.currentTimeMillis() - waitStart > Constants.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
+                break;
+            } else {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    break;
+                }
+            }
+        }
+        return null;
+    }
+
     private void startOperation(final NodeType nodeType, final Agent agent) {
         try {
             //stop any running installation
             final Operation operation
                     = (nodeType == NodeType.DATA_NODE)
                     ? new AddDataNodeOperation(config, agent)
-                    : (nodeType == NodeType.CONFIG_NODE)
-                    ? new AddConfigSrvOperation(config, agent)
                     : new AddRouterOperation(config, agent);
-            runTimeoutThread(operation);
-            showProgress();
+
             addOutput(String.format("Operation %s started", operation.getDescription()));
             addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(operation.getNextTask(), new TaskCallback() {
+            MongoModule.getTaskRunner().executeTask(operation.getNextTask(), new TaskCallback() {
 
                 private final StringBuilder routersOutput = new StringBuilder();
 
@@ -214,7 +262,7 @@ public class AddNodeWindow extends Window {
                                 String primaryNodeHost = m.group(1);
                                 if (!Util.isStringEmpty(primaryNodeHost)) {
                                     String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
-                                    primaryNodeAgent = agentManager.getAgentByHostname(hostname);
+                                    primaryNodeAgent = MongoModule.getAgentManager().getAgentByHostname(hostname);
                                 }
                             }
 
@@ -242,11 +290,11 @@ public class AddNodeWindow extends Window {
                                         "child process started successfully, parent exiting") > -1)) {
                             task.setTaskStatus(TaskStatus.SUCCESS);
                             task.setCompleted(true);
-                            taskRunner.removeTaskCallback(task.getUuid());
+                            MongoModule.getTaskRunner().removeTaskCallback(task.getUuid());
                         }
                     }
 
-                    Agent responseAgent = agentManager.getAgentByUUID(response.getUuid());
+                    Agent responseAgent = MongoModule.getAgentManager().getAgentByUUID(response.getUuid());
                     addLog(String.format("%s:\n%s\n%s",
                             responseAgent != null
                             ? responseAgent.getHostname() : String.format("Offline[%s]", response.getUuid()),
@@ -271,10 +319,8 @@ public class AddNodeWindow extends Window {
 
                                 return operation.getNextTask();
                             } else {
-                                operation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", operation.getDescription()));
                                 hideProgress();
-                                succeeded = true;
                                 if (nodeType == NodeType.DATA_NODE) {
                                     config.getDataNodes().add(agent);
                                     MongoDAO.saveMongoClusterInfo(config);
@@ -287,7 +333,6 @@ public class AddNodeWindow extends Window {
                                 }
                             }
                         } else {
-                            operation.setCompleted(true);
                             addOutput(String.format("Task %s failed", task.getDescription()));
                             addOutput(String.format("Operation %s failed", operation.getDescription()));
                             hideProgress();
@@ -302,34 +347,6 @@ public class AddNodeWindow extends Window {
         }
     }
 
-    private void runTimeoutThread(final Operation operation) {
-        try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(operation.getTotalTimeout() * 1000 + 5000);
-                        if (!operation.isCompleted()) {
-                            addOutput(String.format(
-                                    "Operation %s timed out!!!",
-                                    operation.getDescription()));
-                            hideProgress();
-                        }
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            operationTimeoutThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
-        }
-    }
-
     private void showProgress() {
         indicator.setVisible(true);
         ok.setEnabled(false);
@@ -338,10 +355,6 @@ public class AddNodeWindow extends Window {
     private void hideProgress() {
         indicator.setVisible(false);
         ok.setEnabled(true);
-    }
-
-    public boolean isSucceeded() {
-        return succeeded;
     }
 
     private void addOutput(String output) {
