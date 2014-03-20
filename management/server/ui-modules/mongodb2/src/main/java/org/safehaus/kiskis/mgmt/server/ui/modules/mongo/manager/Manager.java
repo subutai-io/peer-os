@@ -29,11 +29,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
@@ -43,9 +39,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window.DestroyNodeWindow;
 
 /**
  *
@@ -59,8 +54,6 @@ public class Manager {
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
-    private DestroyClusterWindow destroyWindow;
-    private AddNodeWindow addNodeWindow;
     private Config config;
 
     public Manager() {
@@ -145,7 +138,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        destroyWindow = new DestroyClusterWindow(config);
+                                        DestroyClusterWindow destroyWindow = new DestroyClusterWindow(config);
                                         MgmtApplication.addCustomWindow(destroyWindow);
                                         destroyWindow.addListener(new Window.CloseListener() {
 
@@ -174,7 +167,7 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    addNodeWindow = new AddNodeWindow(config);
+                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
                     MgmtApplication.addCustomWindow(addNodeWindow);
                     addNodeWindow.addListener(new Window.CloseListener() {
 
@@ -295,105 +288,18 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    progressIcon.setVisible(true);
-                    checkBtn.setEnabled(false);
-                    startBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    MongoModule.getExecutor().execute(new Runnable() {
 
-                        public void run() {
+                    DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, nodeType, agent);
+                    MgmtApplication.addCustomWindow(destroyNodeWindow);
+                    destroyNodeWindow.addListener(new Window.CloseListener() {
 
-                            if (nodeType == NodeType.CONFIG_NODE) {
-                                config.getConfigServers().remove(agent);
-                                //restart routers
-                                Task stopMongoTask = MongoModule.getTaskRunner().
-                                        executeTask(Tasks.getStopMongoTask(config.getRouterServers()));
-                                //don't check status of this task since this task always ends with execute_timeouted
-                                if (stopMongoTask.isCompleted()) {
-                                    Task startRoutersTask = MongoModule.getTaskRunner().
-                                            executeTask(Tasks.getStartRoutersTask2(config.getRouterServers(),
-                                                            config.getConfigServers(), config));
-                                    //don't check status of this task since this task always ends with execute_timeouted
-                                    if (startRoutersTask.isCompleted()) {
-                                        //check number of started routers
-                                        int numberOfRoutersRestarted = 0;
-                                        for (Map.Entry<UUID, Result> res : startRoutersTask.getResults().entrySet()) {
-                                            if (res.getValue().getStdOut().contains("child process started successfully, parent exiting")) {
-                                                numberOfRoutersRestarted++;
-                                            }
-                                        }
-                                        if (numberOfRoutersRestarted != config.getRouterServers().size()) {
-                                            show("Not all routers restarted. Use Terminal module to restart them");
-                                        }
-                                        //check routers state
-                                        checkNodesStatus(routersTable);
-                                    } else {
-                                        show("Could not restart routers. Use Terminal module to restart them");
-                                    }
-                                } else {
-                                    show("Could not restart routers. Use Terminal module to restart them");
-                                }
-
-                            } else if (nodeType == NodeType.DATA_NODE) {
-                                config.getDataNodes().remove(agent);
-                                //unregister from primary
-                                Task findPrimaryNodeTask = MongoModule.getTaskRunner().
-                                        executeTask(Tasks.getFindPrimaryNodeTask(agent, config));
-
-                                if (findPrimaryNodeTask.isCompleted()) {
-                                    Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                                    Matcher m = p.matcher(findPrimaryNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut());
-                                    Agent primaryNodeAgent = null;
-                                    if (m.find()) {
-                                        String primaryNodeHost = m.group(1);
-                                        if (!Util.isStringEmpty(primaryNodeHost)) {
-                                            String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
-                                            primaryNodeAgent = MongoModule.getAgentManager().getAgentByHostname(hostname);
-                                        }
-                                    }
-                                    if (primaryNodeAgent != null) {
-                                        if (primaryNodeAgent != agent) {
-                                            Task unregisterSecondaryNodeFromPrimaryTask
-                                                    = MongoModule.getTaskRunner().
-                                                    executeTask(
-                                                            Tasks.getUnregisterSecondaryFromPrimaryTask(
-                                                                    primaryNodeAgent, agent, config));
-                                            if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
-                                                show("Could not unregister this node from replica set, skipping...");
-                                            }
-                                        }
-                                    } else {
-                                        show("Could not determine primary node for unregistering from replica set, skipping...");
-                                    }
-                                } else {
-                                    show("Could not determine primary node for unregistering from replica set, skipping...");
-                                }
-
-                            } else if (nodeType == NodeType.ROUTER_NODE) {
-                                config.getRouterServers().remove(agent);
-                            }
-                            //destroy lxc
-                            Agent physicalAgent = MongoModule.getAgentManager().getAgentByHostname(agent.getParentHostName());
-                            if (physicalAgent == null) {
-                                show(
-                                        String.format("Could not determine physical parent of %s. Use LXC module to cleanup",
-                                                agent.getHostname()));
-                            } else {
-                                if (!MongoModule.getLxcManager().destroyLxcOnHost(physicalAgent, agent.getHostname())) {
-                                    show("Could not destroy lxc container. Use LXC module to cleanup");
-                                }
-                            }
-                            //update db
-                            if (!MongoDAO.saveMongoClusterInfo(config)) {
-                                show(String.format("Error while updating cluster info [%s] in DB. Check logs",
-                                        config.getClusterName()));
-                            }
-                            Table table = nodeType == NodeType.CONFIG_NODE ? configServersTable
-                                    : nodeType == NodeType.DATA_NODE ? dataNodesTable : routersTable;
-                            table.removeItem(rowId);
+                        @Override
+                        public void windowClose(Window.CloseEvent e) {
+                            //refresh clusters and show the current one again
+                            refreshClustersInfo();
                         }
                     });
+                    destroyNodeWindow.startOperation();
 
                 }
             });

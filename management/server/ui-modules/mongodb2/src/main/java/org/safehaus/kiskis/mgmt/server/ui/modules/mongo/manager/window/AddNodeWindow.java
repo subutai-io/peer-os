@@ -35,7 +35,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -49,7 +48,6 @@ public class AddNodeWindow extends Window {
     private static final Logger LOG = Logger.getLogger(AddNodeWindow.class.getName());
 
     private final TextArea outputTxtArea;
-    private final TextArea logTextArea;
     private final Button ok;
     private final Label indicator;
     private final Config config;
@@ -57,12 +55,13 @@ public class AddNodeWindow extends Window {
     public AddNodeWindow(final Config config) {
         super("Add New Node");
         setModal(true);
+        setClosable(false);
 
         this.config = config;
 
         setWidth(650, AddNodeWindow.UNITS_PIXELS);
 
-        GridLayout content = new GridLayout(10, 4);
+        GridLayout content = new GridLayout(10, 3);
         content.setSizeFull();
         content.setMargin(true);
         content.setSpacing(true);
@@ -111,14 +110,6 @@ public class AddNodeWindow extends Window {
 
         content.addComponent(outputTxtArea, 0, 1, 9, 1);
 
-        logTextArea = new TextArea("Node output");
-        logTextArea.setRows(13);
-        logTextArea.setColumns(43);
-        logTextArea.setImmediate(true);
-        logTextArea.setWordwrap(true);
-
-        content.addComponent(logTextArea, 0, 2, 9, 2);
-
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
@@ -134,8 +125,8 @@ public class AddNodeWindow extends Window {
             }
         });
 
-        content.addComponent(ok, 9, 3, 9, 3);
-        content.addComponent(indicator, 5, 3, 8, 3);
+        content.addComponent(ok, 9, 2, 9, 2);
+        content.addComponent(indicator, 5, 2, 8, 2);
         content.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
         content.setComponentAlignment(ok, Alignment.MIDDLE_LEFT);
 
@@ -236,15 +227,12 @@ public class AddNodeWindow extends Window {
 
     private void startOperation(final NodeType nodeType, final Agent agent) {
         try {
-            //stop any running installation
             final Operation operation
                     = (nodeType == NodeType.DATA_NODE)
                     ? new AddDataNodeOperation(config, agent)
                     : new AddRouterOperation(config, agent);
 
-            addOutput(String.format("Operation %s started", operation.getDescription()));
             addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
-            addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
 
             MongoModule.getTaskRunner().executeTask(operation.getNextTask(), new TaskCallback() {
 
@@ -294,28 +282,12 @@ public class AddNodeWindow extends Window {
                         }
                     }
 
-                    Agent responseAgent = MongoModule.getAgentManager().getAgentByUUID(response.getUuid());
-                    addLog(String.format("%s:\n%s\n%s",
-                            responseAgent != null
-                            ? responseAgent.getHostname() : String.format("Offline[%s]", response.getUuid()),
-                            Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
-                            Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
-
-                    if (Util.isFinalResponse(response)) {
-                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                            addLog(String.format("Exit code: %d", response.getExitCode()));
-                        } else {
-                            addLog("Command timed out");
-                        }
-                    }
-
                     if (task.isCompleted()) {
                         if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                             addOutput(String.format("Task %s succeeded", task.getDescription()));
 
                             if (operation.hasNextTask()) {
                                 addOutput(String.format("Running task %s", operation.peekNextTask().getDescription()));
-                                addLog(String.format("======= %s =======", operation.peekNextTask().getDescription()));
 
                                 return operation.getNextTask();
                             } else {
@@ -364,16 +336,6 @@ public class AddNodeWindow extends Window {
                             outputTxtArea.getValue(),
                             output));
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-        }
-    }
-
-    private void addLog(String log) {
-        if (!Util.isStringEmpty(log)) {
-            logTextArea.setValue(
-                    MessageFormat.format("{0}\n\n{1}",
-                            logTextArea.getValue(),
-                            log));
-            logTextArea.setCursorPosition(logTextArea.getValue().toString().length() - 1);
         }
     }
 

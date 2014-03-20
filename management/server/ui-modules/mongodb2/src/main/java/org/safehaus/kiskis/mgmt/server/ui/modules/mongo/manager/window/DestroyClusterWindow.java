@@ -44,6 +44,7 @@ public class DestroyClusterWindow extends Window {
     public DestroyClusterWindow(Config config) {
         super("Cluster uninstallation");
         setModal(true);
+        setClosable(false);
 
         this.config = config;
 

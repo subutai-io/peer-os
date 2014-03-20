@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -47,12 +48,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  * @todo remove unnecessary commands like uninstall prev mongo
- * @todo place properly process indicator here and in destroyNodeWindow (look to
- * destroyClusterWindow)
  * @todo show all config fields in manager UI
  * @todo all empty execute_response messages from agents shud be indicated as
  * RUNNING
- * @todo add window for destroy node operation
  *
  */
 public class InstallationStep extends Panel {
@@ -71,7 +69,7 @@ public class InstallationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout grid = new GridLayout(20, 10);
+        GridLayout grid = new GridLayout(10, 10);
         grid.setSizeFull();
         grid.setMargin(true);
 
@@ -81,7 +79,15 @@ public class InstallationStep extends Panel {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        grid.addComponent(outputTxtArea, 0, 0, 18, 3);
+        grid.addComponent(outputTxtArea, 0, 0, 9, 3);
+
+        logTextArea = new TextArea("Node output");
+        logTextArea.setSizeFull();
+        logTextArea.setRows(13);
+        logTextArea.setImmediate(true);
+        logTextArea.setWordwrap(true);
+
+        grid.addComponent(logTextArea, 0, 4, 9, 8);
 
         done = new Button("Done");
         done.setEnabled(false);
@@ -106,16 +112,10 @@ public class InstallationStep extends Panel {
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
         buttons.addComponent(done);
-        grid.addComponent(buttons, 0, 9, 5, 9);
-        grid.addComponent(indicator, 19, 0, 19, 0);
-
-        logTextArea = new TextArea("Node output");
-        logTextArea.setSizeFull();
-        logTextArea.setRows(13);
-        logTextArea.setImmediate(true);
-        logTextArea.setWordwrap(true);
-
-        grid.addComponent(logTextArea, 0, 4, 18, 8);
+        grid.addComponent(indicator, 0, 9, 3, 9);
+        grid.addComponent(buttons, 4, 9, 9, 9);
+        grid.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        grid.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
 
         addComponent(grid);
 
@@ -420,7 +420,6 @@ public class InstallationStep extends Panel {
         try {
 
             final Operation installOperation = new InstallClusterOperation(config);
-            addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
@@ -464,11 +463,13 @@ public class InstallationStep extends Panel {
                     }
 
                     Agent agent = MongoModule.getAgentManager().getAgentByUUID(response.getUuid());
-                    addLog(String.format("%s:\n%s\n%s",
+                    addLog(String.format("%s:\n%s",
                             agent != null
                             ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
-                            Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
-                            Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
+                            Util.isStringEmpty(response.getStdOut()) ? "running..." : response.getStdOut()
+                    )
+                            + (Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr())
+                    );
 
                     if (Util.isFinalResponse(response)) {
                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
