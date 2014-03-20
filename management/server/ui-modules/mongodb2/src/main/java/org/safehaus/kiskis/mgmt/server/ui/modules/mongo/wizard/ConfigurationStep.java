@@ -14,6 +14,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -31,18 +32,14 @@ public class ConfigurationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout grid = new GridLayout(10, 10);
-        grid.setSpacing(true);
-        grid.setMargin(true);
-        grid.setSizeFull();
-
-        Panel panel = new Panel();
-        Label menu = new Label("Please, specify installation settings");
-
-        menu.setContentMode(Label.CONTENT_XHTML);
-        panel.addComponent(menu);
-        grid.addComponent(menu, 0, 0, 1, 8);
-        grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
+        GridLayout layout = new GridLayout(2, 2);
+        layout.setSizeFull();
+        layout.setSpacing(true);
+        layout.setMargin(true);
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing(true);
+        layout.addComponent(new Label("Please, specify installation settings"));
+        layout.addComponent(content);
 
         final TextField clusterNameTxtFld = new TextField("Enter cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
@@ -56,7 +53,7 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        grid.addComponent(clusterNameTxtFld, 2, 0, 9, 0);
+        content.addComponent(clusterNameTxtFld);
 
         //configuration servers number
         ComboBox cfgSrvsCombo = new ComboBox("Choose number of configuration servers (Recommended 3 nodes)", Arrays.asList(1, 3));
@@ -72,7 +69,7 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfConfigServers((Integer) event.getProperty().getValue());
             }
         });
-        grid.addComponent(cfgSrvsCombo, 2, 1, 9, 1);
+        content.addComponent(cfgSrvsCombo);
 
         //routers number
         ComboBox routersCombo = new ComboBox("Choose number of routers ( At least 2 recommended)", Arrays.asList(1, 2, 3));
@@ -88,7 +85,7 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfRouters((Integer) event.getProperty().getValue());
             }
         });
-        grid.addComponent(routersCombo, 2, 2, 9, 2);
+        content.addComponent(routersCombo);
 
         //datanodes number
         ComboBox dataNodesCombo = new ComboBox("Choose number of datanodes", Arrays.asList(3, 5, 7));
@@ -104,7 +101,7 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfDataNodes((Integer) event.getProperty().getValue());
             }
         });
-        grid.addComponent(dataNodesCombo, 2, 3, 9, 3);
+        content.addComponent(dataNodesCombo);
 
         TextField replicaSetName = new TextField("Enter replica set name");
         replicaSetName.setInputPrompt(wizard.getConfig().getReplicaSetName());
@@ -119,7 +116,7 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        grid.addComponent(replicaSetName, 2, 4, 9, 4);
+        content.addComponent(replicaSetName);
 
         TextField cfgSrvPort = new TextField("Enter port for configuration servers");
         cfgSrvPort.setInputPrompt(wizard.getConfig().getCfgSrvPort() + "");
@@ -134,7 +131,7 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        grid.addComponent(cfgSrvPort, 2, 5, 9, 5);
+        content.addComponent(cfgSrvPort);
 
         TextField routerPort = new TextField("Enter port for routers");
         routerPort.setInputPrompt(wizard.getConfig().getRouterPort() + "");
@@ -149,7 +146,7 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        grid.addComponent(routerPort, 2, 6, 9, 6);
+        content.addComponent(routerPort);
 
         TextField dataNodePort = new TextField("Enter port for data nodes");
         dataNodePort.setInputPrompt(wizard.getConfig().getDataNodePort() + "");
@@ -164,7 +161,7 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        grid.addComponent(dataNodePort, 2, 7, 9, 7);
+        content.addComponent(dataNodePort);
 
         TextField domain = new TextField("Enter domain name");
         domain.setInputPrompt(wizard.getConfig().getDomainName());
@@ -179,7 +176,7 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        grid.addComponent(domain, 2, 8, 9, 8);
+        content.addComponent(domain);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -208,9 +205,9 @@ public class ConfigurationStep extends Panel {
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
         buttons.addComponent(next);
-        grid.addComponent(buttons, 0, 9, 2, 9);
+        layout.addComponent(buttons);
 
-        addComponent(grid);
+        addComponent(layout);
 
     }
 
