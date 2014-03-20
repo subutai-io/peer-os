@@ -49,8 +49,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  * @author dilshat
  * @todo remove unnecessary commands like uninstall prev mongo
  * @todo show all config fields in manager UI
- * @todo all empty execute_response messages from agents shud be indicated as
- * RUNNING
  *
  */
 public class InstallationStep extends Panel {

@@ -66,54 +66,6 @@ public class Commands {
         return req;
     }
 
-    //execute on each selected lxc node
-    public static Request getUninstallCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get");
-        req.setArgs(Arrays.asList(
-                "--force-yes",
-                "--assume-yes",
-                "purge",
-                "ksks-mongo"
-        ));
-        req.setTimeout(90);
-        return req;
-    }
-
-    //execute on each selected lxc node
-    public static Request getKillAllCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/pkill");
-        req.setArgs(Arrays.asList(
-                "-9",
-                "-f",
-                //                "'mongod|ksks-mongo|mongos'"
-                "'mongod|mongos'"
-        ));
-        req.setTimeout(30);
-        return req;
-    }
-
-    //execute on each selected lxc node
-    public static Request getCleanCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/bin/rm -R");
-        req.setArgs(Arrays.asList(
-                Constants.CONFIG_DIR,
-                "&",
-                "/bin/rm",
-                Constants.DATA_NODE_CONF_FILE,
-                "&",
-                "/bin/rm -R",
-                Constants.LOG_DIR
-        ));
-        req.setTimeout(30);
-        return req;
-    }
-
     //execute on each replica
     public static Request getSetReplicaSetNameCommand(String replicaSetName) {
 

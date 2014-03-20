@@ -79,7 +79,7 @@ public class AddNodeWindow extends Window {
         nodeTypeCombo.setWidth(150, Sizeable.UNITS_PIXELS);
 
         nodeTypeCombo.addItem(NodeType.ROUTER_NODE);
-        nodeTypeCombo.setItemCaption(NodeType.ROUTER_NODE, "Add Router Server");
+        nodeTypeCombo.setItemCaption(NodeType.ROUTER_NODE, "Add Router");
         nodeTypeCombo.addItem(NodeType.DATA_NODE);
         nodeTypeCombo.setItemCaption(NodeType.DATA_NODE, "Add Data Node");
         nodeTypeCombo.setValue(NodeType.DATA_NODE);

@@ -289,17 +289,29 @@ public class Manager {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
 
-                    DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, nodeType, agent);
-                    MgmtApplication.addCustomWindow(destroyNodeWindow);
-                    destroyNodeWindow.addListener(new Window.CloseListener() {
+                    MgmtApplication.showConfirmationDialog(
+                            "Node destruction confirmation",
+                            String.format("Do you want to destroy the %s node?", agent.getHostname()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
 
-                        @Override
-                        public void windowClose(Window.CloseEvent e) {
-                            //refresh clusters and show the current one again
-                            refreshClustersInfo();
-                        }
-                    });
-                    destroyNodeWindow.startOperation();
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+
+                                        DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, nodeType, agent);
+                                        MgmtApplication.addCustomWindow(destroyNodeWindow);
+                                        destroyNodeWindow.addListener(new Window.CloseListener() {
+
+                                            @Override
+                                            public void windowClose(Window.CloseEvent e) {
+                                                //refresh clusters and show the current one again
+                                                refreshClustersInfo();
+                                            }
+                                        });
+                                        destroyNodeWindow.startOperation();
+                                    }
+                                }
+                            });
 
                 }
             });
