@@ -102,7 +102,6 @@ public class DestroyClusterWindow extends Window {
         try {
             //stop any running installation
             final Operation installOperation = new UninstallClusterOperation(config);
-            runTimeoutThread(installOperation);
             showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
@@ -136,14 +135,12 @@ public class DestroyClusterWindow extends Window {
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
                                 return installOperation.getNextTask();
                             } else {
-                                installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
                                 hideProgress();
                                 MongoDAO.deleteMongoClusterInfo(config.getClusterName());
                                 succeeded = true;
                             }
                         } else {
-                            installOperation.setCompleted(true);
                             addOutput(String.format("Task %s failed", task.getDescription()));
                             addOutput(String.format("Operation %s failed", installOperation.getDescription()));
                             hideProgress();
@@ -155,34 +152,6 @@ public class DestroyClusterWindow extends Window {
             });
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in startOperation", e);
-        }
-    }
-
-    private void runTimeoutThread(final Operation operation) {
-        try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(operation.getTotalTimeout() * 1000 + 5000);
-                        if (!operation.isCompleted()) {
-                            addOutput(String.format(
-                                    "Operation %s timed out!!!",
-                                    operation.getDescription()));
-                            hideProgress();
-                        }
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            operationTimeoutThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
         }
     }
 

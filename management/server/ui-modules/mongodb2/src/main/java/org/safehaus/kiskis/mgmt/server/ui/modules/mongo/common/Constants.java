@@ -20,5 +20,6 @@ public class Constants {
     public static final String TABLE_STOP_PROPERTY = "Stop";
     public static final String TABLE_DESTROY_PROPERTY = "Destroy";
     public static final String TABLE_STATUS_PROPERTY = "Status";
+    public static final int LXC_AGENT_WAIT_TIMEOUT_SEC = 60;
 
 }

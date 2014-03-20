@@ -19,42 +19,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Tasks {
 
-    public static Task getKillRunningMongoTask(Set<Agent> agents) {
-        Task task = new Task("Kill running mongo");
-        for (Agent agent : agents) {
-            Request req = Commands.getKillAllCommand();
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
-        }
-        //ignore exit code
-        task.setIgnoreExitCode(true);
-        return task;
-    }
-
-    public static Task getUninstallMongoTask(Set<Agent> agents) {
-        Task task = new Task("Uninstall existing Mongo");
-        for (Agent agent : agents) {
-            Request req = Commands.getUninstallCommand();
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
-        }
-        //ignore exit code
-        task.setIgnoreExitCode(true);
-        return task;
-    }
-
-    public static Task getCleanMongoDataTask(Set<Agent> agents) {
-        Task task = new Task("Clean previous Mongo data");
-        for (Agent agent : agents) {
-            Request req = Commands.getCleanCommand();
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
-        }
-        //ignore exit code
-        task.setIgnoreExitCode(true);
-        return task;
-    }
-
     public static Task getAptGetUpdateTask(Set<Agent> agents) {
         Task task = new Task("Apt-get update");
         for (Agent agent : agents) {

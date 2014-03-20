@@ -176,4 +176,8 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
         return task;
     }
 
+    public void executeTaskNForget(Task task) {
+        executeTask(task, null);
+    }
+
 }

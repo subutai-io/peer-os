@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager;
 
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window.AddNodeWindow;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window.DestroyClusterWindow;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.CheckStatusCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.callback.StopNodeCallback;
@@ -27,11 +29,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
@@ -41,10 +39,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window.DestroyNodeWindow;
 
 /**
  *
@@ -54,17 +50,18 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 public class Manager {
 
     private final VerticalLayout contentRoot;
-    private final AgentManager agentManager;
     private final ComboBox clusterCombo;
     private final Table configServersTable;
     private final Table routersTable;
     private final Table dataNodesTable;
-    private DestroyClusterWindow destroyWindow;
-    private AddNodeWindow addNodeWindow;
+    private final Label replicaSetName;
+    private final Label domainName;
+    private final Label cfgSrvPort;
+    private final Label routerPort;
+    private final Label dataNodePort;
     private Config config;
 
     public Manager() {
-        agentManager = MongoModule.getAgentManager();
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
@@ -82,14 +79,14 @@ public class Manager {
         //tables go here
         configServersTable = createTableTemplate("Config Servers", 150);
         routersTable = createTableTemplate("Query Routers", 150);
-        dataNodesTable = createTableTemplate("Data Nodes", 270);
+        dataNodesTable = createTableTemplate("Data Nodes", 200);
         //tables go here
 
-        Label clusterNameLabel = new Label("Select the cluster");
-        content.addComponent(clusterNameLabel);
+        HorizontalLayout controlsContent = new HorizontalLayout();
+        controlsContent.setSpacing(true);
 
-        HorizontalLayout topContent = new HorizontalLayout();
-        topContent.setSpacing(true);
+        Label clusterNameLabel = new Label("Select the cluster");
+        controlsContent.addComponent(clusterNameLabel);
 
         clusterCombo = new ComboBox();
         clusterCombo.setMultiSelect(false);
@@ -105,7 +102,7 @@ public class Manager {
             }
         });
 
-        topContent.addComponent(clusterCombo);
+        controlsContent.addComponent(clusterCombo);
 
         Button refreshClustersBtn = new Button("Refresh clusters");
         refreshClustersBtn.addListener(new Button.ClickListener() {
@@ -116,7 +113,7 @@ public class Manager {
             }
         });
 
-        topContent.addComponent(refreshClustersBtn);
+        controlsContent.addComponent(refreshClustersBtn);
 
         Button checkAllBtn = new Button("Check all");
         checkAllBtn.addListener(new Button.ClickListener() {
@@ -130,7 +127,7 @@ public class Manager {
 
         });
 
-        topContent.addComponent(checkAllBtn);
+        controlsContent.addComponent(checkAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -146,16 +143,16 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        destroyWindow = new DestroyClusterWindow(config);
-                                        MgmtApplication.addCustomWindow(destroyWindow);
-                                        destroyWindow.addListener(new Window.CloseListener() {
+                                        DestroyClusterWindow destroyClusterWindow = new DestroyClusterWindow(config);
+                                        MgmtApplication.addCustomWindow(destroyClusterWindow);
+                                        destroyClusterWindow.addListener(new Window.CloseListener() {
 
                                             @Override
                                             public void windowClose(Window.CloseEvent e) {
                                                 refreshClustersInfo();
                                             }
                                         });
-                                        destroyWindow.startOperation();
+                                        destroyClusterWindow.startOperation();
                                     }
                                 }
                             });
@@ -166,7 +163,7 @@ public class Manager {
 
         });
 
-        topContent.addComponent(destroyClusterBtn);
+        controlsContent.addComponent(destroyClusterBtn);
 
         Button addNodeBtn = new Button("Add New Node");
 
@@ -175,17 +172,14 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    addNodeWindow = new AddNodeWindow(
-                            config, MongoModule.getTaskRunner());
+                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
                     MgmtApplication.addCustomWindow(addNodeWindow);
                     addNodeWindow.addListener(new Window.CloseListener() {
 
                         @Override
                         public void windowClose(Window.CloseEvent e) {
                             //refresh clusters and show the current one again
-                            if (addNodeWindow.isSucceeded()) {
-                                refreshClustersInfo();
-                            }
+                            refreshClustersInfo();
                         }
                     });
                 } else {
@@ -194,18 +188,35 @@ public class Manager {
             }
         });
 
-        topContent.addComponent(addNodeBtn);
+        controlsContent.addComponent(addNodeBtn);
 
-        content.addComponent(topContent);
+        content.addComponent(controlsContent);
 
-        HorizontalLayout midContent = new HorizontalLayout();
-        midContent.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        HorizontalLayout configContent = new HorizontalLayout();
+        configContent.setSpacing(true);
 
-        midContent.addComponent(configServersTable);
+        replicaSetName = new Label();
+        domainName = new Label();
+        cfgSrvPort = new Label();
+        routerPort = new Label();
+        dataNodePort = new Label();
 
-        midContent.addComponent(routersTable);
+        configContent.addComponent(new Label("Replica Set:"));
+        configContent.addComponent(replicaSetName);
+        configContent.addComponent(new Label("Domain:"));
+        configContent.addComponent(domainName);
+        configContent.addComponent(new Label("Config server port:"));
+        configContent.addComponent(cfgSrvPort);
+        configContent.addComponent(new Label("Router port:"));
+        configContent.addComponent(routerPort);
+        configContent.addComponent(new Label("Data node port:"));
+        configContent.addComponent(dataNodePort);
 
-        content.addComponent(midContent);
+        content.addComponent(configContent);
+
+        content.addComponent(configServersTable);
+
+        content.addComponent(routersTable);
 
         content.addComponent(dataNodesTable);
 
@@ -299,105 +310,30 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    progressIcon.setVisible(true);
-                    checkBtn.setEnabled(false);
-                    startBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    MongoModule.getExecutor().execute(new Runnable() {
 
-                        public void run() {
+                    MgmtApplication.showConfirmationDialog(
+                            "Node destruction confirmation",
+                            String.format("Do you want to destroy the %s node?", agent.getHostname()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
 
-                            if (nodeType == NodeType.CONFIG_NODE) {
-                                config.getConfigServers().remove(agent);
-                                //restart routers
-                                Task stopMongoTask = MongoModule.getTaskRunner().
-                                        executeTask(Tasks.getStopMongoTask(config.getRouterServers()));
-                                //don't check status of this task since this task always ends with execute_timeouted
-                                if (stopMongoTask.isCompleted()) {
-                                    Task startRoutersTask = MongoModule.getTaskRunner().
-                                            executeTask(Tasks.getStartRoutersTask2(config.getRouterServers(),
-                                                            config.getConfigServers(), config));
-                                    //don't check status of this task since this task always ends with execute_timeouted
-                                    if (startRoutersTask.isCompleted()) {
-                                        //check number of started routers
-                                        int numberOfRoutersRestarted = 0;
-                                        for (Map.Entry<UUID, Result> res : startRoutersTask.getResults().entrySet()) {
-                                            if (res.getValue().getStdOut().contains("child process started successfully, parent exiting")) {
-                                                numberOfRoutersRestarted++;
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+
+                                        DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, nodeType, agent);
+                                        MgmtApplication.addCustomWindow(destroyNodeWindow);
+                                        destroyNodeWindow.addListener(new Window.CloseListener() {
+
+                                            @Override
+                                            public void windowClose(Window.CloseEvent e) {
+                                                //refresh clusters and show the current one again
+                                                refreshClustersInfo();
                                             }
-                                        }
-                                        if (numberOfRoutersRestarted != config.getRouterServers().size()) {
-                                            show("Not all routers restarted. Use Terminal module to restart them");
-                                        }
-                                        //check routers state
-                                        checkNodesStatus(routersTable);
-                                    } else {
-                                        show("Could not restart routers. Use Terminal module to restart them");
+                                        });
+                                        destroyNodeWindow.startOperation();
                                     }
-                                } else {
-                                    show("Could not restart routers. Use Terminal module to restart them");
                                 }
-
-                            } else if (nodeType == NodeType.DATA_NODE) {
-                                config.getDataNodes().remove(agent);
-                                //unregister from primary
-                                Task findPrimaryNodeTask = MongoModule.getTaskRunner().
-                                        executeTask(Tasks.getFindPrimaryNodeTask(agent, config));
-
-                                if (findPrimaryNodeTask.isCompleted()) {
-                                    Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                                    Matcher m = p.matcher(findPrimaryNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut());
-                                    Agent primaryNodeAgent = null;
-                                    if (m.find()) {
-                                        String primaryNodeHost = m.group(1);
-                                        if (!Util.isStringEmpty(primaryNodeHost)) {
-                                            String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
-                                            primaryNodeAgent = agentManager.getAgentByHostname(hostname);
-                                        }
-                                    }
-                                    if (primaryNodeAgent != null) {
-                                        if (primaryNodeAgent != agent) {
-                                            Task unregisterSecondaryNodeFromPrimaryTask
-                                                    = MongoModule.getTaskRunner().
-                                                    executeTask(
-                                                            Tasks.getUnregisterSecondaryFromPrimaryTask(
-                                                                    primaryNodeAgent, agent, config));
-                                            if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
-                                                show("Could not unregister this node from replica set, skipping...");
-                                            }
-                                        }
-                                    } else {
-                                        show("Could not determine primary node for unregistering from replica set, skipping...");
-                                    }
-                                } else {
-                                    show("Could not determine primary node for unregistering from replica set, skipping...");
-                                }
-
-                            } else if (nodeType == NodeType.ROUTER_NODE) {
-                                config.getRouterServers().remove(agent);
-                            }
-                            //destroy lxc
-                            Agent physicalAgent = MongoModule.getAgentManager().getAgentByHostname(agent.getParentHostName());
-                            if (physicalAgent == null) {
-                                show(
-                                        String.format("Could not determine physical parent of %s. Use LXC module to cleanup",
-                                                agent.getHostname()));
-                            } else {
-                                if (!MongoModule.getLxcManager().destroyLxcOnHost(physicalAgent, agent.getHostname())) {
-                                    show("Could not destroy lxc container. Use LXC module to cleanup");
-                                }
-                            }
-                            //update db
-                            if (!MongoDAO.saveMongoClusterInfo(config)) {
-                                show(String.format("Error while updating cluster info [%s] in DB. Check logs",
-                                        config.getClusterName()));
-                            }
-                            Table table = nodeType == NodeType.CONFIG_NODE ? configServersTable
-                                    : nodeType == NodeType.DATA_NODE ? dataNodesTable : routersTable;
-                            table.removeItem(rowId);
-                        }
-                    });
+                            });
 
                 }
             });
@@ -409,10 +345,20 @@ public class Manager {
             populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
             populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
             populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
+            replicaSetName.setValue(config.getReplicaSetName());
+            domainName.setValue(config.getDomainName());
+            cfgSrvPort.setValue(config.getCfgSrvPort());
+            routerPort.setValue(config.getRouterPort());
+            dataNodePort.setValue(config.getDataNodePort());
         } else {
             configServersTable.removeAllItems();
             routersTable.removeAllItems();
             dataNodesTable.removeAllItems();
+            replicaSetName.setValue("");
+            domainName.setValue("");
+            cfgSrvPort.setValue("");
+            routerPort.setValue("");
+            dataNodePort.setValue("");
         }
     }
 
@@ -424,7 +370,7 @@ public class Manager {
             for (Config mongoClusterInfo : mongoClusterInfos) {
                 clusterCombo.addItem(mongoClusterInfo);
                 clusterCombo.setItemCaption(mongoClusterInfo,
-                        String.format("Name: %s RS: %s", mongoClusterInfo.getClusterName(), mongoClusterInfo.getReplicaSetName()));
+                        mongoClusterInfo.getClusterName());
             }
             if (clusterInfo != null) {
                 for (Config mongoClusterInfo : mongoClusterInfos) {
