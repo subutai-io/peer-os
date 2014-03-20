@@ -69,9 +69,9 @@ public class InstallationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout grid = new GridLayout(10, 10);
-        grid.setSizeFull();
-        grid.setMargin(true);
+        GridLayout content = new GridLayout(1, 3);
+        content.setSizeFull();
+        content.setMargin(true);
 
         outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setSizeFull();
@@ -79,7 +79,7 @@ public class InstallationStep extends Panel {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        grid.addComponent(outputTxtArea, 0, 0, 9, 3);
+        content.addComponent(outputTxtArea);
 
         logTextArea = new TextArea("Node output");
         logTextArea.setSizeFull();
@@ -87,7 +87,7 @@ public class InstallationStep extends Panel {
         logTextArea.setImmediate(true);
         logTextArea.setWordwrap(true);
 
-        grid.addComponent(logTextArea, 0, 4, 9, 8);
+        content.addComponent(logTextArea);
 
         done = new Button("Done");
         done.setEnabled(false);
@@ -115,10 +115,10 @@ public class InstallationStep extends Panel {
         bottomContent.addComponent(back);
         bottomContent.addComponent(done);
         bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
-        grid.addComponent(bottomContent, 0, 9, 9, 9);
-        grid.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
+        content.addComponent(bottomContent);
+        content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
 
-        addComponent(grid);
+        addComponent(content);
 
     }
 
