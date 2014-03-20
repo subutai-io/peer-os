@@ -59,9 +59,9 @@ public class AddNodeWindow extends Window {
 
         this.config = config;
 
-        setWidth(650, AddNodeWindow.UNITS_PIXELS);
+        setWidth(600, AddNodeWindow.UNITS_PIXELS);
 
-        GridLayout content = new GridLayout(10, 3);
+        GridLayout content = new GridLayout(1, 3);
         content.setSizeFull();
         content.setMargin(true);
         content.setSpacing(true);
@@ -69,7 +69,7 @@ public class AddNodeWindow extends Window {
         HorizontalLayout topContent = new HorizontalLayout();
         topContent.setSpacing(true);
 
-        content.addComponent(topContent, 0, 0, 9, 0);
+        content.addComponent(topContent);
 
         final ComboBox nodeTypeCombo = new ComboBox();
         nodeTypeCombo.setMultiSelect(false);
@@ -108,12 +108,10 @@ public class AddNodeWindow extends Window {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea, 0, 1, 9, 1);
+        content.addComponent(outputTxtArea);
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
-
-        content.setComponentAlignment(indicator, Alignment.TOP_RIGHT);
 
         ok = new Button("Ok");
         ok.addListener(new Button.ClickListener() {
@@ -125,10 +123,13 @@ public class AddNodeWindow extends Window {
             }
         });
 
-        content.addComponent(ok, 9, 2, 9, 2);
-        content.addComponent(indicator, 5, 2, 8, 2);
-        content.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
-        content.setComponentAlignment(ok, Alignment.MIDDLE_LEFT);
+        HorizontalLayout bottomContent = new HorizontalLayout();
+        bottomContent.addComponent(indicator);
+        bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        bottomContent.addComponent(ok);
+
+        content.addComponent(bottomContent);
+        content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
 
         addComponent(content);
     }

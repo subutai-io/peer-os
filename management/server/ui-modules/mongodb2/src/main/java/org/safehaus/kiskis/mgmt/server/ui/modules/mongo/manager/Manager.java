@@ -138,16 +138,16 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        DestroyClusterWindow destroyWindow = new DestroyClusterWindow(config);
-                                        MgmtApplication.addCustomWindow(destroyWindow);
-                                        destroyWindow.addListener(new Window.CloseListener() {
+                                        DestroyClusterWindow destroyClusterWindow = new DestroyClusterWindow(config);
+                                        MgmtApplication.addCustomWindow(destroyClusterWindow);
+                                        destroyClusterWindow.addListener(new Window.CloseListener() {
 
                                             @Override
                                             public void windowClose(Window.CloseEvent e) {
                                                 refreshClustersInfo();
                                             }
                                         });
-                                        destroyWindow.startOperation();
+                                        destroyClusterWindow.startOperation();
                                     }
                                 }
                             });

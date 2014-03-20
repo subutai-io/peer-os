@@ -110,13 +110,13 @@ public class InstallationStep extends Panel {
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(indicator);
-        buttons.addComponent(back);
-        buttons.addComponent(done);
-        buttons.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
-        grid.addComponent(buttons, 0, 9, 9, 9);
-        grid.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
+        HorizontalLayout bottomContent = new HorizontalLayout();
+        bottomContent.addComponent(indicator);
+        bottomContent.addComponent(back);
+        bottomContent.addComponent(done);
+        bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        grid.addComponent(bottomContent, 0, 9, 9, 9);
+        grid.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
 
         addComponent(grid);
 

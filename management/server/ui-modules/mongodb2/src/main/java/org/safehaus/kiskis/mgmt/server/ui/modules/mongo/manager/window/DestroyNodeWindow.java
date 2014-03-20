@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.manager.window;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
@@ -54,9 +55,9 @@ public class DestroyNodeWindow extends Window {
         this.nodeType = nodeType;
         this.agent = agent;
 
-        setWidth(650, DestroyNodeWindow.UNITS_PIXELS);
+        setWidth(600, DestroyNodeWindow.UNITS_PIXELS);
 
-        GridLayout content = new GridLayout(10, 2);
+        GridLayout content = new GridLayout(1, 2);
         content.setSizeFull();
         content.setMargin(true);
         content.setSpacing(true);
@@ -67,7 +68,8 @@ public class DestroyNodeWindow extends Window {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea, 0, 0, 9, 0);
+        content.addComponent(outputTxtArea);
+
         ok = new Button("Ok");
         ok.addListener(new Button.ClickListener() {
 
@@ -81,10 +83,13 @@ public class DestroyNodeWindow extends Window {
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
         indicator.setVisible(false);
 
-        content.addComponent(ok, 9, 1, 9, 1);
-        content.addComponent(indicator, 5, 1, 8, 1);
-        content.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
-        content.setComponentAlignment(ok, Alignment.MIDDLE_LEFT);
+        HorizontalLayout bottomContent = new HorizontalLayout();
+        bottomContent.addComponent(indicator);
+        bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        bottomContent.addComponent(ok);
+
+        content.addComponent(bottomContent);
+        content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
 
         addComponent(content);
     }
