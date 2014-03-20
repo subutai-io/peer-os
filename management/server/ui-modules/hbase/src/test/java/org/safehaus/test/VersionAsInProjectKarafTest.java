@@ -36,4 +36,7 @@ public class VersionAsInProjectKarafTest {
     public void test() throws Exception {
         assertTrue(true);
     }
+    
+    
+    
 }
