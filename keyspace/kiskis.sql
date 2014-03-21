@@ -32,11 +32,9 @@ log text,
 PRIMARY KEY (id)
 );
 
-
 create table product_operation(
 	id uuid,
 	in_date timeuuid,
-	state text,
-	log text,
+	info text,
 	PRIMARY KEY(id, in_date)
 )with CLUSTERING ORDER BY (in_date DESC);
