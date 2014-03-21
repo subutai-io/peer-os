@@ -153,7 +153,7 @@ public class DbManagerImpl implements DbManager {
 
     public ProductOperation getProductOperation(UUID operationTrackId) {
         try {
-            ResultSet rs = executeQuery("select from product_operation where id = ?", operationTrackId);
+            ResultSet rs = executeQuery("select info from product_operation where id = ?", operationTrackId);
             Row row = rs.one();
             if (row != null) {
                 String info = row.getString("info");

@@ -25,7 +25,7 @@ public interface Mongo {
     public List<Config> getClusters();
 
     /**
-     * Installs cluster according to specified configuration
+     * Installs cluster according to the specified configuration
      *
      * @param config - cluster configuration
      * @return - UUID of operation to track
