@@ -18,6 +18,7 @@
         <module>core</module>
         <module>ui</module>
         <module>ui-modules</module>
+        <module>products</module>
         <!--<module>test_api</module>-->
         <!--<module>test_impl</module>-->
         <!--<module>server-cli</module>-->

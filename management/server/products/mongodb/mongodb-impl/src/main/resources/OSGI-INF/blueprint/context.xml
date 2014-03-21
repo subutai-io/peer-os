@@ -6,12 +6,16 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>  
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>          
+               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>        
+    <reference id="lxcManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>         
         
-    <bean id="mongo-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.mongodb.MongoImpl">
+    <bean id="mongo-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.mongodb.MongoImpl"
+          init-method="init" destroy-method="destroy">
         <property name="taskRunner" ref="taskRunner" />
         <property name="agentManager" ref="agentManager" />
         <property name="dbManager" ref="dbManager" />
+        <property name="lxcManager" ref="lxcManager"/>
     </bean>
     
     <service ref="mongo-impl" interface="org.safehaus.kiskis.mgmt.server.api.mongodb.Mongo"/>

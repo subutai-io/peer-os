@@ -5,6 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.server.api.mongodb;
 
+import java.util.List;
+import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+
 /**
  *
  * @author dilshat
@@ -12,88 +17,78 @@ package org.safehaus.kiskis.mgmt.server.api.mongodb;
 public interface Mongo {
 
     /**
-     * Returns list of configurations of installed clusters in form of json
-     * array string
+     * Returns list of configurations of installed clusters
      *
-     * @return - json array of existing clusters e.g. [ {clusterName: 'test',
-     * replicaSetName:'repl' domain:'intra.lan', dbPath: '/data/db', configFile:
-     * '/etc/mongodb.conf', logFile: '/var/log/mongodb/mongodb.log',
-     * configServerPort:27019, routerPort:27018, dataNodePort:27017,
-     * configServers:['py151503651-lxc-mongo1','py151503651-lxc-mongo2','py151503651-lxc-mongo3'],
-     * routers: ['py151503651-lxc-mongo4','py151503651-lxc-mongo5'],
-     * dataNodes:['py151503651-lxc-mongo6','py151503651-lxc-mongo7','py151503651-lxc-mongo8']
-     * } ]
+     * @return - list of configurations of installed clusters
      *
      */
-    public String getClusters();
+    public List<Config> getClusters();
 
     /**
-     * Installs cluster according to specified configuration in json format
+     * Installs cluster according to specified configuration
      *
-     * @param config - specifies cluster configuration e.g. {
-     * clusterName:'test', replicaSetName:'repl', numberOfConfigServers:3,
-     * numberOfRouters:2, numberOfDataNodes:5, domain:'intra.lan', dbPath:
-     * '/data/db', configFile: '/etc/mongodb.conf', logFile:
-     * '/var/log/mongodb/mongodb.log', configServerPort:27019, routerPort:27018,
-     * dataNodePort:27017 }
-     *
-     * NOTICE: this will be used when we have dynamic lxc placement feature, for
-     * now the config will look like the getClusters' config of one cluster
-     *
-     * @return - status of installation e.g. {clusterName:'test', status:
-     * 'SUCCESS|FAILURE', error:'Cluster with name "test" already exists'}
+     * @param config - cluster configuration
+     * @return - UUID of operation to track
      *
      */
-    public String installCluster(String config);
+    public UUID installCluster(Config config);
 
     /**
      * Uninstalls the specified cluster
      *
-     * @param config - specifies cluster configuration e.g. { clusterName:'test'
-     * }
-     *
-     * @return - status of uninstallation e.g. {clusterName:'test', status:
-     * 'SUCCESS|FAILURE', error:'Cluster not found'}
+     * @param config - cluster configuration
+     * @return - UUID of operation to track
      *
      */
-    public String uninstallCluster(String config);
+    public UUID uninstallCluster(Config config);
+
+    /**
+     * adds node to the specified cluster
+     *
+     * @param config - cluster configuration
+     * @param nodeType - type of node to add
+     * @return - UUID of operation to track
+     *
+     */
+    public UUID addNode(Config config, NodeType nodeType);
+
+    /**
+     * destroys node in the specified cluster
+     *
+     * @param config - cluster configuration
+     * @param agent - agent of node
+     * @return - UUID of operation to track
+     *
+     */
+    public UUID destroyNode(Config config, Agent agent);
 
     /**
      * Starts the specified node
      *
-     * @param config - specifies cluster and node to perform status check on
-     * e.g. { clusterName:'test', nodeHostname: 'py151503651-lxc-mongo2' }
-     *
-     * @return - json string specifying status of the node e.g.
-     * {clusterName:'test', nodeHostname: 'py151503651-lxc-mongo2', status:
-     * 'STARTED|STOPPED|UNKNOWN', error:'mongo not found' }
+     * @param config - cluster configuration
+     * @param agent - agent of node
+     * @return - result of operation true - success, false - failure
      *
      */
-    public String startNode(String config);
+    public boolean startNode(Config config, Agent node);
 
     /**
      * Stops the specified node
      *
-     * @param config - specifies cluster and node to perform status check on
-     * e.g. { clusterName:'test', nodeHostname: 'py151503651-lxc-mongo2' }
-     *
-     * @return - json string specifying status of the node e.g.
-     * {clusterName:'test', nodeHostname: 'py151503651-lxc-mongo2', status:
-     * 'STARTED|STOPPED|UNKNOWN', error:'mongo not found' }
+     * @param config - cluster configuration
+     * @param agent - agent of node
+     * @return - result of operation true - success, false - failure
      *
      */
-    public String stopNode(String config);
+    public boolean stopNode(Config config, Agent node);
 
     /**
      * Checks status of the specified node
      *
-     * @param config - specifies cluster and node to perform status check on
-     * e.g. { clusterName:'test', nodeHostname: 'py151503651-lxc-mongo2' }
-     *
-     * @return - json string specifying status of the node e.g.
-     * {clusterName:'test', nodeHostname: 'py151503651-lxc-mongo2', status:
-     * 'STARTED|STOPPED|UNKNOWN', error:'mongo not found' }
+     * @param config - cluster configuration
+     * @param agent - agent of node
+     * @return - node state
      *
      */
-    public String checkNode(String config);
+    public NodeState checkNode(Config config, Agent node);
 }

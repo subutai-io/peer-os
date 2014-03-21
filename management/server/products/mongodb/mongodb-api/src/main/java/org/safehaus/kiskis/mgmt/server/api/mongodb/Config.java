@@ -5,7 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.server.api.mongodb;
 
-import java.util.List;
+import java.util.Set;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  *
@@ -15,24 +16,99 @@ public class Config {
 
     private String clusterName;
     private String replicaSetName;
-    private String domain;
-    private String dbPath;
-    private String configFile;
-    private String logFile;
-    private Integer configServerPort;
-    private Integer routerPort;
-    private Integer dataNodePort;
+    private String domainName;
+    private int numberOfConfigServers;
+    private int numberOfRouters;
+    private int numberOfDataNodes;
+    private int cfgSrvPort;
+    private int routerPort;
+    private int dataNodePort;
 
-    private List<String> dataNodes;
-    private List<String> configServers;
-    private List<String> routers;
+    private Set<Agent> configServers;
+    private Set<Agent> routerServers;
+    private Set<Agent> dataNodes;
 
-    public List<String> getDataNodes() {
-        return dataNodes;
+    public Config() {
+        reset();
     }
 
-    public void setDataNodes(List<String> dataNodes) {
-        this.dataNodes = dataNodes;
+    public final void reset() {
+        configServers = null;
+        routerServers = null;
+        dataNodes = null;
+        clusterName = "";
+        replicaSetName = "repl";
+        domainName = "intra.lan";
+        numberOfConfigServers = 3;
+        numberOfRouters = 2;
+        numberOfDataNodes = 3;
+        cfgSrvPort = 27019;
+        routerPort = 27018;
+        dataNodePort = 27017;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public int getCfgSrvPort() {
+        return cfgSrvPort;
+    }
+
+    public void setCfgSrvPort(int cfgSrvPort) {
+        this.cfgSrvPort = cfgSrvPort;
+    }
+
+    public int getRouterPort() {
+        return routerPort;
+    }
+
+    public void setRouterPort(int routerPort) {
+        this.routerPort = routerPort;
+    }
+
+    public int getDataNodePort() {
+        return dataNodePort;
+    }
+
+    public void setDataNodePort(int dataNodePort) {
+        this.dataNodePort = dataNodePort;
+    }
+
+    public int getNumberOfConfigServers() {
+        return numberOfConfigServers;
+    }
+
+    public void setNumberOfConfigServers(int numberOfConfigServers) {
+        this.numberOfConfigServers = numberOfConfigServers;
+    }
+
+    public int getNumberOfRouters() {
+        return numberOfRouters;
+    }
+
+    public void setNumberOfRouters(int numberOfRouters) {
+        this.numberOfRouters = numberOfRouters;
+    }
+
+    public int getNumberOfDataNodes() {
+        return numberOfDataNodes;
+    }
+
+    public void setNumberOfDataNodes(int numberOfDataNodes) {
+        this.numberOfDataNodes = numberOfDataNodes;
+    }
+
+    public String getReplicaSetName() {
+        return replicaSetName;
+    }
+
+    public void setReplicaSetName(String replicaSetName) {
+        this.replicaSetName = replicaSetName;
     }
 
     public String getClusterName() {
@@ -43,81 +119,33 @@ public class Config {
         this.clusterName = clusterName;
     }
 
-    public List<String> getConfigServers() {
+    public Set<Agent> getConfigServers() {
         return configServers;
     }
 
-    public void setConfigServers(List<String> configServers) {
+    public void setConfigServers(Set<Agent> configServers) {
         this.configServers = configServers;
     }
 
-    public List<String> getRouters() {
-        return routers;
+    public Set<Agent> getRouterServers() {
+        return routerServers;
     }
 
-    public void setRouters(List<String> routers) {
-        this.routers = routers;
+    public void setRouterServers(Set<Agent> routerServers) {
+        this.routerServers = routerServers;
     }
 
-    public String getDomain() {
-        return domain;
+    public Set<Agent> getDataNodes() {
+        return dataNodes;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public String getDbPath() {
-        return dbPath;
-    }
-
-    public void setDbPath(String dbPath) {
-        this.dbPath = dbPath;
-    }
-
-    public String getConfigFile() {
-        return configFile;
-    }
-
-    public void setConfigFile(String configFile) {
-        this.configFile = configFile;
-    }
-
-    public String getLogFile() {
-        return logFile;
-    }
-
-    public void setLogFile(String logFile) {
-        this.logFile = logFile;
-    }
-
-    public Integer getConfigServerPort() {
-        return configServerPort;
-    }
-
-    public void setConfigServerPort(Integer configServerPort) {
-        this.configServerPort = configServerPort;
-    }
-
-    public Integer getRouterPort() {
-        return routerPort;
-    }
-
-    public void setRouterPort(Integer routerPort) {
-        this.routerPort = routerPort;
-    }
-
-    public Integer getDataNodePort() {
-        return dataNodePort;
-    }
-
-    public void setDataNodePort(Integer dataNodePort) {
-        this.dataNodePort = dataNodePort;
+    public void setDataNodes(Set<Agent> dataNodes) {
+        this.dataNodes = dataNodes;
     }
 
     @Override
     public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", domain=" + domain + ", dbPath=" + dbPath + ", configFile=" + configFile + ", logFile=" + logFile + ", configServerPort=" + configServerPort + ", routerPort=" + routerPort + ", dataNodePort=" + dataNodePort + ", dataNodes=" + dataNodes + ", configServers=" + configServers + ", routers=" + routers + '}';
+        return "ClusterConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", domainName=" + domainName + ", numberOfConfigServers=" + numberOfConfigServers + ", numberOfRouters=" + numberOfRouters + ", numberOfDataNodes=" + numberOfDataNodes + ", cfgSrvPort=" + cfgSrvPort + ", routerPort=" + routerPort + ", dataNodePort=" + dataNodePort + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + '}';
     }
 
 }

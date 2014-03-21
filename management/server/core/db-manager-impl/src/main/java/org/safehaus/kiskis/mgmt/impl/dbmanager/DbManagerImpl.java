@@ -13,13 +13,16 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
 
 /**
  *
@@ -84,11 +87,11 @@ public class DbManagerImpl implements DbManager {
             return session.execute(boundStatement);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in executeQuery", ex);
-            return null;
         }
+        return null;
     }
 
-    public void executeUpdate(String cql, Object... values) {
+    public boolean executeUpdate(String cql, Object... values) {
         try {
             PreparedStatement stmt = statements.get(cql);
             if (stmt == null) {
@@ -100,25 +103,32 @@ public class DbManagerImpl implements DbManager {
                 boundStatement.bind(values);
             }
             session.execute(boundStatement);
+            return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in executeUpdate", ex);
         }
+        return false;
     }
 
-    public void saveInfo(String source, String key, Object info) {
-        executeUpdate("insert into product_info(source,key,info) values (?,?,?)",
+    public boolean saveInfo(String source, String key, Object info) {
+        return executeUpdate("insert into product_info(source,key,info) values (?,?,?)",
                 source,
                 key,
                 gson.toJson(info));
     }
 
     public <T> T getInfo(String source, String key, Class<T> clazz) {
-        ResultSet rs = executeQuery("select info from product_info where source = ? and key = ?", source, key);
-        Row row = rs.one();
-        if (row != null) {
+        try {
 
-            String info = row.getString("info");
-            return gson.fromJson(info, clazz);
+            ResultSet rs = executeQuery("select info from product_info where source = ? and key = ?", source, key);
+            Row row = rs.one();
+            if (row != null) {
+
+                String info = row.getString("info");
+                return gson.fromJson(info, clazz);
+            }
+        } catch (JsonSyntaxException ex) {
+            LOG.log(Level.SEVERE, "Error in T getInfo", ex);
         }
         return null;
     }
@@ -131,15 +141,33 @@ public class DbManagerImpl implements DbManager {
                 String info = row.getString("info");
                 list.add(gson.fromJson(info, clazz));
             }
-        } catch (Exception e) {
-            LOG.info(e.getMessage());
-            return null;
+        } catch (JsonSyntaxException ex) {
+            LOG.log(Level.SEVERE, "Error in List<T> getInfo", ex);
         }
         return list;
     }
 
-    public void deleteInfo(String source, String key) {
-        executeUpdate("delete from product_info where source = ? and key = ?", source, key);
+    public boolean deleteInfo(String source, String key) {
+        return executeUpdate("delete from product_info where source = ? and key = ?", source, key);
+    }
+
+    public ProductOperation getProductOperation(UUID operationTrackId) {
+        try {
+            ResultSet rs = executeQuery("select from product_operation where id = ?", operationTrackId);
+            Row row = rs.one();
+            if (row != null) {
+                String info = row.getString("info");
+                return gson.fromJson(info, ProductOperation.class);
+            }
+        } catch (JsonSyntaxException ex) {
+            LOG.log(Level.SEVERE, "Error in getProductOperation", ex);
+        }
+        return null;
+    }
+
+    public boolean saveProductOperation(ProductOperation operation) {
+        return executeUpdate("insert into product_operation(id,in_date,info) values(?,now(),?)",
+                operation.getId(), gson.toJson(operation));
     }
 
 }
