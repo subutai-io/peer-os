@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.shared.protocol.enums;
+package org.safehaus.kiskis.mgmt.impl.mongodb;
 
 /**
  *
  * @author dilshat
  */
-public enum NodeState {
+public enum TaskType {
 
-    STOPPED, RUNNING, UNKNOWN
+    START_CONFIG_SERVERS, START_ROUTERS, START_REPLICA_SET, FIND_PRIMARY_NODE, RESTART_ROUTERS
 }
