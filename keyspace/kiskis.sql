@@ -33,8 +33,8 @@ PRIMARY KEY (id)
 );
 
 CREATE TABLE product_operation (
-  id uuid,
-  in_date timestamp,
+  source text,
+  id uuid ,
   info text,
-  PRIMARY KEY (id, in_date)
-) WITH CLUSTERING ORDER BY (in_date DESC)
+  PRIMARY KEY (source, id)
+) ;
