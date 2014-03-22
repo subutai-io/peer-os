@@ -16,11 +16,13 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
@@ -28,6 +30,7 @@ import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
+import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
 
 /**
  *
@@ -48,7 +51,7 @@ public class Manager {
     private final Label dataNodePort;
     private Config config;
 
-    public Manager() {
+    public Manager(final Tracker tracker, final TabSheet tabSheet) {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
@@ -130,16 +133,9 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-//                                        DestroyClusterWindow destroyClusterWindow = new DestroyClusterWindow(config);
-//                                        MgmtApplication.addCustomWindow(destroyClusterWindow);
-//                                        destroyClusterWindow.addListener(new Window.CloseListener() {
-//
-//                                            @Override
-//                                            public void windowClose(Window.CloseEvent e) {
-//                                                refreshClustersInfo();
-//                                            }
-//                                        });
-//                                        destroyClusterWindow.startOperation();
+                                        UUID operationID = MongoUI.getMongoManager().uninstallCluster(config);
+                                        tracker.setTrackId(operationID);
+                                        tabSheet.setSelectedTab(tracker.getContent());
                                     }
                                 }
                             });
@@ -222,7 +218,8 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (final Agent agent : agents) {
+        for (Iterator it = agents.iterator(); it.hasNext();) {
+            final Agent agent = (Agent) it.next();
 
             final Button checkBtn = new Button("Check");
             final Button startBtn = new Button("Start");
@@ -247,24 +244,26 @@ public class Manager {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
 
+                    progressIcon.setVisible(true);
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
                     MongoUI.getExecutor().execute(new Runnable() {
 
                         public void run() {
-                            progressIcon.setVisible(true);
-                            startBtn.setEnabled(false);
-                            stopBtn.setEnabled(false);
-                            destroyBtn.setEnabled(false);
 
                             NodeState state = MongoUI.getMongoManager().checkNode(config, agent);
 
-                            if (state == NodeState.RUNNING) {
-                                stopBtn.setEnabled(true);
-                            } else if (state == NodeState.STOPPED) {
-                                startBtn.setEnabled(true);
+                            synchronized (progressIcon) {
+                                if (state == NodeState.RUNNING) {
+                                    stopBtn.setEnabled(true);
+                                } else if (state == NodeState.STOPPED) {
+                                    startBtn.setEnabled(true);
+                                }
+                                destroyBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
                             }
-                            destroyBtn.setEnabled(true);
-
-                            progressIcon.setVisible(false);
                         }
                     });
                 }
@@ -274,22 +273,27 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+
+                    progressIcon.setVisible(true);
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
                     MongoUI.getExecutor().execute(new Runnable() {
 
                         public void run() {
-                            progressIcon.setVisible(true);
-                            startBtn.setEnabled(false);
-                            stopBtn.setEnabled(false);
-                            destroyBtn.setEnabled(false);
 
                             boolean result = MongoUI.getMongoManager().startNode(config, agent);
-                            if (result) {
-                                stopBtn.setEnabled(true);
-                            } else {
-                                startBtn.setEnabled(true);
+
+                            synchronized (progressIcon) {
+                                if (result) {
+                                    stopBtn.setEnabled(true);
+                                } else {
+                                    startBtn.setEnabled(true);
+                                }
+                                destroyBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
                             }
-                            destroyBtn.setEnabled(true);
-                            progressIcon.setVisible(false);
                         }
                     });
                 }
@@ -299,22 +303,27 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+
+                    progressIcon.setVisible(true);
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
                     MongoUI.getExecutor().execute(new Runnable() {
 
                         public void run() {
-                            progressIcon.setVisible(true);
-                            startBtn.setEnabled(false);
-                            stopBtn.setEnabled(false);
-                            destroyBtn.setEnabled(false);
 
                             boolean result = MongoUI.getMongoManager().stopNode(config, agent);
-                            if (result) {
-                                startBtn.setEnabled(true);
-                            } else {
-                                stopBtn.setEnabled(true);
+
+                            synchronized (progressIcon) {
+                                if (result) {
+                                    startBtn.setEnabled(true);
+                                } else {
+                                    stopBtn.setEnabled(true);
+                                }
+                                destroyBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
                             }
-                            destroyBtn.setEnabled(true);
-                            progressIcon.setVisible(false);
                         }
                     });
                 }

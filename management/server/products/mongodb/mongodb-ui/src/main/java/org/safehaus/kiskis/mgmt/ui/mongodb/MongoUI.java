@@ -81,7 +81,7 @@ public class MongoUI implements Module {
             mongoSheet.setSizeFull();
             tracker = new Tracker();
             wizard = new Wizard(tracker, mongoSheet);
-            manager = new Manager();
+            manager = new Manager(tracker, mongoSheet);
             mongoSheet.addTab(wizard.getContent(), "Install");
             mongoSheet.addTab(manager.getContent(), "Manage");
             mongoSheet.addTab(tracker.getContent(), trackerTabName);
