@@ -115,7 +115,8 @@ public class MongoImpl implements Mongo {
 
     public UUID installCluster(final Config config) {
         final ProductOperation po
-                = dbManager.createProductOperation(String.format("Installing cluster %s", config.getClusterName()));
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Installing cluster %s", config.getClusterName()));
         if (po == null) {
             return null;
         }
@@ -429,7 +430,8 @@ public class MongoImpl implements Mongo {
 
     public UUID addNode(final Config config, final NodeType nodeType) {
         final ProductOperation po
-                = dbManager.createProductOperation(String.format("Adding %s to %s", nodeType, config.getClusterName()));
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Adding %s to %s", nodeType, config.getClusterName()));
 
         if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7) {
             po.addLogFailed("Replica set cannot have more than 7 members.\nOperation aborted");
@@ -595,7 +597,8 @@ public class MongoImpl implements Mongo {
 
     public UUID uninstallCluster(final Config config) {
         final ProductOperation po
-                = dbManager.createProductOperation(String.format("Destroying cluster %s", config.getClusterName()));
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Destroying cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -647,7 +650,8 @@ public class MongoImpl implements Mongo {
     public UUID destroyNode(final Config config, final Agent agent) {
         final NodeType nodeType = getNodeType(config, agent);
         final ProductOperation po
-                = dbManager.createProductOperation(String.format("Destroying %s in %s", nodeType, config.getClusterName()));
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Destroying %s in %s", nodeType, config.getClusterName()));
         if (nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1) {
             po.addLogFailed("This is the last configuration server in the cluster. Please, destroy cluster instead\n.Operation aborted");
         } else if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1) {
