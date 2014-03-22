@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation;
 
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -6,7 +6,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.HadoopConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.InstallHadoopOperation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;

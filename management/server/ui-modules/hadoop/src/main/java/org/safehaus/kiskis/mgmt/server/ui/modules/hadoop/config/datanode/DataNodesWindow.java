@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.datanode;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
@@ -11,19 +11,21 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
+import java.util.regex.Pattern;
+
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus.SUCCESS;
 
-public final class TaskTrackersWindow extends Window {
+public final class DataNodesWindow extends Window {
 
     private Button startButton, stopButton, restartButton;
     private Label indicator, statusLabel;
-    private TaskTrackersTable taskTrackersTable;
-
+    private DataNodesTable dataNodesTable;
+    
     private final HadoopClusterInfo cluster;
 
-    public TaskTrackersWindow(String clusterName) {
+    public DataNodesWindow(String clusterName) {        
         setModal(true);
-        setCaption("Hadoop Job Tracker Configuration");
+        setCaption("Hadoop Data Node Configuration");
 
         this.cluster = HadoopDAO.getHadoopClusterInfo(clusterName);
         getStatusLabel();
@@ -53,7 +55,7 @@ public final class TaskTrackersWindow extends Window {
 
         getStatus();
     }
-
+    
     private Button getStartButton() {
         startButton = new Button("Start");
         startButton.setEnabled(false);
@@ -66,7 +68,7 @@ public final class TaskTrackersWindow extends Window {
                 statusLabel.setValue("");
                 indicator.setVisible(true);
 
-                HadoopModule.getTaskRunner().executeTask(Tasks.getJobTrackerCommand(cluster, "start"), new TaskCallback() {
+                HadoopModule.getTaskRunner().executeTask(Tasks.getNameNodeCommand(cluster, "start"), new TaskCallback() {
                     @Override
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (task.isCompleted()) {
@@ -94,7 +96,7 @@ public final class TaskTrackersWindow extends Window {
                 statusLabel.setValue("");
                 indicator.setVisible(true);
 
-                HadoopModule.getTaskRunner().executeTask(Tasks.getJobTrackerCommand(cluster, "stop"), new TaskCallback() {
+                HadoopModule.getTaskRunner().executeTask(Tasks.getNameNodeCommand(cluster, "stop"), new TaskCallback() {
                     @Override
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (task.isCompleted()) {
@@ -122,7 +124,7 @@ public final class TaskTrackersWindow extends Window {
                 statusLabel.setValue("");
                 indicator.setVisible(true);
 
-                HadoopModule.getTaskRunner().executeTask(Tasks.getJobTrackerCommand(cluster, "restart"), new TaskCallback() {
+                HadoopModule.getTaskRunner().executeTask(Tasks.getNameNodeCommand(cluster, "restart"), new TaskCallback() {
                     @Override
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (task.isCompleted()) {
@@ -158,7 +160,7 @@ public final class TaskTrackersWindow extends Window {
         statusLabel.setValue("");
         indicator.setVisible(true);
 
-        HadoopModule.getTaskRunner().executeTask(Tasks.getJobTrackerCommand(cluster, "status"), new TaskCallback() {
+        HadoopModule.getTaskRunner().executeTask(Tasks.getNameNodeCommand(cluster, "status"), new TaskCallback() {
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
@@ -171,7 +173,7 @@ public final class TaskTrackersWindow extends Window {
                             disableButtons(2);
                         }
                         indicator.setVisible(false);
-                        taskTrackersTable.refreshDataSource();
+                        dataNodesTable.refreshDataSource();
                     }
                 }
 
@@ -198,18 +200,20 @@ public final class TaskTrackersWindow extends Window {
         return indicator;
     }
 
-    private TaskTrackersTable getTable() {
-        taskTrackersTable = new TaskTrackersTable(cluster.getClusterName());
+    private DataNodesTable getTable() {
+        dataNodesTable = new DataNodesTable(cluster.getClusterName());
 
-        return taskTrackersTable;
+        return dataNodesTable;
     }
 
     private String parseStatus(String response) {
         String[] array = response.split("\n");
 
         for (String status : array) {
-            if (status.contains("JobTracker")) {
-                return status.replaceAll("JobTracker is ", "");
+            if (status.contains("NameNode")) {
+                return status.
+                        replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
+                        replaceAll("NameNode is ", "");
             }
         }
 

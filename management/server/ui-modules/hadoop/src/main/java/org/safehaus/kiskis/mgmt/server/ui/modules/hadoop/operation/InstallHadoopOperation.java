@@ -14,6 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 public class InstallHadoopOperation extends Operation {
     private final HadoopConfig config;
 
+
     public InstallHadoopOperation(HadoopConfig config) {
         super("Install Hadoop cluster");
 
@@ -42,4 +43,6 @@ public class InstallHadoopOperation extends Operation {
 
         addTask(Tasks.getSetSSHTask(config.getAllNodes()));
     }
+
+
 }

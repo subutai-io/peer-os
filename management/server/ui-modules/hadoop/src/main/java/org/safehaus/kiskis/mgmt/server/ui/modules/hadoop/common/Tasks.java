@@ -2,7 +2,6 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;
@@ -15,6 +14,52 @@ import java.util.UUID;
  * Created with IntelliJ IDEA. User: daralbaev Date: 1/31/14 Time: 8:24 PM
  */
 public class Tasks {
+
+    public static Task removeClusterTask(HadoopClusterInfo cluster){
+        Task task = new Task("Remove hadoop deb packages");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getNameNode().getUuid().toString());
+        Request request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+        task.addRequest(request);
+
+        map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getSecondaryNameNode().getUuid().toString());
+        request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+        task.addRequest(request);
+
+        map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+        task.addRequest(request);
+
+        for (Agent agent : cluster.getDataNodes()) {
+            if (agent != null) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+
+                request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+                task.addRequest(request);
+            }
+        }
+
+        for (Agent agent : cluster.getTaskTrackers()) {
+            if (agent != null) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+
+                request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+                task.addRequest(request);
+            }
+        }
+
+        return task;
+    }
 
     public static Task getInstallTask(List<Agent> agents) {
         Task task = new Task("Setup hadoop deb packages");

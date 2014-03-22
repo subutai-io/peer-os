@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.datanode;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Task;

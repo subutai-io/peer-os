@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,6 +21,25 @@ public class Commands {
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
             "\t      \"--force-yes\",\"--assume-yes\",\"install\",\"ksks-hadoop\"\n" +
+            "\t    ],\n" +
+            "\t    \"timeout\": 180\n" +
+            "\t  }\n" +
+            "\t}";
+
+    public static final String PURGE_DEB = "{\n" +
+            "\t  \"command\": {\n" +
+            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
+            "\t    \"source\": :source,\n" +
+            "\t    \"uuid\": :uuid,\n" +
+            "\t    \"taskUuid\": :taskUuid,\n" +
+            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
+            "\t    \"workingDirectory\": \"/\",\n" +
+            "\t    \"program\": \"/usr/bin/apt-get\",\n" +
+            "\t    \"stdOut\": \"RETURN\",\n" +
+            "\t    \"stdErr\": \"RETURN\",\n" +
+            "\t    \"runAs\": \"root\",\n" +
+            "\t    \"args\": [\n" +
+            "\t      \"--force-yes\",\"--assume-yes\",\"purge\",\"ksks-hadoop\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +
