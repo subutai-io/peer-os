@@ -16,7 +16,6 @@
         <module>terminal</module>
         <module>lxc</module>
         <module>hadoop</module>
-        <module>mongodb2</module>
         <module>cassandra</module>
         <module>pig</module>
         <module>hbase</module>
