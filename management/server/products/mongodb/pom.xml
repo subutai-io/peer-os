@@ -17,5 +17,6 @@
     <modules>
         <module>mongodb-api</module>
         <module>mongodb-impl</module>
+	<module>mongodb-ui</module>
     </modules>
 </project>

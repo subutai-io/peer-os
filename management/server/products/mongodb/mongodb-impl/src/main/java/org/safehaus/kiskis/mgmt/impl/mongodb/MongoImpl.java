@@ -41,9 +41,9 @@ import org.safehaus.kiskis.mgmt.impl.mongodb.lxc.LxcInfo;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddDataNodeOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddRouterOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
-import org.safehaus.kiskis.mgmt.server.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.server.api.mongodb.Mongo;
-import org.safehaus.kiskis.mgmt.server.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
+import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -65,7 +65,7 @@ public class MongoImpl implements Mongo {
     private static LxcManager lxcManager;
     private static ExecutorService executor;
 
-    public static void setLxcManager(LxcManager lxcManager) {
+    public void setLxcManager(LxcManager lxcManager) {
         MongoImpl.lxcManager = lxcManager;
     }
 
@@ -115,19 +115,26 @@ public class MongoImpl implements Mongo {
 
     public UUID installCluster(final Config config) {
         final ProductOperation po
-                = new ProductOperation(
-                        String.format("Installing cluster %s", config.getClusterName()),
-                        dbManager);
+                = dbManager.createProductOperation(String.format("Installing cluster %s", config.getClusterName()));
+        if (po == null) {
+            return null;
+        }
 
         executor.execute(new Runnable() {
 
             public void run() {
 
+                //check if mongo cluster with the same name already exists
+                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
+                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
+                    return;
+                }
+
                 //perform lxc container installation and bootstrap here
                 Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
 
                 if (bestServers.isEmpty()) {
-                    po.addLog("No servers available to accommodate new lxc containers\nInstallation aborted");
+                    po.addLogFailed("No servers available to accommodate new lxc containers\nInstallation aborted");
                 } else {
 
                     //check number if available lxc slots
@@ -139,7 +146,7 @@ public class MongoImpl implements Mongo {
                     }
 
                     if (numOfAvailableLxcSlots < numberOfLxcsNeeded) {
-                        po.addLog(String.format("Only %s lxc containers can be created\nInstallation aborted", numOfAvailableLxcSlots));
+                        po.addLogFailed(String.format("Only %s lxc containers can be created\nInstallation aborted", numOfAvailableLxcSlots));
 
                     } else {
                         //clone lxc containers
@@ -173,20 +180,20 @@ public class MongoImpl implements Mongo {
                                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                                         installMongoCluster(config, po);
                                     } else {
-                                        po.addLog("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+                                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
 
                                     }
                                 } else {
-                                    po.addLog("Waiting timeout for lxc agents to connect is up. Giving up!. Use LXC module to cleanup\nInstallation aborted");
+                                    po.addLogFailed("Waiting timeout for lxc agents to connect is up. Giving up!. Use LXC module to cleanup\nInstallation aborted");
 
                                 }
 
                             } else {
-                                po.addLog("Starting of lxc containers failed. Use LXC module to cleanup\nInstallation aborted");
+                                po.addLogFailed("Starting of lxc containers failed. Use LXC module to cleanup\nInstallation aborted");
 
                             }
                         } else {
-                            po.addLog("Cloning of lxc containers failed. Use LXC module to cleanup\nInstallation aborted");
+                            po.addLogFailed("Cloning of lxc containers failed. Use LXC module to cleanup\nInstallation aborted");
 
                         }
 
@@ -248,12 +255,11 @@ public class MongoImpl implements Mongo {
                             po.addLog(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
                             return installOperation.getNextTask();
                         } else {
-                            po.addLog(String.format("Operation %s completed", installOperation.getDescription()));
+                            po.addLogDone(String.format("Operation %s completed", installOperation.getDescription()));
 
                         }
                     } else {
-                        po.addLog(String.format("Task %s failed", task.getDescription()));
-                        po.addLog(String.format("Operation %s failed", installOperation.getDescription()));
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed", task.getDescription(), installOperation.getDescription()));
 
                     }
                 }
@@ -423,12 +429,10 @@ public class MongoImpl implements Mongo {
 
     public UUID addNode(final Config config, final NodeType nodeType) {
         final ProductOperation po
-                = new ProductOperation(
-                        String.format("Adding %s to %s", nodeType, config.getClusterName()),
-                        dbManager);
+                = dbManager.createProductOperation(String.format("Adding %s to %s", nodeType, config.getClusterName()));
 
         if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7) {
-            po.addLog("Replica set cannot have more than 7 members");
+            po.addLogFailed("Replica set cannot have more than 7 members.\nOperation aborted");
         } else {
             executor.execute(new Runnable() {
 
@@ -436,7 +440,7 @@ public class MongoImpl implements Mongo {
                     Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
 
                     if (bestServers.isEmpty()) {
-                        po.addLog("No servers available to accommodate new lxc containers");
+                        po.addLogFailed("No servers available to accommodate new lxc containers.\nOperation aborted");
 
                         return;
                     }
@@ -458,8 +462,8 @@ public class MongoImpl implements Mongo {
                     }
                     boolean result = lxcManager.cloneLxcOnHost(physicalAgent, lxcHostname.toString());
                     if (!result) {
-                        po.addLog(String.format(
-                                "Cloning of lxc container %s failed. Use LXC module to cleanup. Operation aborted",
+                        po.addLogFailed(String.format(
+                                "Cloning of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
                                 lxcHostname.toString()));
 
                         return;
@@ -472,8 +476,8 @@ public class MongoImpl implements Mongo {
                     //start lxc
                     result = lxcManager.startLxcOnHost(physicalAgent, lxcHostname.toString());
                     if (!result) {
-                        po.addLog(String.format(
-                                "Starting of lxc container %s failed. Use LXC module to cleanup. Operation aborted",
+                        po.addLogFailed(String.format(
+                                "Starting of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
                                 lxcHostname.toString()));
 
                         return;
@@ -485,7 +489,7 @@ public class MongoImpl implements Mongo {
                     //wait for the new lxc agent to connect
                     Agent lxcAgent = waitLxcAgent(lxcHostname.toString());
                     if (lxcAgent == null) {
-                        po.addLog("Waiting timeout for lxc agent to connect is up. Giving up!. Use LXC module to cleanup");
+                        po.addLogFailed("Waiting timeout for lxc agent to connect is up. Giving up!. Use LXC module to cleanup.\nOperation aborted");
 
                         return;
                     }
@@ -574,15 +578,13 @@ public class MongoImpl implements Mongo {
                                 config.getRouterServers().add(agent);
                             }
                             if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                                po.addLog("Cluster info update in DB");
+                                po.addLogDone("Cluster info updated in DB\nDone");
                             } else {
-                                po.addLog("Error while updating cluster info in DB. Check logs");
+                                po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
                             }
                         }
                     } else {
-                        po.addLog(String.format("Task %s failed", task.getDescription()));
-                        po.addLog(String.format("Operation %s failed", operation.getDescription()));
-
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed", task.getDescription(), operation.getDescription()));
                     }
                 }
 
@@ -593,9 +595,8 @@ public class MongoImpl implements Mongo {
 
     public UUID uninstallCluster(final Config config) {
         final ProductOperation po
-                = new ProductOperation(
-                        String.format("Destroying cluster %s", config.getClusterName()),
-                        dbManager);
+                = dbManager.createProductOperation(String.format("Destroying cluster %s", config.getClusterName()));
+
         executor.execute(new Runnable() {
 
             public void run() {
@@ -611,7 +612,7 @@ public class MongoImpl implements Mongo {
                         po.addLog(String.format("Destroying lxc %s", agent.getHostname()));
                         Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
                         if (physicalAgent == null) {
-                            po.addLog(String.format("Could not determine physical parent of %s. Use LXC module to cleanup", agent.getHostname()));
+                            po.addLogFailed(String.format("Could not determine physical parent of %s. Use LXC module to cleanup\nOperation aborted", agent.getHostname()));
                         } else {
                             tasks++;
                             completer.submit(new LxcActor(new LxcInfo(physicalAgent, agent.getHostname()), lxcManager, LxcAction.DESTROY));
@@ -630,12 +631,12 @@ public class MongoImpl implements Mongo {
                 if (result) {
                     po.addLog("Lxc containers successfully destroyed");
                 } else {
-                    po.addLog("Not all lxc containers destroyed. Use LXC module to cleanup");
+                    po.addLog("Not all lxc containers destroyed. Use LXC module to cleanup, skipping...");
                 }
                 if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
-                    po.addLog("Cluster info deleted from DB");
+                    po.addLogDone("Cluster info deleted from DB\nDone");
                 } else {
-                    po.addLog("Error while deleting cluster info from DB. Check logs");
+                    po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
                 }
             }
         });
@@ -646,15 +647,13 @@ public class MongoImpl implements Mongo {
     public UUID destroyNode(final Config config, final Agent agent) {
         final NodeType nodeType = getNodeType(config, agent);
         final ProductOperation po
-                = new ProductOperation(
-                        String.format("Destroying %s in %s", nodeType, config.getClusterName()),
-                        dbManager);
+                = dbManager.createProductOperation(String.format("Destroying %s in %s", nodeType, config.getClusterName()));
         if (nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1) {
-            po.addLog("This is the last configuration server in the cluster. Please, destroy cluster instead\n.Operation aborted");
+            po.addLogFailed("This is the last configuration server in the cluster. Please, destroy cluster instead\n.Operation aborted");
         } else if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1) {
-            po.addLog("This is the last data node in the cluster. Please, destroy cluster instead\n.Operation aborted");
+            po.addLogFailed("This is the last data node in the cluster. Please, destroy cluster instead\n.Operation aborted");
         } else if (nodeType == NodeType.ROUTER_NODE && config.getRouterServers().size() == 1) {
-            po.addLog("This is the last router in the cluster. Please, destroy cluster instead\n.Operation aborted");
+            po.addLogFailed("This is the last router in the cluster. Please, destroy cluster instead\n.Operation aborted");
         } else {
             //go on operation
             executor.execute(new Runnable() {
@@ -681,14 +680,14 @@ public class MongoImpl implements Mongo {
                                     }
                                 }
                                 if (numberOfRoutersRestarted != config.getRouterServers().size()) {
-                                    po.addLog("Not all routers restarted. Use Terminal module to restart them");
+                                    po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
                                 }
 
                             } else {
-                                po.addLog("Could not restart routers. Use Terminal module to restart them");
+                                po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
                             }
                         } else {
-                            po.addLog("Could not restart routers. Use Terminal module to restart them");
+                            po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
                         }
 
                     } else if (nodeType == NodeType.DATA_NODE) {
@@ -735,20 +734,21 @@ public class MongoImpl implements Mongo {
                     Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
                     if (physicalAgent == null) {
                         po.addLog(
-                                String.format("Could not determine physical parent of %s. Use LXC module to cleanup",
+                                String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
                                         agent.getHostname()));
                     } else {
                         if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
-                            po.addLog("Could not destroy lxc container. Use LXC module to cleanup");
+                            po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
                         }
                     }
                     //update db
                     po.addLog("Updating db...");
                     if (!dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                        po.addLog(String.format("Error while updating cluster info [%s] in DB. Check logs",
+                        po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
                                 config.getClusterName()));
+                    } else {
+                        po.addLogDone("Done");
                     }
-                    po.addLog("Done");
                 }
             });
         }

@@ -18,6 +18,6 @@
         <property name="lxcManager" ref="lxcManager"/>
     </bean>
     
-    <service ref="mongo-impl" interface="org.safehaus.kiskis.mgmt.server.api.mongodb.Mongo"/>
+    <service ref="mongo-impl" interface="org.safehaus.kiskis.mgmt.api.mongodb.Mongo"/>
     
 </blueprint>

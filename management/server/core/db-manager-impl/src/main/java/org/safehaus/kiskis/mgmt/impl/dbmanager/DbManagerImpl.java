@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
 
 /**
  *
@@ -151,13 +152,17 @@ public class DbManagerImpl implements DbManager {
         return executeUpdate("delete from product_info where source = ? and key = ?", source, key);
     }
 
-    public ProductOperation getProductOperation(UUID operationTrackId) {
+    public ProductOperationView getProductOperation(UUID operationTrackId) {
         try {
             ResultSet rs = executeQuery("select info from product_operation where id = ?", operationTrackId);
             Row row = rs.one();
             if (row != null) {
                 String info = row.getString("info");
-                return gson.fromJson(info, ProductOperation.class);
+                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
+                if (po != null) {
+                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
+                    return productOperationViewImpl;
+                }
             }
         } catch (JsonSyntaxException ex) {
             LOG.log(Level.SEVERE, "Error in getProductOperation", ex);
@@ -165,9 +170,18 @@ public class DbManagerImpl implements DbManager {
         return null;
     }
 
-    public boolean saveProductOperation(ProductOperation operation) {
-        return executeUpdate("insert into product_operation(id,in_date,info) values(?,now(),?)",
-                operation.getId(), gson.toJson(operation));
+    boolean saveProductOperation(ProductOperationImpl po) {
+        return executeUpdate(
+                "insert into product_operation(id,in_date,info) values(?,now(),?)",
+                po.getId(), gson.toJson(po));
+    }
+
+    public ProductOperation createProductOperation(String description) {
+        ProductOperationImpl po = new ProductOperationImpl(description, this);
+        if (saveProductOperation(po)) {
+            return po;
+        }
+        return null;
     }
 
 }

@@ -10,8 +10,8 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.server.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.server.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 

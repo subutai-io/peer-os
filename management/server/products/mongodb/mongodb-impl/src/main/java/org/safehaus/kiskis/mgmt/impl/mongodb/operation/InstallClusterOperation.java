@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
-import org.safehaus.kiskis.mgmt.server.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**

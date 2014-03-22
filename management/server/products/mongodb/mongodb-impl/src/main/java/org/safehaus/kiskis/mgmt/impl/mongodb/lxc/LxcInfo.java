@@ -5,7 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.mongodb.lxc;
 
-import org.safehaus.kiskis.mgmt.server.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**

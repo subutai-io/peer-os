@@ -11,7 +11,7 @@ import java.util.UUID;
  *
  * @author dilshat
  */
-public interface ProductOperation {
+public interface ProductOperationView {
 
     public String getDescription();
 
@@ -20,10 +20,4 @@ public interface ProductOperation {
     public String getLog();
 
     public ProductOperationState getState();
-
-    public void addLog(String logString);
-
-    public void addLogDone(String logString);
-
-    public void addLogFailed(String logString);
 }

@@ -1,0 +1,74 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.safehaus.kiskis.mgmt.impl.dbmanager;
+
+import java.util.UUID;
+import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+
+/**
+ *
+ * @author dilshat
+ */
+public class ProductOperationImpl implements ProductOperation {
+
+    private final UUID id;
+    private final String description;
+    private final transient DbManagerImpl dbManager;
+    private final StringBuilder log;
+    private ProductOperationState state;
+
+    public ProductOperationImpl(String description, DbManagerImpl dbManager) {
+        this.description = description;
+        this.dbManager = dbManager;
+        log = new StringBuilder();
+        state = ProductOperationState.RUNNING;
+        id = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
+    }
+
+    public String getLog() {
+        return log.toString();
+    }
+
+    public void addLog(String logString) {
+        addLog(logString, state);
+    }
+
+    public void addLogDone(String logString) {
+        addLog(logString, ProductOperationState.SUCCEEDED);
+    }
+
+    public void addLogFailed(String logString) {
+        addLog(logString, ProductOperationState.FAILED);
+    }
+
+    private void addLog(String logString, ProductOperationState state) {
+        if (!Util.isStringEmpty(logString)) {
+
+            if (log.length() > 0) {
+                log.append("\n");
+            }
+            log.append(logString);
+        }
+        this.state = state;
+        dbManager.saveProductOperation(this);
+    }
+
+    public ProductOperationState getState() {
+        return state;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+}

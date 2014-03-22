@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb.common;
 
 import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.server.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
