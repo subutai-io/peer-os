@@ -15,7 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 public class Config {
 
     public static final String PRODUCT_KEY = "MongoDB";
-    private String clusterName;
+    private String clusterName = "";
     private String replicaSetName = "repl";
     private String domainName = "intra.lan";
     private int numberOfConfigServers = 3;
