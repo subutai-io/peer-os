@@ -70,6 +70,7 @@ public class Tracker {
 
     private Table createTableTemplate(String caption, int height) {
         Table table = new Table(caption);
+        table.addContainerProperty("Date", String.class, null);
         table.addContainerProperty("Operation", String.class, null);
         table.addContainerProperty("Check", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
@@ -156,6 +157,7 @@ public class Tracker {
                 });
 
                 operationsTable.addItem(new Object[]{
+                    po.getCreateDate(),
                     po.getDescription(),
                     trackLogsBtn,
                     progressIcon},

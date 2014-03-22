@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.dbmanager;
 
+import java.util.Date;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
@@ -20,12 +21,14 @@ public class ProductOperationViewImpl implements ProductOperationView {
     private final String description;
     private final String log;
     private final ProductOperationState state;
+    private final Date createDate;
 
     public ProductOperationViewImpl(ProductOperation po) {
         id = po.getId();
         description = po.getDescription();
         log = po.getLog();
         state = po.getState();
+        createDate = po.createDate();
     }
 
     public UUID getId() {
@@ -63,6 +66,10 @@ public class ProductOperationViewImpl implements ProductOperationView {
             return false;
         }
         return true;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
     }
 
 }

@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.dbmanager;
 
+import java.util.Date;
 import java.util.UUID;
 import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
@@ -22,6 +23,7 @@ public class ProductOperationImpl implements ProductOperation {
     private final transient DbManagerImpl dbManager;
     private final StringBuilder log;
     private ProductOperationState state;
+    private Date createDate;
 
     public ProductOperationImpl(String description, DbManagerImpl dbManager) {
         this.description = description;
@@ -29,6 +31,7 @@ public class ProductOperationImpl implements ProductOperation {
         log = new StringBuilder();
         state = ProductOperationState.RUNNING;
         id = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
+        createDate = new Date();
     }
 
     public String getLog() {
@@ -90,6 +93,10 @@ public class ProductOperationImpl implements ProductOperation {
             return false;
         }
         return true;
+    }
+
+    public Date createDate() {
+        return createDate;
     }
 
 }

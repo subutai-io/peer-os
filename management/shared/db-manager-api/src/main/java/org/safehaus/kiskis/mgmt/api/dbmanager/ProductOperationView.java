@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.api.dbmanager;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -14,6 +15,8 @@ import java.util.UUID;
 public interface ProductOperationView {
 
     public String getDescription();
+
+    public Date getCreateDate();
 
     public UUID getId();
 
