@@ -148,7 +148,7 @@ public class Tracker {
 
             Item item = operationsTable.getItem(po.getId());
             if (item == null) {
-                final Button trackLogsBtn = new Button("Track logs");
+                final Button trackLogsBtn = new Button("View logs");
                 trackLogsBtn.addListener(new Button.ClickListener() {
 
                     public void buttonClick(Button.ClickEvent event) {
