@@ -23,9 +23,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class ConfigurationStep extends Panel {
 
-    Property.ValueChangeListener configChangeListener = null;
-    Property.ValueChangeListener routersChangeListener = null;
-
     public ConfigurationStep(final Wizard wizard) {
 
         setSizeFull();

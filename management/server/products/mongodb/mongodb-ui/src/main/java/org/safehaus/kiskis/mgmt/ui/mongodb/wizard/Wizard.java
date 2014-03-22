@@ -64,6 +64,7 @@ public class Wizard {
 
     protected void init() {
         step = 1;
+        config.reset();
         putForm();
     }
 
@@ -89,12 +90,6 @@ public class Wizard {
                 progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
                 component = new VerificationStep(this, tracker, tabSheet);
                 break;
-//            }
-//            case 4: {
-//                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
-//                component = new InstallationStep(this);
-//                ((InstallationStep) component).startOperation();
-//                break;
             }
             default: {
                 break;

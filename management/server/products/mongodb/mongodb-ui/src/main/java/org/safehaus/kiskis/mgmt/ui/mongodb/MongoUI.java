@@ -16,6 +16,7 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
+import org.safehaus.kiskis.mgmt.ui.mongodb.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
 
@@ -27,7 +28,7 @@ import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
  */
 public class MongoUI implements Module {
 
-    public static final String MODULE_NAME = "MongoDB";
+    public static final String MODULE_NAME = "Mongo";
     private static Mongo mongoManager;
     private static DbManager dbManager;
     private static ExecutorService executor;
@@ -66,7 +67,7 @@ public class MongoUI implements Module {
 
         private final Wizard wizard;
         private final Tracker tracker;
-//        private final Manager manager;
+        private final Manager manager;
         private final String trackerTabName = "Tracker";
 
         public ModuleComponent() {
@@ -80,9 +81,9 @@ public class MongoUI implements Module {
             mongoSheet.setSizeFull();
             tracker = new Tracker();
             wizard = new Wizard(tracker, mongoSheet);
-//            manager = new Manager();
+            manager = new Manager();
             mongoSheet.addTab(wizard.getContent(), "Install");
-//            mongoSheet.addTab(manager.getContent(), "Manage");
+            mongoSheet.addTab(manager.getContent(), "Manage");
             mongoSheet.addTab(tracker.getContent(), trackerTabName);
 
             mongoSheet.addListener(new TabSheet.SelectedTabChangeListener() {
