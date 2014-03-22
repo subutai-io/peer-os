@@ -11,6 +11,7 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
@@ -155,16 +156,16 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-//                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
-//                    MgmtApplication.addCustomWindow(addNodeWindow);
-//                    addNodeWindow.addListener(new Window.CloseListener() {
-//
-//                        @Override
-//                        public void windowClose(Window.CloseEvent e) {
-//                            //refresh clusters and show the current one again
-//                            refreshClustersInfo();
-//                        }
-//                    });
+                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
+                    MgmtApplication.addCustomWindow(addNodeWindow);
+                    addNodeWindow.addListener(new Window.CloseListener() {
+
+                        @Override
+                        public void windowClose(Window.CloseEvent e) {
+                            //refresh clusters and show the current one again
+                            refreshClustersInfo();
+                        }
+                    });
                 } else {
                     show("Please, select cluster");
                 }
