@@ -20,6 +20,7 @@ import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
 /**
  *
  * @author dilshat
+ * @todo make sure that operation log tracking thread is killed when UI is closed
  */
 public class MongoUI implements Module {
 

@@ -172,8 +172,8 @@ public class DbManagerImpl implements DbManager {
 
     boolean saveProductOperation(ProductOperationImpl po) {
         return executeUpdate(
-                "insert into product_operation(id,in_date,info) values(?,now(),?)",
-                po.getId(), gson.toJson(po));
+                "insert into product_operation(id,in_date,info) values(?,?,?)",
+                po.getId(), po.getId(), gson.toJson(po));
     }
 
     public ProductOperation createProductOperation(String description) {
