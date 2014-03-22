@@ -22,11 +22,11 @@ public class Wizard {
 
     private static final int NUMBER_OF_STEPS = 3;
     private final ProgressIndicator progressBar;
-    private final Config config = new Config();
     private final GridLayout grid;
     private final Tracker tracker;
     private final TabSheet tabSheet;
     private int step = 1;
+    private Config config = new Config();
 
     public Wizard(Tracker tracker, TabSheet tabSheet) {
         this.tracker = tracker;
@@ -64,7 +64,7 @@ public class Wizard {
 
     protected void init() {
         step = 1;
-        config.reset();
+        config = new Config();
         putForm();
     }
 

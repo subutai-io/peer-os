@@ -146,7 +146,7 @@ public class MongoImpl implements Mongo {
                     }
 
                     if (numOfAvailableLxcSlots < numberOfLxcsNeeded) {
-                        po.addLogFailed(String.format("Only %s lxc containers can be created\nInstallation aborted", numOfAvailableLxcSlots));
+                        po.addLogFailed(String.format("Only %s lxc containers can be created. %s needed for installation\nInstallation aborted", numOfAvailableLxcSlots, numberOfLxcsNeeded));
 
                     } else {
                         //clone lxc containers

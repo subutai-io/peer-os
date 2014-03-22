@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.mongodb.tracker;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
@@ -16,6 +17,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
@@ -68,20 +70,6 @@ public class Tracker {
 
     }
 
-    private Table createTableTemplate(String caption, int height) {
-        Table table = new Table(caption);
-        table.addContainerProperty("Date", String.class, null);
-        table.addContainerProperty("Operation", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
-        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(height, Sizeable.UNITS_PIXELS);
-        table.setPageLength(10);
-        table.setSelectable(false);
-        table.setImmediate(true);
-        return table;
-    }
-
     public Component getContent() {
         return contentRoot;
     }
@@ -130,10 +118,11 @@ public class Tracker {
 
     private void populateOperations() {
         List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(10);
+        IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
         currentOperations.removeAll(operations);
 
         for (ProductOperationView po : currentOperations) {
-            operationsTable.removeItem(po.getId());
+            container.removeItem(po.getId());
         }
 
         for (final ProductOperationView po : operations) {
@@ -146,7 +135,7 @@ public class Tracker {
                 progressIcon = new Embedded("", new ThemeResource(okIconSource));
             }
 
-            Item item = operationsTable.getItem(po.getId());
+            Item item = container.getItem(po.getId());
             if (item == null) {
                 final Button trackLogsBtn = new Button("View logs");
                 trackLogsBtn.addListener(new Button.ClickListener() {
@@ -156,20 +145,38 @@ public class Tracker {
                     }
                 });
 
-                operationsTable.addItem(new Object[]{
-                    po.getCreateDate(),
-                    po.getDescription(),
-                    trackLogsBtn,
-                    progressIcon},
-                        po.getId());
+                item = container.addItem(po.getId());
+                item.getItemProperty("Date").setValue(po.getCreateDate());
+                item.getItemProperty("Operation").setValue(po.getDescription());
+                item.getItemProperty("Check").setValue(trackLogsBtn);
+                item.getItemProperty("Status").setValue(progressIcon);
             } else {
                 if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(progressIcon.getSource())) {
                     item.getItemProperty("Status").setValue(progressIcon);
                 }
             }
 
+            Object[] properties = {"Date"};
+            boolean[] ordering = {false};
+            operationsTable.sort(properties, ordering);
+
             currentOperations = operations;
         }
+    }
+
+    private Table createTableTemplate(String caption, int height) {
+        Table table = new Table(caption);
+        table.setContainerDataSource(new IndexedContainer());
+        table.addContainerProperty("Date", Date.class, null);
+        table.addContainerProperty("Operation", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
+        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        table.setHeight(height, Sizeable.UNITS_PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
+        return table;
     }
 
     private void setOutput(String output) {

@@ -43,7 +43,7 @@ public class WelcomeStep extends Panel {
         next.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.getConfig().reset();
+                wizard.init();
                 wizard.next();
             }
         });

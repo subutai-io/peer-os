@@ -16,37 +16,18 @@ public class Config {
 
     public static final String PRODUCT_KEY = "MongoDB";
     private String clusterName;
-    private String replicaSetName;
-    private String domainName;
-    private int numberOfConfigServers;
-    private int numberOfRouters;
-    private int numberOfDataNodes;
-    private int cfgSrvPort;
-    private int routerPort;
-    private int dataNodePort;
+    private String replicaSetName = "repl";
+    private String domainName = "intra.lan";
+    private int numberOfConfigServers = 3;
+    private int numberOfRouters = 2;
+    private int numberOfDataNodes = 3;
+    private int cfgSrvPort = 27019;
+    private int routerPort = 27018;
+    private int dataNodePort = 27017;
 
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
     private Set<Agent> dataNodes;
-
-    public Config() {
-        reset();
-    }
-
-    public final void reset() {
-        configServers = null;
-        routerServers = null;
-        dataNodes = null;
-        clusterName = "";
-        replicaSetName = "repl";
-        domainName = "intra.lan";
-        numberOfConfigServers = 3;
-        numberOfRouters = 2;
-        numberOfDataNodes = 3;
-        cfgSrvPort = 27019;
-        routerPort = 27018;
-        dataNodePort = 27017;
-    }
 
     public String getDomainName() {
         return domainName;
