@@ -56,15 +56,7 @@ public class SomeImplTest {
      */
 //    @Test
     public void testWriteLog() {
-        System.out.println("writeLog");
-        String log = "some log data";
-        DbManager dbManager = new DbManagerImpl();
-        dbManager.setCassandraHost("localhost");
-        dbManager.setCassandraKeyspace("kiskis");
-        dbManager.setCassandraPort(9042);
-        dbManager.init();
 //        SomeImpl instance = new SomeImpl(dbManager);
     }
-
 
 }

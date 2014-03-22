@@ -31,3 +31,10 @@ id text,
 log text,
 PRIMARY KEY (id)
 );
+
+CREATE TABLE product_operation (
+  id uuid,
+  in_date timestamp,
+  info text,
+  PRIMARY KEY (id, in_date)
+) WITH CLUSTERING ORDER BY (in_date DESC)

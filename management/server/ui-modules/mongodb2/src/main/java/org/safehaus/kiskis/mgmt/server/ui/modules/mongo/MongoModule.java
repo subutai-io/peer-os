@@ -74,7 +74,7 @@ public class MongoModule implements Module {
         private final Wizard wizard;
         private final Manager manager;
 
-        public ModuleComponent(TaskRunner taskRunner) {
+        public ModuleComponent() {
             setSizeFull();
             VerticalLayout verticalLayout = new VerticalLayout();
             verticalLayout.setSpacing(true);
@@ -103,7 +103,7 @@ public class MongoModule implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner);
+        return new ModuleComponent();
     }
 
 }
