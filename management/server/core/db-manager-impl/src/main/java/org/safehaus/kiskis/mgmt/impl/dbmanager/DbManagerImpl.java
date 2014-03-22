@@ -184,4 +184,22 @@ public class DbManagerImpl implements DbManager {
         return null;
     }
 
+    public List<ProductOperationView> getProductOperations(int max) {
+        List<ProductOperationView> list = new ArrayList<ProductOperationView>();
+        try {
+            ResultSet rs = executeQuery("select info from product_operation limit ?", max);
+            for (Row row : rs) {
+                String info = row.getString("info");
+                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
+                if (po != null) {
+                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
+                    list.add(productOperationViewImpl);
+                }
+            }
+        } catch (JsonSyntaxException ex) {
+            LOG.log(Level.SEVERE, "Error in getProductOperations", ex);
+        }
+        return list;
+    }
+
 }

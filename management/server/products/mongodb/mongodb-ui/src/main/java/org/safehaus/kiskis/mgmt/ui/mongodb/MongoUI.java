@@ -15,12 +15,15 @@ import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
+import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
 
 /**
  *
  * @author dilshat
- * @todo make sure that operation log tracking thread is killed when UI is closed
+ * @todo make sure that operation log tracking thread is killed when UI is
+ * closed (introduce thread timeout)
  */
 public class MongoUI implements Module {
 
@@ -59,10 +62,12 @@ public class MongoUI implements Module {
         executor.shutdown();
     }
 
-    public static class ModuleComponent extends CustomComponent {
+    public static class ModuleComponent extends CustomComponent implements Disposable {
 
         private final Wizard wizard;
+        private final Tracker tracker;
 //        private final Manager manager;
+        private final String trackerTabName = "Tracker";
 
         public ModuleComponent() {
             setSizeFull();
@@ -73,15 +78,34 @@ public class MongoUI implements Module {
             TabSheet mongoSheet = new TabSheet();
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
-            wizard = new Wizard();
+            tracker = new Tracker();
+            wizard = new Wizard(tracker, mongoSheet);
 //            manager = new Manager();
             mongoSheet.addTab(wizard.getContent(), "Install");
 //            mongoSheet.addTab(manager.getContent(), "Manage");
+            mongoSheet.addTab(tracker.getContent(), trackerTabName);
+
+            mongoSheet.addListener(new TabSheet.SelectedTabChangeListener() {
+
+                public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
+                    TabSheet tabsheet = event.getTabSheet();
+                    String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
+                    if (caption.equals(trackerTabName)) {
+                        tracker.startTracking();
+                    } else {
+                        tracker.stopTracking();
+                    }
+                }
+            });
 
             verticalLayout.addComponent(mongoSheet);
 
             setCompositionRoot(verticalLayout);
 
+        }
+
+        public void dispose() {
+            tracker.stopTracking();
         }
 
     }

@@ -10,6 +10,10 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
+import java.util.UUID;
+import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
+import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
 
 /**
  *
@@ -17,7 +21,7 @@ import com.vaadin.ui.Panel;
  */
 public class VerificationStep extends Panel {
 
-    public VerificationStep(final Wizard wizard) {
+    public VerificationStep(final Wizard wizard, final Tracker tracker, final TabSheet tabSheet) {
 
         setSizeFull();
 
@@ -47,7 +51,9 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                wizard.next();
+                UUID operationID = MongoUI.getMongoManager().installCluster(wizard.getConfig());
+                tracker.setTrackId(operationID);
+                tabSheet.setSelectedTab(tracker.getContent());
             }
         });
 

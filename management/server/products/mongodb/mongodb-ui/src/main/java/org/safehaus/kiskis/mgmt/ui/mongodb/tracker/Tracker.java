@@ -1,0 +1,180 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.safehaus.kiskis.mgmt.ui.mongodb.tracker;
+
+import com.vaadin.data.Item;
+import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.VerticalLayout;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
+
+/**
+ *
+ * @author dilshat
+ */
+public class Tracker {
+
+    private final VerticalLayout contentRoot;
+    private final Table operationsTable;
+    private final TextArea outputTxtArea;
+    private volatile boolean track = false;
+    private volatile UUID trackID;
+    private final String okIconSource = "icons/16/ok.png";
+    private final String errorIconSource = "icons/16/cancel.png";
+    private final String loadIconSource = "../base/common/img/loading-indicator.gif";
+    private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
+
+    public Tracker() {
+        contentRoot = new VerticalLayout();
+        contentRoot.setSpacing(true);
+        contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+
+        VerticalLayout content = new VerticalLayout();
+        content.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        content.setSpacing(true);
+
+        contentRoot.addComponent(content);
+        contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
+        contentRoot.setMargin(true);
+
+        operationsTable = createTableTemplate("Operations", 250);
+
+        outputTxtArea = new TextArea("Operation output");
+        outputTxtArea.setSizeFull();
+        outputTxtArea.setRows(20);
+        outputTxtArea.setImmediate(true);
+        outputTxtArea.setWordwrap(true);
+
+        content.addComponent(operationsTable);
+        content.addComponent(outputTxtArea);
+        content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
+        content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
+
+    }
+
+    private Table createTableTemplate(String caption, int height) {
+        Table table = new Table(caption);
+        table.addContainerProperty("Operation", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
+        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        table.setHeight(height, Sizeable.UNITS_PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
+        return table;
+    }
+
+    public Component getContent() {
+        return contentRoot;
+    }
+
+    public void setTrackId(UUID trackID) {
+        this.trackID = trackID;
+    }
+
+    public void startTracking() {
+        track = true;
+
+        MongoUI.getExecutor().execute(new Runnable() {
+
+            public void run() {
+                while (track) {
+
+                    populateOperations();
+                    populateLogs();
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    public void stopTracking() {
+        track = false;
+    }
+
+    private void populateLogs() {
+        if (trackID != null) {
+            ProductOperationView po = MongoUI.getDbManager().getProductOperation(trackID);
+            if (po != null) {
+                setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                if (po.getState() != ProductOperationState.RUNNING) {
+                    trackID = null;
+                }
+            } else {
+                setOutput("Product operation not found. Check logs");
+            }
+        }
+    }
+
+    private void populateOperations() {
+        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(10);
+        currentOperations.removeAll(operations);
+
+        for (ProductOperationView po : currentOperations) {
+            operationsTable.removeItem(po.getId());
+        }
+
+        for (final ProductOperationView po : operations) {
+            Embedded progressIcon;
+            if (po.getState() == ProductOperationState.RUNNING) {
+                progressIcon = new Embedded("", new ThemeResource(loadIconSource));
+            } else if (po.getState() == ProductOperationState.FAILED) {
+                progressIcon = new Embedded("", new ThemeResource(errorIconSource));
+            } else {
+                progressIcon = new Embedded("", new ThemeResource(okIconSource));
+            }
+
+            Item item = operationsTable.getItem(po.getId());
+            if (item == null) {
+                final Button trackLogsBtn = new Button("Track logs");
+                trackLogsBtn.addListener(new Button.ClickListener() {
+
+                    public void buttonClick(Button.ClickEvent event) {
+                        setTrackId(po.getId());
+                    }
+                });
+
+                operationsTable.addItem(new Object[]{
+                    po.getDescription(),
+                    trackLogsBtn,
+                    progressIcon},
+                        po.getId());
+            } else {
+                if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(progressIcon.getSource())) {
+                    item.getItemProperty("Status").setValue(progressIcon);
+                }
+            }
+
+            currentOperations = operations;
+        }
+    }
+
+    private void setOutput(String output) {
+        if (!Util.isStringEmpty(output)) {
+            outputTxtArea.setValue(output);
+            outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+        }
+    }
+
+}

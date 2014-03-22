@@ -32,4 +32,6 @@ public interface DbManager {
 
     public ProductOperation createProductOperation(String description);
 
+    public List<ProductOperationView> getProductOperations(int max);
+
 }

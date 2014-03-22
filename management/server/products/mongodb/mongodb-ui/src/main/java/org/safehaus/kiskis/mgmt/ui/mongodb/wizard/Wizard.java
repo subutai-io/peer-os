@@ -10,7 +10,9 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
+import com.vaadin.ui.TabSheet;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
 
 /**
  *
@@ -18,13 +20,18 @@ import org.safehaus.kiskis.mgmt.api.mongodb.Config;
  */
 public class Wizard {
 
-    private static final int NUMBER_OF_STEPS = 4;
+    private static final int NUMBER_OF_STEPS = 3;
     private final ProgressIndicator progressBar;
     private final Config config = new Config();
     private final GridLayout grid;
+    private final Tracker tracker;
+    private final TabSheet tabSheet;
     private int step = 1;
 
-    public Wizard() {
+    public Wizard(Tracker tracker, TabSheet tabSheet) {
+        this.tracker = tracker;
+        this.tabSheet = tabSheet;
+
         grid = new GridLayout(1, 20);
         grid.setMargin(true);
         grid.setSizeFull();
@@ -80,14 +87,14 @@ public class Wizard {
             }
             case 3: {
                 progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
-                component = new VerificationStep(this);
+                component = new VerificationStep(this, tracker, tabSheet);
                 break;
-            }
-            case 4: {
-                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
-                component = new InstallationStep(this);
-                ((InstallationStep) component).startOperation();
-                break;
+//            }
+//            case 4: {
+//                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
+//                component = new InstallationStep(this);
+//                ((InstallationStep) component).startOperation();
+//                break;
             }
             default: {
                 break;
