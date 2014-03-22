@@ -343,18 +343,16 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-//
-//                                        DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, nodeType, agent);
-//                                        MgmtApplication.addCustomWindow(destroyNodeWindow);
-//                                        destroyNodeWindow.addListener(new Window.CloseListener() {
-//
-//                                            @Override
-//                                            public void windowClose(Window.CloseEvent e) {
-//                                                //refresh clusters and show the current one again
-//                                                refreshClustersInfo();
-//                                            }
-//                                        });
-//                                        destroyNodeWindow.startOperation();
+                                        DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, agent);
+                                        MgmtApplication.addCustomWindow(destroyNodeWindow);
+                                        destroyNodeWindow.addListener(new Window.CloseListener() {
+
+                                            @Override
+                                            public void windowClose(Window.CloseEvent e) {
+                                                //refresh clusters and show the current one again
+                                                refreshClustersInfo();
+                                            }
+                                        });
                                     }
                                 }
                             });
