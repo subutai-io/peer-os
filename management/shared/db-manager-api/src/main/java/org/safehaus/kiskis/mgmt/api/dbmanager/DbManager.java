@@ -28,10 +28,10 @@ public interface DbManager {
 
     public boolean deleteInfo(String source, String key);
 
-    public ProductOperationView getProductOperation(UUID operationTrackId);
+    public ProductOperationView getProductOperation(String source, UUID operationTrackId);
 
-    public ProductOperation createProductOperation(String description);
+    public ProductOperation createProductOperation(String source, String description);
 
-    public List<ProductOperationView> getProductOperations(int max);
+    public List<ProductOperationView> getProductOperations(String source);
 
 }

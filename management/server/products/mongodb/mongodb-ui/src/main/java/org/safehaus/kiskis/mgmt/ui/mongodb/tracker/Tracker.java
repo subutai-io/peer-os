@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
@@ -104,7 +105,8 @@ public class Tracker {
 
     private void populateLogs() {
         if (trackID != null) {
-            ProductOperationView po = MongoUI.getDbManager().getProductOperation(trackID);
+            ProductOperationView po = MongoUI.getDbManager().getProductOperation(
+                    Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                 if (po.getState() != ProductOperationState.RUNNING) {
@@ -117,7 +119,7 @@ public class Tracker {
     }
 
     private void populateOperations() {
-        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(10);
+        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(Config.PRODUCT_KEY);
         IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
         currentOperations.removeAll(operations);
 

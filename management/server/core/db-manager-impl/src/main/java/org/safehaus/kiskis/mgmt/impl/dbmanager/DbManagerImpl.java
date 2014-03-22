@@ -152,9 +152,12 @@ public class DbManagerImpl implements DbManager {
         return executeUpdate("delete from product_info where source = ? and key = ?", source, key);
     }
 
-    public ProductOperationView getProductOperation(UUID operationTrackId) {
+    public ProductOperationView getProductOperation(String source, UUID operationTrackId) {
         try {
-            ResultSet rs = executeQuery("select info from product_operation where id = ?", operationTrackId);
+            ResultSet rs = executeQuery(
+                    "select info from product_operation where source = ? and id = ?",
+                    source,
+                    operationTrackId);
             Row row = rs.one();
             if (row != null) {
                 String info = row.getString("info");
@@ -170,24 +173,24 @@ public class DbManagerImpl implements DbManager {
         return null;
     }
 
-    boolean saveProductOperation(ProductOperationImpl po) {
+    boolean saveProductOperation(String source, ProductOperationImpl po) {
         return executeUpdate(
-                "insert into product_operation(id,in_date,info) values(?,?,?)",
-                po.getId(), po.createDate(), gson.toJson(po));
+                "insert into product_operation(source,id,info) values(?,?,?)",
+                source, po.getId(), gson.toJson(po));
     }
 
-    public ProductOperation createProductOperation(String description) {
-        ProductOperationImpl po = new ProductOperationImpl(description, this);
-        if (saveProductOperation(po)) {
+    public ProductOperation createProductOperation(String source, String description) {
+        ProductOperationImpl po = new ProductOperationImpl(source, description, this);
+        if (saveProductOperation(source, po)) {
             return po;
         }
         return null;
     }
 
-    public List<ProductOperationView> getProductOperations(int max) {
+    public List<ProductOperationView> getProductOperations(String source) {
         List<ProductOperationView> list = new ArrayList<ProductOperationView>();
         try {
-            ResultSet rs = executeQuery("select info from product_operation limit ?", max);
+            ResultSet rs = executeQuery("select info from product_operation where source = ?", source);
             for (Row row : rs) {
                 String info = row.getString("info");
                 ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);

@@ -100,7 +100,8 @@ public class DestroyNodeWindow extends Window {
                     public void run() {
                         UUID operationID = MongoUI.getMongoManager().destroyNode(config, agent);
                         while (track) {
-                            ProductOperationView po = MongoUI.getDbManager().getProductOperation(operationID);
+                            ProductOperationView po = MongoUI.getDbManager().getProductOperation(
+                                    Config.PRODUCT_KEY, operationID);
                             if (po != null) {
                                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                                 if (po.getState() != ProductOperationState.RUNNING) {

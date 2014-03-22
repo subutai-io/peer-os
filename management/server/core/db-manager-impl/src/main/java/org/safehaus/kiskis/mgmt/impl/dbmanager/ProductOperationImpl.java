@@ -22,11 +22,13 @@ public class ProductOperationImpl implements ProductOperation {
     private final String description;
     private final transient DbManagerImpl dbManager;
     private final StringBuilder log;
+    private final Date createDate;
     private ProductOperationState state;
-    private Date createDate;
+    private final String source;
 
-    public ProductOperationImpl(String description, DbManagerImpl dbManager) {
+    public ProductOperationImpl(String source, String description, DbManagerImpl dbManager) {
         this.description = description;
+        this.source = source;
         this.dbManager = dbManager;
         log = new StringBuilder();
         state = ProductOperationState.RUNNING;
@@ -59,7 +61,7 @@ public class ProductOperationImpl implements ProductOperation {
             log.append(logString);
         }
         this.state = state;
-        dbManager.saveProductOperation(this);
+        dbManager.saveProductOperation(source, this);
     }
 
     public ProductOperationState getState() {
