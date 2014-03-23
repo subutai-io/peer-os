@@ -120,21 +120,7 @@ public final class DataNodesWindow extends Window {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                disableButtons(0);
-                statusLabel.setValue("");
-                indicator.setVisible(true);
-
-                HadoopModule.getTaskRunner().executeTask(Tasks.getNameNodeCommand(cluster, "restart"), new TaskCallback() {
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        if (task.isCompleted()) {
-                            getStatus();
-                        }
-
-                        return null;
-                    }
-                });
-                disableButtons(0);
+                restartCluster();
             }
         });
 
@@ -156,7 +142,7 @@ public final class DataNodesWindow extends Window {
         }
     }
 
-    private void getStatus() {
+    public void getStatus() {
         statusLabel.setValue("");
         indicator.setVisible(true);
 
@@ -182,6 +168,24 @@ public final class DataNodesWindow extends Window {
         });
     }
 
+    public void restartCluster(){
+        disableButtons(0);
+        statusLabel.setValue("");
+        indicator.setVisible(true);
+
+        HadoopModule.getTaskRunner().executeTask(Tasks.getNameNodeCommand(cluster, "restart"), new TaskCallback() {
+            @Override
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                if (task.isCompleted()) {
+                    getStatus();
+                }
+
+                return null;
+            }
+        });
+        disableButtons(0);
+    }
+
     private Label getStatusLabel() {
         if (statusLabel == null) {
             statusLabel = new Label();
@@ -201,7 +205,7 @@ public final class DataNodesWindow extends Window {
     }
 
     private DataNodesTable getTable() {
-        dataNodesTable = new DataNodesTable(cluster.getClusterName());
+        dataNodesTable = new DataNodesTable(this, cluster.getClusterName());
 
         return dataNodesTable;
     }

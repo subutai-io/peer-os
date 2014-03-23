@@ -250,63 +250,6 @@ public class Commands {
             "\t  }\n" +
             "\t}";
 
-    public static final String EXCLUDE_DATA_NODE = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": :source,\n" +
-            "\t    \"uuid\": :uuid,\n" +
-            "\t    \"taskUuid\": :taskUuid,\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"dfs.exclude\",\":IP\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
-
-    public static final String REFRESH_DATA_NODES = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": :source,\n" +
-            "\t    \"uuid\": :uuid,\n" +
-            "\t    \"taskUuid\": :taskUuid,\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \". /etc/profile && hadoop\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"dfsadmin\",\"-refreshNodes\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
-
-    public static final String STOP_DATA_NODE = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": :source,\n" +
-            "\t    \"uuid\": :uuid,\n" +
-            "\t    \"taskUuid\": :taskUuid,\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"hadoop-daemon.sh\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"stop\",\"datanode\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
-
     public static final String STATUS_DATA_NODE = "{\n" +
             "\t  \"command\": {\n" +
             "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
