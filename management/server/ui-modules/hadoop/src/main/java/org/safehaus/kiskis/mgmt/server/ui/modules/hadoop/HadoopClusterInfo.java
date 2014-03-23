@@ -8,8 +8,7 @@ import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author dilshat
@@ -39,6 +38,28 @@ public class HadoopClusterInfo implements Serializable {
 
     public HadoopClusterInfo() {
         this.uuid = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
+    }
+
+    public List<Agent> getAllAgents() {
+        Set<Agent> allAgents = new HashSet<Agent>();
+        if (dataNodes != null) {
+            allAgents.addAll(dataNodes);
+        }
+        if (taskTrackers != null) {
+            allAgents.addAll(taskTrackers);
+        }
+
+        if (nameNode != null) {
+            allAgents.add(nameNode);
+        }
+        if (jobTracker != null) {
+            allAgents.add(jobTracker);
+        }
+        if (secondaryNameNode != null) {
+            allAgents.add(secondaryNameNode);
+        }
+
+        return new ArrayList<Agent>(allAgents);
     }
 
     public UUID getUuid() {

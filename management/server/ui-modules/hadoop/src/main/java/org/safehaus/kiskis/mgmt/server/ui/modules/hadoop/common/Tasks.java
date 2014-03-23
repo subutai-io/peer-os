@@ -361,7 +361,29 @@ public class Tasks {
         map.put(":uuid", cluster.getNameNode().getUuid().toString());
         map.put(":slave-hostname", agent.getHostname());
 
-        request = TaskUtil.createRequest(Commands.REMOVE_DATA_NODE, task, map);
+        request = TaskUtil.createRequest(Commands.REMOVE_NODE_TRACKER, task, map);
+        task.addRequest(request);
+
+        return task;
+    }
+
+    public static Task getRemoveTrackerCommand(HadoopClusterInfo cluster, Agent agent) {
+        Task task = new Task("Remove tracker from cluster");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", agent.getUuid().toString());
+        map.put(":command", "stop");
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_JOB_TRACKER, task, map);
+        task.addRequest(request);
+
+        map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        map.put(":slave-hostname", agent.getHostname());
+
+        request = TaskUtil.createRequest(Commands.REMOVE_NODE_TRACKER, task, map);
         task.addRequest(request);
 
         return task;

@@ -231,7 +231,7 @@ public class Commands {
             "\t  }\n" +
             "\t}";
 
-    public static final String REMOVE_DATA_NODE = "{\n" +
+    public static final String REMOVE_NODE_TRACKER = "{\n" +
             "\t  \"command\": {\n" +
             "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
             "\t    \"source\": :source,\n" +
@@ -264,63 +264,6 @@ public class Commands {
             "\t    \"runAs\": \"root\",\n" +
             "\t    \"args\": [\n" +
             "\t      \"hadoop-all\",\"status\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
-
-    public static final String ADD_DATA_NODE = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": :source,\n" +
-            "\t    \"uuid\": :uuid,\n" +
-            "\t    \"taskUuid\": :taskUuid,\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"slaves\",\":slave-hostname\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
-
-    public static final String START_DATA_NODE = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": :source,\n" +
-            "\t    \"uuid\": :uuid,\n" +
-            "\t    \"taskUuid\": :taskUuid,\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \". /etc/profile && hadoop-daemon.sh\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"start\",\"datanode\"\n" +
-            "\t    ],\n" +
-            "\t    \"timeout\": 180\n" +
-            "\t  }\n" +
-            "\t}";
-
-    public static final String INCLUDE_DATA_NODE = "{\n" +
-            "\t  \"command\": {\n" +
-            "\t    \"type\": \"EXECUTE_REQUEST\",\n" +
-            "\t    \"source\": :source,\n" +
-            "\t    \"uuid\": :uuid,\n" +
-            "\t    \"taskUuid\": :taskUuid,\n" +
-            "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
-            "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \". /etc/profile && hadoop-master-slave.sh\",\n" +
-            "\t    \"stdOut\": \"RETURN\",\n" +
-            "\t    \"stdErr\": \"RETURN\",\n" +
-            "\t    \"runAs\": \"root\",\n" +
-            "\t    \"args\": [\n" +
-            "\t      \"dfs.include\",\":IP\"\n" +
             "\t    ],\n" +
             "\t    \"timeout\": 180\n" +
             "\t  }\n" +

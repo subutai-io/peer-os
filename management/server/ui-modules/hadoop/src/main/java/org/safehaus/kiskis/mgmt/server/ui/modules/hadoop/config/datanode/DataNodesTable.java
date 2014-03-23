@@ -14,7 +14,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.Configuration;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.DataNodeConfiguration;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -108,9 +108,9 @@ public class DataNodesTable extends Table {
             public void buttonClick(Button.ClickEvent event) {
                 String status = (String) item.getItemProperty(STATUS).getValue();
                 if(status.contains("NOT")){
-                    Configuration.removeNode(parent, clusterName, agent, false);
+                    DataNodeConfiguration.removeNode(parent, clusterName, agent, false);
                 } else {
-                    Configuration.removeNode(parent, clusterName, agent, true);
+                    DataNodeConfiguration.removeNode(parent, clusterName, agent, true);
                 }
             }
         });

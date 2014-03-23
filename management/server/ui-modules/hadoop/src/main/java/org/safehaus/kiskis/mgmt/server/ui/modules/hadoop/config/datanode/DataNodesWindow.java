@@ -8,6 +8,8 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.DataNodeConfiguration;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 
@@ -17,13 +19,16 @@ import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
 
 public final class DataNodesWindow extends Window {
 
-    private Button startButton, stopButton, restartButton;
+    private Button startButton, stopButton, restartButton, addButton;
     private Label indicator, statusLabel;
     private DataNodesTable dataNodesTable;
+    private AgentsComboBox agentsComboBox;
+    private DataNodesWindow current;
     
     private final HadoopClusterInfo cluster;
 
-    public DataNodesWindow(String clusterName) {        
+    public DataNodesWindow(String clusterName) {
+        this.current = this;
         setModal(true);
         setCaption("Hadoop Data Node Configuration");
 
@@ -44,6 +49,8 @@ public final class DataNodesWindow extends Window {
         buttonLayout.addComponent(getRestartButton());
         buttonLayout.addComponent(getStatusLabel());
         buttonLayout.addComponent(getIndicator());
+        buttonLayout.addComponent(getAgentsComboBox());
+        buttonLayout.addComponent(getAddButton());
 
         Panel panel = new Panel();
         panel.setSizeFull();
@@ -127,7 +134,31 @@ public final class DataNodesWindow extends Window {
         return restartButton;
     }
 
+    private Button getAddButton() {
+        addButton = new Button("Add");
+        addButton.setEnabled(false);
+        addButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                Agent agent = (Agent) agentsComboBox.getValue();
+                DataNodeConfiguration.addNode(current, cluster.getClusterName(), agent);
+            }
+        });
+
+        return addButton;
+    }
+
+    private AgentsComboBox getAgentsComboBox(){
+        if(agentsComboBox == null){
+            agentsComboBox = new AgentsComboBox(cluster.getClusterName());
+        }
+
+        return agentsComboBox;
+    }
+
     private void disableButtons(int status) {
+        addButton.setEnabled(false);
         startButton.setEnabled(false);
         stopButton.setEnabled(false);
         restartButton.setEnabled(false);
@@ -139,6 +170,7 @@ public final class DataNodesWindow extends Window {
 
         if (status == 2) {
             startButton.setEnabled(true);
+            addButton.setEnabled(true);
         }
     }
 
@@ -222,5 +254,9 @@ public final class DataNodesWindow extends Window {
         }
 
         return "";
+    }
+
+    public void setLoading(boolean loading){
+        indicator.setVisible(loading);
     }
 }
