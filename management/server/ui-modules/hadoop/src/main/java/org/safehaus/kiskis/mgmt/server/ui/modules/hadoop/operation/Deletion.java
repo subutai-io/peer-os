@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation;
 
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
@@ -7,7 +8,6 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClusterForm;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 
 /**
  * Created by daralbaev on 3/18/14.
