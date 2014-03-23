@@ -19,6 +19,9 @@
 
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
@@ -30,7 +33,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieTable;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  *

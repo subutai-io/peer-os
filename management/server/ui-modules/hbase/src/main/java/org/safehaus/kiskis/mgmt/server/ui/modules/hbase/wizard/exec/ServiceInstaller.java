@@ -5,10 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.ui.TextArea;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import java.util.LinkedList;
 import java.util.Queue;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;

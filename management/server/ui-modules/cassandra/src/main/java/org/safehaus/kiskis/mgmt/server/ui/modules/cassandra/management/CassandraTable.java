@@ -11,7 +11,7 @@ import java.util.List;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.exec.ServiceManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraClusterInfo;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM

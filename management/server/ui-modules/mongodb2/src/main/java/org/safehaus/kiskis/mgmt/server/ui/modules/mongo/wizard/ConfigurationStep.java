@@ -14,6 +14,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -31,18 +32,14 @@ public class ConfigurationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout grid = new GridLayout(10, 10);
-        grid.setSpacing(true);
-        grid.setMargin(true);
-        grid.setSizeFull();
-
-        Panel panel = new Panel();
-        Label menu = new Label("Please, specify installation settings");
-
-        menu.setContentMode(Label.CONTENT_XHTML);
-        panel.addComponent(menu);
-        grid.addComponent(menu, 0, 0, 1, 8);
-        grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
+        GridLayout layout = new GridLayout(2, 2);
+        layout.setSizeFull();
+        layout.setSpacing(true);
+        layout.setMargin(true);
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing(true);
+        layout.addComponent(new Label("Please, specify installation settings"));
+        layout.addComponent(content);
 
         final TextField clusterNameTxtFld = new TextField("Enter cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
@@ -56,7 +53,7 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        grid.addComponent(clusterNameTxtFld, 2, 0, 9, 0);
+        content.addComponent(clusterNameTxtFld);
 
         //configuration servers number
         ComboBox cfgSrvsCombo = new ComboBox("Choose number of configuration servers (Recommended 3 nodes)", Arrays.asList(1, 3));
@@ -72,7 +69,7 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfConfigServers((Integer) event.getProperty().getValue());
             }
         });
-        grid.addComponent(cfgSrvsCombo, 2, 1, 9, 1);
+        content.addComponent(cfgSrvsCombo);
 
         //routers number
         ComboBox routersCombo = new ComboBox("Choose number of routers ( At least 2 recommended)", Arrays.asList(1, 2, 3));
@@ -88,7 +85,7 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfRouters((Integer) event.getProperty().getValue());
             }
         });
-        grid.addComponent(routersCombo, 2, 2, 9, 2);
+        content.addComponent(routersCombo);
 
         //datanodes number
         ComboBox dataNodesCombo = new ComboBox("Choose number of datanodes", Arrays.asList(3, 5, 7));
@@ -104,21 +101,82 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfDataNodes((Integer) event.getProperty().getValue());
             }
         });
-        grid.addComponent(dataNodesCombo, 2, 3, 9, 3);
+        content.addComponent(dataNodesCombo);
 
         TextField replicaSetName = new TextField("Enter replica set name");
-        replicaSetName.setInputPrompt("Replica set name");
-        replicaSetName.setRequired(true);
+        replicaSetName.setInputPrompt(wizard.getConfig().getReplicaSetName());
         replicaSetName.setMaxLength(20);
-        replicaSetName.setValue(wizard.getConfig().getReplicaSetName());
         replicaSetName.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                wizard.getConfig().setReplicaSetName(event.getProperty().getValue().toString().trim());
+                String value = event.getProperty().getValue().toString().trim();
+                if (!Util.isStringEmpty(value)) {
+                    wizard.getConfig().setReplicaSetName(value);
+                }
             }
         });
 
-        grid.addComponent(replicaSetName, 2, 4, 9, 4);
+        content.addComponent(replicaSetName);
+
+        TextField cfgSrvPort = new TextField("Enter port for configuration servers");
+        cfgSrvPort.setInputPrompt(wizard.getConfig().getCfgSrvPort() + "");
+        cfgSrvPort.setMaxLength(5);
+        cfgSrvPort.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (Util.isNumeric(value)) {
+                    wizard.getConfig().setCfgSrvPort(Integer.parseInt(value));
+                }
+            }
+        });
+
+        content.addComponent(cfgSrvPort);
+
+        TextField routerPort = new TextField("Enter port for routers");
+        routerPort.setInputPrompt(wizard.getConfig().getRouterPort() + "");
+        routerPort.setMaxLength(5);
+        routerPort.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (Util.isNumeric(value)) {
+                    wizard.getConfig().setRouterPort(Integer.parseInt(value));
+                }
+            }
+        });
+
+        content.addComponent(routerPort);
+
+        TextField dataNodePort = new TextField("Enter port for data nodes");
+        dataNodePort.setInputPrompt(wizard.getConfig().getDataNodePort() + "");
+        dataNodePort.setMaxLength(5);
+        dataNodePort.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (Util.isNumeric(value)) {
+                    wizard.getConfig().setDataNodePort(Integer.parseInt(value));
+                }
+            }
+        });
+
+        content.addComponent(dataNodePort);
+
+        TextField domain = new TextField("Enter domain name");
+        domain.setInputPrompt(wizard.getConfig().getDomainName());
+        domain.setMaxLength(20);
+        domain.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String value = event.getProperty().getValue().toString().trim();
+                if (!Util.isStringEmpty(value)) {
+                    wizard.getConfig().setDomainName(value);
+                }
+            }
+        });
+
+        content.addComponent(domain);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -128,8 +186,6 @@ public class ConfigurationStep extends Panel {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
-                } else if (Util.isStringEmpty(wizard.getConfig().getReplicaSetName())) {
-                    show("Please provide replica set name");
                 } else if (MongoDAO.getMongoClusterInfo(wizard.getConfig().getClusterName()) != null) {
                     show(String.format("Cluster with name '%s' already exists", wizard.getConfig().getClusterName()));
                 } else {
@@ -149,9 +205,9 @@ public class ConfigurationStep extends Panel {
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
         buttons.addComponent(next);
-        grid.addComponent(buttons, 0, 9, 2, 9);
+        layout.addComponent(buttons);
 
-        addComponent(grid);
+        addComponent(layout);
 
     }
 

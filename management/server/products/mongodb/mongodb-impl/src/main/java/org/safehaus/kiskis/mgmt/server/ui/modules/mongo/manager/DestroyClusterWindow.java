@@ -21,14 +21,14 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.UninstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
 
 /**
  *
@@ -102,7 +102,6 @@ public class DestroyClusterWindow extends Window {
         try {
             //stop any running installation
             final Operation installOperation = new UninstallClusterOperation(config);
-            runTimeoutThread(installOperation);
             showProgress();
             addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
@@ -136,14 +135,12 @@ public class DestroyClusterWindow extends Window {
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
                                 return installOperation.getNextTask();
                             } else {
-                                installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
                                 hideProgress();
                                 MongoDAO.deleteMongoClusterInfo(config.getClusterName());
                                 succeeded = true;
                             }
                         } else {
-                            installOperation.setCompleted(true);
                             addOutput(String.format("Task %s failed", task.getDescription()));
                             addOutput(String.format("Operation %s failed", installOperation.getDescription()));
                             hideProgress();
@@ -155,34 +152,6 @@ public class DestroyClusterWindow extends Window {
             });
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in startOperation", e);
-        }
-    }
-
-    private void runTimeoutThread(final Operation operation) {
-        try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(operation.getTotalTimeout() * 1000 + 5000);
-                        if (!operation.isCompleted()) {
-                            addOutput(String.format(
-                                    "Operation %s timed out!!!",
-                                    operation.getDescription()));
-                            hideProgress();
-                        }
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            operationTimeoutThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
         }
     }
 

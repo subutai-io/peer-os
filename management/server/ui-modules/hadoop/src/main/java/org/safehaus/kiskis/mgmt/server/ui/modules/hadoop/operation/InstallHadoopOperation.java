@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.HadoopConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 
 /**
  * Created with IntelliJ IDEA.

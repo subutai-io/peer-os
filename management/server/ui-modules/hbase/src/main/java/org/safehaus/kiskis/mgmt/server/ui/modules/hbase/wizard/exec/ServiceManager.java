@@ -5,6 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.commands.HBaseCommands;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 
@@ -15,7 +18,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseTable;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  *
@@ -36,7 +39,6 @@ public class ServiceManager {
         for (Agent agent : agents) {
             Request command = new HBaseCommands().getCommand(cce);
             command.setUuid(agent.getUuid());
-
             startTask.addRequest(command);
         }
         tasks.add(startTask);
@@ -56,10 +58,6 @@ public class ServiceManager {
     public void start() {
         moveToNextTask();
         if (currentTask != null) {
-//            for (Request command : currentTask.getCommands()) {
-//                executeCommand(command);
-//            }
-
             HBaseModule.getTaskRunner().executeTask(currentTask, new TaskCallback() {
 
                 @Override
@@ -71,8 +69,9 @@ public class ServiceManager {
                                 return currentTask;
                             }
                         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                            hBaseTable.manageUI(task, response, stdOut, stdErr);
                         }
-                        hBaseTable.manageUI(task);
+                        hBaseTable.manageUI(task, response, stdOut, stdErr);
                     }
                     return null;
                 }

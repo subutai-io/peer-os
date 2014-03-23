@@ -6,8 +6,8 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -18,13 +18,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class InstallClusterOperation extends Operation {
 
-    private final ClusterConfig config;
+    private final Config config;
 
-    public ClusterConfig getConfig() {
+    public Config getConfig() {
         return config;
     }
 
-    public InstallClusterOperation(ClusterConfig config) {
+    public InstallClusterOperation(Config config) {
         super("Install Mongo cluster");
         this.config = config;
 
@@ -33,41 +33,36 @@ public class InstallClusterOperation extends Operation {
         clusterMembers.addAll(config.getRouterServers());
         clusterMembers.addAll(config.getDataNodes());
 
-        addTask(Tasks.getKillRunningMongoTask(clusterMembers));
-
-        addTask(Tasks.getUninstallMongoTask(clusterMembers));
-
-        addTask(Tasks.getCleanMongoDataTask(clusterMembers));
-
         addTask(Tasks.getAptGetUpdateTask(clusterMembers));
 
         addTask(Tasks.getInstallMongoTask(clusterMembers));
 
         addTask(Tasks.getStopMongoTask(clusterMembers));
 
-        addTask(Tasks.getRegisterIpsTask(clusterMembers));
+        addTask(Tasks.getRegisterIpsTask(clusterMembers, config));
 
         addTask(Tasks.getSetReplicaSetNameTask(
                 config.getReplicaSetName(),
                 config.getDataNodes()));
 
         addTask(Tasks.getStartConfigServersTask(
-                config.getConfigServers()));
+                config.getConfigServers(), config));
 
         addTask(Tasks.getStartRoutersTask(
                 config.getRouterServers(),
-                config.getConfigServers()));
+                config.getConfigServers(),
+                config));
 
         addTask(Tasks.getStartReplicaSetTask(
-                config.getDataNodes()));
+                config.getDataNodes(), config));
 
         addTask(Tasks.getRegisterSecondaryNodesWithPrimaryTask(
-                config.getDataNodes()));
+                config.getDataNodes(), config));
 
         addTask(Tasks.getRegisterReplicaSetAsShardWithRouter(
                 config.getReplicaSetName(),
                 config.getRouterServers().iterator().next(),
-                config.getDataNodes()));
+                config.getDataNodes(), config));
 
     }
 

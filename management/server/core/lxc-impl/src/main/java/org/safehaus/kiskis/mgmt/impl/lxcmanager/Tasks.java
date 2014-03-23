@@ -8,7 +8,7 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 
 /**
  *

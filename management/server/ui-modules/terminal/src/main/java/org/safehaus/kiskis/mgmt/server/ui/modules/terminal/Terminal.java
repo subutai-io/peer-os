@@ -1,5 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;

@@ -7,10 +7,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class AddRouterOperation extends Operation {
 
-    public AddRouterOperation(ClusterConfig config, Agent agent) {
+    public AddRouterOperation(Config config, Agent agent) {
         super("Add New Router");
 
         Set<Agent> clusterMembers = new HashSet<Agent>();
@@ -29,21 +29,15 @@ public class AddRouterOperation extends Operation {
 
         clusterMembers.add(agent);
 
-        addTask(Tasks.getKillRunningMongoTask(Util.wrapAgentToSet(agent)));
-
-        addTask(Tasks.getUninstallMongoTask(Util.wrapAgentToSet(agent)));
-
-        addTask(Tasks.getCleanMongoDataTask(Util.wrapAgentToSet(agent)));
-
         addTask(Tasks.getAptGetUpdateTask(Util.wrapAgentToSet(agent)));
 
         addTask(Tasks.getInstallMongoTask(Util.wrapAgentToSet(agent)));
 
         addTask(Tasks.getStopMongoTask(Util.wrapAgentToSet(agent)));
 
-        addTask(Tasks.getRegisterIpsTask(clusterMembers));
+        addTask(Tasks.getRegisterIpsTask(clusterMembers, config));
 
-        addTask(Tasks.getStartRoutersTask(Util.wrapAgentToSet(agent), config.getConfigServers()));
+        addTask(Tasks.getStartRoutersTask(Util.wrapAgentToSet(agent), config.getConfigServers(), config));
     }
 
 }

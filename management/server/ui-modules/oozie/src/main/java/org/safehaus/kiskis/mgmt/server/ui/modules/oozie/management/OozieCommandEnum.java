@@ -15,7 +15,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management;
  */
 public enum OozieCommandEnum {
 
-    START_SERVER("service oozie-server start", 300),
+    START_SERVER("service oozie-server start > /dev/null &", 300),
     STOP_SERVER("service oozie-server stop", 60),
     MANAGE("Manage", 0),
     STATUS("service oozie-server status", 60),

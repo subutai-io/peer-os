@@ -1,5 +1,8 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
@@ -8,7 +11,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.HadoopConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard.Step3;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,11 +49,9 @@ public class Installation {
                         if (installOperation.hasNextTask()) {
                             return installOperation.getNextTask();
                         } else {
-                            installOperation.setCompleted(true);
                             copySSH();
                         }
                     } else {
-                        installOperation.setCompleted(true);
                         panel.addOutput(task, " failed.");
                         panel.addOutput(task, stdErr);
                     }

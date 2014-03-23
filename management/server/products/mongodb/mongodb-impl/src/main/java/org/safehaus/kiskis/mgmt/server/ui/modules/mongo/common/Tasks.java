@@ -8,9 +8,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
 import java.util.Iterator;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 

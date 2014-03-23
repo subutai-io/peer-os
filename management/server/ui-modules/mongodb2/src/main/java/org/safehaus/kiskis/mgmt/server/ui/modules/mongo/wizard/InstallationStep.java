@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.modules.mongo.wizard;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -22,40 +23,31 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.operation.InstallClusterOperation;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.ClusterConfig;
-import org.safehaus.kiskis.mgmt.shared.protocol.Operation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Config;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.TaskType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.dao.MongoDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.entity.MongoClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
  * @author dilshat
- * @todo add domain, ports and paths to user configuration
- * @todo remove unnecessary commands like uninstall prev mongo
- * @todo disable output of commands like apt-get update
- * @todo add/delete node also go via lxc clone/destroy
- * @todo uninstall cluster via lxc-destroy
+ *
  */
 public class InstallationStep extends Panel {
 
@@ -65,26 +57,17 @@ public class InstallationStep extends Panel {
     private final Button done;
     private final Button back;
     private final Label indicator;
-    private Thread operationTimeoutThread;
-
-    private final ClusterConfig config;
-    private final AgentManager agentManager;
-    private final TaskRunner taskRunner;
-    private final LxcManager lxcManager;
-    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 60;
+    private final Config config;
 
     public InstallationStep(final Wizard wizard) {
 
         this.config = wizard.getConfig();
-        this.taskRunner = MongoModule.getTaskRunner();
-        this.agentManager = MongoModule.getAgentManager();
-        this.lxcManager = MongoModule.getLxcManager();
 
         setSizeFull();
 
-        GridLayout grid = new GridLayout(20, 10);
-        grid.setSizeFull();
-        grid.setMargin(true);
+        GridLayout content = new GridLayout(1, 3);
+        content.setSizeFull();
+        content.setMargin(true);
 
         outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setSizeFull();
@@ -92,7 +75,15 @@ public class InstallationStep extends Panel {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
-        grid.addComponent(outputTxtArea, 0, 0, 18, 3);
+        content.addComponent(outputTxtArea);
+
+        logTextArea = new TextArea("Node output");
+        logTextArea.setSizeFull();
+        logTextArea.setRows(13);
+        logTextArea.setImmediate(true);
+        logTextArea.setWordwrap(true);
+
+        content.addComponent(logTextArea);
 
         done = new Button("Done");
         done.setEnabled(false);
@@ -104,6 +95,7 @@ public class InstallationStep extends Panel {
             }
         });
         back = new Button("Back");
+        back.setEnabled(false);
         back.addListener(new Button.ClickListener() {
 
             @Override
@@ -114,21 +106,15 @@ public class InstallationStep extends Panel {
 
         indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
 
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(back);
-        buttons.addComponent(done);
-        grid.addComponent(buttons, 0, 9, 5, 9);
-        grid.addComponent(indicator, 19, 0, 19, 0);
+        HorizontalLayout bottomContent = new HorizontalLayout();
+        bottomContent.addComponent(indicator);
+        bottomContent.addComponent(back);
+        bottomContent.addComponent(done);
+        bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+        content.addComponent(bottomContent);
+        content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
 
-        logTextArea = new TextArea("Node output");
-        logTextArea.setSizeFull();
-        logTextArea.setRows(13);
-        logTextArea.setImmediate(true);
-        logTextArea.setWordwrap(true);
-
-        grid.addComponent(logTextArea, 0, 4, 18, 8);
-
-        addComponent(grid);
+        addComponent(content);
 
     }
 
@@ -137,7 +123,7 @@ public class InstallationStep extends Panel {
             showProgress();
 
             //perform lxc container installation and bootstrap here
-            Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
+            Map<Agent, Integer> bestServers = MongoModule.getLxcManager().getPhysicalServersWithLxcSlots();
 
             if (bestServers.isEmpty()) {
                 addOutput("No servers available to accommodate new lxc containers");
@@ -211,7 +197,7 @@ public class InstallationStep extends Panel {
         }
 
         public CloneInfo call() throws Exception {
-            cloneInfo.setResult(lxcManager.cloneLxcOnHost(cloneInfo.physicalAgent, cloneInfo.getLxcHostname()));
+            cloneInfo.setResult(MongoModule.getLxcManager().cloneLxcOnHost(cloneInfo.physicalAgent, cloneInfo.getLxcHostname()));
             return cloneInfo;
         }
     }
@@ -225,13 +211,13 @@ public class InstallationStep extends Panel {
         }
 
         public CloneInfo call() throws Exception {
-            cloneInfo.setResult(lxcManager.startLxcOnHost(cloneInfo.physicalAgent, cloneInfo.getLxcHostname()));
+            cloneInfo.setResult(MongoModule.getLxcManager().startLxcOnHost(cloneInfo.physicalAgent, cloneInfo.getLxcHostname()));
             return cloneInfo;
         }
     }
 
     private void start(final Map<Agent, Integer> bestServers) {
-        Thread t = new Thread(new Runnable() {
+        MongoModule.getExecutor().execute(new Runnable() {
 
             public void run() {
                 List<CloneInfo> cloneInfoList = new ArrayList<CloneInfo>();
@@ -251,11 +237,11 @@ public class InstallationStep extends Panel {
                             Set<Agent> dataNodes = new HashSet<Agent>();
                             for (CloneInfo cloneInfo : cloneInfoList) {
                                 if (cloneInfo.getNodeType() == NodeType.CONFIG_NODE) {
-                                    cfgServers.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
+                                    cfgServers.add(MongoModule.getAgentManager().getAgentByHostname(cloneInfo.getLxcHostname()));
                                 } else if (cloneInfo.getNodeType() == NodeType.ROUTER_NODE) {
-                                    routers.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
+                                    routers.add(MongoModule.getAgentManager().getAgentByHostname(cloneInfo.getLxcHostname()));
                                 } else if (cloneInfo.getNodeType() == NodeType.DATA_NODE) {
-                                    dataNodes.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
+                                    dataNodes.add(MongoModule.getAgentManager().getAgentByHostname(cloneInfo.getLxcHostname()));
                                 }
                             }
                             config.setConfigServers(cfgServers);
@@ -266,9 +252,11 @@ public class InstallationStep extends Panel {
                                 installMongoCluster();
                             } else {
                                 addOutput("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup");
+                                hideProgress();
                             }
                         } else {
                             addOutput("Waiting timeout for lxc agents to connect is up. Giving up!. Use LXC module to cleanup");
+                            hideProgress();
                         }
 
                     } else {
@@ -282,7 +270,6 @@ public class InstallationStep extends Panel {
             }
         });
 
-        t.start();
     }
 
     private boolean waitAllLxcAgents(List<CloneInfo> cloneInfoList) {
@@ -290,7 +277,7 @@ public class InstallationStep extends Panel {
         while (!Thread.interrupted()) {
             boolean allConnected = true;
             for (CloneInfo cloneInfo : cloneInfoList) {
-                if (agentManager.getAgentByHostname(cloneInfo.getLxcHostname()) == null) {
+                if (MongoModule.getAgentManager().getAgentByHostname(cloneInfo.getLxcHostname()) == null) {
                     allConnected = false;
                     break;
                 }
@@ -298,7 +285,7 @@ public class InstallationStep extends Panel {
             if (allConnected) {
                 return true;
             } else {
-                if (System.currentTimeMillis() - waitStart > LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
+                if (System.currentTimeMillis() - waitStart > Constants.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
                     break;
                 } else {
                     try {
@@ -313,21 +300,12 @@ public class InstallationStep extends Panel {
     }
 
     private boolean persistConfigurationToDb() {
-        MongoClusterInfo mongoClusterInfo
-                = new MongoClusterInfo(
-                        config.getClusterName(),
-                        config.getReplicaSetName(),
-                        config.getConfigServers(),
-                        config.getRouterServers(),
-                        config.getDataNodes());
-
-        return MongoDAO.saveMongoClusterInfo(mongoClusterInfo);
+        return MongoDAO.saveMongoClusterInfo(config);
     }
 
     private boolean startLxcs(List<CloneInfo> cloneInfoList) {
         if (!cloneInfoList.isEmpty()) {
-            ExecutorService executor = Executors.newCachedThreadPool();
-            CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+            CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(MongoModule.getExecutor());
             try {
                 for (CloneInfo cloneInfo : cloneInfoList) {
                     addOutput(String.format("Starting lxc %s", cloneInfo.lxcHostname));
@@ -345,11 +323,6 @@ public class InstallationStep extends Panel {
                 return result;
             } catch (InterruptedException e) {
             } catch (ExecutionException e) {
-            } finally {
-                try {
-                    executor.shutdown();
-                } catch (Exception e) {
-                }
             }
         }
         return false;
@@ -393,8 +366,7 @@ public class InstallationStep extends Panel {
 
         Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
 
-        ExecutorService executor = Executors.newCachedThreadPool();
-        CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(executor);
+        CompletionService<CloneInfo> completer = new ExecutorCompletionService<CloneInfo>(MongoModule.getExecutor());
 
         try {
             outerloop:
@@ -435,11 +407,6 @@ public class InstallationStep extends Panel {
 
         } catch (InterruptedException e) {
         } catch (ExecutionException e) {
-        } finally {
-            try {
-                executor.shutdown();
-            } catch (Exception e) {
-            }
         }
 
         return false;
@@ -450,12 +417,10 @@ public class InstallationStep extends Panel {
         try {
 
             final Operation installOperation = new InstallClusterOperation(config);
-            runTimeoutThread(installOperation);
-            addOutput(String.format("Operation %s started", installOperation.getDescription()));
             addOutput(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
             addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
 
-            taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
+            MongoModule.getTaskRunner().executeTask(installOperation.getNextTask(), new TaskCallback() {
                 private final StringBuilder startConfigServersOutput = new StringBuilder();
                 private final StringBuilder startRoutersOutput = new StringBuilder();
                 private final StringBuilder startDataNodesOutput = new StringBuilder();
@@ -490,16 +455,18 @@ public class InstallationStep extends Panel {
                         if (taskOk) {
                             task.setCompleted(true);
                             task.setTaskStatus(TaskStatus.SUCCESS);
-                            taskRunner.removeTaskCallback(task.getUuid());
+                            MongoModule.getTaskRunner().removeTaskCallback(task.getUuid());
                         }
                     }
 
-                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                    addLog(String.format("%s:\n%s\n%s",
+                    Agent agent = MongoModule.getAgentManager().getAgentByUUID(response.getUuid());
+                    addLog(String.format("%s:\n%s",
                             agent != null
                             ? agent.getHostname() : String.format("Offline[%s]", response.getUuid()),
-                            Util.isStringEmpty(response.getStdOut()) ? "" : response.getStdOut(),
-                            Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr()));
+                            Util.isStringEmpty(response.getStdOut()) ? "running..." : response.getStdOut()
+                    )
+                            + (Util.isStringEmpty(response.getStdErr()) ? "" : response.getStdErr())
+                    );
 
                     if (Util.isFinalResponse(response)) {
                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
@@ -517,12 +484,10 @@ public class InstallationStep extends Panel {
                                 addLog(String.format("======= %s =======", installOperation.peekNextTask().getDescription()));
                                 return installOperation.getNextTask();
                             } else {
-                                installOperation.setCompleted(true);
                                 addOutput(String.format("Operation %s completed", installOperation.getDescription()));
                                 hideProgress();
                             }
                         } else {
-                            installOperation.setCompleted(true);
                             addOutput(String.format("Task %s failed", task.getDescription()));
                             addOutput(String.format("Operation %s failed", installOperation.getDescription()));
                             hideProgress();
@@ -536,34 +501,6 @@ public class InstallationStep extends Panel {
             LOG.log(Level.SEVERE, "Error in install", e);
         }
 
-    }
-
-    private void runTimeoutThread(final Operation operation) {
-        try {
-            if (operationTimeoutThread != null && operationTimeoutThread.isAlive()) {
-                operationTimeoutThread.interrupt();
-            }
-            operationTimeoutThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //wait for timeout + 5 sec just in case
-                        Thread.sleep(operation.getTotalTimeout() * 1000 + 5000);
-                        if (!operation.isCompleted()) {
-                            addOutput(String.format(
-                                    "Operation %s timed out!!!",
-                                    operation.getDescription()));
-                            hideProgress();
-                        }
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            });
-            operationTimeoutThread.start();
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error in runTimeoutThread", e);
-        }
     }
 
     private void showProgress() {
