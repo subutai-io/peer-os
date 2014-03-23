@@ -27,14 +27,10 @@ public class ConfigurationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout layout = new GridLayout(2, 2);
-        layout.setSizeFull();
-        layout.setSpacing(true);
-        layout.setMargin(true);
-        VerticalLayout content = new VerticalLayout();
+        GridLayout content = new GridLayout(2, 7);
+        content.setSizeFull();
         content.setSpacing(true);
-        layout.addComponent(new Label("Please, specify installation settings"));
-        layout.addComponent(content);
+        content.setMargin(true);
 
         final TextField clusterNameTxtFld = new TextField("Enter cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
@@ -47,8 +43,6 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
             }
         });
-
-        content.addComponent(clusterNameTxtFld);
 
         //configuration servers number
         ComboBox cfgSrvsCombo = new ComboBox("Choose number of configuration servers (Recommended 3 nodes)", Arrays.asList(1, 3));
@@ -64,7 +58,6 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfConfigServers((Integer) event.getProperty().getValue());
             }
         });
-        content.addComponent(cfgSrvsCombo);
 
         //routers number
         ComboBox routersCombo = new ComboBox("Choose number of routers ( At least 2 recommended)", Arrays.asList(1, 2, 3));
@@ -80,7 +73,6 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfRouters((Integer) event.getProperty().getValue());
             }
         });
-        content.addComponent(routersCombo);
 
         //datanodes number
         ComboBox dataNodesCombo = new ComboBox("Choose number of datanodes", Arrays.asList(3, 5, 7));
@@ -96,7 +88,6 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setNumberOfDataNodes((Integer) event.getProperty().getValue());
             }
         });
-        content.addComponent(dataNodesCombo);
 
         TextField replicaSetName = new TextField("Enter replica set name");
         replicaSetName.setInputPrompt(wizard.getConfig().getReplicaSetName());
@@ -111,8 +102,6 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        content.addComponent(replicaSetName);
-
         TextField cfgSrvPort = new TextField("Enter port for configuration servers");
         cfgSrvPort.setInputPrompt(wizard.getConfig().getCfgSrvPort() + "");
         cfgSrvPort.setMaxLength(5);
@@ -125,8 +114,6 @@ public class ConfigurationStep extends Panel {
                 }
             }
         });
-
-        content.addComponent(cfgSrvPort);
 
         TextField routerPort = new TextField("Enter port for routers");
         routerPort.setInputPrompt(wizard.getConfig().getRouterPort() + "");
@@ -141,8 +128,6 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        content.addComponent(routerPort);
-
         TextField dataNodePort = new TextField("Enter port for data nodes");
         dataNodePort.setInputPrompt(wizard.getConfig().getDataNodePort() + "");
         dataNodePort.setMaxLength(5);
@@ -156,8 +141,6 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        content.addComponent(dataNodePort);
-
         TextField domain = new TextField("Enter domain name");
         domain.setInputPrompt(wizard.getConfig().getDomainName());
         domain.setMaxLength(20);
@@ -170,8 +153,6 @@ public class ConfigurationStep extends Panel {
                 }
             }
         });
-
-        content.addComponent(domain);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -196,10 +177,29 @@ public class ConfigurationStep extends Panel {
             }
         });
 
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(true);
+        layout.addComponent(new Label("Please, specify installation settings"));
+        layout.addComponent(content);
+
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
         buttons.addComponent(next);
-        layout.addComponent(buttons);
+
+        content.addComponent(clusterNameTxtFld);
+        content.addComponent(cfgSrvsCombo);
+        content.addComponent(replicaSetName);
+        content.addComponent(routersCombo);
+        content.addComponent(domain);
+        content.addComponent(dataNodesCombo);
+        content.addComponent(cfgSrvPort);
+        content.addComponent(new Label());
+        content.addComponent(routerPort);
+        content.addComponent(new Label());
+        content.addComponent(dataNodePort);
+        content.addComponent(new Label());
+        content.addComponent(new Label());
+        content.addComponent(buttons);
 
         addComponent(layout);
 
