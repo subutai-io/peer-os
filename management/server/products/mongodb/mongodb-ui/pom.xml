@@ -9,9 +9,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mongodb-api</artifactId>
-    <name>Kiskis Management MongoDB Api</name>
-    <description>Kiskis Management MongoDB Api</description>
+    <artifactId>mongodb-ui</artifactId>
+    <name>Kiskis Management MongoDB UI</name>
+    <description>Kiskis Management MongoDB UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -23,6 +23,26 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mongodb-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ui-vaadin-services</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ui-vaadin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>db-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -39,7 +59,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.api.mongodb</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.ui.mongodb</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

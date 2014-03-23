@@ -31,3 +31,10 @@ id text,
 log text,
 PRIMARY KEY (id)
 );
+
+CREATE TABLE product_operation (
+  source text,
+  id uuid ,
+  info text,
+  PRIMARY KEY (source, id)
+) ;

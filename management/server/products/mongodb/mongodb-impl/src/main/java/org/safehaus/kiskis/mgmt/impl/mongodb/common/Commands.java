@@ -6,8 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb.common;
 
 import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.MongoModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.mongo.common.Constants;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -24,7 +23,7 @@ public class Commands {
         return CommandFactory.newRequest(
                 RequestType.EXECUTE_REQUEST, // type
                 null, //                        !! agent uuid
-                null, //                        source
+                Config.PRODUCT_KEY, //     source
                 null, //                        !! task uuid 
                 1, //                           !! request sequence number
                 "/", //                         cwd
@@ -40,62 +39,30 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Request getAptGetUpdateCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get update");
-        req.setStdOut(OutputRedirection.NO);
-        req.setTimeout(180);
-        return req;
-    }
-
-    //execute on each selected lxc node
     public static Request getInstallCommand() {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get --force-yes --assume-yes install ksks-mongo");
-        req.setStdOut(OutputRedirection.NO);
+        req.setProgram("/usr/bin/apt-get");
+        req.setArgs(Arrays.asList(
+                "--force-yes",
+                "--assume-yes",
+                "install",
+                "ksks-mongo"
+        ));
         req.setTimeout(360);
         return req;
     }
 
     //execute on each selected lxc node
-    public static Request getUninstallCommand() {
+    public static Request getAptGetUpdateCommand() {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get --force-yes --assume-yes purge ksks-mongo");
-        req.setStdOut(OutputRedirection.NO);
-        req.setTimeout(90);
-        return req;
-    }
-
-    //execute on each selected lxc node
-    public static Request getKillAllCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/pkill -9 -f 'mongod|mongos'");
-        req.setTimeout(30);
-        return req;
-    }
-
-    //execute on each selected lxc node
-    public static Request getCleanCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/bin/rm -R");
+        req.setProgram("/usr/bin/apt-get");
         req.setArgs(Arrays.asList(
-                Constants.MONGO_DIR,
-                "&",
-                "/bin/rm -R",
-                Constants.CONFIG_DIR,
-                "&",
-                "/bin/rm",
-                Constants.DATA_NODE_CONF_FILE,
-                "&",
-                "/bin/rm -R",
-                Constants.LOG_DIR
+                "update"
         ));
-        req.setTimeout(30);
+        req.setStdOut(OutputRedirection.NO);
+        req.setTimeout(180);
         return req;
     }
 
@@ -122,52 +89,20 @@ public class Commands {
         return req;
     }
 
-    //execute on each replica
-    public static Request getCheckReplicaSetMasterCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/bin/echo");
-        req.setArgs(Arrays.asList(
-                "'db.isMaster()'",
-                "|",
-                "mongo"//primary replica's output will contain ["ismaster" : true]
-        ));
-        req.setTimeout(30);
-        return req;
-    }
-
-    //execute on any one replica
-    public static Request getFindReplicaSetMasterCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/bin/echo");
-        req.setArgs(Arrays.asList(
-                "'rs.status()'",
-                "|",
-                "mongo"
-        //output will contain json object containing property [members] 
-        //which is json array with info on each replica where primary 
-        //replica has property ["stateStr" : "PRIMARY"] 
-        //and hostname is ["name" : "mongoTestShard1:27017"]
-        ));
-        req.setTimeout(30);
-        return req;
-    }
-
     //execute on primary replica
-    public static Request getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes) {
+    public static Request getRegisterSecondaryNodesWithPrimaryCommand(String secondaryNodes, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--eval",
                 "\"rs.initiate();\"",
                 ";sleep 30;",
                 "mongo",
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--eval",
                 String.format("\"%s\"", secondaryNodes)
         ));
@@ -176,29 +111,29 @@ public class Commands {
     }
 
     //execute on primary data node
-    public static Request getUnregisterSecondaryNodeFromPrimaryCommand(String host) {
+    public static Request getUnregisterSecondaryNodeFromPrimaryCommand(String host, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongo");
         req.setArgs(Arrays.asList(
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--eval",
-                String.format("\"rs.remove('%s:%s');\"", host, Constants.DATA_NODE_PORT)
+                String.format("\"rs.remove('%s:%s');\"", host, cfg.getDataNodePort())
         ));
         req.setTimeout(30);
         return req;
     }
 
     //execute on any router member
-    public static Request getRegisterShardsWithRouterCommand(String shards) {
+    public static Request getRegisterShardsWithRouterCommand(String shards, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("sleep 30;");
         req.setArgs(Arrays.asList(
                 "mongo",
                 "--port",
-                Constants.ROUTER_PORT + "",
+                cfg.getRouterPort() + "",
                 "--eval",
                 String.format("\"%s\"", shards)
         ));
@@ -208,7 +143,7 @@ public class Commands {
 
     // LIFECYCLE COMMANDS =======================================================
     //execute on config server
-    public static Request getStartConfigServerCommand() {
+    public static Request getStartConfigServerCommand(Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("/bin/mkdir");
@@ -221,7 +156,7 @@ public class Commands {
                 "--dbpath",
                 Constants.CONFIG_DIR,
                 "--port",
-                Constants.CONFIG_SRV_PORT + "", // this might be user-supplied
+                cfg.getCfgSrvPort() + "", // this might be user-supplied
                 "--fork",
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
@@ -232,7 +167,7 @@ public class Commands {
     }
 
     //execute on router
-    public static Request getStartRouterCommand(String configServersArg) {
+    public static Request getStartRouterCommand(String configServersArg, Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongos");
@@ -240,7 +175,7 @@ public class Commands {
                 "--configdb",
                 configServersArg,
                 "--port",
-                Constants.ROUTER_PORT + "",
+                cfg.getRouterPort() + "",
                 "--fork",
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
@@ -249,30 +184,25 @@ public class Commands {
         return req;
     }
 
-    //execute on router
-    public static Request getRestartRouterCommand(String configServersArg) {
+    public static Request getStartRouterCommand2(String configServersArg, Config cfg) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/pkill");
+        req.setProgram("mongos");
         req.setArgs(Arrays.asList(
-                "-2",
-                "mongo",
-                ";",
-                "mongos",
                 "--configdb",
                 configServersArg,
                 "--port",
-                Constants.ROUTER_PORT + "",
+                cfg.getRouterPort() + "",
                 "--fork",
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(180);
+        req.setTimeout(60);
         return req;
     }
 
     //execute on shard
-    public static Request getStartNodeCommand() {
+    public static Request getStartNodeCommand(Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("mongod");
@@ -280,7 +210,7 @@ public class Commands {
                 "--config",
                 Constants.DATA_NODE_CONF_FILE,
                 "--port",
-                Constants.DATA_NODE_PORT + "",
+                cfg.getDataNodePort() + "",
                 "--fork",
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
@@ -304,16 +234,16 @@ public class Commands {
         return req;
     }
 
-    public static Request getCheckConfigSrvStatusCommand(String host) {
-        return getCheckInstanceRunningCommand(host, Constants.CONFIG_SRV_PORT + "");
+    public static Request getCheckConfigSrvStatusCommand(String host, Config cfg) {
+        return getCheckInstanceRunningCommand(host, cfg.getCfgSrvPort() + "");
     }
 
-    public static Request getCheckRouterStatusCommand(String host) {
-        return getCheckInstanceRunningCommand(host, Constants.ROUTER_PORT + "");
+    public static Request getCheckRouterStatusCommand(String host, Config cfg) {
+        return getCheckInstanceRunningCommand(host, cfg.getRouterPort() + "");
     }
 
-    public static Request getCheckDataNodeStatusCommand(String host) {
-        return getCheckInstanceRunningCommand(host, Constants.DATA_NODE_PORT + "");
+    public static Request getCheckDataNodeStatusCommand(String host, Config cfg) {
+        return getCheckInstanceRunningCommand(host, cfg.getDataNodePort() + "");
     }
 
     // RECONFIGURATION COMMANDS
@@ -329,7 +259,7 @@ public class Commands {
         return req;
     }
 
-    public static Request getFindPrimaryNodeCommand() {
+    public static Request getFindPrimaryNodeCommand(Config cfg) {
 
         Request req = getTemplate();
         req.setProgram("/bin/echo");
@@ -338,7 +268,7 @@ public class Commands {
                 "|",
                 "mongo",
                 "--port",
-                Constants.DATA_NODE_PORT + ""
+                cfg.getDataNodePort() + ""
         ));
         req.setTimeout(30);
         return req;

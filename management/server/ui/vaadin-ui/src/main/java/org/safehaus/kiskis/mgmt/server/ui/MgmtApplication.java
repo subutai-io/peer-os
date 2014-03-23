@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
+import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener, HttpServletRequestListener {
@@ -128,6 +129,12 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             Iterator<Component> it = tabs.getComponentIterator();
             while (it.hasNext()) {
                 Component component = it.next();
+                if (component instanceof Disposable) {
+                    try {
+                        ((Disposable) component).dispose();
+                    } catch (Exception e) {
+                    }
+                }
                 if (tabs.getTab(component).getCaption().equals(module.getName())) {
                     tabs.removeComponent(component);
                     return;
