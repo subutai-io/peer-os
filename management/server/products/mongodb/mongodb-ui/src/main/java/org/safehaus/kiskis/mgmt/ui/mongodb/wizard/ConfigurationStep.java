@@ -27,14 +27,14 @@ public class ConfigurationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout layout = new GridLayout(2, 2);
-        layout.setSizeFull();
-        layout.setSpacing(true);
-        layout.setMargin(true);
-        VerticalLayout content = new VerticalLayout();
+        GridLayout content = new GridLayout(2, 5);
+        content.setSizeFull();
         content.setSpacing(true);
-        layout.addComponent(new Label("Please, specify installation settings"));
-        layout.addComponent(content);
+        content.setMargin(true);
+//        VerticalLayout content = new VerticalLayout();
+//        content.setSpacing(true);
+//        layout.addComponent(new Label("Please, specify installation settings"));
+//        layout.addComponent(content);
 
         final TextField clusterNameTxtFld = new TextField("Enter cluster name");
         clusterNameTxtFld.setInputPrompt("Cluster name");
@@ -199,9 +199,9 @@ public class ConfigurationStep extends Panel {
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
         buttons.addComponent(next);
-        layout.addComponent(buttons);
+        content.addComponent(buttons);
 
-        addComponent(layout);
+        addComponent(content);
 
     }
 
