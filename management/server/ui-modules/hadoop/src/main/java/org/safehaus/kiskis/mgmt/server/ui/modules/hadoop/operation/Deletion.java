@@ -15,7 +15,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class Deletion {
 
     public static void startDeletion(final String clusterName, final ClusterForm form) {
-        form.setVisible(true);
+        form.refreshDataSource(true);
 
         HadoopClusterInfo cluster = HadoopDAO.getHadoopClusterInfo(clusterName);
         Task task = Tasks.removeClusterTask(cluster);
@@ -25,7 +25,7 @@ public class Deletion {
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
                     HadoopDAO.deleteHadoopClusterInfo(clusterName);
-                    form.setVisible(false);
+                    form.refreshDataSource(false);
                 }
 
                 return null;

@@ -1,41 +1,43 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+
+import java.util.Set;
 
 public class Terminal implements Module {
 
     public static final String MODULE_NAME = "Terminal";
     private TaskRunner taskRunner;
+    private AgentManager agentManager;
 
     public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
     }
 
+    public void setAgentManager(AgentManager agentManager) {
+        this.agentManager = agentManager;
+    }
+
     public static class ModuleComponent extends CustomComponent {
 
         private final TextArea commandOutputTxtArea;
-        private final AgentManager agentManager;
         private volatile int taskCount = 0;
 
-        public ModuleComponent(final TaskRunner taskRunner) {
-            agentManager = ServiceLocator.getService(AgentManager.class);
+        public ModuleComponent(final TaskRunner taskRunner, final AgentManager agentManager) {
+//            agentManager = ServiceLocator.getService(AgentManager.class);
 
             setHeight("100%");
             GridLayout grid = new GridLayout(20, 10);
@@ -204,7 +206,7 @@ public class Terminal implements Module {
 
     @Override
     public Component createComponent() {
-        return new ModuleComponent(taskRunner);
+        return new ModuleComponent(taskRunner, agentManager);
     }
 
 }

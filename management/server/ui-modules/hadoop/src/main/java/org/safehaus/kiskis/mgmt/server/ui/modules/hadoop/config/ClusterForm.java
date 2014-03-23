@@ -49,7 +49,10 @@ public class ClusterForm extends Panel {
         return indicator;
     }
 
-    public void setVisible(boolean isVisible) {
+    public void refreshDataSource(boolean isVisible) {
         indicator.setVisible(isVisible);
+        if(!isVisible){
+            table.refreshDataSource();
+        }
     }
 }

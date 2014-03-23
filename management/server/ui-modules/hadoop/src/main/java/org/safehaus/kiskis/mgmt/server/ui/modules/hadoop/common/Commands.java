@@ -148,7 +148,7 @@ public class Commands {
             "\t    \"taskUuid\": :taskUuid,\n" +
             "\t    \"requestSequenceNumber\": :requestSequenceNumber,\n" +
             "\t    \"workingDirectory\": \"/\",\n" +
-            "\t    \"program\": \"/bin/mkdir -p /root/.ssh && chmod 700 /root/.ssh && ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa\",\n" +
+            "\t    \"program\": \"rm -Rf /root/.ssh && /bin/mkdir -p /root/.ssh && chmod 700 /root/.ssh && ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa\",\n" +
             "\t    \"stdOut\": \"RETURN\",\n" +
             "\t    \"stdErr\": \"RETURN\",\n" +
             "\t    \"runAs\": \"root\",\n" +
