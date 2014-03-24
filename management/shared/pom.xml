@@ -14,7 +14,6 @@
 
     <modules>
         <module>protocol</module>
-        <module>task-runner-api</module>
         <module>agent-manager-api</module>
         <module>db-manager-api</module>
         <module>communication-api</module>

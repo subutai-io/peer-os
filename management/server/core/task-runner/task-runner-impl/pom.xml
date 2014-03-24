@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-core-parent</artifactId>
+        <artifactId>task-runner-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
