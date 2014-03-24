@@ -605,11 +605,11 @@
                                 </artifactItem>
 
                                 <!--Web Server-->
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>web-server</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <!--Web Server-->
 
                                 <!--                                <artifactItem>

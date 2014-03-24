@@ -21,6 +21,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
 import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
 
 @SuppressWarnings("serial")
@@ -112,7 +113,11 @@ public class Manager extends VerticalLayout {
             }
         });
 
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+        indicator = new Label();
+        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+        indicator.setContentMode(Label.CONTENT_XHTML);
+        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
         GridLayout grid = new GridLayout(5, 1);
@@ -148,13 +153,15 @@ public class Manager extends VerticalLayout {
 
     public void getLxcInfo() {
         lxcTable.setEnabled(false);
+        indicator.setVisible(true);
         LxcModule.getExecutor().execute(new Runnable() {
 
             public void run() {
-                Map<String, EnumMap<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>>> agentFamilies = lxcManager.getLxcOnPhysicalServers();
+                Map<String, EnumMap<LxcState, List<String>>> agentFamilies = lxcManager.getLxcOnPhysicalServers();
                 populateTable(agentFamilies);
                 clearEmptyParents();
                 lxcTable.setEnabled(true);
+                indicator.setVisible(false);
 
             }
         });
@@ -173,10 +180,10 @@ public class Manager extends VerticalLayout {
         }
     }
 
-    private void populateTable(Map<String, EnumMap<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>>> agentFamilies) {
+    private void populateTable(Map<String, EnumMap<LxcState, List<String>>> agentFamilies) {
         lxcTable.removeAllItems();
 
-        for (Map.Entry<String, EnumMap<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>>> agentFamily : agentFamilies.entrySet()) {
+        for (Map.Entry<String, EnumMap<LxcState, List<String>>> agentFamily : agentFamilies.entrySet()) {
             final String parentHostname = agentFamily.getKey();
             final Button startAllChildrenBtn = new Button(Buttons.START.getButtonLabel());
             final Button stopAllChildrenBtn = new Button(Buttons.STOP.getButtonLabel());
@@ -249,7 +256,7 @@ public class Manager extends VerticalLayout {
                 }
             });
 
-            for (Map.Entry<org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
+            for (Map.Entry<LxcState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
 
                 for (final String lxcHostname : lxcs.getValue()) {
                     final Button startBtn = new Button(Buttons.START.getButtonLabel());
@@ -258,9 +265,9 @@ public class Manager extends VerticalLayout {
                     final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
                     progressIcon.setVisible(false);
 
-                    if (lxcs.getKey() == org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.RUNNING) {
+                    if (lxcs.getKey() == LxcState.RUNNING) {
                         startBtn.setEnabled(false);
-                    } else if (lxcs.getKey() == org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState.STOPPED) {
+                    } else if (lxcs.getKey() == LxcState.STOPPED) {
                         stopBtn.setEnabled(false);
                     }
                     final Object rowId = lxcTable.addItem(new Object[]{

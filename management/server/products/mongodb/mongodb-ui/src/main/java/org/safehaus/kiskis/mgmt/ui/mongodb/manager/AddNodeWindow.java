@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.mongodb.manager;
 
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -89,7 +90,11 @@ public class AddNodeWindow extends Window {
 
         content.addComponent(outputTxtArea);
 
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+        indicator = new Label();
+        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+        indicator.setContentMode(Label.CONTENT_XHTML);
+        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
         ok = new Button("Ok");

@@ -204,7 +204,7 @@ public class Manager {
 
         content.addComponent(dataNodesTable);
 
-        refreshClustersInfo();
+//        refreshClustersInfo();
     }
 
     public Component getContent() {

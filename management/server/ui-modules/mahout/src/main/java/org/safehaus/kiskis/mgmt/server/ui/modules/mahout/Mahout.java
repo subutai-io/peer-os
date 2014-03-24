@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.mahout;
 
+import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -55,8 +57,13 @@ public class Mahout implements Module {
             commandOutputTxtArea.setWordwrap(false);
             grid.addComponent(commandOutputTxtArea, 0, 1, 19, 9);
 
-            Label logo = MgmtApplication.createImage("mahout.png", 200, 100);
-            grid.addComponent(logo, 0, 0, 7, 0);
+            Label logoImg = new Label();
+            logoImg.setIcon(new ThemeResource("icons/modules/mahout.png"));
+            logoImg.setContentMode(Label.CONTENT_XHTML);
+            logoImg.setHeight(200, Sizeable.UNITS_PIXELS);
+            logoImg.setWidth(100, Sizeable.UNITS_PIXELS);
+
+            grid.addComponent(logoImg, 0, 0, 7, 0);
             checkBtn = new Button("Check");
             grid.addComponent(checkBtn, 16, 0, 16, 0);
             installBtn = new Button("Install");
@@ -64,7 +71,12 @@ public class Mahout implements Module {
             uninstallBtn = new Button("Uninstall");
             grid.addComponent(uninstallBtn, 18, 0, 18, 0);
 
-            indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+            indicator = new Label();
+            indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+            indicator.setContentMode(Label.CONTENT_XHTML);
+            indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+            indicator.setWidth(50, Sizeable.UNITS_PIXELS);
+
             indicator.setVisible(false);
             grid.addComponent(indicator, 14, 0, 15, 0);
 

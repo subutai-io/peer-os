@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -73,7 +74,11 @@ public class Terminal implements Module {
             final Button sendBtn = new Button("Send");
             grid.addComponent(sendBtn, 18, 9, 18, 9);
 
-            final Label indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+            final Label indicator = new Label();
+            indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+            indicator.setContentMode(Label.CONTENT_XHTML);
+            indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+            indicator.setWidth(50, Sizeable.UNITS_PIXELS);
             indicator.setVisible(false);
             grid.addComponent(indicator, 19, 9, 19, 9);
 
