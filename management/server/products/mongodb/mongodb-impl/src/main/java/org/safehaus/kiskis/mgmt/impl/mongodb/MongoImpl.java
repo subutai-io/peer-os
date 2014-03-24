@@ -870,36 +870,50 @@ public class MongoImpl implements Mongo {
                 Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
 
         if (stopNodeTask.isCompleted()) {
-            return checkNode(clusterName, lxcHostname) == NodeState.STOPPED;
+            return stopNodeTask.getTaskStatus() == TaskStatus.SUCCESS;//checkNode(clusterName, lxcHostname) == NodeState.STOPPED;
         }
 
         return false;
     }
 
-    public NodeState checkNode(String clusterName, String lxcHostname) {
+    public UUID checkNode(final String clusterName, final String lxcHostname) {
+        final ProductOperation po
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
-        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-        if (config == null) {
-            return NodeState.UNKNOWN;
-        }
+        executor.execute(new Runnable() {
 
-        Agent node = agentManager.getAgentByHostname(lxcHostname);
-        if (node == null) {
-            return NodeState.UNKNOWN;
-        }
-        Task checkNodeTask = taskRunner.executeTask(
-                Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
 
-        if (checkNodeTask.isCompleted()) {
-            String stdOut = checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut();
-            if (stdOut.indexOf("couldn't connect to server") > -1) {
-                return NodeState.STOPPED;
-            } else if (stdOut.indexOf("connecting to") > -1) {
-                return NodeState.RUNNING;
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+
+                Task checkNodeTask = taskRunner.executeTask(
+                        Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
+
+                if (checkNodeTask.isCompleted()) {
+                    String stdOut = checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut();
+                    if (stdOut.indexOf("couldn't connect to server") > -1) {
+                        po.addLogDone(String.format("Node on %s is stopped", lxcHostname));
+                    } else if (stdOut.indexOf("connecting to") > -1) {
+                        po.addLogDone(String.format("Node on %s is running", lxcHostname));
+                    } else {
+                        po.addLogDone(String.format("Node on %s is not found", lxcHostname));
+                    }
+                }
+
             }
-        }
+        });
 
-        return NodeState.UNKNOWN;
+        return po.getId();
     }
 
     private NodeType getNodeType(Config config, Agent node) {

@@ -24,6 +24,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
+import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
@@ -254,7 +258,27 @@ public class Manager {
 
                         public void run() {
 
-                            NodeState state = MongoUI.getMongoManager().checkNode(config.getClusterName(), agent.getHostname());
+                            UUID trackID = MongoUI.getMongoManager().checkNode(config.getClusterName(), agent.getHostname());
+
+                            NodeState state = NodeState.UNKNOWN;
+                            while (!Thread.interrupted()) {
+                                ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
+                                if (po != null) {
+                                    if (po.getState() != ProductOperationState.RUNNING) {
+                                        if (po.getLog().contains("stopped")) {
+                                            state = NodeState.STOPPED;
+                                        } else if (po.getLog().contains("running")) {
+                                            state = NodeState.RUNNING;
+                                        }
+                                        break;
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ex) {
+                                    break;
+                                }
+                            }
 
                             synchronized (progressIcon) {
                                 if (state == NodeState.RUNNING) {

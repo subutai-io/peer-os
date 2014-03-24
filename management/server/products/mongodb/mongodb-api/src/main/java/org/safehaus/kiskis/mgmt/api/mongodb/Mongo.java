@@ -89,5 +89,5 @@ public interface Mongo {
      * @return - node state
      *
      */
-    public NodeState checkNode(String clusterName, String lxcHostName);
+    public UUID checkNode(String clusterName, String lxcHostName);
 }
