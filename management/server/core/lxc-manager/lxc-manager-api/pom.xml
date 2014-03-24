@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>mgmt-shared-parent</artifactId>
+        <artifactId>lxc-manager-parent</artifactId>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>lxc-api</artifactId>
-    <name>Kiskis Management LXC Api</name>
-    <description>LXC Api</description>
+    <artifactId>lxc-manager-api</artifactId>
+    <name>Kiskis Management Lxc Manager Api</name>
+    <description>Lxc Manager Api</description>
 
     <packaging>bundle</packaging>
 

@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-core-parent</artifactId>
+        <artifactId>lxc-manager-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>lxc-impl</artifactId>
+    <artifactId>lxc-manager-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management LXC</name>
-    <description>Kiskis Management LXC</description>
+    <name>Kiskis Management Lxc Manager</name>
+    <description>Kiskis Management Lxc Manager Impl</description>
 
     <build>
         <plugins>

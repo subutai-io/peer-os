@@ -14,10 +14,6 @@
 
     <modules>
         <module>protocol</module>
-        <module>agent-manager-api</module>
-        <module>db-manager-api</module>
-        <module>communication-api</module>
-	<module>lxc-api</module>
     </modules>
 
     <description>Parent project for the Kiskis Management Shared Artifacts</description>

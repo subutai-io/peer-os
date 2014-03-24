@@ -93,7 +93,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>lxc-api</artifactId>
+            <artifactId>lxc-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
