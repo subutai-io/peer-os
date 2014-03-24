@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.api.dbmanager;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
 import java.util.Date;
 import java.util.UUID;
 

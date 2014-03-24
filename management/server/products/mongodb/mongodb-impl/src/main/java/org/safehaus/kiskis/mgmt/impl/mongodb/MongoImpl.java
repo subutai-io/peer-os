@@ -45,6 +45,7 @@ import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -972,6 +973,10 @@ public class MongoImpl implements Mongo {
         });
 
         return po.getId();
+    }
+
+    public ProductOperationView getProductOperationView(UUID viewId) {
+        return dbManager.getProductOperation(Config.PRODUCT_KEY, viewId);
     }
 
     private NodeType getNodeType(Config config, Agent node) {

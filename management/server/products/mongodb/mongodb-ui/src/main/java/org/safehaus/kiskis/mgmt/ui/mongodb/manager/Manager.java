@@ -24,8 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
@@ -262,7 +262,7 @@ public class Manager {
                             NodeState state = NodeState.UNKNOWN;
                             long start = System.currentTimeMillis();
                             while (!Thread.interrupted()) {
-                                ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
+                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
                                 if (po != null) {
                                     if (po.getState() != ProductOperationState.RUNNING) {
                                         if (po.getLog().contains("stopped")) {
@@ -322,7 +322,7 @@ public class Manager {
                                 waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
                             }
                             while (!Thread.interrupted()) {
-                                ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
+                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
                                 if (po != null) {
                                     if (po.getState() != ProductOperationState.RUNNING) {
                                         if (po.getState() == ProductOperationState.SUCCEEDED) {
@@ -374,7 +374,7 @@ public class Manager {
                             long start = System.currentTimeMillis();
                             NodeState state = NodeState.UNKNOWN;
                             while (!Thread.interrupted()) {
-                                ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
+                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
                                 if (po != null) {
                                     if (po.getState() != ProductOperationState.RUNNING) {
                                         if (po.getState() == ProductOperationState.SUCCEEDED) {

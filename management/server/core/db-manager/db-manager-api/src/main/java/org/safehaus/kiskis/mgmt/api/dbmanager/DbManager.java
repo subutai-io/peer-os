@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.api.dbmanager;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import com.datastax.driver.core.ResultSet;
 import java.util.List;
 import java.util.UUID;
