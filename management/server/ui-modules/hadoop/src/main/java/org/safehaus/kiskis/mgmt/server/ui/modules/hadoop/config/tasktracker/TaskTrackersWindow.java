@@ -1,10 +1,10 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.tasktracker;
 
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
@@ -148,8 +148,8 @@ public final class TaskTrackersWindow extends Window {
         return addButton;
     }
 
-    private AgentsComboBox getAgentsComboBox(){
-        if(agentsComboBox == null){
+    private AgentsComboBox getAgentsComboBox() {
+        if (agentsComboBox == null) {
             agentsComboBox = new AgentsComboBox(cluster.getClusterName());
         }
 
@@ -199,7 +199,7 @@ public final class TaskTrackersWindow extends Window {
         });
     }
 
-    public void restartCluster(){
+    public void restartCluster() {
         disableButtons(0);
         statusLabel.setValue("");
         indicator.setVisible(true);
@@ -228,7 +228,11 @@ public final class TaskTrackersWindow extends Window {
 
     private Label getIndicator() {
         if (indicator == null) {
-            indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+            indicator = new Label();
+            indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+            indicator.setContentMode(Label.CONTENT_XHTML);
+            indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+            indicator.setWidth(50, Sizeable.UNITS_PIXELS);
             indicator.setVisible(false);
         }
 
@@ -253,7 +257,7 @@ public final class TaskTrackersWindow extends Window {
         return "";
     }
 
-    public void setLoading(boolean loading){
+    public void setLoading(boolean loading) {
         indicator.setVisible(loading);
     }
 }

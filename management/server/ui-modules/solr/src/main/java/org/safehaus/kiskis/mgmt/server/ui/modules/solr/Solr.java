@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.solr;
 
+import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -56,14 +58,23 @@ public class Solr implements Module {
             commandOutputTxtArea.setImmediate(true);
             commandOutputTxtArea.setWordwrap(false);
 
-            Label logo = MgmtApplication.createImage("solr.png", 200, 100);
+            Label logo = new Label();
+            logo.setIcon(new ThemeResource("icons/modules/solr.png"));
+            logo.setContentMode(Label.CONTENT_XHTML);
+            logo.setHeight(200, Sizeable.UNITS_PIXELS);
+            logo.setWidth(100, Sizeable.UNITS_PIXELS);
+            
             startBtn = new Button("Start");
             stopBtn = new Button("Stop");
             checkBtn = new Button("Check");
             installBtn = new Button("Install");
             uninstallBtn = new Button("Uninstall");
 
-            indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+            indicator = new Label();
+            indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+            indicator.setContentMode(Label.CONTENT_XHTML);
+            indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+            indicator.setWidth(50, Sizeable.UNITS_PIXELS);
             indicator.setVisible(false);
 
             grid.addComponent(logo, 0, 0, 7, 0);

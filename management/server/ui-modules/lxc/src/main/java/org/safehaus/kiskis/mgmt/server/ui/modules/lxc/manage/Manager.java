@@ -112,7 +112,11 @@ public class Manager extends VerticalLayout {
             }
         });
 
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+        indicator = new Label();
+        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+        indicator.setContentMode(Label.CONTENT_XHTML);
+        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+        indicator.setWidth(50, Sizeable.UNITS_PIXELS);        
         indicator.setVisible(false);
 
         GridLayout grid = new GridLayout(5, 1);

@@ -1,15 +1,13 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config;
 
+import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 
 /**
- * Created with IntelliJ IDEA.
- * User: daralbaev
- * Date: 1/11/14
- * Time: 4:22 PM
+ * Created with IntelliJ IDEA. User: daralbaev Date: 1/11/14 Time: 4:22 PM
  */
 public class ClusterForm extends Panel {
 
@@ -17,7 +15,6 @@ public class ClusterForm extends Panel {
     private Label indicator;
 
     public ClusterForm() {
-
 
         setSizeFull();
         addComponent(getButtonRefresh());
@@ -43,7 +40,11 @@ public class ClusterForm extends Panel {
     }
 
     private Label getIndicator() {
-        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+        indicator = new Label();
+        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+        indicator.setContentMode(Label.CONTENT_XHTML);
+        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
         return indicator;
@@ -51,7 +52,7 @@ public class ClusterForm extends Panel {
 
     public void refreshDataSource(boolean isVisible) {
         indicator.setVisible(isVisible);
-        if(!isVisible){
+        if (!isVisible) {
             table.refreshDataSource();
         }
     }
