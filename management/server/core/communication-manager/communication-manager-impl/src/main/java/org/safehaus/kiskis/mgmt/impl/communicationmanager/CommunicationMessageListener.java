@@ -1,8 +1,8 @@
-package org.safehaus.kiskis.mgmt.impl.communication;
+package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
 import java.util.Iterator;
-import org.safehaus.kiskis.mgmt.api.communication.CommandJson;
-import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 
 import javax.jms.*;
 import java.util.concurrent.ConcurrentLinkedQueue;

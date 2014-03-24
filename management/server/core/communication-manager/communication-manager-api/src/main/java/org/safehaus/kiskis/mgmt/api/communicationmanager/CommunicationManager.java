@@ -1,8 +1,8 @@
-package org.safehaus.kiskis.mgmt.api.communication;
+package org.safehaus.kiskis.mgmt.api.communicationmanager;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
-public interface Communication {
+public interface CommunicationManager {
 
     public void sendRequest(Request request);
 

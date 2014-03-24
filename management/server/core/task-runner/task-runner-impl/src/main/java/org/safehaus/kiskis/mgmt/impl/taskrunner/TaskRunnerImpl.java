@@ -15,8 +15,8 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.communication.Communication;
-import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
@@ -28,11 +28,11 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
     private static final Logger LOG = Logger.getLogger(TaskRunnerImpl.class.getName());
 
     private static final String MODULE_NAME = "TaskRunner";
-    private Communication communicationService;
+    private CommunicationManager communicationService;
     private ChainedTaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
 
-    public void setCommunicationService(Communication communicationService) {
+    public void setCommunicationService(CommunicationManager communicationService) {
         this.communicationService = communicationService;
     }
 

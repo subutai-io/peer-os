@@ -76,7 +76,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.server.communication</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.impl.communicationmanager</Bundle-SymbolicName>
                         <Export-Package>
                             org.apache.activemq.pool;{local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

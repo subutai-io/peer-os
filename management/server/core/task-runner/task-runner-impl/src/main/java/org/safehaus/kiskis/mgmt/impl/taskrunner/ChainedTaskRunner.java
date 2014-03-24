@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.communication.Communication;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
@@ -25,9 +25,9 @@ public class ChainedTaskRunner {
     private static final Logger LOG = Logger.getLogger(ChainedTaskRunner.class.getName());
 
     private final ExpiringCache<UUID, ChainedTaskListener> taskListenerCache = new ExpiringCache<UUID, ChainedTaskListener>();
-    private final Communication communicationService;
+    private final CommunicationManager communicationService;
 
-    public ChainedTaskRunner(Communication communicationService) {
+    public ChainedTaskRunner(CommunicationManager communicationService) {
         this.communicationService = communicationService;
     }
 

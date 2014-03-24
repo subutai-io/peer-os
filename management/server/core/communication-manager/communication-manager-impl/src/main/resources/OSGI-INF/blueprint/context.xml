@@ -25,7 +25,7 @@
     </cm:property-placeholder>
 
     <bean id="communicationService"
-          class="org.safehaus.kiskis.mgmt.impl.communication.CommunicationImpl"
+          class="org.safehaus.kiskis.mgmt.impl.communicationmanager.CommunicationManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="amqPort" value="${amqPort}"/>
         <property name="amqBindAddress" value="${amqBindAddress}"/>
@@ -43,7 +43,7 @@
     </bean>
 
     <service ref="communicationService"
-             interface="org.safehaus.kiskis.mgmt.api.communication.Communication">
+             interface="org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>

@@ -1,13 +1,13 @@
-package org.safehaus.kiskis.mgmt.impl.communication;
+package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.safehaus.kiskis.mgmt.api.communication.CommandJson;
-import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
-import org.safehaus.kiskis.mgmt.api.communication.Communication;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import javax.jms.*;
 import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.broker.BrokerService;
@@ -20,9 +20,9 @@ import org.apache.activemq.pool.PooledConnectionFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-public class CommunicationImpl implements Communication {
+public class CommunicationManagerImpl implements CommunicationManager {
 
-    private static final Logger LOG = Logger.getLogger(CommunicationImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(CommunicationManagerImpl.class.getName());
     private BrokerService broker;
     private PooledConnectionFactory pooledConnectionFactory;
     private CommunicationMessageListener communicationMessageListener;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.api.communication;
+package org.safehaus.kiskis.mgmt.api.communicationmanager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

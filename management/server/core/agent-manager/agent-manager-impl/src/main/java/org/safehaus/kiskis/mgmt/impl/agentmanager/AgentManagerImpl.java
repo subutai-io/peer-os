@@ -24,9 +24,9 @@ import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.communication.Communication;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.communication.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -46,14 +46,14 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     private static final Logger LOG = Logger.getLogger(AgentManagerImpl.class.getName());
 
-    private Communication communicationService;
+    private CommunicationManager communicationService;
     private DbManager dbManagerService;
     private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
     private ExecutorService exec;
     private Cache<UUID, Agent> agents;
     private volatile boolean notifyAgentListeners = true;
 
-    public void setCommunicationService(Communication communicationService) {
+    public void setCommunicationService(CommunicationManager communicationService) {
         this.communicationService = communicationService;
     }
 
