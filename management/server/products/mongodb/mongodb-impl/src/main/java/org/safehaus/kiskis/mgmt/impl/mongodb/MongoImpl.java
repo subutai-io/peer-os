@@ -428,79 +428,82 @@ public class MongoImpl implements Mongo {
         return null;
     }
 
-    public UUID addNode(final Config config, final NodeType nodeType) {
+    public UUID addNode(final String clusterName, final NodeType nodeType) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding %s to %s", nodeType, config.getClusterName()));
+                        String.format("Adding %s to %s", nodeType, clusterName));
 
-        if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7) {
-            po.addLogFailed("Replica set cannot have more than 7 members.\nOperation aborted");
-        } else {
-            executor.execute(new Runnable() {
+        executor.execute(new Runnable() {
 
-                public void run() {
-                    Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
-
-                    if (bestServers.isEmpty()) {
-                        po.addLogFailed("No servers available to accommodate new lxc containers.\nOperation aborted");
-
-                        return;
-                    }
-                    Agent physicalAgent = bestServers.entrySet().iterator().next().getKey();
-
-                    //clone lxc
-                    StringBuilder lxcHostname;
-                    if (nodeType == NodeType.DATA_NODE) {
-                        lxcHostname = new StringBuilder(physicalAgent.getHostname()).
-                                append(Common.PARENT_CHILD_LXC_SEPARATOR).
-                                append("mongo-data-").append(Util.generateTimeBasedUUID());
-                    } else {
-                        lxcHostname = new StringBuilder(physicalAgent.getHostname()).
-                                append(Common.PARENT_CHILD_LXC_SEPARATOR).
-                                append("mongo-rout-").append(Util.generateTimeBasedUUID());
-                    }
-                    if (lxcHostname.length() > 64) {
-                        lxcHostname.setLength(64);
-                    }
-                    boolean result = lxcManager.cloneLxcOnHost(physicalAgent, lxcHostname.toString());
-                    if (!result) {
-                        po.addLogFailed(String.format(
-                                "Cloning of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
-                                lxcHostname.toString()));
-
-                        return;
-                    } else {
-                        po.addLog(String.format(
-                                "Successfuly cloned %s lxc container",
-                                lxcHostname.toString()));
-                    }
-
-                    //start lxc
-                    result = lxcManager.startLxcOnHost(physicalAgent, lxcHostname.toString());
-                    if (!result) {
-                        po.addLogFailed(String.format(
-                                "Starting of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
-                                lxcHostname.toString()));
-
-                        return;
-                    } else {
-                        po.addLog(String.format(
-                                "Successfuly started %s lxc container",
-                                lxcHostname.toString()));
-                    }
-                    //wait for the new lxc agent to connect
-                    Agent lxcAgent = waitLxcAgent(lxcHostname.toString());
-                    if (lxcAgent == null) {
-                        po.addLogFailed("Waiting timeout for lxc agent to connect is up. Giving up!. Use LXC module to cleanup.\nOperation aborted");
-
-                        return;
-                    }
-
-                    //start addition of node
-                    addNodeInternal(po, config, nodeType, lxcAgent);
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
                 }
-            });
-        }
+                if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7) {
+                    po.addLogFailed("Replica set cannot have more than 7 members.\nOperation aborted");
+                    return;
+                }
+                Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
+
+                if (bestServers.isEmpty()) {
+                    po.addLogFailed("No servers available to accommodate new lxc containers.\nOperation aborted");
+                    return;
+                }
+                Agent physicalAgent = bestServers.entrySet().iterator().next().getKey();
+
+                //clone lxc
+                StringBuilder lxcHostname;
+                if (nodeType == NodeType.DATA_NODE) {
+                    lxcHostname = new StringBuilder(physicalAgent.getHostname()).
+                            append(Common.PARENT_CHILD_LXC_SEPARATOR).
+                            append("mongo-data-").append(Util.generateTimeBasedUUID());
+                } else {
+                    lxcHostname = new StringBuilder(physicalAgent.getHostname()).
+                            append(Common.PARENT_CHILD_LXC_SEPARATOR).
+                            append("mongo-rout-").append(Util.generateTimeBasedUUID());
+                }
+                if (lxcHostname.length() > 64) {
+                    lxcHostname.setLength(64);
+                }
+                boolean result = lxcManager.cloneLxcOnHost(physicalAgent, lxcHostname.toString());
+                if (!result) {
+                    po.addLogFailed(String.format(
+                            "Cloning of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
+                            lxcHostname.toString()));
+
+                    return;
+                } else {
+                    po.addLog(String.format(
+                            "Successfuly cloned %s lxc container",
+                            lxcHostname.toString()));
+                }
+
+                //start lxc
+                result = lxcManager.startLxcOnHost(physicalAgent, lxcHostname.toString());
+                if (!result) {
+                    po.addLogFailed(String.format(
+                            "Starting of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
+                            lxcHostname.toString()));
+
+                    return;
+                } else {
+                    po.addLog(String.format(
+                            "Successfuly started %s lxc container",
+                            lxcHostname.toString()));
+                }
+                //wait for the new lxc agent to connect
+                Agent lxcAgent = waitLxcAgent(lxcHostname.toString());
+                if (lxcAgent == null) {
+                    po.addLogFailed("Waiting timeout for lxc agent to connect is up. Giving up!. Use LXC module to cleanup.\nOperation aborted");
+                    return;
+                }
+
+                //start addition of node
+                addNodeInternal(po, config, nodeType, lxcAgent);
+            }
+        });
 
         return po.getId();
     }
@@ -595,14 +598,18 @@ public class MongoImpl implements Mongo {
         });
     }
 
-    public UUID uninstallCluster(final Config config) {
+    public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", config.getClusterName()));
-
+                        String.format("Destroying cluster %s", clusterName));
         executor.execute(new Runnable() {
 
             public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
                 CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
                 boolean result = true;
                 try {
@@ -615,7 +622,7 @@ public class MongoImpl implements Mongo {
                         po.addLog(String.format("Destroying lxc %s", agent.getHostname()));
                         Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
                         if (physicalAgent == null) {
-                            po.addLogFailed(String.format("Could not determine physical parent of %s. Use LXC module to cleanup\nOperation aborted", agent.getHostname()));
+                            po.addLog(String.format("Could not determine physical parent of %s. Use LXC module to cleanup", agent.getHostname()));
                         } else {
                             tasks++;
                             completer.submit(new LxcActor(new LxcInfo(physicalAgent, agent.getHostname()), lxcManager, LxcAction.DESTROY));
@@ -627,6 +634,8 @@ public class MongoImpl implements Mongo {
                         LxcInfo info = future.get();
                         result &= info.isResult();
                     }
+
+                    result &= agents.size() == tasks;
 
                 } catch (InterruptedException e) {
                 } catch (ExecutionException e) {
@@ -647,115 +656,132 @@ public class MongoImpl implements Mongo {
         return po.getId();
     }
 
-    public UUID destroyNode(final Config config, final Agent agent) {
-        final NodeType nodeType = getNodeType(config, agent);
+    public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", nodeType, config.getClusterName()));
-        if (nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1) {
-            po.addLogFailed("This is the last configuration server in the cluster. Please, destroy cluster instead\n.Operation aborted");
-        } else if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1) {
-            po.addLogFailed("This is the last data node in the cluster. Please, destroy cluster instead\n.Operation aborted");
-        } else if (nodeType == NodeType.ROUTER_NODE && config.getRouterServers().size() == 1) {
-            po.addLogFailed("This is the last router in the cluster. Please, destroy cluster instead\n.Operation aborted");
-        } else {
-            //go on operation
-            executor.execute(new Runnable() {
+                        String.format("Destroying %s in %s", lxcHostname, clusterName));
 
-                public void run() {
-                    if (nodeType == NodeType.CONFIG_NODE) {
-                        config.getConfigServers().remove(agent);
-                        //restart routers
-                        po.addLog("Restarting routers...");
-                        Task stopMongoTask = taskRunner.
-                                executeTask(Tasks.getStopMongoTask(config.getRouterServers()));
+        //go on operation
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                Agent agent = agentManager.getAgentByHostname(lxcHostname);
+                if (agent == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+
+                final NodeType nodeType = getNodeType(config, agent);
+                if (nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1) {
+                    po.addLogFailed("This is the last configuration server in the cluster. Please, destroy cluster instead\n.Operation aborted");
+                    return;
+                } else if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1) {
+                    po.addLogFailed("This is the last data node in the cluster. Please, destroy cluster instead\n.Operation aborted");
+                    return;
+                } else if (nodeType == NodeType.ROUTER_NODE && config.getRouterServers().size() == 1) {
+                    po.addLogFailed("This is the last router in the cluster. Please, destroy cluster instead\n.Operation aborted");
+                    return;
+                }
+
+                if (nodeType == NodeType.CONFIG_NODE) {
+                    config.getConfigServers().remove(agent);
+                    //restart routers
+                    po.addLog("Restarting routers...");
+                    Task stopMongoTask = taskRunner.
+                            executeTask(Tasks.getStopMongoTask(config.getRouterServers()));
+                    //don't check status of this task since this task always ends with execute_timeouted
+                    if (stopMongoTask.isCompleted()) {
+                        Task startRoutersTask = taskRunner.
+                                executeTask(Tasks.getStartRoutersTask2(config.getRouterServers(),
+                                                config.getConfigServers(), config));
                         //don't check status of this task since this task always ends with execute_timeouted
-                        if (stopMongoTask.isCompleted()) {
-                            Task startRoutersTask = taskRunner.
-                                    executeTask(Tasks.getStartRoutersTask2(config.getRouterServers(),
-                                                    config.getConfigServers(), config));
-                            //don't check status of this task since this task always ends with execute_timeouted
-                            if (startRoutersTask.isCompleted()) {
-                                //check number of started routers
-                                int numberOfRoutersRestarted = 0;
-                                for (Map.Entry<UUID, Result> res : startRoutersTask.getResults().entrySet()) {
-                                    if (res.getValue().getStdOut().contains("child process started successfully, parent exiting")) {
-                                        numberOfRoutersRestarted++;
-                                    }
+                        if (startRoutersTask.isCompleted()) {
+                            //check number of started routers
+                            int numberOfRoutersRestarted = 0;
+                            for (Map.Entry<UUID, Result> res : startRoutersTask.getResults().entrySet()) {
+                                if (res.getValue().getStdOut().contains("child process started successfully, parent exiting")) {
+                                    numberOfRoutersRestarted++;
                                 }
-                                if (numberOfRoutersRestarted != config.getRouterServers().size()) {
-                                    po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
-                                }
-
-                            } else {
-                                po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
                             }
+                            if (numberOfRoutersRestarted != config.getRouterServers().size()) {
+                                po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
+                            }
+
                         } else {
                             po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
                         }
+                    } else {
+                        po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
+                    }
 
-                    } else if (nodeType == NodeType.DATA_NODE) {
-                        config.getDataNodes().remove(agent);
-                        //unregister from primary
-                        po.addLog("Unregistering this node from replica set...");
-                        Task findPrimaryNodeTask = taskRunner.
-                                executeTask(Tasks.getFindPrimaryNodeTask(agent, config));
+                } else if (nodeType == NodeType.DATA_NODE) {
+                    config.getDataNodes().remove(agent);
+                    //unregister from primary
+                    po.addLog("Unregistering this node from replica set...");
+                    Task findPrimaryNodeTask = taskRunner.
+                            executeTask(Tasks.getFindPrimaryNodeTask(agent, config));
 
-                        if (findPrimaryNodeTask.isCompleted()) {
-                            Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                            Matcher m = p.matcher(findPrimaryNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut());
-                            Agent primaryNodeAgent = null;
-                            if (m.find()) {
-                                String primaryNodeHost = m.group(1);
-                                if (!Util.isStringEmpty(primaryNodeHost)) {
-                                    String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
-                                    primaryNodeAgent = agentManager.getAgentByHostname(hostname);
-                                }
+                    if (findPrimaryNodeTask.isCompleted()) {
+                        Pattern p = Pattern.compile("primary\" : \"(.*)\"");
+                        Matcher m = p.matcher(findPrimaryNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut());
+                        Agent primaryNodeAgent = null;
+                        if (m.find()) {
+                            String primaryNodeHost = m.group(1);
+                            if (!Util.isStringEmpty(primaryNodeHost)) {
+                                String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
+                                primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                             }
-                            if (primaryNodeAgent != null) {
-                                if (primaryNodeAgent != agent) {
-                                    Task unregisterSecondaryNodeFromPrimaryTask
-                                            = taskRunner.
-                                            executeTask(
-                                                    Tasks.getUnregisterSecondaryFromPrimaryTask(
-                                                            primaryNodeAgent, agent, config));
-                                    if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
-                                        po.addLog("Could not unregister this node from replica set, skipping...");
-                                    }
+                        }
+                        if (primaryNodeAgent != null) {
+                            if (primaryNodeAgent != agent) {
+                                Task unregisterSecondaryNodeFromPrimaryTask
+                                        = taskRunner.
+                                        executeTask(
+                                                Tasks.getUnregisterSecondaryFromPrimaryTask(
+                                                        primaryNodeAgent, agent, config));
+                                if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                                    po.addLog("Could not unregister this node from replica set, skipping...");
                                 }
-                            } else {
-                                po.addLog("Could not determine primary node for unregistering from replica set, skipping...");
                             }
                         } else {
                             po.addLog("Could not determine primary node for unregistering from replica set, skipping...");
                         }
+                    } else {
+                        po.addLog("Could not determine primary node for unregistering from replica set, skipping...");
+                    }
 
-                    } else if (nodeType == NodeType.ROUTER_NODE) {
-                        config.getRouterServers().remove(agent);
-                    }
-                    //destroy lxc
-                    po.addLog("Destroying lxc container...");
-                    Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
-                    if (physicalAgent == null) {
-                        po.addLog(
-                                String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                                        agent.getHostname()));
-                    } else {
-                        if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
-                            po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
-                        }
-                    }
-                    //update db
-                    po.addLog("Updating db...");
-                    if (!dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                        po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                                config.getClusterName()));
-                    } else {
-                        po.addLogDone("Done");
+                } else if (nodeType == NodeType.ROUTER_NODE) {
+                    config.getRouterServers().remove(agent);
+                }
+                //destroy lxc
+                po.addLog("Destroying lxc container...");
+                Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
+                if (physicalAgent == null) {
+                    po.addLog(
+                            String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
+                                    agent.getHostname()));
+                } else {
+                    if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
+                        po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
                     }
                 }
-            });
-        }
+                //update db
+                po.addLog("Updating db...");
+                if (!dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                    po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
+                            config.getClusterName()));
+                } else {
+                    po.addLogDone("Done");
+                }
+            }
+        });
+
         return po.getId();
     }
 
@@ -771,7 +797,17 @@ public class MongoImpl implements Mongo {
         return new ArrayList<Config>();
     }
 
-    public boolean startNode(Config config, Agent node) {
+    public boolean startNode(String clusterName, String lxcHostname) {
+        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+        if (config == null) {
+            return false;
+        }
+
+        Agent node = agentManager.getAgentByHostname(lxcHostname);
+        if (node == null) {
+            return false;
+        }
+
         Task startNodeTask;
         NodeType nodeType = getNodeType(config, node);
 
@@ -818,18 +854,39 @@ public class MongoImpl implements Mongo {
         return NodeState.RUNNING.equals(startNodeTask.getData());
     }
 
-    public boolean stopNode(Config config, Agent node) {
+    public boolean stopNode(String clusterName, String lxcHostname) {
+
+        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+        if (config == null) {
+            return false;
+        }
+
+        Agent node = agentManager.getAgentByHostname(lxcHostname);
+        if (node == null) {
+            return false;
+        }
+
         Task stopNodeTask = taskRunner.executeTask(
                 Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
 
         if (stopNodeTask.isCompleted()) {
-            return checkNode(config, node) == NodeState.STOPPED;
+            return checkNode(clusterName, lxcHostname) == NodeState.STOPPED;
         }
 
         return false;
     }
 
-    public NodeState checkNode(Config config, Agent node) {
+    public NodeState checkNode(String clusterName, String lxcHostname) {
+
+        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+        if (config == null) {
+            return NodeState.UNKNOWN;
+        }
+
+        Agent node = agentManager.getAgentByHostname(lxcHostname);
+        if (node == null) {
+            return NodeState.UNKNOWN;
+        }
         Task checkNodeTask = taskRunner.executeTask(
                 Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
 

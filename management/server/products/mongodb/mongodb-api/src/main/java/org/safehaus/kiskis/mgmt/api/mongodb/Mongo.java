@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.api.mongodb;
 
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 /**
@@ -36,59 +35,59 @@ public interface Mongo {
     /**
      * Uninstalls the specified cluster
      *
-     * @param config - cluster configuration
+     * @param clusterName - name of cluster
      * @return - UUID of operation to track
      *
      */
-    public UUID uninstallCluster(Config config);
+    public UUID uninstallCluster(String clusterName);
 
     /**
      * adds node to the specified cluster
      *
-     * @param config - cluster configuration
+     * @param clusterName - name of cluster
      * @param nodeType - type of node to add
      * @return - UUID of operation to track
      *
      */
-    public UUID addNode(Config config, NodeType nodeType);
+    public UUID addNode(String clusterName, NodeType nodeType);
 
     /**
      * destroys node in the specified cluster
      *
-     * @param config - cluster configuration
-     * @param agent - agent of node
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
      * @return - UUID of operation to track
      *
      */
-    public UUID destroyNode(Config config, Agent agent);
+    public UUID destroyNode(String clusterName, String lxcHostName);
 
     /**
      * Starts the specified node
      *
-     * @param config - cluster configuration
-     * @param agent - agent of node
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
      * @return - result of operation true - success, false - failure
      *
      */
-    public boolean startNode(Config config, Agent node);
+    public boolean startNode(String clusterName, String lxcHostName);
 
     /**
      * Stops the specified node
      *
-     * @param config - cluster configuration
-     * @param agent - agent of node
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
      * @return - result of operation true - success, false - failure
      *
      */
-    public boolean stopNode(Config config, Agent node);
+    public boolean stopNode(String clusterName, String lxcHostName);
 
     /**
      * Checks status of the specified node
      *
-     * @param config - cluster configuration
-     * @param agent - agent of node
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
      * @return - node state
      *
      */
-    public NodeState checkNode(Config config, Agent node);
+    public NodeState checkNode(String clusterName, String lxcHostName);
 }

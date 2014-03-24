@@ -98,7 +98,7 @@ public class DestroyNodeWindow extends Window {
                 MongoUI.getExecutor().execute(new Runnable() {
 
                     public void run() {
-                        UUID operationID = MongoUI.getMongoManager().destroyNode(config, agent);
+                        UUID operationID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
                         while (track) {
                             ProductOperationView po = MongoUI.getDbManager().getProductOperation(
                                     Config.PRODUCT_KEY, operationID);
