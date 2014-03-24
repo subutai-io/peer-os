@@ -10,12 +10,10 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClustersTable;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +26,7 @@ public class StepStart extends Panel {
 
     private ClustersTable table;
     private Item selectedItem;
+    HorizontalLayout hlcluster;
 
     public StepStart(final Wizard wizard) {
         setSizeFull();
@@ -92,6 +91,8 @@ public class StepStart extends Panel {
             public void buttonClick(Button.ClickEvent event) {
                 table = getTable();
                 table.refreshDataSource();
+                hlcluster.removeAllComponents();
+                hlcluster.addComponent(table);
             }
         });
 
@@ -102,7 +103,10 @@ public class StepStart extends Panel {
         gridLayout.setComponentAlignment(refresh, Alignment.BOTTOM_RIGHT);
         addComponent(gridLayout);
         table = getTable();
-        addComponent(table);
+        hlcluster = new HorizontalLayout();
+        hlcluster.setSizeFull();
+        hlcluster.addComponent(table);
+        addComponent(hlcluster);
     }
 
     private void show(String notification) {

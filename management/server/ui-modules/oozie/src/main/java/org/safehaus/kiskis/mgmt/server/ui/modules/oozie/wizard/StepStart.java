@@ -20,14 +20,9 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.ClustersTable;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,6 +42,7 @@ public class StepStart extends Panel {
     VerticalLayout vLayout;
     ClustersTable table;
 //    private OozieDAO oozieDAO;
+    HorizontalLayout hlcluster;
 
     public StepStart(final Wizard wizard) {
 //        this.oozieDAO = oozieDAO;
@@ -108,18 +104,10 @@ public class StepStart extends Panel {
         refresh.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-//                table = getTable();
-                table = new ClustersTable();
-                table.addListener(new ItemClickEvent.ItemClickListener() {
-
-                    @Override
-                    public void itemClick(ItemClickEvent event) {
-                        selectedItem = event.getItem();
-                    }
-
-                });
-                vLayout.removeAllComponents();
-                vLayout.addComponent(table);
+                table = getTable();
+                table.refreshDataSource();
+                hlcluster.removeAllComponents();
+                hlcluster.addComponent(table);
             }
         });
 
@@ -131,24 +119,28 @@ public class StepStart extends Panel {
         addComponent(gridLayout);
         vLayout = new VerticalLayout();
         addComponent(vLayout);
-//        table = getTable();
-//        addComponent(table);
+        table = getTable();
+        hlcluster = new HorizontalLayout();
+        hlcluster.setSizeFull();
+        hlcluster.addComponent(table);
+        addComponent(hlcluster);
+
     }
 
     private void show(String notification) {
         getWindow().showNotification(notification);
     }
 
-//    private ClustersTable getTable() {
-//        table = new ClustersTable();
-//        table.addListener(new ItemClickEvent.ItemClickListener() {
-//
-//            @Override
-//            public void itemClick(ItemClickEvent event) {
-//                selectedItem = event.getItem();
-//            }
-//
-//        });
-//        return table;
-//}
+    private ClustersTable getTable() {
+        table = new ClustersTable();
+        table.addListener(new ItemClickEvent.ItemClickListener() {
+
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                selectedItem = event.getItem();
+            }
+
+        });
+        return table;
+    }
 }
