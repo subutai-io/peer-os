@@ -226,8 +226,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                                 }
                             }
                             Thread.sleep(1000);
-                        } catch (Exception ex) {
-                            LOG.log(Level.SEVERE, "Error in AgentNotifier.run", ex);
+                        } catch (InterruptedException ex) {
+                            break;
                         }
                     }
                 }

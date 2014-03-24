@@ -90,7 +90,7 @@ public class Tracker {
                     populateOperations();
                     populateLogs();
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         break;
                     }

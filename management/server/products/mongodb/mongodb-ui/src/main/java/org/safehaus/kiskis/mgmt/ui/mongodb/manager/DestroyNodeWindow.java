@@ -112,10 +112,15 @@ public class DestroyNodeWindow extends Window {
                                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                                 if (po.getState() != ProductOperationState.RUNNING) {
                                     hideProgress();
-                                    return;
+                                    break;
                                 }
                             } else {
                                 setOutput("Product operation not found. Check logs");
+                            }
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                break;
                             }
                         }
                     }
