@@ -9,13 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>communication-parent</artifactId>
-    <name>Kiskis Management Communication Parent</name>
-    <description>Kiskis Management Communication Parent</description>
+    <artifactId>communication-manager-parent</artifactId>
+    <name>Kiskis Management Communication Manager Parent</name>
+    <description>Kiskis Management Communication Manager Parent</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>communication-api</module>
-        <module>communication-impl</module>
+        <module>communication-manager-api</module>
+        <module>communication-manager-impl</module>
     </modules>
 </project>

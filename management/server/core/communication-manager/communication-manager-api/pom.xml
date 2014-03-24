@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <artifactId>communication-parent</artifactId>
+        <artifactId>communication-manager-parent</artifactId>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>communication-api</artifactId>
-    <name>Kiskis Management Communication Api</name>
-    <description>Communication Api</description>
+    <artifactId>communication-manager-api</artifactId>
+    <name>Kiskis Management Communication Manager Api</name>
+    <description>Communication Manager Api</description>
 
     <packaging>bundle</packaging>
 

@@ -17,7 +17,7 @@
     <modules>
         <module>agent-manager</module>
         <module>db-manager</module>
-        <module>communication</module>
+        <module>communication-manager</module>
         <module>task-runner</module>
 	<module>lxc-manager</module>
     </modules>

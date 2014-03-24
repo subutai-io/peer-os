@@ -443,12 +443,12 @@
                                 <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>communication-api</artifactId>
+                                    <artifactId>communication-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>communication-impl</artifactId>
+                                    <artifactId>communication-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>                                
                                 <artifactItem>
