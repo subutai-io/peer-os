@@ -13,8 +13,6 @@
     <description>Kiskis Management Modules Parent</description>
 
     <modules>
-        <module>terminal</module>
-        <module>lxc</module>
         <module>hadoop</module>
         <module>cassandra</module>
         <module>pig</module>
@@ -27,7 +25,6 @@
         <module>lucene</module>
         <module>solr</module>
         <module>monitor</module>
-        <!--<module>logs</module>-->
     </modules>
    
 </project>

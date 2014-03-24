@@ -295,7 +295,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lxc-module</artifactId>
+                                    <artifactId>lxc-manager-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -443,22 +443,22 @@
                                 <!--Shared Dependencies-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>communication-api</artifactId>
+                                    <artifactId>communication-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>communication-impl</artifactId>
+                                    <artifactId>communication-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>                                
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lxc-api</artifactId>
+                                    <artifactId>lxc-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lxc-impl</artifactId>
+                                    <artifactId>lxc-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>                                
                                 <artifactItem>

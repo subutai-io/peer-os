@@ -4,22 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-parent</artifactId>
+        <artifactId>mgmt-server-core-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mgmt-server-core-parent</artifactId>
-    <name>Kiskis Management Core Parent</name>
-    <description>Kiskis Management Core Parent</description>
+    <artifactId>db-manager-parent</artifactId>
+    <name>Kiskis Management Db Manager Parent</name>
+    <description>Kiskis Management Db Manager Parent</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>agent-manager</module>
-        <module>db-manager</module>
-        <module>communication-manager</module>
-        <module>task-runner</module>
-	<module>lxc-manager</module>
-	<module>terminal</module>
+        <module>db-manager-api</module>
+        <module>db-manager-impl</module>
     </modules>
 </project>

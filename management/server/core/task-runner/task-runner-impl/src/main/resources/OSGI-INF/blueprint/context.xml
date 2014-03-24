@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+        >
+
+    <reference id="communicationService" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager"/>               
+        
+    <bean id="module" scope="singleton"
+          class="org.safehaus.kiskis.mgmt.impl.taskrunner.TaskRunnerImpl"
+          init-method="init" destroy-method="destroy" activation="eager">
+        <property name="communicationService" ref="communicationService"/>
+    </bean>
+    
+    <service ref="module" interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>
+    
+</blueprint>
