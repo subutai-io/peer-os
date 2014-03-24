@@ -1,0 +1,13 @@
+{
+	"query" : {
+        "term" : { "name" : "cpu_user" }
+    },
+	"filter" : {
+        "range" : {
+            "@timestamp" : {
+                "from" : "$fromDate",
+                "to" : "$toDate"
+            }
+        }
+    }
+}

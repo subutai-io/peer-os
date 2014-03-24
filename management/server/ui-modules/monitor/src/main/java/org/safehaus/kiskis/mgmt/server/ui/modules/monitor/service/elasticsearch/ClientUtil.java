@@ -8,8 +8,17 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientUtil {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ClientUtil.class);
+
+    //    private static final String HOST = "172.16.10.103";
+//    private static final String HOST = "http://172.16.10.108/";
+    private static final String HOST = "10.10.10.1";
+    private static final int PORT = 9300;
 
     private static TransportClient client;
 
@@ -19,12 +28,20 @@ public class ClientUtil {
             return client;
         }
 
-        Settings settings = ImmutableSettings.settingsBuilder()
-                .put("client.transport.ignore_cluster_name", true)
-                .put("node.name", "TestNode")
-                .build();
+        LOG.info("host: {}, port: {}", HOST, PORT);
 
-        client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("172.16.10.103", 9300));
+//        Settings settings = ImmutableSettings.settingsBuilder()
+//                .put("client.transport.ignore_cluster_name", true)
+//                .put("node.name", "TestNode")
+//                .build();
+//
+//        client = new TransportClient(settings).addTransportAddress( new InetSocketTransportAddress(HOST, PORT) );
+
+        Settings settings = ImmutableSettings.settingsBuilder().build();
+
+        client = new TransportClient(settings).addTransportAddress(
+                new InetSocketTransportAddress(HOST, PORT)
+        );
 
         return client;
     }

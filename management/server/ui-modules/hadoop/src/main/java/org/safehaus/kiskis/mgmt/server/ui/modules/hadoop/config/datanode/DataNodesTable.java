@@ -1,21 +1,23 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.datanode;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Commands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.DataNodeConfiguration;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,19 +27,22 @@ import java.util.UUID;
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 11/30/13 Time: 6:56 PM
  */
-public class TaskTrackersTable extends Table {
+public class DataNodesTable extends Table {
 
     public static final String HOSTNAME = "hostname",
             STATUS = "status",
             REMOVE = "remove";
     private final String clusterName;
     private IndexedContainer container;
+    private DataNodesWindow parent;
+
     private HadoopClusterInfo cluster;
 
-    public TaskTrackersTable(String clusterName) {
+    public DataNodesTable(DataNodesWindow parent, String clusterName) {
+        this.parent = parent;
         this.clusterName = clusterName;
 
-        this.setCaption(" Task Trackers");
+        this.setCaption(" Data Nodes");
         this.setContainerDataSource(getContainer());
 
         this.setWidth("100%");
@@ -55,18 +60,20 @@ public class TaskTrackersTable extends Table {
         // Create the container properties
         container.addContainerProperty(HOSTNAME, String.class, "");
         container.addContainerProperty(STATUS, String.class, "");
-        
-        List<Agent> list = cluster.getTaskTrackers();
+        container.addContainerProperty(REMOVE, Button.class, "");
+
+        // Create some orders
+        List<Agent> list = cluster.getDataNodes();
         for (Agent agent : list) {
             addOrderToContainer(container, agent);
 
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(":source", HadoopModule.MODULE_NAME);
             map.put(":uuid", agent.getUuid().toString());
+
             Task statusTask = TaskUtil.getTask(Commands.STATUS_DATA_NODE, map);
 
             HadoopModule.getTaskRunner().executeTask(statusTask, new TaskCallback() {
-
                 Map<UUID, String> statuses = new HashMap<UUID, String>();
 
                 @Override
@@ -80,7 +87,6 @@ public class TaskTrackersTable extends Table {
                             findRow(status.getKey(), status.getValue());
                         }
                     }
-
                     return null;
                 }
             });
@@ -91,10 +97,25 @@ public class TaskTrackersTable extends Table {
 
     private void addOrderToContainer(Container container, final Agent agent) {
         Object itemId = container.addItem();
-        Item item = container.getItem(itemId);
+        final Item item = container.getItem(itemId);
 
         item.getItemProperty(HOSTNAME).setValue(agent.getHostname());
         item.getItemProperty(STATUS).setValue("");
+
+        Button button = new Button(REMOVE);
+        button.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                String status = (String) item.getItemProperty(STATUS).getValue();
+                if(status.contains("NOT")){
+                    DataNodeConfiguration.removeNode(parent, clusterName, agent, false);
+                } else {
+                    DataNodeConfiguration.removeNode(parent, clusterName, agent, true);
+                }
+            }
+        });
+
+        item.getItemProperty(REMOVE).setValue(button);
     }
 
     public void refreshDataSource() {
@@ -119,8 +140,8 @@ public class TaskTrackersTable extends Table {
         String[] array = response.split("\n");
 
         for (String status : array) {
-            if (status.contains("TaskTracker")) {
-                return status.replaceAll("TaskTracker is ", "");
+            if (status.contains("DataNode is")) {
+                return status.replaceAll("DataNode is ", "");
             }
         }
 

@@ -1,7 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,12 +14,15 @@ import com.vaadin.ui.Panel;
 public class ClusterForm extends Panel {
 
     private ClusterTable table;
+    private Label indicator;
 
     public ClusterForm() {
 
+
         setSizeFull();
         addComponent(getButtonRefresh());
-        addComponent(getTable());
+        addComponent(getIndicator());
+        addComponent(getTable(this));
     }
 
     private Button getButtonRefresh() {
@@ -32,8 +37,22 @@ public class ClusterForm extends Panel {
         return button;
     }
 
-    private ClusterTable getTable() {
-        table = new ClusterTable();
+    private ClusterTable getTable(ClusterForm form) {
+        table = new ClusterTable(form);
         return table;
+    }
+
+    private Label getIndicator() {
+        indicator = MgmtApplication.createImage("indicator.gif", 50, 11);
+        indicator.setVisible(false);
+
+        return indicator;
+    }
+
+    public void refreshDataSource(boolean isVisible) {
+        indicator.setVisible(isVisible);
+        if(!isVisible){
+            table.refreshDataSource();
+        }
     }
 }

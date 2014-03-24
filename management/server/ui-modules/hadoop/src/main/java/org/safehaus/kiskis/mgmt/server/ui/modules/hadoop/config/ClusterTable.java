@@ -8,8 +8,9 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode.DataNodesWindow;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.tasktracker.TaskTrackersWindow;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.datanode.DataNodesWindow;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.tasktracker.TaskTrackersWindow;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.Deletion;
 
 import java.util.List;
 
@@ -18,16 +19,20 @@ import java.util.List;
  */
 public class ClusterTable extends Table {
 
+    private ClusterForm parent;
+
     static final Action ACTION_NAME_NODE = new Action("Edit name node and data trackers");
     static final Action ACTION_JOB_TRACKER = new Action("Edit job tracker and task trackers");
+    static final Action ACTION_DELETE_CLUSTER = new Action("Delete cluster");
     static final Action[] ACTIONS = new Action[]{ACTION_NAME_NODE,
-        ACTION_JOB_TRACKER};
+            ACTION_JOB_TRACKER, ACTION_DELETE_CLUSTER};
 
     private DataNodesWindow dataNodesWindow;
     private TaskTrackersWindow taskTrackersWindow;
 
-    public ClusterTable() {
+    public ClusterTable(ClusterForm form) {
 
+        this.parent = form;
         this.setCaption(" Hadoop Clusters");
         this.setContainerDataSource(getContainer());
 
@@ -56,6 +61,9 @@ public class ClusterTable extends Table {
                     taskTrackersWindow = new TaskTrackersWindow(
                             (String) item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue());
                     getApplication().getMainWindow().addWindow(taskTrackersWindow);
+                } else if (ACTION_DELETE_CLUSTER == action) {
+                    Deletion.startDeletion((String) item.getItemProperty(
+                            HadoopClusterInfo.CLUSTER_NAME_LABEL).getValue(), parent);
                 }
             }
 
