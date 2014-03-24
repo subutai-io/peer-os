@@ -29,7 +29,7 @@ public class Step0 extends Panel {
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/hadoop-logo.jpg"));
+        logoImg.setIcon(new ThemeResource("icons/modules/hadoop.jpg"));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
         logoImg.setWidth(220, Sizeable.UNITS_PIXELS);

@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard;
 import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
@@ -39,8 +40,8 @@ public class StepStart extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-        Label logoImg = new Label(
-                String.format("<img src='http://%s:%s/hbase_logo.png' width='150px'/>", MgmtApplication.APP_URL, Common.WEB_SERVER_PORT));
+        Label logoImg = new Label();
+        logoImg.setIcon(new ThemeResource("icons/modules/hbase.png"));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
         logoImg.setWidth(220, Sizeable.UNITS_PIXELS);
