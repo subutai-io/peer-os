@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.terminal;
+package org.safehaus.kiskis.mgmt.ui.terminal;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -18,7 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.util.Set;
 
-public class Terminal implements Module {
+public class TerminalUI implements Module {
 
     public static final String MODULE_NAME = "Terminal";
     private TaskRunner taskRunner;
@@ -206,7 +206,7 @@ public class Terminal implements Module {
 
     @Override
     public String getName() {
-        return Terminal.MODULE_NAME;
+        return TerminalUI.MODULE_NAME;
     }
 
     @Override

@@ -13,7 +13,6 @@
     <description>Kiskis Management Modules Parent</description>
 
     <modules>
-        <module>terminal</module>
         <module>hadoop</module>
         <module>cassandra</module>
         <module>pig</module>

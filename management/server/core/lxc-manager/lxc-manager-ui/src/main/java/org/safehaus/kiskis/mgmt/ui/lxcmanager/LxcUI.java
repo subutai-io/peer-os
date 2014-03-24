@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.lxc;
+package org.safehaus.kiskis.mgmt.ui.lxcmanager;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
@@ -7,13 +7,13 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.clone.Cloner;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage.Manager;
+import org.safehaus.kiskis.mgmt.ui.lxcmanager.clone.Cloner;
+import org.safehaus.kiskis.mgmt.ui.lxcmanager.manage.Manager;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 
-public class LxcModule implements Module {
+public class LxcUI implements Module {
 
     public static final String MODULE_NAME = "LXC";
     private AgentManager agentManager;

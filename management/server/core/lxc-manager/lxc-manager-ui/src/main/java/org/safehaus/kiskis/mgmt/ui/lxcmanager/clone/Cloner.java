@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.clone;
+package org.safehaus.kiskis.mgmt.ui.lxcmanager.clone;
 
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
+import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
@@ -154,7 +154,7 @@ public class Cloner extends VerticalLayout {
         } else if (physicalAgents.isEmpty()) {
             indicator.setVisible(true);
             final double count = (Double) slider.getValue();
-            LxcModule.getExecutor().execute(new Runnable() {
+            LxcUI.getExecutor().execute(new Runnable() {
                 public void run() {
                     Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
                     if (bestServers.isEmpty()) {
@@ -188,7 +188,7 @@ public class Cloner extends VerticalLayout {
                                     lxcHostNames.add(lxcHost.toString());
 
                                     //start clone task
-                                    LxcModule.getExecutor().execute(new Runnable() {
+                                    LxcUI.getExecutor().execute(new Runnable() {
                                         public void run() {
                                             boolean result = lxcManager.cloneLxcOnHost(entry.getKey(), lxcHost.toString());
                                             Item row = lxcTable.getItem(lxcHost.toString());
@@ -242,7 +242,7 @@ public class Cloner extends VerticalLayout {
             final AtomicInteger countProcessed = new AtomicInteger((int) (count * physicalAgents.size()));
             for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
                 for (final String lxcHostname : agg.getValue()) {
-                    LxcModule.getExecutor().execute(new Runnable() {
+                    LxcUI.getExecutor().execute(new Runnable() {
                         public void run() {
                             boolean result = lxcManager.cloneLxcOnHost(agg.getKey(), lxcHostname);
                             Item row = lxcTable.getItem(lxcHostname);

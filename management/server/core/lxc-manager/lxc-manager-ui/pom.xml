@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.server.ui.modules</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}.ui.lxcmanager</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

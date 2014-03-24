@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-ui-modules</artifactId>
+        <artifactId>terminal-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>terminal-module</artifactId>
+    <artifactId>terminal-ui</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Terminal Module</name>
-    <description>Kiskis Management Terminal Module</description>
+    <name>Kiskis Management Terminal UI</name>
+    <description>Kiskis Management Terminal UI</description>
 
     <build>
         <plugins>
@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.server.ui.modules</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}.ui.terminal</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

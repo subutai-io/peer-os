@@ -6,7 +6,7 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.server.ui.modules.terminal.Terminal">
+    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.terminal.TerminalUI">
         <property name="taskRunner" ref="taskRunner"/>
         <property name="agentManager" ref="agentManager"/>
     </bean>    

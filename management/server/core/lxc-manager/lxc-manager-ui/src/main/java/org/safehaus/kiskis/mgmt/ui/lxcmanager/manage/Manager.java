@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.lxc.manage;
+package org.safehaus.kiskis.mgmt.ui.lxcmanager.manage;
 
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Map;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.common.Buttons;
+import org.safehaus.kiskis.mgmt.ui.lxcmanager.common.Buttons;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
-import org.safehaus.kiskis.mgmt.server.ui.modules.lxc.LxcModule;
+import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
 
 @SuppressWarnings("serial")
 public class Manager extends VerticalLayout {
@@ -154,7 +154,7 @@ public class Manager extends VerticalLayout {
     public void getLxcInfo() {
         lxcTable.setEnabled(false);
         indicator.setVisible(true);
-        LxcModule.getExecutor().execute(new Runnable() {
+        LxcUI.getExecutor().execute(new Runnable() {
 
             public void run() {
                 Map<String, EnumMap<LxcState, List<String>>> agentFamilies = lxcManager.getLxcOnPhysicalServers();
@@ -293,7 +293,7 @@ public class Manager extends VerticalLayout {
                                 startBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                LxcModule.getExecutor().execute(new Runnable() {
+                                LxcUI.getExecutor().execute(new Runnable() {
 
                                     public void run() {
                                         boolean success = lxcManager.startLxcOnHost(physicalAgent, lxcHostname);
@@ -320,7 +320,7 @@ public class Manager extends VerticalLayout {
                                 stopBtn.setEnabled(false);
                                 destroyBtn.setEnabled(false);
                                 progressIcon.setVisible(true);
-                                LxcModule.getExecutor().execute(new Runnable() {
+                                LxcUI.getExecutor().execute(new Runnable() {
 
                                     public void run() {
                                         boolean success = lxcManager.stopLxcOnHost(physicalAgent, lxcHostname);
@@ -356,7 +356,7 @@ public class Manager extends VerticalLayout {
                                                         stopBtn.setEnabled(false);
                                                         destroyBtn.setEnabled(false);
                                                         progressIcon.setVisible(true);
-                                                        LxcModule.getExecutor().execute(new Runnable() {
+                                                        LxcUI.getExecutor().execute(new Runnable() {
 
                                                             public void run() {
                                                                 boolean success = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
@@ -384,7 +384,7 @@ public class Manager extends VerticalLayout {
                                     stopBtn.setEnabled(false);
                                     destroyBtn.setEnabled(false);
                                     progressIcon.setVisible(true);
-                                    LxcModule.getExecutor().execute(new Runnable() {
+                                    LxcUI.getExecutor().execute(new Runnable() {
 
                                         public void run() {
                                             boolean success = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
