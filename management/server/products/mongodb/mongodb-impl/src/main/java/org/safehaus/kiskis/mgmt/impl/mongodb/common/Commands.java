@@ -43,8 +43,9 @@ public class Commands {
     public static Request getInstallCommand() {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get");
+        req.setProgram("sleep 10;");
         req.setArgs(Arrays.asList(
+                "/usr/bin/apt-get",
                 "--force-yes",
                 "--assume-yes",
                 "install",
