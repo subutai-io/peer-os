@@ -75,7 +75,7 @@ public class ModuleComponent extends CustomComponent {
         try {
 //            Handler handler = HandlerFactory.getHandler( getSelectedMetric() );
 //            chart.load( handler, getSelectedNode() );
-            chart.load(null, null);
+            chart.load( getSelectedNode(), getSelectedMetric() );
         } catch (Exception e) {
             LOG.error("Error while loading chart: ", e);
         }
