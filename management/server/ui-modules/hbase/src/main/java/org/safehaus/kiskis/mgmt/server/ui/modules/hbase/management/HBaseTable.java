@@ -83,15 +83,6 @@ public class HBaseTable extends Table {
             }
         });
 
-//        Button statusButton = new Button("Status");
-//        statusButton.addListener(new Button.ClickListener() {
-//
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-//                cce = HBaseCommandEnum.STATUS;
-//                manager.runCommand(cci.getNodes(), cce);
-//            }
-//        });
         Button manageButton = new Button("Manage");
         manageButton.addListener(new Button.ClickListener() {
 
@@ -119,7 +110,6 @@ public class HBaseTable extends Table {
 
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
-//        item.getItemProperty("Status").setValue(statusButton);
         item.getItemProperty("Manage").setValue(manageButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
