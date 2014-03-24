@@ -163,7 +163,7 @@ public class Commands {
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         //                        "--logappend"
         ));
-        req.setTimeout(180);
+        req.setTimeout(Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC);
         return req;
     }
 
@@ -181,26 +181,9 @@ public class Commands {
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(180);
+        req.setTimeout(Timeouts.START_ROUTER_TIMEOUT_SEC);
         return req;
     }
-
-//    public static Request getStartRouterCommand2(String configServersArg, Config cfg) {
-//
-//        Request req = getTemplate();
-//        req.setProgram("mongos");
-//        req.setArgs(Arrays.asList(
-//                "--configdb",
-//                configServersArg,
-//                "--port",
-//                cfg.getRouterPort() + "",
-//                "--fork",
-//                "--logpath",
-//                String.format("%s/mongodb.log", Constants.LOG_DIR)
-//        ));
-//        req.setTimeout(60);
-//        return req;
-//    }
 
     //execute on shard
     public static Request getStartNodeCommand(Config cfg) {
@@ -216,7 +199,7 @@ public class Commands {
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(300);
+        req.setTimeout(Timeouts.START_DATE_NODE_TIMEOUT_SEC);
         return req;
     }
 
@@ -256,7 +239,7 @@ public class Commands {
                 "-2",
                 "mongo"
         ));
-        req.setTimeout(Timeouts.STOP_NODE_STATUS_TIMEOUT_SEC);
+        req.setTimeout(Timeouts.STOP_NODE_TIMEOUT_SEC);
         return req;
     }
 

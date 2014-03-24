@@ -315,6 +315,12 @@ public class Manager {
 
                             long start = System.currentTimeMillis();
                             NodeState state = NodeState.UNKNOWN;
+                            int waitTimeout = Timeouts.START_DATE_NODE_TIMEOUT_SEC;
+                            if (nodeType == NodeType.CONFIG_NODE) {
+                                waitTimeout = Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC;
+                            } else if (nodeType == NodeType.ROUTER_NODE) {
+                                waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
+                            }
                             while (!Thread.interrupted()) {
                                 ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
                                 if (po != null) {
@@ -330,7 +336,7 @@ public class Manager {
                                 } catch (InterruptedException ex) {
                                     break;
                                 }
-                                if (System.currentTimeMillis() - start > (Timeouts.START_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
+                                if (System.currentTimeMillis() - start > (waitTimeout + 3) * 1000) {
                                     break;
                                 }
                             }
@@ -382,7 +388,7 @@ public class Manager {
                                 } catch (InterruptedException ex) {
                                     break;
                                 }
-                                if (System.currentTimeMillis() - start > (Timeouts.STOP_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
+                                if (System.currentTimeMillis() - start > (Timeouts.STOP_NODE_TIMEOUT_SEC + 3) * 1000) {
                                     break;
                                 }
                             }
@@ -431,18 +437,6 @@ public class Manager {
                 }
             });
         }
-    }
-
-    private NodeType getNodeType(Config config, Agent node) {
-        NodeType nodeType = NodeType.DATA_NODE;
-
-        if (config.getRouterServers().contains(node)) {
-            nodeType = NodeType.ROUTER_NODE;
-        } else if (config.getConfigServers().contains(node)) {
-            nodeType = NodeType.CONFIG_NODE;
-        }
-
-        return nodeType;
     }
 
     private void refreshUI() {
