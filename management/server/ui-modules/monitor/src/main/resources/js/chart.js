@@ -1,26 +1,44 @@
 var SERIES;
 var POINT;
-var i = 0;
+var Y = 0;
 
-function setSeries(s) {
-    SERIES = s;
+//function setSeries(s) {
+//    SERIES = s;
+//}
+
+//function addPoint() {
+//    if (POINT != null) {
+//        SERIES.addPoint(POINT, true, true);
+//        POINT = null;
+//    }
+//
+//    console.log("i: " + i);
+//}
+
+//function createPoint() {
+//    var x = ( new Date() ).getTime();
+////    var y = Math.random();
+////    POINT = [x, y];
+////    var point = [x, i];
+//    SERIES.addPoint( [x, i], true, true );
+//}
+
+
+function setY(y) {
+    Y = y;
+    console.log("setY: " + Y);
 }
 
 function addPoint() {
-    if (POINT != null) {
-        SERIES.addPoint(POINT, true, true);
-        POINT = null;
-    }
-
-    console.log("i: " + i);
+    var x = ( new Date() ).getTime();
+    SERIES.addPoint( [x, Y], true, true );
+    console.log("addPoint: " + Y);
 }
 
-function createPoint() {
-    var x = ( new Date() ).getTime();
-    var y = Math.random();
-
-//    POINT = [x, y];
-    POINT = [x, i];
+function onLoad(series) {
+    SERIES = series;
+    setInterval(addPoint, 1000);
+//    setInterval(createPoint, 1000);
 }
 
 $(function () {
@@ -38,14 +56,15 @@ $(function () {
                 marginRight: 10,
                 events: {
                     load: function() {
-                        setSeries(this.series[0]);
-                        setInterval(addPoint, 1000);
-                        setInterval(createPoint, 1000);
+                        onLoad( this.series[0] );
+//                        setSeries(this.series[0]);
+//                        setInterval(addPoint, 1000);
+//                        setInterval(createPoint, 1000);
                     }
                 }
             },
             title: {
-                text: ''
+                text: '$mainTitle'
             },
             xAxis: {
                 type: 'datetime',
@@ -56,7 +75,7 @@ $(function () {
             },
             yAxis: {
                 title: {
-                    text: 'Value'
+                    text: '$yTitle'
                 },
                 plotLines: [{
                     value: 0,
@@ -81,7 +100,8 @@ $(function () {
                     var data = [];
                     var time = ( new Date() ).getTime();
 
-                    for (var i = 0; i < 10; i++) {
+                    for (i = -19; i <= 0; i++) {
+//                    for (var i = 0; i < 10; i++) {
                         data.push({
                             x: time + i * 1000,
 //                            y: Math.random()
