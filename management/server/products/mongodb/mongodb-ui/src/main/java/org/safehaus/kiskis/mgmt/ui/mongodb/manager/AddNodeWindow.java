@@ -16,6 +16,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
@@ -138,10 +140,15 @@ public class AddNodeWindow extends Window {
                         setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                         if (po.getState() != ProductOperationState.RUNNING) {
                             hideProgress();
-                            return;
+                            break;
                         }
                     } else {
                         setOutput("Product operation not found. Check logs");
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        break;
                     }
                 }
             }
