@@ -24,12 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -261,6 +260,7 @@ public class Manager {
                             UUID trackID = MongoUI.getMongoManager().checkNode(config.getClusterName(), agent.getHostname());
 
                             NodeState state = NodeState.UNKNOWN;
+                            long start = System.currentTimeMillis();
                             while (!Thread.interrupted()) {
                                 ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
                                 if (po != null) {
@@ -276,6 +276,9 @@ public class Manager {
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException ex) {
+                                    break;
+                                }
+                                if (System.currentTimeMillis() - start > Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC * 1000) {
                                     break;
                                 }
                             }

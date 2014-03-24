@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.impl.mongodb.common;
 
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -230,7 +231,7 @@ public class Commands {
                 "--port",
                 port
         ));
-        req.setTimeout(10);
+        req.setTimeout(Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC);
         return req;
     }
 
