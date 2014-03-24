@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.api.mongodb;
 
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 /**
  *
@@ -66,17 +65,17 @@ public interface Mongo {
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @return - result of operation true - success, false - failure
+     * @return - UUID of operation to track
      *
      */
-    public boolean startNode(String clusterName, String lxcHostName);
+    public UUID startNode(String clusterName, String lxcHostName);
 
     /**
      * Stops the specified node
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @return - result of operation true - success, false - failure
+     * @return - UUID of operation to track
      *
      */
     public UUID stopNode(String clusterName, String lxcHostName);
@@ -86,7 +85,7 @@ public interface Mongo {
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @return - node state
+     * @return - UUID of operation to track
      *
      */
     public UUID checkNode(String clusterName, String lxcHostName);

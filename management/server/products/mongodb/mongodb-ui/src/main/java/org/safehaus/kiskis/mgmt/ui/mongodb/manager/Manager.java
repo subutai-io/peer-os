@@ -311,10 +311,32 @@ public class Manager {
 
                         public void run() {
 
-                            boolean result = MongoUI.getMongoManager().startNode(config.getClusterName(), agent.getHostname());
+                            UUID trackID = MongoUI.getMongoManager().startNode(config.getClusterName(), agent.getHostname());
+
+                            long start = System.currentTimeMillis();
+                            NodeState state = NodeState.UNKNOWN;
+                            while (!Thread.interrupted()) {
+                                ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
+                                if (po != null) {
+                                    if (po.getState() != ProductOperationState.RUNNING) {
+                                        if (po.getState() == ProductOperationState.SUCCEEDED) {
+                                            state = NodeState.RUNNING;
+                                        }
+                                        break;
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ex) {
+                                    break;
+                                }
+                                if (System.currentTimeMillis() - start > (Timeouts.START_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
+                                    break;
+                                }
+                            }
 
                             synchronized (progressIcon) {
-                                if (result) {
+                                if (state == NodeState.RUNNING) {
                                     stopBtn.setEnabled(true);
                                 } else {
                                     startBtn.setEnabled(true);
@@ -349,7 +371,7 @@ public class Manager {
                                 ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
                                 if (po != null) {
                                     if (po.getState() != ProductOperationState.RUNNING) {
-                                        if (po.getLog().contains("stopped")) {
+                                        if (po.getState() == ProductOperationState.SUCCEEDED) {
                                             state = NodeState.STOPPED;
                                         }
                                         break;
@@ -409,6 +431,18 @@ public class Manager {
                 }
             });
         }
+    }
+
+    private NodeType getNodeType(Config config, Agent node) {
+        NodeType nodeType = NodeType.DATA_NODE;
+
+        if (config.getRouterServers().contains(node)) {
+            nodeType = NodeType.ROUTER_NODE;
+        } else if (config.getConfigServers().contains(node)) {
+            nodeType = NodeType.CONFIG_NODE;
+        }
+
+        return nodeType;
     }
 
     private void refreshUI() {

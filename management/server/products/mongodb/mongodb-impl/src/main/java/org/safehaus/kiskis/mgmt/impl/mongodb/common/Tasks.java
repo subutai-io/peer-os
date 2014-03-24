@@ -127,25 +127,25 @@ public class Tasks {
         return task;
     }
 
-    public static Task getStartRoutersTask2(Set<Agent> routers, Set<Agent> configServers, Config cfg) {
-        Task task = new Task("Start routers");
-        StringBuilder configServersArg = new StringBuilder();
-        for (Agent agent : configServers) {
-            configServersArg.append(agent.getHostname()).append(".").append(cfg.getDomainName()).
-                    append(":").append(cfg.getCfgSrvPort()).append(",");
-        }
-        //drop comma
-        if (configServersArg.length() > 0) {
-            configServersArg.setLength(configServersArg.length() - 1);
-        }
-        for (Agent agent : routers) {
-            Request req = Commands.getStartRouterCommand2(configServersArg.toString(), cfg);
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
-        }
-        task.setData(TaskType.START_ROUTERS);
-        return task;
-    }
+//    public static Task getStartRoutersTask2(Set<Agent> routers, Set<Agent> configServers, Config cfg) {
+//        Task task = new Task("Start routers");
+//        StringBuilder configServersArg = new StringBuilder();
+//        for (Agent agent : configServers) {
+//            configServersArg.append(agent.getHostname()).append(".").append(cfg.getDomainName()).
+//                    append(":").append(cfg.getCfgSrvPort()).append(",");
+//        }
+//        //drop comma
+//        if (configServersArg.length() > 0) {
+//            configServersArg.setLength(configServersArg.length() - 1);
+//        }
+//        for (Agent agent : routers) {
+//            Request req = Commands.getStartRouterCommand2(configServersArg.toString(), cfg);
+//            req.setUuid(agent.getUuid());
+//            task.addRequest(req);
+//        }
+//        task.setData(TaskType.START_ROUTERS);
+//        return task;
+//    }
 
     public static Task getStartReplicaSetTask(Set<Agent> dataNodes, Config cfg) {
         Task task = new Task("Start replica set");
