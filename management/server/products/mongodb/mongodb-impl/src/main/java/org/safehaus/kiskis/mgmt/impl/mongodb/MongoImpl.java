@@ -714,6 +714,10 @@ public class MongoImpl implements Mongo {
                                     synchronized (task) {
                                         task.notifyAll();
                                     }
+                                } else if (task.isCompleted()) {
+                                    synchronized (task) {
+                                        task.notifyAll();
+                                    }
                                 }
                                 return null;
                             }
