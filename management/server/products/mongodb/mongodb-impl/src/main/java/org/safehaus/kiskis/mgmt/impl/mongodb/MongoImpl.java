@@ -854,26 +854,44 @@ public class MongoImpl implements Mongo {
         return NodeState.RUNNING.equals(startNodeTask.getData());
     }
 
-    public boolean stopNode(String clusterName, String lxcHostname) {
+    public UUID stopNode(final String clusterName, final String lxcHostname) {
+        final ProductOperation po
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
-        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-        if (config == null) {
-            return false;
-        }
+        executor.execute(new Runnable() {
 
-        Agent node = agentManager.getAgentByHostname(lxcHostname);
-        if (node == null) {
-            return false;
-        }
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
 
-        Task stopNodeTask = taskRunner.executeTask(
-                Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
 
-        if (stopNodeTask.isCompleted()) {
-            return stopNodeTask.getTaskStatus() == TaskStatus.SUCCESS;//checkNode(clusterName, lxcHostname) == NodeState.STOPPED;
-        }
+                Task stopNodeTask = taskRunner.executeTask(
+                        Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
 
-        return false;
+                if (stopNodeTask.isCompleted()) {
+                    if (stopNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLogDone(String.format("Node on %s stopped", lxcHostname));
+                    } else {
+                        po.addLogFailed(String.format("Failed to stop node %s. %s",
+                                lxcHostname,
+                                stopNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
+                        ));
+                    }
+                }
+
+            }
+        });
+
+        return po.getId();
     }
 
     public UUID checkNode(final String clusterName, final String lxcHostname) {
@@ -906,7 +924,7 @@ public class MongoImpl implements Mongo {
                     } else if (stdOut.indexOf("connecting to") > -1) {
                         po.addLogDone(String.format("Node on %s is running", lxcHostname));
                     } else {
-                        po.addLogDone(String.format("Node on %s is not found", lxcHostname));
+                        po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
                     }
                 }
 

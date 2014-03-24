@@ -11,5 +11,7 @@ package org.safehaus.kiskis.mgmt.api.mongodb;
  */
 public class Timeouts {
 
-    public static final int CHECK_NODE_STATUS_TIMEOUT_SEC = 10;
+    public static final int CHECK_NODE_STATUS_TIMEOUT_SEC = 7;
+    public static final int STOP_NODE_STATUS_TIMEOUT_SEC = 30;
+    public static final int START_NODE_STATUS_TIMEOUT_SEC = 7;
 }

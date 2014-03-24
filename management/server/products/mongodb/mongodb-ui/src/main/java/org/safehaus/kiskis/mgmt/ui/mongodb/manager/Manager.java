@@ -278,7 +278,7 @@ public class Manager {
                                 } catch (InterruptedException ex) {
                                     break;
                                 }
-                                if (System.currentTimeMillis() - start > Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC * 1000) {
+                                if (System.currentTimeMillis() - start > (Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
                                     break;
                                 }
                             }
@@ -341,10 +341,32 @@ public class Manager {
 
                         public void run() {
 
-                            boolean result = MongoUI.getMongoManager().stopNode(config.getClusterName(), agent.getHostname());
+                            UUID trackID = MongoUI.getMongoManager().stopNode(config.getClusterName(), agent.getHostname());
+
+                            long start = System.currentTimeMillis();
+                            NodeState state = NodeState.UNKNOWN;
+                            while (!Thread.interrupted()) {
+                                ProductOperationView po = MongoUI.getDbManager().getProductOperation(Config.PRODUCT_KEY, trackID);
+                                if (po != null) {
+                                    if (po.getState() != ProductOperationState.RUNNING) {
+                                        if (po.getLog().contains("stopped")) {
+                                            state = NodeState.STOPPED;
+                                        }
+                                        break;
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ex) {
+                                    break;
+                                }
+                                if (System.currentTimeMillis() - start > (Timeouts.STOP_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
+                                    break;
+                                }
+                            }
 
                             synchronized (progressIcon) {
-                                if (result) {
+                                if (state == NodeState.STOPPED) {
                                     startBtn.setEnabled(true);
                                 } else {
                                     stopBtn.setEnabled(true);

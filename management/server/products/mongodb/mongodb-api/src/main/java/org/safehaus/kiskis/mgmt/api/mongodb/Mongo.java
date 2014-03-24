@@ -79,7 +79,7 @@ public interface Mongo {
      * @return - result of operation true - success, false - failure
      *
      */
-    public boolean stopNode(String clusterName, String lxcHostName);
+    public UUID stopNode(String clusterName, String lxcHostName);
 
     /**
      * Checks status of the specified node

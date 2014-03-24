@@ -256,7 +256,7 @@ public class Commands {
                 "-2",
                 "mongo"
         ));
-        req.setTimeout(30);
+        req.setTimeout(Timeouts.STOP_NODE_STATUS_TIMEOUT_SEC);
         return req;
     }
 
