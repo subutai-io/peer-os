@@ -316,37 +316,41 @@ public class MongoImpl implements Mongo {
         Iterator<String> routersHostnamesIterator = routersHostnames.iterator();
         Iterator<String> dataNodesHostnamesIterator = dataNodesHostnames.iterator();
 
-        Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
-
         CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
 
         try {
-            outerloop:
-            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
-                for (int i = 1; i <= entry.getValue(); i++) {
-                    if (configSrvsHostnamesIterator.hasNext()) {
-                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                .append(configSrvsHostnamesIterator.next()).toString();
-                        po.addLog(String.format("Cloning lxc %s", lxcHostname));
-                        completer.submit(new LxcActor(new LxcInfo(entry.getKey(), lxcHostname, NodeType.CONFIG_NODE), lxcManager, LxcAction.CLONE));
-                    } else if (routersHostnamesIterator.hasNext()) {
-                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                .append(routersHostnamesIterator.next()).toString();
-                        po.addLog(String.format("Cloning lxc %s", lxcHostname));
-                        completer.submit(new LxcActor(new LxcInfo(entry.getKey(), lxcHostname, NodeType.ROUTER_NODE), lxcManager, LxcAction.CLONE));
-                    } else if (dataNodesHostnamesIterator.hasNext()) {
-                        final String lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                                .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                                .append(dataNodesHostnamesIterator.next()).toString();
-                        po.addLog(String.format("Cloning lxc %s", lxcHostname));
-                        completer.submit(new LxcActor(new LxcInfo(entry.getKey(), lxcHostname, NodeType.DATA_NODE), lxcManager, LxcAction.CLONE));
-                    } else {
-                        break outerloop;
-                    }
+            for (int i = 1; i <= numOfLxcs; i++) {
+                Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+                String lxcHostname;
+                NodeType nodeType;
+
+                Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                bestServers.put(entry.getKey(), entry.getValue() - 1);
+
+                if (configSrvsHostnamesIterator.hasNext()) {
+                    lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                            .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                            .append(configSrvsHostnamesIterator.next()).toString();
+                    nodeType = NodeType.CONFIG_NODE;
+                } else if (routersHostnamesIterator.hasNext()) {
+                    lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                            .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                            .append(routersHostnamesIterator.next()).toString();
+                    nodeType = NodeType.ROUTER_NODE;
+                } else if (dataNodesHostnamesIterator.hasNext()) {
+                    lxcHostname = new StringBuilder(entry.getKey().getHostname())
+                            .append(Common.PARENT_CHILD_LXC_SEPARATOR)
+                            .append(dataNodesHostnamesIterator.next()).toString();
+                    nodeType = NodeType.DATA_NODE;
+                } else {
+                    break;
                 }
+
+                po.addLog(String.format("Cloning lxc %s", lxcHostname));
+                completer.submit(new LxcActor(new LxcInfo(entry.getKey(), lxcHostname, nodeType), lxcManager, LxcAction.CLONE));
+
             }
+
             boolean result = true;
             for (int i = 0; i < numOfLxcs; i++) {
                 Future<LxcInfo> future = completer.take();
