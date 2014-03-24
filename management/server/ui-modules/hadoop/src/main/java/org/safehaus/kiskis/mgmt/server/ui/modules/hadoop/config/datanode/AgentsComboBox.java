@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.datanode;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.datanode;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.FieldEvents;

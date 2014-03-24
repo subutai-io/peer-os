@@ -1,11 +1,10 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common;
 
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +14,52 @@ import java.util.UUID;
  * Created with IntelliJ IDEA. User: daralbaev Date: 1/31/14 Time: 8:24 PM
  */
 public class Tasks {
+
+    public static Task removeClusterTask(HadoopClusterInfo cluster) {
+        Task task = new Task("Remove hadoop deb packages");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getNameNode().getUuid().toString());
+        Request request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+        task.addRequest(request);
+
+        map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getSecondaryNameNode().getUuid().toString());
+        request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+        task.addRequest(request);
+
+        map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+        task.addRequest(request);
+
+        for (Agent agent : cluster.getDataNodes()) {
+            if (agent != null) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+
+                request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+                task.addRequest(request);
+            }
+        }
+
+        for (Agent agent : cluster.getTaskTrackers()) {
+            if (agent != null) {
+                map = new HashMap<String, String>();
+                map.put(":source", HadoopModule.MODULE_NAME);
+                map.put(":uuid", agent.getUuid().toString());
+
+                request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+                task.addRequest(request);
+            }
+        }
+
+        return task;
+    }
 
     public static Task getInstallTask(List<Agent> agents) {
         Task task = new Task("Setup hadoop deb packages");
@@ -29,6 +74,20 @@ public class Tasks {
                 task.addRequest(request);
             }
         }
+
+        return task;
+    }
+
+    public static Task getUninstallTask(Agent agent) {
+        Task task = new Task("Purge hadoop deb packages");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", agent.getUuid().toString());
+
+        Request request = TaskUtil.createRequest(Commands.PURGE_DEB, task, map);
+        task.addRequest(request);
+
 
         return task;
     }
@@ -271,7 +330,7 @@ public class Tasks {
 
         return task;
     }
-    
+
     public static Task getNameNodeCommand(HadoopClusterInfo cluster, String command) {
         Task task = new Task(command + "for Hadoop Name Node");
 
@@ -281,6 +340,50 @@ public class Tasks {
         map.put(":command", command);
 
         Request request = TaskUtil.createRequest(Commands.COMMAND_NAME_NODE, task, map);
+        task.addRequest(request);
+
+        return task;
+    }
+
+    public static Task getRemoveNodeCommand(HadoopClusterInfo cluster, Agent agent) {
+        Task task = new Task("Remove node from cluster");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", agent.getUuid().toString());
+        map.put(":command", "stop");
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_NAME_NODE, task, map);
+        task.addRequest(request);
+
+        map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getNameNode().getUuid().toString());
+        map.put(":slave-hostname", agent.getHostname());
+
+        request = TaskUtil.createRequest(Commands.REMOVE_NODE_TRACKER, task, map);
+        task.addRequest(request);
+
+        return task;
+    }
+
+    public static Task getRemoveTrackerCommand(HadoopClusterInfo cluster, Agent agent) {
+        Task task = new Task("Remove tracker from cluster");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", agent.getUuid().toString());
+        map.put(":command", "stop");
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_JOB_TRACKER, task, map);
+        task.addRequest(request);
+
+        map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", cluster.getJobTracker().getUuid().toString());
+        map.put(":slave-hostname", agent.getHostname());
+
+        request = TaskUtil.createRequest(Commands.REMOVE_NODE_TRACKER, task, map);
         task.addRequest(request);
 
         return task;

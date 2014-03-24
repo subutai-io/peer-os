@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.wizard;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.install.Installation;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.Installation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.ArrayList;
