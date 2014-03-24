@@ -21,15 +21,15 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Tasks {
 
-    public static Task getAptGetUpdateTask(Set<Agent> agents) {
-        Task task = new Task("Apt-get update");
-        for (Agent agent : agents) {
-            Request req = Commands.getAptGetUpdateCommand();
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
-        }
-        return task;
-    }
+//    public static Task getAptGetUpdateTask(Set<Agent> agents) {
+//        Task task = new Task("Apt-get update");
+//        for (Agent agent : agents) {
+//            Request req = Commands.getAptGetUpdateCommand();
+//            req.setUuid(agent.getUuid());
+//            task.addRequest(req);
+//        }
+//        return task;
+//    }
 
     public static Task getInstallMongoTask(Set<Agent> agents) {
         Task task = new Task("Install mongo");

@@ -55,17 +55,17 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Request getAptGetUpdateCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get");
-        req.setArgs(Arrays.asList(
-                "update"
-        ));
-        req.setStdOut(OutputRedirection.NO);
-        req.setTimeout(180);
-        return req;
-    }
+//    public static Request getAptGetUpdateCommand() {
+//
+//        Request req = getTemplate();
+//        req.setProgram("/usr/bin/apt-get");
+//        req.setArgs(Arrays.asList(
+//                "update"
+//        ));
+//        req.setStdOut(OutputRedirection.NO);
+//        req.setTimeout(180);
+//        return req;
+//    }
 
     //execute on each replica
     public static Request getSetReplicaSetNameCommand(String replicaSetName) {
