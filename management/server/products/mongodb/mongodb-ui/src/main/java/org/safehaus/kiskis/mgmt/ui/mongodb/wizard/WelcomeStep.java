@@ -6,12 +6,12 @@
 package org.safehaus.kiskis.mgmt.ui.mongodb.wizard;
 
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 
 /**
  *
@@ -32,7 +32,11 @@ public class WelcomeStep extends Panel {
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-        Label logoImg = MgmtApplication.createImage("mongodb.png", 150, 150);
+        Label logoImg = new Label();
+        logoImg.setIcon(new ThemeResource("icons/modules/mongodb.png"));
+        logoImg.setContentMode(Label.CONTENT_XHTML);
+        logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
+        logoImg.setWidth(150, Sizeable.UNITS_PIXELS);
         grid.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Start");
