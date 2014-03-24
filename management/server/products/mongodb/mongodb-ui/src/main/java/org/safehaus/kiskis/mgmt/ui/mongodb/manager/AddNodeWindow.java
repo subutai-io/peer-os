@@ -125,7 +125,7 @@ public class AddNodeWindow extends Window {
         MongoUI.getExecutor().execute(new Runnable() {
 
             public void run() {
-                UUID operationID = MongoUI.getMongoManager().addNode(config, nodeType);
+                UUID operationID = MongoUI.getMongoManager().addNode(config.getClusterName(), nodeType);
                 while (track) {
                     ProductOperationView po = MongoUI.getDbManager().getProductOperation(
                             Config.PRODUCT_KEY, operationID);

@@ -134,7 +134,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID operationID = MongoUI.getMongoManager().uninstallCluster(config);
+                                        UUID operationID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
                                         tracker.setTrackId(operationID);
                                         tabSheet.setSelectedTab(tracker.getContent());
                                     }
@@ -254,7 +254,7 @@ public class Manager {
 
                         public void run() {
 
-                            NodeState state = MongoUI.getMongoManager().checkNode(config, agent);
+                            NodeState state = MongoUI.getMongoManager().checkNode(config.getClusterName(), agent.getHostname());
 
                             synchronized (progressIcon) {
                                 if (state == NodeState.RUNNING) {
@@ -284,7 +284,7 @@ public class Manager {
 
                         public void run() {
 
-                            boolean result = MongoUI.getMongoManager().startNode(config, agent);
+                            boolean result = MongoUI.getMongoManager().startNode(config.getClusterName(), agent.getHostname());
 
                             synchronized (progressIcon) {
                                 if (result) {
@@ -314,7 +314,7 @@ public class Manager {
 
                         public void run() {
 
-                            boolean result = MongoUI.getMongoManager().stopNode(config, agent);
+                            boolean result = MongoUI.getMongoManager().stopNode(config.getClusterName(), agent.getHostname());
 
                             synchronized (progressIcon) {
                                 if (result) {
@@ -384,7 +384,7 @@ public class Manager {
         }
     }
 
-    private void refreshClustersInfo() {
+    public void refreshClustersInfo() {
         List<Config> mongoClusterInfos = MongoUI.getMongoManager().getClusters();
         Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();

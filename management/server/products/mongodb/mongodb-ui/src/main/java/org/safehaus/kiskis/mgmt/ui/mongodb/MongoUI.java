@@ -66,7 +66,8 @@ public class MongoUI implements Module {
         private final Wizard wizard;
         private final Tracker tracker;
         private final Manager manager;
-        private final String trackerTabName = "Tracker";
+        private final String managerTabName = "Manage";
+        private final String trackerTabName = "Track";
 
         public ModuleComponent() {
             setSizeFull();
@@ -81,7 +82,7 @@ public class MongoUI implements Module {
             wizard = new Wizard(tracker, mongoSheet);
             manager = new Manager(tracker, mongoSheet);
             mongoSheet.addTab(wizard.getContent(), "Install");
-            mongoSheet.addTab(manager.getContent(), "Manage");
+            mongoSheet.addTab(manager.getContent(), managerTabName);
             mongoSheet.addTab(tracker.getContent(), trackerTabName);
 
             mongoSheet.addListener(new TabSheet.SelectedTabChangeListener() {
@@ -93,6 +94,10 @@ public class MongoUI implements Module {
                         tracker.startTracking();
                     } else {
                         tracker.stopTracking();
+                    }
+
+                    if (caption.equals(managerTabName)) {
+                        manager.refreshClustersInfo();
                     }
                 }
             });
