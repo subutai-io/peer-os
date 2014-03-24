@@ -16,10 +16,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -134,8 +132,7 @@ public class AddNodeWindow extends Window {
             public void run() {
                 UUID operationID = MongoUI.getMongoManager().addNode(config.getClusterName(), nodeType);
                 while (track) {
-                    ProductOperationView po = MongoUI.getDbManager().getProductOperation(
-                            Config.PRODUCT_KEY, operationID);
+                    ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(operationID);
                     if (po != null) {
                         setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                         if (po.getState() != ProductOperationState.RUNNING) {

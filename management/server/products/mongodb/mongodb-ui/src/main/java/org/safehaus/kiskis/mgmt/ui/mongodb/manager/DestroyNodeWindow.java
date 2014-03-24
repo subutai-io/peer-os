@@ -15,8 +15,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -106,8 +106,7 @@ public class DestroyNodeWindow extends Window {
                     public void run() {
                         UUID operationID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
                         while (track) {
-                            ProductOperationView po = MongoUI.getDbManager().getProductOperation(
-                                    Config.PRODUCT_KEY, operationID);
+                            ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(operationID);
                             if (po != null) {
                                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                                 if (po.getState() != ProductOperationState.RUNNING) {

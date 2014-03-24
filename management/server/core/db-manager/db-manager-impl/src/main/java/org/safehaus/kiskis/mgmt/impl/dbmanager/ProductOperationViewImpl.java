@@ -8,8 +8,8 @@ package org.safehaus.kiskis.mgmt.impl.dbmanager;
 import java.util.Date;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 
 /**
  *

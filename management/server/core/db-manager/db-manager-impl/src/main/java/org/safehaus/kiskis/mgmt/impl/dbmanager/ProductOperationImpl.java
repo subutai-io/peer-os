@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.UUID;
 import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**

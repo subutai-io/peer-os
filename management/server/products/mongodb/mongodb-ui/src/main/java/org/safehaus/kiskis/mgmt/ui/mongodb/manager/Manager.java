@@ -24,8 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -254,7 +257,31 @@ public class Manager {
 
                         public void run() {
 
-                            NodeState state = MongoUI.getMongoManager().checkNode(config.getClusterName(), agent.getHostname());
+                            UUID trackID = MongoUI.getMongoManager().checkNode(config.getClusterName(), agent.getHostname());
+
+                            NodeState state = NodeState.UNKNOWN;
+                            long start = System.currentTimeMillis();
+                            while (!Thread.interrupted()) {
+                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
+                                if (po != null) {
+                                    if (po.getState() != ProductOperationState.RUNNING) {
+                                        if (po.getLog().contains("stopped")) {
+                                            state = NodeState.STOPPED;
+                                        } else if (po.getLog().contains("running")) {
+                                            state = NodeState.RUNNING;
+                                        }
+                                        break;
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ex) {
+                                    break;
+                                }
+                                if (System.currentTimeMillis() - start > (Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
+                                    break;
+                                }
+                            }
 
                             synchronized (progressIcon) {
                                 if (state == NodeState.RUNNING) {
@@ -284,10 +311,38 @@ public class Manager {
 
                         public void run() {
 
-                            boolean result = MongoUI.getMongoManager().startNode(config.getClusterName(), agent.getHostname());
+                            UUID trackID = MongoUI.getMongoManager().startNode(config.getClusterName(), agent.getHostname());
+
+                            long start = System.currentTimeMillis();
+                            NodeState state = NodeState.UNKNOWN;
+                            int waitTimeout = Timeouts.START_DATE_NODE_TIMEOUT_SEC;
+                            if (nodeType == NodeType.CONFIG_NODE) {
+                                waitTimeout = Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC;
+                            } else if (nodeType == NodeType.ROUTER_NODE) {
+                                waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
+                            }
+                            while (!Thread.interrupted()) {
+                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
+                                if (po != null) {
+                                    if (po.getState() != ProductOperationState.RUNNING) {
+                                        if (po.getState() == ProductOperationState.SUCCEEDED) {
+                                            state = NodeState.RUNNING;
+                                        }
+                                        break;
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ex) {
+                                    break;
+                                }
+                                if (System.currentTimeMillis() - start > (waitTimeout + 3) * 1000) {
+                                    break;
+                                }
+                            }
 
                             synchronized (progressIcon) {
-                                if (result) {
+                                if (state == NodeState.RUNNING) {
                                     stopBtn.setEnabled(true);
                                 } else {
                                     startBtn.setEnabled(true);
@@ -314,10 +369,32 @@ public class Manager {
 
                         public void run() {
 
-                            boolean result = MongoUI.getMongoManager().stopNode(config.getClusterName(), agent.getHostname());
+                            UUID trackID = MongoUI.getMongoManager().stopNode(config.getClusterName(), agent.getHostname());
+
+                            long start = System.currentTimeMillis();
+                            NodeState state = NodeState.UNKNOWN;
+                            while (!Thread.interrupted()) {
+                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
+                                if (po != null) {
+                                    if (po.getState() != ProductOperationState.RUNNING) {
+                                        if (po.getState() == ProductOperationState.SUCCEEDED) {
+                                            state = NodeState.STOPPED;
+                                        }
+                                        break;
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ex) {
+                                    break;
+                                }
+                                if (System.currentTimeMillis() - start > (Timeouts.STOP_NODE_TIMEOUT_SEC + 3) * 1000) {
+                                    break;
+                                }
+                            }
 
                             synchronized (progressIcon) {
-                                if (result) {
+                                if (state == NodeState.STOPPED) {
                                     startBtn.setEnabled(true);
                                 } else {
                                     stopBtn.setEnabled(true);

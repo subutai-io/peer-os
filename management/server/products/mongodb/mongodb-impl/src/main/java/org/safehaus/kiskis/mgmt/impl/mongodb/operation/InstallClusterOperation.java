@@ -33,7 +33,7 @@ public class InstallClusterOperation extends Operation {
         clusterMembers.addAll(config.getRouterServers());
         clusterMembers.addAll(config.getDataNodes());
 
-        addTask(Tasks.getAptGetUpdateTask(clusterMembers));
+//        addTask(Tasks.getAptGetUpdateTask(clusterMembers));
 
         addTask(Tasks.getInstallMongoTask(clusterMembers));
 

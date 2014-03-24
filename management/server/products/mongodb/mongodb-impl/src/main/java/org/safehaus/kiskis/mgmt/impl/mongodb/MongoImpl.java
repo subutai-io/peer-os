@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -29,7 +30,6 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
@@ -45,6 +45,7 @@ import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -665,7 +666,7 @@ public class MongoImpl implements Mongo {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
                     return;
@@ -698,23 +699,40 @@ public class MongoImpl implements Mongo {
                     //don't check status of this task since this task always ends with execute_timeouted
                     if (stopMongoTask.isCompleted()) {
                         Task startRoutersTask = taskRunner.
-                                executeTask(Tasks.getStartRoutersTask2(config.getRouterServers(),
+                                executeTask(Tasks.getStartRoutersTask(config.getRouterServers(),
                                                 config.getConfigServers(), config));
-                        //don't check status of this task since this task always ends with execute_timeouted
-                        if (startRoutersTask.isCompleted()) {
-                            //check number of started routers
-                            int numberOfRoutersRestarted = 0;
-                            for (Map.Entry<UUID, Result> res : startRoutersTask.getResults().entrySet()) {
-                                if (res.getValue().getStdOut().contains("child process started successfully, parent exiting")) {
-                                    numberOfRoutersRestarted++;
-                                }
-                            }
-                            if (numberOfRoutersRestarted != config.getRouterServers().size()) {
-                                po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
-                            }
 
-                        } else {
-                            po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
+                        final AtomicInteger okCount = new AtomicInteger(0);
+                        taskRunner.executeTask(startRoutersTask, new TaskCallback() {
+
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
+
+                                    okCount.incrementAndGet();
+                                }
+                                if (okCount.get() == config.getRouterServers().size()) {
+                                    taskRunner.removeTaskCallback(task.getUuid());
+                                    synchronized (task) {
+                                        task.notifyAll();
+                                    }
+                                } else if (task.isCompleted()) {
+                                    synchronized (task) {
+                                        task.notifyAll();
+                                    }
+                                }
+                                return null;
+                            }
+                        });
+
+                        synchronized (startRoutersTask) {
+                            try {
+                                startRoutersTask.wait(startRoutersTask.getAvgTimeout() * 1000 + 1000);
+                            } catch (InterruptedException ex) {
+                            }
+                        }
+
+                        if (okCount.get() != config.getRouterServers().size()) {
+                            po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
                         }
                     } else {
                         po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
@@ -797,109 +815,168 @@ public class MongoImpl implements Mongo {
         return new ArrayList<Config>();
     }
 
-    public boolean startNode(String clusterName, String lxcHostname) {
-        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-        if (config == null) {
-            return false;
-        }
+    public UUID startNode(final String clusterName, final String lxcHostname) {
+        final ProductOperation po
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Starting node %s in %s", lxcHostname, clusterName));
 
-        Agent node = agentManager.getAgentByHostname(lxcHostname);
-        if (node == null) {
-            return false;
-        }
+        executor.execute(new Runnable() {
 
-        Task startNodeTask;
-        NodeType nodeType = getNodeType(config, node);
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
 
-        if (nodeType == NodeType.CONFIG_NODE) {
-            startNodeTask = Tasks.getStartConfigServersTask(
-                    Util.wrapAgentToSet(node), config);
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
 
-        } else if (nodeType == NodeType.DATA_NODE) {
-            startNodeTask = Tasks.getStartReplicaSetTask(
-                    Util.wrapAgentToSet(node), config);
-        } else {
-            startNodeTask = Tasks.getStartRoutersTask(
-                    Util.wrapAgentToSet(node),
-                    config.getConfigServers(),
-                    config);
-        }
+                Task startNodeTask;
+                NodeType nodeType = getNodeType(config, node);
 
-        taskRunner.executeTask(startNodeTask, new TaskCallback() {
+                if (nodeType == NodeType.CONFIG_NODE) {
+                    startNodeTask = Tasks.getStartConfigServersTask(
+                            Util.wrapAgentToSet(node), config);
 
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
+                } else if (nodeType == NodeType.DATA_NODE) {
+                    startNodeTask = Tasks.getStartReplicaSetTask(
+                            Util.wrapAgentToSet(node), config);
+                } else {
+                    startNodeTask = Tasks.getStartRoutersTask(
+                            Util.wrapAgentToSet(node),
+                            config.getConfigServers(),
+                            config);
+                }
 
-                    taskRunner.removeTaskCallback(task.getUuid());
-                    task.setData(NodeState.RUNNING);
-                    synchronized (task) {
-                        task.notifyAll();
+                taskRunner.executeTask(startNodeTask, new TaskCallback() {
+
+                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                        if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
+
+                            taskRunner.removeTaskCallback(task.getUuid());
+                            task.setData(NodeState.RUNNING);
+                            synchronized (task) {
+                                task.notifyAll();
+                            }
+                        } else if (task.isCompleted()) {
+                            synchronized (task) {
+                                task.notifyAll();
+                            }
+                        }
+                        return null;
                     }
-                } else if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
+                });
+
+                synchronized (startNodeTask) {
+                    try {
+                        startNodeTask.wait(startNodeTask.getAvgTimeout() * 1000 + 1000);
+                    } catch (InterruptedException ex) {
                     }
                 }
-                return null;
+
+                if (NodeState.RUNNING.equals(startNodeTask.getData())) {
+                    po.addLogDone(String.format("Node on %s started", lxcHostname));
+                } else {
+                    po.addLogFailed(String.format("Failed to start node %s. %s",
+                            lxcHostname,
+                            startNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
+                    ));
+                }
+
+            }
+
+        });
+
+//        return NodeState.RUNNING.equals(startNodeTask.getData());
+        return po.getId();
+    }
+
+    public UUID stopNode(final String clusterName, final String lxcHostname) {
+        final ProductOperation po
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+
+                Task stopNodeTask = taskRunner.executeTask(
+                        Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
+
+                if (stopNodeTask.isCompleted()) {
+                    if (stopNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLogDone(String.format("Node on %s stopped", lxcHostname));
+                    } else {
+                        po.addLogFailed(String.format("Failed to stop node %s. %s",
+                                lxcHostname,
+                                stopNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
+                        ));
+                    }
+                }
+
             }
         });
 
-        synchronized (startNodeTask) {
-            try {
-                startNodeTask.wait(startNodeTask.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-            }
-        }
-
-        return NodeState.RUNNING.equals(startNodeTask.getData());
+        return po.getId();
     }
 
-    public boolean stopNode(String clusterName, String lxcHostname) {
+    public UUID checkNode(final String clusterName, final String lxcHostname) {
+        final ProductOperation po
+                = dbManager.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
-        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-        if (config == null) {
-            return false;
-        }
+        executor.execute(new Runnable() {
 
-        Agent node = agentManager.getAgentByHostname(lxcHostname);
-        if (node == null) {
-            return false;
-        }
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
 
-        Task stopNodeTask = taskRunner.executeTask(
-                Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
 
-        if (stopNodeTask.isCompleted()) {
-            return checkNode(clusterName, lxcHostname) == NodeState.STOPPED;
-        }
+                Task checkNodeTask = taskRunner.executeTask(
+                        Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
 
-        return false;
+                if (checkNodeTask.isCompleted()) {
+                    String stdOut = checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut();
+                    if (stdOut.indexOf("couldn't connect to server") > -1) {
+                        po.addLogDone(String.format("Node on %s is stopped", lxcHostname));
+                    } else if (stdOut.indexOf("connecting to") > -1) {
+                        po.addLogDone(String.format("Node on %s is running", lxcHostname));
+                    } else {
+                        po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
+                    }
+                }
+
+            }
+        });
+
+        return po.getId();
     }
 
-    public NodeState checkNode(String clusterName, String lxcHostname) {
-
-        Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-        if (config == null) {
-            return NodeState.UNKNOWN;
-        }
-
-        Agent node = agentManager.getAgentByHostname(lxcHostname);
-        if (node == null) {
-            return NodeState.UNKNOWN;
-        }
-        Task checkNodeTask = taskRunner.executeTask(
-                Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
-
-        if (checkNodeTask.isCompleted()) {
-            String stdOut = checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut();
-            if (stdOut.indexOf("couldn't connect to server") > -1) {
-                return NodeState.STOPPED;
-            } else if (stdOut.indexOf("connecting to") > -1) {
-                return NodeState.RUNNING;
-            }
-        }
-
-        return NodeState.UNKNOWN;
+    public ProductOperationView getProductOperationView(UUID viewId) {
+        return dbManager.getProductOperation(Config.PRODUCT_KEY, viewId);
     }
 
     private NodeType getNodeType(Config config, Agent node) {

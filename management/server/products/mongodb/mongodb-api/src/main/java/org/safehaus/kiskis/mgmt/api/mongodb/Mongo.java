@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.api.mongodb;
 
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 
 /**
  *
@@ -66,28 +66,37 @@ public interface Mongo {
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @return - result of operation true - success, false - failure
+     * @return - UUID of operation to track
      *
      */
-    public boolean startNode(String clusterName, String lxcHostName);
+    public UUID startNode(String clusterName, String lxcHostName);
 
     /**
      * Stops the specified node
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @return - result of operation true - success, false - failure
+     * @return - UUID of operation to track
      *
      */
-    public boolean stopNode(String clusterName, String lxcHostName);
+    public UUID stopNode(String clusterName, String lxcHostName);
 
     /**
      * Checks status of the specified node
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @return - node state
+     * @return - UUID of operation to track
      *
      */
-    public NodeState checkNode(String clusterName, String lxcHostName);
+    public UUID checkNode(String clusterName, String lxcHostName);
+
+    /**
+     * Returns view of product operation
+     *
+     * @param viewId - operation view id
+     * @return - product operation view
+     *
+     */
+    public ProductOperationView getProductOperationView(UUID viewId);
 }

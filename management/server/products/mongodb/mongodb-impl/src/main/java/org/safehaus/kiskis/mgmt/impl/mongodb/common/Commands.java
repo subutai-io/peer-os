@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.impl.mongodb.common;
 
 import java.util.Arrays;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -54,17 +55,17 @@ public class Commands {
     }
 
     //execute on each selected lxc node
-    public static Request getAptGetUpdateCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/apt-get");
-        req.setArgs(Arrays.asList(
-                "update"
-        ));
-        req.setStdOut(OutputRedirection.NO);
-        req.setTimeout(180);
-        return req;
-    }
+//    public static Request getAptGetUpdateCommand() {
+//
+//        Request req = getTemplate();
+//        req.setProgram("/usr/bin/apt-get");
+//        req.setArgs(Arrays.asList(
+//                "update"
+//        ));
+//        req.setStdOut(OutputRedirection.NO);
+//        req.setTimeout(180);
+//        return req;
+//    }
 
     //execute on each replica
     public static Request getSetReplicaSetNameCommand(String replicaSetName) {
@@ -162,7 +163,7 @@ public class Commands {
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         //                        "--logappend"
         ));
-        req.setTimeout(180);
+        req.setTimeout(Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC);
         return req;
     }
 
@@ -180,24 +181,7 @@ public class Commands {
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(180);
-        return req;
-    }
-
-    public static Request getStartRouterCommand2(String configServersArg, Config cfg) {
-
-        Request req = getTemplate();
-        req.setProgram("mongos");
-        req.setArgs(Arrays.asList(
-                "--configdb",
-                configServersArg,
-                "--port",
-                cfg.getRouterPort() + "",
-                "--fork",
-                "--logpath",
-                String.format("%s/mongodb.log", Constants.LOG_DIR)
-        ));
-        req.setTimeout(60);
+        req.setTimeout(Timeouts.START_ROUTER_TIMEOUT_SEC);
         return req;
     }
 
@@ -215,7 +199,7 @@ public class Commands {
                 "--logpath",
                 String.format("%s/mongodb.log", Constants.LOG_DIR)
         ));
-        req.setTimeout(300);
+        req.setTimeout(Timeouts.START_DATE_NODE_TIMEOUT_SEC);
         return req;
     }
 
@@ -230,7 +214,7 @@ public class Commands {
                 "--port",
                 port
         ));
-        req.setTimeout(10);
+        req.setTimeout(Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC);
         return req;
     }
 
@@ -255,7 +239,7 @@ public class Commands {
                 "-2",
                 "mongo"
         ));
-        req.setTimeout(30);
+        req.setTimeout(Timeouts.STOP_NODE_TIMEOUT_SEC);
         return req;
     }
 

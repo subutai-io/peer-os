@@ -29,7 +29,7 @@ public class AddDataNodeOperation extends Operation {
 
         clusterMembers.add(agent);
 
-        addTask(Tasks.getAptGetUpdateTask(Util.wrapAgentToSet(agent)));
+//        addTask(Tasks.getAptGetUpdateTask(Util.wrapAgentToSet(agent)));
 
         addTask(Tasks.getInstallMongoTask(Util.wrapAgentToSet(agent)));
 

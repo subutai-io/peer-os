@@ -38,7 +38,6 @@ public class TerminalUI implements Module {
         private volatile int taskCount = 0;
 
         public ModuleComponent(final TaskRunner taskRunner, final AgentManager agentManager) {
-//            agentManager = ServiceLocator.getService(AgentManager.class);
 
             setHeight("100%");
             GridLayout grid = new GridLayout(20, 10);
