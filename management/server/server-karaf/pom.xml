@@ -290,7 +290,7 @@
                                 <!--UI Modules-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>terminal-module</artifactId>
+                                    <artifactId>terminal-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
