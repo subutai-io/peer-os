@@ -44,6 +44,7 @@ import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -261,7 +262,14 @@ public class MongoImpl implements Mongo {
 
                         }
                     } else {
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed", task.getDescription(), installOperation.getDescription()));
+                        String err = "";
+                        for (Map.Entry<UUID, Result> res : task.getResults().entrySet()) {
+                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
+                                err = res.getValue().getStdErr();
+                                break;
+                            }
+                        }
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s", task.getDescription(), installOperation.getDescription(), err));
 
                     }
                 }
@@ -590,7 +598,14 @@ public class MongoImpl implements Mongo {
                             }
                         }
                     } else {
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed", task.getDescription(), operation.getDescription()));
+                        String err = "";
+                        for (Map.Entry<UUID, Result> res : task.getResults().entrySet()) {
+                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
+                                err = res.getValue().getStdErr();
+                                break;
+                            }
+                        }
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s", task.getDescription(), operation.getDescription(), err));
                     }
                 }
 
