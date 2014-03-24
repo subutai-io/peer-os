@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>mgmt-shared-parent</artifactId>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
+	<artifactId>db-manager-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
