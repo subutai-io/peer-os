@@ -147,49 +147,62 @@ public class NodesWindow extends Window {
         if (cce != null) {
             switch (cce) {
                 case START_SERVER: {
-                    switch (task.getTaskStatus()) {
-                        case SUCCESS: {
-                            switchState(false);
-                            getWindow().showNotification("Start success.");
-                            break;
-                        }
-                        case FAIL: {
-                            getWindow().showNotification("Start failed.");
-                            break;
-                        }
-                    }
+                    // Emin needs to fix agent EXECUTE_RESPONSE_DONE error of locked thread
+                    switchState(false);
+                    getWindow().showNotification("Start success.");
+//                    switch (task.getTaskStatus()) {
+//                        case SUCCESS: {
+//                            switchState(false);
+//                            getWindow().showNotification("Start success.");
+//                            break;
+//                        }
+//                        case FAIL: {
+//                            getWindow().showNotification("Start failed.");
+//                            break;
+//                        }
+//                    }
                     break;
                 }
                 case STOP_SERVER: {
-                    switch (task.getTaskStatus()) {
-                        case SUCCESS: {
-                            switchState(true);
-                            getWindow().showNotification("Stop success.");
-                            break;
-                        }
-                        case FAIL: {
-                            getWindow().showNotification("Stop failed.");
-                            break;
-                        }
-                    }
+                    switchState(true);
+                    getWindow().showNotification("Stop success.");
+//                    switch (task.getTaskStatus()) {
+//                        case SUCCESS: {
+//                            switchState(true);
+//                            getWindow().showNotification("Stop success.");
+//                            break;
+//                        }
+//                        case FAIL: {
+//                            getWindow().showNotification("Stop failed.");
+//                            break;
+//                        }
+//                    }
                     break;
                 }
                 case STATUS: {
-                    switch (task.getTaskStatus()) {
-                        case SUCCESS: {
+                    if (stdOut.contains("Oozie Server is running")) {
+                        getWindow().showNotification("Oozie Server is running");
+                        switchState(false);
+                    } else {
+                        getWindow().showNotification(" Oozie Server is not running");
+                        switchState(true);
 
-                            if (stdOut.contains("Oozie Server is running")) {
-                                getWindow().showNotification("Oozie Server is running");
-                                switchState(false);
-                            }
-                            break;
-                        }
-                        case FAIL: {
-                            getWindow().showNotification(" Oozie Server is not running");
-                            switchState(true);
-                            break;
-                        }
                     }
+//                    switch (task.getTaskStatus()) {
+//                        case SUCCESS: {
+//
+//                            if (stdOut.contains("Oozie Server is running")) {
+//                                getWindow().showNotification("Oozie Server is running");
+//                                switchState(false);
+//                            }
+//                            break;
+//                        }
+//                        case FAIL: {
+//                            getWindow().showNotification(" Oozie Server is not running");
+//                            switchState(true);
+//                            break;
+//                        }
+//                    }
                     break;
                 }
 
