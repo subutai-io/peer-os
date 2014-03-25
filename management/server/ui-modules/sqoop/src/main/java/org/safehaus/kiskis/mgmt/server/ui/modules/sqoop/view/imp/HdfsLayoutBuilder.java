@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UIUtil;
 
 public class HdfsLayoutBuilder {
 
-    public static Layout create() {
+    public static Layout create(ImportLayout importLayout) {
 
         TextArea textArea = UIUtil.getTextArea(800, 600);
         UILogger logger = new UILogger(textArea);
@@ -34,7 +34,7 @@ public class HdfsLayoutBuilder {
         layout.addComponent(usernameField, "left: 30px; top: 250px;");
         layout.addComponent(passwordField, "left: 30px; top: 300px;");
 
-        layout.addComponent(UIUtil.getButton("Back", 120, ImportLayoutBuilder.getListener(LayoutType.MAIN)), "left: 30px; top: 380px;");
+        layout.addComponent(UIUtil.getButton("Back", 120, importLayout.getListener(LayoutType.MAIN)), "left: 30px; top: 380px;");
         layout.addComponent(UIUtil.getButton("Import", 120, chain), "left: 160px; top: 380px;");
         layout.addComponent(textArea, "left: 380px; top: 100px;");
 
