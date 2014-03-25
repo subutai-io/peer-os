@@ -19,6 +19,7 @@ public class LxcUI implements Module {
     private AgentManager agentManager;
     private LxcManager lxcManager;
     private static ExecutorService executor;
+    private final static String managerTabCaption = "Manage";
 
     public void setAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
@@ -51,9 +52,20 @@ public class LxcUI implements Module {
             TabSheet commandsSheet = new TabSheet();
             commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
             commandsSheet.setSizeFull();
-
+            final Manager manager = new Manager(agentManager, lxcManager);
             commandsSheet.addTab(new Cloner(lxcManager), "Clone");
-            commandsSheet.addTab(new Manager(agentManager, lxcManager), "Manage");
+            commandsSheet.addTab(manager, managerTabCaption);
+
+            commandsSheet.addListener(new TabSheet.SelectedTabChangeListener() {
+
+                public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
+                    TabSheet tabsheet = event.getTabSheet();
+                    String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
+                    if (caption.equals(managerTabCaption)) {
+                        manager.getLxcInfo();
+                    }
+                }
+            });
 
             verticalLayout.addComponent(commandsSheet);
 
