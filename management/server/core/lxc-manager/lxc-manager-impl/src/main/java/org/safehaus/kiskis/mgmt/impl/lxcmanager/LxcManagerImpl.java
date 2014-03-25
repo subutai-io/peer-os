@@ -197,14 +197,18 @@ public class LxcManagerImpl implements LxcManager {
         if (!metrics.isEmpty()) {
             for (Map.Entry<Agent, ServerMetric> entry : metrics.entrySet()) {
                 ServerMetric metric = entry.getValue();
-                int numOfLxcByLxcLimit = MAX_NUMBER_OF_LXCS_PER_HOST - metric.getNumOfLxcs();
+//                int numOfLxcByLxcLimit = MAX_NUMBER_OF_LXCS_PER_HOST - metric.getNumOfLxcs();
                 int numOfLxcByRam = (int) ((metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
                 int numOfLxcByHdd = (int) ((metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
                 int numOfLxcByCpu = (int) (((100 - metric.getCpuLoadPercent()) - (MIN_CPU_IN_RESERVE_PERCENT / metric.getNumOfProcessors())) / (MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors()));
-                if (numOfLxcByLxcLimit > 0 && numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
-                    int minNumOfLxcs = Math.min(Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam), numOfLxcByLxcLimit);
+                if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
+                    int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
                     bestServers.put(entry.getKey(), minNumOfLxcs);
                 }
+//                if (numOfLxcByLxcLimit > 0 && numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
+//                    int minNumOfLxcs = Math.min(Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam), numOfLxcByLxcLimit);
+//                    bestServers.put(entry.getKey(), minNumOfLxcs);
+//                }
             }
         }
         return bestServers;

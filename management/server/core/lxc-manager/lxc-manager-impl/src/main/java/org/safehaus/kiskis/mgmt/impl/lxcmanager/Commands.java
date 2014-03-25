@@ -61,7 +61,7 @@ public class Commands {
     public static Request getLxcInfoWithWaitCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("sleep 5;/usr/bin/lxc-info -n " + lxcHostname);
+        req.setProgram("sleep 10;/usr/bin/lxc-info -n " + lxcHostname);
         req.setTimeout(60);
         return req;
     }
