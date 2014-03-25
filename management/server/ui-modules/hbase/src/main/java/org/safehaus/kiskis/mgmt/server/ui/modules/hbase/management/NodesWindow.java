@@ -152,6 +152,7 @@ public class NodesWindow extends Window {
                     switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             switchState(false);
+                            getWindow().showNotification("HBase started.");
                             break;
                         }
                         case FAIL: {
@@ -164,6 +165,7 @@ public class NodesWindow extends Window {
                 case STOP: {
                     switch (task.getTaskStatus()) {
                         case SUCCESS: {
+                            getWindow().showNotification("HBase stopped.");
                             switchState(true);
                             break;
                         }
