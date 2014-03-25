@@ -77,8 +77,8 @@ public class ModuleComponent extends CustomComponent {
         Set<Agent> agents = MgmtApplication.getSelectedAgents();
 
         return agents == null || agents.size() == 0
-                ? "py453399588"
-//                ? null
+//                ? "py453399588"
+                ? null
                 : agents.iterator().next().getHostname();
     }
 

@@ -18,7 +18,7 @@ class Chart {
 
     private JavaScript javaScript;
 
-    private Timer timer;
+    private Poll poll;
 
     private String host;
     private Metric metric;
@@ -35,7 +35,6 @@ class Chart {
     }
 
     void load(String host, Metric metric) {
-
         LOG.info("host: {}; metric: {}", host, metric);
 
         if (host == null || metric == null) {
@@ -58,17 +57,17 @@ class Chart {
                 .replace( "$data", data );
 
         javaScript.execute(chart);
-        startTimer();
+        startPolling();
     }
 
-    private void startTimer() {
+    private void startPolling() {
 
-        if (timer != null) {
-            timer.interrupt();
+        if (poll != null) {
+            poll.interrupt();
         }
 
-        timer = new Timer(this);
-        timer.start();
+        poll = new Poll(this);
+        poll.start();
     }
 
     void push() {
