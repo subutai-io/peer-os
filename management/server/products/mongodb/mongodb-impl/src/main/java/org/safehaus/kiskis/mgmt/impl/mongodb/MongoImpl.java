@@ -156,6 +156,11 @@ public class MongoImpl implements Mongo {
                         List<LxcInfo> infos = new ArrayList<LxcInfo>();
                         if (cloneLxcs(config, po, bestServers, infos)) {
                             po.addLog("Lxc containers cloned successfully");
+                            try {
+                                Thread.sleep(7000);
+                            } catch (InterruptedException ex) {
+                                return;
+                            }
                             //start lxc containers
                             if (startLxcs(po, infos)) {
                                 po.addLog("Lxc containers started successfully");
