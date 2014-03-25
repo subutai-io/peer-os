@@ -16,7 +16,7 @@ class HttpPost {
 
     static String execute(String params) throws Exception {
 
-        String url = "http://172.16.10.108:9200/_all/logs/_search";
+        String url = "http://127.0.0.1:9200/_all/logs/_search";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
