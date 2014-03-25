@@ -71,6 +71,27 @@ public class TaskTrackerConfiguration {
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                        setMasters(form, cluster, agent);
+                    } else {
+                        System.err.println(stdErr);
+                    }
+                }
+
+                return null;
+            }
+        });
+    }
+
+    public static void setMasters(final TaskTrackersWindow form, final HadoopClusterInfo cluster, final Agent agent) {
+
+        Task task = Tasks.getSetMastersTask(Arrays.asList(agent), cluster.getNameNode(), cluster.getJobTracker(),
+                cluster.getReplicationFactor());
+
+        HadoopModule.getTaskRunner().executeTask(task, new TaskCallback() {
+            @Override
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                if (task.isCompleted()) {
+                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                         registerNode(form, cluster, agent);
                     } else {
                         System.err.println(stdErr);
