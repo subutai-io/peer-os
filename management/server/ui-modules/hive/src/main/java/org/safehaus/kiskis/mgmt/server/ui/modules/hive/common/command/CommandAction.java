@@ -33,7 +33,7 @@ public class CommandAction implements Action {
         switch (result) {
         case CONTINUE:
             reset(context, chain);
-            CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, getCommandLine()), this);
+            CommandExecutor.INSTANCE.execute( CommandBuilder.getCommand(context, getCommandLine() ), this);
             break;
         case SKIP:
             chain.proceed(context);
