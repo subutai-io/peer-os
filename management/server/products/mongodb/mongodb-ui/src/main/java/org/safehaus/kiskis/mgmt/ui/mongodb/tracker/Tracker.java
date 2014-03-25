@@ -37,16 +37,15 @@ public class Tracker {
     private final VerticalLayout contentRoot;
     private final Table operationsTable;
     private final TextArea outputTxtArea;
-    private final Application app;
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private volatile UUID trackID;
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
+    private Application app;
 
-    public Tracker(Application app) {
-        this.app = app;
+    public Tracker() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -83,6 +82,10 @@ public class Tracker {
         this.trackID = trackID;
     }
 
+    public void setApp(Application app) {
+        this.app = app;
+    }
+
     public void startTracking() {
         track = true;
 
@@ -98,7 +101,9 @@ public class Tracker {
                     } catch (InterruptedException ex) {
                         break;
                     }
-                    System.out.println(((MgmtApplication) app).getSelectedTabName());
+                    if (app != null) {
+                        System.out.println(((MgmtApplication) app).getSelectedTabName());
+                    }
                 }
             }
         });
