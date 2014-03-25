@@ -331,12 +331,40 @@ public class Tasks {
         return task;
     }
 
+    public static Task getTaskTrackerCommand(Agent agent, String command) {
+        Task task = new Task(command + "for Hadoop Job Tracker");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", agent.getUuid().toString());
+        map.put(":command", command);
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_JOB_TRACKER, task, map);
+        task.addRequest(request);
+
+        return task;
+    }
+
     public static Task getNameNodeCommand(HadoopClusterInfo cluster, String command) {
         Task task = new Task(command + "for Hadoop Name Node");
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(":source", HadoopModule.MODULE_NAME);
         map.put(":uuid", cluster.getNameNode().getUuid().toString());
+        map.put(":command", command);
+
+        Request request = TaskUtil.createRequest(Commands.COMMAND_NAME_NODE, task, map);
+        task.addRequest(request);
+
+        return task;
+    }
+
+    public static Task getDataNodeCommand(Agent agent, String command) {
+        Task task = new Task(command + "for Hadoop Name Node");
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(":source", HadoopModule.MODULE_NAME);
+        map.put(":uuid", agent.getUuid().toString());
         map.put(":command", command);
 
         Request request = TaskUtil.createRequest(Commands.COMMAND_NAME_NODE, task, map);
