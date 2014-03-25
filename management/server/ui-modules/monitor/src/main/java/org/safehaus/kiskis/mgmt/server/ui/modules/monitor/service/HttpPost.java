@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search;
+package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,21 +29,23 @@ class HttpPost {
         wr.close();
 
         int responseCode = con.getResponseCode();
-        LOG.info("url: {}", url);
-        LOG.info("params: {}", params);
         LOG.info("responseCode: {}", responseCode);
 
+        if (responseCode != 200) {
+            return "";
+        }
+
         BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
-        StringBuffer response = new StringBuffer();
+        StringBuffer buffer = new StringBuffer();
         String inputLine;
 
         while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+            buffer.append(inputLine);
         }
 
         in.close();
 
-        return response.toString();
+        return buffer.toString();
     }
 
 }

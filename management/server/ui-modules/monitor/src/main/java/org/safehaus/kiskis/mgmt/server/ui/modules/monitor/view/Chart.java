@@ -2,8 +2,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
 import com.vaadin.ui.Window;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Metric;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Query;
+import org.apache.commons.lang3.StringUtils;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.Metric;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.Query;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.JavaScript;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ class Chart {
     private void loadScripts() {
         javaScript.loadFile("js/jquery.min.js");
         javaScript.loadFile("js/highcharts.js");
+        javaScript.loadFile("js/global.js");
     }
 
     void load(String host, Metric metric) {
@@ -43,7 +45,11 @@ class Chart {
         this.host = host;
         this.metric = metric;
 
-        String data = Query.execute(host, metric.toString(), 20);
+        String data = Query.execute(host, metric.toString(), 25);
+
+        if (StringUtils.isEmpty(data)) {
+            return;
+        }
 
         String chart = CHART_TEMPLATE
                 .replace( "$mainTitle", String.format("%s / %s", host, metric) )
@@ -67,8 +73,6 @@ class Chart {
 
     void push() {
         String data = Query.execute(host, metric.toString(), 1);
-        LOG.info("data: {}", data);
-
         String script = String.format("setData(%s);", data);
         javaScript.execute(script);
     }

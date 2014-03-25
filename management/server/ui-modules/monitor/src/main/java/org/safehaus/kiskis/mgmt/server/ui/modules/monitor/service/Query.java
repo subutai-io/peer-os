@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search;
+package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -36,7 +36,7 @@ public class Query {
         JsonNode json = OBJECT_MAPPER.readTree(response);
         List<JsonNode> nodes = HostFilter.filter(json, host, maxSize);
 
-        return Format.toPoints(nodes);
+        return nodes.isEmpty() ? "" : Format.toPoints(nodes);
     }
 
 }
