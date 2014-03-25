@@ -125,6 +125,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     public String getSelectedTabName() {
         System.out.println(tabs.getComponentCount());
         if (tabs.getSelectedTab() != null) {
+            System.out.println("TAb exists");
             return tabs.getSelectedTab().getCaption();
         }
         return null;
