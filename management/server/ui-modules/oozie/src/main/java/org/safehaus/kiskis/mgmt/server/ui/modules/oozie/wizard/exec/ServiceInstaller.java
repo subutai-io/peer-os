@@ -68,7 +68,7 @@ public class ServiceInstaller implements TaskCallback {
         allHadoopNodes.add(config.getServer());
         allHadoopNodes.addAll(config.getClients());
 
-        Task configugeRootHostClients = new Task("Configure client");
+        Task configugeRootHostClients = new Task("Configure set root host");
         for (Agent agent : allHadoopNodes) {
             Request command = oc.getSetRootHost(" " + config.getServer().getListIP().get(0));
             command.setUuid(agent.getUuid());
@@ -76,7 +76,7 @@ public class ServiceInstaller implements TaskCallback {
         }
         tasks.add(configugeRootHostClients);
 
-        Task configugeRootGroupsClients = new Task("Configure client");
+        Task configugeRootGroupsClients = new Task("Configure set root groups");
         for (Agent agent : allHadoopNodes) {
             Request command = oc.getSetRootGroups();
             command.setUuid(agent.getUuid());
