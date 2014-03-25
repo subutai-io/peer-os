@@ -18,7 +18,7 @@ function addPoint() {
     }
 
     var x = ( new Date() ).getTime();
-    var y = DATA[ DATA.length-1 ].y + Math.random() / 10;
+    var y = DATA[ DATA.length-1 ].y;
 
     SERIES.addPoint([x, y], true, true);
 }
@@ -46,7 +46,7 @@ $(function () {
                 }
             },
             title: {
-                text: 'MEMORY for node1'
+                text: '$mainTitle'
             },
             xAxis: {
                 type: 'datetime',
@@ -57,7 +57,7 @@ $(function () {
             },
             yAxis: {
                 title: {
-                    text: 'KB'
+                    text: '$yTitle'
                 },
                 plotLines: [{
                     value: 0,
