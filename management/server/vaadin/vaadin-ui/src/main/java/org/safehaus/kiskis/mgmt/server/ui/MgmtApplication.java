@@ -122,6 +122,13 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         }
     }
 
+    public String getSelectedTabName() {
+        if (tabs.getSelectedTab() != null) {
+            return tabs.getTab(tabs.getSelectedTab()).getCaption();
+        }
+        return null;
+    }
+
     @Override
     public void moduleUnregistered(Module module) {
         try {
