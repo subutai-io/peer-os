@@ -16,12 +16,12 @@ public class Query {
 
     private static final String QUERY = FileUtil.getContent("elasticsearch/query.json");
 
-    public static String execute(String host, String metricName, int maxSize) {
+    public static String execute(String host, String metric, int maxSize) {
 
         String data = "";
 
         try {
-            data = doExecute(host, metricName, maxSize);
+            data = doExecute(host, metric, maxSize);
         } catch (Exception e) {
             LOG.error("Error while executing query: ", e);
         }

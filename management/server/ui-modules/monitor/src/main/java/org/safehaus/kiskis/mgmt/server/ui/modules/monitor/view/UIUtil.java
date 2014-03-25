@@ -1,8 +1,9 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.ListSelect;
 
 public class UIUtil {
 
@@ -18,10 +19,24 @@ public class UIUtil {
         return comboBox;
     }
 
-    public static Button getButton(String name, float width) {
+    public static Button getButton(String name, String width) {
+
         Button button = new Button(name);
-        button.setWidth(width, Sizeable.UNITS_PIXELS);
+        button.setWidth(width);
 
         return button;
+    }
+
+    public static ListSelect addListSelect(AbsoluteLayout parent, String caption, String position, String width, String height) {
+
+        ListSelect list = new ListSelect(caption);
+        list.setWidth(width);
+        list.setHeight(height);
+        list.setNullSelectionAllowed(false);
+        list.setImmediate(true);
+
+        parent.addComponent(list, position);
+
+        return list;
     }
 }
