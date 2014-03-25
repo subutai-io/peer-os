@@ -53,7 +53,7 @@ public class VerificationStep extends Panel {
 
                 UUID operationID = MongoUI.getMongoManager().installCluster(wizard.getConfig());
                 tracker.setTrackId(operationID);
-                MongoUI.setRefreshClusters(true);
+                tracker.setRefreshClusters(true);
                 tabSheet.setSelectedTab(tracker.getContent());
                 wizard.init();
             }

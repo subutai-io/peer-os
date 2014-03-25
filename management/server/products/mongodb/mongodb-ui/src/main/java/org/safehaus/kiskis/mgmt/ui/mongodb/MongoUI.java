@@ -30,11 +30,6 @@ public class MongoUI implements Module {
     private static Mongo mongoManager;
     private static DbManager dbManager;
     private static ExecutorService executor;
-    private static boolean refreshClusters = false;
-
-    public static void setRefreshClusters(boolean refreshClusters) {
-        MongoUI.refreshClusters = refreshClusters;
-    }
 
     public static Mongo getMongoManager() {
         return mongoManager;
@@ -101,8 +96,8 @@ public class MongoUI implements Module {
                         tracker.stopTracking();
                     }
 
-                    if (caption.equals(managerTabName) && refreshClusters) {
-                        refreshClusters = false;
+                    if (caption.equals(managerTabName) && tracker.isRefreshClusters()) {
+                        tracker.setRefreshClusters(false);
                         manager.refreshClustersInfo();
                     }
                 }
