@@ -93,20 +93,26 @@ public class Tracker {
 
             public void run() {
                 while (track) {
-
-                    populateOperations();
-                    populateLogs();
+                    if (isMongoShown()) {
+                        populateOperations();
+                        populateLogs();
+                    }
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         break;
                     }
-                    if (app != null) {
-                        System.out.println(((MgmtApplication) app).getSelectedTabName());
-                    }
+
                 }
             }
         });
+    }
+
+    private boolean isMongoShown() {
+        if (app != null) {
+            return MongoUI.MODULE_NAME.equals(((MgmtApplication) app).getSelectedTabName());
+        }
+        return false;
     }
 
     public void stopTracking() {
