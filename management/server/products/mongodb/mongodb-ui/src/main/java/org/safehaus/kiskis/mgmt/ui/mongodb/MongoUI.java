@@ -78,7 +78,7 @@ public class MongoUI implements Module {
             TabSheet mongoSheet = new TabSheet();
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
-            tracker = new Tracker();
+            tracker = new Tracker(getApplication());
             wizard = new Wizard(tracker, mongoSheet);
             manager = new Manager(tracker, mongoSheet);
             mongoSheet.addTab(wizard.getContent(), "Install");
