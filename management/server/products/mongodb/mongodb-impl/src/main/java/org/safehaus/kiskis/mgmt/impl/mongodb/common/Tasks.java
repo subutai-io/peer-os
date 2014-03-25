@@ -30,7 +30,6 @@ public class Tasks {
 //        }
 //        return task;
 //    }
-
     public static Task getInstallMongoTask(Set<Agent> agents) {
         Task task = new Task("Install mongo");
         for (Agent agent : agents) {
@@ -53,23 +52,53 @@ public class Tasks {
         return task;
     }
 
+//    public static Task getRegisterIpsTask(Set<Agent> agents, Config cfg) {
+//        Task task = new Task("Register nodes's IP-Host with other nodes");
+//        for (Agent agent : agents) {
+//            StringBuilder cleanHosts = new StringBuilder();
+//            StringBuilder appendHosts = new StringBuilder();
+//            for (Agent otherAgent : agents) {
+//                if (agent != otherAgent) {
+//                    String ip = Util.getAgentIpByMask(otherAgent, Common.IP_MASK);
+//                    String hostname = otherAgent.getHostname();
+//                    cleanHosts.append(ip).append("|").append(hostname).append("|");
+//                    appendHosts.append("if ! /bin/grep -q '").
+//                            append(ip).
+//                            append(" ").append(hostname).append(".").append(cfg.getDomainName()).
+//                            append("' '/etc/hosts'; then /bin/echo '").
+//                            append(ip).
+//                            append(" ").append(hostname).append(".").append(cfg.getDomainName()).
+//                            append("' >> '/etc/hosts'; fi ;");
+//                }
+//            }
+//            if (cleanHosts.length() > 0) {
+//                //drop pipe | symbol
+//                cleanHosts.setLength(cleanHosts.length() - 1);
+//                cleanHosts.insert(0, "egrep -v '");
+//                cleanHosts.append("' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;");
+//                appendHosts.insert(0, cleanHosts);
+//            }
+//            Request req = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
+//            req.setUuid(agent.getUuid());
+//            task.addRequest(req);
+//        }
+//        return task;
+//    }
     public static Task getRegisterIpsTask(Set<Agent> agents, Config cfg) {
         Task task = new Task("Register nodes's IP-Host with other nodes");
         for (Agent agent : agents) {
-            StringBuilder cleanHosts = new StringBuilder();
+            StringBuilder cleanHosts = new StringBuilder("localhost|127.0.0.1|");
             StringBuilder appendHosts = new StringBuilder();
             for (Agent otherAgent : agents) {
                 if (agent != otherAgent) {
                     String ip = Util.getAgentIpByMask(otherAgent, Common.IP_MASK);
                     String hostname = otherAgent.getHostname();
                     cleanHosts.append(ip).append("|").append(hostname).append("|");
-                    appendHosts.append("if ! /bin/grep -q '").
-                            append(ip).
-                            append(" ").append(hostname).append(".").append(cfg.getDomainName()).
-                            append("' '/etc/hosts'; then /bin/echo '").
-                            append(ip).
-                            append(" ").append(hostname).append(".").append(cfg.getDomainName()).
-                            append("' >> '/etc/hosts'; fi ;");
+                    appendHosts.append("/bin/echo '").
+                            append(ip).append(" ").
+                            append(hostname).append(".").append(cfg.getDomainName()).
+                            append(" ").append(hostname).
+                            append("' >> '/etc/hosts'; ");
                 }
             }
             if (cleanHosts.length() > 0) {
@@ -79,6 +108,7 @@ public class Tasks {
                 cleanHosts.append("' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;");
                 appendHosts.insert(0, cleanHosts);
             }
+            appendHosts.append("/bin/echo '127.0.0.1 localhost ").append(agent.getHostname()).append("' >> '/etc/hosts';");
             Request req = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
             req.setUuid(agent.getUuid());
             task.addRequest(req);
