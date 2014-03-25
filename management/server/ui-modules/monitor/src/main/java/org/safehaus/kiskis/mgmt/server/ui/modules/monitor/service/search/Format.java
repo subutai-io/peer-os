@@ -36,9 +36,10 @@ public class Format {
 
     private static String getPoint(JsonNode node, int i) {
 
-        // Fix for the demo
+//        Fix for the demo
 //        long time = parseTime( node.get("@timestamp").asText() );
-        String time = String.format("( new Date() ).getTime() + %s * 1000", i);
+
+        String time = String.format("( new Date() ).getTime() + %s * 5000", i);
         double value = node.get("val").asDouble();
 
         return String.format(POINT, time, value);

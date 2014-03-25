@@ -44,6 +44,7 @@ public class Tracker {
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
     private Application app;
+    private boolean refreshClusters = false;
 
     public Tracker() {
         contentRoot = new VerticalLayout();
@@ -72,6 +73,14 @@ public class Tracker {
         content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
 
+    }
+
+    public boolean isRefreshClusters() {
+        return refreshClusters;
+    }
+
+    public void setRefreshClusters(boolean refreshClusters) {
+        this.refreshClusters = refreshClusters;
     }
 
     public Component getContent() {

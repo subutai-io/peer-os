@@ -2,18 +2,12 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
 import com.vaadin.ui.Window;
-import org.codehaus.jackson.JsonNode;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle.Handler;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle.Metric;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Format;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Metric;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Query;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.JavaScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.Random;
 
 class Chart {
 
@@ -22,7 +16,11 @@ class Chart {
     private static final String CHART_TEMPLATE = FileUtil.getContent("js/chart.js");
 
     private JavaScript javaScript;
+
     private Timer timer;
+
+    private String host;
+    private Metric metric;
 
     Chart(Window window) {
         javaScript = new JavaScript(window);
@@ -36,12 +34,20 @@ class Chart {
 
     void load(String host, Metric metric) {
 
-        String data = Query.execute("py453399588", "cpu_user", 20);
-        LOG.info("data: {}", data);
+        LOG.info("host: {}; metric: {}", host, metric);
+
+        if (host == null || metric == null) {
+            return;
+        }
+
+        this.host = host;
+        this.metric = metric;
+
+        String data = Query.execute(host, metric.toString(), 20);
 
         String chart = CHART_TEMPLATE
-                .replace( "$mainTitle", String.format("%s for %s", metric, host) )
-                .replace("$yTitle", metric.getTitleY())
+                .replace( "$mainTitle", String.format("%s / %s", host, metric) )
+                .replace( "$yTitle", metric.getUnit() )
                 .replace( "$data", data )
                 .replace( "$data", data );
 
@@ -60,7 +66,7 @@ class Chart {
     }
 
     void push() {
-        String data = Query.execute("py453399588", "cpu_user", 1);
+        String data = Query.execute(host, metric.toString(), 1);
         LOG.info("data: {}", data);
 
         String script = String.format("setData(%s);", data);

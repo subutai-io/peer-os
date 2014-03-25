@@ -173,48 +173,81 @@ public class Cloner extends VerticalLayout {
 
                             String productName = textFieldLxcName.getValue().toString().trim();
                             Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
-                            Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+//                            Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
                             int numOfLxcsToClone = (int) count;
                             final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
-                            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
-                                for (int i = 1; i <= entry.getValue(); i++) {
-                                    List<String> lxcHostNames = agentFamilies.get(entry.getKey());
-                                    if (lxcHostNames == null) {
-                                        lxcHostNames = new ArrayList<String>();
-                                        agentFamilies.put(entry.getKey(), lxcHostNames);
-                                    }
-                                    final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
-                                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
-                                    lxcHostNames.add(lxcHost.toString());
 
-                                    //start clone task
-                                    LxcUI.getExecutor().execute(new Runnable() {
-                                        public void run() {
-                                            boolean result = lxcManager.cloneLxcOnHost(entry.getKey(), lxcHost.toString());
-                                            Item row = lxcTable.getItem(lxcHost.toString());
-                                            if (row != null) {
-                                                if (result) {
-                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
-                                                } else {
-                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
-                                                }
-                                            }
-                                            if (countProcessed.decrementAndGet() == 0) {
-                                                indicator.setVisible(false);
+                            for (int i = 1; i <= numOfLxcsToClone; i++) {
+                                Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+                                final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                                bestServers.put(entry.getKey(), entry.getValue() - 1);
+                                List<String> lxcHostNames = agentFamilies.get(entry.getKey());
+                                if (lxcHostNames == null) {
+                                    lxcHostNames = new ArrayList<String>();
+                                    agentFamilies.put(entry.getKey(), lxcHostNames);
+                                }
+                                final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
+                                lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(lxcHostNames.size() + 1);
+                                lxcHostNames.add(lxcHost.toString());
+
+                                //start clone task
+                                LxcUI.getExecutor().execute(new Runnable() {
+                                    public void run() {
+                                        boolean result = lxcManager.cloneLxcOnHost(entry.getKey(), lxcHost.toString());
+                                        Item row = lxcTable.getItem(lxcHost.toString());
+                                        if (row != null) {
+                                            if (result) {
+                                                row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
+                                            } else {
+                                                row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
                                             }
                                         }
-                                    });
-                                    //
-                                    numOfLxcsToClone--;
-                                    if (numOfLxcsToClone == 0) {
-                                        break;
+                                        if (countProcessed.decrementAndGet() == 0) {
+                                            indicator.setVisible(false);
+                                        }
                                     }
-                                }
-                                if (numOfLxcsToClone == 0) {
-                                    break;
-                                }
+                                });
+
                             }
 
+//                            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
+//                                for (int i = 1; i <= entry.getValue(); i++) {
+//                                    List<String> lxcHostNames = agentFamilies.get(entry.getKey());
+//                                    if (lxcHostNames == null) {
+//                                        lxcHostNames = new ArrayList<String>();
+//                                        agentFamilies.put(entry.getKey(), lxcHostNames);
+//                                    }
+//                                    final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
+//                                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
+//                                    lxcHostNames.add(lxcHost.toString());
+//
+//                                    //start clone task
+//                                    LxcUI.getExecutor().execute(new Runnable() {
+//                                        public void run() {
+//                                            boolean result = lxcManager.cloneLxcOnHost(entry.getKey(), lxcHost.toString());
+//                                            Item row = lxcTable.getItem(lxcHost.toString());
+//                                            if (row != null) {
+//                                                if (result) {
+//                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
+//                                                } else {
+//                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
+//                                                }
+//                                            }
+//                                            if (countProcessed.decrementAndGet() == 0) {
+//                                                indicator.setVisible(false);
+//                                            }
+//                                        }
+//                                    });
+//                                    //
+//                                    numOfLxcsToClone--;
+//                                    if (numOfLxcsToClone == 0) {
+//                                        break;
+//                                    }
+//                                }
+//                                if (numOfLxcsToClone == 0) {
+//                                    break;
+//                                }
+//                            }
                             populateLxcTable(agentFamilies);
                         }
 
