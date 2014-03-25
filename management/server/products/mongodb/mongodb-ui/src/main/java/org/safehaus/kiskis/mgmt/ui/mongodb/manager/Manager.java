@@ -139,6 +139,7 @@ public class Manager {
                                     if (ok) {
                                         UUID operationID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
                                         tracker.setTrackId(operationID);
+                                        MongoUI.setRefreshClusters(true);
                                         tabSheet.setSelectedTab(tracker.getContent());
                                     }
                                 }
