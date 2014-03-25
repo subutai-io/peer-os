@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.elasticsearch;
+package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,11 +9,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class HttpPost {
+// TODO refactor
+class HttpPost {
 
     private final static Logger LOG = LoggerFactory.getLogger(HttpPost.class);
 
-    public static String execute(String params) throws Exception {
+    static String execute(String params) throws Exception {
 
         String url = "http://172.16.10.108:9200/_all/logs/_search";
         URL obj = new URL(url);
