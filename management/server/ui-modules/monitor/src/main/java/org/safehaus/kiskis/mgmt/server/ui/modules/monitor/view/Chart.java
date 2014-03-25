@@ -34,24 +34,19 @@ class Chart {
 
     void load(String host, Metric metric) {
 
-        LOG.info("metric: {}", metric);
+        LOG.info("host: {}; metric: {}", host, metric);
 
-        if (metric == null) {
+        if (host == null || metric == null) {
             return;
         }
-
-//        if (true) {
-//            return;
-//        }
 
         this.host = host;
         this.metric = metric;
 
         String data = Query.execute(host, metric.toString(), 20);
-        LOG.info("data: {}", data);
 
         String chart = CHART_TEMPLATE
-                .replace( "$mainTitle", String.format("%s for %s", metric, host) )
+                .replace( "$mainTitle", String.format("%s / %s", host, metric) )
                 .replace( "$yTitle", metric.getUnit() )
                 .replace( "$data", data )
                 .replace( "$data", data );
