@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mongodb.tracker;
 
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
@@ -23,6 +24,7 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
@@ -35,12 +37,13 @@ public class Tracker {
     private final VerticalLayout contentRoot;
     private final Table operationsTable;
     private final TextArea outputTxtArea;
-    private volatile boolean track = false;
-    private volatile UUID trackID;
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
+    private volatile UUID trackID;
+    private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
+    private Application app;
 
     public Tracker() {
         contentRoot = new VerticalLayout();
@@ -79,6 +82,10 @@ public class Tracker {
         this.trackID = trackID;
     }
 
+    public void setApp(Application app) {
+        this.app = app;
+    }
+
     public void startTracking() {
         track = true;
 
@@ -86,17 +93,26 @@ public class Tracker {
 
             public void run() {
                 while (track) {
-
-                    populateOperations();
-                    populateLogs();
+                    if (isMongoShown()) {
+                        populateOperations();
+                        populateLogs();
+                    }
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         break;
                     }
+
                 }
             }
         });
+    }
+
+    private boolean isMongoShown() {
+        if (app != null) {
+            return MongoUI.MODULE_NAME.equals(((MgmtApplication) app).getSelectedTabName());
+        }
+        return false;
     }
 
     public void stopTracking() {
