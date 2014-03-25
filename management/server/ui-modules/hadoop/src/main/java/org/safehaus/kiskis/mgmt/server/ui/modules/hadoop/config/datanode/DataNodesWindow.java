@@ -8,6 +8,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.AgentsComboBox;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.DataNodeConfiguration;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -151,7 +152,7 @@ public final class DataNodesWindow extends Window {
 
     private AgentsComboBox getAgentsComboBox() {
         if (agentsComboBox == null) {
-            agentsComboBox = new AgentsComboBox(cluster.getClusterName());
+            agentsComboBox = new AgentsComboBox(cluster.getClusterName(),AgentsComboBox.NAMENODE);
         }
 
         return agentsComboBox;

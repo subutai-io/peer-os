@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config.datanode;
+package org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.config;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.FieldEvents;
@@ -19,8 +19,11 @@ public final class AgentsComboBox extends ComboBox {
     private HadoopClusterInfo cluster;
     private final String clusterName;
     private final AgentManager agentManager;
+    private int filter;
+    public static final int NAMENODE = 0, JOBTRACKER = 1;
 
-    public AgentsComboBox(String clusterName) {
+    public AgentsComboBox(String clusterName, int filter) {
+        this.filter = filter;
         this.clusterName = clusterName;
         agentManager = HadoopModule.getAgentManager();
 
@@ -49,12 +52,16 @@ public final class AgentsComboBox extends ComboBox {
             list.remove(cluster.getSecondaryNameNode());
             list.remove(cluster.getJobTracker());
 
-            for (Agent agent : cluster.getDataNodes()) {
-                list.remove(agent);
+            if(filter == NAMENODE){
+                for (Agent agent : cluster.getDataNodes()) {
+                    list.remove(agent);
+                }
             }
 
-            for (Agent agent : cluster.getTaskTrackers()) {
-                list.remove(agent);
+            if(filter == JOBTRACKER){
+                for (Agent agent : cluster.getTaskTrackers()) {
+                    list.remove(agent);
+                }
             }
         }
 
