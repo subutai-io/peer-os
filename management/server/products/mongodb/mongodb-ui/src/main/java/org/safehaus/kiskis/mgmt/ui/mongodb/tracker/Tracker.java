@@ -125,7 +125,7 @@ public class Tracker {
         for (ProductOperationView po : currentOperations) {
             container.removeItem(po.getId());
         }
-
+        boolean sortNeeded = false;
         for (final ProductOperationView po : operations) {
             Embedded progressIcon;
             if (po.getState() == ProductOperationState.RUNNING) {
@@ -151,18 +151,23 @@ public class Tracker {
                 item.getItemProperty("Operation").setValue(po.getDescription());
                 item.getItemProperty("Check").setValue(trackLogsBtn);
                 item.getItemProperty("Status").setValue(progressIcon);
+
+                sortNeeded = true;
             } else {
                 if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(progressIcon.getSource())) {
                     item.getItemProperty("Status").setValue(progressIcon);
                 }
             }
 
+        }
+
+        if (sortNeeded) {
             Object[] properties = {"Date"};
             boolean[] ordering = {false};
             operationsTable.sort(properties, ordering);
-
-            currentOperations = operations;
         }
+
+        currentOperations = operations;
     }
 
     private Table createTableTemplate(String caption, int height) {
