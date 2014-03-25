@@ -1,48 +1,32 @@
-var SERIES;
-var POINT;
-var Y = 0;
+var DATA = $data;
+var SERIES = [];
 
-//function setSeries(s) {
-//    SERIES = s;
-//}
+// Called from the server
+function setData(data) {
+    DATA = data;
+}
 
-//function addPoint() {
-//    if (POINT != null) {
-//        SERIES.addPoint(POINT, true, true);
-//        POINT = null;
-//    }
-//
-//    console.log("i: " + i);
-//}
-
-//function createPoint() {
-//    var x = ( new Date() ).getTime();
-////    var y = Math.random();
-////    POINT = [x, y];
-////    var point = [x, i];
-//    SERIES.addPoint( [x, i], true, true );
-//}
-
-
-function setY(y) {
-    Y = y;
-    console.log("setY: " + Y);
+function addPoints() {
+    addPoint();
+    setTimeout(addPoints, 1000);
 }
 
 function addPoint() {
-    var x = ( new Date() ).getTime();
-    SERIES.addPoint( [x, Y], true, true );
-    console.log("addPoint: " + Y);
-}
 
-function onLoad(series) {
-    SERIES = series;
-    setInterval(addPoint, 1000);
-//    setInterval(createPoint, 1000);
+    if (DATA == null || DATA.length == 0) {
+        return;
+    }
+
+    var x = ( new Date() ).getTime();
+    var y = DATA[ DATA.length-1 ].y + Math.random() / 10;
+
+    SERIES.addPoint([x, y], true, true);
 }
 
 $(function () {
+
     $(document).ready(function() {
+
         Highcharts.setOptions({
             global: {
                 useUTC: false
@@ -56,15 +40,13 @@ $(function () {
                 marginRight: 10,
                 events: {
                     load: function() {
-                        onLoad( this.series[0] );
-//                        setSeries(this.series[0]);
-//                        setInterval(addPoint, 1000);
-//                        setInterval(createPoint, 1000);
+                        SERIES = this.series[0];
+                        addPoints();
                     }
                 }
             },
             title: {
-                text: '$mainTitle'
+                text: 'MEMORY for node1'
             },
             xAxis: {
                 type: 'datetime',
@@ -75,7 +57,7 @@ $(function () {
             },
             yAxis: {
                 title: {
-                    text: '$yTitle'
+                    text: 'KB'
                 },
                 plotLines: [{
                     value: 0,
@@ -95,22 +77,7 @@ $(function () {
             },
             series: [{
                 name: 'Value',
-                data: (function() {
-
-                    var data = [];
-                    var time = ( new Date() ).getTime();
-
-                    for (i = -19; i <= 0; i++) {
-//                    for (var i = 0; i < 10; i++) {
-                        data.push({
-                            x: time + i * 1000,
-//                            y: Math.random()
-                            y: 0
-                        });
-                    }
-
-                    return data;
-                })()
+                data: $data
             }]
         });
     });

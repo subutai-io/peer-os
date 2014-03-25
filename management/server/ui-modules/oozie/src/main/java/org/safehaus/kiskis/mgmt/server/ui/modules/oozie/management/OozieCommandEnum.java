@@ -15,14 +15,14 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management;
  */
 public enum OozieCommandEnum {
 
-    START_SERVER("service oozie-server start > /dev/null &", 300),
+    START_SERVER("service oozie-server start > /dev/null &", 30),
     STOP_SERVER("service oozie-server stop", 60),
     MANAGE("Manage", 0),
     STATUS("service oozie-server status", 60),
     INSTALL_SERVER("apt-get --assume-yes --force-yes install ksks-oozie-server", 300),
     INSTALL_CLIENT("apt-get --assume-yes --force-yes install ksks-oozie-client", 300),
-    CONFIGURE_ROOT_HOST(". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser.root.hosts", 120),
-    CONFIGURE_ROOT_GROUPS(". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser.root.groups '\\*'", 120),
+    CONFIGURE_ROOT_HOST(". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser.root.hosts", 300),
+    CONFIGURE_ROOT_GROUPS(". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser.root.groups '\\*'", 300),
     PURGE_SERVER("apt-get --assume-yes --force-yes purge ksks-oozie-server", 300),
     PURGE_CLIENT("apt-get --assume-yes --force-yes purge ksks-oozie-client", 300);
 

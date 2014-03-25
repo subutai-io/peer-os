@@ -1,0 +1,9 @@
+{
+    "query" : {
+        "term" : { "name" : "$metricName" }
+    }
+    ,"sort": {
+        "@timestamp": { "order": "desc", "ignore_unmapped" : true }
+    },
+    "size" : 500
+}

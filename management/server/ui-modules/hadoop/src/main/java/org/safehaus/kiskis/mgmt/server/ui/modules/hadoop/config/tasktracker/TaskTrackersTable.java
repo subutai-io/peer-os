@@ -12,8 +12,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopModule;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Commands;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.TaskUtil;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.common.Tasks;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.operation.TaskTrackerConfiguration;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -60,15 +59,12 @@ public class TaskTrackersTable extends Table {
         container.addContainerProperty(HOSTNAME, String.class, "");
         container.addContainerProperty(STATUS, String.class, "");
         container.addContainerProperty(REMOVE, Button.class, "");
-        
+
         List<Agent> list = cluster.getTaskTrackers();
         for (Agent agent : list) {
             addOrderToContainer(container, agent);
 
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put(":source", HadoopModule.MODULE_NAME);
-            map.put(":uuid", agent.getUuid().toString());
-            Task statusTask = TaskUtil.getTask(Commands.STATUS_DATA_NODE, map);
+            Task statusTask = Tasks.getTaskTrackerCommand(agent, "status");
 
             HadoopModule.getTaskRunner().executeTask(statusTask, new TaskCallback() {
 
@@ -106,7 +102,7 @@ public class TaskTrackersTable extends Table {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 String status = (String) item.getItemProperty(STATUS).getValue();
-                if(status.contains("NOT")){
+                if (status.contains("NOT")) {
                     TaskTrackerConfiguration.removeNode(parent, clusterName, agent, false);
                 } else {
                     TaskTrackerConfiguration.removeNode(parent, clusterName, agent, true);

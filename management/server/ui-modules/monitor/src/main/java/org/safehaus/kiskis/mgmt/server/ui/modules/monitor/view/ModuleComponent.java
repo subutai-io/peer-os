@@ -3,19 +3,12 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonNode;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.elasticsearch.HostFilter;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.elasticsearch.HttpPost;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.elasticsearch.Params;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.elasticsearch.Search;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ModuleComponent extends CustomComponent {
-
-    private final static Logger LOG = LoggerFactory.getLogger(ModuleComponent.class);
 
     private static final String DEFAULT_NODE = "node1";
     private static final String DEFAULT_METRIC = "MEMORY";
@@ -66,19 +59,11 @@ public class ModuleComponent extends CustomComponent {
 
     private void handleSubmit() {
 
-//        Search.execute();
-
         if (chart == null) {
-            chart = new Chart(getWindow());
+            chart = new Chart( getWindow() );
         }
 
-        try {
-//            Handler handler = HandlerFactory.getHandler( getSelectedMetric() );
-//            chart.load( handler, getSelectedNode() );
-            chart.load( getSelectedNode(), getSelectedMetric() );
-        } catch (Exception e) {
-            LOG.error("Error while loading chart: ", e);
-        }
+        chart.load( getSelectedNode(), getSelectedMetric() );
     }
 
     private String getSelectedNode() {

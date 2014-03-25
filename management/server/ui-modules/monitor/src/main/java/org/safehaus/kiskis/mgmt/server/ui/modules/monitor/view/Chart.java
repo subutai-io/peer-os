@@ -1,8 +1,12 @@
+
 package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 
 import com.vaadin.ui.Window;
+import org.codehaus.jackson.JsonNode;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle.Handler;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.handle.Metric;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Format;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Query;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.FileUtil;
 import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.util.JavaScript;
 import org.slf4j.Logger;
@@ -15,41 +19,14 @@ class Chart {
 
     private final static Logger LOG = LoggerFactory.getLogger(Chart.class);
 
-//    private static final String CHART_TEMPLATE = FileUtil.getContent("js/chart2.js");
     private static final String CHART_TEMPLATE = FileUtil.getContent("js/chart.js");
 
     private JavaScript javaScript;
-    private boolean pushed = false;
+    private Timer timer;
 
     Chart(Window window) {
         javaScript = new JavaScript(window);
         loadScripts();
-    }
-
-//    void load(Handler handler, String node) {
-//
-////        Map<String, Double> data = handler.getData(node);
-////
-////        String chart = CHART_TEMPLATE
-////                .replace("${mainTitle}", handler.getMainTitle())
-////                .replace("${yTitle}", handler.getYTitle())
-////                .replace("${categories}", format( new ArrayList( data.keySet() ), "'%s'") )
-////                .replace("${values}", format( data.values(), "%s" ) );
-//
-//        String chart = CHART_TEMPLATE;
-//
-//        javaScript.execute(chart);
-//        push();
-//    }
-
-    void load(String host, Metric metric) {
-
-        String chart = CHART_TEMPLATE
-                .replace("$mainTitle", String.format("%s for %s", metric, host) )
-                .replace("$yTitle", metric.getTitleY() );
-
-        javaScript.execute(chart);
-        push();
     }
 
     private void loadScripts() {
@@ -57,55 +34,37 @@ class Chart {
         javaScript.loadFile("js/highcharts.js");
     }
 
-    private static String format(Collection<? extends Object> list, String pattern) {
-        String str = "";
+    void load(String host, Metric metric) {
 
-        for (Object v : list) {
-            if (!str.isEmpty()) {
-                str += ",";
-            }
+        String data = Query.execute("py453399588", "cpu_user", 20);
+        LOG.info("data: {}", data);
 
-            str += String.format(pattern, v);
-        }
+        String chart = CHART_TEMPLATE
+                .replace( "$mainTitle", String.format("%s for %s", metric, host) )
+                .replace("$yTitle", metric.getTitleY())
+                .replace( "$data", data )
+                .replace( "$data", data );
 
-        return str;
+        javaScript.execute(chart);
+        startTimer();
     }
 
-    private void pushValue() {
-        for (int i = 0; i < 100; i++) {
-            try {
-                Thread.sleep(3000);
+    private void startTimer() {
 
-//                Random random = new Random();
-//                double d = random.nextDouble();
-
-                double d = 0;
-                LOG.info("i: {}, d: {}", i, d);
-
-                String script = String.format("setY(%s);", d);
-                javaScript.execute(script);
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if (timer != null) {
+            timer.interrupt();
         }
+
+        timer = new Timer(this);
+        timer.start();
     }
 
-    private void push() {
+    void push() {
+        String data = Query.execute("py453399588", "cpu_user", 1);
+        LOG.info("data: {}", data);
 
-        if (pushed) {
-            return;
-        }
-
-        pushed = true;
-
-        Thread thread = new Thread(){
-            public void run() {
-                pushValue();
-            }
-        };
-
-        thread.start();
+        String script = String.format("setData(%s);", data);
+        javaScript.execute(script);
     }
 
 }
