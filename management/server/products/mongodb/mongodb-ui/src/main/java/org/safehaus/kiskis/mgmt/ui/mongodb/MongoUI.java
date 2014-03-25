@@ -107,6 +107,8 @@ public class MongoUI implements Module {
 
             setCompositionRoot(verticalLayout);
 
+            manager.refreshClustersInfo();
+
         }
 
         @Override
