@@ -92,7 +92,6 @@ public class OozieTable extends Table {
                     switch (task.getTaskStatus()) {
                         case SUCCESS: {
                             getWindow().showNotification("Purge success");
-                            refreshDatasource();
                             break;
                         }
                         case FAIL: {
@@ -110,6 +109,7 @@ public class OozieTable extends Table {
                 }
             }
         }
+        refreshDatasource();
     }
 
 }
