@@ -7,10 +7,14 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.ActionList
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.common.command.CommandAction;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hive.view.UILogger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.slf4j.*;
 
 public class StatusChainBuilder extends AbstractChainBuilder {
 
-    private static final String SERVICE_COMMAND = "service hive-thrift status";
+    private static final Logger LOG = LoggerFactory.getLogger(StatusChainBuilder.class);
+
+    private static final String DERBY_SERVICE_COMMAND = "service derby status";
+    private static final String HIVE_SERVICE_COMMAND = "service hive-thrift status";
 
     public StatusChainBuilder(UILogger logger) {
         super(logger);
@@ -18,8 +22,9 @@ public class StatusChainBuilder extends AbstractChainBuilder {
 
     public Chain getChain() {
         return new Chain(agentInitAction,
-                new CommandAction(STATUS_COMMAND, getInstallStatusListener()),
-                new CommandAction(SERVICE_COMMAND, getServiceStatusListener())
+                new CommandAction(STATUS_COMMAND, getInstallStatusListener() ),
+                new CommandAction(DERBY_SERVICE_COMMAND, getDerbyServiceStatusListener() ),
+                new CommandAction(HIVE_SERVICE_COMMAND, getHiveServiceStatusListener() )
         );
     }
 
@@ -44,13 +49,36 @@ public class StatusChainBuilder extends AbstractChainBuilder {
         };
     }
 
-    public ActionListener getServiceStatusListener() {
-        return new BasicListener(logger, "Checking service status, please wait...") {
+    public ActionListener getDerbyServiceStatusListener() {
+        return new BasicListener(logger, "Checking Derby service status...") {
             @Override
             protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
+
+                LOG.info("response: {}", response);
+                LOG.info("stdOut: {}", stdOut);
+                LOG.info("stdErr: {}", stdErr);
+
+                logger.info(stdOut);
+                logger.info(stdErr);
+
+                return true;
+            }
+        };
+    }
+
+    public ActionListener getHiveServiceStatusListener() {
+        return new BasicListener(logger, "Checking Hive service status...") {
+            @Override
+            protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
+
+                LOG.info("response: {}", response);
+                LOG.info("stdOut: {}", stdOut);
+                LOG.info("stdErr: {}", stdErr);
+
                 logger.info(stdOut);
                 logger.info(stdErr);
                 logger.info("Completed");
+
                 return false;
             }
         };
