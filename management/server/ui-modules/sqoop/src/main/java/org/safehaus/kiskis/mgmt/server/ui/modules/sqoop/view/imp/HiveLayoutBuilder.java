@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.server.ui.modules.sqoop.view.UIUtil;
 
 public class HiveLayoutBuilder {
 
-    public static Layout create() {
+    public static Layout create(ImportLayout importLayout) {
 
         TextArea textArea = UIUtil.getTextArea(800, 600);
         UILogger logger = new UILogger(textArea);
@@ -41,7 +41,7 @@ public class HiveLayoutBuilder {
         layout.addComponent(hiveDatabaseField, "left: 30px; top: 400px;");
         layout.addComponent(hiveTableField, "left: 30px; top: 440px;");
 
-        layout.addComponent(UIUtil.getButton("Back", 120, ImportLayoutBuilder.getListener(LayoutType.MAIN)), "left: 30px; top: 500px;");
+        layout.addComponent(UIUtil.getButton("Back", 120, importLayout.getListener(LayoutType.MAIN)), "left: 30px; top: 500px;");
         layout.addComponent(UIUtil.getButton("Import", 120, chain), "left: 160px; top: 500px;");
         layout.addComponent(textArea, "left: 380px; top: 100px;");
 

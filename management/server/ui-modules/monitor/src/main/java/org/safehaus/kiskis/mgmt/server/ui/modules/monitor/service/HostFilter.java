@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search;
+package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service;
 
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ class HostFilter {
         Collections.reverse(nodes);
 
         for (JsonNode node : nodes) {
-            LOG.info("{}: {}", node.get("@timestamp"), node.get("val") );
+            LOG.info("node: {}", node);
         }
 
         return nodes;

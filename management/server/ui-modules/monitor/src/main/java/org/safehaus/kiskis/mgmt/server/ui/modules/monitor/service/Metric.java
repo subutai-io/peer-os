@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search;
+package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service;
 
 public enum Metric {
 

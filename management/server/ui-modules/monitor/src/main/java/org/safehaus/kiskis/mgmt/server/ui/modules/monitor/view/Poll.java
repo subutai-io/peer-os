@@ -3,9 +3,9 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class Timer extends Thread {
+class Poll extends Thread {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Timer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Poll.class);
 
     private static final int PAUSE = 5000;
 
@@ -13,12 +13,13 @@ class Timer extends Thread {
 
     private Chart chart;
 
-    Timer(Chart chart) {
+    Poll(Chart chart) {
         this.chart = chart;
     }
 
     public void run() {
-        while (true) {
+        // We don't want this thread running eternally if the thread isn't stopped explicitly.
+        for (int i = 0; i < 200; i++) {
             pause();
             chart.push();
 

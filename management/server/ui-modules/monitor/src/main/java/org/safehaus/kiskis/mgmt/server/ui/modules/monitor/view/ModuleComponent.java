@@ -3,10 +3,8 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.view;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search.Metric;
+import org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.Metric;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -79,7 +77,8 @@ public class ModuleComponent extends CustomComponent {
         Set<Agent> agents = MgmtApplication.getSelectedAgents();
 
         return agents == null || agents.size() == 0
-                ? null //"py453399588"
+//                ? "py453399588"
+                ? null
                 : agents.iterator().next().getHostname();
     }
 

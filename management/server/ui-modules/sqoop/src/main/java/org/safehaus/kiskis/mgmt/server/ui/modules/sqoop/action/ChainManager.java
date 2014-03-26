@@ -60,8 +60,8 @@ public class ChainManager {
 
     public Chain getChain(String command, String message, Action validationAction) {
 
-        CommandAction exportAction = new CommandAction(command, new BasicListener(logger, message), true);
+        CommandAction commandAction = new CommandAction(command, new BasicListener(logger, message), true);
 
-        return new Chain(agentInitAction, validationAction, exportAction);
+        return new Chain(agentInitAction, validationAction, commandAction);
     }
 }

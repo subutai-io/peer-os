@@ -1,28 +1,3 @@
-var DATA = $data;
-var SERIES = [];
-
-// Called from the server
-function setData(data) {
-    DATA = data;
-}
-
-function addPoints() {
-    addPoint();
-    setTimeout(addPoints, 1000);
-}
-
-function addPoint() {
-
-    if (DATA == null || DATA.length == 0) {
-        return;
-    }
-
-    var x = ( new Date() ).getTime();
-    var y = DATA[ DATA.length-1 ].y;
-
-    SERIES.addPoint([x, y], true, true);
-}
-
 $(function () {
 
     $(document).ready(function() {
@@ -40,8 +15,7 @@ $(function () {
                 marginRight: 10,
                 events: {
                     load: function() {
-                        SERIES = this.series[0];
-                        addPoints();
+                        startPolling(this.series[0], $data);
                     }
                 }
             },
@@ -67,9 +41,8 @@ $(function () {
             },
             tooltip: {
                 formatter: function() {
-                    return '<b>'+ this.series.name +'</b><br/>'+
-                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
-                        Highcharts.numberFormat(this.y, 2);
+                    return Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'
+                        + Highcharts.numberFormat(this.y, 2);
                 }
             },
             legend: {

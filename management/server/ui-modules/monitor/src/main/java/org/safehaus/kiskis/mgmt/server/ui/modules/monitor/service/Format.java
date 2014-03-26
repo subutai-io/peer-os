@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service.search;
+package org.safehaus.kiskis.mgmt.server.ui.modules.monitor.service;
 
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
@@ -8,7 +8,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Random;
 
 // TODO remove the stuff done for the demo
 public class Format {

@@ -38,7 +38,7 @@ public class TaskTrackerConfiguration {
                     } else {
                         form.getStatus();
                     }
-                    uninstallDeb(agent);
+                    //uninstallDeb(agent);
                 }
 
                 return null;
