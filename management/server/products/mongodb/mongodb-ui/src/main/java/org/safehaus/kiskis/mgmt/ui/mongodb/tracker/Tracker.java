@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mongodb.tracker;
 
-import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
@@ -24,7 +23,6 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
@@ -43,7 +41,6 @@ public class Tracker {
     private volatile UUID trackID;
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
-    private Application app;
     private boolean refreshClusters = false;
 
     public Tracker() {
@@ -91,37 +88,26 @@ public class Tracker {
         this.trackID = trackID;
     }
 
-    public void setApp(Application app) {
-        this.app = app;
-    }
-
     public void startTracking() {
-        track = true;
+        if (!track) {
+            track = true;
 
-        MongoUI.getExecutor().execute(new Runnable() {
+            MongoUI.getExecutor().execute(new Runnable() {
 
-            public void run() {
-                while (track) {
-                    if (isMongoShown()) {
+                public void run() {
+                    while (track) {
                         populateOperations();
                         populateLogs();
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            break;
+                        }
 
+                    }
                 }
-            }
-        });
-    }
-
-    private boolean isMongoShown() {
-        if (app != null) {
-            return MongoUI.MODULE_NAME.equals(((MgmtApplication) app).getSelectedTabName());
+            });
         }
-        return false;
     }
 
     public void stopTracking() {

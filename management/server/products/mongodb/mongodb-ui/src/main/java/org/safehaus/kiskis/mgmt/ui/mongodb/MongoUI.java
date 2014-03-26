@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
+import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 import org.safehaus.kiskis.mgmt.ui.mongodb.manager.Manager;
@@ -61,13 +62,14 @@ public class MongoUI implements Module {
         executor.shutdown();
     }
 
-    public static class ModuleComponent extends CustomComponent implements Disposable {
+    public static class ModuleComponent extends CustomComponent implements Disposable, MainUISelectedTabChangeListener {
 
         private final Wizard wizard;
         private final Tracker tracker;
         private final Manager manager;
         private final String managerTabName = "Manage";
         private final String trackerTabName = "Track";
+        private String mongoSelectedTabCaption;
 
         public ModuleComponent() {
             setSizeFull();
@@ -89,14 +91,13 @@ public class MongoUI implements Module {
 
                 public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
                     TabSheet tabsheet = event.getTabSheet();
-                    String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
-                    if (caption.equals(trackerTabName)) {
+                    mongoSelectedTabCaption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
+                    if (trackerTabName.equals(mongoSelectedTabCaption)) {
                         tracker.startTracking();
                     } else {
                         tracker.stopTracking();
                     }
-
-                    if (caption.equals(managerTabName) && tracker.isRefreshClusters()) {
+                    if (managerTabName.equals(mongoSelectedTabCaption) && tracker.isRefreshClusters()) {
                         tracker.setRefreshClusters(false);
                         manager.refreshClustersInfo();
                     }
@@ -111,14 +112,16 @@ public class MongoUI implements Module {
 
         }
 
-        @Override
-        public void attach() {
-            super.attach(); //To change body of generated methods, choose Tools | Templates.
-            tracker.setApp(getApplication());
-        }
-
         public void dispose() {
             tracker.stopTracking();
+        }
+
+        public void selectedTabChanged(TabSheet.Tab selectedTab) {
+            if (MODULE_NAME.equals(selectedTab.getCaption()) && trackerTabName.equals(mongoSelectedTabCaption)) {
+                tracker.startTracking();
+            } else {
+                tracker.stopTracking();
+            }
         }
 
     }
