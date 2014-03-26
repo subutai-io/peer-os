@@ -176,10 +176,11 @@ public class NodesWindow extends Window {
                     break;
                 }
                 case STATUS: {
-                    if (stdOut.contains("Oozie Server is running")) {
+                    /*if (stdOut.contains("Oozie Server is running")) {
                         getWindow().showNotification("Oozie Server is running");
                         switchState(false);
-                    }
+                    }*/
+
                     /*
                     else {
 
@@ -189,21 +190,23 @@ public class NodesWindow extends Window {
                     }
                     */
 
-//                    switch (task.getTaskStatus()) {
-//                        case SUCCESS: {
-//
-//                            if (stdOut.contains("Oozie Server is running")) {
-//                                getWindow().showNotification("Oozie Server is running");
-//                                switchState(false);
-//                            }
-//                            break;
-//                        }
-//                        case FAIL: {
-//                            getWindow().showNotification(" Oozie Server is not running");
-//                            switchState(true);
-//                            break;
-//                        }
-//                    }
+                    switch (task.getTaskStatus()) {
+                        case SUCCESS: {
+
+                            if (stdOut.contains("Oozie Server is running")) {
+                                getWindow().showNotification("Oozie Server is running");
+                                switchState(false);
+                            }
+                            break;
+                        }
+                        case FAIL: {
+                            if(stdOut.contains("Oozie Server is not running")) {
+                                getWindow().showNotification(" Oozie Server is not running");
+                                switchState(true);
+                            }
+                            break;
+                        }
+                    }
                     break;
                 }
 
