@@ -10,6 +10,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 public class RemoveChainBuilder extends AbstractChainBuilder {
 
+    private static final String STOP_SERVICES = "service derby stop; . /etc/profile && service hive-thrift stop";
+
     private static final String HIVE_REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-hive";
     private static final String DERBY_REMOVE_COMMAND = "apt-get --force-yes --assume-yes --purge remove ksks-derby";
 
@@ -21,9 +23,10 @@ public class RemoveChainBuilder extends AbstractChainBuilder {
 
     public Chain getChain() {
         return new Chain(agentInitAction,
-                new CommandAction(STATUS_COMMAND, getStatusListener()),
-                new CommandAction(HIVE_REMOVE_COMMAND, getHiveRemoveListener()),
-                new CommandAction(DERBY_REMOVE_COMMAND, getDerbyRemoveListener())
+                new CommandAction(STATUS_COMMAND, getStatusListener() ),
+                new CommandAction(STOP_SERVICES, getServicesStopListener() ),
+                new CommandAction(HIVE_REMOVE_COMMAND, getHiveRemoveListener() ),
+                new CommandAction(DERBY_REMOVE_COMMAND, getDerbyRemoveListener() )
         );
     }
 
@@ -32,6 +35,24 @@ public class RemoveChainBuilder extends AbstractChainBuilder {
             @Override
             protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
                 context.put(HIVE_NOT_INSTALLED, !stdOut.contains("ksks-hive"));
+                return true;
+            }
+        };
+    }
+
+    public ActionListener getServicesStopListener() {
+        return new BasicListener(logger, "Stopping the services: derby, hive-thrift...") {
+
+            @Override
+            protected boolean onComplete(Context context, String stdOut, String stdErr, Response response) {
+
+                if (response.getExitCode() != null && response.getExitCode() != 0) {
+                    logger.complete("Error occurred while stopping services. Please see the server logs for details.");
+                    return false;
+                }
+
+                logger.info("Services stopped successfully");
+
                 return true;
             }
         };
