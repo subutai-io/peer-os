@@ -103,13 +103,15 @@ public class ServiceManager {
                             return currentTask;
                         } else {
                             oozieTable.manageUI(task, stdOut, stdErr);
-                            deleteInfo();
+
                         }
                     }
                     return null;
                 }
             });
+
         }
+        deleteInfo();
     }
 
     public void moveToNextTask() {
