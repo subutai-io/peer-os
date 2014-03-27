@@ -67,7 +67,7 @@ public class HBaseTable extends Table {
                 getWindow().showNotification("Starting cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.START;
                 selectedItem = item;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getMaster(), cce);
             }
         });
 
@@ -79,7 +79,7 @@ public class HBaseTable extends Table {
                 getWindow().showNotification("Stopping cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.STOP;
                 selectedItem = item;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getMaster(), cce);
 
             }
         });
@@ -92,7 +92,7 @@ public class HBaseTable extends Table {
                 getWindow().showNotification("Checking status: " + config.getUuid());
                 cce = HBaseCommandEnum.STATUS;
                 selectedItem = item;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getMaster(), cce);
 
             }
         });
