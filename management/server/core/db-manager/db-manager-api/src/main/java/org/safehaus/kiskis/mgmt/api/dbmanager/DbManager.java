@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.api.dbmanager;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import com.datastax.driver.core.ResultSet;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,5 +35,7 @@ public interface DbManager {
     public ProductOperation createProductOperation(String source, String description);
 
     public List<ProductOperationView> getProductOperations(String source);
+
+    public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate);
 
 }

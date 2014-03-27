@@ -14,7 +14,10 @@ import com.datastax.driver.core.Session;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,12 +36,13 @@ public class DbManagerImpl implements DbManager {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
+    private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
+    private final DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
     private Cluster cluster;
     private Session session;
     private String cassandraHost;
     private String cassandraKeyspace;
     private int cassandraPort;
-    private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
 
     public void setCassandraKeyspace(String cassandraKeyspace) {
         this.cassandraKeyspace = cassandraKeyspace;
@@ -191,6 +195,31 @@ public class DbManagerImpl implements DbManager {
         List<ProductOperationView> list = new ArrayList<ProductOperationView>();
         try {
             ResultSet rs = executeQuery("select info from product_operation where source = ? order by id desc limit 50", source);
+            for (Row row : rs) {
+                String info = row.getString("info");
+                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
+                if (po != null) {
+                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
+                    list.add(productOperationViewImpl);
+                }
+            }
+        } catch (JsonSyntaxException ex) {
+            LOG.log(Level.SEVERE, "Error in getProductOperations", ex);
+        }
+        return list;
+    }
+
+    public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate) {
+        List<ProductOperationView> list = new ArrayList<ProductOperationView>();
+        try {
+            ResultSet rs = executeQuery(
+                    "select info from product_operation where source = ?"
+                    + " and id >= maxTimeuuid(?)"
+                    + " and id <= minTimeuuid(?)"
+                    + " order by id desc limit 100",
+                    source,
+                    dfm.format(fromDate),
+                    dfm.format(toDate));
             for (Row row : rs) {
                 String info = row.getString("info");
                 ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);

@@ -17,6 +17,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -129,7 +130,9 @@ public class Tracker {
     }
 
     private void populateOperations() {
-        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(Config.PRODUCT_KEY);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(Config.PRODUCT_KEY, cal.getTime(), new Date());
         IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
         currentOperations.removeAll(operations);
 
