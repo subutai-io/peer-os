@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -478,7 +479,7 @@ public class LxcManagerImpl implements LxcManager {
 
                 LxcInfo lxcInfo = new LxcInfo(entry.getKey(), lxcHostname.toString());
                 lxcInfos.add(lxcInfo);
-                completer.submit(new LxcActor(lxcInfo, this));
+                completer.submit(new LxcActor(lxcInfo, this, LxcAction.CREATE));
 
             }
 
@@ -504,7 +505,11 @@ public class LxcManagerImpl implements LxcManager {
                 for (LxcInfo lxcInfo : lxcInfos) {
                     lxcHostnames.add(lxcInfo.getLxcHostname());
                 }
-                destroyLxcs(lxcHostnames);
+                try {
+                    destroyLxcs(lxcHostnames);
+                } catch (LxcDestroyException ex) {
+                    throw new LxcCreateException("Not all lxcs created successfully. Use LXC module to cleanup");
+                }
                 throw new LxcCreateException("Not all lxcs created successfully");
             }
 
@@ -547,7 +552,11 @@ public class LxcManagerImpl implements LxcManager {
                 for (LxcInfo lxcInfo : lxcInfos) {
                     lxcHostnames.add(lxcInfo.getLxcHostname());
                 }
-                destroyLxcs(lxcHostnames);
+                try {
+                    destroyLxcs(lxcHostnames);
+                } catch (LxcDestroyException ex) {
+                    throw new LxcCreateException("Waiting interval for lxc agents timed out. Use LXC module to cleanup");
+                }
                 throw new LxcCreateException("Waiting interval for lxc agents timed out");
             }
         } else {
@@ -588,18 +597,45 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
-    public void destroyLxcs(Set<String> lxcHostnames) {
+    public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException {
         if (lxcHostnames != null && !lxcHostnames.isEmpty()) {
+            CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
+            List<LxcInfo> lxcInfos = new ArrayList<LxcInfo>();
             for (String lxcHostname : lxcHostnames) {
                 if (!Util.isStringEmpty(lxcHostname) && lxcHostname.matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
                     String parentHostname = lxcHostname.substring(0, lxcHostname.indexOf(Common.PARENT_CHILD_LXC_SEPARATOR));
 
                     Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
                     if (physicalAgent != null) {
-                        taskRunner.executeTaskNForget(Tasks.getLxcDestroyTask(physicalAgent, lxcHostname));
+                        LxcInfo lxcInfo = new LxcInfo(physicalAgent, lxcHostname);
+                        lxcInfos.add(lxcInfo);
+                        completer.submit(new LxcActor(lxcInfo, this, LxcAction.DESTROY));
                     }
                 }
             }
+
+            //wait for completion
+            try {
+                for (int i = 0; i < lxcInfos.size(); i++) {
+                    Future<LxcInfo> future = completer.take();
+                    future.get();
+                }
+
+            } catch (InterruptedException e) {
+            } catch (ExecutionException e) {
+            }
+
+            boolean result = true;
+            for (LxcInfo lxcInfo : lxcInfos) {
+                result &= lxcInfo.isResult();
+            }
+
+            if (!result) {
+                throw new LxcDestroyException("Not all lxcs destroyed. Use LXC module to cleanup");
+            }
+
+        } else {
+            throw new LxcDestroyException("Invalid set of lxc hostnames");
         }
 
     }

@@ -37,5 +37,5 @@ public interface LxcManager {
 
     public Map<Agent, Set<Agent>> createLxcs(int count) throws LxcCreateException;
 
-    public void destroyLxcs(Set<String> lxcHostnames);
+    public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException;
 }

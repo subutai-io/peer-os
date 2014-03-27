@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
-import org.safehaus.kiskis.mgmt.impl.mongodb.lxc.LxcActor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,12 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +24,7 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -36,8 +32,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.TaskType;
-import org.safehaus.kiskis.mgmt.impl.mongodb.lxc.LxcAction;
-import org.safehaus.kiskis.mgmt.impl.mongodb.lxc.LxcInfo;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddDataNodeOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddRouterOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
@@ -183,8 +177,12 @@ public class MongoImpl implements Mongo {
                         for (Agent lxcAgent : config.getDataNodes()) {
                             lxcHostnames.add(lxcAgent.getHostname());
                         }
-                        lxcManager.destroyLxcs(lxcHostnames);
-                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+                        try {
+                            lxcManager.destroyLxcs(lxcHostnames);
+                        } catch (LxcDestroyException ex) {
+                            po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+                        }
+                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs\nInstallation aborted");
                     }
 
                 } catch (LxcCreateException ex) {
@@ -416,41 +414,23 @@ public class MongoImpl implements Mongo {
                     po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
                     return;
                 }
-                CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
-                boolean result = true;
+                Set<String> lxcHostnames = new HashSet<String>();
+                for (Agent lxcAgent : config.getConfigServers()) {
+                    lxcHostnames.add(lxcAgent.getHostname());
+                }
+                for (Agent lxcAgent : config.getRouterServers()) {
+                    lxcHostnames.add(lxcAgent.getHostname());
+                }
+                for (Agent lxcAgent : config.getDataNodes()) {
+                    lxcHostnames.add(lxcAgent.getHostname());
+                }
                 try {
-                    Set<Agent> agents = new HashSet<Agent>();
-                    agents.addAll(config.getConfigServers());
-                    agents.addAll(config.getRouterServers());
-                    agents.addAll(config.getDataNodes());
-                    int tasks = 0;
-                    for (Agent agent : agents) {
-                        po.addLog(String.format("Destroying lxc %s", agent.getHostname()));
-                        Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
-                        if (physicalAgent == null) {
-                            po.addLog(String.format("Could not determine physical parent of %s. Use LXC module to cleanup", agent.getHostname()));
-                        } else {
-                            tasks++;
-                            completer.submit(new LxcActor(new LxcInfo(physicalAgent, agent.getHostname()), lxcManager, LxcAction.DESTROY));
-                        }
-                    }
-
-                    for (int i = 0; i < tasks; i++) {
-                        Future<LxcInfo> future = completer.take();
-                        LxcInfo info = future.get();
-                        result &= info.isResult();
-                    }
-
-                    result &= agents.size() == tasks;
-
-                } catch (InterruptedException e) {
-                } catch (ExecutionException e) {
-                }
-                if (result) {
+                    lxcManager.destroyLxcs(lxcHostnames);
                     po.addLog("Lxc containers successfully destroyed");
-                } else {
-                    po.addLog("Not all lxc containers destroyed. Use LXC module to cleanup, skipping...");
+                } catch (LxcDestroyException ex) {
+                    po.addLog(String.format("%s, skipping...", ex.getMessage()));
                 }
+
                 if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
                     po.addLogDone("Cluster info deleted from DB\nDone");
                 } else {

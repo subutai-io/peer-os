@@ -16,14 +16,20 @@ public class LxcActor implements Callable<LxcInfo> {
 
     private final LxcInfo info;
     private final LxcManager lxcManager;
+    private final LxcAction lxcAction;
 
-    public LxcActor(LxcInfo info, LxcManager lxcManager) {
+    public LxcActor(LxcInfo info, LxcManager lxcManager, LxcAction lxcAction) {
         this.info = info;
         this.lxcManager = lxcManager;
+        this.lxcAction = lxcAction;
     }
 
     public LxcInfo call() throws Exception {
-        info.setResult(lxcManager.cloneNStartLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
+        if (lxcAction == LxcAction.CREATE) {
+            info.setResult(lxcManager.cloneNStartLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
+        } else if (lxcAction == LxcAction.DESTROY) {
+            info.setResult(lxcManager.destroyLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
+        }
         return info;
     }
 }
