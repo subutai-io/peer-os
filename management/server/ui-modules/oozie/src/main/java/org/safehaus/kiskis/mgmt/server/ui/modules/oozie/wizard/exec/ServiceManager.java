@@ -64,7 +64,7 @@ public class ServiceManager {
     public void runCommand(Agent agent, OozieCommandEnum cce) {
         Task startTask = new Task("Run command");
         Request command = new OozieCommands().getCommand(cce);
-        command.setTimeout(cce.get);
+        command.setTimeout(cce.getTimeout());
         command.setUuid(agent.getUuid());
         startTask.addRequest(command);
         tasks.add(startTask);
