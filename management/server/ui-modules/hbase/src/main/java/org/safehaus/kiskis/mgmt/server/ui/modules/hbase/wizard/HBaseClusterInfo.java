@@ -19,7 +19,8 @@ public class HBaseClusterInfo {
             NAME_LABEL = "name",
             NODES_LABEL = "nodes",
             SEEDS_LABEL = "seeds",
-            DOMAINNAME_LABEL = "domainName";
+            DOMAINNAME_LABEL = "domainName",
+                    TYPE = "type";
 
     private UUID uuid;
     private Set<UUID> master;

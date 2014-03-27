@@ -1,27 +1,17 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management;
 
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum.START;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum.STATUS;
-import static org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management.HBaseCommandEnum.STOP;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
-import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.FAIL;
-import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  * Created with IntelliJ IDEA. User: daralbaev Date: 12/1/13 Time: 1:38 AM
@@ -71,64 +61,75 @@ public class NodesWindow extends Window {
     private IndexedContainer getCassandraContainer() {
         container = new IndexedContainer();
         container.addContainerProperty("Hostname", String.class, "");
+        container.addContainerProperty("Type", String.class, "");
 //        container.addContainerProperty("uuid", UUID.class, "");
-        container.addContainerProperty("Start", Button.class, "");
-        container.addContainerProperty("Stop", Button.class, "");
-        container.addContainerProperty("Status", Button.class, "");
+//        container.addContainerProperty("Start", Button.class, "");
+//        container.addContainerProperty("Stop", Button.class, "");
+//        container.addContainerProperty("Status", Button.class, "");
 //        container.addContainerProperty("Destroy", Button.class, "");
-        for (Agent agent : config.getAgents()) {
-            addOrderToContainer(container, agent);
+        for (Agent agent : config.getBackupMasters()) {
+            addOrderToContainer(container, agent, "Backup masters");
+        }
+        for (Agent agent : config.getMaster()) {
+            addOrderToContainer(container, agent, "Master");
+        }
+        for (Agent agent : config.getQuorum()) {
+            addOrderToContainer(container, agent, "Quorum");
+        }
+        for (Agent agent : config.getRegion()) {
+            addOrderToContainer(container, agent, "Region");
         }
         return container;
     }
 
-    private void addOrderToContainer(Container container, final Agent agent) {
+    private void addOrderToContainer(Container container, final Agent agent, String type) {
         Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
         item.getItemProperty("Hostname").setValue(agent.getHostname());
+        item.getItemProperty("Type").setValue(type);
 //        item.getItemProperty("uuid").setValue(agent.getUuid());
 
-        Button startButton = new Button("Start");
-        startButton.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Starting instance: " + agent.getHostname());
-                cce = HBaseCommandEnum.START;
-                selectedItem = item;
-                table.setEnabled(false);
-                serviceManager.runCommand(agent, cce);
-            }
-        });
-        Button stopButton = new Button("Stop");
-        stopButton.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Stopping instance: " + agent.getHostname());
-                cce = HBaseCommandEnum.STOP;
-                selectedItem = item;
-                table.setEnabled(false);
-                serviceManager.runCommand(agent, cce);
-            }
-        });
-
-        Button statusButton = new Button("Status");
-        statusButton.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getWindow().showNotification("Checking the status: " + agent.getHostname());
-                cce = HBaseCommandEnum.STATUS;
-                selectedItem = item;
-                table.setEnabled(false);
-                serviceManager.runCommand(agent, cce);
-            }
-        });
-
-        item.getItemProperty("Start").setValue(startButton);
-        item.getItemProperty("Stop").setValue(stopButton);
-        item.getItemProperty("Status").setValue(statusButton);
+//        Button startButton = new Button("Start");
+//        startButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                getWindow().showNotification("Starting instance: " + agent.getHostname());
+//                cce = HBaseCommandEnum.START;
+//                selectedItem = item;
+//                table.setEnabled(false);
+//                serviceManager.runCommand(agent, cce);
+//            }
+//        });
+//        Button stopButton = new Button("Stop");
+//        stopButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                getWindow().showNotification("Stopping instance: " + agent.getHostname());
+//                cce = HBaseCommandEnum.STOP;
+//                selectedItem = item;
+//                table.setEnabled(false);
+//                serviceManager.runCommand(agent, cce);
+//            }
+//        });
+//
+//        Button statusButton = new Button("Status");
+//        statusButton.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                getWindow().showNotification("Checking the status: " + agent.getHostname());
+//                cce = HBaseCommandEnum.STATUS;
+//                selectedItem = item;
+//                table.setEnabled(false);
+//                serviceManager.runCommand(agent, cce);
+//            }
+//        });
+//
+//        item.getItemProperty("Start").setValue(startButton);
+//        item.getItemProperty("Stop").setValue(stopButton);
+//        item.getItemProperty("Status").setValue(statusButton);
 //        item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
