@@ -52,6 +52,10 @@ public class Task implements Serializable {
         return Collections.unmodifiableMap(results);
     }
 
+    public void addResult(UUID id, Result result) {
+        results.put(id, result);
+    }
+
     public Object getData() {
         return data;
     }
