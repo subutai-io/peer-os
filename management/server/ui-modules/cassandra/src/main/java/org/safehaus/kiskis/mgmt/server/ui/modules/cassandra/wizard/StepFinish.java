@@ -47,26 +47,29 @@ public class StepFinish extends Panel {
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
-        final Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                installer = new ServiceInstaller(wizard.getConfig(), terminal);
-//                wizard.registerResponseListener(installer);
-                installer.start();
-                next.setCaption("Installing...");
-                next.setEnabled(false);
-            }
-        });
-
-        Button back = new Button("Cancel");
+        final Button back = new Button("Cancel");
         back.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 wizard.cancel();
             }
         });
+
+        final Button next = new Button("Next");
+        next.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                installer = new ServiceInstaller(wizard.getConfig(), terminal, back);
+//                wizard.registerResponseListener(installer);
+                installer.start();
+                next.setCaption("Installing...");
+                next.setEnabled(false);
+                back.setEnabled(false);
+            }
+        });
+
+
 
         verticalLayout.addComponent(grid);
 

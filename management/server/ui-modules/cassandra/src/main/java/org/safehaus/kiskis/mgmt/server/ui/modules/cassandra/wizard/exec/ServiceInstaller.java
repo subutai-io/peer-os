@@ -10,6 +10,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.dao.CassandraClusterInfo;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Button;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.commands.CassandraCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.cassandra.wizard.CassandraConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
@@ -29,11 +30,13 @@ public class ServiceInstaller {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
+    private final Button back;
     private Task currentTask;
     CassandraConfig config;
 
-    public ServiceInstaller(CassandraConfig config, TextArea terminal) {
+    public ServiceInstaller(CassandraConfig config, TextArea terminal, Button back) {
         this.terminal = terminal;
+        this.back = back;
         this.config = config;
 
         Task updateApt = new Task("apt-get update");
@@ -163,11 +166,15 @@ public class ServiceInstaller {
 //                            }
                             return currentTask;
                         } else {
+                            back.setEnabled(true);
+                            back.setCaption("Complete");
                             terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
                             saveCCI();
                         }
                     } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                         terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+                        back.setEnabled(true);
+                        back.setCaption("Complete");
                     }
                     terminal.setCursorPosition(terminal.getValue().toString().length());
                     return null;
