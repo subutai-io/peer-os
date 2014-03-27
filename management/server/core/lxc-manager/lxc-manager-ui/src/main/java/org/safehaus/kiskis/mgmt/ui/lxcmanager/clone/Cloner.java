@@ -146,8 +146,11 @@ public class Cloner extends VerticalLayout {
 
     private void startCloneTask() {
         Set<Agent> physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
+        final String productName = textFieldLxcName.getValue().toString().trim();
 
-        if (physicalAgents.isEmpty()) {
+        if (!Util.isStringEmpty(productName) && !productName.matches(hostValidatorRegex)) {
+            show("Please, use only letters, digits, dots and hyphens in product name");
+        } else if (physicalAgents.isEmpty()) {
             indicator.setVisible(true);
             final double count = (Double) slider.getValue();
             LxcUI.getExecutor().execute(new Runnable() {
@@ -167,9 +170,7 @@ public class Cloner extends VerticalLayout {
                             indicator.setVisible(false);
                         } else {
 
-                            String productName = textFieldLxcName.getValue().toString().trim();
                             Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
-//                            Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
                             int numOfLxcsToClone = (int) count;
                             final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
 
@@ -218,21 +219,20 @@ public class Cloner extends VerticalLayout {
                     }
                 }
             });
-
-        } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
-            show("Enter product name");
-        } else if (!textFieldLxcName.getValue().toString().trim().matches(hostValidatorRegex)) {
-            show("Please, use only letters, digits, dots and hyphens in product name");
         } else {
 
-            String productName = textFieldLxcName.getValue().toString().trim();
             Map<Agent, List<String>> agentFamilies = new HashMap<Agent, List<String>>();
             double count = (Double) slider.getValue();
             for (Agent physAgent : physicalAgents) {
                 List<String> lxcHostNames = new ArrayList<String>();
                 for (int i = 1; i <= count; i++) {
                     StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
-                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
+                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR);
+                    if (Util.isStringEmpty(productName)) {
+                        lxcHost.append(productName).append(i);
+                    } else {
+                        lxcHost.append(Util.generateTimeBasedUUID().toString());
+                    }
                     lxcHostNames.add(lxcHost.toString());
                 }
                 agentFamilies.put(physAgent, lxcHostNames);
