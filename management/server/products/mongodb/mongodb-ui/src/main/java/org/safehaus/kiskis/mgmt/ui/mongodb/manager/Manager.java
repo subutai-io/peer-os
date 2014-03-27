@@ -86,7 +86,7 @@ public class Manager {
         clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.setTextInputAllowed(false);
-        clusterCombo.setWidth(300, Sizeable.UNITS_PIXELS);
+        clusterCombo.setWidth(200, Sizeable.UNITS_PIXELS);
         clusterCombo.addListener(new Property.ValueChangeListener() {
 
             @Override
@@ -153,30 +153,68 @@ public class Manager {
 
         controlsContent.addComponent(destroyClusterBtn);
 
-        Button addNodeBtn = new Button("Add New Node");
+        Button addRouterBtn = new Button("Add Router");
+        addRouterBtn.addListener(new Button.ClickListener() {
 
-        addNodeBtn.addListener(new Button.ClickListener() {
-
-            @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
-                    MgmtApplication.addCustomWindow(addNodeWindow);
-                    addNodeWindow.addListener(new Window.CloseListener() {
+                    MgmtApplication.showConfirmationDialog(
+                            "Confirm adding node",
+                            String.format("Do you want to add ROUTER to the %s cluster?", config.getClusterName()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
 
-                        @Override
-                        public void windowClose(Window.CloseEvent e) {
-                            //refresh clusters and show the current one again
-                            refreshClustersInfo();
-                        }
-                    });
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+                                        //show common progress window and pass strategy to it
+                                        show("OK");
+                                    }
+                                }
+                            });
                 } else {
                     show("Please, select cluster");
                 }
             }
         });
 
-        controlsContent.addComponent(addNodeBtn);
+        Button addDataNodeBtn = new Button("Add Data Node");
+
+        addDataNodeBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+//                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
+//                    MgmtApplication.addCustomWindow(addNodeWindow);
+//                    addNodeWindow.addListener(new Window.CloseListener() {
+//
+//                        @Override
+//                        public void windowClose(Window.CloseEvent e) {
+//                            //refresh clusters and show the current one again
+//                            refreshClustersInfo();
+//                        }
+//                    });
+                    MgmtApplication.showConfirmationDialog(
+                            "Confirm adding node",
+                            String.format("Do you want to add DATA_NODE to the %s cluster?", config.getClusterName()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
+
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+                                        //show common progress window and pass strategy to it
+                                        show("OK");
+                                    }
+                                }
+                            });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+        });
+
+        controlsContent.addComponent(addRouterBtn);
+        controlsContent.addComponent(addDataNodeBtn);
 
         content.addComponent(controlsContent);
 
