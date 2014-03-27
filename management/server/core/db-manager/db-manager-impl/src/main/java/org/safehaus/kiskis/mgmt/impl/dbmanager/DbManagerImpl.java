@@ -14,8 +14,6 @@ import com.datastax.driver.core.Session;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +35,7 @@ public class DbManagerImpl implements DbManager {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
     private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
-    private final DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+//    private final DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
     private Cluster cluster;
     private Session session;
     private String cassandraHost;
@@ -218,8 +216,8 @@ public class DbManagerImpl implements DbManager {
                     + " and id <= minTimeuuid(?)"
                     + " order by id desc limit 100",
                     source,
-                    dfm.format(fromDate),
-                    dfm.format(toDate));
+                    fromDate,
+                    toDate);
             for (Row row : rs) {
                 String info = row.getString("info");
                 ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
