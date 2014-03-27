@@ -38,6 +38,7 @@ public class ServiceManager {
         Task startTask = new Task("Run command");
         for (Agent agent : agents) {
             Request command = new HBaseCommands().getCommand(cce);
+            command.setTimeout(cce.getTimeout());
             command.setUuid(agent.getUuid());
             startTask.addRequest(command);
         }
@@ -48,8 +49,8 @@ public class ServiceManager {
     public void runCommand(Agent agent, HBaseCommandEnum cce) {
         Task startTask = new Task("Run command");
         Request command = new HBaseCommands().getCommand(cce);
+        command.setTimeout(cce.getTimeout());
         command.setUuid(agent.getUuid());
-
         startTask.addRequest(command);
         tasks.add(startTask);
         start();
