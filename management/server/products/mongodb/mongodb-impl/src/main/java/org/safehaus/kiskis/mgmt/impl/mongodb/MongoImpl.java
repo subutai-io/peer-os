@@ -8,7 +8,6 @@ package org.safehaus.kiskis.mgmt.impl.mongodb;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,19 +134,24 @@ public class MongoImpl implements Mongo {
                     Set<Agent> cfgServers = new HashSet<Agent>();
                     Set<Agent> routers = new HashSet<Agent>();
                     Set<Agent> dataNodes = new HashSet<Agent>();
-                    for (int i = 0; i < numberOfLxcsNeeded; i++) {
-                        Agent lxcAgent = null;
-                        for (Iterator<Map.Entry<Agent, Set<Agent>>> it = lxcAgentsMap.entrySet().iterator(); it.hasNext();) {
-                            Map.Entry<Agent, Set<Agent>> lxcAgents = it.next();
-                            Iterator<Agent> it2 = lxcAgents.getValue().iterator();
-                            if (it2.hasNext()) {
-                                lxcAgent = it2.next();
-                                it2.remove();
-                                break;
-                            } else {
-                                it.remove();
-                            }
-                        }
+
+                    Set<Agent> availableAgents = new HashSet<Agent>();
+
+                    for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
+                        availableAgents.addAll(entry.getValue());
+                    }
+                    for (Agent lxcAgent : availableAgents) {
+//                        for (Iterator<Map.Entry<Agent, Set<Agent>>> it = lxcAgentsMap.entrySet().iterator(); it.hasNext();) {
+//                            Map.Entry<Agent, Set<Agent>> lxcAgents = it.next();
+//                            Iterator<Agent> it2 = lxcAgents.getValue().iterator();
+//                            if (it2.hasNext()) {
+//                                lxcAgent = it2.next();
+//                                it2.remove();
+//                                break;
+//                            } else {
+//                                it.remove();
+//                            }
+//                        }
                         if (cfgServers.size() < config.getNumberOfConfigServers()) {
                             cfgServers.add(lxcAgent);
                         } else if (routers.size() < config.getNumberOfRouters()) {
