@@ -98,7 +98,7 @@ public class Cloner extends VerticalLayout {
         GridLayout topContent = new GridLayout(8, 1);
         topContent.setSpacing(true);
 
-        Button cloneBtn2 = new Button("Clone2");
+        Button cloneBtn2 = new Button("Clone&Start");
         cloneBtn2.addListener(new Button.ClickListener() {
 
             public void buttonClick(Button.ClickEvent event) {
