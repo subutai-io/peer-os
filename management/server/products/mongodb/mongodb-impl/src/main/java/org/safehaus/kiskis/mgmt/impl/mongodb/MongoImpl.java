@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -133,80 +134,53 @@ public class MongoImpl implements Mongo {
                     return;
                 }
 
-                //perform lxc container installation and bootstrap here
-                Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
+                try {
+                    int numberOfLxcsNeeded = config.getNumberOfConfigServers() + config.getNumberOfRouters() + config.getNumberOfDataNodes();
+                    //clone lxc containers
+                    po.addLog(String.format("Creating %d lxc containers", numberOfLxcsNeeded));
+                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(numberOfLxcsNeeded);
 
-                if (bestServers.isEmpty()) {
-                    po.addLogFailed("No servers available to accommodate new lxc containers\nInstallation aborted");
-                } else {
-
-                    //check number if available lxc slots
-                    int numberOfLxcsNeeded = config.getNumberOfConfigServers() + config.getNumberOfDataNodes() + config.getNumberOfRouters();
-
-                    int numOfAvailableLxcSlots = 0;
-                    for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
-                        numOfAvailableLxcSlots += srv.getValue();
-                    }
-
-                    if (numOfAvailableLxcSlots < numberOfLxcsNeeded) {
-                        po.addLogFailed(String.format("Only %s lxc containers can be created. %s needed for installation\nInstallation aborted", numOfAvailableLxcSlots, numberOfLxcsNeeded));
-
-                    } else {
-                        //clone lxc containers
-                        List<LxcInfo> infos = new ArrayList<LxcInfo>();
-                        if (cloneLxcs(config, po, bestServers, infos)) {
-                            po.addLog("Lxc containers cloned successfully");
-                            try {
-                                Thread.sleep(7000);
-                            } catch (InterruptedException ex) {
-                                return;
-                            }
-                            //start lxc containers
-                            if (startLxcs(po, infos)) {
-                                po.addLog("Lxc containers started successfully");
-
-                                //wait until all lxc agents connect
-                                if (waitAllLxcAgents(infos)) {
-
-                                    //install mongo
-                                    Set<Agent> cfgServers = new HashSet<Agent>();
-                                    Set<Agent> routers = new HashSet<Agent>();
-                                    Set<Agent> dataNodes = new HashSet<Agent>();
-                                    for (LxcInfo cloneInfo : infos) {
-                                        if (cloneInfo.getNodeType() == NodeType.CONFIG_NODE) {
-                                            cfgServers.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
-                                        } else if (cloneInfo.getNodeType() == NodeType.ROUTER_NODE) {
-                                            routers.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
-                                        } else if (cloneInfo.getNodeType() == NodeType.DATA_NODE) {
-                                            dataNodes.add(agentManager.getAgentByHostname(cloneInfo.getLxcHostname()));
-                                        }
-                                    }
-                                    config.setConfigServers(cfgServers);
-                                    config.setDataNodes(dataNodes);
-                                    config.setRouterServers(routers);
-
-                                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                                        installMongoCluster(config, po);
-                                    } else {
-                                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
-
-                                    }
-                                } else {
-                                    po.addLogFailed("Waiting timeout for lxc agents to connect is up. Giving up!. Use LXC module to cleanup\nInstallation aborted");
-
-                                }
-
+                    Set<Agent> cfgServers = new HashSet<Agent>();
+                    Set<Agent> routers = new HashSet<Agent>();
+                    Set<Agent> dataNodes = new HashSet<Agent>();
+                    for (int i = 0; i < numberOfLxcsNeeded; i++) {
+                        Agent lxcAgent = null;
+                        for (Iterator<Map.Entry<Agent, Set<Agent>>> it = lxcAgentsMap.entrySet().iterator(); it.hasNext();) {
+                            Map.Entry<Agent, Set<Agent>> lxcAgents = it.next();
+                            Iterator<Agent> it2 = lxcAgents.getValue().iterator();
+                            if (it2.hasNext()) {
+                                lxcAgent = it2.next();
+                                it2.remove();
+                                break;
                             } else {
-                                po.addLogFailed("Starting of lxc containers failed. Use LXC module to cleanup\nInstallation aborted");
-
+                                it.remove();
                             }
-                        } else {
-                            po.addLogFailed("Cloning of lxc containers failed. Use LXC module to cleanup\nInstallation aborted");
-
                         }
-
+                        if (cfgServers.size() < config.getNumberOfConfigServers()) {
+                            cfgServers.add(lxcAgent);
+                        } else if (routers.size() < config.getNumberOfRouters()) {
+                            routers.add(lxcAgent);
+                        } else if (dataNodes.size() < config.getNumberOfDataNodes()) {
+                            dataNodes.add(lxcAgent);
+                        } else {
+                            break;
+                        }
                     }
+                    config.setConfigServers(cfgServers);
+                    config.setDataNodes(dataNodes);
+                    config.setRouterServers(routers);
+
+                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                        installMongoCluster(config, po);
+                    } else {
+                        //maybe destroy all lxcs also
+                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+                    }
+
+                } catch (LxcCreateException ex) {
+                    po.addLogFailed(ex.getMessage());
                 }
+
             }
         });
 
@@ -283,147 +257,6 @@ public class MongoImpl implements Mongo {
             }
         });
 
-    }
-
-    private boolean cloneLxcs(final Config config, final ProductOperation po, final Map<Agent, Integer> bestServers, final List<LxcInfo> infos) {
-
-        Set<String> configSrvsHostnames = new HashSet<String>();
-        Set<String> routersHostnames = new HashSet<String>();
-        Set<String> dataNodesHostnames = new HashSet<String>();
-
-        int numOfLxcs = 0;
-        for (int i = 1; i <= config.getNumberOfConfigServers(); i++) {
-            numOfLxcs++;
-            StringBuilder lxcHostname = new StringBuilder("mongo-cfg-").append(Util.generateTimeBasedUUID());
-            if (lxcHostname.length() > 64) {
-                lxcHostname.setLength(64);
-            }
-            configSrvsHostnames.add(lxcHostname.toString());
-        }
-        for (int i = 1; i <= config.getNumberOfRouters(); i++) {
-            numOfLxcs++;
-            StringBuilder lxcHostname = new StringBuilder("mongo-rout-").append(Util.generateTimeBasedUUID());
-            if (lxcHostname.length() > 64) {
-                lxcHostname.setLength(64);
-            }
-            routersHostnames.add(lxcHostname.toString());
-        }
-        for (int i = 1; i <= config.getNumberOfDataNodes(); i++) {
-            numOfLxcs++;
-            StringBuilder lxcHostname = new StringBuilder("mongo-data-").append(Util.generateTimeBasedUUID());
-            if (lxcHostname.length() > 64) {
-                lxcHostname.setLength(64);
-            }
-            dataNodesHostnames.add(lxcHostname.toString());
-        }
-
-        Iterator<String> configSrvsHostnamesIterator = configSrvsHostnames.iterator();
-        Iterator<String> routersHostnamesIterator = routersHostnames.iterator();
-        Iterator<String> dataNodesHostnamesIterator = dataNodesHostnames.iterator();
-
-        CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
-
-        try {
-            for (int i = 1; i <= numOfLxcs; i++) {
-                Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
-                String lxcHostname;
-                NodeType nodeType;
-
-                Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                bestServers.put(entry.getKey(), entry.getValue() - 1);
-
-                if (configSrvsHostnamesIterator.hasNext()) {
-                    lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                            .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                            .append(configSrvsHostnamesIterator.next()).toString();
-                    nodeType = NodeType.CONFIG_NODE;
-                } else if (routersHostnamesIterator.hasNext()) {
-                    lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                            .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                            .append(routersHostnamesIterator.next()).toString();
-                    nodeType = NodeType.ROUTER_NODE;
-                } else if (dataNodesHostnamesIterator.hasNext()) {
-                    lxcHostname = new StringBuilder(entry.getKey().getHostname())
-                            .append(Common.PARENT_CHILD_LXC_SEPARATOR)
-                            .append(dataNodesHostnamesIterator.next()).toString();
-                    nodeType = NodeType.DATA_NODE;
-                } else {
-                    break;
-                }
-
-                po.addLog(String.format("Cloning lxc %s", lxcHostname));
-                completer.submit(new LxcActor(new LxcInfo(entry.getKey(), lxcHostname, nodeType), lxcManager, LxcAction.CLONE));
-
-            }
-
-            boolean result = true;
-            for (int i = 0; i < numOfLxcs; i++) {
-                Future<LxcInfo> future = completer.take();
-                LxcInfo info = future.get();
-                infos.add(info);
-                result &= info.isResult();
-            }
-
-            return result;
-
-        } catch (InterruptedException e) {
-        } catch (ExecutionException e) {
-        }
-
-        return false;
-
-    }
-
-    private boolean startLxcs(final ProductOperation po, List<LxcInfo> infos) {
-        if (!infos.isEmpty()) {
-            CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
-            try {
-                for (LxcInfo info : infos) {
-                    po.addLog(String.format("Starting lxc %s", info.getLxcHostname()));
-                    info.setResult(false);
-                    completer.submit(new LxcActor(info, lxcManager, LxcAction.START));
-                }
-
-                boolean result = true;
-                for (int i = 0; i < infos.size(); i++) {
-                    Future<LxcInfo> future = completer.take();
-                    LxcInfo cloneInfo = future.get();
-                    result &= cloneInfo.isResult();
-                }
-
-                return result;
-            } catch (InterruptedException e) {
-            } catch (ExecutionException e) {
-            }
-        }
-        return false;
-    }
-
-    private boolean waitAllLxcAgents(List<LxcInfo> infos) {
-        long waitStart = System.currentTimeMillis();
-        while (!Thread.interrupted()) {
-            boolean allConnected = true;
-            for (LxcInfo info : infos) {
-                if (agentManager.getAgentByHostname(info.getLxcHostname()) == null) {
-                    allConnected = false;
-                    break;
-                }
-            }
-            if (allConnected) {
-                return true;
-            } else {
-                if (System.currentTimeMillis() - waitStart > Constants.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
-                    break;
-                } else {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     private Agent waitLxcAgent(String lxcHostname) {
