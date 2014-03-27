@@ -609,9 +609,17 @@ public class LxcManagerImpl implements LxcManager {
                     if (physicalAgent != null) {
                         LxcInfo lxcInfo = new LxcInfo(physicalAgent, lxcHostname);
                         lxcInfos.add(lxcInfo);
-                        completer.submit(new LxcActor(lxcInfo, this, LxcAction.DESTROY));
+                    } else {
+                        throw new LxcDestroyException(String.format("Could node determine parent host of %s container", lxcHostname));
                     }
+                } else {
+                    throw new LxcDestroyException(String.format("Malformed lxc hostname [%s]", lxcHostname));
                 }
+            }
+
+            //launch destroyals
+            for (LxcInfo lxcInfo : lxcInfos) {
+                completer.submit(new LxcActor(lxcInfo, this, LxcAction.DESTROY));
             }
 
             //wait for completion
