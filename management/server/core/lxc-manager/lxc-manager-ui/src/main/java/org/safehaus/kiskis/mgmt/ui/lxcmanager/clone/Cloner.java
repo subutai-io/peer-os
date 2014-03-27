@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -95,41 +92,14 @@ public class Cloner extends VerticalLayout {
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(8, 1);
+        GridLayout topContent = new GridLayout(7, 1);
         topContent.setSpacing(true);
-
-        Button cloneBtn2 = new Button("Clone&Start");
-        cloneBtn2.addListener(new Button.ClickListener() {
-
-            public void buttonClick(Button.ClickEvent event) {
-                indicator.setVisible(true);
-                LxcUI.getExecutor().execute(new Runnable() {
-
-                    public void run() {
-                        final double count = (Double) slider.getValue();
-                        try {
-                            Map<Agent, Set<Agent>> newLxcs = lxcManager.createLxcs((int) count);
-                            for (Map.Entry<Agent, Set<Agent>> ag : newLxcs.entrySet()) {
-                                System.out.println("Physical " + ag.getKey().getHostname());
-                                for (Agent lxc : ag.getValue()) {
-                                    System.out.println(">>> " + lxc.getHostname());
-                                }
-                            }
-                        } catch (LxcCreateException ex) {
-                            show(ex.toString());
-                        }
-                        indicator.setVisible(false);
-                    }
-                });
-            }
-        });
 
         topContent.addComponent(new Label("Product name"));
         topContent.addComponent(textFieldLxcName);
         topContent.addComponent(new Label("Lxc count"));
         topContent.addComponent(slider);
         topContent.addComponent(cloneBtn);
-        topContent.addComponent(cloneBtn2);
         topContent.addComponent(clearBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
@@ -177,11 +147,7 @@ public class Cloner extends VerticalLayout {
     private void startCloneTask() {
         Set<Agent> physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
 
-        if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
-            show("Enter product name");
-        } else if (!textFieldLxcName.getValue().toString().trim().matches(hostValidatorRegex)) {
-            show("Please, use only letters, digits, dots and hyphens in product name");
-        } else if (physicalAgents.isEmpty()) {
+        if (physicalAgents.isEmpty()) {
             indicator.setVisible(true);
             final double count = (Double) slider.getValue();
             LxcUI.getExecutor().execute(new Runnable() {
@@ -217,7 +183,13 @@ public class Cloner extends VerticalLayout {
                                     agentFamilies.put(entry.getKey(), lxcHostNames);
                                 }
                                 final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
-                                lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(lxcHostNames.size() + 1);
+                                lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR);
+                                if (Util.isStringEmpty(productName)) {
+                                    lxcHost.append(Util.generateTimeBasedUUID().toString());
+                                } else {
+                                    lxcHost.append(productName);
+                                    lxcHost.append(lxcHostNames.size() + 1);
+                                }
                                 lxcHostNames.add(lxcHost.toString());
 
                                 //start clone task
@@ -240,44 +212,6 @@ public class Cloner extends VerticalLayout {
 
                             }
 
-//                            for (final Map.Entry<Agent, Integer> entry : sortedBestServers.entrySet()) {
-//                                for (int i = 1; i <= entry.getValue(); i++) {
-//                                    List<String> lxcHostNames = agentFamilies.get(entry.getKey());
-//                                    if (lxcHostNames == null) {
-//                                        lxcHostNames = new ArrayList<String>();
-//                                        agentFamilies.put(entry.getKey(), lxcHostNames);
-//                                    }
-//                                    final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
-//                                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR).append(productName).append(i);
-//                                    lxcHostNames.add(lxcHost.toString());
-//
-//                                    //start clone task
-//                                    LxcUI.getExecutor().execute(new Runnable() {
-//                                        public void run() {
-//                                            boolean result = lxcManager.cloneLxcOnHost(entry.getKey(), lxcHost.toString());
-//                                            Item row = lxcTable.getItem(lxcHost.toString());
-//                                            if (row != null) {
-//                                                if (result) {
-//                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(okIconSource)));
-//                                                } else {
-//                                                    row.getItemProperty("Status").setValue(new Embedded("", new ThemeResource(errorIconSource)));
-//                                                }
-//                                            }
-//                                            if (countProcessed.decrementAndGet() == 0) {
-//                                                indicator.setVisible(false);
-//                                            }
-//                                        }
-//                                    });
-//                                    //
-//                                    numOfLxcsToClone--;
-//                                    if (numOfLxcsToClone == 0) {
-//                                        break;
-//                                    }
-//                                }
-//                                if (numOfLxcsToClone == 0) {
-//                                    break;
-//                                }
-//                            }
                             populateLxcTable(agentFamilies);
                         }
 
@@ -285,6 +219,10 @@ public class Cloner extends VerticalLayout {
                 }
             });
 
+        } else if (Util.isStringEmpty(textFieldLxcName.getValue().toString())) {
+            show("Enter product name");
+        } else if (!textFieldLxcName.getValue().toString().trim().matches(hostValidatorRegex)) {
+            show("Please, use only letters, digits, dots and hyphens in product name");
         } else {
 
             String productName = textFieldLxcName.getValue().toString().trim();
