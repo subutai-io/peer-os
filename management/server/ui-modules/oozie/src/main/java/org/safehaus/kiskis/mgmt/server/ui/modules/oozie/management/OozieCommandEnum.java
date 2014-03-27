@@ -38,4 +38,8 @@ public enum OozieCommandEnum {
         return program;
     }
 
+    public int getTimeout() {
+        return this.timeout;
+    }
+
 }
