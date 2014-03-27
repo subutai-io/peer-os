@@ -35,7 +35,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.Constants;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.TaskType;
 import org.safehaus.kiskis.mgmt.impl.mongodb.lxc.LxcAction;
 import org.safehaus.kiskis.mgmt.impl.mongodb.lxc.LxcInfo;
@@ -52,7 +51,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
@@ -259,26 +257,6 @@ public class MongoImpl implements Mongo {
 
     }
 
-    private Agent waitLxcAgent(String lxcHostname) {
-        long waitStart = System.currentTimeMillis();
-        while (!Thread.interrupted()) {
-            Agent lxcAgent = agentManager.getAgentByHostname(lxcHostname);
-            if (lxcAgent != null) {
-                return lxcAgent;
-            }
-            if (System.currentTimeMillis() - waitStart > Constants.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
-                break;
-            } else {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    break;
-                }
-            }
-        }
-        return null;
-    }
-
     public UUID addNode(final String clusterName, final NodeType nodeType) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
@@ -296,63 +274,21 @@ public class MongoImpl implements Mongo {
                     po.addLogFailed("Replica set cannot have more than 7 members.\nOperation aborted");
                     return;
                 }
-                Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
+                try {
 
-                if (bestServers.isEmpty()) {
-                    po.addLogFailed("No servers available to accommodate new lxc containers.\nOperation aborted");
-                    return;
-                }
-                Agent physicalAgent = bestServers.entrySet().iterator().next().getKey();
+                    po.addLog("Creating lxc container");
 
-                //clone lxc
-                StringBuilder lxcHostname;
-                if (nodeType == NodeType.DATA_NODE) {
-                    lxcHostname = new StringBuilder(physicalAgent.getHostname()).
-                            append(Common.PARENT_CHILD_LXC_SEPARATOR).
-                            append("mongo-data-").append(Util.generateTimeBasedUUID());
-                } else {
-                    lxcHostname = new StringBuilder(physicalAgent.getHostname()).
-                            append(Common.PARENT_CHILD_LXC_SEPARATOR).
-                            append("mongo-rout-").append(Util.generateTimeBasedUUID());
-                }
-                if (lxcHostname.length() > 64) {
-                    lxcHostname.setLength(64);
-                }
-                boolean result = lxcManager.cloneLxcOnHost(physicalAgent, lxcHostname.toString());
-                if (!result) {
-                    po.addLogFailed(String.format(
-                            "Cloning of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
-                            lxcHostname.toString()));
+                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(1);
 
-                    return;
-                } else {
-                    po.addLog(String.format(
-                            "Successfuly cloned %s lxc container",
-                            lxcHostname.toString()));
+                    Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
+
+                    //start addition of node
+                    addNodeInternal(po, config, nodeType, lxcAgent);
+
+                } catch (LxcCreateException ex) {
+                    po.addLogFailed(ex.getMessage());
                 }
 
-                //start lxc
-                result = lxcManager.startLxcOnHost(physicalAgent, lxcHostname.toString());
-                if (!result) {
-                    po.addLogFailed(String.format(
-                            "Starting of lxc container %s failed. Use LXC module to cleanup.\nOperation aborted",
-                            lxcHostname.toString()));
-
-                    return;
-                } else {
-                    po.addLog(String.format(
-                            "Successfuly started %s lxc container",
-                            lxcHostname.toString()));
-                }
-                //wait for the new lxc agent to connect
-                Agent lxcAgent = waitLxcAgent(lxcHostname.toString());
-                if (lxcAgent == null) {
-                    po.addLogFailed("Waiting timeout for lxc agent to connect is up. Giving up!. Use LXC module to cleanup.\nOperation aborted");
-                    return;
-                }
-
-                //start addition of node
-                addNodeInternal(po, config, nodeType, lxcAgent);
             }
         });
 
