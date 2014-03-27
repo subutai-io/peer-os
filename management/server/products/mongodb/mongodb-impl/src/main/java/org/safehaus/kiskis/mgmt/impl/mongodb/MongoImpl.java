@@ -171,7 +171,19 @@ public class MongoImpl implements Mongo {
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                         installMongoCluster(config, po);
                     } else {
-                        //maybe destroy all lxcs also
+                        //destroy all lxcs also
+
+                        Set<String> lxcHostnames = new HashSet<String>();
+                        for (Agent lxcAgent : config.getConfigServers()) {
+                            lxcHostnames.add(lxcAgent.getHostname());
+                        }
+                        for (Agent lxcAgent : config.getRouterServers()) {
+                            lxcHostnames.add(lxcAgent.getHostname());
+                        }
+                        for (Agent lxcAgent : config.getDataNodes()) {
+                            lxcHostnames.add(lxcAgent.getHostname());
+                        }
+                        lxcManager.destroyLxcs(lxcHostnames);
                         po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                     }
 

@@ -36,4 +36,6 @@ public interface LxcManager {
     public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname);
 
     public Map<Agent, Set<Agent>> createLxcs(int count) throws LxcCreateException;
+
+    public void destroyLxcs(Set<String> lxcHostnames);
 }
