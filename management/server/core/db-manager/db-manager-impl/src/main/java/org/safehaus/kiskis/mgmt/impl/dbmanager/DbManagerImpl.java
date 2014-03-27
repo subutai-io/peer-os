@@ -190,7 +190,7 @@ public class DbManagerImpl implements DbManager {
     public List<ProductOperationView> getProductOperations(String source) {
         List<ProductOperationView> list = new ArrayList<ProductOperationView>();
         try {
-            ResultSet rs = executeQuery("select info from product_operation where source = ?", source);
+            ResultSet rs = executeQuery("select info from product_operation where source = ? order by id desc limit 50", source);
             for (Row row : rs) {
                 String info = row.getString("info");
                 ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);

@@ -173,9 +173,10 @@ public class Tracker {
         }
 
         if (sortNeeded) {
-            Object[] properties = {"Date"};
-            boolean[] ordering = {false};
-            operationsTable.sort(properties, ordering);
+//            added sorting to cassandra query            
+//            Object[] properties = {"Date"};
+//            boolean[] ordering = {false};
+//            operationsTable.sort(properties, ordering);
         }
 
         currentOperations = operations;
