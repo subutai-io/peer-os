@@ -32,7 +32,8 @@ public class ProductOperationImpl implements ProductOperation {
         this.dbManager = dbManager;
         log = new StringBuilder();
         state = ProductOperationState.RUNNING;
-        id = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
+        id = UUID.fromString(new com.eaio.uuid.UUID().toString());
+//        id = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
         createDate = new Date();
     }
 

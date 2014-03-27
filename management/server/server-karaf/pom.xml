@@ -200,6 +200,12 @@
             <artifactId>spring-osgi-annotation</artifactId>
             <version>${org.springframework.osgi.version}</version>
         </dependency>-->
+        
+        <dependency>
+            <groupId>com.eaio.uuid</groupId>
+            <artifactId>uuid</artifactId>
+            <version>3.2</version>
+        </dependency>        
     </dependencies>
     <build>
         <resources>
@@ -605,7 +611,7 @@
                                 </artifactItem>
 
                                 <!--Web Server-->
-<!--                                <artifactItem>
+                                <!--                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>web-server</artifactId>
                                     <version>${project.version}</version>
@@ -647,7 +653,11 @@
                                 </artifactItem>            
                                 <!--MONGO-->
                                 <!-- PRODUCTS -->
-
+                                <artifactItem>
+                                    <groupId>com.eaio.uuid</groupId>
+                                    <artifactId>uuid</artifactId>
+                                    <version>3.2</version>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
