@@ -507,8 +507,8 @@ public class LxcManagerImpl implements LxcManager {
 
         //wait for lxc agents to connect
         long waitStart = System.currentTimeMillis();
-        result = true;
         while (!Thread.interrupted()) {
+            result = true;
             for (LxcInfo lxcInfo : lxcInfos) {
                 Agent lxcAgent = agentManager.getAgentByHostname(lxcInfo.getLxcHostname());
                 if (lxcAgent == null) {
@@ -570,7 +570,7 @@ public class LxcManagerImpl implements LxcManager {
             });
             synchronized (startNCloneTask) {
                 try {
-                    startNCloneTask.wait(startNCloneTask.getAvgTimeout() + 1000);
+                    startNCloneTask.wait(startNCloneTask.getAvgTimeout() * 1000 + 1000);
                 } catch (InterruptedException ex) {
                 }
             }

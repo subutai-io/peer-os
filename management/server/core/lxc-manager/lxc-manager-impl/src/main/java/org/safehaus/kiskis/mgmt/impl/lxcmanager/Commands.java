@@ -45,7 +45,7 @@ public class Commands {
     public static Request getCloneNStartCommand(String lxcHostname) {
         Request req = getTemplate();
         req.setProgram(String.format(
-                "/usr/bin/lxc-clone -o base-container -n %1$s;sleep 10;/usr/bin/lxc-start -n %1$s;sleep 10;/usr/bin/lxc-info -n %1$s",
+                "/usr/bin/lxc-clone -o base-container -n %1$s;sleep 10;/usr/bin/lxc-start -n %1$s -d;sleep 10;/usr/bin/lxc-info -n %1$s",
                 lxcHostname));
         req.setTimeout(360);
         return req;
