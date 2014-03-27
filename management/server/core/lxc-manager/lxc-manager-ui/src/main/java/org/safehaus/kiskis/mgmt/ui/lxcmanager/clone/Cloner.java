@@ -228,7 +228,7 @@ public class Cloner extends VerticalLayout {
                 for (int i = 1; i <= count; i++) {
                     StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
                     lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR);
-                    if (Util.isStringEmpty(productName)) {
+                    if (!Util.isStringEmpty(productName)) {
                         lxcHost.append(productName).append(i);
                     } else {
                         lxcHost.append(Util.generateTimeBasedUUID().toString());
