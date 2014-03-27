@@ -4,14 +4,13 @@
     <reference id="taskRunner" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>    
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>     
+               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>    
     
-    <bean id="lxcmanager" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.lxcmanager.LxcManagerImpl"
-          init-method="init" destroy-method="destroy">
+    <bean id="solr-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.solr.SolrImpl">
         <property name="taskRunner" ref="taskRunner"/>
         <property name="agentManager" ref="agentManager"/>
-    </bean>     
-    
-    <service ref="lxcmanager" interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>
+    </bean>    
+       
+    <service ref="solr-impl" interface="org.safehaus.kiskis.mgmt.api.solr.Solr"/>
     
 </blueprint>

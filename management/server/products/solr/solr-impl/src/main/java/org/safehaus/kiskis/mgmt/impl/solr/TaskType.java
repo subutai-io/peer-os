@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.lxcmanager;
+package org.safehaus.kiskis.mgmt.impl.solr;
 
 /**
  *
@@ -11,5 +11,5 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
  */
 public enum TaskType {
 
-    CLONE_LXC, GET_LXC_LIST, START_LXC, STOP_LXC, DESTROY_LXC, GET_LXC_INFO, GET_METRICS, CLONE_N_START
+    CHECK, INSTALL, UNINSTALL, START, STOP, STATUS
 }

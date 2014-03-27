@@ -18,9 +18,8 @@ public class Tasks {
 
     public static Task getCloneSingleLxcTask(Agent physicalAgent, String lxcHostName) {
         Task task = new Task();
-        Request cmd = Commands.getCloneCommand();
+        Request cmd = Commands.getCloneCommand(lxcHostName);
         cmd.setUuid(physicalAgent.getUuid());
-        cmd.setProgram(cmd.getProgram() + lxcHostName);
         task.addRequest(cmd);
         return task;
     }
@@ -41,6 +40,15 @@ public class Tasks {
         Task task = new Task();
         task.setData(TaskType.START_LXC);
         Request cmd = Commands.getLxcStartCommand(lxcHostname);
+        cmd.setUuid(physicalAgent.getUuid());
+        task.addRequest(cmd);
+        return task;
+    }
+
+    public static Task getLxcCloneNStartTask(Agent physicalAgent, String lxcHostname) {
+        Task task = new Task();
+        task.setData(TaskType.CLONE_N_START);
+        Request cmd = Commands.getCloneNStartCommand(lxcHostname);
         cmd.setUuid(physicalAgent.getUuid());
         task.addRequest(cmd);
         return task;

@@ -3,13 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.lxcmanager;
+package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
 /**
  *
  * @author dilshat
  */
-public enum TaskType {
+public class LxcCreateException extends Exception {
 
-    CLONE_LXC, GET_LXC_LIST, START_LXC, STOP_LXC, DESTROY_LXC, GET_LXC_INFO, GET_METRICS, CLONE_N_START
+    public LxcCreateException(String message) {
+        super(message);
+    }
+
 }

@@ -9,14 +9,22 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -44,9 +52,19 @@ public class LxcManagerImpl implements LxcManager {
     private final double MIN_CPU_LXC_PERCENT = 15;           // 15%
     private final double MIN_CPU_IN_RESERVE_PERCENT = 30;    // 30%
     private final int MAX_NUMBER_OF_LXCS_PER_HOST = 5;       // 5
+    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 60;
 
     private TaskRunner taskRunner;
     private AgentManager agentManager;
+    private ExecutorService executor;
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+    public void destroy() {
+        executor.shutdown();
+    }
 
     public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
@@ -420,6 +438,144 @@ public class LxcManagerImpl implements LxcManager {
             }
 
             return LxcState.STOPPED.equals(getLxcInfoTask.getData());
+        }
+        return false;
+    }
+
+    public Map<Agent, Set<Agent>> createLxcs(int count) throws LxcCreateException {
+        Map<Agent, Set<Agent>> lxcAgents = new HashMap<Agent, Set<Agent>>();
+
+        Map<Agent, Integer> bestServers = getPhysicalServersWithLxcSlots();
+
+        //check if servers with lxc slots are available
+        if (bestServers.isEmpty()) {
+            throw new LxcCreateException("No physical servers available to accommodate new lxc containers");
+        }
+
+        //check number if available lxc slots
+        int numOfAvailableLxcSlots = 0;
+        for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
+            numOfAvailableLxcSlots += srv.getValue();
+        }
+
+        if (numOfAvailableLxcSlots < count) {
+            throw new LxcCreateException(String.format("Only %s lxc containers can be created", numOfAvailableLxcSlots));
+        }
+
+        //create lxc containers
+        CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
+        List<LxcInfo> lxcInfos = new ArrayList<LxcInfo>();
+        for (int i = 0; i < count; i++) {
+            Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+
+            Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+            bestServers.put(entry.getKey(), entry.getValue() - 1);
+
+            StringBuilder lxcHostname = new StringBuilder(entry.getKey().getHostname());
+            lxcHostname.append(Common.PARENT_CHILD_LXC_SEPARATOR);
+            lxcHostname.append(Util.generateTimeBasedUUID().toString());
+
+            LxcInfo lxcInfo = new LxcInfo(entry.getKey(), lxcHostname.toString());
+            lxcInfos.add(lxcInfo);
+            completer.submit(new LxcActor(lxcInfo, this));
+
+        }
+
+        //wait for completion
+        try {
+            for (int i = 0; i < count; i++) {
+                Future<LxcInfo> future = completer.take();
+                future.get();
+            }
+
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        }
+
+        boolean result = true;
+        for (LxcInfo lxcInfo : lxcInfos) {
+            result &= lxcInfo.isResult();
+        }
+
+        if (!result) {
+            //cleanup lxcs
+            for (LxcInfo lxcInfo : lxcInfos) {
+                taskRunner.executeTaskNForget(Tasks.getLxcDestroyTask(lxcInfo.getPhysicalAgent(), lxcInfo.getLxcHostname()));
+            }
+            throw new LxcCreateException("Not all lxcs created successfully");
+        }
+
+        //wait for lxc agents to connect
+        long waitStart = System.currentTimeMillis();
+        result = true;
+        while (!Thread.interrupted()) {
+            for (LxcInfo lxcInfo : lxcInfos) {
+                Agent lxcAgent = agentManager.getAgentByHostname(lxcInfo.getLxcHostname());
+                if (lxcAgent == null) {
+                    result = false;
+                    break;
+                } else {
+                    Set<Agent> lxcAgentsList = lxcAgents.get(lxcInfo.getPhysicalAgent());
+                    if (lxcAgentsList == null) {
+                        lxcAgentsList = new HashSet<Agent>();
+                        lxcAgents.put(lxcInfo.getPhysicalAgent(), lxcAgentsList);
+                    }
+                    lxcAgentsList.add(lxcAgent);
+                }
+            }
+            if (result) {
+                break;
+            } else {
+                if (System.currentTimeMillis() - waitStart > LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
+                    break;
+                } else {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!result) {
+            //cleanup lxcs
+            for (LxcInfo lxcInfo : lxcInfos) {
+                taskRunner.executeTaskNForget(Tasks.getLxcDestroyTask(lxcInfo.getPhysicalAgent(), lxcInfo.getLxcHostname()));
+            }
+            throw new LxcCreateException("Waiting interval for lxc agents timed out");
+        }
+
+        return lxcAgents;
+    }
+
+    public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname) {
+        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+            Task startNCloneTask = Tasks.getLxcCloneNStartTask(physicalAgent, lxcHostname);
+            taskRunner.executeTask(startNCloneTask, new TaskCallback() {
+
+                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                    if (task.isCompleted()) {
+
+                        if (stdOut.indexOf("RUNNING") != -1) {
+                            task.setData(LxcState.RUNNING);
+                        }
+                        synchronized (task) {
+                            task.notifyAll();
+                        }
+                    }
+
+                    return null;
+                }
+            });
+            synchronized (startNCloneTask) {
+                try {
+                    startNCloneTask.wait(startNCloneTask.getAvgTimeout() + 1000);
+                } catch (InterruptedException ex) {
+                }
+            }
+
+            return LxcState.RUNNING.equals(startNCloneTask.getData());
         }
         return false;
     }
