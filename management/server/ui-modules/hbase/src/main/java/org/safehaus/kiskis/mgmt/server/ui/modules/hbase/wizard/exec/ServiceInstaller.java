@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Button;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
@@ -29,11 +30,13 @@ public class ServiceInstaller {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
+    private final Button back;
     private Task currentTask;
     HBaseConfig config;
 
-    public ServiceInstaller(Wizard wizard, TextArea terminal) {
+    public ServiceInstaller(Wizard wizard, TextArea terminal, Button back) {
         this.terminal = terminal;
+        this.back = back;
         this.config = wizard.getConfig();
 
         Task updateApt = new Task("apt-get update");
@@ -125,11 +128,15 @@ public class ServiceInstaller {
                                 terminal.setValue(terminal.getValue().toString() + "Running next step " + currentTask.getDescription() + "\n");
                                 return currentTask;
                             } else {
-                                terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+                                back.setEnabled(true);
+                                back.setCaption("Complete");
+                                terminal.setValue(terminal.getValue().toString() + "Tasks complete Please use manage tab for managing product..\n");
                                 saveHBaseInfo();
                             }
                         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                             terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+                            back.setEnabled(true);
+                            back.setCaption("Complete");
                         }
                         terminal.setCursorPosition(terminal.getValue().toString().length());
                     }
