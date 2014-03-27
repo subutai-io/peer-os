@@ -1,23 +1,24 @@
 package org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import com.vaadin.ui.TextArea;
-import java.util.HashSet;
-import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
-
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
-import java.util.logging.Logger;
+import com.vaadin.ui.Button;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieModule;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.commands.OozieCommands;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.management.OozieCommandEnum;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
@@ -27,11 +28,13 @@ public class ServiceInstaller implements TaskCallback {
 
     private final Queue<Task> tasks = new LinkedList<Task>();
     private final TextArea terminal;
+    private final Button back;
     private Task currentTask;
     private final OozieConfig config;
 
-    public ServiceInstaller(Wizard wizard, TextArea terminal) {
+    public ServiceInstaller(Wizard wizard, TextArea terminal, Button back) {
         this.terminal = terminal;
+        this.back = back;
         this.config = wizard.getConfig();
         OozieCommands oc = new OozieCommands();
 
@@ -114,10 +117,14 @@ public class ServiceInstaller implements TaskCallback {
                 return currentTask;
             } else {
                 saveInfo();
-                terminal.setValue(terminal.getValue().toString() + "Tasks complete.\n");
+                back.setCaption("Complete");
+                back.setEnabled(true);
+                terminal.setValue(terminal.getValue().toString() + "Tasks complete. Please use manage tab for managing product.\n");
             }
         } else if (task.getTaskStatus() == TaskStatus.FAIL) {
             terminal.setValue(terminal.getValue().toString() + task.getDescription() + " failed\n");
+            back.setCaption("Complete");
+            back.setEnabled(true);
         }
 
         return null;
