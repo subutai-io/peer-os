@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -92,14 +95,41 @@ public class Cloner extends VerticalLayout {
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout(7, 1);
+        GridLayout topContent = new GridLayout(8, 1);
         topContent.setSpacing(true);
+
+        Button cloneBtn2 = new Button("Clone2");
+        cloneBtn2.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                indicator.setVisible(true);
+                LxcUI.getExecutor().execute(new Runnable() {
+
+                    public void run() {
+                        final double count = (Double) slider.getValue();
+                        try {
+                            Map<Agent, Set<Agent>> newLxcs = lxcManager.createLxcs((int) count);
+                            for (Map.Entry<Agent, Set<Agent>> ag : newLxcs.entrySet()) {
+                                System.out.println("Physical " + ag.getKey().getHostname());
+                                for (Agent lxc : ag.getValue()) {
+                                    System.out.println(">>> " + lxc.getHostname());
+                                }
+                            }
+                        } catch (LxcCreateException ex) {
+                            show(ex.toString());
+                        }
+                        indicator.setVisible(false);
+                    }
+                });
+            }
+        });
 
         topContent.addComponent(new Label("Product name"));
         topContent.addComponent(textFieldLxcName);
         topContent.addComponent(new Label("Lxc count"));
         topContent.addComponent(slider);
         topContent.addComponent(cloneBtn);
+        topContent.addComponent(cloneBtn2);
         topContent.addComponent(clearBtn);
         topContent.addComponent(indicator);
         topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
