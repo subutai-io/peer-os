@@ -34,8 +34,6 @@ public interface DbManager {
 
     public ProductOperation createProductOperation(String source, String description);
 
-    public List<ProductOperationView> getProductOperations(String source);
-
-    public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate);
+    public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate, int limit);
 
 }

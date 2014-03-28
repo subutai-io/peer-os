@@ -9,16 +9,20 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Runo;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 import org.safehaus.kiskis.mgmt.ui.mongodb.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.ui.mongodb.window.ProgressWindow;
 import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
 
 /**
@@ -81,8 +85,8 @@ public class MongoUI implements Module {
             mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
             mongoSheet.setSizeFull();
             tracker = new Tracker();
-            wizard = new Wizard(tracker, mongoSheet);
-            manager = new Manager(tracker, mongoSheet);
+            manager = new Manager();
+            wizard = new Wizard(manager);
             mongoSheet.addTab(wizard.getContent(), "Install");
             mongoSheet.addTab(manager.getContent(), managerTabName);
             mongoSheet.addTab(tracker.getContent(), trackerTabName);
@@ -97,10 +101,10 @@ public class MongoUI implements Module {
                     } else {
                         tracker.stopTracking();
                     }
-                    if (managerTabName.equals(mongoSelectedTabCaption) && tracker.isRefreshClusters()) {
-                        tracker.setRefreshClusters(false);
-                        manager.refreshClustersInfo();
-                    }
+//                    if (managerTabName.equals(mongoSelectedTabCaption) && tracker.isRefreshClusters()) {
+//                        tracker.setRefreshClusters(false);
+//                        manager.refreshClustersInfo();
+//                    }
                 }
             });
 
@@ -124,6 +128,19 @@ public class MongoUI implements Module {
             }
         }
 
+    }
+
+    public static void showProgressWindow(final Manager manager, UUID trackID) {
+        ProgressWindow progressWindow = new ProgressWindow(trackID);
+        MgmtApplication.addCustomWindow(progressWindow);
+        progressWindow.addListener(new Window.CloseListener() {
+
+            @Override
+            public void windowClose(Window.CloseEvent e) {
+                manager.refreshClustersInfo();
+
+            }
+        });
     }
 
     public String getName() {

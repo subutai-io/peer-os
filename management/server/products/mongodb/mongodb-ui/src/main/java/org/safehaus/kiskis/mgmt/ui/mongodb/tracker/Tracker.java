@@ -42,7 +42,6 @@ public class Tracker {
     private volatile UUID trackID;
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
-    private boolean refreshClusters = false;
 
     public Tracker() {
         contentRoot = new VerticalLayout();
@@ -71,14 +70,6 @@ public class Tracker {
         content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
 
-    }
-
-    public boolean isRefreshClusters() {
-        return refreshClusters;
-    }
-
-    public void setRefreshClusters(boolean refreshClusters) {
-        this.refreshClusters = refreshClusters;
     }
 
     public Component getContent() {
@@ -132,7 +123,7 @@ public class Tracker {
     private void populateOperations() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(Config.PRODUCT_KEY, cal.getTime(), new Date());
+        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(Config.PRODUCT_KEY, cal.getTime(), new Date(), 100);
         IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
         currentOperations.removeAll(operations);
 

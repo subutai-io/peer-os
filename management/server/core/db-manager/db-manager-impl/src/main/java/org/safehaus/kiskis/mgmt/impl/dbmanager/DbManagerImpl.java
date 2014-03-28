@@ -189,35 +189,18 @@ public class DbManagerImpl implements DbManager {
         return null;
     }
 
-    public List<ProductOperationView> getProductOperations(String source) {
-        List<ProductOperationView> list = new ArrayList<ProductOperationView>();
-        try {
-            ResultSet rs = executeQuery("select info from product_operation where source = ? order by id desc limit 50", source);
-            for (Row row : rs) {
-                String info = row.getString("info");
-                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
-                if (po != null) {
-                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
-                    list.add(productOperationViewImpl);
-                }
-            }
-        } catch (JsonSyntaxException ex) {
-            LOG.log(Level.SEVERE, "Error in getProductOperations", ex);
-        }
-        return list;
-    }
-
-    public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate) {
+    public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate, int limit) {
         List<ProductOperationView> list = new ArrayList<ProductOperationView>();
         try {
             ResultSet rs = executeQuery(
                     "select info from product_operation where source = ?"
                     + " and id >= maxTimeuuid(?)"
                     + " and id <= minTimeuuid(?)"
-                    + " order by id desc limit 100",
+                    + " order by id desc limit ?",
                     source,
                     fromDate,
-                    toDate);
+                    toDate,
+                    limit);
             for (Row row : rs) {
                 String info = row.getString("info");
                 ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);

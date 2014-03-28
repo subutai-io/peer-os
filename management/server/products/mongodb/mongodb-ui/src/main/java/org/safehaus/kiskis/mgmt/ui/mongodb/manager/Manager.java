@@ -11,13 +11,11 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Iterator;
@@ -34,8 +32,6 @@ import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
-import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.ui.mongodb.window.ProgressWindow;
 
 /**
  *
@@ -55,9 +51,11 @@ public class Manager {
     private final Label routerPort;
     private final Label dataNodePort;
     private Config config;
+    private Manager INSTANCE;
 
-    public Manager(final Tracker tracker, final TabSheet tabSheet) {
+    public Manager() {
 
+        INSTANCE = this;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -139,18 +137,7 @@ public class Manager {
                                 public void response(boolean ok) {
                                     if (ok) {
                                         UUID trackID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
-                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
-                                        MgmtApplication.addCustomWindow(progressWindow);
-                                        progressWindow.addListener(new Window.CloseListener() {
-
-                                            @Override
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-//                                        tracker.setTrackId(operationID);
-//                                        tracker.setRefreshClusters(true);
-//                                        tabSheet.setSelectedTab(tracker.getContent());
+                                        MongoUI.showProgressWindow(INSTANCE, trackID);
                                     }
                                 }
                             });
@@ -177,15 +164,7 @@ public class Manager {
                                 public void response(boolean ok) {
                                     if (ok) {
                                         UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.ROUTER_NODE);
-                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
-                                        MgmtApplication.addCustomWindow(progressWindow);
-                                        progressWindow.addListener(new Window.CloseListener() {
-
-                                            @Override
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
+                                        MongoUI.showProgressWindow(INSTANCE, trackID);
                                     }
                                 }
                             });
@@ -221,15 +200,7 @@ public class Manager {
                                 public void response(boolean ok) {
                                     if (ok) {
                                         UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.DATA_NODE);
-                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
-                                        MgmtApplication.addCustomWindow(progressWindow);
-                                        progressWindow.addListener(new Window.CloseListener() {
-
-                                            @Override
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
+                                        MongoUI.showProgressWindow(INSTANCE, trackID);
                                     }
                                 }
                             });
@@ -486,15 +457,7 @@ public class Manager {
                                 public void response(boolean ok) {
                                     if (ok) {
                                         UUID trackID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
-                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
-                                        MgmtApplication.addCustomWindow(progressWindow);
-                                        progressWindow.addListener(new Window.CloseListener() {
-
-                                            @Override
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
+                                        MongoUI.showProgressWindow(INSTANCE, trackID);
                                     }
                                 }
                             });
