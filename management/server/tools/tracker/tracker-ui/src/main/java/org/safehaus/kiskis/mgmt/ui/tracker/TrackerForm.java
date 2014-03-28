@@ -265,6 +265,8 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
             }
             if (!Util.isStringEmpty(oldSource)) {
                 sourcesCombo.setValue(oldSource);
+            } else if (!sources.isEmpty()) {
+                sourcesCombo.setValue(sources.iterator().next());
             }
             startTracking();
         } else {
