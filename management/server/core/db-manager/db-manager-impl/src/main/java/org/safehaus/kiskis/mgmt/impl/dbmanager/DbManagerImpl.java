@@ -215,4 +215,19 @@ public class DbManagerImpl implements DbManager {
         return list;
     }
 
+    public List<String> getProductOperationSources() {
+        List<String> sources = new ArrayList<String>();
+        try {
+            ResultSet rs = executeQuery(
+                    "select distinct source from product_operation");
+            for (Row row : rs) {
+                String source = row.getString("source");
+                sources.add(source);
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getProductOperationSources", ex);
+        }
+        return sources;
+    }
+
 }

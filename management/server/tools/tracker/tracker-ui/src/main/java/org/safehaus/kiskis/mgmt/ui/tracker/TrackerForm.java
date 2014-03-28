@@ -12,6 +12,7 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
@@ -47,10 +48,12 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private final PopupDateField fromDate, toDate;
+    private final ComboBox sourcesCombo;
     private Date fromDateValue, toDateValue;
     private volatile UUID trackID;
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
+    private String source;
 
     public TrackerForm() {
         contentRoot = new VerticalLayout();
@@ -68,6 +71,20 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
 
         HorizontalLayout filterLayout = new HorizontalLayout();
         filterLayout.setSpacing(true);
+
+        sourcesCombo = new ComboBox("Source");
+        sourcesCombo.setMultiSelect(false);
+        sourcesCombo.setImmediate(true);
+        sourcesCombo.setTextInputAllowed(false);
+        sourcesCombo.setNullSelectionAllowed(false);
+        sourcesCombo.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                source = (String) event.getProperty().getValue();
+                trackID = null;
+            }
+        });
+
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
         fromDateValue = cal.getTime();
@@ -94,6 +111,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
                 }
             }
         });
+        filterLayout.addComponent(sourcesCombo);
         filterLayout.addComponent(fromDate);
         filterLayout.addComponent(toDate);
 
@@ -144,8 +162,8 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     }
 
     private void populateLogs() {
-        if (trackID != null) {
-            ProductOperationView po = TrackerUI.getDbManager().getProductOperation(null, trackID);
+        if (trackID != null && source != null) {
+            ProductOperationView po = TrackerUI.getDbManager().getProductOperation(source, trackID);
             if (po != null) {
                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                 if (po.getState() != ProductOperationState.RUNNING) {
@@ -158,57 +176,59 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     }
 
     private void populateOperations() {
-        List<ProductOperationView> operations = TrackerUI.getDbManager().getProductOperations(
-                null, fromDateValue, toDateValue, 100);
-        IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
-        currentOperations.removeAll(operations);
+        if (source != null) {
+            List<ProductOperationView> operations = TrackerUI.getDbManager().getProductOperations(
+                    source, fromDateValue, toDateValue, 100);
+            IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
+            currentOperations.removeAll(operations);
 
-        for (ProductOperationView po : currentOperations) {
-            container.removeItem(po.getId());
-        }
-        boolean sortNeeded = false;
-        for (final ProductOperationView po : operations) {
-            Embedded progressIcon;
-            if (po.getState() == ProductOperationState.RUNNING) {
-                progressIcon = new Embedded("", new ThemeResource(loadIconSource));
-            } else if (po.getState() == ProductOperationState.FAILED) {
-                progressIcon = new Embedded("", new ThemeResource(errorIconSource));
-            } else {
-                progressIcon = new Embedded("", new ThemeResource(okIconSource));
+            for (ProductOperationView po : currentOperations) {
+                container.removeItem(po.getId());
             }
-
-            Item item = container.getItem(po.getId());
-            if (item == null) {
-                final Button trackLogsBtn = new Button("View logs");
-                trackLogsBtn.addListener(new Button.ClickListener() {
-
-                    public void buttonClick(Button.ClickEvent event) {
-                        trackID = po.getId();
-                    }
-                });
-
-                item = container.addItem(po.getId());
-                item.getItemProperty("Date").setValue(po.getCreateDate());
-                item.getItemProperty("Operation").setValue(po.getDescription());
-                item.getItemProperty("Check").setValue(trackLogsBtn);
-                item.getItemProperty("Status").setValue(progressIcon);
-
-                sortNeeded = true;
-            } else {
-                if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(progressIcon.getSource())) {
-                    item.getItemProperty("Status").setValue(progressIcon);
+            boolean sortNeeded = false;
+            for (final ProductOperationView po : operations) {
+                Embedded progressIcon;
+                if (po.getState() == ProductOperationState.RUNNING) {
+                    progressIcon = new Embedded("", new ThemeResource(loadIconSource));
+                } else if (po.getState() == ProductOperationState.FAILED) {
+                    progressIcon = new Embedded("", new ThemeResource(errorIconSource));
+                } else {
+                    progressIcon = new Embedded("", new ThemeResource(okIconSource));
                 }
+
+                Item item = container.getItem(po.getId());
+                if (item == null) {
+                    final Button trackLogsBtn = new Button("View logs");
+                    trackLogsBtn.addListener(new Button.ClickListener() {
+
+                        public void buttonClick(Button.ClickEvent event) {
+                            trackID = po.getId();
+                        }
+                    });
+
+                    item = container.addItem(po.getId());
+                    item.getItemProperty("Date").setValue(po.getCreateDate());
+                    item.getItemProperty("Operation").setValue(po.getDescription());
+                    item.getItemProperty("Check").setValue(trackLogsBtn);
+                    item.getItemProperty("Status").setValue(progressIcon);
+
+                    sortNeeded = true;
+                } else {
+                    if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(progressIcon.getSource())) {
+                        item.getItemProperty("Status").setValue(progressIcon);
+                    }
+                }
+
             }
 
-        }
+            if (sortNeeded) {
+                Object[] properties = {"Date"};
+                boolean[] ordering = {false};
+                operationsTable.sort(properties, ordering);
+            }
 
-        if (sortNeeded) {
-            Object[] properties = {"Date"};
-            boolean[] ordering = {false};
-            operationsTable.sort(properties, ordering);
+            currentOperations = operations;
         }
-
-        currentOperations = operations;
     }
 
     private Table createTableTemplate(String caption, int height) {
