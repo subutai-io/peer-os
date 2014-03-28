@@ -12,7 +12,10 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.Embedded;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
@@ -39,6 +42,7 @@ public class Tracker {
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
+    private final PopupDateField fromDate, toDate;
     private volatile UUID trackID;
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
@@ -48,6 +52,7 @@ public class Tracker {
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setMargin(true);
 
         VerticalLayout content = new VerticalLayout();
         content.setWidth(100, Sizeable.UNITS_PERCENTAGE);
@@ -55,7 +60,23 @@ public class Tracker {
 
         contentRoot.addComponent(content);
         contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
-        contentRoot.setMargin(true);
+
+        HorizontalLayout filterLayout = new HorizontalLayout();
+        filterLayout.setSpacing(true);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        fromDate = new PopupDateField("From", cal.getTime());
+        toDate = new PopupDateField("To", new Date());
+
+        fromDate.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        fromDate.setInvalidAllowed(false);
+        fromDate.setInvalidCommitted(false);
+        toDate.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        toDate.setInvalidAllowed(false);
+        toDate.setInvalidCommitted(false);
+
+        filterLayout.addComponent(fromDate);
+        filterLayout.addComponent(toDate);
 
         operationsTable = createTableTemplate("Operations", 250);
 
@@ -65,6 +86,7 @@ public class Tracker {
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
+        content.addComponent(filterLayout);
         content.addComponent(operationsTable);
         content.addComponent(outputTxtArea);
         content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
@@ -123,7 +145,8 @@ public class Tracker {
     private void populateOperations() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(Config.PRODUCT_KEY, cal.getTime(), new Date(), 100);
+        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(
+                Config.PRODUCT_KEY, (Date) fromDate.getValue(), (Date) toDate.getValue(), 100);
         IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
         currentOperations.removeAll(operations);
 
