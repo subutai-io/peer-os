@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.mongodb.manager;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
@@ -512,7 +513,7 @@ public class Manager {
     }
 
     private Table createTableTemplate(String caption, int size) {
-        Table table = new Table(caption);
+        final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Check", Button.class, null);
         table.addContainerProperty("Start", Button.class, null);
@@ -524,6 +525,13 @@ public class Manager {
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
+
+        table.addListener(new ItemClickEvent.ItemClickListener() {
+
+            public void itemClick(ItemClickEvent event) {
+                show(table.getItem(event.getItemId()).getItemProperty("Host").getValue() + "");
+            }
+        });
         return table;
     }
 
