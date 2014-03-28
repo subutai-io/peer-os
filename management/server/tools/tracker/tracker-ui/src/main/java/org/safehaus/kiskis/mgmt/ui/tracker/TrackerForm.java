@@ -82,6 +82,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
             public void valueChange(Property.ValueChangeEvent event) {
                 source = (String) event.getProperty().getValue();
                 trackID = null;
+                outputTxtArea.setValue("");
             }
         });
 
@@ -181,6 +182,10 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         if (!Util.isStringEmpty(source)) {
             List<ProductOperationView> operations = TrackerUI.getDbManager().getProductOperations(
                     source, fromDateValue, toDateValue, 100);
+            if (operations.isEmpty()) {
+                trackID = null;
+                outputTxtArea.setValue("");
+            }
             IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
             currentOperations.removeAll(operations);
 
