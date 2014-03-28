@@ -3,19 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb.tracker;
+package org.safehaus.kiskis.mgmt.ui.tracker;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
+import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.PopupDateField;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
@@ -24,17 +25,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
 import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
-import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
 /**
  *
  * @author dilshat
  */
-public class Tracker {
+public class TrackerForm extends CustomComponent implements MainUISelectedTabChangeListener {
+
+    private static final Logger LOG = Logger.getLogger(TrackerForm.class.getName());
 
     private final VerticalLayout contentRoot;
     private final Table operationsTable;
@@ -43,11 +47,12 @@ public class Tracker {
     private final String errorIconSource = "icons/16/cancel.png";
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private final PopupDateField fromDate, toDate;
+    private Date fromDateValue, toDateValue;
     private volatile UUID trackID;
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
 
-    public Tracker() {
+    public TrackerForm() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
@@ -65,16 +70,30 @@ public class Tracker {
         filterLayout.setSpacing(true);
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        fromDate = new PopupDateField("From", cal.getTime());
-        toDate = new PopupDateField("To", new Date());
-
+        fromDateValue = cal.getTime();
+        toDateValue = new Date();
+        fromDate = new PopupDateField("From", fromDateValue);
+        toDate = new PopupDateField("To", toDateValue);
         fromDate.setDateFormat("yyyy-MM-dd HH:mm:ss");
-        fromDate.setInvalidAllowed(false);
-        fromDate.setInvalidCommitted(false);
         toDate.setDateFormat("yyyy-MM-dd HH:mm:ss");
-        toDate.setInvalidAllowed(false);
-        toDate.setInvalidCommitted(false);
+        fromDate.setResolution(PopupDateField.RESOLUTION_SEC);
+        toDate.setResolution(PopupDateField.RESOLUTION_SEC);
+        fromDate.addListener(new Property.ValueChangeListener() {
 
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() instanceof Date) {
+                    fromDateValue = (Date) event.getProperty().getValue();
+                }
+            }
+        });
+        toDate.addListener(new Property.ValueChangeListener() {
+
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() instanceof Date) {
+                    toDateValue = (Date) event.getProperty().getValue();
+                }
+            }
+        });
         filterLayout.addComponent(fromDate);
         filterLayout.addComponent(toDate);
 
@@ -91,27 +110,23 @@ public class Tracker {
         content.addComponent(outputTxtArea);
         content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
-
     }
 
-    public Component getContent() {
-        return contentRoot;
-    }
-
-    public void setTrackId(UUID trackID) {
-        this.trackID = trackID;
-    }
-
-    public void startTracking() {
+    private void startTracking() {
         if (!track) {
             track = true;
 
-            MongoUI.getExecutor().execute(new Runnable() {
+            TrackerUI.getExecutor().execute(new Runnable() {
 
                 public void run() {
                     while (track) {
-                        populateOperations();
-                        populateLogs();
+                        try {
+                            populateOperations();
+                            populateLogs();
+
+                        } catch (Exception e) {
+                            LOG.log(Level.SEVERE, "Error in tracker", e);
+                        }
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException ex) {
@@ -124,13 +139,13 @@ public class Tracker {
         }
     }
 
-    public void stopTracking() {
+    private void stopTracking() {
         track = false;
     }
 
     private void populateLogs() {
         if (trackID != null) {
-            ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
+            ProductOperationView po = TrackerUI.getDbManager().getProductOperation(null, trackID);
             if (po != null) {
                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                 if (po.getState() != ProductOperationState.RUNNING) {
@@ -143,10 +158,8 @@ public class Tracker {
     }
 
     private void populateOperations() {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        List<ProductOperationView> operations = MongoUI.getDbManager().getProductOperations(
-                Config.PRODUCT_KEY, (Date) fromDate.getValue(), (Date) toDate.getValue(), 100);
+        List<ProductOperationView> operations = TrackerUI.getDbManager().getProductOperations(
+                null, fromDateValue, toDateValue, 100);
         IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
         currentOperations.removeAll(operations);
 
@@ -170,7 +183,7 @@ public class Tracker {
                 trackLogsBtn.addListener(new Button.ClickListener() {
 
                     public void buttonClick(Button.ClickEvent event) {
-                        setTrackId(po.getId());
+                        trackID = po.getId();
                     }
                 });
 
@@ -217,6 +230,14 @@ public class Tracker {
         if (!Util.isStringEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+        }
+    }
+
+    public void selectedTabChanged(TabSheet.Tab selectedTab) {
+        if (TrackerUI.MODULE_NAME.equals(selectedTab.getCaption())) {
+            startTracking();
+        } else {
+            stopTracking();
         }
     }
 

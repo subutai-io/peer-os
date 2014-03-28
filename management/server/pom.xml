@@ -18,7 +18,7 @@
         <module>vaadin</module>
         <module>ui-modules</module>
         <module>products</module>
-
+        <module>tools</module>
         <module>server-karaf</module>
     </modules>
 

@@ -9,16 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mgmt-server-core-parent</artifactId>
-    <name>Kiskis Management Core Parent</name>
-    <description>Kiskis Management Core Parent</description>
+    <artifactId>mgmt-server-tools-parent</artifactId>
+    <name>Kiskis Management Tools Parent</name>
+    <description>Kiskis Management Tools Parent</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>agent-manager</module>
-        <module>db-manager</module>
-        <module>communication-manager</module>
-        <module>task-runner</module>
-        <module>lxc-manager</module>
+      <module>terminal</module>
+       <module>tracker</module> 
     </modules>
 </project>
