@@ -39,7 +39,7 @@ public class CassandraTable extends Table {
 
     private IndexedContainer getCassandraContainer() {
         IndexedContainer container = new IndexedContainer();
-        container.addContainerProperty(CassandraClusterInfo.UUID_LABEL, String.class, "");
+        container.addContainerProperty(CassandraClusterInfo.DOMAINNAME_LABEL, String.class, "");
         container.addContainerProperty(CassandraClusterInfo.NAME_LABEL, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
@@ -56,7 +56,7 @@ public class CassandraTable extends Table {
     private void addClusterDataToContainer(final Container container, final CassandraClusterInfo cci) {
         final Object itemId = container.addItem();
         final Item item = container.getItem(itemId);
-        item.getItemProperty(CassandraClusterInfo.UUID_LABEL).setValue(cci.getDomainName());
+        item.getItemProperty(CassandraClusterInfo.DOMAINNAME_LABEL).setValue(cci.getDomainName());
         item.getItemProperty(CassandraClusterInfo.NAME_LABEL).setValue(cci.getName());
 
         Button startButton = new Button("Start");

@@ -8,6 +8,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 
 import java.util.List;
+
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseDAO;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hbase.wizard.exec.ServiceManager;
@@ -42,8 +43,8 @@ public class HBaseTable extends Table {
 //        container.addContainerProperty(HBaseClusterInfo.DOMAINNAME_LABEL, String.class, "");
         container.addContainerProperty("Start", Button.class, "");
         container.addContainerProperty("Stop", Button.class, "");
-//        container.addContainerProperty("Status", Button.class, "");
-        container.addContainerProperty("Manage", Button.class, "");
+        container.addContainerProperty("Status", Button.class, "");
+        container.addContainerProperty("Details", Button.class, "");
         container.addContainerProperty("Destroy", Button.class, "");
         List<HBaseConfig> cdList = HBaseDAO.getClusterInfo();
         for (HBaseConfig config : cdList) {
@@ -66,7 +67,7 @@ public class HBaseTable extends Table {
                 getWindow().showNotification("Starting cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.START;
                 selectedItem = item;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getMaster(), cce);
             }
         });
 
@@ -78,12 +79,26 @@ public class HBaseTable extends Table {
                 getWindow().showNotification("Stopping cluster: " + config.getUuid());
                 cce = HBaseCommandEnum.STOP;
                 selectedItem = item;
-                manager.runCommand(config.getAgents(), cce);
+                manager.runCommand(config.getMaster(), cce);
 
             }
         });
 
-        Button manageButton = new Button("Manage");
+        Button statusButton = new Button("Status");
+        statusButton.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                getWindow().showNotification("Checking status: " + config.getUuid());
+                cce = HBaseCommandEnum.STATUS;
+                selectedItem = item;
+                manager.runCommand(config.getMaster(), cce);
+
+            }
+        });
+
+
+        Button manageButton = new Button("Details");
         manageButton.addListener(new Button.ClickListener() {
 
             @Override
@@ -110,11 +125,13 @@ public class HBaseTable extends Table {
 
         item.getItemProperty("Start").setValue(startButton);
         item.getItemProperty("Stop").setValue(stopButton);
-        item.getItemProperty("Manage").setValue(manageButton);
+        item.getItemProperty("Status").setValue(statusButton);
+        item.getItemProperty("Details").setValue(manageButton);
         item.getItemProperty("Destroy").setValue(destroyButton);
     }
 
     public void refreshDatasource() {
+
         this.setContainerDataSource(getContainer());
     }
 
@@ -129,25 +146,44 @@ public class HBaseTable extends Table {
         if (cce != null) {
             switch (cce) {
                 case START: {
-                    switch (task.getTaskStatus()) {
+                    getWindow().showNotification("Start success");
+                    switchState(false);
+                    /*switch (task.getTaskStatus()) {
                         case SUCCESS: {
-                            getWindow().showNotification("Start success");
-                            switchState(false);
                             break;
                         }
                         case FAIL: {
                             getWindow().showNotification("Start failed. Please use Terminal to check the problem");
                             break;
                         }
-                    }
+                    }*/
                     break;
 
                 }
                 case STOP: {
+                    getWindow().showNotification("Stop success");
+                    switchState(true);
+                    /*switch (task.getTaskStatus()) {
+                        case SUCCESS: {
+                            break;
+                        }
+                        case FAIL: {
+                            getWindow().showNotification("Stop failed. Please use Terminal to check the problem");
+                            break;
+                        }
+                    }*/
+                    break;
+                }
+                case STATUS: {
                     switch (task.getTaskStatus()) {
                         case SUCCESS: {
-                            getWindow().showNotification("Stop success");
-                            switchState(true);
+                            if (stdOut.toLowerCase().contains("is running")) {
+                                getWindow().showNotification("Cluster is running");
+                                switchState(false);
+                            } else {
+                                getWindow().showNotification("Cluster is not running");
+                                switchState(true);
+                            }
                             break;
                         }
                         case FAIL: {
@@ -158,13 +194,13 @@ public class HBaseTable extends Table {
                     break;
                 }
                 case PURGE: {
-                    switch (task.getTaskStatus()) {
+                    getWindow().showNotification("Purge success");
+                    HBaseDAO
+                            .deleteClusterInfo(selectedConfig.getUuid());
+                    /*switch (task.getTaskStatus()) {
                         case SUCCESS: {
-                            getWindow().showNotification("Purge success");
                             if (HBaseDAO
                                     .deleteClusterInfo(selectedConfig.getUuid())) {
-//                    container.removeItem(itemId);
-                                refreshDatasource();
                             }
                             break;
                         }
@@ -172,7 +208,8 @@ public class HBaseTable extends Table {
                             getWindow().showNotification("Purge failed. Please remove using Terminal");
                             break;
                         }
-                    }
+                    }*/
+                    refreshDatasource();
                     break;
                 }
                 case MANAGE: {

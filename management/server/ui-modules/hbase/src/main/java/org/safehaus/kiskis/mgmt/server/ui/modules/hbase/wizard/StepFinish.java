@@ -23,6 +23,8 @@ public class StepFinish extends Panel {
 
     private TextArea terminal;
     ServiceInstaller installer;
+    Button next;
+    Button back;
 
     public StepFinish(final Wizard wizard) {
 
@@ -47,19 +49,20 @@ public class StepFinish extends Panel {
         grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
-        final Button next = new Button("Next");
+        next = new Button("Next");
         next.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                installer = new ServiceInstaller(wizard, terminal);
+                installer = new ServiceInstaller(wizard, terminal, back);
                 installer.start();
                 next.setCaption("Installing...");
+                back.setEnabled(false);
                 next.setEnabled(false);
             }
         });
 
-        Button back = new Button("Cancel");
+         back = new Button("Cancel");
         back.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {

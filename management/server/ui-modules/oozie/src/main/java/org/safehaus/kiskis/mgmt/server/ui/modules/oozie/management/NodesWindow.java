@@ -17,8 +17,6 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.OozieConfig;
 import org.safehaus.kiskis.mgmt.server.ui.modules.oozie.wizard.exec.ServiceManager;
-import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.FAIL;
-import static org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus.SUCCESS;
 
 public class NodesWindow extends Window {
 
@@ -31,8 +29,6 @@ public class NodesWindow extends Window {
 
     /**
      *
-     * @param config
-     * @param manager
      */
     public NodesWindow(OozieConfig config, ServiceManager manager) {
         this.config = config;
@@ -180,29 +176,37 @@ public class NodesWindow extends Window {
                     break;
                 }
                 case STATUS: {
-                    if (stdOut.contains("Oozie Server is running")) {
+                    /*if (stdOut.contains("Oozie Server is running")) {
                         getWindow().showNotification("Oozie Server is running");
                         switchState(false);
-                    } else {
+                    }*/
+
+                    /*
+                    else {
+
                         getWindow().showNotification(" Oozie Server is not running");
                         switchState(true);
 
                     }
-//                    switch (task.getTaskStatus()) {
-//                        case SUCCESS: {
-//
-//                            if (stdOut.contains("Oozie Server is running")) {
-//                                getWindow().showNotification("Oozie Server is running");
-//                                switchState(false);
-//                            }
-//                            break;
-//                        }
-//                        case FAIL: {
-//                            getWindow().showNotification(" Oozie Server is not running");
-//                            switchState(true);
-//                            break;
-//                        }
-//                    }
+                    */
+
+                    switch (task.getTaskStatus()) {
+                        case SUCCESS: {
+
+                            if (stdOut.contains("Oozie Server is running")) {
+                                getWindow().showNotification("Oozie Server is running");
+                                switchState(false);
+                            }
+                            break;
+                        }
+                        case FAIL: {
+                            if(stdOut.contains("Oozie Server is not running")) {
+                                getWindow().showNotification(" Oozie Server is not running");
+                                switchState(true);
+                            }
+                            break;
+                        }
+                    }
                     break;
                 }
 

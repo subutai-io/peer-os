@@ -53,6 +53,7 @@ public class ServiceManager {
         Task startTask = new Task("Run command");
         for (Agent agent : agents) {
             Request command = new OozieCommands().getCommand(cce);
+            command.setTimeout(cce.getTimeout());
             command.setUuid(agent.getUuid());
             startTask.addRequest(command);
         }
@@ -63,6 +64,7 @@ public class ServiceManager {
     public void runCommand(Agent agent, OozieCommandEnum cce) {
         Task startTask = new Task("Run command");
         Request command = new OozieCommands().getCommand(cce);
+        command.setTimeout(cce.getTimeout());
         command.setUuid(agent.getUuid());
         startTask.addRequest(command);
         tasks.add(startTask);
@@ -103,13 +105,15 @@ public class ServiceManager {
                             return currentTask;
                         } else {
                             oozieTable.manageUI(task, stdOut, stdErr);
-                            deleteInfo();
+
                         }
                     }
                     return null;
                 }
             });
+
         }
+        deleteInfo();
     }
 
     public void moveToNextTask() {

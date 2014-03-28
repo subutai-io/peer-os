@@ -10,10 +10,10 @@ package org.safehaus.kiskis.mgmt.server.ui.modules.hbase.management;
  * @author bahadyr
  */
 public enum HBaseCommandEnum {
-
-    START("service hbase start > /dev/null &", 30),
-    STOP("service hbase stop", 30),
-    STATUS("service hbase status", 30),
+    //. /etc/profile &&
+    START("service hbase start > /dev/null &", 10), // > /dev/null &
+    STOP("service hbase stop > /dev/null &", 10),
+    STATUS("service hbase status", 120),
     INSTALL("apt-get --assume-yes --force-yes install ksks-hbase", 300),
     SET_MASTER(". /etc/profile && $HBASE_HOME/scripts/master.sh", 300),
     SET_REGION(". /etc/profile && $HBASE_HOME/scripts/region.sh", 300),
@@ -32,6 +32,10 @@ public enum HBaseCommandEnum {
 
     public String getProgram() {
         return program;
+    }
+
+    public int getTimeout() {
+        return this.timeout;
     }
 
 }
