@@ -198,7 +198,7 @@ public class ConfigurationStep extends Panel {
         content.addComponent(new Label());
         content.addComponent(dataNodePort);
         content.addComponent(new Label());
-        content.addComponent(new Label());
+//        content.addComponent(new Label());
         content.addComponent(buttons);
 
         addComponent(layout);

@@ -9,6 +9,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.Terminal;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -33,6 +34,7 @@ import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
+import org.safehaus.kiskis.mgmt.ui.mongodb.window.TerminalWindow;
 
 /**
  *
@@ -529,7 +531,14 @@ public class Manager {
         table.addListener(new ItemClickEvent.ItemClickListener() {
 
             public void itemClick(ItemClickEvent event) {
-                show(table.getItem(event.getItemId()).getItemProperty("Host").getValue() + "");
+                if (event.isDoubleClick()) {
+                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                    Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname(lxcHostname);
+                    if (lxcAgent != null) {
+                        TerminalWindow terminal = new TerminalWindow(lxcAgent);
+                        MgmtApplication.addCustomWindow(terminal);
+                    }
+                }
             }
         });
         return table;

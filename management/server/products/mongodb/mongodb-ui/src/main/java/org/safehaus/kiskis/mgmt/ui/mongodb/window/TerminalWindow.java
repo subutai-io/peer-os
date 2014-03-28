@@ -38,24 +38,32 @@ public class TerminalWindow extends Window {
     private volatile int taskCount = 0;
 
     public TerminalWindow(final Agent agent) {
-        setHeight("100%");
+        super(String.format("Shell with %s", agent.getHostname()));
+        setModal(true);
+        setWidth(600, ProgressWindow.UNITS_PIXELS);
+        setHeight(360, ProgressWindow.UNITS_PIXELS);
+
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
         content.setMargin(true);
         content.setSpacing(true);
 
         commandOutputTxtArea = new TextArea("Commands output");
-        commandOutputTxtArea.setSizeFull();
+        commandOutputTxtArea.setRows(13);
+        commandOutputTxtArea.setColumns(43);
         commandOutputTxtArea.setImmediate(true);
-        commandOutputTxtArea.setWordwrap(false);
+        commandOutputTxtArea.setWordwrap(true);
         content.addComponent(commandOutputTxtArea);
 
         HorizontalLayout controls = new HorizontalLayout();
+        controls.setSpacing(true);
         content.addComponent(controls);
 
-        final TextField programTxtFld = new TextField("Command");
-        programTxtFld.setValue("pwd");
+        Label lblCommand = new Label("Command");
+        final TextField txtCommand = new TextField();
+        txtCommand.setValue("pwd");
 
+        final Button clearBtn = new Button("Clear");
         final Button sendBtn = new Button("Send");
         final Label indicator = new Label();
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
@@ -64,11 +72,13 @@ public class TerminalWindow extends Window {
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
-        controls.addComponent(indicator);
-        controls.addComponent(programTxtFld);
+        controls.addComponent(lblCommand);
+        controls.addComponent(txtCommand);
+        controls.addComponent(clearBtn);
         controls.addComponent(sendBtn);
+        controls.addComponent(indicator);
 
-        programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
+        txtCommand.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
             @Override
             public void handleAction(Object sender, Object target) {
                 sendBtn.click();
@@ -77,10 +87,10 @@ public class TerminalWindow extends Window {
         sendBtn.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (!Util.isStringEmpty(programTxtFld.getValue().toString())) {
+                if (!Util.isStringEmpty(txtCommand.getValue().toString())) {
                     Task task = new Task();
                     Request request = getRequestTemplate();
-                    request.setProgram(programTxtFld.getValue().toString());
+                    request.setProgram(txtCommand.getValue().toString());
                     task.addRequest(request, agent);
                     indicator.setVisible(true);
                     taskCount++;
@@ -116,6 +126,12 @@ public class TerminalWindow extends Window {
                 } else {
                     addOutput("Please enter command to run");
                 }
+            }
+        });
+        clearBtn.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                commandOutputTxtArea.setValue("");
             }
         });
 
