@@ -35,7 +35,6 @@ public class DbManagerImpl implements DbManager {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
     private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
-//    private final DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
     private Cluster cluster;
     private Session session;
     private String cassandraHost;
@@ -124,11 +123,13 @@ public class DbManagerImpl implements DbManager {
         try {
 
             ResultSet rs = executeQuery("select info from product_info where source = ? and key = ?", source, key);
-            Row row = rs.one();
-            if (row != null) {
+            if (rs != null) {
+                Row row = rs.one();
+                if (row != null) {
 
-                String info = row.getString("info");
-                return gson.fromJson(info, clazz);
+                    String info = row.getString("info");
+                    return gson.fromJson(info, clazz);
+                }
             }
         } catch (JsonSyntaxException ex) {
             LOG.log(Level.SEVERE, "Error in T getInfo", ex);
@@ -140,9 +141,11 @@ public class DbManagerImpl implements DbManager {
         List<T> list = new ArrayList<T>();
         try {
             ResultSet rs = executeQuery("select info from product_info where source = ?", source);
-            for (Row row : rs) {
-                String info = row.getString("info");
-                list.add(gson.fromJson(info, clazz));
+            if (rs != null) {
+                for (Row row : rs) {
+                    String info = row.getString("info");
+                    list.add(gson.fromJson(info, clazz));
+                }
             }
         } catch (JsonSyntaxException ex) {
             LOG.log(Level.SEVERE, "Error in List<T> getInfo", ex);
@@ -160,13 +163,15 @@ public class DbManagerImpl implements DbManager {
                     "select info from product_operation where source = ? and id = ?",
                     source,
                     operationTrackId);
-            Row row = rs.one();
-            if (row != null) {
-                String info = row.getString("info");
-                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
-                if (po != null) {
-                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
-                    return productOperationViewImpl;
+            if (rs != null) {
+                Row row = rs.one();
+                if (row != null) {
+                    String info = row.getString("info");
+                    ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
+                    if (po != null) {
+                        ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
+                        return productOperationViewImpl;
+                    }
                 }
             }
         } catch (JsonSyntaxException ex) {
@@ -201,12 +206,14 @@ public class DbManagerImpl implements DbManager {
                     fromDate,
                     toDate,
                     limit);
-            for (Row row : rs) {
-                String info = row.getString("info");
-                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
-                if (po != null) {
-                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
-                    list.add(productOperationViewImpl);
+            if (rs != null) {
+                for (Row row : rs) {
+                    String info = row.getString("info");
+                    ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
+                    if (po != null) {
+                        ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
+                        list.add(productOperationViewImpl);
+                    }
                 }
             }
         } catch (JsonSyntaxException ex) {
@@ -217,15 +224,13 @@ public class DbManagerImpl implements DbManager {
 
     public List<String> getProductOperationSources() {
         List<String> sources = new ArrayList<String>();
-        try {
-            ResultSet rs = executeQuery(
-                    "select distinct source from product_operation");
+        ResultSet rs = executeQuery(
+                "select distinct source from product_operation");
+        if (rs != null) {
             for (Row row : rs) {
                 String source = row.getString("source");
                 sources.add(source);
             }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getProductOperationSources", ex);
         }
         return sources;
     }

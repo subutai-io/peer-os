@@ -128,7 +128,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         content.addComponent(outputTxtArea);
         content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
-        
+
         addComponent(contentRoot);
     }
 
@@ -164,7 +164,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     }
 
     private void populateLogs() {
-        if (trackID != null && source != null) {
+        if (trackID != null && !Util.isStringEmpty(source)) {
             ProductOperationView po = TrackerUI.getDbManager().getProductOperation(source, trackID);
             if (po != null) {
                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
@@ -178,7 +178,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     }
 
     private void populateOperations() {
-        if (source != null) {
+        if (!Util.isStringEmpty(source)) {
             List<ProductOperationView> operations = TrackerUI.getDbManager().getProductOperations(
                     source, fromDateValue, toDateValue, 100);
             IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
