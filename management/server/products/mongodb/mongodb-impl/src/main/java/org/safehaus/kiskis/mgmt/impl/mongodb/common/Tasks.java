@@ -21,21 +21,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  */
 public class Tasks {
 
-//    public static Task getAptGetUpdateTask(Set<Agent> agents) {
-//        Task task = new Task("Apt-get update");
-//        for (Agent agent : agents) {
-//            Request req = Commands.getAptGetUpdateCommand();
-//            req.setUuid(agent.getUuid());
-//            task.addRequest(req);
-//        }
-//        return task;
-//    }
     public static Task getInstallMongoTask(Set<Agent> agents) {
         Task task = new Task("Install mongo");
         for (Agent agent : agents) {
-            Request req = Commands.getInstallCommand();
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(Commands.getInstallCommand(), agent);
         }
         return task;
     }
@@ -43,47 +32,13 @@ public class Tasks {
     public static Task getStopMongoTask(Set<Agent> agents) {
         Task task = new Task("Stop mongo");
         for (Agent agent : agents) {
-            Request req = Commands.getStopNodeCommand();
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(Commands.getStopNodeCommand(), agent);
         }
         //ignore exit code
 //        task.setIgnoreExitCode(true);
         return task;
     }
 
-//    public static Task getRegisterIpsTask(Set<Agent> agents, Config cfg) {
-//        Task task = new Task("Register nodes's IP-Host with other nodes");
-//        for (Agent agent : agents) {
-//            StringBuilder cleanHosts = new StringBuilder();
-//            StringBuilder appendHosts = new StringBuilder();
-//            for (Agent otherAgent : agents) {
-//                if (agent != otherAgent) {
-//                    String ip = Util.getAgentIpByMask(otherAgent, Common.IP_MASK);
-//                    String hostname = otherAgent.getHostname();
-//                    cleanHosts.append(ip).append("|").append(hostname).append("|");
-//                    appendHosts.append("if ! /bin/grep -q '").
-//                            append(ip).
-//                            append(" ").append(hostname).append(".").append(cfg.getDomainName()).
-//                            append("' '/etc/hosts'; then /bin/echo '").
-//                            append(ip).
-//                            append(" ").append(hostname).append(".").append(cfg.getDomainName()).
-//                            append("' >> '/etc/hosts'; fi ;");
-//                }
-//            }
-//            if (cleanHosts.length() > 0) {
-//                //drop pipe | symbol
-//                cleanHosts.setLength(cleanHosts.length() - 1);
-//                cleanHosts.insert(0, "egrep -v '");
-//                cleanHosts.append("' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;");
-//                appendHosts.insert(0, cleanHosts);
-//            }
-//            Request req = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
-//            req.setUuid(agent.getUuid());
-//            task.addRequest(req);
-//        }
-//        return task;
-//    }
     public static Task getRegisterIpsTask(Set<Agent> agents, Config cfg) {
         Task task = new Task("Register nodes's IP-Host with other nodes");
         for (Agent agent : agents) {
@@ -109,9 +64,8 @@ public class Tasks {
                 appendHosts.insert(0, cleanHosts);
             }
             appendHosts.append("/bin/echo '127.0.0.1 localhost ").append(agent.getHostname()).append("' >> '/etc/hosts';");
-            Request req = Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString());
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(
+                    Commands.getAddNodesIpHostToOtherNodesCommand(appendHosts.toString()), agent);
         }
         return task;
     }
@@ -119,9 +73,7 @@ public class Tasks {
     public static Task getSetReplicaSetNameTask(String replicaSetName, Set<Agent> dataNodes) {
         Task task = new Task(String.format("Set replica set name to %s", replicaSetName));
         for (Agent agent : dataNodes) {
-            Request req = Commands.getSetReplicaSetNameCommand(replicaSetName);
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(Commands.getSetReplicaSetNameCommand(replicaSetName), agent);
         }
         return task;
     }
@@ -129,9 +81,7 @@ public class Tasks {
     public static Task getStartConfigServersTask(Set<Agent> configServers, Config cfg) {
         Task task = new Task("Start config servers");
         for (Agent agent : configServers) {
-            Request req = Commands.getStartConfigServerCommand(cfg);
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(Commands.getStartConfigServerCommand(cfg), agent);
         }
         task.setData(TaskType.START_CONFIG_SERVERS);
         return task;
@@ -149,9 +99,8 @@ public class Tasks {
             configServersArg.setLength(configServersArg.length() - 1);
         }
         for (Agent agent : routers) {
-            Request req = Commands.getStartRouterCommand(configServersArg.toString(), cfg);
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(
+                    Commands.getStartRouterCommand(configServersArg.toString(), cfg), agent);
         }
         task.setData(TaskType.START_ROUTERS);
         return task;
@@ -160,18 +109,16 @@ public class Tasks {
     public static Task getStartReplicaSetTask(Set<Agent> dataNodes, Config cfg) {
         Task task = new Task("Start replica set");
         for (Agent agent : dataNodes) {
-            Request req = Commands.getStartNodeCommand(cfg);
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(Commands.getStartNodeCommand(cfg), agent);
         }
         task.setData(TaskType.START_REPLICA_SET);
         return task;
     }
 
-    public static Task getRegisterSecondaryNodesWithPrimaryTask(Set<Agent> dataNodes, Config cfg) {
+    public static Task getRegisterSecondaryNodesWithPrimaryTask(Config cfg) {
         Task task = new Task("Register secondary nodes with primary");
         StringBuilder secondaryStr = new StringBuilder();
-        Iterator<Agent> it = dataNodes.iterator();
+        Iterator<Agent> it = cfg.getDataNodes().iterator();
         Agent primaryNodeAgent = it.next();
         while (it.hasNext()) {
             Agent secondaryNodeAgent = it.next();
@@ -179,9 +126,9 @@ public class Tasks {
                     append(secondaryNodeAgent.getHostname()).append(".").append(cfg.getDomainName()).
                     append(":").append(cfg.getDataNodePort()).append("');");
         }
-        Request req = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString(), cfg);
-        req.setUuid(primaryNodeAgent.getUuid());
-        task.addRequest(req);
+        task.addRequest(
+                Commands.getRegisterSecondaryNodesWithPrimaryCommand(
+                        secondaryStr.toString(), cfg), primaryNodeAgent);
         return task;
     }
 
@@ -191,24 +138,23 @@ public class Tasks {
         secondaryStr.append("rs.add('").
                 append(secondaryNodeAgent.getHostname()).append(".").append(cfg.getDomainName()).
                 append(":").append(cfg.getDataNodePort()).append("');");
-        Request req = Commands.getRegisterSecondaryNodesWithPrimaryCommand(secondaryStr.toString(), cfg);
-        req.setUuid(primaryNodeAgent.getUuid());
-        task.addRequest(req);
+        task.addRequest(
+                Commands.getRegisterSecondaryNodesWithPrimaryCommand(
+                        secondaryStr.toString(), cfg), primaryNodeAgent);
         return task;
     }
 
-    public static Task getRegisterReplicaSetAsShardWithRouter(String replicaSetName, Agent router, Set<Agent> dataNodes, Config cfg) {
+    public static Task getRegisterReplicaSetAsShardWithRouter(Config cfg) {
         Task task = new Task("Register replica set as shard with router");
         StringBuilder shard = new StringBuilder();
-        for (Agent agent : dataNodes) {
-            shard.append("sh.addShard('").append(replicaSetName).
+        for (Agent agent : cfg.getDataNodes()) {
+            shard.append("sh.addShard('").append(cfg.getReplicaSetName()).
                     append("/").append(agent.getHostname()).append(".").append(cfg.getDomainName()).
                     append(":").append(cfg.getDataNodePort()).append("');");
         }
-        Request req = Commands.getRegisterShardsWithRouterCommand(
-                shard.toString(), cfg);
-        req.setUuid(router.getUuid());
-        task.addRequest(req);
+        task.addRequest(
+                Commands.getRegisterShardsWithRouterCommand(
+                        shard.toString(), cfg), cfg.getRouterServers().iterator().next());
         return task;
     }
 
@@ -216,8 +162,7 @@ public class Tasks {
         Task task = new Task("Unregister secondary node from primary");
         Request req = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
                 String.format("%s.%s", secondaryNode.getHostname(), cfg.getDomainName()), cfg);
-        req.setUuid(primaryNode.getUuid());
-        task.addRequest(req);
+        task.addRequest(req, primaryNode);
         task.setIgnoreExitCode(true);
         return task;
     }
@@ -236,17 +181,14 @@ public class Tasks {
                 req = Commands.getCheckDataNodeStatusCommand(
                         String.format("%s.%s", agent.getHostname(), cfg.getDomainName()), cfg);
             }
-            req.setUuid(agent.getUuid());
-            task.addRequest(req);
+            task.addRequest(req, agent);
         }
         return task;
     }
 
     public static Task getFindPrimaryNodeTask(Agent secondaryNode, Config cfg) {
         Task task = new Task("Find primary node");
-        Request req = Commands.getFindPrimaryNodeCommand(cfg);
-        req.setUuid(secondaryNode.getUuid());
-        task.addRequest(req);
+        task.addRequest(Commands.getFindPrimaryNodeCommand(cfg), secondaryNode);
         task.setData(TaskType.FIND_PRIMARY_NODE);
         return task;
     }

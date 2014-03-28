@@ -141,17 +141,6 @@ public class MongoImpl implements Mongo {
                         availableAgents.addAll(entry.getValue());
                     }
                     for (Agent lxcAgent : availableAgents) {
-//                        for (Iterator<Map.Entry<Agent, Set<Agent>>> it = lxcAgentsMap.entrySet().iterator(); it.hasNext();) {
-//                            Map.Entry<Agent, Set<Agent>> lxcAgents = it.next();
-//                            Iterator<Agent> it2 = lxcAgents.getValue().iterator();
-//                            if (it2.hasNext()) {
-//                                lxcAgent = it2.next();
-//                                it2.remove();
-//                                break;
-//                            } else {
-//                                it.remove();
-//                            }
-//                        }
                         if (cfgServers.size() < config.getNumberOfConfigServers()) {
                             cfgServers.add(lxcAgent);
                         } else if (routers.size() < config.getNumberOfRouters()) {
@@ -170,7 +159,6 @@ public class MongoImpl implements Mongo {
                         installMongoCluster(config, po);
                     } else {
                         //destroy all lxcs also
-
                         Set<String> lxcHostnames = new HashSet<String>();
                         for (Agent lxcAgent : config.getConfigServers()) {
                             lxcHostnames.add(lxcAgent.getHostname());
@@ -680,7 +668,6 @@ public class MongoImpl implements Mongo {
 
         });
 
-//        return NodeState.RUNNING.equals(startNodeTask.getData());
         return po.getId();
     }
 

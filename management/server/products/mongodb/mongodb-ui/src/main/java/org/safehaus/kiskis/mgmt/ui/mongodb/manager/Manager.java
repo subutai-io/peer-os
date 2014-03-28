@@ -181,16 +181,6 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-//                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
-//                    MgmtApplication.addCustomWindow(addNodeWindow);
-//                    addNodeWindow.addListener(new Window.CloseListener() {
-//
-//                        @Override
-//                        public void windowClose(Window.CloseEvent e) {
-//                            //refresh clusters and show the current one again
-//                            refreshClustersInfo();
-//                        }
-//                    });
                     MgmtApplication.showConfirmationDialog(
                             "Confirm adding node",
                             String.format("Do you want to add DATA_NODE to the %s cluster?", config.getClusterName()),
