@@ -129,7 +129,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
 
-        addComponent(contentRoot);
+        setCompositionRoot(contentRoot);
     }
 
     private void startTracking() {
@@ -257,6 +257,15 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
 
     public void selectedTabChanged(TabSheet.Tab selectedTab) {
         if (TrackerUI.MODULE_NAME.equals(selectedTab.getCaption())) {
+            String oldSource = source;
+            sourcesCombo.removeAllItems();
+            List<String> sources = TrackerUI.getDbManager().getProductOperationSources();
+            for (String src : sources) {
+                sourcesCombo.addItem(src);
+            }
+            if (!Util.isStringEmpty(oldSource)) {
+                sourcesCombo.setValue(oldSource);
+            }
             startTracking();
         } else {
             stopTracking();
