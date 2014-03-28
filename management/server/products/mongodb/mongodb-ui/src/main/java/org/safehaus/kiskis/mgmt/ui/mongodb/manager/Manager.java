@@ -35,6 +35,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.ui.mongodb.window.ProgressWindow;
 
 /**
  *
@@ -459,13 +460,13 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, agent);
-                                        MgmtApplication.addCustomWindow(destroyNodeWindow);
-                                        destroyNodeWindow.addListener(new Window.CloseListener() {
+                                        UUID trackID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
+                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
+                                        MgmtApplication.addCustomWindow(progressWindow);
+                                        progressWindow.addListener(new Window.CloseListener() {
 
                                             @Override
                                             public void windowClose(Window.CloseEvent e) {
-                                                //refresh clusters and show the current one again
                                                 refreshClustersInfo();
                                             }
                                         });
