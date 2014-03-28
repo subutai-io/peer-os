@@ -138,10 +138,19 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID operationID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
-                                        tracker.setTrackId(operationID);
-                                        tracker.setRefreshClusters(true);
-                                        tabSheet.setSelectedTab(tracker.getContent());
+                                        UUID trackID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
+                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
+                                        MgmtApplication.addCustomWindow(progressWindow);
+                                        progressWindow.addListener(new Window.CloseListener() {
+
+                                            @Override
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
+//                                        tracker.setTrackId(operationID);
+//                                        tracker.setRefreshClusters(true);
+//                                        tabSheet.setSelectedTab(tracker.getContent());
                                     }
                                 }
                             });
@@ -167,8 +176,16 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        //show common progress window and pass strategy to it
-                                        show("OK");
+                                        UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.ROUTER_NODE);
+                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
+                                        MgmtApplication.addCustomWindow(progressWindow);
+                                        progressWindow.addListener(new Window.CloseListener() {
+
+                                            @Override
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
                                     }
                                 }
                             });
@@ -203,8 +220,16 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        //show common progress window and pass strategy to it
-                                        show("OK");
+                                        UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.DATA_NODE);
+                                        ProgressWindow progressWindow = new ProgressWindow(trackID);
+                                        MgmtApplication.addCustomWindow(progressWindow);
+                                        progressWindow.addListener(new Window.CloseListener() {
+
+                                            @Override
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
                                     }
                                 }
                             });
