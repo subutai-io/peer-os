@@ -50,55 +50,55 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
  * @author dilshat
  */
 public class MongoImpl implements Mongo {
-
+    
     private static final Logger LOG = Logger.getLogger(MongoImpl.class.getName());
-
+    
     private static TaskRunner taskRunner;
     private static AgentManager agentManager;
     private static DbManager dbManager;
     private static LxcManager lxcManager;
     private static ExecutorService executor;
-
+    
     public void setLxcManager(LxcManager lxcManager) {
         MongoImpl.lxcManager = lxcManager;
     }
-
+    
     public void setAgentManager(AgentManager agentManager) {
         MongoImpl.agentManager = agentManager;
     }
-
+    
     public void setDbManager(DbManager dbManager) {
         MongoImpl.dbManager = dbManager;
     }
-
+    
     public void setTaskRunner(TaskRunner taskRunner) {
         MongoImpl.taskRunner = taskRunner;
     }
-
+    
     public static TaskRunner getTaskRunner() {
         return taskRunner;
     }
-
+    
     public static AgentManager getAgentManager() {
         return agentManager;
     }
-
+    
     public static DbManager getDbManager() {
         return dbManager;
     }
-
+    
     public static LxcManager getLxcManager() {
         return lxcManager;
     }
-
+    
     public static ExecutorService getExecutor() {
         return executor;
     }
-
+    
     public void init() {
         executor = Executors.newCachedThreadPool();
     }
-
+    
     public void destroy() {
         MongoImpl.taskRunner = null;
         MongoImpl.agentManager = null;
@@ -106,7 +106,7 @@ public class MongoImpl implements Mongo {
         MongoImpl.lxcManager = null;
         executor.shutdown();
     }
-
+    
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
@@ -114,9 +114,9 @@ public class MongoImpl implements Mongo {
         if (po == null) {
             return null;
         }
-
+        
         executor.execute(new Runnable() {
-
+            
             public void run() {
 
                 //check if mongo cluster with the same name already exists
@@ -124,19 +124,19 @@ public class MongoImpl implements Mongo {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
                 }
-
+                
                 try {
                     int numberOfLxcsNeeded = config.getNumberOfConfigServers() + config.getNumberOfRouters() + config.getNumberOfDataNodes();
                     //clone lxc containers
                     po.addLog(String.format("Creating %d lxc containers", numberOfLxcsNeeded));
                     Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(numberOfLxcsNeeded);
-
+                    
                     Set<Agent> cfgServers = new HashSet<Agent>();
                     Set<Agent> routers = new HashSet<Agent>();
                     Set<Agent> dataNodes = new HashSet<Agent>();
-
+                    
                     Set<Agent> availableAgents = new HashSet<Agent>();
-
+                    
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
                         availableAgents.addAll(entry.getValue());
                     }
@@ -154,7 +154,7 @@ public class MongoImpl implements Mongo {
                     config.setConfigServers(cfgServers);
                     config.setDataNodes(dataNodes);
                     config.setRouterServers(routers);
-
+                    
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                         installMongoCluster(config, po);
                     } else {
@@ -176,29 +176,29 @@ public class MongoImpl implements Mongo {
                         }
                         po.addLogFailed("Could not save new cluster configuration to DB! Please see logs\nInstallation aborted");
                     }
-
+                    
                 } catch (LxcCreateException ex) {
                     po.addLogFailed(ex.getMessage());
                 }
-
+                
             }
         });
-
+        
         return po.getId();
     }
-
+    
     private void installMongoCluster(final Config config, final ProductOperation po) {
         final Operation installOperation = new InstallClusterOperation(config);
         po.addLog(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
-
+        
         taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
             private final StringBuilder startConfigServersOutput = new StringBuilder();
             private final StringBuilder startRoutersOutput = new StringBuilder();
             private final StringBuilder startDataNodesOutput = new StringBuilder();
-
+            
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
+                
                 if (task.getData() != null) {
                     boolean taskOk = false;
                     if (task.getData() == TaskType.START_CONFIG_SERVERS) {
@@ -229,7 +229,7 @@ public class MongoImpl implements Mongo {
                         taskRunner.removeTaskCallback(task.getUuid());
                     }
                 }
-
+                
                 if (task.isCompleted()) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog(String.format("Task %s succeeded", task.getDescription()));
@@ -238,7 +238,7 @@ public class MongoImpl implements Mongo {
                             return installOperation.getNextTask();
                         } else {
                             po.addLogDone(String.format("Operation %s completed", installOperation.getDescription()));
-
+                            
                         }
                     } else {
                         String err = "";
@@ -249,23 +249,23 @@ public class MongoImpl implements Mongo {
                             }
                         }
                         po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s", task.getDescription(), installOperation.getDescription(), err));
-
+                        
                     }
                 }
-
+                
                 return null;
             }
         });
-
+        
     }
-
+    
     public UUID addNode(final String clusterName, final NodeType nodeType) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Adding %s to %s", nodeType, clusterName));
-
+        
         executor.execute(new Runnable() {
-
+            
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
@@ -277,42 +277,42 @@ public class MongoImpl implements Mongo {
                     return;
                 }
                 try {
-
+                    
                     po.addLog("Creating lxc container");
-
+                    
                     Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(1);
-
+                    
                     Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
                     //start addition of node
                     addNodeInternal(po, config, nodeType, lxcAgent);
-
+                    
                 } catch (LxcCreateException ex) {
                     po.addLogFailed(ex.getMessage());
                 }
-
+                
             }
         });
-
+        
         return po.getId();
     }
-
+    
     private void addNodeInternal(final ProductOperation po, final Config config, final NodeType nodeType, final Agent agent) {
         final Operation operation
                 = (nodeType == NodeType.DATA_NODE)
                 ? new AddDataNodeOperation(config, agent)
                 : new AddRouterOperation(config, agent);
-
+        
         po.addLog(String.format("Running task %s", operation.peekNextTask().getDescription()));
-
+        
         taskRunner.executeTask(operation.getNextTask(), new TaskCallback() {
-
+            
             private final StringBuilder routersOutput = new StringBuilder();
-
+            
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
-
+                    
                     if (task.isCompleted()) {
                         Agent primaryNodeAgent = null;
                         Pattern p = Pattern.compile("primary\" : \"(.*)\"");
@@ -324,7 +324,7 @@ public class MongoImpl implements Mongo {
                                 primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                             }
                         }
-
+                        
                         if (primaryNodeAgent != null) {
                             Request registerSecondaryWithPrimaryCmd = operation.peekNextTask().getRequests().iterator().next();
                             registerSecondaryWithPrimaryCmd.setUuid(primaryNodeAgent.getUuid());
@@ -339,7 +339,7 @@ public class MongoImpl implements Mongo {
                     if (task.getData() == TaskType.RESTART_ROUTERS && !Util.isStringEmpty(response.getStdOut())) {
                         routersOutput.append(response.getStdOut());
                     }
-
+                    
                     if ((task.getData() == TaskType.RESTART_ROUTERS
                             && Util.countNumberOfOccurences(routersOutput.toString(),
                                     "child process started successfully, parent exiting")
@@ -352,18 +352,18 @@ public class MongoImpl implements Mongo {
                         taskRunner.removeTaskCallback(task.getUuid());
                     }
                 }
-
+                
                 if (task.isCompleted()) {
                     if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog(String.format("Task %s succeeded", task.getDescription()));
-
+                        
                         if (operation.hasNextTask()) {
                             po.addLog(String.format("Running task %s", operation.peekNextTask().getDescription()));
-
+                            
                             return operation.getNextTask();
                         } else {
                             po.addLog(String.format("Operation %s completed", operation.getDescription()));
-
+                            
                             if (nodeType == NodeType.DATA_NODE) {
                                 config.getDataNodes().add(agent);
                             } else if (nodeType == NodeType.CONFIG_NODE) {
@@ -388,24 +388,26 @@ public class MongoImpl implements Mongo {
                         po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s", task.getDescription(), operation.getDescription(), err));
                     }
                 }
-
+                
                 return null;
             }
         });
     }
-
+    
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Destroying cluster %s", clusterName));
         executor.execute(new Runnable() {
-
+            
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
                     return;
                 }
+                
+                po.addLog("Destroying lxc containers");
                 Set<String> lxcHostnames = new HashSet<String>();
                 for (Agent lxcAgent : config.getConfigServers()) {
                     lxcHostnames.add(lxcAgent.getHostname());
@@ -422,7 +424,7 @@ public class MongoImpl implements Mongo {
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
                 }
-
+                
                 if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
                     po.addLogDone("Cluster info deleted from DB\nDone");
                 } else {
@@ -430,10 +432,10 @@ public class MongoImpl implements Mongo {
                 }
             }
         });
-
+        
         return po.getId();
     }
-
+    
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
@@ -441,20 +443,20 @@ public class MongoImpl implements Mongo {
 
         //go on operation
         executor.execute(new Runnable() {
-
+            
             public void run() {
                 final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
                     return;
                 }
-
+                
                 Agent agent = agentManager.getAgentByHostname(lxcHostname);
                 if (agent == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
                     return;
                 }
-
+                
                 final NodeType nodeType = getNodeType(config, agent);
                 if (nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1) {
                     po.addLogFailed("This is the last configuration server in the cluster. Please, destroy cluster instead\n.Operation aborted");
@@ -466,7 +468,7 @@ public class MongoImpl implements Mongo {
                     po.addLogFailed("This is the last router in the cluster. Please, destroy cluster instead\n.Operation aborted");
                     return;
                 }
-
+                
                 if (nodeType == NodeType.CONFIG_NODE) {
                     config.getConfigServers().remove(agent);
                     //restart routers
@@ -478,13 +480,13 @@ public class MongoImpl implements Mongo {
                         Task startRoutersTask = taskRunner.
                                 executeTask(Tasks.getStartRoutersTask(config.getRouterServers(),
                                                 config.getConfigServers(), config));
-
+                        
                         final AtomicInteger okCount = new AtomicInteger(0);
                         taskRunner.executeTask(startRoutersTask, new TaskCallback() {
-
+                            
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                 if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
-
+                                    
                                     okCount.incrementAndGet();
                                 }
                                 if (okCount.get() == config.getRouterServers().size()) {
@@ -500,28 +502,28 @@ public class MongoImpl implements Mongo {
                                 return null;
                             }
                         });
-
+                        
                         synchronized (startRoutersTask) {
                             try {
                                 startRoutersTask.wait(startRoutersTask.getAvgTimeout() * 1000 + 1000);
                             } catch (InterruptedException ex) {
                             }
                         }
-
+                        
                         if (okCount.get() != config.getRouterServers().size()) {
                             po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
                         }
                     } else {
                         po.addLog("Could not restart routers. Use Terminal module to restart them, skipping...");
                     }
-
+                    
                 } else if (nodeType == NodeType.DATA_NODE) {
                     config.getDataNodes().remove(agent);
                     //unregister from primary
                     po.addLog("Unregistering this node from replica set...");
                     Task findPrimaryNodeTask = taskRunner.
                             executeTask(Tasks.getFindPrimaryNodeTask(agent, config));
-
+                    
                     if (findPrimaryNodeTask.isCompleted()) {
                         Pattern p = Pattern.compile("primary\" : \"(.*)\"");
                         Matcher m = p.matcher(findPrimaryNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut());
@@ -550,7 +552,7 @@ public class MongoImpl implements Mongo {
                     } else {
                         po.addLog("Could not determine primary node for unregistering from replica set, skipping...");
                     }
-
+                    
                 } else if (nodeType == NodeType.ROUTER_NODE) {
                     config.getRouterServers().remove(agent);
                 }
@@ -576,49 +578,49 @@ public class MongoImpl implements Mongo {
                 }
             }
         });
-
+        
         return po.getId();
     }
-
+    
     public List<Config> getClusters() {
         try {
-
+            
             return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-
+            
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in getClusters", ex);
         }
-
+        
         return new ArrayList<Config>();
     }
-
+    
     public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Starting node %s in %s", lxcHostname, clusterName));
-
+        
         executor.execute(new Runnable() {
-
+            
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
                     return;
                 }
-
+                
                 Agent node = agentManager.getAgentByHostname(lxcHostname);
                 if (node == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
                     return;
                 }
-
+                
                 Task startNodeTask;
                 NodeType nodeType = getNodeType(config, node);
-
+                
                 if (nodeType == NodeType.CONFIG_NODE) {
                     startNodeTask = Tasks.getStartConfigServersTask(
                             Util.wrapAgentToSet(node), config);
-
+                    
                 } else if (nodeType == NodeType.DATA_NODE) {
                     startNodeTask = Tasks.getStartReplicaSetTask(
                             Util.wrapAgentToSet(node), config);
@@ -628,12 +630,12 @@ public class MongoImpl implements Mongo {
                             config.getConfigServers(),
                             config);
                 }
-
+                
                 taskRunner.executeTask(startNodeTask, new TaskCallback() {
-
+                    
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
-
+                            
                             taskRunner.removeTaskCallback(task.getUuid());
                             task.setData(NodeState.RUNNING);
                             synchronized (task) {
@@ -647,14 +649,14 @@ public class MongoImpl implements Mongo {
                         return null;
                     }
                 });
-
+                
                 synchronized (startNodeTask) {
                     try {
                         startNodeTask.wait(startNodeTask.getAvgTimeout() * 1000 + 1000);
                     } catch (InterruptedException ex) {
                     }
                 }
-
+                
                 if (NodeState.RUNNING.equals(startNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s started", lxcHostname));
                 } else {
@@ -663,37 +665,37 @@ public class MongoImpl implements Mongo {
                             startNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
                     ));
                 }
-
+                
             }
-
+            
         });
-
+        
         return po.getId();
     }
-
+    
     public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Stopping node %s in %s", lxcHostname, clusterName));
-
+        
         executor.execute(new Runnable() {
-
+            
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
                     return;
                 }
-
+                
                 Agent node = agentManager.getAgentByHostname(lxcHostname);
                 if (node == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
                     return;
                 }
-
+                
                 Task stopNodeTask = taskRunner.executeTask(
                         Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
-
+                
                 if (stopNodeTask.isCompleted()) {
                     if (stopNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone(String.format("Node on %s stopped", lxcHostname));
@@ -704,36 +706,36 @@ public class MongoImpl implements Mongo {
                         ));
                     }
                 }
-
+                
             }
         });
-
+        
         return po.getId();
     }
-
+    
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = dbManager.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Checking state of %s in %s", lxcHostname, clusterName));
-
+        
         executor.execute(new Runnable() {
-
+            
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
                     return;
                 }
-
+                
                 Agent node = agentManager.getAgentByHostname(lxcHostname);
                 if (node == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
                     return;
                 }
-
+                
                 Task checkNodeTask = taskRunner.executeTask(
                         Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
-
+                
                 if (checkNodeTask.isCompleted()) {
                     String stdOut = checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut();
                     if (stdOut.indexOf("couldn't connect to server") > -1) {
@@ -744,27 +746,27 @@ public class MongoImpl implements Mongo {
                         po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
                     }
                 }
-
+                
             }
         });
-
+        
         return po.getId();
     }
-
+    
     public ProductOperationView getProductOperationView(UUID viewId) {
         return dbManager.getProductOperation(Config.PRODUCT_KEY, viewId);
     }
-
+    
     private NodeType getNodeType(Config config, Agent node) {
         NodeType nodeType = NodeType.DATA_NODE;
-
+        
         if (config.getRouterServers().contains(node)) {
             nodeType = NodeType.ROUTER_NODE;
         } else if (config.getConfigServers().contains(node)) {
             nodeType = NodeType.CONFIG_NODE;
         }
-
+        
         return nodeType;
     }
-
+    
 }
