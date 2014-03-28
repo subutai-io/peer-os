@@ -101,10 +101,6 @@ public class MongoUI implements Module {
                     } else {
                         tracker.stopTracking();
                     }
-//                    if (managerTabName.equals(mongoSelectedTabCaption) && tracker.isRefreshClusters()) {
-//                        tracker.setRefreshClusters(false);
-//                        manager.refreshClustersInfo();
-//                    }
                 }
             });
 
