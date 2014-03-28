@@ -128,6 +128,8 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         content.addComponent(outputTxtArea);
         content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
+        
+        addComponent(contentRoot);
     }
 
     private void startTracking() {
