@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.api.mongodb;
 
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 
 /**
  *

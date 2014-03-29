@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mongodb-parent</artifactId>
+        <artifactId>tracker-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mongodb-impl</artifactId>
+    <artifactId>tracker-ui</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management MongoDB</name>
-    <description>Kiskis Management MongoDB</description>
+    <name>Kiskis Management Tracker UI</name>
+    <description>Kiskis Management Tracker UI</description>
 
     <build>
         <plugins>
@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.server.ui.modules</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}.ui.tracker</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
@@ -42,18 +42,13 @@
             <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>ui-vaadin-services</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ui-vaadin</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -72,29 +67,10 @@
             <version>${com.vaadin.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>task-runner-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>agent-manager-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>db-manager-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mongodb-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lxc-manager-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
