@@ -21,6 +21,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -85,11 +86,15 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
                 outputTxtArea.setValue("");
             }
         });
-
+        SimpleDateFormat df = new SimpleDateFormat("ddMMyyyy HH:mm:ss");
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        fromDateValue = cal.getTime();
-        toDateValue = new Date();
+        try {
+            fromDateValue = df.parse(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + String.format("%02d", (cal.get(Calendar.MONTH) + 1)) + cal.get(Calendar.YEAR) + " 00:00:00");
+            toDateValue = df.parse(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + String.format("%02d", (cal.get(Calendar.MONTH) + 1)) + cal.get(Calendar.YEAR) + " 23:59:59");
+        } catch (java.text.ParseException ex) {
+            Logger.getLogger(TrackerForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         fromDate = new PopupDateField("From", fromDateValue);
         toDate = new PopupDateField("To", toDateValue);
         fromDate.setDateFormat("yyyy-MM-dd HH:mm:ss");
