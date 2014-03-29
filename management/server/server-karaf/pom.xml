@@ -301,7 +301,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>terminal-ui</artifactId>
+                                    <artifactId>task-runner-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
