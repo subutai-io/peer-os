@@ -286,7 +286,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
 
     @Override
     public void detach() {
-        super.detach(); s
+        super.detach();
         stopTracking();
     }
 
