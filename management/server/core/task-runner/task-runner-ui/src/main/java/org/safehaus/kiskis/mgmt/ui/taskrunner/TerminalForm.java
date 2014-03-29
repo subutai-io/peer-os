@@ -3,21 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb.window;
+package org.safehaus.kiskis.mgmt.ui.taskrunner;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -26,61 +29,56 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
 /**
  *
  * @author dilshat
  */
-public class TerminalWindow extends Window {
+public class TerminalForm extends CustomComponent {
 
     private final TextArea commandOutputTxtArea;
     private volatile int taskCount = 0;
 
-    public TerminalWindow(final Agent agent) {
-        super(String.format("Shell with %s", agent.getHostname()));
-        setModal(true);
-        setWidth(600, ProgressWindow.UNITS_PIXELS);
-        setHeight(360, ProgressWindow.UNITS_PIXELS);
-
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeFull();
-        content.setMargin(true);
-        content.setSpacing(true);
-
+    public TerminalForm(final TaskRunner taskRunner, final AgentManager agentManager) {
+        setHeight("100%");
+        GridLayout grid = new GridLayout(20, 10);
+        grid.setSizeFull();
+        grid.setMargin(true);
+        grid.setSpacing(true);
         commandOutputTxtArea = new TextArea("Commands output");
-        commandOutputTxtArea.setRows(13);
-        commandOutputTxtArea.setColumns(43);
+        commandOutputTxtArea.setSizeFull();
         commandOutputTxtArea.setImmediate(true);
-        commandOutputTxtArea.setWordwrap(true);
-        content.addComponent(commandOutputTxtArea);
-
-        HorizontalLayout controls = new HorizontalLayout();
-        controls.setSpacing(true);
-        content.addComponent(controls);
-
-        Label lblCommand = new Label("Command");
-        final TextField txtCommand = new TextField();
-        txtCommand.setValue("pwd");
-
-        final Button clearBtn = new Button("Clear");
+        commandOutputTxtArea.setWordwrap(false);
+        grid.addComponent(commandOutputTxtArea, 0, 0, 19, 8);
+        Label programLbl = new Label("Program");
+        final TextField programTxtFld = new TextField();
+        programTxtFld.setValue("pwd");
+        programTxtFld.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        grid.addComponent(programLbl, 0, 9, 1, 9);
+        grid.addComponent(programTxtFld, 2, 9, 11, 9);
+        Label workDirLbl = new Label("Cwd");
+        final TextField workDirTxtFld = new TextField();
+        workDirTxtFld.setValue("/");
+        grid.addComponent(workDirLbl, 12, 9, 12, 9);
+        grid.addComponent(workDirTxtFld, 13, 9, 13, 9);
+        Label timeoutLbl = new Label("Timeout");
+        final TextField timeoutTxtFld = new TextField();
+        timeoutTxtFld.setValue("30");
+        grid.addComponent(timeoutLbl, 14, 9, 15, 9);
+        grid.addComponent(timeoutTxtFld, 16, 9, 16, 9);
+        Button clearBtn = new Button("Clear");
+        grid.addComponent(clearBtn, 17, 9, 17, 9);
         final Button sendBtn = new Button("Send");
-        final Button closeBtn = new Button("Close");
+        grid.addComponent(sendBtn, 18, 9, 18, 9);
         final Label indicator = new Label();
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
         indicator.setContentMode(Label.CONTENT_XHTML);
         indicator.setHeight(11, Sizeable.UNITS_PIXELS);
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
-
-        controls.addComponent(lblCommand);
-        controls.addComponent(txtCommand);
-        controls.addComponent(clearBtn);
-        controls.addComponent(sendBtn);
-        controls.addComponent(closeBtn);
-        controls.addComponent(indicator);
-
-        txtCommand.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
+        grid.addComponent(indicator, 19, 9, 19, 9);
+        setCompositionRoot(grid);
+        programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
             @Override
             public void handleAction(Object sender, Object target) {
                 sendBtn.click();
@@ -89,17 +87,33 @@ public class TerminalWindow extends Window {
         sendBtn.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (!Util.isStringEmpty(txtCommand.getValue().toString())) {
+                Set<Agent> agents = MgmtApplication.getSelectedAgents();
+                if (agents.isEmpty()) {
+                    show("Please, select nodes");
+                } else if (programTxtFld.getValue() == null || Util.isStringEmpty(programTxtFld.getValue().toString())) {
+                    show("Please, enter command");
+                } else {
                     Task task = new Task();
-                    Request request = getRequestTemplate();
-                    request.setProgram(txtCommand.getValue().toString());
-                    task.addRequest(request, agent);
+                    for (Agent agent : agents) {
+                        Request request = getRequestTemplate();
+                        request.setProgram(programTxtFld.getValue().toString());
+                        if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
+                            int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
+                            if (timeout > 0 && timeout <= 3600) {
+                                request.setTimeout(timeout);
+                            }
+                        }
+                        if (workDirTxtFld.getValue() != null && !Util.isStringEmpty(workDirTxtFld.getValue().toString())) {
+                            request.setWorkingDirectory(workDirTxtFld.getValue().toString());
+                        }
+                        task.addRequest(request, agent);
+                    }
                     indicator.setVisible(true);
                     taskCount++;
-                    MongoUI.getTaskRunner().executeTask(task, new TaskCallback() {
+                    taskRunner.executeTask(task, new TaskCallback() {
                         @Override
                         public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                            Agent agent = MongoUI.getAgentManager().getAgentByUUID(response.getUuid());
+                            Agent agent = agentManager.getAgentByUUID(response.getUuid());
                             String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
                             StringBuilder out = new StringBuilder(host).append(":\n");
                             if (!Util.isStringEmpty(response.getStdOut())) {
@@ -125,8 +139,6 @@ public class TerminalWindow extends Window {
                             return null;
                         }
                     });
-                } else {
-                    addOutput("Please enter command to run");
                 }
             }
         });
@@ -136,14 +148,6 @@ public class TerminalWindow extends Window {
                 commandOutputTxtArea.setValue("");
             }
         });
-        closeBtn.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                close();
-            }
-        });
-
-        addComponent(content);
     }
 
     private void addOutput(String output) {
@@ -153,8 +157,12 @@ public class TerminalWindow extends Window {
         }
     }
 
+    private void show(String notification) {
+        getWindow().showNotification(notification);
+    }
+
     public static Request getRequestTemplate() {
-        return CommandFactory.newRequest(RequestType.EXECUTE_REQUEST, null, MongoUI.MODULE_NAME, null, 1, "/", "pwd", OutputRedirection.RETURN, OutputRedirection.RETURN, null, null, "root", null, null, 60); //
+        return CommandFactory.newRequest(RequestType.EXECUTE_REQUEST, null, TaskRunnerUI.MODULE_NAME, null, 1, "/", "pwd", OutputRedirection.RETURN, OutputRedirection.RETURN, null, null, "root", null, null, 30); //
     }
 
 }
