@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.ui.mongodb.window;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -40,8 +39,8 @@ public class TerminalWindow extends Window {
     public TerminalWindow(final Agent agent) {
         super(String.format("Shell with %s", agent.getHostname()));
         setModal(true);
-        setWidth(600, ProgressWindow.UNITS_PIXELS);
-        setHeight(360, ProgressWindow.UNITS_PIXELS);
+        setWidth(600, UNITS_PIXELS);
+        setHeight(400, UNITS_PIXELS);
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -49,7 +48,7 @@ public class TerminalWindow extends Window {
         content.setSpacing(true);
 
         commandOutputTxtArea = new TextArea("Commands output");
-        commandOutputTxtArea.setRows(13);
+        commandOutputTxtArea.setRows(15);
         commandOutputTxtArea.setColumns(43);
         commandOutputTxtArea.setImmediate(true);
         commandOutputTxtArea.setWordwrap(true);
@@ -61,23 +60,22 @@ public class TerminalWindow extends Window {
 
         Label lblCommand = new Label("Command");
         final TextField txtCommand = new TextField();
+        txtCommand.setWidth(250, UNITS_PIXELS);
         txtCommand.setValue("pwd");
 
         final Button clearBtn = new Button("Clear");
         final Button sendBtn = new Button("Send");
-        final Button closeBtn = new Button("Close");
         final Label indicator = new Label();
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
         indicator.setContentMode(Label.CONTENT_XHTML);
-        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
-        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
+        indicator.setHeight(11, UNITS_PIXELS);
+        indicator.setWidth(50, UNITS_PIXELS);
         indicator.setVisible(false);
 
         controls.addComponent(lblCommand);
         controls.addComponent(txtCommand);
         controls.addComponent(clearBtn);
         controls.addComponent(sendBtn);
-        controls.addComponent(closeBtn);
         controls.addComponent(indicator);
 
         txtCommand.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
@@ -134,12 +132,6 @@ public class TerminalWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 commandOutputTxtArea.setValue("");
-            }
-        });
-        closeBtn.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                close();
             }
         });
 
