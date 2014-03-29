@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.ui.terminal</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}.ui.taskrunner</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
