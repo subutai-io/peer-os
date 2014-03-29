@@ -13,7 +13,6 @@ import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
@@ -25,7 +24,6 @@ public class MongoUI implements Module {
 
     public static final String MODULE_NAME = "Mongo";
     private static Mongo mongoManager;
-    private static TaskRunner taskRunner;
     private static AgentManager agentManager;
     private static ExecutorService executor;
 
@@ -39,14 +37,6 @@ public class MongoUI implements Module {
 
     public void setMongoManager(Mongo mongoManager) {
         MongoUI.mongoManager = mongoManager;
-    }
-
-    public static TaskRunner getTaskRunner() {
-        return taskRunner;
-    }
-
-    public void setTaskRunner(TaskRunner taskRunner) {
-        MongoUI.taskRunner = taskRunner;
     }
 
     public static AgentManager getAgentManager() {
@@ -63,7 +53,6 @@ public class MongoUI implements Module {
 
     public void destroy() {
         mongoManager = null;
-        taskRunner = null;
         agentManager = null;
         executor.shutdown();
     }

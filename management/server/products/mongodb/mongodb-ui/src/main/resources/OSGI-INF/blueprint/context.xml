@@ -3,14 +3,11 @@
     
     <reference id="mongoManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.mongodb.Mongo"/>   
-    <reference id="taskRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>    
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>                 
         
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI"
           init-method="init" destroy-method="destroy">
-        <property name="taskRunner" ref="taskRunner" />
         <property name="agentManager" ref="agentManager" />
         <property name="mongoManager" ref="mongoManager"/>
     </bean>
