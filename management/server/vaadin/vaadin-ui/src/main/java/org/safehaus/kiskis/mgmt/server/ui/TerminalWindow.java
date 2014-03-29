@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb.window;
+package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -15,8 +15,11 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -25,7 +28,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
-import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
 /**
  *
@@ -36,8 +38,8 @@ public class TerminalWindow extends Window {
     private final TextArea commandOutputTxtArea;
     private volatile int taskCount = 0;
 
-    public TerminalWindow(final Agent agent) {
-        super(String.format("Shell with %s", agent.getHostname()));
+    public TerminalWindow(final Set<Agent> agents, final TaskRunner taskRunner, final AgentManager agentManager) {
+        super(String.format("Shell"));
         setModal(true);
         setWidth(600, UNITS_PIXELS);
         setHeight(400, UNITS_PIXELS);
@@ -89,15 +91,17 @@ public class TerminalWindow extends Window {
             public void buttonClick(Button.ClickEvent event) {
                 if (!Util.isStringEmpty(txtCommand.getValue().toString())) {
                     Task task = new Task();
-                    Request request = getRequestTemplate();
-                    request.setProgram(txtCommand.getValue().toString());
-                    task.addRequest(request, agent);
+                    for (Agent agent : agents) {
+                        Request request = getRequestTemplate();
+                        request.setProgram(txtCommand.getValue().toString());
+                        task.addRequest(request, agent);
+                    }
                     indicator.setVisible(true);
                     taskCount++;
-                    MongoUI.getTaskRunner().executeTask(task, new TaskCallback() {
+                    taskRunner.executeTask(task, new TaskCallback() {
                         @Override
                         public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                            Agent agent = MongoUI.getAgentManager().getAgentByUUID(response.getUuid());
+                            Agent agent = agentManager.getAgentByUUID(response.getUuid());
                             String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
                             StringBuilder out = new StringBuilder(host).append(":\n");
                             if (!Util.isStringEmpty(response.getStdOut())) {
@@ -146,7 +150,7 @@ public class TerminalWindow extends Window {
     }
 
     public static Request getRequestTemplate() {
-        return CommandFactory.newRequest(RequestType.EXECUTE_REQUEST, null, MongoUI.MODULE_NAME, null, 1, "/", "pwd", OutputRedirection.RETURN, OutputRedirection.RETURN, null, null, "root", null, null, 60); //
+        return CommandFactory.newRequest(RequestType.EXECUTE_REQUEST, null, null, null, 1, "/", "pwd", OutputRedirection.RETURN, OutputRedirection.RETURN, null, null, "root", null, null, 60); //
     }
 
 }

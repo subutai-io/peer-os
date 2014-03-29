@@ -6,7 +6,6 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.*;
 import java.util.Iterator;
 import java.util.List;
@@ -14,12 +13,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 @SuppressWarnings("serial")
 public class Cloner extends VerticalLayout {
 
+    private final MgmtAgentManager agentTree;
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
@@ -33,9 +34,11 @@ public class Cloner extends VerticalLayout {
     private final String loadIconSource = "../base/common/img/loading-indicator.gif";
     private final String hostValidatorRegex = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
 
-    public Cloner(final LxcManager lxcManager) {
+    public Cloner(final LxcManager lxcManager, MgmtAgentManager agentTree) {
         setSpacing(true);
         setMargin(true);
+
+        this.agentTree = agentTree;
 
         this.lxcManager = lxcManager;
 
@@ -145,7 +148,7 @@ public class Cloner extends VerticalLayout {
     }
 
     private void startCloneTask() {
-        Set<Agent> physicalAgents = Util.filterPhysicalAgents(MgmtApplication.getSelectedAgents());
+        Set<Agent> physicalAgents = Util.filterPhysicalAgents(agentTree.getSelectedAgents());
         final String productName = textFieldLxcName.getValue().toString().trim();
 
         if (!Util.isStringEmpty(productName) && !productName.matches(hostValidatorRegex)) {

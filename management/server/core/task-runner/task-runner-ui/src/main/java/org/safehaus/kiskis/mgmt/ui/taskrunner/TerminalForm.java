@@ -7,22 +7,25 @@ package org.safehaus.kiskis.mgmt.ui.taskrunner;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.Runo;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -34,13 +37,21 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
  *
  * @author dilshat
  */
-public class TerminalForm extends CustomComponent {
+public class TerminalForm extends CustomComponent implements Disposable {
 
+    private final MgmtAgentManager agentTree;
     private final TextArea commandOutputTxtArea;
     private volatile int taskCount = 0;
 
     public TerminalForm(final TaskRunner taskRunner, final AgentManager agentManager) {
-        setHeight("100%");
+        setHeight(100, UNITS_PERCENTAGE);
+
+        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+        horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
+        horizontalSplit.setSplitPosition(200, UNITS_PIXELS);
+        agentTree = MgmtApplication.createAgentTree();
+        horizontalSplit.setFirstComponent(agentTree);
+
         GridLayout grid = new GridLayout(20, 10);
         grid.setSizeFull();
         grid.setMargin(true);
@@ -53,7 +64,7 @@ public class TerminalForm extends CustomComponent {
         Label programLbl = new Label("Program");
         final TextField programTxtFld = new TextField();
         programTxtFld.setValue("pwd");
-        programTxtFld.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        programTxtFld.setWidth(100, UNITS_PERCENTAGE);
         grid.addComponent(programLbl, 0, 9, 1, 9);
         grid.addComponent(programTxtFld, 2, 9, 11, 9);
         Label workDirLbl = new Label("Cwd");
@@ -73,11 +84,14 @@ public class TerminalForm extends CustomComponent {
         final Label indicator = new Label();
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
         indicator.setContentMode(Label.CONTENT_XHTML);
-        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
-        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
+        indicator.setHeight(11, UNITS_PIXELS);
+        indicator.setWidth(50, UNITS_PIXELS);
         indicator.setVisible(false);
         grid.addComponent(indicator, 19, 9, 19, 9);
-        setCompositionRoot(grid);
+
+        horizontalSplit.setSecondComponent(grid);
+        setCompositionRoot(horizontalSplit);
+
         programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
             @Override
             public void handleAction(Object sender, Object target) {
@@ -87,7 +101,7 @@ public class TerminalForm extends CustomComponent {
         sendBtn.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Set<Agent> agents = MgmtApplication.getSelectedAgents();
+                Set<Agent> agents = agentTree.getSelectedAgents();
                 if (agents.isEmpty()) {
                     show("Please, select nodes");
                 } else if (programTxtFld.getValue() == null || Util.isStringEmpty(programTxtFld.getValue().toString())) {
@@ -163,6 +177,10 @@ public class TerminalForm extends CustomComponent {
 
     public static Request getRequestTemplate() {
         return CommandFactory.newRequest(RequestType.EXECUTE_REQUEST, null, TaskRunnerUI.MODULE_NAME, null, 1, "/", "pwd", OutputRedirection.RETURN, OutputRedirection.RETURN, null, null, "root", null, null, 30); //
+    }
+
+    public void dispose() {
+        agentTree.dispose();
     }
 
 }

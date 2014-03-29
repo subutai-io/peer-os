@@ -50,7 +50,7 @@ public class VerificationStep extends Panel {
             public void buttonClick(Button.ClickEvent event) {
 
                 UUID trackID = MongoUI.getMongoManager().installCluster(wizard.getConfig());
-                MongoUI.showProgressWindow(wizard.getManager(), trackID);
+                MongoUI.showProgressWindow(trackID, null);
                 wizard.init();
             }
         });

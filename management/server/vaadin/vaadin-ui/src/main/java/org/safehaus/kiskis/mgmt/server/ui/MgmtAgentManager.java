@@ -14,23 +14,30 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 
 /**
- * Created with IntelliJ IDEA. User: daralbaev Date: 11/8/13 Time: 7:24 PM
+ * @author dilshat
  */
 @SuppressWarnings("serial")
 
 public final class MgmtAgentManager extends ConcurrentComponent
-        implements AgentListener {
+        implements AgentListener, Disposable {
 
     private final AgentManager agentManager;
     private final Tree tree;
     private HierarchicalContainer container;
     private static final Logger LOG = Logger.getLogger(MgmtAgentManager.class.getName());
     private Set<Agent> currentAgents = new HashSet<Agent>();
+    private Set<Agent> selectedAgents = new HashSet<Agent>();
 
-    public MgmtAgentManager(AgentManager agentManager) {
+    public Set<Agent> getSelectedAgents() {
+        return Collections.unmodifiableSet(selectedAgents);
+    }
+
+    public MgmtAgentManager(AgentManager agentManager, final boolean global) {
         this.agentManager = agentManager;
+
         setSizeFull();
         setMargin(true);
 
@@ -69,19 +76,25 @@ public final class MgmtAgentManager extends ConcurrentComponent
 
                     Set<Agent> selectedList = new HashSet<Agent>();
 
-                    for (Object o : (Set<Object>) t.getValue()) {
+                    for (Object o : (Iterable<? extends Object>) t.getValue()) {
                         if (tree.getItem(o).getItemProperty("value").getValue() != null) {
                             Agent agent = (Agent) tree.getItem(o).getItemProperty("value").getValue();
                             selectedList.add(agent);
                         }
                     }
 
-                    MgmtApplication.setSelectedAgents(selectedList);
+                    if (global) {
+                        MgmtApplication.setSelectedAgents(selectedList);
+                    } else {
+                        selectedAgents = selectedList;
+                    }
 
                 }
             }
         });
         addComponent(tree);
+
+        agentManager.addListener(this);
     }
 
     @Override
@@ -246,5 +259,9 @@ public final class MgmtAgentManager extends ConcurrentComponent
                 LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
             }
         }
+    }
+
+    public void dispose() {
+        agentManager.removeListener(this);
     }
 }

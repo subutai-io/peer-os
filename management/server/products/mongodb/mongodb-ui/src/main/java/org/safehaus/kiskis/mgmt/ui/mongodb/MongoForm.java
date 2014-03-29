@@ -9,7 +9,6 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 import org.safehaus.kiskis.mgmt.ui.mongodb.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
 
@@ -17,7 +16,7 @@ import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
  *
  * @author dilshat
  */
-public class MongoForm extends CustomComponent implements Disposable {
+public class MongoForm extends CustomComponent {
 
     private final Wizard wizard;
     private final Manager manager;
@@ -37,9 +36,6 @@ public class MongoForm extends CustomComponent implements Disposable {
         verticalLayout.addComponent(mongoSheet);
         setCompositionRoot(verticalLayout);
         manager.refreshClustersInfo();
-    }
-
-    public void dispose() {
     }
 
 }

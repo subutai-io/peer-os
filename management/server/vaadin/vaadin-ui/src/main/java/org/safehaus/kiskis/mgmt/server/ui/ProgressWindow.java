@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb.window;
+package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
@@ -17,9 +17,8 @@ import com.vaadin.ui.Window;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
 /**
  *
@@ -32,14 +31,18 @@ public class ProgressWindow extends Window {
     private final Label indicator;
     private volatile boolean track = true;
     private final UUID trackID;
+    private final Tracker tracker;
+    private final String source;
 
-    public ProgressWindow(UUID trackID) {
+    public ProgressWindow(Tracker tracker, UUID trackID, String source) {
         super("Operation progress");
         setModal(true);
         setClosable(false);
         setWidth(600, ProgressWindow.UNITS_PIXELS);
 
         this.trackID = trackID;
+        this.tracker = tracker;
+        this.source = source;
 
         GridLayout content = new GridLayout(1, 2);
         content.setSizeFull();
@@ -92,34 +95,29 @@ public class ProgressWindow extends Window {
     }
 
     private void start() {
-        MongoUI.getExecutor().execute(new Runnable() {
+
+        showProgress();
+        MgmtAppFactory.getExecutor().execute(new Runnable() {
 
             public void run() {
-                showProgress();
-                MongoUI.getExecutor().execute(new Runnable() {
-
-                    public void run() {
-                        while (track) {
-                            ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
-                            if (po != null) {
-                                setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                                if (po.getState() != ProductOperationState.RUNNING) {
-                                    hideProgress();
-                                    break;
-                                }
-                            } else {
-                                setOutput("Product operation not found. Check logs");
-                            }
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException ex) {
-                                break;
-                            }
+                while (track) {
+                    ProductOperationView po = tracker.getProductOperation(source, trackID);
+                    if (po != null) {
+                        setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                        if (po.getState() != ProductOperationState.RUNNING) {
+                            hideProgress();
+                            break;
                         }
+                    } else {
+                        setOutput("Product operation not found. Check logs");
                     }
-                });
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+                }
             }
-
         });
 
     }

@@ -11,12 +11,11 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.ui.mongodb.manager.Manager;
-import org.safehaus.kiskis.mgmt.ui.mongodb.window.ProgressWindow;
 
 /**
  *
@@ -69,17 +68,18 @@ public class MongoUI implements Module {
         executor.shutdown();
     }
 
-    public static void showProgressWindow(final Manager manager, UUID trackID) {
-        ProgressWindow progressWindow = new ProgressWindow(trackID);
+    public static void showProgressWindow(UUID trackID, final Window.CloseListener closeCallback) {
+        Window progressWindow = MgmtApplication.createProgressWindow(Config.PRODUCT_KEY, trackID);
         MgmtApplication.addCustomWindow(progressWindow);
-        progressWindow.addListener(new Window.CloseListener() {
+        if (closeCallback != null) {
+            progressWindow.addListener(new Window.CloseListener() {
 
-            @Override
-            public void windowClose(Window.CloseEvent e) {
-                manager.refreshClustersInfo();
-
-            }
-        });
+                @Override
+                public void windowClose(Window.CloseEvent e) {
+                    closeCallback.windowClose(e);
+                }
+            });
+        }
     }
 
     public String getName() {

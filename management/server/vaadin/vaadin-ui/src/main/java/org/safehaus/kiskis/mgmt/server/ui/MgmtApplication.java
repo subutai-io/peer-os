@@ -17,8 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
@@ -30,18 +33,26 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private static final ThreadLocal<MgmtApplication> threadLocal = new ThreadLocal<MgmtApplication>();
     private final ModuleNotifier moduleNotifier;
     private final AgentManager agentManager;
+    private final TaskRunner taskRunner;
+    private final Tracker tracker;
     private Window window;
     private Set<Agent> selectedAgents = new HashSet<Agent>();
     private MgmtAgentManager agentList;
 
-    public MgmtApplication(String title, AgentManager agentManager, ModuleNotifier moduleNotifier) {
+    public MgmtApplication(String title, AgentManager agentManager, TaskRunner taskRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
         this.agentManager = agentManager;
+        this.taskRunner = taskRunner;
+        this.tracker = tracker;
         this.moduleNotifier = moduleNotifier;
         this.title = title;
     }
     private final String title;
     private TabSheet tabs;
-    public static String APP_URL;
+    private static String APP_URL;
+
+    public static String getAPP_URL() {
+        return APP_URL;
+    }
 
     @Override
     public void init() {
@@ -62,13 +73,13 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             layout.setExpandRatio(horizontalSplit, 1);
             horizontalSplit.setSplitPosition(200, Sizeable.UNITS_PIXELS);
 
-            agentList = new MgmtAgentManager(agentManager);
+            agentList = new MgmtAgentManager(agentManager, true);
             //add listener
-            agentManager.addListener(agentList);
-            Panel panel = new Panel();
-            panel.addComponent(agentList);
-            panel.setSizeFull();
-            horizontalSplit.setFirstComponent(panel);
+//            agentManager.addListener(agentList);
+//            Panel panel = new Panel();
+//            panel.addComponent(agentList);
+//            panel.setSizeFull();
+            horizontalSplit.setFirstComponent(agentList);
 
             tabs = new TabSheet();
             tabs.setSizeFull();
@@ -133,7 +144,8 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                     }
                 }
             }
-            agentManager.removeListener(agentList);
+//            agentManager.removeListener(agentList);
+            agentList.dispose();
             moduleNotifier.removeListener(this);
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Application closing, removing module service listener");
         } catch (Exception e) {
@@ -152,12 +164,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         }
     }
 
-//    public String getSelectedTabName() {
-//        if (tabs.getSelectedTab() != null) {
-//            return tabs.getTab(tabs.getSelectedTab()).getCaption();
-//        }
-//        return null;
-//    }
     @Override
     public void moduleUnregistered(Module module) {
         try {
@@ -259,6 +265,27 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in removeCustomWindow", e);
         }
+    }
+
+    public static MgmtAgentManager createAgentTree() {
+        if (getInstance() != null) {
+            return new MgmtAgentManager(getInstance().agentManager, false);
+        }
+        return null;
+    }
+
+    public static Window createTerminalWindow(final Set<Agent> agents) {
+        if (getInstance() != null) {
+            return new TerminalWindow(agents, getInstance().taskRunner, getInstance().agentManager);
+        }
+        return null;
+    }
+
+    public static Window createProgressWindow(String source, UUID trackID) {
+        if (getInstance() != null) {
+            return new ProgressWindow(getInstance().tracker, trackID, source);
+        }
+        return null;
     }
 
 }
