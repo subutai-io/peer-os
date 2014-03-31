@@ -4,19 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-parent</artifactId>
+        <artifactId>mgmt-server-products-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mgmt-server-products-parent</artifactId>
-    <name>Kiskis Management Products Parent</name>
-    <description>Kiskis Management Products Parent</description>
+    <artifactId>mahout-parent</artifactId>
+    <name>Kiskis Management Mahout Parent</name>
+    <description>Kiskis Management Mahout Parent</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>mongodb</module>
-        <module>solr</module> 
-	<module>mahout</module> 
+        <module>mahout-api</module>
+        <module>mahout-impl</module>
+        <module>mahout-ui</module>
     </modules>
 </project>
