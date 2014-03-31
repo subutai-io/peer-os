@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.api.solr;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -26,4 +27,12 @@ public interface Solr {
     public UUID addNode(String clusterName);
 
     public UUID destroyNode(String clusterName, String lxcHostname);
+
+    /**
+     * Returns list of configurations of installed clusters
+     *
+     * @return - list of configurations of installed clusters
+     *
+     */
+    public List<Config> getClusters();
 }

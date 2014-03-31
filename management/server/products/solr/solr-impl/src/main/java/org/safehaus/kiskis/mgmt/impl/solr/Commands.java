@@ -47,7 +47,6 @@ public class Commands {
         Request req = getRequestTemplate();
         req.setProgram("service solr start");
         req.setStdOut(OutputRedirection.NO);
-        req.setTimeout(5);
         return req;
     }
 

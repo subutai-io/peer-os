@@ -5,7 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mongodb.manager;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
@@ -44,7 +46,7 @@ public class StartTask implements Runnable {
         }
 
         while (!Thread.interrupted()) {
-            ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
+            ProductOperationView po = MongoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
                     if (po.getState() == ProductOperationState.SUCCEEDED) {

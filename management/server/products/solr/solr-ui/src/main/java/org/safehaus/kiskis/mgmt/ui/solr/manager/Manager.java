@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb.manager;
+package org.safehaus.kiskis.mgmt.ui.solr.manager;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -25,14 +24,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
-import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
+import org.safehaus.kiskis.mgmt.ui.solr.SolrUI;
 
 /**
  *
@@ -43,14 +42,7 @@ public class Manager {
 
     private final VerticalLayout contentRoot;
     private final ComboBox clusterCombo;
-    private final Table configServersTable;
-    private final Table routersTable;
-    private final Table dataNodesTable;
-    private final Label replicaSetName;
-    private final Label domainName;
-    private final Label cfgSrvPort;
-    private final Label routerPort;
-    private final Label dataNodePort;
+    private final Table nodesTable;
     private Config config;
 
     public Manager() {
@@ -69,9 +61,7 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        configServersTable = createTableTemplate("Config Servers", 150);
-        routersTable = createTableTemplate("Query Routers", 150);
-        dataNodesTable = createTableTemplate("Data Nodes", 200);
+        nodesTable = createTableTemplate("Nodes", 200);
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -112,9 +102,7 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                checkNodesStatus(configServersTable);
-                checkNodesStatus(routersTable);
-                checkNodesStatus(dataNodesTable);
+                checkNodesStatus(nodesTable);
             }
 
         });
@@ -135,7 +123,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
+                                        UUID trackID = SolrUI.getSolrManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -154,51 +142,22 @@ public class Manager {
 
         controlsContent.addComponent(destroyClusterBtn);
 
-        Button addRouterBtn = new Button("Add Router");
-        addRouterBtn.addListener(new Button.ClickListener() {
+        Button addNodeBtn = new Button("Add Node");
 
-            public void buttonClick(Button.ClickEvent event) {
-                if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Confirm adding node",
-                            String.format("Do you want to add ROUTER to the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.ROUTER_NODE);
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                } else {
-                    show("Please, select cluster");
-                }
-            }
-        });
-
-        Button addDataNodeBtn = new Button("Add Data Node");
-
-        addDataNodeBtn.addListener(new Button.ClickListener() {
+        addNodeBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
                     MgmtApplication.showConfirmationDialog(
                             "Confirm adding node",
-                            String.format("Do you want to add DATA_NODE to the %s cluster?", config.getClusterName()),
+                            String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
                             "Yes", "No", new ConfirmationDialogCallback() {
 
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.DATA_NODE);
+                                        UUID trackID = SolrUI.getSolrManager().addNode(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -214,38 +173,11 @@ public class Manager {
             }
         });
 
-        controlsContent.addComponent(addRouterBtn);
-        controlsContent.addComponent(addDataNodeBtn);
+        controlsContent.addComponent(addNodeBtn);
 
         content.addComponent(controlsContent);
 
-        HorizontalLayout configContent = new HorizontalLayout();
-        configContent.setSpacing(true);
-
-        replicaSetName = new Label();
-        domainName = new Label();
-        cfgSrvPort = new Label();
-        routerPort = new Label();
-        dataNodePort = new Label();
-
-        configContent.addComponent(new Label("Replica Set:"));
-        configContent.addComponent(replicaSetName);
-        configContent.addComponent(new Label("Domain:"));
-        configContent.addComponent(domainName);
-        configContent.addComponent(new Label("Config server port:"));
-        configContent.addComponent(cfgSrvPort);
-        configContent.addComponent(new Label("Router port:"));
-        configContent.addComponent(routerPort);
-        configContent.addComponent(new Label("Data node port:"));
-        configContent.addComponent(dataNodePort);
-
-        content.addComponent(configContent);
-
-        content.addComponent(configServersTable);
-
-        content.addComponent(routersTable);
-
-        content.addComponent(dataNodesTable);
+        content.addComponent(nodesTable);
 
     }
 
@@ -257,7 +189,7 @@ public class Manager {
         contentRoot.getWindow().showNotification(notification);
     }
 
-    private void populateTable(final Table table, Set<Agent> agents, final NodeType nodeType) {
+    private void populateTable(final Table table, Set<Agent> agents) {
 
         table.removeAllItems();
 
@@ -292,7 +224,7 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    MongoUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    SolrUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -319,7 +251,7 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    MongoUI.getExecutor().execute(new StartTask(nodeType, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    SolrUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -347,7 +279,7 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    MongoUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    SolrUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -377,7 +309,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
+                                        UUID trackID = SolrUI.getSolrManager().destroyNode(config.getClusterName(), agent.getHostname());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -395,28 +327,14 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
-            populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
-            populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
-            replicaSetName.setValue(config.getReplicaSetName());
-            domainName.setValue(config.getDomainName());
-            cfgSrvPort.setValue(config.getCfgSrvPort());
-            routerPort.setValue(config.getRouterPort());
-            dataNodePort.setValue(config.getDataNodePort());
+            populateTable(nodesTable, config.getNodes());
         } else {
-            configServersTable.removeAllItems();
-            routersTable.removeAllItems();
-            dataNodesTable.removeAllItems();
-            replicaSetName.setValue("");
-            domainName.setValue("");
-            cfgSrvPort.setValue("");
-            routerPort.setValue("");
-            dataNodePort.setValue("");
+            nodesTable.removeAllItems();
         }
     }
 
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = MongoUI.getMongoManager().getClusters();
+        List<Config> mongoClusterInfos = SolrUI.getSolrManager().getClusters();
         Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
@@ -466,7 +384,7 @@ public class Manager {
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                    Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname(lxcHostname);
+                    Agent lxcAgent = SolrUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
                         MgmtApplication.addCustomWindow(terminal);

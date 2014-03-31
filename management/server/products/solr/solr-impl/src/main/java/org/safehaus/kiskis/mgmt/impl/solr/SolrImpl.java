@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
+import java.util.ArrayList;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -10,11 +11,14 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
@@ -28,6 +32,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 public class SolrImpl implements Solr {
 
+    private static final Logger LOG = Logger.getLogger(SolrImpl.class.getName());
+    
     public static final String MODULE_NAME = "Solr";
     private TaskRunner taskRunner;
     private AgentManager agentManager;
@@ -455,6 +461,18 @@ public class SolrImpl implements Solr {
         });
 
         return po.getId();
+    }
+
+    public List<Config> getClusters() {
+        try {
+
+            return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getClusters", ex);
+        }
+
+        return new ArrayList<Config>();
     }
 
 }

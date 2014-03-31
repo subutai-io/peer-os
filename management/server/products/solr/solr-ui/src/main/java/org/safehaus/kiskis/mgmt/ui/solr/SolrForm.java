@@ -3,25 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb;
+package org.safehaus.kiskis.mgmt.ui.solr;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import org.safehaus.kiskis.mgmt.ui.mongodb.manager.Manager;
-import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.ui.solr.manager.Manager;
+import org.safehaus.kiskis.mgmt.ui.solr.wizard.Wizard;
 
 /**
  *
  * @author dilshat
  */
-public class MongoForm extends CustomComponent {
+public class SolrForm extends CustomComponent {
 
     private final Wizard wizard;
     private final Manager manager;
 
-    public MongoForm() {
+    public SolrForm() {
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);

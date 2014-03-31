@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb.wizard;
+package org.safehaus.kiskis.mgmt.ui.solr.wizard;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
@@ -11,9 +11,9 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
+import org.safehaus.kiskis.mgmt.ui.solr.SolrUI;
 
 /**
  *
@@ -36,14 +36,7 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        cfgView.addStringCfg("Replica Set Name", wizard.getConfig().getReplicaSetName());
-        cfgView.addStringCfg("Domain Name", wizard.getConfig().getDomainName());
-        cfgView.addStringCfg("Number of configuration servers", wizard.getConfig().getNumberOfConfigServers() + "");
-        cfgView.addStringCfg("Number of routers", wizard.getConfig().getNumberOfRouters() + "");
-        cfgView.addStringCfg("Number of data nodes", wizard.getConfig().getNumberOfDataNodes() + "");
-        cfgView.addStringCfg("Configuration servers port", wizard.getConfig().getCfgSrvPort() + "");
-        cfgView.addStringCfg("Routers port", wizard.getConfig().getRouterPort() + "");
-        cfgView.addStringCfg("Data nodes port", wizard.getConfig().getDataNodePort() + "");
+        cfgView.addStringCfg("Number of nodes", wizard.getConfig().getNumberOfNodes() + "");
 
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
@@ -51,7 +44,7 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                UUID trackID = MongoUI.getMongoManager().installCluster(wizard.getConfig());
+                UUID trackID = SolrUI.getSolrManager().installCluster(wizard.getConfig());
                 MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }

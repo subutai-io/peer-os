@@ -291,4 +291,18 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         return null;
     }
 
+    public static void showProgressWindow(String source, UUID trackID, final Window.CloseListener closeCallback) {
+        Window progressWindow = MgmtApplication.createProgressWindow(source, trackID);
+        MgmtApplication.addCustomWindow(progressWindow);
+        if (closeCallback != null) {
+            progressWindow.addListener(new Window.CloseListener() {
+
+                @Override
+                public void windowClose(Window.CloseEvent e) {
+                    closeCallback.windowClose(e);
+                }
+            });
+        }
+    }
+
 }

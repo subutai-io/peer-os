@@ -3,27 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mongodb.manager;
+package org.safehaus.kiskis.mgmt.ui.solr.manager;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
+import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
-import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
+import org.safehaus.kiskis.mgmt.ui.solr.SolrUI;
 
 /**
  *
  * @author dilshat
  */
-public class CheckTask implements Runnable {
+public class StartTask implements Runnable {
 
     private final String clusterName, lxcHostname;
     private final CompleteEvent completeEvent;
 
-    public CheckTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
+    public StartTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
@@ -31,17 +30,16 @@ public class CheckTask implements Runnable {
 
     public void run() {
 
-        UUID trackID = MongoUI.getMongoManager().checkNode(clusterName, lxcHostname);
+        UUID trackID = SolrUI.getSolrManager().startNode(clusterName, lxcHostname);
 
-        NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
+        NodeState state = NodeState.UNKNOWN;
+
         while (!Thread.interrupted()) {
-            ProductOperationView po = MongoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+            ProductOperationView po = SolrUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains("stopped")) {
-                        state = NodeState.STOPPED;
-                    } else if (po.getLog().contains("running")) {
+                    if (po.getState() == ProductOperationState.SUCCEEDED) {
                         state = NodeState.RUNNING;
                     }
                     break;
@@ -52,7 +50,7 @@ public class CheckTask implements Runnable {
             } catch (InterruptedException ex) {
                 break;
             }
-            if (System.currentTimeMillis() - start > (Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
+            if (System.currentTimeMillis() - start > (30 + 3) * 1000) {
                 break;
             }
         }
