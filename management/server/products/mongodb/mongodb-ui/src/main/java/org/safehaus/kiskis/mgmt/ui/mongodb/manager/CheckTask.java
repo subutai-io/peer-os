@@ -39,9 +39,9 @@ public class CheckTask implements Runnable {
             ProductOperationView po = MongoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains("stopped")) {
+                    if (po.getLog().contains(NodeState.STOPPED.toString())) {
                         state = NodeState.STOPPED;
-                    } else if (po.getLog().contains("running")) {
+                    } else if (po.getLog().contains(NodeState.RUNNING.toString())) {
                         state = NodeState.RUNNING;
                     }
                     break;

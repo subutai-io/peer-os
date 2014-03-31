@@ -750,9 +750,9 @@ public class MongoImpl implements Mongo {
                 if (checkNodeTask.isCompleted()) {
                     String stdOut = checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut();
                     if (stdOut.indexOf("couldn't connect to server") > -1) {
-                        po.addLogDone(String.format("Node on %s is stopped", lxcHostname));
+                        po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.STOPPED));
                     } else if (stdOut.indexOf("connecting to") > -1) {
-                        po.addLogDone(String.format("Node on %s is running", lxcHostname));
+                        po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.RUNNING));
                     } else {
                         po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
                     }

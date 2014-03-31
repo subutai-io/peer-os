@@ -38,9 +38,9 @@ public class CheckTask implements Runnable {
             ProductOperationView po = SolrUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains("STOPPED")) {
+                    if (po.getLog().contains(NodeState.STOPPED.toString())) {
                         state = NodeState.STOPPED;
-                    } else if (po.getLog().contains("RUNNING")) {
+                    } else if (po.getLog().contains(NodeState.RUNNING.toString())) {
                         state = NodeState.RUNNING;
                     }
                     break;
