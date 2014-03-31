@@ -56,7 +56,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
     private String source;
-    private int limit = 50;
+    private int limit = 10;
 
     public TrackerForm() {
         contentRoot = new VerticalLayout();
@@ -136,6 +136,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         filterLayout.addComponent(sourcesCombo);
         filterLayout.addComponent(fromDate);
         filterLayout.addComponent(toDate);
+        filterLayout.addComponent(limitCombo);
 
         operationsTable = createTableTemplate("Operations", 250);
 
