@@ -33,7 +33,7 @@ public class WelcomeStep extends Panel {
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/mongodb.png"));
+        logoImg.setIcon(new ThemeResource("icons/modules/solr.png"));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
         logoImg.setWidth(150, Sizeable.UNITS_PIXELS);
