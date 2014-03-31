@@ -167,6 +167,7 @@ public class MongoImpl implements Mongo {
                     config.setRouterServers(routers);
 
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                        po.addLog("Cluster info saved to DB");
                         installMongoCluster(config, po);
                     } else {
                         //destroy all lxcs also

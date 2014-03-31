@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
-      <module>mongodb</module>
-      <!-- <module>solr</module> -->
+        <module>mongodb</module>
+        <module>solr</module> 
     </modules>
 </project>

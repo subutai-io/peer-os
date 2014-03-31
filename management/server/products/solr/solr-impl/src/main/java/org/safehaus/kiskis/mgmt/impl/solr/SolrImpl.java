@@ -1,28 +1,60 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.solr.Solr;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 public class SolrImpl implements Solr {
 
     public static final String MODULE_NAME = "Solr";
     private TaskRunner taskRunner;
     private AgentManager agentManager;
+    private DbManager dbManager;
+    private Tracker tracker;
+    private LxcManager lxcManager;
+    private ExecutorService executor;
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+    public void destroy() {
+        executor.shutdown();
+    }
+
+    public void setLxcManager(LxcManager lxcManager) {
+        this.lxcManager = lxcManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        this.dbManager = dbManager;
+    }
+
+    public void setTracker(Tracker tracker) {
+        this.tracker = tracker;
+    }
 
     public void setTaskRunner(TaskRunner taskRunner) {
         this.taskRunner = taskRunner;
@@ -32,342 +64,397 @@ public class SolrImpl implements Solr {
         this.agentManager = agentManager;
     }
 
-    public UUID installNode(String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public UUID installCluster(final Config config) {
+        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Solr");
 
-    public UUID uninstallNode(String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public UUID startNode(String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public UUID stopNode(String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public UUID checkNode(String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static class ModuleComponent extends CustomComponent {
-
-        private final TextArea commandOutputTxtArea;
-        private final AgentManager agentManager;
-        private final Label indicator;
-        private final TaskRunner taskRunner;
-        private final Button startBtn;
-        private final Button stopBtn;
-        private final Button checkBtn;
-        private final Button installBtn;
-        private final Button uninstallBtn;
-        private volatile int taskCount = 0;
-
-        public ModuleComponent(final TaskRunner taskRunner, final AgentManager agentManager) {
-            this.agentManager = agentManager;
-            this.taskRunner = taskRunner;
-            setHeight("100%");
-            GridLayout grid = new GridLayout(20, 10);
-            grid.setSizeFull();
-            grid.setMargin(true);
-            grid.setSpacing(true);
-
-            commandOutputTxtArea = new TextArea("Commands output");
-            commandOutputTxtArea.setSizeFull();
-            commandOutputTxtArea.setImmediate(true);
-            commandOutputTxtArea.setWordwrap(false);
-
-            Label logo = new Label();
-            logo.setIcon(new ThemeResource("icons/modules/solr.png"));
-            logo.setContentMode(Label.CONTENT_XHTML);
-            logo.setHeight(200, Sizeable.UNITS_PIXELS);
-            logo.setWidth(100, Sizeable.UNITS_PIXELS);
-
-            startBtn = new Button("Start");
-            stopBtn = new Button("Stop");
-            checkBtn = new Button("Check");
-            installBtn = new Button("Install");
-            uninstallBtn = new Button("Uninstall");
-
-            indicator = new Label();
-            indicator.setIcon(new ThemeResource("icons/indicator.gif"));
-            indicator.setContentMode(Label.CONTENT_XHTML);
-            indicator.setHeight(11, Sizeable.UNITS_PIXELS);
-            indicator.setWidth(50, Sizeable.UNITS_PIXELS);
-            indicator.setVisible(false);
-
-            grid.addComponent(logo, 0, 0, 7, 0);
-            grid.addComponent(startBtn, 14, 0, 14, 0);
-            grid.addComponent(stopBtn, 15, 0, 15, 0);
-            grid.addComponent(checkBtn, 16, 0, 16, 0);
-            grid.addComponent(installBtn, 17, 0, 17, 0);
-            grid.addComponent(uninstallBtn, 18, 0, 18, 0);
-            grid.addComponent(indicator, 12, 0, 13, 0);
-            grid.addComponent(commandOutputTxtArea, 0, 1, 19, 9);
-
-            grid.setComponentAlignment(startBtn, Alignment.MIDDLE_CENTER);
-            grid.setComponentAlignment(stopBtn, Alignment.MIDDLE_CENTER);
-            grid.setComponentAlignment(checkBtn, Alignment.MIDDLE_CENTER);
-            grid.setComponentAlignment(installBtn, Alignment.MIDDLE_CENTER);
-            grid.setComponentAlignment(uninstallBtn, Alignment.MIDDLE_CENTER);
-            grid.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
-
-            setCompositionRoot(grid);
-
-            installBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
-
-                    if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
-                    } else {
-                        commandOutputTxtArea.setValue("\nInstalling Solr ...\n");
-                        Task checkTask = Tasks.getCheckTask(agents);
-
-                        executeTask(checkTask, new TaskCallback() {
-                            final Set<Agent> eligibleAgents = new HashSet<Agent>();
-
-                            @Override
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                                if (task.getData() == TaskType.CHECK) {
-                                    if (Util.isFinalResponse(response)) {
-                                        if (stdOut.indexOf("ksks-solr") > -1) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Solr is already installed. Omitting node from installation set"));
-                                        } else {
-                                            Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                                            if (agent != null) {
-                                                eligibleAgents.add(agent);
-                                            } else {
-                                                addOutput(String.format("%s: %s\n", getHostname(response), "Agent is offline. Omitting node from installation set"));
-                                            }
-                                        }
-                                    }
-                                    if (task.isCompleted()) {
-                                        if (eligibleAgents.isEmpty()) {
-                                            addOutput(String.format("%s\n", "No nodes eligible for installation. Installation aborted"));
-                                        } else {
-                                            //run installation 
-                                            return Tasks.getInstallTask(eligibleAgents);
-                                        }
-                                    }
-                                } else {
-                                    if (Util.isFinalResponse(response)) {
-                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                            if (response.getExitCode() == 0) {
-                                                addOutput(String.format("%s: %s\n", getHostname(response), "Installation done"));
-                                            } else {
-                                                addOutput(String.format("%s: %s: %s\n", getHostname(response), "Installation failed", stdErr));
-                                            }
-                                        } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
-                                        }
-                                    }
-
-                                }
-
-                                return null;
-                            }
-                        });
-                    }
-                }
-            });
-
-            checkBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
-
-                    if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
-                    } else {
-                        commandOutputTxtArea.setValue("\nChecking if Solr is installed ...\n");
-                        Task checkTask = Tasks.getCheckTask(agents);
-                        executeTask(checkTask, new TaskCallback() {
-
-                            @Override
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                                if (Util.isFinalResponse(response)) {
-                                    if (stdOut.indexOf("ksks-solr") > -1) {
-                                        addOutput(String.format("%s: %s\n", getHostname(response), "Solr is installed"));
-                                    } else {
-                                        addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed"));
-                                    }
-                                }
-
-                                return null;
-                            }
-                        });
-                    }
-                }
-            });
-
-            uninstallBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
-
-                    if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
-                    } else {
-                        commandOutputTxtArea.setValue("\nUninstalling Solr ...\n");
-                        Task uninstallTask = Tasks.getUninstallTask(agents);
-                        executeTask(uninstallTask, new TaskCallback() {
-
-                            @Override
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                                if (Util.isFinalResponse(response)) {
-                                    if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                        if (response.getExitCode() == 0) {
-                                            if (stdOut.indexOf("Package ksks-solr is not installed, so not removed") == -1) {
-                                                addOutput(String.format("%s: %s\n", getHostname(response), "Uninstallation done"));
-                                            } else {
-                                                addOutput(String.format("%s: %s\n", getHostname(response), "Solr is not installed, so not removed"));
-                                            }
-                                        } else {
-                                            addOutput(String.format("%s: %s: %s\n", getHostname(response), "Uninstallation failed", stdErr));
-                                        }
-                                    } else if (response.getType() == ResponseType.EXECUTE_TIMEOUTED) {
-                                        addOutput(String.format("%s: %s\n", getHostname(response), "Command timed out"));
-                                    }
-                                }
-
-                                return null;
-                            }
-                        });
-                    }
-                }
-            });
-
-            startBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
-
-                    if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
-                    } else {
-                        commandOutputTxtArea.setValue("\nStarting Solr ...\n");
-                        Task startTask = Tasks.getStartTask(agents);
-
-                        executeTask(startTask, new TaskCallback() {
-
-                            @Override
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                                if (task.getData() == TaskType.START && task.isCompleted()) {
-                                    //run status check task
-                                    return Tasks.getStatusTask(agents);
-
-                                } else if (task.getData() == TaskType.STATUS) {
-                                    if (Util.isFinalResponse(response)) {
-                                        if (stdErr.length() > 0) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), stdErr));
-                                        } else if (stdOut.length() > 0) {
-                                            addOutput(String.format("%s: %s\n", getHostname(response), stdOut));
-                                        }
-                                    }
-
-                                }
-
-                                return null;
-                            }
-                        });
-                    }
-                }
-            });
-
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    final Set<Agent> agents = Util.filterLxcAgents(MgmtApplication.getSelectedAgents());
-
-                    if (agents.isEmpty()) {
-                        commandOutputTxtArea.setValue("\nPlease, select lxc node(s)");
-                    } else {
-                        commandOutputTxtArea.setValue("\nStopping Solr ...\n");
-
-                        Task stopTask = Tasks.getStopTask(agents);
-                        executeTask(stopTask, new TaskCallback() {
-
-                            @Override
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                                if (Util.isFinalResponse(response)) {
-                                    if (stdErr.length() > 0) {
-                                        addOutput(String.format("%s: %s\n", getHostname(response), stdErr));
-                                    } else {
-                                        addOutput(String.format("%s: %s\n", getHostname(response), "Stop Solr done"));
-                                    }
-                                }
-
-                                return null;
-                            }
-                        });
-
-                    }
-                }
-            });
-
+        if (po == null) {
+            return null;
         }
 
-        private String getHostname(Response response) {
-            Agent agent = agentManager.getAgentByUUID(response.getUuid());
-            return agent == null
-                    ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
-        }
+        executor.execute(new Runnable() {
 
-        private void executeTask(Task task, final TaskCallback callback) {
-            startBtn.setEnabled(false);
-            stopBtn.setEnabled(false);
-            checkBtn.setEnabled(false);
-            installBtn.setEnabled(false);
-            uninstallBtn.setEnabled(false);
-            indicator.setVisible(true);
-            taskCount++;
-            taskRunner.executeTask(task, new TaskCallback() {
+            public void run() {
+                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
+                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
+                    return;
+                }
 
-                @Override
-                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                    Task nextTask = callback.onResponse(task, response, stdOut, stdErr);
+                try {
+                    po.addLog(String.format("Creating %d lxc containers", config.getNumberOfNodes()));
+                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(config.getNumberOfNodes());
+                    config.setNodes(new HashSet<Agent>());
 
-                    if (task.isCompleted() && nextTask == null) {
-                        taskCount--;
-                        if (taskCount == 0) {
-                            indicator.setVisible(false);
-                            startBtn.setEnabled(true);
-                            stopBtn.setEnabled(true);
-                            checkBtn.setEnabled(true);
-                            installBtn.setEnabled(true);
-                            uninstallBtn.setEnabled(true);
+                    for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
+                        config.getNodes().addAll(entry.getValue());
+                    }
+
+                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+
+                        po.addLog("Cluster info saved to DB");
+
+                        //install
+                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+
+                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLogDone("Installation succeeded");
+                        } else {
+                            po.addLogFailed("Installation failed");
                         }
+
+                    } else {
+                        //destroy all lxcs also
+                        Set<String> lxcHostnames = new HashSet<String>();
+                        for (Agent lxcAgent : config.getNodes()) {
+                            lxcHostnames.add(lxcAgent.getHostname());
+                        }
+                        try {
+                            lxcManager.destroyLxcs(lxcHostnames);
+                        } catch (LxcDestroyException ex) {
+                            po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+                        }
+                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs\nInstallation aborted");
+                    }
+                } catch (LxcCreateException ex) {
+                    po.addLogFailed(ex.getMessage());
+                }
+
+            }
+        });
+
+        return po.getId();
+    }
+
+    public UUID uninstallCluster(final String clusterName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Destroying cluster %s", clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                po.addLog("Destroying lxc containers");
+
+                Set<String> lxcHostnames = new HashSet<String>();
+                for (Agent lxcAgent : config.getNodes()) {
+                    lxcHostnames.add(lxcAgent.getHostname());
+                }
+                try {
+                    lxcManager.destroyLxcs(lxcHostnames);
+                    po.addLog("Lxc containers successfully destroyed");
+                } catch (LxcDestroyException ex) {
+                    po.addLog(String.format("%s, skipping...", ex.getMessage()));
+                }
+
+                if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
+                    po.addLogDone("Cluster info deleted from DB\nDone");
+                } else {
+                    po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+                }
+
+            }
+        });
+
+        return po.getId();
+    }
+
+    public UUID startNode(final String clusterName, final String lxcHostName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Starting node %s in %s", lxcHostName, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                final Agent node = agentManager.getAgentByHostname(lxcHostName);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    return;
+                }
+
+                Task startNodeTask = Tasks.getStartTask(node);
+                final Task checkNodeTask = Tasks.getStatusTask(node);
+
+                taskRunner.executeTask(startNodeTask, new TaskCallback() {
+
+                    @Override
+                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+
+                        if (task.getData() == TaskType.START && task.isCompleted()) {
+                            //run status check task
+                            return checkNodeTask;
+
+                        } else if (task.getData() == TaskType.STATUS) {
+                            if (Util.isFinalResponse(response)) {
+                                if (stdOut.contains("is running")) {
+                                    task.setData(NodeState.RUNNING);
+                                } else if (stdOut.contains("is not running")) {
+                                    task.setData(NodeState.STOPPED);
+                                }
+
+                                synchronized (task) {
+                                    task.notifyAll();
+                                }
+                            }
+
+                        }
+
+                        return null;
+                    }
+                });
+
+                synchronized (checkNodeTask) {
+                    try {
+                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 1000);
+                    } catch (InterruptedException ex) {
+                    }
+                }
+
+                if (NodeState.RUNNING.equals(checkNodeTask.getData())) {
+                    po.addLogDone(String.format("Node on %s started", lxcHostName));
+                } else {
+                    po.addLogFailed(String.format("Failed to start node %s. %s",
+                            lxcHostName,
+                            startNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
+                    ));
+                }
+
+            }
+        });
+
+        return po.getId();
+    }
+
+    public UUID stopNode(final String clusterName, final String lxcHostName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Stopping node %s in %s", lxcHostName, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                final Agent node = agentManager.getAgentByHostname(lxcHostName);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    return;
+                }
+
+                Task stopNodeTask = Tasks.getStopTask(node);
+                final Task checkNodeTask = Tasks.getStatusTask(node);
+
+                taskRunner.executeTask(stopNodeTask, new TaskCallback() {
+
+                    @Override
+                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+
+                        if (task.getData() == TaskType.STOP && task.isCompleted()) {
+                            //run status check task
+                            return checkNodeTask;
+
+                        } else if (task.getData() == TaskType.STATUS) {
+                            if (Util.isFinalResponse(response)) {
+                                if (stdOut.contains("is running")) {
+                                    task.setData(NodeState.RUNNING);
+                                } else if (stdOut.contains("is not running")) {
+                                    task.setData(NodeState.STOPPED);
+                                }
+
+                                synchronized (task) {
+                                    task.notifyAll();
+                                }
+                            }
+
+                        }
+
+                        return null;
+                    }
+                });
+
+                synchronized (checkNodeTask) {
+                    try {
+                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 1000);
+                    } catch (InterruptedException ex) {
+                    }
+                }
+
+                if (NodeState.STOPPED.equals(checkNodeTask.getData())) {
+                    po.addLogDone(String.format("Node on %s stopped", lxcHostName));
+                } else {
+                    po.addLogFailed(String.format("Failed to stop node %s. %s",
+                            lxcHostName,
+                            stopNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
+                    ));
+                }
+
+            }
+        });
+
+        return po.getId();
+    }
+
+    public UUID checkNode(final String clusterName, final String lxcHostName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Checking node %s in %s", lxcHostName, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                final Agent node = agentManager.getAgentByHostname(lxcHostName);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    return;
+                }
+
+                final Task checkNodeTask = taskRunner.executeTask(Tasks.getStatusTask(node));
+
+                NodeState nodeState = NodeState.UNKNOWN;
+                if (checkNodeTask.isCompleted()) {
+                    Result result = checkNodeTask.getResults().entrySet().iterator().next().getValue();
+                    if (result.getStdOut().contains("is running")) {
+                        nodeState = NodeState.RUNNING;
+                    } else if (result.getStdOut().contains("is not running")) {
+                        nodeState = NodeState.STOPPED;
+                    }
+                }
+
+                if (NodeState.UNKNOWN.equals(nodeState)) {
+                    po.addLogFailed(String.format("Failed to check status of %s, %s",
+                            lxcHostName,
+                            checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
+                    ));
+                } else {
+                    po.addLogDone(String.format("Node %s is %s",
+                            lxcHostName,
+                            nodeState
+                    ));
+                }
+
+            }
+        });
+
+        return po.getId();
+    }
+
+    public UUID destroyNode(final String clusterName, final String lxcHostName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Destroying %s in %s", lxcHostName, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                Agent agent = agentManager.getAgentByHostname(lxcHostName);
+                if (agent == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    return;
+                }
+
+                config.getNodes().remove(agent);
+                //destroy lxc
+                po.addLog("Destroying lxc container...");
+                Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
+                if (physicalAgent == null) {
+                    po.addLog(
+                            String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
+                                    agent.getHostname()));
+                } else {
+                    if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
+                        po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
+                    }
+                }
+                //update db
+                po.addLog("Updating db...");
+                if (!dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                    po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
+                            config.getClusterName()));
+                } else {
+                    po.addLogDone("Done");
+                }
+            }
+        });
+
+        return po.getId();
+    }
+
+    public UUID addNode(final String clusterName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Adding node to %s", clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                try {
+
+                    po.addLog("Creating lxc container");
+
+                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(1);
+
+                    Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
+
+                    //install
+                    po.addLog("Installing Solr");
+
+                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
+
+                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLogDone("Installation succeeded");
+
+                        config.getNodes().add(lxcAgent);
+
+                        if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+                            po.addLogDone("Cluster info updated in DB\nDone");
+                        } else {
+                            po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
+                        }
+                    } else {
+                        po.addLogFailed(String.format("Installation failed, %s",
+                                installTask.getResults().entrySet().iterator().next().getValue().getStdErr()));
                     }
 
-                    return nextTask;
+                } catch (LxcCreateException ex) {
+                    po.addLogFailed(ex.getMessage());
                 }
-            });
-        }
-
-        private void addOutput(String output) {
-            if (!Util.isStringEmpty(output)) {
-                commandOutputTxtArea.setValue(
-                        String.format("%s\n%s",
-                                commandOutputTxtArea.getValue(),
-                                output));
-                commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
             }
-        }
+        });
 
+        return po.getId();
     }
 
 }
