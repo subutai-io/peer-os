@@ -15,16 +15,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
  */
 public class Tasks {
 
-//    public static Task getCheckTask(Set<Agent> agents) {
-//        Task task = new Task("Check existence of Solr");
-//        task.setData(TaskType.CHECK);
-//        for (Agent agent : agents) {
-//            Request req = Commands.getCheckCommand();
-//            req.setUuid(agent.getUuid());
-//            task.addRequest(req);
-//        }
-//        return task;
-//    }
     public static Task getInstallTask(Set<Agent> agents) {
         Task task = new Task("Install Solr");
         task.setData(TaskType.INSTALL);
@@ -34,16 +24,6 @@ public class Tasks {
         return task;
     }
 
-//    public static Task getUninstallTask(Set<Agent> agents) {
-//        Task task = new Task("Uninstall Solr");
-//        task.setData(TaskType.UNINSTALL);
-//        for (Agent agent : agents) {
-//            Request req = Commands.getUninstallCommand();
-//            req.setUuid(agent.getUuid());
-//            task.addRequest(req);
-//        }
-//        return task;
-//    }
     public static Task getStartTask(Agent agent) {
         Task task = new Task("Start Solr");
         task.setData(TaskType.START);

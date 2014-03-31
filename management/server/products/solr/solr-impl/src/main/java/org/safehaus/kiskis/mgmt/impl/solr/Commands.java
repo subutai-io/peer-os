@@ -35,19 +35,6 @@ public class Commands {
                 30); //  
     }
 
-    public static Request getCheckCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("dpkg -l | grep '^ii' | grep ksks");
-        return req;
-    }
-
-    public static Request getUninstallCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("service solr stop ; apt-get --force-yes --assume-yes purge ksks-solr");
-        req.setTimeout(60);
-        return req;
-    }
-
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
         req.setProgram("apt-get update && apt-get --force-yes --assume-yes install ksks-solr");
