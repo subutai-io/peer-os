@@ -23,6 +23,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +56,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<ProductOperationView>();
     private String source;
+    private int limit = 50;
 
     public TrackerForm() {
         contentRoot = new VerticalLayout();
@@ -117,6 +119,20 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
                 }
             }
         });
+
+        ComboBox limitCombo = new ComboBox("Show last", Arrays.asList(10, 50, 100));
+        limitCombo.setMultiSelect(false);
+        limitCombo.setImmediate(true);
+        limitCombo.setTextInputAllowed(false);
+        limitCombo.setNullSelectionAllowed(false);
+        limitCombo.setValue(limit);
+        limitCombo.addListener(new Property.ValueChangeListener() {
+
+            public void valueChange(Property.ValueChangeEvent event) {
+                limit = (Integer) event.getProperty().getValue();
+            }
+        });
+
         filterLayout.addComponent(sourcesCombo);
         filterLayout.addComponent(fromDate);
         filterLayout.addComponent(toDate);
@@ -187,7 +203,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     private void populateOperations() {
         if (!Util.isStringEmpty(source)) {
             List<ProductOperationView> operations = TrackerUI.getTracker().getProductOperations(
-                    source, fromDateValue, toDateValue, 100);
+                    source, fromDateValue, toDateValue, limit);
             if (operations.isEmpty()) {
                 trackID = null;
                 outputTxtArea.setValue("");
