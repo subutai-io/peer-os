@@ -266,7 +266,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         }
     }
 
-    public void refreshSources() {
+    void refreshSources() {
         String oldSource = source;
         sourcesCombo.removeAllItems();
         List<String> sources = TrackerUI.getTracker().getProductOperationSources();

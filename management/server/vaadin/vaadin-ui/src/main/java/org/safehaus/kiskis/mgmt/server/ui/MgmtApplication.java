@@ -75,10 +75,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
             agentList = new MgmtAgentManager(agentManager, true);
             //add listener
-//            agentManager.addListener(agentList);
-//            Panel panel = new Panel();
-//            panel.addComponent(agentList);
-//            panel.setSizeFull();
             horizontalSplit.setFirstComponent(agentList);
 
             tabs = new TabSheet();
@@ -113,20 +109,26 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
                     TabSheet tabsheet = event.getTabSheet();
                     Tab selectedTab = tabsheet.getTab(event.getTabSheet().getSelectedTab());
-                    Iterator<Component> it = tabs.getComponentIterator();
-                    while (it.hasNext()) {
-                        Component component = it.next();
-                        if (component instanceof MainUISelectedTabChangeListener) {
-                            try {
-                                ((MainUISelectedTabChangeListener) component).selectedTabChanged(selectedTab);
-                            } catch (Exception e) {
-                            }
-                        }
-                    }
+                    notifyTabListeners(selectedTab);
                 }
             });
+
+            notifyTabListeners(tabs.getTab(tabs.getSelectedTab()));
         } catch (Exception ex) {
         } finally {
+        }
+    }
+
+    private void notifyTabListeners(Tab selectedTab) {
+        Iterator<Component> it = tabs.getComponentIterator();
+        while (it.hasNext()) {
+            Component component = it.next();
+            if (component instanceof MainUISelectedTabChangeListener) {
+                try {
+                    ((MainUISelectedTabChangeListener) component).selectedTabChanged(selectedTab);
+                } catch (Exception e) {
+                }
+            }
         }
     }
 
@@ -144,7 +146,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                     }
                 }
             }
-//            agentManager.removeListener(agentList);
             agentList.dispose();
             moduleNotifier.removeListener(this);
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Application closing, removing module service listener");
