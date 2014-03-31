@@ -140,7 +140,7 @@ public class SolrImpl implements Solr {
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
@@ -179,13 +179,13 @@ public class SolrImpl implements Solr {
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
                 final Agent node = agentManager.getAgentByHostname(lxcHostName);
                 if (node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
 
@@ -252,13 +252,13 @@ public class SolrImpl implements Solr {
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
                 final Agent node = agentManager.getAgentByHostname(lxcHostName);
                 if (node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
 
@@ -325,13 +325,13 @@ public class SolrImpl implements Solr {
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
                 final Agent node = agentManager.getAgentByHostname(lxcHostName);
                 if (node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
 
@@ -375,13 +375,18 @@ public class SolrImpl implements Solr {
             public void run() {
                 final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
                 Agent agent = agentManager.getAgentByHostname(lxcHostName);
                 if (agent == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostName));
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
+                    return;
+                }
+
+                if (config.getNodes().size() == 1) {
+                    po.addLogFailed("This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
                 }
 
@@ -422,7 +427,7 @@ public class SolrImpl implements Solr {
             public void run() {
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 

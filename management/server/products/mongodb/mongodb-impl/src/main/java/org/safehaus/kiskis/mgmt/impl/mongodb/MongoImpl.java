@@ -439,7 +439,7 @@ public class MongoImpl implements Mongo {
                 if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
                     po.addLogDone("Cluster info deleted from DB\nDone");
                 } else {
-                    po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+                    po.addLogFailed("Error while deleting cluster info from DB. Check logs\nFailed");
                 }
             }
         });
@@ -470,13 +470,13 @@ public class MongoImpl implements Mongo {
 
                 final NodeType nodeType = getNodeType(config, agent);
                 if (nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1) {
-                    po.addLogFailed("This is the last configuration server in the cluster. Please, destroy cluster instead\n.Operation aborted");
+                    po.addLogFailed("This is the last configuration server in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
                 } else if (nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1) {
-                    po.addLogFailed("This is the last data node in the cluster. Please, destroy cluster instead\n.Operation aborted");
+                    po.addLogFailed("This is the last data node in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
                 } else if (nodeType == NodeType.ROUTER_NODE && config.getRouterServers().size() == 1) {
-                    po.addLogFailed("This is the last router in the cluster. Please, destroy cluster instead\n.Operation aborted");
+                    po.addLogFailed("This is the last router in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
                 }
 
