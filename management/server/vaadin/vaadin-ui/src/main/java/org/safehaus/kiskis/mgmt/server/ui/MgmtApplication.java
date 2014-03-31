@@ -113,7 +113,9 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 }
             });
 
-            notifyTabListeners(tabs.getTab(tabs.getSelectedTab()));
+            if (tabs.getSelectedTab() != null) {
+                notifyTabListeners(tabs.getTab(tabs.getSelectedTab()));
+            }
         } catch (Exception ex) {
         } finally {
         }
