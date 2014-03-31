@@ -391,11 +391,6 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>solr-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>monitor-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
