@@ -296,6 +296,21 @@
                                 <!--UI Modules-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>solr-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>solr-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>solr-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>tracker-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
