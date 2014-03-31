@@ -40,7 +40,9 @@ public class TrackerUI implements Module {
 
     @Override
     public Component createComponent() {
-        return new TrackerForm();
+        TrackerForm trackerForm = new TrackerForm();
+        trackerForm.refreshSources();
+        return trackerForm;
     }
 
 }
