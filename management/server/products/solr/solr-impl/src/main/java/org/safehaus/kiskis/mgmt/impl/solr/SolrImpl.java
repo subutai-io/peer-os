@@ -33,7 +33,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 public class SolrImpl implements Solr {
 
     private static final Logger LOG = Logger.getLogger(SolrImpl.class.getName());
-    
+
     public static final String MODULE_NAME = "Solr";
     private TaskRunner taskRunner;
     private AgentManager agentManager;
@@ -96,7 +96,7 @@ public class SolrImpl implements Solr {
 
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
 
-                        po.addLog("Cluster info saved to DB");
+                        po.addLog("Cluster info saved to DB\nInstalling Solr");
 
                         //install
                         Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
