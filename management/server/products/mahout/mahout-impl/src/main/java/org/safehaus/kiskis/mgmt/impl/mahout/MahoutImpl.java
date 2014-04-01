@@ -290,6 +290,8 @@ public class MahoutImpl implements Mahout {
                     return;
                 }
 
+                po.addLog("Checking prerequisites...");
+
                 //check installed ksks packages
                 Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
 
@@ -315,7 +317,7 @@ public class MahoutImpl implements Mahout {
                     po.addLog("Cluster info updated in DB\nInstalling Mahout...");
                     //install mahout            
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
