@@ -53,12 +53,15 @@ public class AddNodeWindow extends Window {
 
         content.addComponent(topContent);
 
-        final ComboBox hadoopNodes = new ComboBox("Nodes", nodes);
+        final ComboBox hadoopNodes = new ComboBox("Nodes");
         hadoopNodes.setMultiSelect(false);
         hadoopNodes.setImmediate(true);
-        hadoopNodes.setItemCaptionPropertyId("hostname");
         hadoopNodes.setTextInputAllowed(false);
         hadoopNodes.setWidth(200, Sizeable.UNITS_PIXELS);
+        for (Agent node : nodes) {
+            hadoopNodes.addItem(node);
+            hadoopNodes.setItemCaption(node, node.getHostname());
+        }
         hadoopNodes.setValue(nodes.iterator().next());
 
         topContent.addComponent(hadoopNodes);
