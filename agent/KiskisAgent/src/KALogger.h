@@ -19,8 +19,8 @@
  *  @details   KALogger class is designed for log facilities.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.1
- *  @date      Dec 17, 2013
+ *  @version   1.0.2
+ *  @date      Feb 03, 2014
  */
 
 #ifndef KALOGGER_H_

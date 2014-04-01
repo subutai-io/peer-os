@@ -20,8 +20,8 @@
  *  		   Each Execution runs concurrently and does the given command job.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.1
- *  @date      Dec 17, 2013
+ *  @version   1.0.2
+ *  @date      Feb 03, 2014
  */
 #ifndef KATHREAD_H_
 #define KATHREAD_H_

@@ -21,8 +21,8 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.1
- *  @date      Dec 17, 2013
+ *  @version   1.0.2
+ *  @date      Feb 03, 2014
  */
 /** \mainpage  Welcome to Project KiskisAgent
  *	\section   KisKisAgent
@@ -372,7 +372,7 @@ int main(int argc,char *argv[],char *envp[])
 	clientaddress = Uuid;
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection url:",url));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Server Address:",serveraddress));
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Cleint Address:",clientaddress));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Client Address:",clientaddress));
 	KAConnection connection(url,serveraddress,clientaddress);
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying to open Connection with ActiveMQ Broker: ",url));
 	KACommand command;

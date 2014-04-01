@@ -19,8 +19,8 @@
  *  @details   KAStreamReader Class is used for capturing intermediate responses.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.1
- *  @date      Dec 17, 2013
+ *  @version   1.0.2
+ *  @date      Feb 03, 2014
  */
 #ifndef KASTREAMREADER_H_
 #define KASTREAMREADER_H_
