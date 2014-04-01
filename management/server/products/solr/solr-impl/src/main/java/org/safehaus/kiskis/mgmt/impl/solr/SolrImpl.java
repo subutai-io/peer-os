@@ -116,9 +116,9 @@ public class SolrImpl implements Solr {
                         try {
                             lxcManager.destroyLxcs(lxcHostnames);
                         } catch (LxcDestroyException ex) {
-                            po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+                            po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
-                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs\nInstallation aborted");
+                        po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
                     }
                 } catch (LxcCreateException ex) {
                     po.addLogFailed(ex.getMessage());
@@ -439,24 +439,22 @@ public class SolrImpl implements Solr {
 
                     Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
-                    //install
-                    po.addLog("Installing Solr");
+                    config.getNodes().add(lxcAgent);
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
+                    if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+                        po.addLog("Cluster info updated in DB\nInstalling Solr");
 
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLogDone("Installation succeeded");
+                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
 
-                        config.getNodes().add(lxcAgent);
+                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLogDone("Installation succeeded\nDone");
 
-                        if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
-                            po.addLogDone("Cluster info updated in DB\nDone");
                         } else {
-                            po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
+                            po.addLogFailed(String.format("Installation failed, %s",
+                                    installTask.getResults().entrySet().iterator().next().getValue().getStdErr()));
                         }
                     } else {
-                        po.addLogFailed(String.format("Installation failed, %s",
-                                installTask.getResults().entrySet().iterator().next().getValue().getStdErr()));
+                        po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
                     }
 
                 } catch (LxcCreateException ex) {

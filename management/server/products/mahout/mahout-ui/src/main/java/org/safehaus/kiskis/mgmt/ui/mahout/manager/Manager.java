@@ -28,15 +28,13 @@ import org.safehaus.kiskis.mgmt.api.mahout.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
 
 /**
  *
  * @author dilshat
- *@todo add hadoop node selection for addNode
+ * @todo add hadoop node selection for addNode
  */
 public class Manager {
 
@@ -96,18 +94,6 @@ public class Manager {
         });
 
         controlsContent.addComponent(refreshClustersBtn);
-
-        Button checkAllBtn = new Button("Check all");
-        checkAllBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                checkNodesStatus(nodesTable);
-            }
-
-        });
-
-        controlsContent.addComponent(checkAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -196,105 +182,15 @@ public class Manager {
         for (Iterator it = agents.iterator(); it.hasNext();) {
             final Agent agent = (Agent) it.next();
 
-            final Button checkBtn = new Button("Check");
-            final Button startBtn = new Button("Start");
-            final Button stopBtn = new Button("Stop");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-            stopBtn.setEnabled(false);
-            startBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
-                checkBtn,
-                startBtn,
-                stopBtn,
                 destroyBtn,
                 progressIcon},
                     null);
-
-            checkBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    MahoutUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                if (state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else if (state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
-
-            startBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    MahoutUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                if (state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-
-                }
-            });
-
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    MahoutUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                if (state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                } else {
-                                    stopBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
 
             destroyBtn.addListener(new Button.ClickListener() {
 

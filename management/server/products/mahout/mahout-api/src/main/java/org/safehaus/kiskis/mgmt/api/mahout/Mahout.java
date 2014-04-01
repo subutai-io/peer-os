@@ -18,10 +18,6 @@ public interface Mahout {
 
     public UUID uninstallCluster(String clusterName);
 
-    public UUID startNode(String clusterName, String lxcHostname);
-
-    public UUID stopNode(String clusterName, String lxcHostname);
-
     public UUID checkNode(String clusterName, String lxcHostname);
 
     public UUID addNode(String clusterName, String lxcHostname);

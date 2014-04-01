@@ -183,9 +183,9 @@ public class MongoImpl implements Mongo {
                         try {
                             lxcManager.destroyLxcs(lxcHostnames);
                         } catch (LxcDestroyException ex) {
-                            po.addLogFailed("Could not save new cluster configuration to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+                            po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
-                        po.addLogFailed("Could not save new cluster configuration to DB! Please see logs\nInstallation aborted");
+                        po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
                     }
 
                 } catch (LxcCreateException ex) {
@@ -293,11 +293,23 @@ public class MongoImpl implements Mongo {
 
                     Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(1);
 
-                    Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
+                    Agent agent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
-                    //start addition of node
-                    addNodeInternal(po, config, nodeType, lxcAgent);
+                    if (nodeType == NodeType.DATA_NODE) {
+                        config.getDataNodes().add(agent);
+                    } else if (nodeType == NodeType.CONFIG_NODE) {
+                        config.getConfigServers().add(agent);
+                    } else if (nodeType == NodeType.ROUTER_NODE) {
+                        config.getRouterServers().add(agent);
+                    }
 
+                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                        po.addLog("Cluster info updated in DB");
+                        //start addition of node
+                        addNodeInternal(po, config, nodeType, agent);
+                    } else {
+                        po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
+                    }
                 } catch (LxcCreateException ex) {
                     po.addLogFailed(ex.getMessage());
                 }
@@ -309,6 +321,7 @@ public class MongoImpl implements Mongo {
     }
 
     private void addNodeInternal(final ProductOperation po, final Config config, final NodeType nodeType, final Agent agent) {
+
         final Operation operation
                 = (nodeType == NodeType.DATA_NODE)
                 ? new AddDataNodeOperation(config, agent)
@@ -373,20 +386,7 @@ public class MongoImpl implements Mongo {
 
                             return operation.getNextTask();
                         } else {
-                            po.addLog(String.format("Operation %s completed", operation.getDescription()));
-
-                            if (nodeType == NodeType.DATA_NODE) {
-                                config.getDataNodes().add(agent);
-                            } else if (nodeType == NodeType.CONFIG_NODE) {
-                                config.getConfigServers().add(agent);
-                            } else if (nodeType == NodeType.ROUTER_NODE) {
-                                config.getRouterServers().add(agent);
-                            }
-                            if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                                po.addLogDone("Cluster info updated in DB\nDone");
-                            } else {
-                                po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
-                            }
+                            po.addLogDone(String.format("Operation %s completed\nDone", operation.getDescription()));
                         }
                     } else {
                         String err = "";
@@ -396,13 +396,14 @@ public class MongoImpl implements Mongo {
                                 break;
                             }
                         }
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s", task.getDescription(), operation.getDescription(), err));
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s\nUse LXC module to cleanup", task.getDescription(), operation.getDescription(), err));
                     }
                 }
 
                 return null;
             }
         });
+
     }
 
     public UUID uninstallCluster(final String clusterName) {
