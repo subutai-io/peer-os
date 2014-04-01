@@ -296,6 +296,21 @@
                                 <!--UI Modules-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mahout-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mahout-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mahout-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>solr-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
