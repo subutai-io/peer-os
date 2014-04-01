@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mahout.manager;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;

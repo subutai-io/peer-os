@@ -75,12 +75,12 @@ public class Wizard {
                 break;
             }
             case 2: {
-                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
+                progressBar.setValue((step - 1) / (NUMBER_OF_STEPS - 1));
                 component = new ConfigurationStep(this);
                 break;
             }
             case 3: {
-                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
+                progressBar.setValue((step - 1) / (NUMBER_OF_STEPS - 1));
                 component = new VerificationStep(this);
                 break;
             }
