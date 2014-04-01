@@ -102,6 +102,40 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
+                    MgmtApplication.showConfirmationDialog(
+                            "Cluster destruction confirmation",
+                            String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
+
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+                                        UUID trackID = MahoutUI.getMahoutManager().uninstallCluster(config.getClusterName());
+                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+
+        });
+
+        controlsContent.addComponent(destroyClusterBtn);
+
+        Button addNodeBtn = new Button("Add Node");
+
+        addNodeBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
                     HadoopClusterInfo info = MahoutUI.getDbManager().
                             getInfo(HadoopClusterInfo.SOURCE,
                                     config.getClusterName(),
@@ -124,40 +158,6 @@ public class Manager {
                     } else {
                         show("Hadoop cluster info not found");
                     }
-                } else {
-                    show("Please, select cluster");
-                }
-            }
-
-        });
-
-        controlsContent.addComponent(destroyClusterBtn);
-
-        Button addNodeBtn = new Button("Add Node");
-
-        addNodeBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Confirm adding node",
-                            String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = MahoutUI.getMahoutManager().addNode(config.getClusterName(), null);
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
-                                }
-                            });
                 } else {
                     show("Please, select cluster");
                 }
