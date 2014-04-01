@@ -17,13 +17,10 @@ import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 
 /**
  *
@@ -33,12 +30,12 @@ public class DbManagerImpl implements DbManager {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
+    private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
     private Cluster cluster;
     private Session session;
     private String cassandraHost;
     private String cassandraKeyspace;
     private int cassandraPort;
-    private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
 
     public void setCassandraKeyspace(String cassandraKeyspace) {
         this.cassandraKeyspace = cassandraKeyspace;
@@ -122,11 +119,13 @@ public class DbManagerImpl implements DbManager {
         try {
 
             ResultSet rs = executeQuery("select info from product_info where source = ? and key = ?", source, key);
-            Row row = rs.one();
-            if (row != null) {
+            if (rs != null) {
+                Row row = rs.one();
+                if (row != null) {
 
-                String info = row.getString("info");
-                return gson.fromJson(info, clazz);
+                    String info = row.getString("info");
+                    return gson.fromJson(info, clazz);
+                }
             }
         } catch (JsonSyntaxException ex) {
             LOG.log(Level.SEVERE, "Error in T getInfo", ex);
@@ -138,9 +137,11 @@ public class DbManagerImpl implements DbManager {
         List<T> list = new ArrayList<T>();
         try {
             ResultSet rs = executeQuery("select info from product_info where source = ?", source);
-            for (Row row : rs) {
-                String info = row.getString("info");
-                list.add(gson.fromJson(info, clazz));
+            if (rs != null) {
+                for (Row row : rs) {
+                    String info = row.getString("info");
+                    list.add(gson.fromJson(info, clazz));
+                }
             }
         } catch (JsonSyntaxException ex) {
             LOG.log(Level.SEVERE, "Error in List<T> getInfo", ex);
@@ -150,59 +151,6 @@ public class DbManagerImpl implements DbManager {
 
     public boolean deleteInfo(String source, String key) {
         return executeUpdate("delete from product_info where source = ? and key = ?", source, key);
-    }
-
-    public ProductOperationView getProductOperation(String source, UUID operationTrackId) {
-        try {
-            ResultSet rs = executeQuery(
-                    "select info from product_operation where source = ? and id = ?",
-                    source,
-                    operationTrackId);
-            Row row = rs.one();
-            if (row != null) {
-                String info = row.getString("info");
-                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
-                if (po != null) {
-                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
-                    return productOperationViewImpl;
-                }
-            }
-        } catch (JsonSyntaxException ex) {
-            LOG.log(Level.SEVERE, "Error in getProductOperation", ex);
-        }
-        return null;
-    }
-
-    boolean saveProductOperation(String source, ProductOperationImpl po) {
-        return executeUpdate(
-                "insert into product_operation(source,id,info) values(?,?,?)",
-                source, po.getId(), gson.toJson(po));
-    }
-
-    public ProductOperation createProductOperation(String source, String description) {
-        ProductOperationImpl po = new ProductOperationImpl(source, description, this);
-        if (saveProductOperation(source, po)) {
-            return po;
-        }
-        return null;
-    }
-
-    public List<ProductOperationView> getProductOperations(String source) {
-        List<ProductOperationView> list = new ArrayList<ProductOperationView>();
-        try {
-            ResultSet rs = executeQuery("select info from product_operation where source = ?", source);
-            for (Row row : rs) {
-                String info = row.getString("info");
-                ProductOperationImpl po = gson.fromJson(info, ProductOperationImpl.class);
-                if (po != null) {
-                    ProductOperationViewImpl productOperationViewImpl = new ProductOperationViewImpl(po);
-                    list.add(productOperationViewImpl);
-                }
-            }
-        } catch (JsonSyntaxException ex) {
-            LOG.log(Level.SEVERE, "Error in getProductOperations", ex);
-        }
-        return list;
     }
 
 }

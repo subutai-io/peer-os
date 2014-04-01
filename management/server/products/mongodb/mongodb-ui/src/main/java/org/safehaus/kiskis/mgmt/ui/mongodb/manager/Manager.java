@@ -5,36 +5,34 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mongodb.manager;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
-import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
-import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
 
 /**
  *
@@ -55,7 +53,7 @@ public class Manager {
     private final Label dataNodePort;
     private Config config;
 
-    public Manager(final Tracker tracker, final TabSheet tabSheet) {
+    public Manager() {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
@@ -86,7 +84,7 @@ public class Manager {
         clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.setTextInputAllowed(false);
-        clusterCombo.setWidth(300, Sizeable.UNITS_PIXELS);
+        clusterCombo.setWidth(200, Sizeable.UNITS_PIXELS);
         clusterCombo.addListener(new Property.ValueChangeListener() {
 
             @Override
@@ -137,10 +135,13 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID operationID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
-                                        tracker.setTrackId(operationID);
-                                        tracker.setRefreshClusters(true);
-                                        tabSheet.setSelectedTab(tracker.getContent());
+                                        UUID trackID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
+                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
                                     }
                                 }
                             });
@@ -153,30 +154,68 @@ public class Manager {
 
         controlsContent.addComponent(destroyClusterBtn);
 
-        Button addNodeBtn = new Button("Add New Node");
+        Button addRouterBtn = new Button("Add Router");
+        addRouterBtn.addListener(new Button.ClickListener() {
 
-        addNodeBtn.addListener(new Button.ClickListener() {
-
-            @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    AddNodeWindow addNodeWindow = new AddNodeWindow(config);
-                    MgmtApplication.addCustomWindow(addNodeWindow);
-                    addNodeWindow.addListener(new Window.CloseListener() {
+                    MgmtApplication.showConfirmationDialog(
+                            "Confirm adding node",
+                            String.format("Do you want to add ROUTER to the %s cluster?", config.getClusterName()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
 
-                        @Override
-                        public void windowClose(Window.CloseEvent e) {
-                            //refresh clusters and show the current one again
-                            refreshClustersInfo();
-                        }
-                    });
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+                                        UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.ROUTER_NODE);
+                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
                 } else {
                     show("Please, select cluster");
                 }
             }
         });
 
-        controlsContent.addComponent(addNodeBtn);
+        Button addDataNodeBtn = new Button("Add Data Node");
+
+        addDataNodeBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+                    MgmtApplication.showConfirmationDialog(
+                            "Confirm adding node",
+                            String.format("Do you want to add DATA_NODE to the %s cluster?", config.getClusterName()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
+
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+                                        UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.DATA_NODE);
+                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+        });
+
+        controlsContent.addComponent(addRouterBtn);
+        controlsContent.addComponent(addDataNodeBtn);
 
         content.addComponent(controlsContent);
 
@@ -208,7 +247,6 @@ public class Manager {
 
         content.addComponent(dataNodesTable);
 
-//        refreshClustersInfo();
     }
 
     public Component getContent() {
@@ -254,36 +292,9 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    MongoUI.getExecutor().execute(new Runnable() {
+                    MongoUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
-                        public void run() {
-
-                            UUID trackID = MongoUI.getMongoManager().checkNode(config.getClusterName(), agent.getHostname());
-
-                            NodeState state = NodeState.UNKNOWN;
-                            long start = System.currentTimeMillis();
-                            while (!Thread.interrupted()) {
-                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
-                                if (po != null) {
-                                    if (po.getState() != ProductOperationState.RUNNING) {
-                                        if (po.getLog().contains("stopped")) {
-                                            state = NodeState.STOPPED;
-                                        } else if (po.getLog().contains("running")) {
-                                            state = NodeState.RUNNING;
-                                        }
-                                        break;
-                                    }
-                                }
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException ex) {
-                                    break;
-                                }
-                                if (System.currentTimeMillis() - start > (Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
-                                    break;
-                                }
-                            }
-
+                        public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
                                 if (state == NodeState.RUNNING) {
                                     stopBtn.setEnabled(true);
@@ -294,7 +305,7 @@ public class Manager {
                                 progressIcon.setVisible(false);
                             }
                         }
-                    });
+                    }));
                 }
             });
 
@@ -308,40 +319,9 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    MongoUI.getExecutor().execute(new Runnable() {
+                    MongoUI.getExecutor().execute(new StartTask(nodeType, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
-                        public void run() {
-
-                            UUID trackID = MongoUI.getMongoManager().startNode(config.getClusterName(), agent.getHostname());
-
-                            long start = System.currentTimeMillis();
-                            NodeState state = NodeState.UNKNOWN;
-                            int waitTimeout = Timeouts.START_DATE_NODE_TIMEOUT_SEC;
-                            if (nodeType == NodeType.CONFIG_NODE) {
-                                waitTimeout = Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC;
-                            } else if (nodeType == NodeType.ROUTER_NODE) {
-                                waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
-                            }
-                            while (!Thread.interrupted()) {
-                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
-                                if (po != null) {
-                                    if (po.getState() != ProductOperationState.RUNNING) {
-                                        if (po.getState() == ProductOperationState.SUCCEEDED) {
-                                            state = NodeState.RUNNING;
-                                        }
-                                        break;
-                                    }
-                                }
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException ex) {
-                                    break;
-                                }
-                                if (System.currentTimeMillis() - start > (waitTimeout + 3) * 1000) {
-                                    break;
-                                }
-                            }
-
+                        public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
                                 if (state == NodeState.RUNNING) {
                                     stopBtn.setEnabled(true);
@@ -352,7 +332,8 @@ public class Manager {
                                 progressIcon.setVisible(false);
                             }
                         }
-                    });
+                    }));
+
                 }
             });
 
@@ -366,34 +347,9 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    MongoUI.getExecutor().execute(new Runnable() {
+                    MongoUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
-                        public void run() {
-
-                            UUID trackID = MongoUI.getMongoManager().stopNode(config.getClusterName(), agent.getHostname());
-
-                            long start = System.currentTimeMillis();
-                            NodeState state = NodeState.UNKNOWN;
-                            while (!Thread.interrupted()) {
-                                ProductOperationView po = MongoUI.getMongoManager().getProductOperationView(trackID);
-                                if (po != null) {
-                                    if (po.getState() != ProductOperationState.RUNNING) {
-                                        if (po.getState() == ProductOperationState.SUCCEEDED) {
-                                            state = NodeState.STOPPED;
-                                        }
-                                        break;
-                                    }
-                                }
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException ex) {
-                                    break;
-                                }
-                                if (System.currentTimeMillis() - start > (Timeouts.STOP_NODE_TIMEOUT_SEC + 3) * 1000) {
-                                    break;
-                                }
-                            }
-
+                        public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
                                 if (state == NodeState.STOPPED) {
                                     startBtn.setEnabled(true);
@@ -404,7 +360,7 @@ public class Manager {
                                 progressIcon.setVisible(false);
                             }
                         }
-                    });
+                    }));
                 }
             });
 
@@ -421,13 +377,10 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        DestroyNodeWindow destroyNodeWindow = new DestroyNodeWindow(config, agent);
-                                        MgmtApplication.addCustomWindow(destroyNodeWindow);
-                                        destroyNodeWindow.addListener(new Window.CloseListener() {
+                                        UUID trackID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
+                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
-                                            @Override
                                             public void windowClose(Window.CloseEvent e) {
-                                                //refresh clusters and show the current one again
                                                 refreshClustersInfo();
                                             }
                                         });
@@ -495,7 +448,7 @@ public class Manager {
     }
 
     private Table createTableTemplate(String caption, int size) {
-        Table table = new Table(caption);
+        final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Check", Button.class, null);
         table.addContainerProperty("Start", Button.class, null);
@@ -507,6 +460,22 @@ public class Manager {
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
+
+        table.addListener(new ItemClickEvent.ItemClickListener() {
+
+            public void itemClick(ItemClickEvent event) {
+                if (event.isDoubleClick()) {
+                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                    Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname(lxcHostname);
+                    if (lxcAgent != null) {
+                        Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
+                        MgmtApplication.addCustomWindow(terminal);
+                    } else {
+                        show("Agent is not connected");
+                    }
+                }
+            }
+        });
         return table;
     }
 

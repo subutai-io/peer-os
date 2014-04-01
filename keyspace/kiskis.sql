@@ -34,7 +34,7 @@ PRIMARY KEY (id)
 
 CREATE TABLE product_operation (
   source text,
-  id uuid ,
+  id timeuuid,
   info text,
   PRIMARY KEY (source, id)
-) ;
+)

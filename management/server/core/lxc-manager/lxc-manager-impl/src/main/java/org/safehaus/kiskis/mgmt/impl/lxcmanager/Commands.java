@@ -35,9 +35,18 @@ public class Commands {
                 30); //                         timeout (sec)
     }
 
-    public static Request getCloneCommand() {
+    public static Request getCloneCommand(String lxcHostname) {
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-clone -o base-container -n ");
+        req.setProgram(String.format("/usr/bin/lxc-clone -o base-container -n %s", lxcHostname));
+        req.setTimeout(360);
+        return req;
+    }
+
+    public static Request getCloneNStartCommand(String lxcHostname) {
+        Request req = getTemplate();
+        req.setProgram(String.format(
+                "/usr/bin/lxc-clone -o base-container -n %1$s;sleep 10;/usr/bin/lxc-start -n %1$s -d;sleep 10;/usr/bin/lxc-info -n %1$s",
+                lxcHostname));
         req.setTimeout(360);
         return req;
     }
@@ -53,7 +62,7 @@ public class Commands {
     public static Request getLxcInfoCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-info -n " + lxcHostname);
+        req.setProgram(String.format("/usr/bin/lxc-info -n %s", lxcHostname));
         req.setTimeout(60);
         return req;
     }
@@ -61,7 +70,7 @@ public class Commands {
     public static Request getLxcInfoWithWaitCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("sleep 10;/usr/bin/lxc-info -n " + lxcHostname);
+        req.setProgram(String.format("sleep 10;/usr/bin/lxc-info -n %s", lxcHostname));
         req.setTimeout(60);
         return req;
     }
@@ -69,7 +78,7 @@ public class Commands {
     public static Request getLxcStartCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-start -n " + lxcHostname + " -d");
+        req.setProgram(String.format("/usr/bin/lxc-start -n %s -d", lxcHostname));
         req.setTimeout(120);
         return req;
     }
@@ -77,7 +86,7 @@ public class Commands {
     public static Request getLxcStopCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-stop -n " + lxcHostname);
+        req.setProgram(String.format("/usr/bin/lxc-stop -n %s", lxcHostname));
         req.setTimeout(120);
         return req;
     }
@@ -85,7 +94,7 @@ public class Commands {
     public static Request getLxcDestroyCommand(String lxcHostname) {
 
         Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-stop -n " + lxcHostname + " && /usr/bin/lxc-destroy -n " + lxcHostname);
+        req.setProgram(String.format("/usr/bin/lxc-stop -n %1$s && /usr/bin/lxc-destroy -n %1$s", lxcHostname));
         req.setTimeout(180);
         return req;
     }

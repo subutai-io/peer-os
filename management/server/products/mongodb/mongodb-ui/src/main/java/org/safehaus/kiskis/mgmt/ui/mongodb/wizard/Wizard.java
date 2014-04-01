@@ -10,9 +10,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.TabSheet;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
 
 /**
  *
@@ -23,15 +21,10 @@ public class Wizard {
     private static final int NUMBER_OF_STEPS = 3;
     private final ProgressIndicator progressBar;
     private final GridLayout grid;
-    private final Tracker tracker;
-    private final TabSheet tabSheet;
     private int step = 1;
     private Config config = new Config();
 
-    public Wizard(Tracker tracker, TabSheet tabSheet) {
-        this.tracker = tracker;
-        this.tabSheet = tabSheet;
-
+    public Wizard() {
         grid = new GridLayout(1, 20);
         grid.setMargin(true);
         grid.setSizeFull();
@@ -82,13 +75,13 @@ public class Wizard {
                 break;
             }
             case 2: {
-                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
+                progressBar.setValue((step - 1) / (NUMBER_OF_STEPS - 1));
                 component = new ConfigurationStep(this);
                 break;
             }
             case 3: {
-                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
-                component = new VerificationStep(this, tracker, tabSheet);
+                progressBar.setValue((step - 1) / (NUMBER_OF_STEPS - 1));
+                component = new VerificationStep(this);
                 break;
             }
             default: {

@@ -6,19 +6,12 @@
 package org.safehaus.kiskis.mgmt.ui.mongodb;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Runo;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
-import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
-import org.safehaus.kiskis.mgmt.ui.mongodb.manager.Manager;
-import org.safehaus.kiskis.mgmt.ui.mongodb.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
 
 /**
  *
@@ -28,15 +21,20 @@ public class MongoUI implements Module {
 
     public static final String MODULE_NAME = "Mongo";
     private static Mongo mongoManager;
-    private static DbManager dbManager;
+    private static AgentManager agentManager;
     private static ExecutorService executor;
+    private static Tracker tracker;
+
+    public static Tracker getTracker() {
+        return tracker;
+    }
+
+    public void setTracker(Tracker tracker) {
+        MongoUI.tracker = tracker;
+    }
 
     public static Mongo getMongoManager() {
         return mongoManager;
-    }
-
-    public static DbManager getDbManager() {
-        return dbManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -47,8 +45,12 @@ public class MongoUI implements Module {
         MongoUI.mongoManager = mongoManager;
     }
 
-    public void setDbManager(DbManager dbManager) {
-        MongoUI.dbManager = dbManager;
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager) {
+        MongoUI.agentManager = agentManager;
     }
 
     public void init() {
@@ -56,79 +58,31 @@ public class MongoUI implements Module {
     }
 
     public void destroy() {
-        dbManager = null;
+        tracker = null;
         mongoManager = null;
+        agentManager = null;
         executor.shutdown();
     }
 
-    public static class ModuleComponent extends CustomComponent implements Disposable {
-
-        private final Wizard wizard;
-        private final Tracker tracker;
-        private final Manager manager;
-        private final String managerTabName = "Manage";
-        private final String trackerTabName = "Track";
-
-        public ModuleComponent() {
-            setSizeFull();
-            VerticalLayout verticalLayout = new VerticalLayout();
-            verticalLayout.setSpacing(true);
-            verticalLayout.setSizeFull();
-
-            TabSheet mongoSheet = new TabSheet();
-            mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
-            mongoSheet.setSizeFull();
-            tracker = new Tracker();
-            wizard = new Wizard(tracker, mongoSheet);
-            manager = new Manager(tracker, mongoSheet);
-            mongoSheet.addTab(wizard.getContent(), "Install");
-            mongoSheet.addTab(manager.getContent(), managerTabName);
-            mongoSheet.addTab(tracker.getContent(), trackerTabName);
-
-            mongoSheet.addListener(new TabSheet.SelectedTabChangeListener() {
-
-                public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
-                    TabSheet tabsheet = event.getTabSheet();
-                    String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
-                    if (caption.equals(trackerTabName)) {
-                        tracker.startTracking();
-                    } else {
-                        tracker.stopTracking();
-                    }
-
-                    if (caption.equals(managerTabName) && tracker.isRefreshClusters()) {
-                        tracker.setRefreshClusters(false);
-                        manager.refreshClustersInfo();
-                    }
-                }
-            });
-
-            verticalLayout.addComponent(mongoSheet);
-
-            setCompositionRoot(verticalLayout);
-
-            manager.refreshClustersInfo();
-
-        }
-
-        @Override
-        public void attach() {
-            super.attach(); //To change body of generated methods, choose Tools | Templates.
-            tracker.setApp(getApplication());
-        }
-
-        public void dispose() {
-            tracker.stopTracking();
-        }
-
-    }
-
+//    public static void showProgressWindow(UUID trackID, final Window.CloseListener closeCallback) {
+//        Window progressWindow = MgmtApplication.createProgressWindow(Config.PRODUCT_KEY, trackID);
+//        MgmtApplication.addCustomWindow(progressWindow);
+//        if (closeCallback != null) {
+//            progressWindow.addListener(new Window.CloseListener() {
+//
+//                @Override
+//                public void windowClose(Window.CloseEvent e) {
+//                    closeCallback.windowClose(e);
+//                }
+//            });
+//        }
+//    }
     public String getName() {
         return MODULE_NAME;
     }
 
     public Component createComponent() {
-        return new ModuleComponent();
+        return new MongoForm();
     }
 
 }

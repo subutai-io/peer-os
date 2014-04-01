@@ -55,7 +55,7 @@ public class ChainedTaskRunner {
                             taskListenerCache.remove(tl.getTask().getUuid());
                         }
 
-                        tl.getTask().getResults().put(response.getUuid(), new Result(tl.getStdOut(response), tl.getStdErr(response), response.getExitCode()));
+                        tl.getTask().addResult(response.getUuid(), new Result(tl.getStdOut(response), tl.getStdErr(response), response.getExitCode()));
                     }
 
                     Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(response), tl.getStdErr(response));

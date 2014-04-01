@@ -6,7 +6,8 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>     
     
-    <bean id="lxcmanager" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.lxcmanager.LxcManagerImpl">
+    <bean id="lxcmanager" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.lxcmanager.LxcManagerImpl"
+          init-method="init" destroy-method="destroy">
         <property name="taskRunner" ref="taskRunner"/>
         <property name="agentManager" ref="agentManager"/>
     </bean>     

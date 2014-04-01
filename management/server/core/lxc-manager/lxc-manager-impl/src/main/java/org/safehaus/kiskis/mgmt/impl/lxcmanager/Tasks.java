@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 
 /**
@@ -18,20 +17,15 @@ public class Tasks {
 
     public static Task getCloneSingleLxcTask(Agent physicalAgent, String lxcHostName) {
         Task task = new Task();
-        Request cmd = Commands.getCloneCommand();
-        cmd.setUuid(physicalAgent.getUuid());
-        cmd.setProgram(cmd.getProgram() + lxcHostName);
-        task.addRequest(cmd);
+        task.addRequest(Commands.getCloneCommand(lxcHostName), physicalAgent);
         return task;
     }
 
     public static Task getLxcListTask(Set<Agent> physicalAgents) {
         Task task = new Task();
         task.setData(TaskType.GET_LXC_LIST);
-        for (Agent physAgent : physicalAgents) {
-            Request cmd = Commands.getLxcListCommand();
-            cmd.setUuid(physAgent.getUuid());
-            task.addRequest(cmd);
+        for (Agent physicalAgent : physicalAgents) {
+            task.addRequest(Commands.getLxcListCommand(), physicalAgent);
         }
 
         return task;
@@ -40,45 +34,42 @@ public class Tasks {
     public static Task getLxcStartTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.START_LXC);
-        Request cmd = Commands.getLxcStartCommand(lxcHostname);
-        cmd.setUuid(physicalAgent.getUuid());
-        task.addRequest(cmd);
+        task.addRequest(Commands.getLxcStartCommand(lxcHostname), physicalAgent);
+        return task;
+    }
+
+    public static Task getLxcCloneNStartTask(Agent physicalAgent, String lxcHostname) {
+        Task task = new Task();
+        task.setData(TaskType.CLONE_N_START);
+        task.addRequest(Commands.getCloneNStartCommand(lxcHostname), physicalAgent);
         return task;
     }
 
     public static Task getLxcStopTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.STOP_LXC);
-        Request cmd = Commands.getLxcStopCommand(lxcHostname);
-        cmd.setUuid(physicalAgent.getUuid());
-        task.addRequest(cmd);
+        task.addRequest(Commands.getLxcStopCommand(lxcHostname), physicalAgent);
         return task;
     }
 
     public static Task getLxcInfoTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.GET_LXC_INFO);
-        Request cmd = Commands.getLxcInfoCommand(lxcHostname);
-        cmd.setUuid(physicalAgent.getUuid());
-        task.addRequest(cmd);
+        task.addRequest(Commands.getLxcInfoCommand(lxcHostname), physicalAgent);
         return task;
     }
 
     public static Task getLxcInfoWithWaitTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.GET_LXC_INFO);
-        Request cmd = Commands.getLxcInfoWithWaitCommand(lxcHostname);
-        cmd.setUuid(physicalAgent.getUuid());
-        task.addRequest(cmd);
+        task.addRequest(Commands.getLxcInfoWithWaitCommand(lxcHostname), physicalAgent);
         return task;
     }
 
     public static Task getLxcDestroyTask(Agent physicalAgent, String lxcHostname) {
         Task task = new Task();
         task.setData(TaskType.DESTROY_LXC);
-        Request cmd = Commands.getLxcDestroyCommand(lxcHostname);
-        cmd.setUuid(physicalAgent.getUuid());
-        task.addRequest(cmd);
+        task.addRequest(Commands.getLxcDestroyCommand(lxcHostname), physicalAgent);
         return task;
     }
 
@@ -86,9 +77,7 @@ public class Tasks {
         Task task = new Task();
         task.setData(TaskType.GET_METRICS);
         for (Agent physicalAgent : physicalAgents) {
-            Request cmd = Commands.getMetricsCommand();
-            cmd.setUuid(physicalAgent.getUuid());
-            task.addRequest(cmd);
+            task.addRequest(Commands.getMetricsCommand(), physicalAgent);
         }
         return task;
     }

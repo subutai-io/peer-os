@@ -33,8 +33,6 @@ public class InstallClusterOperation extends Operation {
         clusterMembers.addAll(config.getRouterServers());
         clusterMembers.addAll(config.getDataNodes());
 
-//        addTask(Tasks.getAptGetUpdateTask(clusterMembers));
-
         addTask(Tasks.getInstallMongoTask(clusterMembers));
 
         addTask(Tasks.getStopMongoTask(clusterMembers));
@@ -56,13 +54,9 @@ public class InstallClusterOperation extends Operation {
         addTask(Tasks.getStartReplicaSetTask(
                 config.getDataNodes(), config));
 
-        addTask(Tasks.getRegisterSecondaryNodesWithPrimaryTask(
-                config.getDataNodes(), config));
+        addTask(Tasks.getRegisterSecondaryNodesWithPrimaryTask(config));
 
-        addTask(Tasks.getRegisterReplicaSetAsShardWithRouter(
-                config.getReplicaSetName(),
-                config.getRouterServers().iterator().next(),
-                config.getDataNodes(), config));
+        addTask(Tasks.getRegisterReplicaSetAsShardWithRouter(config));
 
     }
 

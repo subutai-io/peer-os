@@ -27,11 +27,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mongodb-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin-services</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -42,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>db-manager-api</artifactId>
+            <artifactId>mongodb-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

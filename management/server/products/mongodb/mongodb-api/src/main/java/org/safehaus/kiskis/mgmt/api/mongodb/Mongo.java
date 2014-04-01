@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.api.mongodb;
 
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 
 /**
  *
@@ -91,12 +91,4 @@ public interface Mongo {
      */
     public UUID checkNode(String clusterName, String lxcHostName);
 
-    /**
-     * Returns view of product operation
-     *
-     * @param viewId - operation view id
-     * @return - product operation view
-     *
-     */
-    public ProductOperationView getProductOperationView(UUID viewId);
 }

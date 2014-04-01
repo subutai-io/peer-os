@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.api.lxcmanager;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
@@ -31,4 +32,10 @@ public interface LxcManager {
     public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname);
 
     public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname);
+
+    public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname);
+
+    public Map<Agent, Set<Agent>> createLxcs(int count) throws LxcCreateException;
+
+    public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException;
 }

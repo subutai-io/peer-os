@@ -19,7 +19,7 @@
         <module>db-manager</module>
         <module>communication-manager</module>
         <module>task-runner</module>
-	<module>lxc-manager</module>
-	<module>terminal</module>
+        <module>lxc-manager</module>
+	<module>tracker</module>
     </modules>
 </project>

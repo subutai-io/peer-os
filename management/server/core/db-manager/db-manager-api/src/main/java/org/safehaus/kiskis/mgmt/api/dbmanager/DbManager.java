@@ -5,10 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.api.dbmanager;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.ProductOperationView;
 import com.datastax.driver.core.ResultSet;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * ы
@@ -28,11 +26,5 @@ public interface DbManager {
     public <T> List<T> getInfo(String source, Class<T> clazz);
 
     public boolean deleteInfo(String source, String key);
-
-    public ProductOperationView getProductOperation(String source, UUID operationTrackId);
-
-    public ProductOperation createProductOperation(String source, String description);
-
-    public List<ProductOperationView> getProductOperations(String source);
 
 }

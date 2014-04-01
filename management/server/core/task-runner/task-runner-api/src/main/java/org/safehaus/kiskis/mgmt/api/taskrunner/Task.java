@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-//import java.util.ListIterator;
 /**
- * @author bahadyr
+ * @author dilshat
  */
 public class Task implements Serializable {
 
@@ -49,7 +49,11 @@ public class Task implements Serializable {
     }
 
     public Map<UUID, Result> getResults() {
-        return results;
+        return Collections.unmodifiableMap(results);
+    }
+
+    public void addResult(UUID id, Result result) {
+        results.put(id, result);
     }
 
     public Object getData() {
@@ -84,6 +88,13 @@ public class Task implements Serializable {
         }
     }
 
+    public void addRequest(Request request, Agent agent) {
+        if (request != null && agent != null) {
+            request.setUuid(agent.getUuid());
+            addRequest(request);
+        }
+    }
+
     public int getTotalTimeout() {
         int timeout = 0;
         for (Request cmd : requests) {
@@ -98,7 +109,8 @@ public class Task implements Serializable {
 
     public Request getNextRequest() {
         if (hasNextRequest()) {
-            return requests.get(++currentCmdId);
+            currentCmdId++;
+            return requests.get(currentCmdId);
         }
 
         return null;
@@ -111,19 +123,20 @@ public class Task implements Serializable {
         return null;
     }
 
-    /*public Request peekPreviousRequest() {
-     if (currentCmdId > 0) {
-     return requests.get(currentCmdId - 1);
-     }
-     return null;
-     }
+    public Request peekPreviousRequest() {
+        if (currentCmdId > 0) {
+            return requests.get(currentCmdId - 1);
+        }
+        return null;
+    }
 
-     public Request peekCurrentRequest() {
-     if (currentCmdId >= 0) {
-     return requests.get(currentCmdId);
-     }
-     return null;
-     }*/
+    public Request peekCurrentRequest() {
+        if (currentCmdId >= 0) {
+            return requests.get(currentCmdId);
+        }
+        return null;
+    }
+
     public boolean hasNextRequest() {
         return currentCmdId < requests.size() - 1;
     }
@@ -153,16 +166,18 @@ public class Task implements Serializable {
     }
 
     public Integer getIncrementedReqSeqNumber() {
-        return ++reqSeqNumber;
+        reqSeqNumber++;
+        return reqSeqNumber;
     }
 
-    /*public Integer getReqSeqNumber() {
-     return reqSeqNumber;
-     }
+    public Integer getReqSeqNumber() {
+        return reqSeqNumber;
+    }
 
-     public void setReqSeqNumber(Integer reqSeqNumber) {
-     this.reqSeqNumber = reqSeqNumber;
-     }*/
+    public void setReqSeqNumber(Integer reqSeqNumber) {
+        this.reqSeqNumber = reqSeqNumber;
+    }
+
     public UUID getUuid() {
         return uuid;
     }
@@ -208,7 +223,7 @@ public class Task implements Serializable {
             return false;
         }
         final Task other = (Task) obj;
-        return !(this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid)));
+        return !(this.uuid != other.getUuid() && (this.uuid == null || !this.uuid.equals(other.getUuid())));
     }
 
 }

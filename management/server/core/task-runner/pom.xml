@@ -17,5 +17,6 @@
     <modules>
         <module>task-runner-api</module>
         <module>task-runner-impl</module>
+	<module>task-runner-ui</module>
     </modules>
 </project>
