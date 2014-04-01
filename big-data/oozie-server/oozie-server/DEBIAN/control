@@ -1,0 +1,9 @@
+Package: ksks-oozie-server
+Priority: optional
+Section: devel
+Installed-Size: 115000
+Maintainer: kiskis
+Architecture: all
+Version: 1.0.16
+Depends: ksks-hadoop, zip, unzip
+Description: This is a oozie server package of kiskis distribution.

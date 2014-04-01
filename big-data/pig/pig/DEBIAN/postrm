@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e 
+pig="pig-0.12.0"
+
+# Remove Pig Files and Folders
+if [ -d "/opt/$pig" ]; then
+	rm -r /opt/$pig
+fi
+
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+pigHome="\/opt\/$pig"
+pigPath="\/opt\/$pig\/bin"
+
+if grep -q "PIG_HOME=" $FilePath
+then
+        echo "PIG_HOME is being deleted!"
+        sed -i "/export PIG_HOME=$pigHome/d" $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        if grep -q "${pigPath}" $FilePath
+        then
+                sed -i "s/$pigPath://g" $FilePath
+                sed -i "s/:$pigPath//g" $FilePath
+        fi
+else
+        echo "PATH does not exist"
+fi
+
+. $FilePath

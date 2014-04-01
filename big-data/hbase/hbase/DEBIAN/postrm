@@ -1,0 +1,28 @@
+#!/bin/sh 
+set -e
+# Remove HBase Files and Folders
+if [ -d "/opt/hbase-0.94.16" ]; then
+	rm -r /opt/hbase-0.94.16
+fi
+
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+hbaseHome="\/opt\/hbase-0.94.16"
+hbasePath="\/opt\/hbase-0.94.16\/bin"
+
+if grep -q "HBASE_HOME=" $FilePath
+then
+        echo "HBASE_HOME env variable is deleted!"
+        sed -i "/export HBASE_HOME=$hbaseHome/d" $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        if grep -q "${hbasePath}" $FilePath
+        then
+                sed -i "s/$hbasePath://g" $FilePath
+                sed -i "s/:$hbasePath//g" $FilePath
+        fi
+fi
+
+. $FilePath

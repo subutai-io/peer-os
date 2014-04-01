@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+tar -xpzf /opt/oozie-3.3.2-distro.tar.gz -C /opt
+rm -rf /opt/oozie-3.3.2-distro.tar.gz
+tar -xpzf /opt/libext.tar.gz -C /opt/oozie-3.3.2
+rm -rf /opt/libext.tar.gz
+tar -xpzf /opt/ext-2.2.tar.gz -C /opt/oozie-3.3.2
+rm -rf /opt/ext-2.2.tar.gz
+
+FilePath="/etc/profile"
+oozieHomeEcho="/opt/oozie-3.3.2"
+ooziePath="\/opt\/oozie-3.3.2\/bin"
+ooziePathEcho=$oozieHomeEcho"/bin"
+
+# Add oozie home       
+if grep -q "OOZIE_HOME" $FilePath
+then
+    echo "OOZIE_HOME is already added!"
+else
+        echo "Oozie path is being inserted"
+        # Add Oozie Install Path to the /etc/profile file
+	echo "OOZIE_HOME="$oozieHomeEcho >> $FilePath
+fi
+
+# Add oozie bin directory to the path
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${ooziePath}" $FilePath
+        then
+                echo "Oozie path is already inserted!!!"
+        else
+                echo "Oozie path is being insterted!"
+                sed -i "s/export PATH=/export PATH=$ooziePath:/1" $FilePath
+        fi
+else
+        echo "PATH is being inserted for the first time"
+        echo "export PATH=$PATH:$ooziePathEcho" >> "${FilePath}"
+fi
+
+cd /opt  
+/opt/oozie-3.3.2/bin/oozie-setup.sh -extjs /opt/oozie-3.3.2/ext-2.2
+/opt/oozie-3.3.2/bin/ooziedb.sh create -sqlfile oozie.sql -run

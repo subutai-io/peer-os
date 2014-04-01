@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+#hadoop dfsadmin -safemode leave
+#if hadoop fs -test -d /tmp ; then
+#        echo "/tmp directory exists!"
+#	hadoop fs -rmr /tmp
+#fi
+
+#if hadoop fs -test -d /user/hive/warehouse ; then
+#        echo "/user/hive/warehouse directory exists!"
+#        hadoop fs -rmr /user/hive/warehouse
+#fi
+if [ -d "/opt/hive-0.11.0-bin" ]; then
+        echo "/opt/hive-0.11.0-bin exists!"
+	rm -r /opt/hive-0.11.0-bin
+else
+        echo "/opt/hive-0.11.0-bin does not exist!"
+fi
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+hiveHome="\/opt\/hive-0.11.0-bin"
+hivePath="\/opt\/hive-0.11.0-bin\/bin"
+
+if grep -q "HIVE_HOME=" $FilePath
+then
+        echo "hive home is being deleted!"
+        sed -i "/HIVE_HOME=$hiveHome/d" $FilePath
+else
+        echo "hive home does not exist"
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${hivePath}" $FilePath
+        then
+                echo "Hive path is being deleted from path!"
+                sed -i "s/$hivePath://g" $FilePath
+                sed -i "s/:$hivePath//g" $FilePath
+        else
+                echo "Hive path does not exist on path"
+        fi
+else
+        echo "PATH does not exist"
+fi
+if [ -f "/etc/init.d/hive" ]; then
+        rm  /etc/init.d/hive
+fi
+if [ -d "/etc/hive" ]; then
+        rm -r /etc/hive
+fi
+
+. $FilePath

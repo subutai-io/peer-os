@@ -1,0 +1,32 @@
+#!/bin/bash
+# Starts and stops Zookeeper.
+
+case "$1" in
+start)
+	start-stop-daemon --start --exec /opt/zookeeper-3.4.5/bin/zookeeper.sh start
+;;
+
+stop)
+	start-stop-daemon --start --exec /opt/zookeeper-3.4.5/bin/zookeeper.sh stop
+;;
+
+restart)
+        $0 stop
+        $0 start
+;;
+
+status)
+        line=$(ps aux | grep [Q]uorumPeerMain)
+        if [ -n "$line" ]; then
+                echo "Zookeeper is Running"
+                exit 0
+        else
+                echo "Zookeeper is NOT Running"
+                exit 1
+        fi
+;;
+
+*)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac

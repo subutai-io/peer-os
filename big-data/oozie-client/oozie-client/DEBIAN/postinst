@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+tar -xpzf /opt/oozie-client-3.3.2.tar.gz -C /opt
+rm -rf /opt/oozie-client-3.3.2.tar.gz
+
+FilePath="/etc/profile"
+oozieClientHomeEcho="/opt/oozie-client-3.3.2"
+oozieClientPath="\/opt\/oozie-client-3.3.2\/bin"
+oozieClientPathEcho=$oozieClientHomeEcho"/bin"
+
+# Add hive home       
+if grep -q "OOZIE_CLIENT_HOME" $FilePath
+then
+    echo "OOZIE_CLIENT_HOME is already added!"
+else
+        echo "oozie client path is being inserted"
+        # Add Oozie Install Path to the /etc/profile file
+	echo "OOZIE_CLIENT_HOME="$oozieClientHomeEcho >> $FilePath
+fi
+
+# Add oozie client bin directory to the path
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${oozieClientPath}" $FilePath
+        then
+                echo "Oozie client path is already inserted!!!"
+        else
+                echo "Oozie Client path is being insterted!"
+                sed -i "s/export PATH=/export PATH=$oozieClientPath:/1" $FilePath
+        fi
+else
+        echo "PATH is being inserted for the first time"
+        echo "export PATH=$PATH:$oozieClientPathEcho" >> "${FilePath}"
+fi
+. $FilePath

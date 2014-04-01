@@ -1,0 +1,44 @@
+#!/bin/sh
+
+tar -xpzf /opt/zookeeper-3.4.5.tar.gz -C /opt
+rm -rf /opt/zookeeper-3.4.5.tar.gz
+
+# Create zookeeper related folders into "/var" directory
+if [ -d "/var/zookeeper" ]; then
+        echo "/var/zookeeper exists!"
+else
+        echo "/var/zookeeper does not exist!"
+	mkdir /var/zookeeper
+fi
+
+FilePath="/etc/profile"
+zookeeperHomeEcho="/opt/zookeeper-3.4.5"
+zookeeperPath="\/opt\/zookeeper-3.4.5\/bin"
+zookeeperPathEcho=$zookeeperHomeEcho"/bin"
+
+# Add zookeeper home       
+if grep -q "ZOOKEEPER_HOME" $FilePath
+then
+    echo "ZOOKEEPER_HOME is already added!"
+else
+        echo "zookeeper path is being inserted"
+        # Add Zookeeper Install Path to the /etc/profile file
+	echo "ZOOKEEPER_HOME="$zookeeperHomeEcho >> $FilePath
+fi
+
+# Add zookeeper bin directory to the path
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${zookeeperPath}" $FilePath
+        then
+                echo "Zookeeper path is already inserted!!!"
+        else
+                echo "Zookeeper path is being insterted!"
+                sed -i "s/export PATH=/export PATH=$zookeeperPath:/1" $FilePath
+        fi
+else
+        echo "PATH is being inserted for the first time"
+        echo "export PATH=$PATH:$zookeeperPathEcho" >> "${FilePath}"
+fi
+. $FilePath

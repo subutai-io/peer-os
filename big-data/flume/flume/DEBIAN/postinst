@@ -1,0 +1,30 @@
+#!/bin/sh 
+set -e
+FilePath="/etc/profile"
+flumeHomeEcho="/opt/flume-1.4.0"
+flumePath="\/opt\/flume-1.4.0\/bin"
+flumePathEcho=$flumeHomeEcho"/bin"
+flumeConf=$flumeHomeEcho"/conf"
+
+if grep -q "FLUME_HOME=" $FilePath
+then
+        echo "FLUME_HOME is already added!"
+else
+        echo "FLUME_HOME is being inserted"
+        echo "export FLUME_HOME="$flumeHomeEcho >> $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        if grep -q "${flumePath}" $FilePath
+        then
+                echo "FLUME is already inserted to PATH!!!"
+        else
+                echo "FLUME is being insterted to PATH!"
+                sed -i "s/export PATH=/export PATH=$flumePath:/1" $FilePath
+        fi
+else
+        echo "export PATH=$PATH:$flumePathEcho" >> "${FilePath}"
+fi
+
+. $FilePath

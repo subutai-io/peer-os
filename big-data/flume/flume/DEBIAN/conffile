@@ -1,0 +1,4 @@
+/opt/flume-1.4.0/conf/flume-conf.properties
+/opt/flume-1.4.0/conf/flume-env.sh  
+/opt/flume-1.4.0/conf/flume-env.sh.template  
+/opt/flume-1.4.0/conf/log4j.properti

@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+#Remove zookeeper home directory
+if [ -d "/opt/zookeeper-3.4.5" ]; then
+        echo "/opt/zookeeper-3.4.5 exists!"
+	rm -r /opt/zookeeper-3.4.5
+else
+        echo "/opt/zookeeper-3.4.5 does not exist!"
+fi
+# Remove zookeeper related folders
+if [ -d "/var/zookeeper" ]; then
+        echo "/var/zookeeper exists!"
+        rm -r /var/zookeeper
+else
+        echo "/var/zookeeper does not exist!"
+fi
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+zookeeperHome="\/opt\/zookeeper-3.4.5"
+zookeeperPath="\/opt\/zookeeper-3.4.5\/bin"
+
+if grep -q "ZOOKEEPER_HOME=" $FilePath
+then
+        echo "zookeeper home is being deleted!"
+        sed -i "/ZOOKEEPER_HOME=$zookeeperHome/d" $FilePath
+else
+        echo "zookeeper home does not exist"
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${zookeeperPath}" $FilePath
+        then
+                echo "Zookeeper path is being deleted from path!"
+                sed -i "s/$zookeeperPath://g" $FilePath
+                sed -i "s/:$zookeeperPath//g" $FilePath
+        else
+                echo "Zookeeper path does not exist on path"
+        fi
+else
+        echo "PATH does not exist"
+fi
+
+. $FilePath

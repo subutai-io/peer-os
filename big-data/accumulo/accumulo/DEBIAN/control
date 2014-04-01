@@ -1,0 +1,9 @@
+Package: ksks-accumulo
+Priority: optional
+Section: devel
+Installed-Size: 100
+Maintainer: kiskis 
+Architecture: amd64 
+Version: 1.0.1
+Depends: ksks-hadoop
+Description: This is a accumulo package of kiskis distribution.

@@ -1,0 +1,9 @@
+Package: ksks-flume
+Priority: optional
+Section: devel
+Installed-Size: 100
+Maintainer: kiskis 
+Architecture: amd64
+Version: 1.0.9
+Depends: ksks-hadoop
+Description: This is a flume package of kiskis distribution.

@@ -1,0 +1,9 @@
+Package: ksks-derby
+Priority: optional
+Section: devel
+Installed-Size: 54272
+Maintainer: kiskis
+Architecture: all
+Version: 1.0.14
+Depends: ksks-hive
+Description: This is a derby package of kiskis distribution.

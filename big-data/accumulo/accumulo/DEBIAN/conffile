@@ -1,0 +1,11 @@
+/opt/accumulo-1.4.2/conf/accumulo-env.sh
+/opt/accumulo-1.4.2/conf/accumulo-metrics.xml
+/opt/accumulo-1.4.2/conf/accumulo-site.xml
+/opt/accumulo-1.4.2/conf/gc
+/opt/accumulo-1.4.2/conf/generic_logger.xml
+/opt/accumulo-1.4.2/conf/log4j.properties
+/opt/accumulo-1.4.2/conf/masters
+/opt/accumulo-1.4.2/conf/monitor
+/opt/accumulo-1.4.2/conf/monitor_logger.xml
+/opt/accumulo-1.4.2/conf/slaves
+/opt/accumulo-1.4.2/conf/tracers
