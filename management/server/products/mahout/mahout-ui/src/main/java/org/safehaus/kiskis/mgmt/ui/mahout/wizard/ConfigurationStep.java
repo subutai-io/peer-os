@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.mahout.wizard;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -15,6 +16,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +46,7 @@ public class ConfigurationStep extends Panel {
         content.setMargin(true);
 
         hadoopClusters = new ComboBox("Hadoop cluster");
-        select = new TwinColSelect("Nodes", new HashSet<Agent>());
+        select = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
         hadoopClusters.setMultiSelect(false);
         hadoopClusters.setImmediate(true);
@@ -75,9 +77,10 @@ public class ConfigurationStep extends Panel {
 
         if (hadoopClusters.getValue() != null) {
             HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClusters.getValue();
-            for (Agent agent : hadoopInfo.getAllAgents()) {
-                select.addItem(agent);
-            }
+            wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
+            select.setContainerDataSource(
+                    new BeanItemContainer<Agent>(
+                            Agent.class, hadoopInfo.getAllAgents()));
         }
 
         hadoopClusters.addListener(new Property.ValueChangeListener() {
@@ -85,12 +88,11 @@ public class ConfigurationStep extends Panel {
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
-                    wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-                    select.removeAllItems();
                     select.setValue(null);
-                    for (Agent agent : hadoopInfo.getAllAgents()) {
-                        select.addItem(agent);
-                    }
+                    select.setContainerDataSource(
+                            new BeanItemContainer<Agent>(
+                                    Agent.class, hadoopInfo.getAllAgents()));
+                    wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setNodes(new HashSet<Agent>());
                 }
             }
@@ -152,6 +154,7 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent(next);
 
         content.addComponent(hadoopClusters);
+        content.addComponent(select);
         content.addComponent(buttons);
 
         addComponent(layout);

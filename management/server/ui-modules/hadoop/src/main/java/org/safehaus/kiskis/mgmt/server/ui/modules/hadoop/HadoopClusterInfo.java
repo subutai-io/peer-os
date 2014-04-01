@@ -147,4 +147,26 @@ public class HadoopClusterInfo implements Serializable {
                 + ", taskTrackers=" + taskTrackers
                 + ", ipMask=" + ipMask + '}';
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final HadoopClusterInfo other = (HadoopClusterInfo) obj;
+        if (this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid))) {
+            return false;
+        }
+        return true;
+    }
+
 }
