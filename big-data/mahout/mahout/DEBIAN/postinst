@@ -1,0 +1,33 @@
+#!/bin/sh
+
+tar -xpzf /opt/mahout.tar.gz -C /opt
+rm -rf /opt/mahout.tar.gz
+
+FilePath="/etc/profile"
+mahoutHomeEcho="/opt/mahout"
+mahoutPath="\/opt\/mahout\/bin"
+mahoutPathEcho=$mahoutHomeEcho"/bin"
+
+if grep -q "MAHOUT_HOME=" $FilePath
+then
+        echo "mahout home is already added!"
+else
+        echo "mahout home is being inserted"
+        echo "MAHOUT_HOME="$mahoutHomeEcho >> $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${mahoutPath}" $FilePath
+        then
+                echo "Mahout path is already inserted!!!"
+        else
+                echo "Mahout path is being insterted!"
+                sed -i "s/export PATH=/export PATH=$mahoutPath:/1" $FilePath
+        fi
+else
+        echo "PATH is being inserted for the first time"
+        echo "export PATH=$PATH:$mahoutPathEcho" >> "${FilePath}"
+fi
+. $FilePath

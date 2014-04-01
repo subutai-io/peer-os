@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+# Remove Hadoop Files and Folders
+if [ -d "/opt/hadoop-1.2.1" ]; then
+        echo "/opt/hadoop-1.2.1 exists!"
+	rm -r /opt/hadoop-1.2.1
+else
+        echo "/opt/hadoop-1.2.1 does not exist!"
+fi
+if ls /var/lib/*hadoop* ; then
+        echo "/var/lib/ directory has hadoop files, deleting!"
+        rm -r /var/lib/*hadoop*
+else
+        echo "/var/lib/ directory does not have hadoop files!"
+fi
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+hadoopHome="\/opt\/hadoop-1.2.1"
+hadoopPath="\/opt\/hadoop-1.2.1\/bin:\/opt\/hadoop-1.2.1\/sbin"
+
+if grep -q "export HADOOP_HOME=" $FilePath
+then
+        echo "hadoop home is being deleted!"
+        sed -i "/export HADOOP_HOME=$hadoopHome/d" $FilePath
+else
+        echo "hadoop home does not exist"
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${hadoopPath}" $FilePath
+        then
+                echo "Hadoop path is being deleted from path!"
+                sed -i "s/$hadoopPath://g" $FilePath
+                sed -i "s/:$hadoopPath//g" $FilePath
+        else
+                echo "Hadoop path does not exist on path"
+        fi
+else
+        echo "PATH does not exist"
+fi
+
+if [ -f "/etc/init.d/hadoop-dfs" ]; then
+	rm  /etc/init.d/hadoop-dfs
+fi
+if [ -f "/etc/init.d/hadoop-mapred" ]; then
+        rm  /etc/init.d/hadoop-mapred
+fi
+if [ -f "/etc/init.d/hadoop-all" ]; then
+        rm  /etc/init.d/hadoop-all
+fi
+
+. $FilePath

@@ -1,0 +1,83 @@
+#!/bin/sh
+set -e
+# Check if any deb file exists!!!
+echo $BASE
+
+sh -c 'cd $BASE'
+
+if ls *.deb ; then
+	rm  *.deb
+fi
+
+BASE="/var/lib/jenkins/jobs/master.bigdata.presto/Presto"
+SOURCE="/var/lib/jenkins/jobs/master.bigdata.presto/workspace/big-data/presto/presto"
+TARGET="/var/lib/jenkins/Automation/Bigdata/presto"
+
+fileName=`ls | awk '{print $1}' | head -1`
+echo $fileName
+
+cp -a $SOURCE/etc  $BASE/$fileName/
+cp -a $SOURCE/usr  $BASE/$fileName/
+cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
+rm -rf $BASE/$fileName/opt/*
+cp -a $SOURCE/opt/* $BASE/$fileName/opt/
+
+#getting presto packages
+wget http://central.maven.org/maven2/com/facebook/presto/presto-server/0.61/presto-server-0.61.tar.gz -P $fileName/opt/
+wget http://central.maven.org/maven2/io/airlift/discovery/discovery-server/1.16/discovery-server-1.16.tar.gz -P $fileName/opt/
+wget http://central.maven.org/maven2/com/facebook/presto/presto-cli/0.61/presto-cli-0.61-executable.jar -P $fileName/opt/
+tar -xvpzf $BASE/$fileName/opt/presto-server-0.61.tar.gz -C .
+tar -xvpzf $BASE/$fileName/opt/discovery-server-1.16.tar.gz -C .
+mv presto-server-0.61/* $fileName/opt/presto-server-0.61/
+rm -rf presto-server-0.61/
+mv discovery-server-1.16 $fileName/opt/
+rm $fileName/opt/presto-server-0.61.tar.gz
+rm $fileName/opt/discovery-server-1.16.tar.gz
+mv $fileName/opt/presto-cli-0.61-executable.jar $fileName/opt/presto-server-0.61/
+rm $fileName/opt/README.md
+
+#Adding jar flies from discovery server
+cp $fileName/opt/discovery-server-1.16/lib/*.jar $fileName/opt/presto-server-0.61/lib/
+rm -rf $fileName/opt/discovery-server-1.16
+
+lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
+lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
+lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
+linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
+
+version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
+package=$(echo $linePackage | awk -F":" '{split($2,a," ");print a[1]}')
+echo $version
+echo $package
+
+versionFirst=$(echo $version | awk -F"." '{print $1}')
+versionSecond=$(echo $version | awk -F"." '{print $2}')
+versionThird=$(echo $version | awk -F"." '{print $3}')
+
+updatedVersion=$(echo `expr $versionThird + 1`)
+updatedRelease=$versionFirst.$versionSecond.$versionThird
+replaceVersion="Version: $updatedRelease"
+sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
+packageName=$package-$updatedRelease"-amd64"
+
+if [ "$fileName" != "$packageName" ] ;then
+echo "different!!"
+mv $fileName $packageName
+fi
+
+find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
+rm $packageName/DEBIAN/md5sums
+md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
+
+versionOfPresto=0.61
+
+sed -i s/presto-server-[0-9]*.[0-9]*'\/'/presto-server-$versionOfPresto'\/'/g $packageName/DEBIAN/conffile
+sed -i s/prestoVer=\"[0-9]*.[0-9]*\"/prestoVer=\"$versionOfPresto\"/g $packageName/DEBIAN/postrm
+sed -i s/prestoVer=\"[0-9]*.[0-9]*\"/prestoVer=\"$versionOfPresto\"/g $packageName/etc/init.d/presto
+sed -i s/prestoVer=\"[0-9]*.[0-9]*\"/prestoVer=\"$versionOfPresto\"/g $packageName/etc/init.d/presto-client
+sed -i s/prestoVer=\"[0-9]*.[0-9]*\"/prestoVer=\"$versionOfPresto\"/g $packageName/usr/bin/presto-config.sh
+
+dpkg-deb -z8 -Zgzip --build $packageName/
+cp $packageName".deb" $TARGET/
+
+

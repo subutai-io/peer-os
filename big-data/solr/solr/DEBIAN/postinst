@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+tar -xpzf /opt/solr-4.4.0.tgz -C /opt
+rm -rf /opt/solr-4.4.0.tgz
+service solr start

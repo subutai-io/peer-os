@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+if [ -d "/opt/lucene-4.4.0" ]; then
+        echo "/opt/lucene-4.4.0 exists!"
+	rm -r /opt/lucene-4.4.0
+else
+        echo "/opt/lucene-4.4.0 does not exist!"
+fi

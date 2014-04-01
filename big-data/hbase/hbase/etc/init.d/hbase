@@ -1,0 +1,138 @@
+#!/bin/bash
+# HBase init script
+#
+
+hbase=hbase-0.94.16
+
+. /opt/$hbase/conf/hbase-env.sh
+
+pidRegion=`ls -alt /tmp | grep hbase-.*-regionserver.pid | head -1 | awk -F " " '{print $9}'`
+pidZookeeper=`ls -alt /tmp | grep hbase-.*-zookeeper.pid | head -1 | awk -F " " '{print $9}'`
+pidMaster=`ls -alt /tmp | grep hbase-.*-master.pid | head -1 | awk -F " " '{print $9}'`
+
+CMD_PATT="hbase"
+is_master_running()
+{
+    if [ -f /tmp/$pidMaster ] && [ "x$pidMaster" != "x" ]; then
+        pid=`cat /tmp/$pidMaster`
+        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
+        return 1
+    fi
+    return 1
+}
+
+is_zookeeper_running()
+{
+    if [ -f /tmp/$pidZookeeper ] && [ "x$pidZookeeper" != "x" ]; then
+        pid=`cat /tmp/$pidZookeeper`
+        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
+        return 1
+    fi
+    return 1 
+}
+
+is_region_running()
+{
+    if [ -f /tmp/$pidRegion ] && [ "x$pidRegion" != "x" ]; then
+        pid=`cat /tmp/$pidRegion`
+        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
+        return 1
+    fi
+    return 1
+}
+
+calculate(){
+	is_master_running
+   	first=$?
+	is_zookeeper_running
+	second=$?
+	is_region_running
+	third=$?
+	#echo $first
+	#echo $second
+	#echo $third
+	a=$((first * 4))
+	b=$((second * 2))
+	c=$((third * 1))
+	#echo "$((a + b + c))"
+	return "$((a + b + c))"
+}
+
+case "$1" in
+start)
+        start-stop-daemon --start --exec /opt/$hbase/bin/start-hbase.sh
+;;
+
+stop)
+        start-stop-daemon --start --exec /opt/$hbase/bin/stop-hbase.sh
+;;
+
+restart)
+        $0 stop
+        $0 start
+;;
+
+status)
+        calculate 
+        stat=$?
+        case "$stat" in 
+        0)
+			echo "HMaster is running"
+			echo "HQuorumPeer is running" 
+			echo "HRegionServer is running" ;;				
+		1)
+			echo "HMaster is running"
+			echo "HQuorumPeer is running" 
+			echo "HRegionServer is NOT running" ;;
+        2)
+			echo "HMaster is running"
+			echo "HQuorumPeer is NOT running"
+			echo "HRegionServer is running" ;;
+		3)
+			echo "HMaster is running"
+			echo "HQuorumPeer is NOT running"
+			echo "HRegionServer is NOT running" ;;
+        4)
+			echo "HMaster is NOT running"
+			echo "HQuorumPeer is running"
+			echo "HRegionServer is running" ;;
+		5)
+			echo "HMaster is NOT running"
+			echo "HQuorumPeer is running" 
+			echo "HRegionServer is NOT running";;
+        6)
+			echo "HMaster is NOT running"
+			echo "HQuorumPeer is NOT running"
+			echo "HRegionServer is running" ;;
+		7)
+			echo "HMaster is NOT running"
+			echo "HQuorumPeer is NOT running"
+			echo "HRegionServer is NOT running" ;;
+		*)
+			echo "HMaster is NOT running"
+			echo "HQuorumPeer is NOT running"
+			echo "HRegionServer is NOT running" ;;
+	esac
+;;
+calc)
+	calculate
+;;
+kill)
+	start-stop-daemon -K -p "/tmp/$pidMaster" -R TERM/30/KILL/5 >/dev/null
+	if [ -f /tmp/$pidMaster ];then
+		rm /tmp/$pidMaster
+	fi 
+	start-stop-daemon -K -p "/tmp/$pidZookeeper" -R TERM/30/KILL/5 >/dev/null
+	if [ -f /tmp/$pidZookeeper ];then
+		rm /tmp/$pidZookeeper
+	fi	
+	start-stop-daemon -K -p "/tmp/$pidRegion" -R TERM/30/KILL/5 >/dev/null
+	if [ -f /tmp/$pidRegion ];then
+		rm /tmp/$pidRegion
+	fi  
+	echo "killed"
+;;
+*)
+        echo "Usage: $0 {start|stop|restart|status|kill}"
+        exit 1
+esac

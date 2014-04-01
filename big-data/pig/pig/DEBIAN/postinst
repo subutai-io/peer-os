@@ -1,0 +1,32 @@
+#!/bin/sh 
+set -e
+pig="pig-0.12.0"
+FilePath="/etc/profile"
+pigHomeEcho="/opt/$pig"
+pigPath="\/opt\/$pig\/bin"
+pigPathEcho=$pigHomeEcho"/bin"
+pigConf=$pigHomeEcho"/conf"
+
+if grep -q "PIG_HOME=" $FilePath
+then
+        echo "PIG_HOME is already added!"
+else
+        echo "PIG_HOME is inserted to your env variables..."
+        echo "export PIG_HOME="$pigHomeEcho >> $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        if grep -q "${pigPath}" $FilePath
+        then
+                echo "PIG is already inserted to PATH !!!"
+        else
+                echo "PIG is inserted to PATH!"
+                sed -i "s/export PATH=/export PATH=$pigPath:/1" $FilePath
+        fi
+else
+        echo "PIG is inserted to PATH!"
+        echo "export PATH=$PATH:$pigPathEcho" >> "${FilePath}"
+fi
+
+. $FilePath

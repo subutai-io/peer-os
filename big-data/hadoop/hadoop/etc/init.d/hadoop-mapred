@@ -1,0 +1,42 @@
+#!/bin/bash
+# Starts and stops hadoop JobTracker, and TaskTrackers.
+
+case "$1" in
+start)
+	start-stop-daemon --start --exec /opt/hadoop-1.2.1/bin/start-mapred.sh
+;;
+
+stop)
+	start-stop-daemon --start --exec /opt/hadoop-1.2.1/bin/stop-mapred.sh
+;;
+
+restart)
+	$0 stop
+	$0 start
+;;
+
+status)
+	line=$(ps aux | grep [J]obTracker)
+	line2=$(ps aux | grep [T]askTracker)
+	#if pidof -o %PPID DataNode > /dev/null; then
+	if [ -n "$line" ]; then
+		echo "JobTracker is Running"
+		#exit 0
+	else
+		echo "JobTracker is NOT Running"
+		#exit 1
+	fi
+	
+	if [ -n "$line2" ]; then
+                echo "TaskTracker is Running"
+                #exit 0
+        else
+                echo "TaskTracker is NOT Running"
+                #exit 1
+        fi
+;;
+
+*)
+	echo "Usage: $0 {start|stop|restart|status}"
+	exit 1
+esac

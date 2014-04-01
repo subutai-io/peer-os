@@ -1,0 +1,4 @@
+/opt/pig-0.12.0/conf/log4j.properties.template
+/opt/pig-0.12.0/conf/pig-env.sh
+/opt/pig-0.12.0/conf/pig.properties
+

@@ -1,0 +1,3 @@
+/opt/sqoop-1.4.3/conf/sqoop-env-template.sh
+/opt/sqoop-1.4.3/conf/sqoop-site-template.xml
+/opt/sqoop-1.4.3/conf/sqoop-site.xml

@@ -1,0 +1,73 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+#Remove ZeroMQ home directory
+if [ -d "/opt/zeromq-2.1.7" ]; then
+        echo "/opt/zeromq-2.1.7 exists!"
+	rm -r /opt/zeromq-2.1.7
+else
+        echo "/opt/zeromq-2.1.7 does not exist!"
+fi
+
+#Remove JZMQ home directory
+if [ -d "/opt/jzmq" ]; then
+        echo "/opt/jzmq exists!"
+        rm -r /opt/jzmq
+else
+        echo "/opt/jzmq does not exist!"
+fi
+
+#Remove Storm home directory
+if [ -d "/opt/storm-0.8.2" ]; then
+        echo "/opt/storm-0.8.2 exists!"
+        rm -r /opt/storm-0.8.2
+else
+        echo "/opt/storm-0.8.2 does not exist!"
+fi
+# Remove Storm related folders
+if [ -d "/var/stormtmp" ]; then
+        echo "/var/stormtmp exists!"
+        rm -r /var/stormtmp
+else
+        echo "/var/stormtmp does not exist!"
+fi
+
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+stormHome="\/opt\/storm-0.8.2"
+stormPath="\/opt\/storm-0.8.2\/bin"
+
+if grep -q "STORM_HOME=" $FilePath
+then
+        echo "storm home is being deleted!"
+        sed -i "/STORM_HOME=$stormHome/d" $FilePath
+else
+        echo "storm home does not exist"
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${stormPath}" $FilePath
+        then
+                echo "Storm path is being deleted from path!"
+                sed -i "s/$stormPath://g" $FilePath
+                sed -i "s/:$stormPath//g" $FilePath
+        else
+                echo "Storm path does not exist on path"
+        fi
+else
+        echo "PATH does not exist"
+fi
+if [ -f "/etc/init.d/storm-nimbus" ]; then
+	rm  /etc/init.d/storm-nimbus
+fi
+if [ -f "/etc/init.d/storm-supervisor" ]; then
+        rm  /etc/init.d/storm-supervisor
+fi
+if [ -f "/etc/init.d/storm-ui" ]; then
+	rm  /etc/init.d/storm-ui
+fi
+. $FilePath

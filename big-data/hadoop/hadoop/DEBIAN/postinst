@@ -1,0 +1,59 @@
+#!/bin/bash
+set -e
+
+tar -xpzf /opt/hadoop-1.2.1-bin.tar.gz -C /opt
+
+FilePath="/etc/profile"
+hadoopHomeEcho="/opt/hadoop-1.2.1"
+hadoopPath="\/opt\/hadoop-1.2.1\/bin:\/opt\/hadoop-1.2.1\/sbin"
+hadoopPathEcho=$hadoopHomeEcho"/bin:"$hadoopHomeEcho"/sbin"
+hadoopConf=$hadoopHomeEcho"/conf"
+
+# Replace the comment with the real export in the file
+sed -i 's/# export JAVA_HOME=\/usr\/lib\/j2sdk1.5-sun/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hadoopConf/hadoop-env.sh
+# Suppress HADOOP_HOME is deprecated message
+echo 'export HADOOP_HOME_WARN_SUPPRESS="TRUE"' >> $hadoopConf/hadoop-env.sh
+
+if grep -q "export HADOOP_HOME=" $FilePath
+then
+        echo "hadoop home is already added!"
+else
+        echo "hadoop home is being inserted"
+        echo "export HADOOP_HOME="$hadoopHomeEcho >> $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        echo "Path is previously insterted to" $FilePath
+        if grep -q "${hadoopPath}" $FilePath
+        then
+                echo "Hadoop path is already inserted!!!"
+        else
+                echo "Hadoop path is being insterted!"
+                sed -i "s/export PATH=/export PATH=$hadoopPath:/1" $FilePath
+        fi
+else
+        echo "PATH is being inserted for the first time"
+        echo "export PATH=$PATH:$hadoopPathEcho" >> "${FilePath}"
+fi
+rm -rf /opt/hadoop-1.2.1-bin.tar.gz
+. $FilePath
+touch $hadoopConf/dfs.exclude
+touch $hadoopConf/dfs.include
+touch $hadoopConf/mapred.exclude
+touch $hadoopConf/mapred.include
+$hadoopHomeEcho/bin/hadoop-configure.sh localhost:8020 localhost:9000 1
+$hadoopHomeEcho/bin/hadoop-master-slave.sh masters clear
+$hadoopHomeEcho/bin/hadoop-master-slave.sh slaves clear
+$hadoopHomeEcho/bin/hadoop-master-slave.sh masters localhost
+$hadoopHomeEcho/bin/hadoop-master-slave.sh slaves localhost
+
+$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml fs.default.name hdfs://localhost:8020
+$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml hadoop.tmp.dir /var/lib/hadoop-'\$'{user.name}
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.replication 1
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts /opt/hadoop-1.2.1/conf/dfs.include
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-1.2.1/conf/dfs.exclude
+
+$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.job.tracker localhost:9000
+$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.hosts /opt/hadoop-1.2.1/conf/mapred.include
+$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.hosts.exclude /opt/hadoop-1.2.1/conf/mapred.exclude

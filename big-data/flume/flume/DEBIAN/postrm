@@ -1,0 +1,28 @@
+#!/bin/sh 
+set -e
+# Remove Flume Files and Folders
+if [ -d "/opt/flume-1.4.0" ]; then
+	rm -r /opt/flume-1.4.0
+fi
+
+#Remove paths and exports from relevant files
+FilePath="/etc/profile"
+flumeHome="\/opt\/flume-1.4.0"
+flumePath="\/opt\/flume-1.4.0\/bin"
+
+if grep -q "FLUME_HOME=" $FilePath
+then
+        echo "FLUME_HOME is being deleted!"
+        sed -i "/export FLUME_HOME=$flumeHome/d" $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        if grep -q "${flumePath}" $FilePath
+        then
+                sed -i "s/$flumePath://g" $FilePath
+                sed -i "s/:$flumePath//g" $FilePath
+        fi
+fi
+
+. $FilePath

@@ -1,0 +1,38 @@
+#!/usr/bin/expect
+#Updating Default Settgins for base lxc package
+set timeout 600
+
+set ip [lindex $argv 0]
+set user [lindex $argv 1]
+set password [lindex $argv 2]
+
+#Login phase to 172.16.9.100 static ip of base container
+spawn ssh "$user\@$ip"
+expect "password:"
+send "$password\r";
+
+#updating apt-get
+expect "# " { send "apt-get update\r"  }
+
+#adding kiskis-repolist to /etc/apt/sources.list.d/ 
+expect "# " { send "touch kiskis-repo.list\r"}
+expect "# " { send "echo \"deb http://10.10.10.1/ksks precise main\" > kiskis-repo.list\r "}
+expect "# " { send "mv kiskis-repo.list /etc/apt/sources.list.d/\r" }
+
+#setting timezone for default lxc-container(DEFAULT EET)
+expect "# " { send "echo \"Europe/Istanbul\" > /etc/timezone\r" }
+expect "# " { send "dpkg-reconfigure -f noninteractive tzdata\r" }
+
+#installing openjre-7 & ganglia
+expect "# " { send "echo \"export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64\" >> /etc/profile\r" }
+expect "# " { send "dpkg -i ksks-logstash-1.0.1-amd64.deb\r"}
+expect "# " { send "apt-get --assume-yes --force-yes install ganglia-monitor\r"}
+expect "# " { send "apt-get --assume-yes --force-yes install openjdk-7-jre\r" }
+expect "# " { send "dpkg -i jmxtrans-1.0.1-amd64.deb\r"}
+expect "JVM Min/Max Heap size (MB): " { send "\r"}
+
+#Cleaning archive folder
+expect "# " { send "rm /var/cache/apt/archives/*\r" }
+
+expect "# " { send "logout\r" }
+interact

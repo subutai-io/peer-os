@@ -1,0 +1,9 @@
+#!/bin/sh 
+set -e
+
+prestoVer="0.61"
+presto="presto-server-$prestoVer"
+
+if [ -d "/opt/$presto/" ]; then
+	rm -r /opt/$presto/
+fi

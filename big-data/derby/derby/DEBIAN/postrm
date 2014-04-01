@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+. /etc/profile
+
+derbyHomeEcho="/opt/db-derby-10.4.2.0-bin"
+FilePath="/etc/profile"
+derbyHome="\/opt\/db-derby-10.4.2.0-bin"
+
+#Remove derby directory if exists
+if [ -d "$derbyHomeEcho" ]; then
+        echo "$derbyHomeEcho exists!"
+	rm -r "$derbyHomeEcho"
+else
+        echo "$derbyHomeEcho does not exist!"
+fi
+#Remove DERBY_HOME from file
+if grep -q "DERBY_HOME=" $FilePath
+then
+        echo "DERBY HOME is being deleted!"
+        sed -i "/export DERBY_HOME=$derbyHome/d" $FilePath
+else
+        echo "DERBY HOME does not exist"
+fi
+if [ -f $HIVE_HOME/lib/derbyclient.jar ]; then
+	rm $HIVE_HOME/lib/derbyclient.jar
+fi
+if [ -f $HIVE_HOME/lib/derbytools.jar ]; then
+	rm $HIVE_HOME/lib/derbytools.jar
+fi

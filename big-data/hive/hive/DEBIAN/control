@@ -1,0 +1,9 @@
+Package: ksks-hive
+Priority: optional
+Section: devel
+Installed-Size: 69000
+Maintainer: kiskis
+Architecture: all
+Version: 1.0.24
+Depends: ksks-hadoop
+Description: This is a hive package of kiskis distribution.

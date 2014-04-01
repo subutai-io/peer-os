@@ -1,0 +1,30 @@
+#!/bin/sh 
+set -e
+FilePath="/etc/profile"
+hbaseHomeEcho="/opt/hbase-0.94.16"
+hbasePath="\/opt\/hbase-0.94.16\/bin"
+hbasePathEcho=$hbaseHomeEcho"/bin"
+hbaseConf=$hbaseHomeEcho"/conf"
+
+if grep -q "HBASE_HOME=" $FilePath
+then
+        echo "HBASE_HOME is already added!"
+else
+        echo "HBASE_HOME is being inserted"
+        echo "export HBASE_HOME="$hbaseHomeEcho >> $FilePath
+fi
+
+if grep -q "export PATH=" $FilePath
+then
+        if grep -q "${hbasePath}" $FilePath
+        then
+                echo "HBase is already inserted to PATH!!!"
+        else
+                echo "HBase is inserted to PATH!"
+                sed -i "s/export PATH=/export PATH=$hbasePath:/1" $FilePath
+        fi
+else
+        echo "export PATH=$PATH:$hbasePathEcho" >> "${FilePath}"
+fi
+
+. $FilePath

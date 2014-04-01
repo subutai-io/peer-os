@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+if [ -d "/opt/solr-4.4.0" ]; then
+        echo "/opt/solr-4.4.0 exists!"
+	rm -r /opt/solr-4.4.0
+else
+        echo "/opt/solr-4.4.0 does not exist!"
+fi
+if [ -f "/etc/init.d/solr" ]; then
+        rm  /etc/init.d/solr
+fi

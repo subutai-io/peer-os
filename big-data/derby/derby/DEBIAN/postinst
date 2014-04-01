@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+. /etc/profile
+tar -xpzf /opt/db-derby-10.4.2.0-bin.tar.gz -C /opt
+rm -rf /opt/db-derby-10.4.2.0-bin.tar.gz
+
+FilePath="/etc/profile"
+derbyHomeEcho="/opt/db-derby-10.4.2.0-bin"
+
+# Add derby home       
+if grep -q "DERBY_HOME" $FilePath
+then
+    echo "DERBY_HOME is already added!"
+else
+        echo "Derby path is being inserted"
+        # Add Derby Installation Path to the /etc/profile file
+	echo "export DERBY_HOME="$derbyHomeEcho >> $FilePath
+fi
+# Copy jar files to hive lib directory
+cp $derbyHomeEcho/lib/derbyclient.jar $HIVE_HOME/lib
+cp $derbyHomeEcho/lib/derbytools.jar $HIVE_HOME/lib
+#Create data directory for derby database
+if [ -d "/opt/db-derby-10.4.2.0-bin/data" ]; then
+	echo "/opt/db-derby-10.4.2.0-bin/data already exists!"
+else
+	mkdir /opt/db-derby-10.4.2.0-bin/data
+fi

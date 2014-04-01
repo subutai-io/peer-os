@@ -1,0 +1,8 @@
+Package: ksks-zookeeper
+Priority: optional
+Section: devel
+Installed-Size: 40000
+Maintainer: kiskis
+Architecture: all
+Version: 1.0.2
+Description: This is a zookeeper package of kiskis distribution.
