@@ -29,7 +29,6 @@ import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
 /**
  *
  * @author dilshat
- * @todo add hadoop node selection
  */
 public class ConfigurationStep extends Panel {
 

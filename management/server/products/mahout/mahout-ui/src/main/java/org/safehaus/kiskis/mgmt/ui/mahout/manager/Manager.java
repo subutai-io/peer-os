@@ -19,6 +19,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.mahout.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
@@ -100,24 +102,28 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Cluster destruction confirmation",
-                            String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
+                    HadoopClusterInfo info = MahoutUI.getDbManager().
+                            getInfo(HadoopClusterInfo.SOURCE,
+                                    config.getClusterName(),
+                                    HadoopClusterInfo.class);
+                    if (info != null) {
+                        Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
+                        nodes.removeAll(config.getNodes());
+                        if (!nodes.isEmpty()) {
+                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
+                            MgmtApplication.addCustomWindow(addNodeWindow);
+                            addNodeWindow.addListener(new Window.CloseListener() {
 
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = MahoutUI.getMahoutManager().uninstallCluster(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
+                                public void windowClose(Window.CloseEvent e) {
+                                    refreshClustersInfo();
                                 }
                             });
+                        } else {
+                            show("All nodes in corresponding Hadoop cluster have Mahout installed");
+                        }
+                    } else {
+                        show("Hadoop cluster info not found");
+                    }
                 } else {
                     show("Please, select cluster");
                 }
