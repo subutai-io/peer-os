@@ -230,43 +230,31 @@ public class Manager {
     }
 
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = MahoutUI.getMahoutManager().getClusters();
+        List<Config> clustersInfo = MahoutUI.getMahoutManager().getClusters();
         Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
-            for (Config mongoClusterInfo : mongoClusterInfos) {
+        if (clustersInfo != null && clustersInfo.size() > 0) {
+            for (Config mongoClusterInfo : clustersInfo) {
                 clusterCombo.addItem(mongoClusterInfo);
                 clusterCombo.setItemCaption(mongoClusterInfo,
                         mongoClusterInfo.getClusterName());
             }
             if (clusterInfo != null) {
-                for (Config mongoClusterInfo : mongoClusterInfos) {
+                for (Config mongoClusterInfo : clustersInfo) {
                     if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
                         clusterCombo.setValue(mongoClusterInfo);
                         return;
                     }
                 }
             } else {
-                clusterCombo.setValue(mongoClusterInfos.iterator().next());
+                clusterCombo.setValue(clustersInfo.iterator().next());
             }
-        }
-    }
-
-    public static void checkNodesStatus(Table table) {
-        for (Iterator it = table.getItemIds().iterator(); it.hasNext();) {
-            int rowId = (Integer) it.next();
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-            checkBtn.click();
         }
     }
 
     private Table createTableTemplate(String caption, int size) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);

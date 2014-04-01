@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
-import java.util.ArrayList;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -17,8 +16,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
@@ -31,8 +28,6 @@ import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 public class SolrImpl implements Solr {
-
-    private static final Logger LOG = Logger.getLogger(SolrImpl.class.getName());
 
     public static final String MODULE_NAME = "Solr";
     private TaskRunner taskRunner;
@@ -73,10 +68,6 @@ public class SolrImpl implements Solr {
     public UUID installCluster(final Config config) {
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Solr");
 
-        if (po == null) {
-            return null;
-        }
-
         executor.execute(new Runnable() {
 
             public void run() {
@@ -86,17 +77,17 @@ public class SolrImpl implements Solr {
                 }
 
                 try {
-                    po.addLog(String.format("Creating %d lxc containers", config.getNumberOfNodes()));
+                    po.addLog(String.format("Creating %d lxc containers...", config.getNumberOfNodes()));
                     Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(config.getNumberOfNodes());
                     config.setNodes(new HashSet<Agent>());
 
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
                         config.getNodes().addAll(entry.getValue());
                     }
-
+                    po.addLog("Lxc containers created successfully\nUpdating db...");
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
 
-                        po.addLog("Cluster info saved to DB\nInstalling Solr");
+                        po.addLog("Cluster info saved to DB\nInstalling Solr...");
 
                         //install
                         Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
@@ -104,7 +95,14 @@ public class SolrImpl implements Solr {
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded");
                         } else {
-                            po.addLogFailed("Installation failed");
+                            String err = "";
+                            for (Map.Entry<UUID, Result> res : installTask.getResults().entrySet()) {
+                                if (!Util.isStringEmpty(res.getValue().getStdErr())) {
+                                    err = res.getValue().getStdErr();
+                                    break;
+                                }
+                            }
+                            po.addLogFailed(String.format("Installation failed, %s", err));
                         }
 
                     } else {
@@ -144,7 +142,7 @@ public class SolrImpl implements Solr {
                     return;
                 }
 
-                po.addLog("Destroying lxc containers");
+                po.addLog("Destroying lxc containers...");
 
                 Set<String> lxcHostnames = new HashSet<String>();
                 for (Agent lxcAgent : config.getNodes()) {
@@ -156,7 +154,7 @@ public class SolrImpl implements Solr {
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
                 }
-
+                po.addLog("Updating db...");
                 if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
                     po.addLogDone("Cluster info deleted from DB\nDone");
                 } else {
@@ -188,7 +186,7 @@ public class SolrImpl implements Solr {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
-
+                po.addLog("Starting node...");
                 Task startNodeTask = Tasks.getStartTask(node);
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
@@ -261,7 +259,7 @@ public class SolrImpl implements Solr {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
-
+                po.addLog("Stopping node...");
                 Task stopNodeTask = Tasks.getStopTask(node);
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
@@ -334,7 +332,7 @@ public class SolrImpl implements Solr {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
-
+                po.addLog("Checking node...");
                 final Task checkNodeTask = taskRunner.executeTask(Tasks.getStatusTask(node));
 
                 NodeState nodeState = NodeState.UNKNOWN;
@@ -390,7 +388,6 @@ public class SolrImpl implements Solr {
                     return;
                 }
 
-                config.getNodes().remove(agent);
                 //destroy lxc
                 po.addLog("Destroying lxc container...");
                 Agent physicalAgent = agentManager.getAgentByHostname(agent.getParentHostName());
@@ -401,10 +398,13 @@ public class SolrImpl implements Solr {
                 } else {
                     if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
                         po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
+                    } else {
+                        po.addLog("Lxc container destroyed successfully");
                     }
                 }
                 //update db
                 po.addLog("Updating db...");
+                config.getNodes().remove(agent);
                 if (!dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
                             config.getClusterName()));
@@ -433,16 +433,16 @@ public class SolrImpl implements Solr {
 
                 try {
 
-                    po.addLog("Creating lxc container");
+                    po.addLog("Creating lxc container...");
 
                     Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(1);
 
                     Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
                     config.getNodes().add(lxcAgent);
-
+                    po.addLog("Lxc container created successfully\nUpdating db...");
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
-                        po.addLog("Cluster info updated in DB\nInstalling Solr");
+                        po.addLog("Cluster info updated in DB\nInstalling Solr...");
 
                         Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
 
@@ -467,15 +467,9 @@ public class SolrImpl implements Solr {
     }
 
     public List<Config> getClusters() {
-        try {
 
-            return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
 
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getClusters", ex);
-        }
-
-        return new ArrayList<Config>();
     }
 
 }

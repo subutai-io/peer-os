@@ -30,4 +30,12 @@ public class Tasks {
         }
         return task;
     }
+
+    public static Task getUninstallTask(Set<Agent> agents) {
+        Task task = new Task("Uninstall Mahout");
+        for (Agent agent : agents) {
+            task.addRequest(Commands.getUninstallCommand(), agent);
+        }
+        return task;
+    }
 }

@@ -49,4 +49,11 @@ public class Commands {
         return req;
     }
 
+    public static Request getUninstallCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("apt-get --force-yes --assume-yes purge ksks-mahout");
+        req.setTimeout(60);
+        return req;
+    }
+
 }

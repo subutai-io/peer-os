@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +14,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
@@ -50,8 +47,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
  * @author dilshat
  */
 public class MongoImpl implements Mongo {
-
-    private static final Logger LOG = Logger.getLogger(MongoImpl.class.getName());
 
     private static TaskRunner taskRunner;
     private static AgentManager agentManager;
@@ -121,9 +116,6 @@ public class MongoImpl implements Mongo {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Installing cluster %s", config.getClusterName()));
-        if (po == null) {
-            return null;
-        }
 
         executor.execute(new Runnable() {
 
@@ -138,7 +130,7 @@ public class MongoImpl implements Mongo {
                 try {
                     int numberOfLxcsNeeded = config.getNumberOfConfigServers() + config.getNumberOfRouters() + config.getNumberOfDataNodes();
                     //clone lxc containers
-                    po.addLog(String.format("Creating %d lxc containers", numberOfLxcsNeeded));
+                    po.addLog(String.format("Creating %d lxc containers...", numberOfLxcsNeeded));
                     Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(numberOfLxcsNeeded);
 
                     Set<Agent> cfgServers = new HashSet<Agent>();
@@ -164,9 +156,9 @@ public class MongoImpl implements Mongo {
                     config.setConfigServers(cfgServers);
                     config.setDataNodes(dataNodes);
                     config.setRouterServers(routers);
-
+                    po.addLog("Lxc containers created successfully\nUpdating db...");
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                        po.addLog("Cluster info saved to DB");
+                        po.addLog("Cluster info saved to DB\nInstalling Mongo...");
                         installMongoCluster(config, po);
                     } else {
                         //destroy all lxcs also
@@ -302,9 +294,9 @@ public class MongoImpl implements Mongo {
                     } else if (nodeType == NodeType.ROUTER_NODE) {
                         config.getRouterServers().add(agent);
                     }
-
+                    po.addLog("Lxc container created successfully\nUpdating db...");
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                        po.addLog("Cluster info updated in DB");
+                        po.addLog("Cluster info updated in DB\nInstalling Mongo");
                         //start addition of node
                         addNodeInternal(po, config, nodeType, agent);
                     } else {
@@ -436,7 +428,7 @@ public class MongoImpl implements Mongo {
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
                 }
-
+                po.addLog("Updating db...");
                 if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
                     po.addLogDone("Cluster info deleted from DB\nDone");
                 } else {
@@ -578,6 +570,8 @@ public class MongoImpl implements Mongo {
                 } else {
                     if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
                         po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
+                    } else {
+                        po.addLog("Lxc container destroyed successfully");
                     }
                 }
                 //update db
@@ -595,15 +589,8 @@ public class MongoImpl implements Mongo {
     }
 
     public List<Config> getClusters() {
-        try {
 
-            return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getClusters", ex);
-        }
-
-        return new ArrayList<Config>();
+        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }
 
     public UUID startNode(final String clusterName, final String lxcHostname) {
@@ -642,7 +629,7 @@ public class MongoImpl implements Mongo {
                             config.getConfigServers(),
                             config);
                 }
-
+                po.addLog("Starting node...");
                 taskRunner.executeTask(startNodeTask, new TaskCallback() {
 
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -705,6 +692,7 @@ public class MongoImpl implements Mongo {
                     return;
                 }
 
+                po.addLog("Stopping node...");
                 Task stopNodeTask = taskRunner.executeTask(
                         Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
 
@@ -744,7 +732,7 @@ public class MongoImpl implements Mongo {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
                     return;
                 }
-
+                po.addLog("Checking node...");
                 Task checkNodeTask = taskRunner.executeTask(
                         Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
 
