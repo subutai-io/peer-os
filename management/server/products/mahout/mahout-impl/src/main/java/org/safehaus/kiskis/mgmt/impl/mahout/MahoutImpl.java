@@ -290,6 +290,8 @@ public class MahoutImpl implements Mahout {
                     return;
                 }
 
+                po.addLog("Checking prerequisites...");
+
                 //check installed ksks packages
                 Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
 

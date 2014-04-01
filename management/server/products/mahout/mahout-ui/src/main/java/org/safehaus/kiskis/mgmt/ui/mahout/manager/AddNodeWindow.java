@@ -56,6 +56,7 @@ public class AddNodeWindow extends Window {
         final ComboBox hadoopNodes = new ComboBox("Nodes", nodes);
         hadoopNodes.setMultiSelect(false);
         hadoopNodes.setImmediate(true);
+        hadoopNodes.setItemCaptionPropertyId("hostname");
         hadoopNodes.setTextInputAllowed(false);
         hadoopNodes.setWidth(200, Sizeable.UNITS_PIXELS);
         hadoopNodes.setValue(nodes.iterator().next());
