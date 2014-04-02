@@ -78,7 +78,7 @@ fi
 cd $BASE
 cp -a $SOURCE/DEBIAN $BASE/$fileName/
 cp -a $SOURCE/etc $BASE/$fileName/
-cp -a $SOURCE/opt $BASE/$filename/
+cp -a $SOURCE/opt $BASE/$fileName/
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
