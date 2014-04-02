@@ -21,7 +21,6 @@
         <!--<module>mahout</module>-->
         <module>hive</module>
         <module>flume</module>
-        <module>lucene</module>
         <module>monitor</module>
     </modules>
    
