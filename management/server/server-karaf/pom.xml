@@ -296,6 +296,21 @@
                                 <!--UI Modules-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lucene-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lucene-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lucene-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>pig-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -409,11 +424,11 @@
                                     <artifactId>flume-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>lucene-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>monitor-module</artifactId>
