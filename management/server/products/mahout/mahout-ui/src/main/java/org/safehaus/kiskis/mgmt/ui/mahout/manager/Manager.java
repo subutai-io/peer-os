@@ -188,13 +188,11 @@ public class Manager {
             final Agent agent = (Agent) it.next();
 
             final Button destroyBtn = new Button("Destroy");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-            progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
-                destroyBtn,
-                progressIcon},
+                destroyBtn
+            },
                     null);
 
             destroyBtn.addListener(new Button.ClickListener() {
@@ -261,7 +259,6 @@ public class Manager {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);
