@@ -35,8 +35,8 @@ public class PigUI implements Module {
         return pigManager;
     }
 
-    public void setPigManager(Pig mahoutManager) {
-        PigUI.pigManager = mahoutManager;
+    public void setPigManager(Pig pigManager) {
+        PigUI.pigManager = pigManager;
     }
 
     public void setTracker(Tracker tracker) {
