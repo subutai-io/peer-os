@@ -188,13 +188,11 @@ public class Manager {
             final Agent agent = (Agent) it.next();
 
             final Button destroyBtn = new Button("Destroy");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-            progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
                 agent.getHostname(),
-                destroyBtn,
-                progressIcon},
+                destroyBtn
+            },
                     null);
 
             destroyBtn.addListener(new Button.ClickListener() {
