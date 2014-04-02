@@ -379,11 +379,11 @@
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+<!--                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>pig-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hbase-module</artifactId>
