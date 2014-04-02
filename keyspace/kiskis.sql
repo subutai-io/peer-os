@@ -37,4 +37,4 @@ CREATE TABLE product_operation (
   id timeuuid,
   info text,
   PRIMARY KEY (source, id)
-)
+);
