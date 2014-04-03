@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.impl.spark;
 
+import java.util.Arrays;
+import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -114,7 +116,19 @@ public class Commands {
 
     public static Request getAddSlaveCommand(String slaveHostname) {
         Request req = getRequestTemplate();
-        req.setProgram(String.format("sparkSlaveConf.sh %s", slaveHostname));
+        req.setProgram(String.format(". /etc/profile && sparkSlaveConf.sh %s", slaveHostname));
+        req.setTimeout(60);
+        return req;
+    }
+
+    public static Request getAddSlavesCommand(Set<String> slaveHostnames) {
+        Request req = getRequestTemplate();
+//        String slaves = Arrays.toString(slaveHostnames.toArray(new String[slaveHostnames.size()])).substring(1).replaceAll("\\]$", "");
+        StringBuilder slaves = new StringBuilder();
+        for (String slaveHostname : slaveHostnames) {
+            slaves.append(slaveHostname).append(" ");
+        }
+        req.setProgram(String.format(". /etc/profile && sparkSlaveConf.sh %s", slaves));
         req.setTimeout(60);
         return req;
     }
