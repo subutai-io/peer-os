@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.api.spark;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
@@ -42,6 +43,18 @@ public class Config {
 
     public void setNodes(Set<Agent> nodes) {
         this.nodes = nodes;
+    }
+
+    public Set<Agent> getAllNodes() {
+        Set<Agent> allNodes = new HashSet<Agent>();
+        if (nodes != null) {
+            allNodes.addAll(nodes);
+        }
+        if (masterNode != null) {
+            allNodes.add(masterNode);
+        }
+
+        return allNodes;
     }
 
     @Override

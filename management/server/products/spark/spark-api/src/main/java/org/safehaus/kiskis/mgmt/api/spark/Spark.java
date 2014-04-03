@@ -22,7 +22,7 @@ public interface Spark {
 
     public UUID destroySlaveNode(String clusterName, String lxcHostname);
 
-    public UUID changeMasterNode(String clusterName, String newMasterHostname);
+    public UUID changeMasterNode(String clusterName, String newMasterHostname, boolean keepSlave);
 
     /**
      * Returns list of configurations of installed clusters
