@@ -68,6 +68,8 @@ public class SparkImpl implements Spark {
     /*
      * @todo find out if spark after installation is running
      * this is needed to install both slave and master on the same node
+     do we need to restart master after adding slave
+     do we need to restart slave after changing master ip
      */
     public UUID installCluster(final Config config) {
         final ProductOperation po
@@ -224,9 +226,6 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    /*
-     * @todo register slave with master
-     */
     public UUID addSlaveNode(final String clusterName, final String lxcHostname) {
 
         final ProductOperation po
@@ -255,17 +254,17 @@ public class SparkImpl implements Spark {
                 Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
 
                 if (!checkInstalled.isCompleted()) {
-                    po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
+                    po.addLogFailed("Failed to check presence of installed ksks packages\nOperation aborted");
                     return;
                 }
 
                 Result result = checkInstalled.getResults().get(agent.getUuid());
 
                 if (result.getStdOut().contains("ksks-spark")) {
-                    po.addLogFailed(String.format("Node %s already has Spark installed\nInstallation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Node %s already has Spark installed\nOperation aborted", lxcHostname));
                     return;
                 } else if (!result.getStdOut().contains("ksks-hadoop")) {
-                    po.addLogFailed(String.format("Node %s has no Hadoop installation\nInstallation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Node %s has no Hadoop installation\nOperation aborted", lxcHostname));
                     return;
                 }
 
@@ -279,13 +278,35 @@ public class SparkImpl implements Spark {
                     Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLogDone("Installation succeeded\nDone");
+                        po.addLog("Installation succeeded\nRegistering slave with master...");
+
+                        if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) != null) {
+
+                            Task registerSlaveTask = taskRunner.executeTask(Tasks.getAddSlaveTask(config.getMasterNode(), agent));
+
+                            if (registerSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                po.addLog("Registration succeeded\nSetting master IP on slave...");
+
+                                Task setMasterIP = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getMasterNode()));
+
+                                if (setMasterIP.getTaskStatus() == TaskStatus.SUCCESS) {
+                                    po.addLogDone("Master IP successfully set\nDone");
+                                } else {
+                                    po.addLogFailed("Failed to set master IP");
+                                }
+                            } else {
+                                po.addLogFailed(String.format("Registration failed, %s", registerSlaveTask.getFirstError()));
+                            }
+                        } else {
+                            po.addLogFailed("Failed to register slave with master: Master is not connected");
+                        }
+
                     } else {
 
                         po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
                 } else {
-                    po.addLogFailed("Could not update cluster info in DB! Please see logs\nInstallation aborted");
+                    po.addLogFailed("Could not update cluster info in DB! Please see logs\nOperation aborted");
                 }
             }
         });
@@ -293,9 +314,6 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    /*
-     * @todo unregister slave from master
-     */
     public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
 
         final ProductOperation po
@@ -325,6 +343,22 @@ public class SparkImpl implements Spark {
                 if (agent == config.getMasterNode()) {
                     po.addLogFailed("This is the master node in the cluster. Please, change master first\nOperation aborted");
                     return;
+                }
+
+                po.addLog("Unregistering slave from master...");
+
+                if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) != null) {
+
+                    Task unregisterSlaveTask = taskRunner.executeTask(Tasks.getRemoveSlaveTask(config.getMasterNode(), agent));
+
+                    if (unregisterSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Successfully unregistered slave from master");
+                    } else {
+                        po.addLog(String.format("Failed to unregister slave from master: %s, skipping...",
+                                unregisterSlaveTask.getFirstError()));
+                    }
+                } else {
+                    po.addLog("Failed to unregister slave from master: Master is not connected, skipping...");
                 }
 
                 po.addLog("Uninstalling Spark...");
