@@ -244,14 +244,9 @@ public class MongoImpl implements Mongo {
 
                         }
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : task.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s", task.getDescription(), installOperation.getDescription(), err));
+
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s",
+                                task.getDescription(), installOperation.getDescription(), task.getFirstError()));
 
                     }
                 }
@@ -381,14 +376,8 @@ public class MongoImpl implements Mongo {
                             po.addLogDone(String.format("Operation %s completed\nDone", operation.getDescription()));
                         }
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : task.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s\nUse LXC module to cleanup", task.getDescription(), operation.getDescription(), err));
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s\nUse LXC module to cleanup",
+                                task.getDescription(), operation.getDescription(), task.getFirstError()));
                     }
                 }
 

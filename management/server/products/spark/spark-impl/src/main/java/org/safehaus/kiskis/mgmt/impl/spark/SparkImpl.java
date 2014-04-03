@@ -150,19 +150,19 @@ public class SparkImpl implements Spark {
                         if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Setting master IP succeeded\nRegistering slaves...");
 
-                            Task registerSlavestask = taskRunner.executeTask(Tasks.getAddSlavesTask(config.getMasterNode(), config.getNodes()));
+                            Task registerSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(config.getMasterNode(), config.getNodes()));
 
-                            if (registerSlavestask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            if (registerSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                                 po.addLogDone("Slaves successfully registered\nDone");
                             } else {
-                                po.addLogFailed(String.format("Failed to register slaves with master, %s", getErrorFromResults(registerSlavestask.getResults())));
+                                po.addLogFailed(String.format("Failed to register slaves with master, %s", registerSlavesTask.getFirstError()));
                             }
                         } else {
-                            po.addLogFailed(String.format("Setting master IP failed, %s", getErrorFromResults(setMasterIPTask.getResults())));
+                            po.addLogFailed(String.format("Setting master IP failed, %s", setMasterIPTask.getFirstError()));
                         }
 
                     } else {
-                        po.addLogFailed(String.format("Installation failed, %s", getErrorFromResults(installTask.getResults())));
+                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
                 } else {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
@@ -172,17 +172,6 @@ public class SparkImpl implements Spark {
         });
 
         return po.getId();
-    }
-
-    private String getErrorFromResults(Map<UUID, Result> results) {
-        String err = "";
-        for (Map.Entry<UUID, Result> res : results.entrySet()) {
-            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                err = res.getValue().getStdErr();
-                break;
-            }
-        }
-        return err;
     }
 
     public UUID uninstallCluster(final String clusterName) {
@@ -227,7 +216,7 @@ public class SparkImpl implements Spark {
                         po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
                     }
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", getErrorFromResults(uninstallTask.getResults())));
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                 }
             }
         });
@@ -293,7 +282,7 @@ public class SparkImpl implements Spark {
                         po.addLogDone("Installation succeeded\nDone");
                     } else {
 
-                        po.addLogFailed(String.format("Installation failed, %s", getErrorFromResults(installTask.getResults())));
+                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
                 } else {
                     po.addLogFailed("Could not update cluster info in DB! Please see logs\nInstallation aborted");
@@ -367,7 +356,7 @@ public class SparkImpl implements Spark {
                         po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                     }
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", getErrorFromResults(uninstallTask.getResults())));
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                 }
 
             }
