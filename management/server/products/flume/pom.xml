@@ -4,22 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-parent</artifactId>
+        <artifactId>mgmt-server-products-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mgmt-server-products-parent</artifactId>
-    <name>Kiskis Management Products Parent</name>
-    <description>Kiskis Management Products Parent</description>
+    <artifactId>flume-parent</artifactId>
+    <name>Kiskis Management Flume Parent</name>
+    <description>Kiskis Management Flume Parent</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>mongodb</module>
-        <module>solr</module> 
-	<module>mahout</module> 
-	<module>pig</module> 
-	<module>lucene</module>
-        <module>flume</module>
+        <module>flume-api</module>
+        <module>flume-impl</module>
+        <module>flume-ui</module>
     </modules>
 </project>
