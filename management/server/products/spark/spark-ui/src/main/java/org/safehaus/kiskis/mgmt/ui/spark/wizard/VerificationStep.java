@@ -37,8 +37,9 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
+        cfgView.addStringCfg("Master Node", wizard.getConfig().getMasterNode().getHostname());
         for (Agent agent : wizard.getConfig().getSlaveNodes()) {
-            cfgView.addStringCfg("Node to install", agent.getHostname() + "");
+            cfgView.addStringCfg("Slave nodes", agent.getHostname() + "");
         }
 
         Button install = new Button("Install");
