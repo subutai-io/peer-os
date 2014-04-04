@@ -40,10 +40,18 @@ public class CheckTask implements Runnable {
             ProductOperationView po = SparkUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains(NodeState.STOPPED.toString())) {
-                        state = NodeState.STOPPED;
-                    } else if (po.getLog().contains(NodeState.RUNNING.toString())) {
-                        state = NodeState.RUNNING;
+                    if (master) {
+                        if (po.getLog().contains("SparkMaster is Running")) {
+                            state = NodeState.RUNNING;
+                        } else if (po.getLog().contains("SparkMaster is NOT Running")) {
+                            state = NodeState.STOPPED;
+                        }
+                    } else {
+                        if (po.getLog().contains("SparkWorker is Running")) {
+                            state = NodeState.RUNNING;
+                        } else if (po.getLog().contains("SparkWorker is NOT Running")) {
+                            state = NodeState.STOPPED;
+                        }
                     }
                     break;
                 }
