@@ -398,13 +398,12 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (agent.equals(config.getMasterNode())) {
-                    po.addLogFailed("This is the master node in the cluster. Please, change master first\nOperation aborted");
-                    return;
-                }
-
+//                if (agent.equals(config.getMasterNode())) {
+//                    po.addLogFailed("This is the master node in the cluster. Please, change master first\nOperation aborted");
+//                    return;
+//                }
                 //check if node is in the cluster
-                if (!config.getAllNodes().contains(agent)) {
+                if (!config.getSlaveNodes().contains(agent)) {
                     po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted", agent.getHostname()));
                     return;
                 }
@@ -433,36 +432,42 @@ public class SparkImpl implements Spark {
                     po.addLog("Failed to unregister slave from master: Master is not connected, skipping...");
                 }
 
-                po.addLog("Uninstalling Spark...");
+                boolean uninstall = !agent.equals(config.getMasterNode());
 
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                if (uninstall) {
+                    po.addLog("Uninstalling Spark...");
 
-                if (uninstallTask.isCompleted()) {
-                    Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
-                    Result result = res.getValue();
-                    if (result.getExitCode() != null && result.getExitCode() == 0) {
-                        if (result.getStdOut().contains("Package ksks-spark is not installed, so not removed")) {
-                            po.addLog(String.format("Spark is not installed, so not removed on node %s", result.getStdErr(),
-                                    agent.getHostname()));
+                    Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+
+                    if (uninstallTask.isCompleted()) {
+                        Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
+                        Result result = res.getValue();
+                        if (result.getExitCode() != null && result.getExitCode() == 0) {
+                            if (result.getStdOut().contains("Package ksks-spark is not installed, so not removed")) {
+                                po.addLog(String.format("Spark is not installed, so not removed on node %s", result.getStdErr(),
+                                        agent.getHostname()));
+                            } else {
+                                po.addLog(String.format("Spark is removed from node %s",
+                                        agent.getHostname()));
+                            }
                         } else {
-                            po.addLog(String.format("Spark is removed from node %s",
+                            po.addLog(String.format("Error %s on node %s", result.getStdErr(),
                                     agent.getHostname()));
                         }
-                    } else {
-                        po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                                agent.getHostname()));
-                    }
 
-                    config.getSlaveNodes().remove(agent);
-                    po.addLog("Updating db...");
-
-                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                        po.addLogDone("Cluster info updated in DB\nDone");
                     } else {
-                        po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
+                        po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                        return;
                     }
+                }
+
+                config.getSlaveNodes().remove(agent);
+                po.addLog("Updating db...");
+
+                if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                    po.addLogDone("Cluster info updated in DB\nDone");
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                    po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                 }
 
             }
