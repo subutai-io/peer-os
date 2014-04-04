@@ -642,16 +642,182 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    public UUID startNode(String clusterName, String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Starting node %s in %s", lxcHostname, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+
+                if (!config.getAllNodes().contains(node)) {
+                    po.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
+                    return;
+                }
+
+                if (master && !config.getMasterNode().equals(node)) {
+                    po.addLogFailed(String.format("Node %s is not a master node\nOperation aborted", node.getHostname()));
+                    return;
+                } else if (!master && !config.getSlaveNodes().contains(node)) {
+                    po.addLogFailed(String.format("Node %s is not a slave node\nOperation aborted", node.getHostname()));
+                    return;
+                }
+
+                po.addLog(String.format("Starting %s on %s...", master ? "master" : "slave", node.getHostname()));
+
+                Task startTask;
+                if (master) {
+                    startTask = Tasks.getStartMasterTask(Util.wrapAgentToSet(node));
+                } else {
+                    startTask = Tasks.getStartSlaveTask(Util.wrapAgentToSet(node));
+                }
+
+                final AtomicInteger okCount = new AtomicInteger(0);
+                taskRunner.executeTask(startTask, new TaskCallback() {
+
+                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                        okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+
+                        if (okCount.get() >= 0) {
+                            taskRunner.removeTaskCallback(task.getUuid());
+                            synchronized (task) {
+                                task.notifyAll();
+                            }
+                        } else if (task.isCompleted()) {
+                            synchronized (task) {
+                                task.notifyAll();
+                            }
+                        }
+
+                        return null;
+                    }
+                });
+
+                synchronized (startTask) {
+                    try {
+                        startTask.wait(startTask.getAvgTimeout() * 1000 + 1000);
+                    } catch (InterruptedException ex) {
+                    }
+                }
+                if (okCount.get() >= 0) {
+                    po.addLogDone(String.format("Node %s started", node.getHostname()));
+                } else {
+                    po.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(), startTask.getFirstError()));
+                }
+
+            }
+        });
+
+        return po.getId();
+
     }
 
-    public UUID stopNode(String clusterName, String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+
+                if (!config.getAllNodes().contains(node)) {
+                    po.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
+                    return;
+                }
+
+                if (master && !config.getMasterNode().equals(node)) {
+                    po.addLogFailed(String.format("Node %s is not a master node\nOperation aborted", node.getHostname()));
+                    return;
+                } else if (!master && !config.getSlaveNodes().contains(node)) {
+                    po.addLogFailed(String.format("Node %s is not a slave node\nOperation aborted", node.getHostname()));
+                    return;
+                }
+
+                po.addLog(String.format("Stopping %s on %s...", master ? "master" : "slave", node.getHostname()));
+
+                Task stopTask;
+                if (master) {
+                    stopTask = taskRunner.executeTask(Tasks.getStopMasterTask(Util.wrapAgentToSet(node)));
+                } else {
+                    stopTask = taskRunner.executeTask(Tasks.getStopSlaveTask(Util.wrapAgentToSet(node)));
+                }
+
+                if (stopTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLogDone(String.format("Node %s stopped", node.getHostname()));
+                } else {
+                    po.addLogFailed(String.format("Stopping %s failed, %s", node.getHostname(), stopTask.getFirstError()));
+                }
+
+            }
+        });
+
+        return po.getId();
     }
 
-    public UUID checkNode(String clusterName, String lxcHostName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public UUID checkNode(final String clusterName, final String lxcHostname) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+                    return;
+                }
+
+                Agent node = agentManager.getAgentByHostname(lxcHostname);
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+
+                if (!config.getAllNodes().contains(node)) {
+                    po.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
+                    return;
+                }
+
+                po.addLog("Checking node...");
+
+                Task checkNodeTask = taskRunner.executeTask(
+                        Tasks.getStatusAllTask(Util.wrapAgentToSet(node)));
+
+                Result res = checkNodeTask.getResults().get(node.getUuid());
+                if (checkNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLogDone(String.format("%s", res.getStdOut()));
+                } else {
+                    po.addLogFailed(String.format("Faied to check status, %s", res.getStdErr()));
+                }
+            }
+        });
+
+        return po.getId();
     }
 
 }
