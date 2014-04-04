@@ -31,4 +31,34 @@ public interface Spark {
      *
      */
     public List<Config> getClusters();
+
+    /**
+     * Starts the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
+     * @return - UUID of operation to track
+     *
+     */
+    public UUID startNode(String clusterName, String lxcHostName);
+
+    /**
+     * Stops the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
+     * @return - UUID of operation to track
+     *
+     */
+    public UUID stopNode(String clusterName, String lxcHostName);
+
+    /**
+     * Checks status of the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
+     * @return - UUID of operation to track
+     *
+     */
+    public UUID checkNode(String clusterName, String lxcHostName);
 }

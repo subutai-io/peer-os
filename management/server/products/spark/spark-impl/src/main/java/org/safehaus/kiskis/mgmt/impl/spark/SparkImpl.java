@@ -409,6 +409,9 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
+    /*
+     * @todo add workaround for stopping slave on master
+     */
     public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
 
         final ProductOperation po
@@ -618,6 +621,18 @@ public class SparkImpl implements Spark {
         });
 
         return po.getId();
+    }
+
+    public UUID startNode(String clusterName, String lxcHostName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public UUID stopNode(String clusterName, String lxcHostName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public UUID checkNode(String clusterName, String lxcHostName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
