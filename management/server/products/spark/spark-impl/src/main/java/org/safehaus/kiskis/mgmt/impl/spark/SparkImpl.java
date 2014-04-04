@@ -290,12 +290,14 @@ public class SparkImpl implements Spark {
                 }
 
                 //check if node is in the cluster
-                if (config.getAllNodes().contains(agent)) {
+                if (config.getSlaveNodes().contains(agent)) {
                     po.addLogFailed(String.format("Node %s already belongs to this cluster\nOperation aborted", agent.getHostname()));
                     return;
                 }
 
                 po.addLog("Checking prerequisites...");
+
+                boolean install = !agent.equals(config.getMasterNode());
 
                 //check installed ksks packages
                 Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
@@ -307,7 +309,7 @@ public class SparkImpl implements Spark {
 
                 Result result = checkInstalled.getResults().get(agent.getUuid());
 
-                if (result.getStdOut().contains("ksks-spark")) {
+                if (result.getStdOut().contains("ksks-spark") && install) {
                     po.addLogFailed(String.format("Node %s already has Spark installed\nOperation aborted", lxcHostname));
                     return;
                 } else if (!result.getStdOut().contains("ksks-hadoop")) {
@@ -319,50 +321,85 @@ public class SparkImpl implements Spark {
                 po.addLog("Updating db...");
                 //save to db
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog("Cluster info updated in DB\nInstalling Spark...");
+                    po.addLog("Cluster info updated in DB");
                     //install spark            
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                    if (install) {
+                        po.addLog("Installing Spark...");
+                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Installation succeeded\nSetting master IP on slave...");
+                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLog("Installation succeeded");
+                        } else {
+                            po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                            return;
+                        }
+                    }
 
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getMasterNode()));
+                    po.addLog("Setting master IP on slave...");
+                    Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getMasterNode()));
 
-                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Master IP successfully set\nRegistering slave with master...");
+                    if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Master IP successfully set\nRegistering slave with master...");
 
-                            Task registerSlaveTask = taskRunner.executeTask(Tasks.getAddSlaveTask(config.getMasterNode(), agent));
+                        Task registerSlaveTask = taskRunner.executeTask(Tasks.getAddSlaveTask(config.getMasterNode(), agent));
 
-                            if (registerSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                                po.addLog("Registration succeeded\nStarting Spark on new node...");
+                        if (registerSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLog("Registration succeeded\nRestarting master...");
 
-                                Task startSparkTask = taskRunner.executeTask(Tasks.getStartSlaveTask(Util.wrapAgentToSet(agent)));
-                                if (startSparkTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                                    po.addLog("Spark started successfully\nRestarting master...");
+                            Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getMasterNode()));
 
-                                    Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getMasterNode()));
+                            if (restartMasterTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                po.addLog("Master restarted successfully\nStarting Spark on new node...");
 
-                                    if (restartMasterTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                                        po.addLogDone("Master restarted successfully\nDone");
-                                    } else {
-                                        po.addLogFailed(String.format("Master restart failed, %s", restartMasterTask.getFirstError()));
+                                Task startSparkTask = Tasks.getStartSlaveTask(Util.wrapAgentToSet(agent));
+                                final AtomicInteger okCount = new AtomicInteger(0);
+                                taskRunner.executeTask(startSparkTask, new TaskCallback() {
+
+                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                        if (stdOut.contains("starting")) {
+                                            okCount.incrementAndGet();
+                                        }
+
+                                        if (okCount.get() >= 0) {
+                                            taskRunner.removeTaskCallback(task.getUuid());
+                                            synchronized (task) {
+                                                task.notifyAll();
+                                            }
+                                        } else if (task.isCompleted()) {
+                                            synchronized (task) {
+                                                task.notifyAll();
+                                            }
+                                        }
+
+                                        return null;
                                     }
+                                });
+
+                                synchronized (startSparkTask) {
+                                    try {
+                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
+                                    } catch (InterruptedException ex) {
+                                    }
+                                }
+
+                                if (okCount.get() >= 0) {
+                                    po.addLogDone("Spark started successfully\nDone");
                                 } else {
-                                    po.addLogFailed(String.format("Starting of spark failed, %s", startSparkTask.getFirstError()));
+                                    po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
                                 }
 
                             } else {
-                                po.addLogFailed(String.format("Registration failed, %s", registerSlaveTask.getFirstError()));
+                                po.addLogFailed(String.format("Master restart failed, %s", restartMasterTask.getFirstError()));
                             }
+
                         } else {
-                            po.addLogFailed(String.format("Failed to set master IP, %s", setMasterIPTask.getFirstError()));
+                            po.addLogFailed(String.format("Registration failed, %s", registerSlaveTask.getFirstError()));
                         }
-
                     } else {
-
-                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to set master IP, %s", setMasterIPTask.getFirstError()));
                     }
+
                 } else {
                     po.addLogFailed("Could not update cluster info in DB! Please see logs\nOperation aborted");
                 }
@@ -459,6 +496,16 @@ public class SparkImpl implements Spark {
                         po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                         return;
                     }
+                } else {
+                    po.addLog("Stopping slave...");
+
+                    Task stopSlaveTask = taskRunner.executeTask(Tasks.getStopSlaveTask(Util.wrapAgentToSet(agent)));
+
+                    if (stopSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Slave stopped successfully");
+                    } else {
+                        po.addLog(String.format("Failed to stop slave, %s, skipping...", stopSlaveTask.getFirstError()));
+                    }
                 }
 
                 config.getSlaveNodes().remove(agent);
@@ -476,6 +523,9 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
+    /*
+     * @todo add callback to start cluster
+     */
     public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
