@@ -409,9 +409,6 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    /*
-     * @todo add workaround for stopping slave on master
-     */
     public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
 
         final ProductOperation po
@@ -438,10 +435,6 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-//                if (agent.equals(config.getMasterNode())) {
-//                    po.addLogFailed("This is the master node in the cluster. Please, change master first\nOperation aborted");
-//                    return;
-//                }
                 //check if node is in the cluster
                 if (!config.getSlaveNodes().contains(agent)) {
                     po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted", agent.getHostname()));
@@ -526,9 +519,6 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    /*
-     * @todo add callback to start cluster
-     */
     public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -594,12 +584,41 @@ public class SparkImpl implements Spark {
                         if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Master IP set successfully\nStarting cluster...");
                             //start master & slaves
-                            Task startAllTask = taskRunner.executeTask(Tasks.getStartAllTask(Util.wrapAgentToSet(newMaster)));
-                            if (startAllTask.getTaskStatus() == TaskStatus.SUCCESS) {
+
+                            Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
+                            final AtomicInteger okCount = new AtomicInteger(0);
+                            taskRunner.executeTask(startSparkTask, new TaskCallback() {
+
+                                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                    okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+
+                                    if (okCount.get() >= config.getAllNodes().size()) {
+                                        taskRunner.removeTaskCallback(task.getUuid());
+                                        synchronized (task) {
+                                            task.notifyAll();
+                                        }
+                                    } else if (task.isCompleted()) {
+                                        synchronized (task) {
+                                            task.notifyAll();
+                                        }
+                                    }
+
+                                    return null;
+                                }
+                            });
+
+                            synchronized (startSparkTask) {
+                                try {
+                                    startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
+                                } catch (InterruptedException ex) {
+                                }
+                            }
+                            if (okCount.get() >= config.getAllNodes().size()) {
                                 po.addLog("Cluster started successfully");
                             } else {
-                                po.addLog(String.format("Start of cluster failed, %s, skipping...", startAllTask.getFirstError()));
+                                po.addLog(String.format("Start of cluster failed, %s, skipping...", startSparkTask.getFirstError()));
                             }
+
                             po.addLog("Updating db...");
                             //update db
                             if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
