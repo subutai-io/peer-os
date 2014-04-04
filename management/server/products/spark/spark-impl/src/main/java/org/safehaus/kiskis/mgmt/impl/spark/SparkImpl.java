@@ -12,17 +12,20 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.api.spark.Spark;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
@@ -151,13 +154,35 @@ public class SparkImpl implements Spark {
                             if (registerSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                                 po.addLog("Slaves successfully registered\nStarting Spark...");
 
-                                Task startSparkTask = taskRunner.executeTask(Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode())));
+                                Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
+                                taskRunner.executeTask(startSparkTask, new TaskCallback() {
+
+                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                        if (Util.countNumberOfOccurences(stdOut, "starting") == config.getAllNodes().size()
+                                                || task.isCompleted()) {
+                                            synchronized (task) {
+                                                task.notifyAll();
+                                            }
+                                        }
+
+                                        return null;
+                                    }
+                                });
+
+                                synchronized (startSparkTask) {
+                                    try {
+                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
+                                    } catch (InterruptedException ex) {
+                                    }
+                                }
                                 //start spark
-                                if (startSparkTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                Result res = startSparkTask.getResults().get(config.getMasterNode().getUuid());
+                                if (Util.countNumberOfOccurences(res.getStdOut(), "starting") == config.getAllNodes().size()) {
                                     po.addLogDone("Spark started successfully\nDone");
                                 } else {
                                     po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
                                 }
+
                             } else {
                                 po.addLogFailed(String.format("Failed to register slaves with master, %s", registerSlavesTask.getFirstError()));
                             }
