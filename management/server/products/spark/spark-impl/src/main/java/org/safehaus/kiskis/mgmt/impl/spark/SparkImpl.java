@@ -357,7 +357,7 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (agent == config.getMasterNode()) {
+                if (agent.equals(config.getMasterNode())) {
                     po.addLogFailed("This is the master node in the cluster. Please, change master first\nOperation aborted");
                     return;
                 }
@@ -410,7 +410,7 @@ public class SparkImpl implements Spark {
                     po.addLog("Updating db...");
 
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                        po.addLogDone("Cluster info update in DB\nDone");
+                        po.addLogDone("Cluster info updated in DB\nDone");
                     } else {
                         po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                     }
@@ -446,6 +446,11 @@ public class SparkImpl implements Spark {
                 Agent newMaster = agentManager.getAgentByHostname(newMasterHostname);
                 if (newMaster == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", newMasterHostname));
+                    return;
+                }
+
+                if (newMaster.equals(config.getMasterNode())) {
+                    po.addLogFailed(String.format("Node %s is already a master node\nOperation aborted", newMasterHostname));
                     return;
                 }
 

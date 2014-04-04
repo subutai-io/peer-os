@@ -8,10 +8,12 @@ package org.safehaus.kiskis.mgmt.ui.spark.manager;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -33,7 +35,6 @@ import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
 /**
  *
  * @author dilshat
- * @todo add hadoop node selection for addNode
  */
 public class Manager {
 
@@ -41,6 +42,7 @@ public class Manager {
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private Config config;
+    private final String MASTER_PREFIX = "Master: ";
 
     public Manager() {
 
@@ -185,12 +187,22 @@ public class Manager {
         for (Iterator it = agents.iterator(); it.hasNext();) {
             final Agent agent = (Agent) it.next();
 
+            final Button checkBtn = new Button("Check");
+            final Button startBtn = new Button("Start");
+            final Button stopBtn = new Button("Stop");
             final Button destroyBtn = new Button("Destroy");
+            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            stopBtn.setEnabled(false);
+            startBtn.setEnabled(false);
+            progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                agent.getHostname(),
-                destroyBtn
-            },
+                (config.getMasterNode() == agent ? MASTER_PREFIX : "") + agent.getHostname(),
+                checkBtn,
+                startBtn,
+                stopBtn,
+                destroyBtn,
+                progressIcon},
                     null);
 
             destroyBtn.addListener(new Button.ClickListener() {
@@ -224,7 +236,7 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(nodesTable, config.getSlaveNodes());
+            populateTable(nodesTable, config.getAllNodes());
         } else {
             nodesTable.removeAllItems();
         }
@@ -253,12 +265,16 @@ public class Manager {
         }
     }
 
-    private Table createTableTemplate(String caption, int size) {
+    private Table createTableTemplate(String caption, int height) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Start", Button.class, null);
+        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(size, Sizeable.UNITS_PIXELS);
+        table.setHeight(height, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
@@ -268,6 +284,7 @@ public class Manager {
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                    lxcHostname = lxcHostname.replaceAll(MASTER_PREFIX, "");
                     Agent lxcAgent = SparkUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
