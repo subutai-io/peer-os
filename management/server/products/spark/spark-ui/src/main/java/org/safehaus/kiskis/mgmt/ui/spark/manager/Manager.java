@@ -180,7 +180,10 @@ public class Manager {
         contentRoot.getWindow().showNotification(notification);
     }
 
-    private void populateTable(final Table table, Set<Agent> agents) {
+    /*
+     * @todo separate master from slaves
+     */
+    private void populateTable(final Table table, Set<Agent> agents, Agent master) {
 
         table.removeAllItems();
 
@@ -190,6 +193,7 @@ public class Manager {
             final Button checkBtn = new Button("Check");
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
+            final Button setMasterBtn = new Button("Set As Master");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             stopBtn.setEnabled(false);
@@ -197,10 +201,11 @@ public class Manager {
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                (config.getMasterNode() == agent ? MASTER_PREFIX : "") + agent.getHostname(),
+                agent.getHostname(),
                 checkBtn,
                 startBtn,
                 stopBtn,
+                setMasterBtn,
                 destroyBtn,
                 progressIcon},
                     null);
@@ -232,11 +237,31 @@ public class Manager {
                 }
             });
         }
+
+        //add master here
+        final Button checkBtn = new Button("Check");
+        final Button startBtn = new Button("Start");
+        final Button stopBtn = new Button("Stop");
+        final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+        stopBtn.setEnabled(false);
+        startBtn.setEnabled(false);
+        progressIcon.setVisible(false);
+
+        final Object rowId = table.addItem(new Object[]{
+            MASTER_PREFIX + master.getHostname(),
+            checkBtn,
+            startBtn,
+            stopBtn,
+            null,
+            null,
+            progressIcon},
+                null);
+
     }
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(nodesTable, config.getAllNodes());
+            populateTable(nodesTable, config.getSlaveNodes(), config.getMasterNode());
         } else {
             nodesTable.removeAllItems();
         }
@@ -271,6 +296,7 @@ public class Manager {
         table.addContainerProperty("Check", Button.class, null);
         table.addContainerProperty("Start", Button.class, null);
         table.addContainerProperty("Stop", Button.class, null);
+        table.addContainerProperty("Action", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);

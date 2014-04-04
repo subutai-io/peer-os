@@ -76,6 +76,11 @@ public class SparkImpl implements Spark {
         executor.execute(new Runnable() {
 
             public void run() {
+                if (config == null || Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
+                    po.addLogFailed("Malformed configuration\nInstallation aborted");
+                    return;
+                }
+
                 if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
@@ -155,11 +160,18 @@ public class SparkImpl implements Spark {
                                 po.addLog("Slaves successfully registered\nStarting Spark...");
 
                                 Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
+                                final AtomicInteger okCount = new AtomicInteger(0);
                                 taskRunner.executeTask(startSparkTask, new TaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        if (Util.countNumberOfOccurences(stdOut, "starting") >= config.getAllNodes().size()
-                                                || task.isCompleted()) {
+                                        okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+
+                                        if (okCount.get() >= config.getAllNodes().size()) {
+                                            taskRunner.removeTaskCallback(task.getUuid());
+                                            synchronized (task) {
+                                                task.notifyAll();
+                                            }
+                                        } else if (task.isCompleted()) {
                                             synchronized (task) {
                                                 task.notifyAll();
                                             }
@@ -175,9 +187,7 @@ public class SparkImpl implements Spark {
                                     } catch (InterruptedException ex) {
                                     }
                                 }
-                                //start spark
-                                Result res = startSparkTask.getResults().get(config.getMasterNode().getUuid());
-                                if (Util.countNumberOfOccurences(res.getStdOut(), "starting") >= config.getAllNodes().size()) {
+                                if (okCount.get() >= config.getAllNodes().size()) {
                                     po.addLogDone("Spark started successfully\nDone");
                                 } else {
                                     po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
@@ -276,6 +286,12 @@ public class SparkImpl implements Spark {
                 Agent agent = agentManager.getAgentByHostname(lxcHostname);
                 if (agent == null) {
                     po.addLogFailed(String.format("New node %s is not connected\nOperation aborted", lxcHostname));
+                    return;
+                }
+
+                //check if node is in the cluster
+                if (config.getAllNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Node %s already belongs to this cluster\nOperation aborted", agent.getHostname()));
                     return;
                 }
 
@@ -387,6 +403,12 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
+                //check if node is in the cluster
+                if (!config.getAllNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted", agent.getHostname()));
+                    return;
+                }
+
                 po.addLog("Unregistering slave from master...");
 
                 if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) != null) {
@@ -476,6 +498,12 @@ public class SparkImpl implements Spark {
 
                 if (newMaster.equals(config.getMasterNode())) {
                     po.addLogFailed(String.format("Node %s is already a master node\nOperation aborted", newMasterHostname));
+                    return;
+                }
+
+                //check if node is in the cluster
+                if (!config.getAllNodes().contains(newMaster)) {
+                    po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted", newMasterHostname));
                     return;
                 }
 
