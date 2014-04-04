@@ -191,7 +191,7 @@ public class Commands {
         for (Agent slaveNode : slaveNodes) {
             slaves.append(slaveNode.getHostname()).append(" ");
         }
-        req.setProgram(String.format(". /etc/profile && sparkSlaveConf.sh %s", slaves));
+        req.setProgram(String.format(". /etc/profile && sparkSlaveConf.sh clear ; sparkSlaveConf.sh %s", slaves));
         req.setTimeout(60);
         return req;
     }

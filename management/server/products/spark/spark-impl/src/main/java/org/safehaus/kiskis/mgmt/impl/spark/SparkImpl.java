@@ -65,12 +65,6 @@ public class SparkImpl implements Spark {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }
 
-    /*
-     * @todo find out if spark after installation is running
-     * this is needed to install both slave and master on the same node
-     do we need to restart master after adding slave - yes
-     do we need to restart slave after changing master ip - yes
-     */
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -238,7 +232,7 @@ public class SparkImpl implements Spark {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                        String.format("Adding node %s to %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -250,7 +244,7 @@ public class SparkImpl implements Spark {
                 }
 
                 if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) == null) {
-                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getMasterNode().getHostname()));
                     return;
                 }
 
@@ -430,15 +424,87 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    public UUID changeMasterNode(String clusterName, String newMasterHostname, boolean keepSlave) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Changing master to %s in %s", newMasterHostname, clusterName));
 
-        //stop all nodes
-        //clear slaves from old master
-        //add slaves to new master, if keepSlave=true then master node is also added as slave
-        //modify master ip on all nodes
-        //start master
-        //start slaves
+        executor.execute(new Runnable() {
+
+            public void run() {
+                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) == null) {
+                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getMasterNode().getHostname()));
+                    return;
+                }
+
+                Agent newMaster = agentManager.getAgentByHostname(newMasterHostname);
+                if (newMaster == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", newMasterHostname));
+                    return;
+                }
+
+                po.addLog("Stopping all nodes...");
+                //stop all nodes
+                Task stopAllNodesTask = taskRunner.executeTask(Tasks.getStopAllTask(Util.wrapAgentToSet(config.getMasterNode())));
+                if (stopAllNodesTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLog("All nodes stopped\nClearing slaves on old master...");
+                    //clear slaves from old master
+                    Task clearSlavesTask = taskRunner.executeTask(Tasks.getClearSlavesTask(config.getMasterNode()));
+                    if (clearSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Slaves cleared successfully");
+                    } else {
+                        po.addLog(String.format("Clearing slaves failed, %s, skipping...", clearSlavesTask.getFirstError()));
+                    }
+                    //add slaves to new master, if keepSlave=true then master node is also added as slave
+                    config.getSlaveNodes().add(config.getMasterNode());
+                    config.setMasterNode(newMaster);
+                    if (keepSlave) {
+                        config.getSlaveNodes().add(newMaster);
+                    } else {
+                        config.getSlaveNodes().remove(newMaster);
+                    }
+                    po.addLog("Adding nodes to new master...");
+                    Task addSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(newMaster, config.getSlaveNodes()));
+                    if (addSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Nodes added successfully\nSetting new master IP...");
+                        //modify master ip on all nodes
+                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getAllNodes(), newMaster));
+                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLog("Master IP set successfully\nStarting cluster...");
+                            //start master & slaves
+                            Task startAllTask = taskRunner.executeTask(Tasks.getStartAllTask(Util.wrapAgentToSet(newMaster)));
+                            if (startAllTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                po.addLog("Cluster started successfully");
+                            } else {
+                                po.addLog(String.format("Start of cluster failed, %s, skipping...", startAllTask.getFirstError()));
+                            }
+                            po.addLog("Updating db...");
+                            //update db
+                            if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+                                po.addLogDone("Cluster info updated in DB\nDone");
+                            } else {
+                                po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
+                            }
+                        } else {
+                            po.addLogFailed(String.format("Failed to set master IP on all nodes, %s\nOperation aborted", setMasterIPTask.getFirstError()));
+                        }
+                    } else {
+                        po.addLogFailed(String.format("Failed to add slaves to new master, %s\nOperation aborted", addSlavesTask.getFirstError()));
+                    }
+
+                } else {
+                    po.addLogFailed(String.format("Failed to stop all nodes, %s", stopAllNodesTask.getFirstError()));
+                }
+            }
+        });
+
+        return po.getId();
     }
 
 }
