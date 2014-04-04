@@ -20,7 +20,7 @@ public class Commands {
                 null, //                        !! task uuid
                 1, //                           !! request sequence number
                 "/", //                         cwd
-                "pwd", //                        program
+                null, //                        program
                 OutputRedirection.RETURN, //    std output redirection
                 OutputRedirection.RETURN, //    std error redirection
                 null, //                        stdout capture file path
