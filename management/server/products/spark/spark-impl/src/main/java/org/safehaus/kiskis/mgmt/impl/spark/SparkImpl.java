@@ -158,7 +158,7 @@ public class SparkImpl implements Spark {
                                 taskRunner.executeTask(startSparkTask, new TaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        if (Util.countNumberOfOccurences(stdOut, "starting") == config.getAllNodes().size()
+                                        if (Util.countNumberOfOccurences(stdOut, "starting") >= config.getAllNodes().size()
                                                 || task.isCompleted()) {
                                             synchronized (task) {
                                                 task.notifyAll();
@@ -177,7 +177,7 @@ public class SparkImpl implements Spark {
                                 }
                                 //start spark
                                 Result res = startSparkTask.getResults().get(config.getMasterNode().getUuid());
-                                if (Util.countNumberOfOccurences(res.getStdOut(), "starting") == config.getAllNodes().size()) {
+                                if (Util.countNumberOfOccurences(res.getStdOut(), "starting") >= config.getAllNodes().size()) {
                                     po.addLogDone("Spark started successfully\nDone");
                                 } else {
                                     po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
