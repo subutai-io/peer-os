@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.spark.manager;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
@@ -95,8 +96,22 @@ public class Manager {
                 refreshClustersInfo();
             }
         });
-
         controlsContent.addComponent(refreshClustersBtn);
+
+        Button checkAllBtn = new Button("Check All");
+
+        checkAllBtn.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                for (Iterator it = nodesTable.getItemIds().iterator(); it.hasNext();) {
+                    int rowId = (Integer) it.next();
+                    Item row = nodesTable.getItem(rowId);
+                    Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
+                    checkBtn.click();
+                }
+            }
+        });
+        controlsContent.addComponent(checkAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
