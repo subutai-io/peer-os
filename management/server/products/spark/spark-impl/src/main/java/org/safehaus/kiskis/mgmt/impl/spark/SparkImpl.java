@@ -31,7 +31,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 /**
  *
  * @author dilshat
- * @todo check destroy slave on master & change master actions
+ * @todo check destroy slave on master & stop slave in manager
  */
 public class SparkImpl implements Spark {
 
