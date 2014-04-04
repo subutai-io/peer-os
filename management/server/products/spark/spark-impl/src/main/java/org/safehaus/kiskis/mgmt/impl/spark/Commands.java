@@ -158,7 +158,7 @@ public class Commands {
 
     public static Request getSetMasterIPCommand(Agent masterNode) {
         Request req = getRequestTemplate();
-        req.setProgram(String.format(". /etc/profile && sparkMasterConf.sh %s", masterNode.getHostname()));
+        req.setProgram(String.format(". /etc/profile && sparkMasterConf.sh clear ; sparkMasterConf.sh %s", masterNode.getHostname()));
         req.setTimeout(60);
         return req;
     }
