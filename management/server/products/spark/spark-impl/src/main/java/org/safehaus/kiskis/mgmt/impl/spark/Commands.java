@@ -61,7 +61,7 @@ public class Commands {
     public static Request getStartAllCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service spark-all start");
-        req.setTimeout(60);
+        req.setTimeout(360);
         return req;
     }
 
@@ -89,7 +89,14 @@ public class Commands {
     public static Request getStartMasterCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service spark-master start");
-        req.setTimeout(60);
+        req.setTimeout(90);
+        return req;
+    }
+
+    public static Request getRestartMasterCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service spark-master stop && service spark-master start");
+        req.setTimeout(120);
         return req;
     }
 
@@ -117,7 +124,7 @@ public class Commands {
     public static Request getStartSlaveCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service spark-slave start");
-        req.setTimeout(60);
+        req.setTimeout(90);
         return req;
     }
 

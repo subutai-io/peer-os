@@ -79,6 +79,12 @@ public class Tasks {
         return task;
     }
 
+    public static Task getRestartMasterTask(Agent masterNode) {
+        Task task = new Task();
+        task.addRequest(Commands.getRestartMasterCommand(), masterNode);
+        return task;
+    }
+
     public static Task getStopMasterTask(Set<Agent> agents) {
         Task task = new Task();
         for (Agent agent : agents) {

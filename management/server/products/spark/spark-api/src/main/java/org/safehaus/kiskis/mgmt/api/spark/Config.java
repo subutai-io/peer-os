@@ -19,7 +19,7 @@ public class Config {
     private String clusterName = "";
 
     private Agent masterNode;
-    private Set<Agent> nodes;
+    private Set<Agent> slaves;
 
     public Agent getMasterNode() {
         return masterNode;
@@ -37,18 +37,18 @@ public class Config {
         this.clusterName = clusterName;
     }
 
-    public Set<Agent> getNodes() {
-        return nodes;
+    public Set<Agent> getSlaveNodes() {
+        return slaves;
     }
 
-    public void setNodes(Set<Agent> nodes) {
-        this.nodes = nodes;
+    public void setSlaveNodes(Set<Agent> slaves) {
+        this.slaves = slaves;
     }
 
     public Set<Agent> getAllNodes() {
         Set<Agent> allNodes = new HashSet<Agent>();
-        if (nodes != null) {
-            allNodes.addAll(nodes);
+        if (slaves != null) {
+            allNodes.addAll(slaves);
         }
         if (masterNode != null) {
             allNodes.add(masterNode);
@@ -59,7 +59,7 @@ public class Config {
 
     @Override
     public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", nodes=" + nodes + '}';
+        return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
     }
 
 }

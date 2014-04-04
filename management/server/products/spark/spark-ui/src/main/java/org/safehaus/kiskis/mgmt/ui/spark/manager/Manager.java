@@ -140,7 +140,7 @@ public class Manager {
                                     HadoopClusterInfo.class);
                     if (info != null) {
                         Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
-                        nodes.removeAll(config.getNodes());
+                        nodes.removeAll(config.getSlaveNodes());
                         if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
                             MgmtApplication.addCustomWindow(addNodeWindow);
@@ -224,7 +224,7 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(nodesTable, config.getNodes());
+            populateTable(nodesTable, config.getSlaveNodes());
         } else {
             nodesTable.removeAllItems();
         }

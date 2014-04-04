@@ -92,7 +92,7 @@ public class ConfigurationStep extends Panel {
                             new BeanItemContainer<Agent>(
                                     Agent.class, hadoopInfo.getAllAgents()));
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-                    wizard.getConfig().setNodes(new HashSet<Agent>());
+                    wizard.getConfig().setSlaveNodes(new HashSet<Agent>());
                 }
             }
         });
@@ -106,15 +106,15 @@ public class ConfigurationStep extends Panel {
         select.setRightColumnCaption("Selected Nodes");
         select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         select.setRequired(true);
-        if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
-            select.setValue(wizard.getConfig().getNodes());
+        if (!Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
+            select.setValue(wizard.getConfig().getSlaveNodes());
         }
         select.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
-                    wizard.getConfig().setNodes(agentList);
+                    wizard.getConfig().setSlaveNodes(agentList);
                 }
             }
         });
@@ -127,7 +127,7 @@ public class ConfigurationStep extends Panel {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
-                } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
                     show("Please, select target nodes");
                 } else {
                     wizard.next();
