@@ -29,7 +29,9 @@ import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
 
 /**
@@ -183,7 +185,7 @@ public class Manager {
     /*
      * @todo separate master from slaves
      */
-    private void populateTable(final Table table, Set<Agent> agents, Agent master) {
+    private void populateTable(final Table table, Set<Agent> agents, final Agent master) {
 
         table.removeAllItems();
 
@@ -209,6 +211,123 @@ public class Manager {
                 destroyBtn,
                 progressIcon},
                     null);
+
+            checkBtn.addListener(new Button.ClickListener() {
+
+                public void buttonClick(Button.ClickEvent event) {
+                    progressIcon.setVisible(true);
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    setMasterBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
+                    SparkUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+
+                        public void onComplete(NodeState state) {
+                            synchronized (progressIcon) {
+                                if (state == NodeState.RUNNING) {
+                                    stopBtn.setEnabled(true);
+                                } else if (state == NodeState.STOPPED) {
+                                    startBtn.setEnabled(true);
+                                }
+                                setMasterBtn.setEnabled(true);
+                                destroyBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
+                            }
+                        }
+                    }));
+                }
+            });
+
+            startBtn.addListener(new Button.ClickListener() {
+
+                public void buttonClick(Button.ClickEvent event) {
+                    progressIcon.setVisible(true);
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    setMasterBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
+                    SparkUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+
+                        public void onComplete(NodeState state) {
+                            synchronized (progressIcon) {
+                                if (state == NodeState.RUNNING) {
+                                    stopBtn.setEnabled(true);
+                                } else if (state == NodeState.STOPPED) {
+                                    startBtn.setEnabled(true);
+                                }
+                                setMasterBtn.setEnabled(true);
+                                destroyBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
+                            }
+                        }
+                    }));
+                }
+            });
+
+            stopBtn.addListener(new Button.ClickListener() {
+
+                public void buttonClick(Button.ClickEvent event) {
+                    progressIcon.setVisible(true);
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    setMasterBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
+                    SparkUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+
+                        public void onComplete(NodeState state) {
+                            synchronized (progressIcon) {
+                                if (state == NodeState.RUNNING) {
+                                    stopBtn.setEnabled(true);
+                                } else if (state == NodeState.STOPPED) {
+                                    startBtn.setEnabled(true);
+                                }
+                                setMasterBtn.setEnabled(true);
+                                destroyBtn.setEnabled(true);
+                                progressIcon.setVisible(false);
+                            }
+                        }
+                    }));
+                }
+            });
+
+            setMasterBtn.addListener(new Button.ClickListener() {
+
+                public void buttonClick(Button.ClickEvent event) {
+                    MgmtApplication.showConfirmationDialog(
+                            "Master change confirmation",
+                            String.format("Do you want to set %s as master node?", agent.getHostname()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
+
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+
+                                        MgmtApplication.showConfirmationDialog(
+                                                "Setup slave confirmation",
+                                                "Do you want to have a slave on the master node?",
+                                                "Yes", "No", new ConfirmationDialogCallback() {
+
+                                                    @Override
+                                                    public void response(boolean ok) {
+
+                                                        UUID trackID = SparkUI.getSparkManager().changeMasterNode(config.getClusterName(), agent.getHostname(), ok);
+                                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                                                            public void windowClose(Window.CloseEvent e) {
+                                                                refreshClustersInfo();
+                                                            }
+                                                        });
+
+                                                    }
+                                                });
+                                    }
+                                }
+                            });
+                }
+            });
 
             destroyBtn.addListener(new Button.ClickListener() {
 
@@ -256,6 +375,75 @@ public class Manager {
             null,
             progressIcon},
                 null);
+
+        checkBtn.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                progressIcon.setVisible(true);
+                startBtn.setEnabled(false);
+                stopBtn.setEnabled(false);
+
+                SparkUI.getExecutor().execute(new CheckTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+
+                    public void onComplete(NodeState state) {
+                        synchronized (progressIcon) {
+                            if (state == NodeState.RUNNING) {
+                                stopBtn.setEnabled(true);
+                            } else if (state == NodeState.STOPPED) {
+                                startBtn.setEnabled(true);
+                            }
+                            progressIcon.setVisible(false);
+                        }
+                    }
+                }));
+            }
+        });
+
+        startBtn.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                progressIcon.setVisible(true);
+                startBtn.setEnabled(false);
+                stopBtn.setEnabled(false);
+
+                SparkUI.getExecutor().execute(new StartTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+
+                    public void onComplete(NodeState state) {
+                        synchronized (progressIcon) {
+                            if (state == NodeState.RUNNING) {
+                                stopBtn.setEnabled(true);
+                            } else if (state == NodeState.STOPPED) {
+                                startBtn.setEnabled(true);
+                            }
+                            progressIcon.setVisible(false);
+                        }
+                    }
+                }));
+            }
+        });
+
+        stopBtn.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                progressIcon.setVisible(true);
+                startBtn.setEnabled(false);
+                stopBtn.setEnabled(false);
+
+                SparkUI.getExecutor().execute(new StopTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+
+                    public void onComplete(NodeState state) {
+                        synchronized (progressIcon) {
+                            if (state == NodeState.RUNNING) {
+                                stopBtn.setEnabled(true);
+                            } else if (state == NodeState.STOPPED) {
+                                startBtn.setEnabled(true);
+                            }
+                            progressIcon.setVisible(false);
+                        }
+                    }
+                }));
+            }
+        });
 
     }
 
