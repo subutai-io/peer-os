@@ -51,6 +51,4 @@ class Format {
 
         return time;
     }
-
-
 }
