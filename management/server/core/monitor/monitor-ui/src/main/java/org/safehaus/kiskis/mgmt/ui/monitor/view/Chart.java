@@ -37,7 +37,7 @@ class Chart {
 
         String data = Query.execute(host, metric.toString(), 25);
 
-        if (StringUtils.isEmpty(data)) {
+        if ( StringUtils.isEmpty(data) ) {
             return;
         }
 

@@ -42,15 +42,15 @@ public class ModuleComponent extends CustomComponent {
 
     private void addSubmitButton(AbsoluteLayout layout) {
 
-        Button startButton = UIUtil.getButton("Start", "150px");
+        Button button = UIUtil.getButton("Submit", "150px");
 
-        startButton.addListener(new Button.ClickListener() {
+        button.addListener(new Button.ClickListener() {
             public void buttonClick(Button.ClickEvent event) {
                 submitButtonClicked();
             }
         });
 
-        layout.addComponent(startButton, "left: 20px; top: 330px;");
+        layout.addComponent(button, "left: 20px; top: 330px;");
     }
 
     private void addChartLayout(AbsoluteLayout layout) {

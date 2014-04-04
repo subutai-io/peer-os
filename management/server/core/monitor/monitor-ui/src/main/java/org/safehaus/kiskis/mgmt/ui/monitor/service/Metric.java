@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.monitor.service;
 
+// TODO refactor
 public enum Metric {
 
     cpu_user("cpu_user", "%"),

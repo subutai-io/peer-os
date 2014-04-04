@@ -9,16 +9,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-// TODO remove the stuff done for the demo
-public class Format {
+class Format {
 
     private final static Logger LOG = LoggerFactory.getLogger(Format.class);
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
 
-    private static final String POINT = "{ x: %s, y: %s }";
-
-    public static String toPoints(List<JsonNode> nodes) {
+    static String toPoints(List<JsonNode> nodes) {
 
         String str = "";
 
@@ -27,7 +24,7 @@ public class Format {
                 str += ", ";
             }
 
-            str += getPoint(nodes.get(i), i - nodes.size() );
+            str += getPoint( nodes.get(i), i - nodes.size() );
         }
 
         return String.format("[%s]", str);
@@ -35,13 +32,10 @@ public class Format {
 
     private static String getPoint(JsonNode node, int i) {
 
-//        Fix for the demo
-//        long time = parseTime( node.get("@timestamp").asText() );
-
-        String time = String.format("( new Date() ).getTime() + %s * 5000", i);
+        long time = parseTime( node.get("@timestamp").asText() );
         double value = node.get("val").asDouble();
 
-        return String.format(POINT, time, value);
+        return String.format("{ x: %s, y: %s }", time, value);
     }
 
     private static long parseTime(String dateStr) {
