@@ -38,4 +38,13 @@ public class Tasks {
         }
         return task;
     }
+
+    public static Task getSetMasterIPTask(Set<Agent> agents, Agent masterNode) {
+        Task task = new Task();
+        for (Agent agent : agents) {
+            task.addRequest(Commands.getSetMasterIPCommand(masterNode), agent);
+        }
+        return task;
+    }
+
 }

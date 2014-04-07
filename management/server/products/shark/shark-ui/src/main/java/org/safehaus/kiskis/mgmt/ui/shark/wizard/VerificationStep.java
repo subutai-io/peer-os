@@ -47,7 +47,7 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                UUID trackID = SharkUI.getSharkManager().installCluster(wizard.getConfig());
+                UUID trackID = SharkUI.getSharkManager().installCluster(wizard.getConfig().getClusterName());
                 MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }

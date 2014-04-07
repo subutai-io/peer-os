@@ -14,13 +14,15 @@ import java.util.UUID;
  */
 public interface Shark {
 
-    public UUID installCluster(Config config);
+    public UUID installCluster(String clusterName);
 
     public UUID uninstallCluster(String clusterName);
 
     public UUID addNode(String clusterName, String lxcHostname);
 
     public UUID destroyNode(String clusterName, String lxcHostname);
+
+    public UUID actualizeMasterIP(String clusterName);
 
     /**
      * Returns list of configurations of installed clusters

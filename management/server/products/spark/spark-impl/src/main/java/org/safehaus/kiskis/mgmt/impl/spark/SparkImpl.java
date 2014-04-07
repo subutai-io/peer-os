@@ -77,7 +77,7 @@ public class SparkImpl implements Spark {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (config == null || Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
+                if (config == null || Util.isStringEmpty(config.getClusterName()) ||Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.shark;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -60,31 +59,41 @@ public class SharkImpl implements Shark {
         this.agentManager = agentManager;
     }
 
-    public UUID installCluster(final Config config) {
+    public UUID installCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                        String.format("Installing cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
-                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
+                if (Util.isStringEmpty(clusterName)) {
+                    po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
 
-                //check if node agent is connected
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
-                    Agent node = it.next();
+                if (dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class) != null) {
+                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", clusterName));
+                    return;
+                }
+
+                org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
+                        = dbManager.getInfo(Config.PRODUCT_KEY, clusterName,
+                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                if (sparkConfig == null) {
+                    po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
+                    return;
+                }
+
+                Config config = new Config();
+                config.setClusterName(clusterName);
+                config.setNodes(sparkConfig.getAllNodes());
+
+                for (Agent node : config.getNodes()) {
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
-                        po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
-                        it.remove();
+                        po.addLogFailed(String.format("Node %s is not connected\nInstallation aborted", node.getHostname()));
+                        return;
                     }
-                }
-
-                if (config.getNodes().isEmpty()) {
-                    po.addLogFailed("No nodes eligible for installation. Operation aborted");
-                    return;
                 }
 
                 po.addLog("Checking prerequisites...");
@@ -97,34 +106,35 @@ public class SharkImpl implements Shark {
                     return;
                 }
 
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
-                    Agent node = it.next();
-
+                for (Agent node : config.getNodes()) {
                     Result result = checkInstalled.getResults().get(node.getUuid());
 
-                    if (result.getStdOut().contains("ksks-mahout")) {
-                        po.addLog(String.format("Node %s already has Mahout installed. Omitting this node from installation", node.getHostname()));
-                        it.remove();
-                    } else if (!result.getStdOut().contains("ksks-hadoop")) {
-                        po.addLog(String.format("Node %s has no Hadoop installation. Omitting this node from installation", node.getHostname()));
-                        it.remove();
+                    if (result.getStdOut().contains("ksks-shark")) {
+                        po.addLogFailed(String.format("Node %s already has Shark installed\nInstallation aborted", node.getHostname()));
+                        return;
+                    } else if (!result.getStdOut().contains("ksks-spark")) {
+                        po.addLog(String.format("Node %s has no Spark installation\nInstallation aborted", node.getHostname()));
+                        return;
                     }
                 }
 
-                if (config.getNodes().isEmpty()) {
-                    po.addLogFailed("No nodes eligible for installation. Operation aborted");
-                    return;
-                }
                 po.addLog("Updating db...");
                 //save to db
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog("Cluster info saved to DB\nInstalling Mahout...");
-                    //install mahout            
+                    po.addLog("Cluster info saved to DB\nInstalling Shark...");
 
                     Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLogDone("Installation succeeded\nDone");
+                        po.addLog("Installation succeeded\nSetting Master IP...");
+
+                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
+
+                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLogDone("Master IP successfully set\nDone");
+                        } else {
+                            po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPTask.getFirstError()));
+                        }
                     } else {
                         po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
@@ -151,7 +161,7 @@ public class SharkImpl implements Shark {
                     return;
                 }
 
-                po.addLog("Uninstalling Mahout...");
+                po.addLog("Uninstalling Shark...");
 
                 Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getNodes()));
 
@@ -160,11 +170,11 @@ public class SharkImpl implements Shark {
                         Result result = res.getValue();
                         Agent agent = agentManager.getAgentByUUID(res.getKey());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
-                            if (result.getStdOut().contains("Package ksks-mahout is not installed, so not removed")) {
-                                po.addLog(String.format("Mahout is not installed, so not removed on node %s", result.getStdErr(),
+                            if (result.getStdOut().contains("Package ksks-shark is not installed, so not removed")) {
+                                po.addLog(String.format("Shark is not installed, so not removed on node %s", result.getStdErr(),
                                         agent == null ? res.getKey() : agent.getHostname()));
                             } else {
-                                po.addLog(String.format("Mahout is removed from node %s",
+                                po.addLog(String.format("Shark is removed from node %s",
                                         agent == null ? res.getKey() : agent.getHostname()));
                             }
                         } else {
@@ -212,18 +222,17 @@ public class SharkImpl implements Shark {
                     po.addLogFailed("This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
                 }
-                po.addLog("Uninstalling Mahout...");
+                po.addLog("Uninstalling Shark...");
                 Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
 
                 if (uninstallTask.isCompleted()) {
-                    Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
-                    Result result = res.getValue();
+                    Result result = uninstallTask.getResults().get(agent.getUuid());
                     if (result.getExitCode() != null && result.getExitCode() == 0) {
-                        if (result.getStdOut().contains("Package ksks-mahout is not installed, so not removed")) {
-                            po.addLog(String.format("Mahout is not installed, so not removed on node %s", result.getStdErr(),
+                        if (result.getStdOut().contains("Package ksks-shark is not installed, so not removed")) {
+                            po.addLog(String.format("Shark is not installed, so not removed on node %s", result.getStdErr(),
                                     agent.getHostname()));
                         } else {
-                            po.addLog(String.format("Mahout is removed from node %s",
+                            po.addLog(String.format("Shark is removed from node %s",
                                     agent.getHostname()));
                         }
                     } else {
@@ -269,6 +278,24 @@ public class SharkImpl implements Shark {
                     return;
                 }
 
+                if (config.getNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Node %s already belongs to this cluster\nOperation aborted", lxcHostname));
+                    return;
+                }
+
+                org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
+                        = dbManager.getInfo(Config.PRODUCT_KEY, clusterName,
+                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                if (sparkConfig == null) {
+                    po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
+                    return;
+                }
+
+                if (!sparkConfig.getAllNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Node %s does not belong to %s spark cluster\nOperation aborted", lxcHostname, clusterName));
+                    return;
+                }
+
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
@@ -281,11 +308,11 @@ public class SharkImpl implements Shark {
 
                 Result result = checkInstalled.getResults().get(agent.getUuid());
 
-                if (result.getStdOut().contains("ksks-mahout")) {
-                    po.addLogFailed(String.format("Node %s already has Mahout installed\nInstallation aborted", lxcHostname));
+                if (result.getStdOut().contains("ksks-shark")) {
+                    po.addLogFailed(String.format("Node %s already has Shark installed\nInstallation aborted", lxcHostname));
                     return;
-                } else if (!result.getStdOut().contains("ksks-hadoop")) {
-                    po.addLogFailed(String.format("Node %s has no Hadoop installation\nInstallation aborted", lxcHostname));
+                } else if (!result.getStdOut().contains("ksks-spark")) {
+                    po.addLogFailed(String.format("Node %s has no Spark installation\nInstallation aborted", lxcHostname));
                     return;
                 }
 
@@ -293,13 +320,20 @@ public class SharkImpl implements Shark {
                 po.addLog("Updating db...");
                 //save to db
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog("Cluster info updated in DB\nInstalling Mahout...");
-                    //install mahout            
+                    po.addLog("Cluster info updated in DB\nInstalling Shark...");
 
                     Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLogDone("Installation succeeded\nDone");
+                        po.addLog("Installation succeeded\nSetting Master IP...");
+
+                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), sparkConfig.getMasterNode()));
+
+                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLogDone("Master IP successfully set\nDone");
+                        } else {
+                            po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPTask.getFirstError()));
+                        }
                     } else {
 
                         po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
@@ -316,6 +350,49 @@ public class SharkImpl implements Shark {
 
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    public UUID actualizeMasterIP(final String clusterName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                        String.format("Actualizing master IP of %s", clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
+                        = dbManager.getInfo(Config.PRODUCT_KEY, clusterName,
+                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                if (sparkConfig == null) {
+                    po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
+                    return;
+                }
+
+                for (Agent node : config.getNodes()) {
+                    if (agentManager.getAgentByHostname(node.getHostname()) == null) {
+                        po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
+                        return;
+                    }
+                }
+
+                Task setMaterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
+
+                if (setMaterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLogDone("Master IP actualized successfully\nDone");
+                } else {
+                    po.addLogFailed(String.format("Failed to actualize Master IP, %s", setMaterIPTask.getFirstError()));
+                }
+
+            }
+        });
+
+        return po.getId();
     }
 
 }

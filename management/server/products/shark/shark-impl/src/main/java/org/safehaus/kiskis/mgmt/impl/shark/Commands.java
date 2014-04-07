@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.shark;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -52,6 +53,13 @@ public class Commands {
     public static Request getUninstallCommand() {
         Request req = getRequestTemplate();
         req.setProgram("apt-get --force-yes --assume-yes purge ksks-shark");
+        req.setTimeout(60);
+        return req;
+    }
+
+    public static Request getSetMasterIPCommand(Agent masterNode) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format(". /etc/profile && sharkConf.sh clear master ; sharkConf.sh master %s", masterNode.getHostname()));
         req.setTimeout(60);
         return req;
     }
