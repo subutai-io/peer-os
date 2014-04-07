@@ -20,7 +20,6 @@
         <module>oozie</module>
         <module>hive</module>
         <module>flume</module>
-        <module>monitor</module>
     </modules>
    
 </project>
