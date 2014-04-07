@@ -20,6 +20,10 @@
 	<module>mahout</module> 
 	<module>pig</module> 
 	<module>lucene</module>
+<<<<<<< HEAD
         <module>flume</module>
+=======
+	<module>spark</module>
+>>>>>>> ac96425e968773d2ff209217d7fa0ebc7b37dafe
     </modules>
 </project>

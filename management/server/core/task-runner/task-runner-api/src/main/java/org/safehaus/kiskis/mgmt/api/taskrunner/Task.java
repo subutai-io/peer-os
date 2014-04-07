@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  * @author dilshat
@@ -200,6 +201,17 @@ public class Task implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFirstError() {
+        String err = "";
+        for (Map.Entry<UUID, Result> res : results.entrySet()) {
+            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
+                err = res.getValue().getStdErr();
+                break;
+            }
+        }
+        return err;
     }
 
     @Override
