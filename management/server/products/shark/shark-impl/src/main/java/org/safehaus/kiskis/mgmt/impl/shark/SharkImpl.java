@@ -78,7 +78,7 @@ public class SharkImpl implements Shark {
                 }
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
-                        = dbManager.getInfo(Config.PRODUCT_KEY, clusterName,
+                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
                                 org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
@@ -289,7 +289,7 @@ public class SharkImpl implements Shark {
                 }
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
-                        = dbManager.getInfo(Config.PRODUCT_KEY, clusterName,
+                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
                                 org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
@@ -372,7 +372,7 @@ public class SharkImpl implements Shark {
                 }
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
-                        = dbManager.getInfo(Config.PRODUCT_KEY, clusterName,
+                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
                                 org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));

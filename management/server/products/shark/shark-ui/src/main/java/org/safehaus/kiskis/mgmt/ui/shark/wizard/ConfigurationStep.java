@@ -53,16 +53,6 @@ public class ConfigurationStep extends Panel {
             }
         }
 
-        Config info = SharkUI.getDbManager().
-                getInfo(Config.PRODUCT_KEY,
-                        wizard.getConfig().getClusterName(),
-                        Config.class);
-
-        if (info != null) {
-            sparkClusters.setValue(info);
-        } else if (clusters.size() > 0) {
-            sparkClusters.setValue(clusters.iterator().next());
-        }
 
         sparkClusters.addListener(new Property.ValueChangeListener() {
             @Override
@@ -74,6 +64,17 @@ public class ConfigurationStep extends Panel {
                 }
             }
         });
+        
+        Config info = SharkUI.getDbManager().
+                getInfo(Config.PRODUCT_KEY,
+                        wizard.getConfig().getClusterName(),
+                        Config.class);
+        if (info != null) {
+            sparkClusters.setValue(info);
+        } else if (clusters.size() > 0) {
+            sparkClusters.setValue(clusters.iterator().next());
+        }
+
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
