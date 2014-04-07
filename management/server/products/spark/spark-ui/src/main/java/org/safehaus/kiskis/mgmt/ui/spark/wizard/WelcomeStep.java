@@ -33,10 +33,10 @@ public class WelcomeStep extends Panel {
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/spark.gif"));
+        logoImg.setIcon(new ThemeResource("icons/modules/spark.png"));
         logoImg.setContentMode(Label.CONTENT_XHTML);
-        logoImg.setHeight(200, Sizeable.UNITS_PIXELS);
-        logoImg.setWidth(180, Sizeable.UNITS_PIXELS);
+        logoImg.setHeight(100, Sizeable.UNITS_PIXELS);
+        logoImg.setWidth(192, Sizeable.UNITS_PIXELS);
         grid.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Start");
