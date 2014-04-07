@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.api.mahout;
+package org.safehaus.kiskis.mgmt.api.shark;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -14,7 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class Config {
 
-    public static final String PRODUCT_KEY = "Mahout";
+    public static final String PRODUCT_KEY = "Shark";
     private String clusterName = "";
 
     private Set<Agent> nodes;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.mahout;
+package org.safehaus.kiskis.mgmt.impl.shark;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -43,7 +43,7 @@ public class Commands {
 
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("sleep 10; apt-get --force-yes --assume-yes install ksks-mahout");
+        req.setProgram("apt-get --force-yes --assume-yes install ksks-shark");
         req.setStdOut(OutputRedirection.NO);
         req.setTimeout(90);
         return req;
@@ -51,7 +51,7 @@ public class Commands {
 
     public static Request getUninstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("apt-get --force-yes --assume-yes purge ksks-mahout");
+        req.setProgram("apt-get --force-yes --assume-yes purge ksks-shark");
         req.setTimeout(60);
         return req;
     }

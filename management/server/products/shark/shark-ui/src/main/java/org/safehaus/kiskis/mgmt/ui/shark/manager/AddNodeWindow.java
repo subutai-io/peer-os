@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mahout.manager;
+package org.safehaus.kiskis.mgmt.ui.shark.manager;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
@@ -17,13 +17,13 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.mahout.Config;
+import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
+import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
 /**
  *
@@ -79,12 +79,12 @@ public class AddNodeWindow extends Window {
                 addNodeBtn.setEnabled(false);
                 showProgress();
                 Agent agent = (Agent) hadoopNodes.getValue();
-                final UUID trackID = MahoutUI.getMahoutManager().addNode(config.getClusterName(), agent.getHostname());
-                MahoutUI.getExecutor().execute(new Runnable() {
+                final UUID trackID = SharkUI.getSharkManager().addNode(config.getClusterName(), agent.getHostname());
+                SharkUI.getExecutor().execute(new Runnable() {
 
                     public void run() {
                         while (track) {
-                            ProductOperationView po = MahoutUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+                            ProductOperationView po = SharkUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
                             if (po != null) {
                                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                                 if (po.getState() != ProductOperationState.RUNNING) {

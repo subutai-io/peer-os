@@ -3,17 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mahout.manager;
+package org.safehaus.kiskis.mgmt.ui.shark.manager;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -24,18 +22,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.mahout.Config;
+import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
+import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
 /**
  *
  * @author dilshat
- * @todo add hadoop node selection for addNode
  */
 public class Manager {
 
@@ -110,7 +106,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = MahoutUI.getMahoutManager().uninstallCluster(config.getClusterName());
+                                        UUID trackID = SharkUI.getSharkManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -136,12 +132,12 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    HadoopClusterInfo info = MahoutUI.getDbManager().
-                            getInfo(HadoopClusterInfo.SOURCE,
+                    org.safehaus.kiskis.mgmt.api.spark.Config info = SharkUI.getDbManager().
+                            getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY,
                                     config.getClusterName(),
-                                    HadoopClusterInfo.class);
+                                    org.safehaus.kiskis.mgmt.api.spark.Config.class);
                     if (info != null) {
-                        Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
+                        Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
                         nodes.removeAll(config.getNodes());
                         if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
@@ -208,7 +204,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = MahoutUI.getMahoutManager().destroyNode(config.getClusterName(), agent.getHostname());
+                                        UUID trackID = SharkUI.getSharkManager().destroyNode(config.getClusterName(), agent.getHostname());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -233,7 +229,7 @@ public class Manager {
     }
 
     public void refreshClustersInfo() {
-        List<Config> clustersInfo = MahoutUI.getMahoutManager().getClusters();
+        List<Config> clustersInfo = SharkUI.getSharkManager().getClusters();
         Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (clustersInfo != null && clustersInfo.size() > 0) {
@@ -270,7 +266,7 @@ public class Manager {
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                    Agent lxcAgent = MahoutUI.getAgentManager().getAgentByHostname(lxcHostname);
+                    Agent lxcAgent = SharkUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
                         MgmtApplication.addCustomWindow(terminal);

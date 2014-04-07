@@ -3,25 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mahout;
+package org.safehaus.kiskis.mgmt.ui.shark;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import org.safehaus.kiskis.mgmt.ui.mahout.manager.Manager;
-import org.safehaus.kiskis.mgmt.ui.mahout.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.ui.shark.manager.Manager;
+import org.safehaus.kiskis.mgmt.ui.shark.wizard.Wizard;
 
 /**
  *
  * @author dilshat
  */
-public class MahoutForm extends CustomComponent {
+public class SharkForm extends CustomComponent {
 
     private final Wizard wizard;
     private final Manager manager;
 
-    public MahoutForm() {
+    public SharkForm() {
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);

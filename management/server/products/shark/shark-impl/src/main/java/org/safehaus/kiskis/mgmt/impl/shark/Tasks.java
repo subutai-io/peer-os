@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.mahout;
+package org.safehaus.kiskis.mgmt.impl.shark;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 public class Tasks {
 
     public static Task getCheckInstalledTask(Set<Agent> agents) {
-        Task task = new Task("Check existence of ksks packages");
+        Task task = new Task();
         for (Agent agent : agents) {
             task.addRequest(Commands.getCheckInstalledCommand(), agent);
         }
@@ -24,7 +24,7 @@ public class Tasks {
     }
 
     public static Task getInstallTask(Set<Agent> agents) {
-        Task task = new Task("Install Mahout");
+        Task task = new Task();
         for (Agent agent : agents) {
             task.addRequest(Commands.getInstallCommand(), agent);
         }
@@ -32,7 +32,7 @@ public class Tasks {
     }
 
     public static Task getUninstallTask(Set<Agent> agents) {
-        Task task = new Task("Uninstall Mahout");
+        Task task = new Task();
         for (Agent agent : agents) {
             task.addRequest(Commands.getUninstallCommand(), agent);
         }

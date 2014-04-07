@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mahout.wizard;
+package org.safehaus.kiskis.mgmt.ui.shark.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -21,10 +21,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
+import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
 /**
  *
@@ -32,7 +32,7 @@ import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
  */
 public class ConfigurationStep extends Panel {
 
-    private final ComboBox hadoopClusters;
+    private final ComboBox sparkClusters;
     private final TwinColSelect select;
 
     public ConfigurationStep(final Wizard wizard) {
@@ -44,53 +44,53 @@ public class ConfigurationStep extends Panel {
         content.setSpacing(true);
         content.setMargin(true);
 
-        hadoopClusters = new ComboBox("Hadoop cluster");
+        sparkClusters = new ComboBox("Spark cluster");
         select = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
-        hadoopClusters.setMultiSelect(false);
-        hadoopClusters.setImmediate(true);
-        hadoopClusters.setTextInputAllowed(false);
-        hadoopClusters.setRequired(true);
-        hadoopClusters.setNullSelectionAllowed(false);
+        sparkClusters.setMultiSelect(false);
+        sparkClusters.setImmediate(true);
+        sparkClusters.setTextInputAllowed(false);
+        sparkClusters.setRequired(true);
+        sparkClusters.setNullSelectionAllowed(false);
 
-        List<HadoopClusterInfo> clusters = MahoutUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
+        List<Config> clusters = SharkUI.getDbManager().
+                getInfo(Config.PRODUCT_KEY, Config.class);
         if (clusters.size() > 0) {
-            for (HadoopClusterInfo hadoopClusterInfo : clusters) {
-                hadoopClusters.addItem(hadoopClusterInfo);
-                hadoopClusters.setItemCaption(hadoopClusterInfo,
+            for (Config hadoopClusterInfo : clusters) {
+                sparkClusters.addItem(hadoopClusterInfo);
+                sparkClusters.setItemCaption(hadoopClusterInfo,
                         hadoopClusterInfo.getClusterName());
             }
         }
 
-        HadoopClusterInfo info = MahoutUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE,
+        Config info = SharkUI.getDbManager().
+                getInfo(Config.PRODUCT_KEY,
                         wizard.getConfig().getClusterName(),
-                        HadoopClusterInfo.class);
+                        Config.class);
 
         if (info != null) {
-            hadoopClusters.setValue(info);
+            sparkClusters.setValue(info);
         } else if (clusters.size() > 0) {
-            hadoopClusters.setValue(clusters.iterator().next());
+            sparkClusters.setValue(clusters.iterator().next());
         }
 
-        if (hadoopClusters.getValue() != null) {
-            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClusters.getValue();
+        if (sparkClusters.getValue() != null) {
+            Config hadoopInfo = (Config) sparkClusters.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             select.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents()));
+                            Agent.class, hadoopInfo.getAllNodes()));
         }
 
-        hadoopClusters.addListener(new Property.ValueChangeListener() {
+        sparkClusters.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
+                    Config hadoopInfo = (Config) event.getProperty().getValue();
                     select.setValue(null);
                     select.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents()));
+                                    Agent.class, hadoopInfo.getAllNodes()));
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setNodes(new HashSet<Agent>());
                 }
@@ -126,7 +126,7 @@ public class ConfigurationStep extends Panel {
             public void buttonClick(Button.ClickEvent event) {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
-                    show("Please, select Hadoop cluster");
+                    show("Please, select Spark cluster");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
                     show("Please, select target nodes");
                 } else {
@@ -152,7 +152,7 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent(back);
         buttons.addComponent(next);
 
-        content.addComponent(hadoopClusters);
+        content.addComponent(sparkClusters);
         content.addComponent(select);
         content.addComponent(buttons);
 

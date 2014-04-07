@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.mahout;
+package org.safehaus.kiskis.mgmt.impl.shark;
 
 import java.util.Iterator;
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.mahout.Config;
-import org.safehaus.kiskis.mgmt.api.mahout.Mahout;
+import org.safehaus.kiskis.mgmt.api.shark.Config;
+import org.safehaus.kiskis.mgmt.api.shark.Shark;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
@@ -28,7 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-public class MahoutImpl implements Mahout {
+public class SharkImpl implements Shark {
 
     private TaskRunner taskRunner;
     private AgentManager agentManager;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.api.mahout;
+package org.safehaus.kiskis.mgmt.api.shark;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +12,7 @@ import java.util.UUID;
  *
  * @author dilshat
  */
-public interface Mahout {
+public interface Shark {
 
     public UUID installCluster(Config config);
 

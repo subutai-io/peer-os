@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mahout.wizard;
+package org.safehaus.kiskis.mgmt.ui.shark.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ProgressIndicator;
-import org.safehaus.kiskis.mgmt.api.mahout.Config;
+import org.safehaus.kiskis.mgmt.api.shark.Config;
 
 /**
  *

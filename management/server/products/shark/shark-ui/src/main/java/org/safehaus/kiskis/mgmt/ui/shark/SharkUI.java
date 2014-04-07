@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.mahout;
+package org.safehaus.kiskis.mgmt.ui.shark;
 
 import com.vaadin.ui.Component;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.mahout.Mahout;
+import org.safehaus.kiskis.mgmt.api.shark.Shark;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
@@ -18,10 +18,10 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
  *
  * @author dilshat
  */
-public class MahoutUI implements Module {
+public class SharkUI implements Module {
 
-    public static final String MODULE_NAME = "Mahout";
-    private static Mahout mahoutManager;
+    public static final String MODULE_NAME = "Shark";
+    private static Shark sharkManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static DbManager dbManager;
@@ -31,16 +31,16 @@ public class MahoutUI implements Module {
         return tracker;
     }
 
-    public static Mahout getMahoutManager() {
-        return mahoutManager;
+    public static Shark getSharkManager() {
+        return sharkManager;
     }
 
-    public void setMahoutManager(Mahout mahoutManager) {
-        MahoutUI.mahoutManager = mahoutManager;
+    public void setSharkManager(Shark sharkManager) {
+        SharkUI.sharkManager = sharkManager;
     }
 
     public void setTracker(Tracker tracker) {
-        MahoutUI.tracker = tracker;
+        SharkUI.tracker = tracker;
     }
 
     public static DbManager getDbManager() {
@@ -48,7 +48,7 @@ public class MahoutUI implements Module {
     }
 
     public void setDbManager(DbManager dbManager) {
-        MahoutUI.dbManager = dbManager;
+        SharkUI.dbManager = dbManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -60,7 +60,7 @@ public class MahoutUI implements Module {
     }
 
     public void setAgentManager(AgentManager agentManager) {
-        MahoutUI.agentManager = agentManager;
+        SharkUI.agentManager = agentManager;
     }
 
     public void init() {
@@ -68,7 +68,7 @@ public class MahoutUI implements Module {
     }
 
     public void destroy() {
-        mahoutManager = null;
+        sharkManager = null;
         agentManager = null;
         dbManager = null;
         tracker = null;
@@ -80,7 +80,7 @@ public class MahoutUI implements Module {
     }
 
     public Component createComponent() {
-        return new MahoutForm();
+        return new SharkForm();
     }
 
 }
