@@ -149,10 +149,10 @@ public class Manager {
                                 }
                             });
                         } else {
-                            show("All nodes in corresponding Hadoop cluster have Mahout installed");
+                            show("All nodes in corresponding Spark cluster have Shark installed");
                         }
                     } else {
-                        show("Hadoop cluster info not found");
+                        show("Spark cluster info not found");
                     }
                 } else {
                     show("Please, select cluster");
@@ -161,6 +161,33 @@ public class Manager {
         });
 
         controlsContent.addComponent(addNodeBtn);
+
+        Button actualizeBtn = new Button("Update Master");
+
+        actualizeBtn.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+                    MgmtApplication.showConfirmationDialog(
+                            "Master IP update",
+                            String.format("Do you want to Actualize master IP in %s cluster?", config.getClusterName()),
+                            "Yes", "No", new ConfirmationDialogCallback() {
+
+                                @Override
+                                public void response(boolean ok) {
+                                    if (ok) {
+                                        UUID trackID = SharkUI.getSharkManager().actualizeMasterIP(config.getClusterName());
+                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                                    }
+                                }
+                            });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+        });
+
+        controlsContent.addComponent(actualizeBtn);
 
         content.addComponent(controlsContent);
 

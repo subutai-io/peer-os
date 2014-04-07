@@ -28,12 +28,12 @@ public class WelcomeStep extends Panel {
         grid.setMargin(true);
         grid.setSizeFull();
 
-        Label welcomeMsg = new Label("<center><h2>Welcome to Solr Installation Wizard!</h2>");
+        Label welcomeMsg = new Label("<center><h2>Welcome to Shark Installation Wizard!</h2>");
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/solr.png"));
+        logoImg.setIcon(new ThemeResource("icons/modules/shark.png"));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
         logoImg.setWidth(150, Sizeable.UNITS_PIXELS);

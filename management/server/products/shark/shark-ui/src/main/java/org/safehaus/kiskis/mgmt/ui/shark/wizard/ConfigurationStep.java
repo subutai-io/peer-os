@@ -6,23 +6,15 @@
 package org.safehaus.kiskis.mgmt.ui.shark.wizard;
 
 import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
@@ -33,7 +25,6 @@ import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 public class ConfigurationStep extends Panel {
 
     private final ComboBox sparkClusters;
-    private final TwinColSelect select;
 
     public ConfigurationStep(final Wizard wizard) {
 
@@ -45,7 +36,6 @@ public class ConfigurationStep extends Panel {
         content.setMargin(true);
 
         sparkClusters = new ComboBox("Spark cluster");
-        select = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
         sparkClusters.setMultiSelect(false);
         sparkClusters.setImmediate(true);
@@ -56,10 +46,10 @@ public class ConfigurationStep extends Panel {
         List<Config> clusters = SharkUI.getDbManager().
                 getInfo(Config.PRODUCT_KEY, Config.class);
         if (clusters.size() > 0) {
-            for (Config hadoopClusterInfo : clusters) {
-                sparkClusters.addItem(hadoopClusterInfo);
-                sparkClusters.setItemCaption(hadoopClusterInfo,
-                        hadoopClusterInfo.getClusterName());
+            for (Config info : clusters) {
+                sparkClusters.addItem(info);
+                sparkClusters.setItemCaption(info,
+                        info.getClusterName());
             }
         }
 
@@ -74,47 +64,13 @@ public class ConfigurationStep extends Panel {
             sparkClusters.setValue(clusters.iterator().next());
         }
 
-        if (sparkClusters.getValue() != null) {
-            Config hadoopInfo = (Config) sparkClusters.getValue();
-            wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-            select.setContainerDataSource(
-                    new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllNodes()));
-        }
-
         sparkClusters.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    Config hadoopInfo = (Config) event.getProperty().getValue();
-                    select.setValue(null);
-                    select.setContainerDataSource(
-                            new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllNodes()));
-                    wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-                    wizard.getConfig().setNodes(new HashSet<Agent>());
-                }
-            }
-        });
-
-        select.setItemCaptionPropertyId("hostname");
-        select.setRows(7);
-        select.setNullSelectionAllowed(false);
-        select.setMultiSelect(true);
-        select.setImmediate(true);
-        select.setLeftColumnCaption("Available Nodes");
-        select.setRightColumnCaption("Selected Nodes");
-        select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        select.setRequired(true);
-        if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
-            select.setValue(wizard.getConfig().getNodes());
-        }
-        select.addListener(new Property.ValueChangeListener() {
-
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (event.getProperty().getValue() != null) {
-                    Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
-                    wizard.getConfig().setNodes(agentList);
+                    Config config = (Config) event.getProperty().getValue();
+                    wizard.getConfig().setClusterName(config.getClusterName());
+                    wizard.getConfig().setNodes(config.getAllNodes());
                 }
             }
         });
@@ -127,8 +83,6 @@ public class ConfigurationStep extends Panel {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Spark cluster");
-                } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
-                    show("Please, select target nodes");
                 } else {
                     wizard.next();
                 }
@@ -153,7 +107,6 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent(next);
 
         content.addComponent(sparkClusters);
-        content.addComponent(select);
         content.addComponent(buttons);
 
         addComponent(layout);
