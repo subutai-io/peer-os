@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.spark.wizard;
+package org.safehaus.kiskis.mgmt.ui.shark.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
@@ -28,15 +28,15 @@ public class WelcomeStep extends Panel {
         grid.setMargin(true);
         grid.setSizeFull();
 
-        Label welcomeMsg = new Label("<center><h2>Welcome to Spark Installation Wizard!</h2>");
+        Label welcomeMsg = new Label("<center><h2>Welcome to Shark Installation Wizard!</h2>");
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/spark.png"));
+        logoImg.setIcon(new ThemeResource("icons/modules/shark.png"));
         logoImg.setContentMode(Label.CONTENT_XHTML);
-        logoImg.setHeight(100, Sizeable.UNITS_PIXELS);
-        logoImg.setWidth(192, Sizeable.UNITS_PIXELS);
+        logoImg.setHeight(363, Sizeable.UNITS_PIXELS);
+        logoImg.setWidth(88, Sizeable.UNITS_PIXELS);
         grid.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Start");

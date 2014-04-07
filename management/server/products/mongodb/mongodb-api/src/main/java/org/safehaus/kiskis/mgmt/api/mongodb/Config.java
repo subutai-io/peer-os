@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.api.mongodb;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
@@ -28,6 +29,15 @@ public class Config {
     private Set<Agent> configServers;
     private Set<Agent> routerServers;
     private Set<Agent> dataNodes;
+
+    public Set<Agent> getAllNodes() {
+        Set<Agent> nodes = new HashSet<Agent>();
+        nodes.addAll(configServers);
+        nodes.addAll(dataNodes);
+        nodes.addAll(routerServers);
+
+        return nodes;
+    }
 
     public String getDomainName() {
         return domainName;
