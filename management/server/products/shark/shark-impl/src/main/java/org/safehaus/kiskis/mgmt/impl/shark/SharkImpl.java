@@ -218,6 +218,11 @@ public class SharkImpl implements Shark {
                     return;
                 }
 
+                if (!config.getNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
+                    return;
+                }
+
                 if (config.getNodes().size() == 1) {
                     po.addLogFailed("This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
