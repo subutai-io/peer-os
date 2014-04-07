@@ -126,14 +126,7 @@ public class LuceneImpl implements Lucene {
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : installTask.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Installation failed, %s", err));
+                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
                 } else {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
@@ -186,14 +179,7 @@ public class LuceneImpl implements Lucene {
                         po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
                     }
                 } else {
-                    String err = "";
-                    for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                            err = res.getValue().getStdErr();
-                            break;
-                        }
-                    }
-                    po.addLogFailed(String.format("Uninstallation failed, %s", err));
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                 }
 
             }
@@ -254,14 +240,8 @@ public class LuceneImpl implements Lucene {
                         po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                     }
                 } else {
-                    String err = "";
-                    for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                            err = res.getValue().getStdErr();
-                            break;
-                        }
-                    }
-                    po.addLogFailed(String.format("Uninstallation failed, %s", err));
+
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                 }
             }
         });
@@ -322,14 +302,7 @@ public class LuceneImpl implements Lucene {
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : installTask.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Installation failed, %s", err));
+                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
                 } else {
                     po.addLogFailed("Could not update cluster info in DB! Please see logs\nInstallation aborted");

@@ -37,7 +37,7 @@ public class ProgressWindow extends Window {
     public ProgressWindow(Tracker tracker, UUID trackID, String source) {
         super("Operation progress");
         setModal(true);
-        setClosable(false);
+        setClosable(true);
         setWidth(600, ProgressWindow.UNITS_PIXELS);
 
         this.trackID = trackID;

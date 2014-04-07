@@ -257,9 +257,16 @@
                                     <version>${org.eclipse.jetty.orbit.version}</version>
                                 </artifactItem>
                                 <artifactItem>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch</artifactId>
+                                    <version>${org.elasticsearch.version}</version>
+                                </artifactItem>
+
+                                <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
                                     <version>${com.sun.jersey.version}</version>
+
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
@@ -505,6 +512,21 @@
                                 <!-- Core Modules - END -->
 
                                 <!-- Products Modules - START -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>spark-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>spark-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>spark-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>mongodb-api</artifactId>

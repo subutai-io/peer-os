@@ -95,14 +95,7 @@ public class SolrImpl implements Solr {
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded");
                         } else {
-                            String err = "";
-                            for (Map.Entry<UUID, Result> res : installTask.getResults().entrySet()) {
-                                if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                    err = res.getValue().getStdErr();
-                                    break;
-                                }
-                            }
-                            po.addLogFailed(String.format("Installation failed, %s", err));
+                            po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                         }
 
                     } else {
