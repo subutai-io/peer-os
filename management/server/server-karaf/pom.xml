@@ -262,8 +262,6 @@
                                     <version>${org.elasticsearch.version}</version>
                                 </artifactItem>
 
-                                <!--UI Modules-->
-
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
