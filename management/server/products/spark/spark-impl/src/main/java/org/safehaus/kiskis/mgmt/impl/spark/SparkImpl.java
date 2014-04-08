@@ -747,9 +747,11 @@ public class SparkImpl implements Spark {
                 taskRunner.executeTask(startTask, new TaskCallback() {
 
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+                        if (stdOut.contains("starting")) {
+                            okCount.incrementAndGet();
+                        }
 
-                        if (okCount.get() >= 0) {
+                        if (okCount.get() > 0) {
                             taskRunner.removeTaskCallback(task.getUuid());
                             synchronized (task) {
                                 task.notifyAll();
@@ -770,7 +772,7 @@ public class SparkImpl implements Spark {
                     } catch (InterruptedException ex) {
                     }
                 }
-                if (okCount.get() >= 0) {
+                if (okCount.get() > 0) {
                     po.addLogDone(String.format("Node %s started", node.getHostname()));
                 } else {
                     po.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(), startTask.getFirstError()));

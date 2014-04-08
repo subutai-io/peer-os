@@ -38,9 +38,9 @@ public class CheckTask implements Runnable {
             ProductOperationView po = PrestoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains("Spark Worker is running")) {
+                    if (po.getLog().contains("Running")) {
                         state = NodeState.RUNNING;
-                    } else if (po.getLog().contains("Spark Worker is NOT running")) {
+                    } else if (po.getLog().contains("Not running")) {
                         state = NodeState.STOPPED;
                     }
                     break;

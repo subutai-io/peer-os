@@ -147,12 +147,12 @@ public class PrestoImpl implements Presto {
                     Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getAllNodes()));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Installation succeeded\nConfiguring cSoordinator...");
+                        po.addLog("Installation succeeded\nConfiguring coordinator...");
 
                         Task configureCoordinatorTask = taskRunner.executeTask(Tasks.getSetCoordinatorTask(config.getCoordinatorNode()));
 
                         if (configureCoordinatorTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Coordinator configured succeessfully\nConfiguring workers...");
+                            po.addLog("Coordinator configured successfully\nConfiguring workers...");
 
                             Task configureWorkersTask = taskRunner.executeTask(Tasks.getSetWorkerTask(config.getCoordinatorNode(), config.getWorkers()));
 
@@ -164,9 +164,9 @@ public class PrestoImpl implements Presto {
                                 taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+                                        okCount.set(Util.countNumberOfOccurences(stdOut, "Started"));
 
-                                        if (okCount.get() >= config.getAllNodes().size()) {
+                                        if (okCount.get() == config.getAllNodes().size()) {
                                             taskRunner.removeTaskCallback(task.getUuid());
                                             synchronized (task) {
                                                 task.notifyAll();
@@ -187,7 +187,7 @@ public class PrestoImpl implements Presto {
                                     } catch (InterruptedException ex) {
                                     }
                                 }
-                                if (okCount.get() >= config.getAllNodes().size()) {
+                                if (okCount.get() == config.getAllNodes().size()) {
                                     po.addLogDone("Presto started successfully\nDone");
                                 } else {
                                     po.addLogFailed(String.format("Failed to start Presto, %s", startPrestoTask.getFirstError()));
@@ -343,11 +343,11 @@ public class PrestoImpl implements Presto {
                         taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                if (stdOut.contains("starting")) {
+                                if (stdOut.contains("Started")) {
                                     okCount.incrementAndGet();
                                 }
 
-                                if (okCount.get() >= 0) {
+                                if (okCount.get() > 0) {
                                     taskRunner.removeTaskCallback(task.getUuid());
                                     synchronized (task) {
                                         task.notifyAll();
@@ -369,7 +369,7 @@ public class PrestoImpl implements Presto {
                             }
                         }
 
-                        if (okCount.get() >= 0) {
+                        if (okCount.get() > 0) {
                             po.addLogDone("Presto started successfully\nDone");
                         } else {
                             po.addLogFailed(String.format("Failed to start Presto, %s", startPrestoTask.getFirstError()));
@@ -522,9 +522,9 @@ public class PrestoImpl implements Presto {
                         taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+                                okCount.set(Util.countNumberOfOccurences(stdOut, "Started"));
 
-                                if (okCount.get() >= config.getAllNodes().size()) {
+                                if (okCount.get() == config.getAllNodes().size()) {
                                     taskRunner.removeTaskCallback(task.getUuid());
                                     synchronized (task) {
                                         task.notifyAll();
@@ -545,7 +545,7 @@ public class PrestoImpl implements Presto {
                             } catch (InterruptedException ex) {
                             }
                         }
-                        if (okCount.get() >= config.getAllNodes().size()) {
+                        if (okCount.get() == config.getAllNodes().size()) {
                             po.addLog("Cluster started successfully");
                         } else {
                             po.addLog(String.format("Start of cluster failed, %s, skipping...", startPrestoTask.getFirstError()));
@@ -604,9 +604,11 @@ public class PrestoImpl implements Presto {
                 taskRunner.executeTask(startTask, new TaskCallback() {
 
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+                        if (stdOut.contains("Started")) {
+                            okCount.incrementAndGet();
+                        }
 
-                        if (okCount.get() >= 0) {
+                        if (okCount.get() > 0) {
                             taskRunner.removeTaskCallback(task.getUuid());
                             synchronized (task) {
                                 task.notifyAll();
@@ -627,7 +629,7 @@ public class PrestoImpl implements Presto {
                     } catch (InterruptedException ex) {
                     }
                 }
-                if (okCount.get() >= 0) {
+                if (okCount.get() > 0) {
                     po.addLogDone(String.format("Node %s started", node.getHostname()));
                 } else {
                     po.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(), startTask.getFirstError()));
