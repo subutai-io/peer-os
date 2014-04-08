@@ -164,7 +164,10 @@ public class PrestoImpl implements Presto {
                                 taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        okCount.set(Util.countNumberOfOccurences(stdOut, "Started"));
+
+                                        if (stdOut.contains("Started")) {
+                                            okCount.incrementAndGet();
+                                        }
 
                                         if (okCount.get() == config.getAllNodes().size()) {
                                             taskRunner.removeTaskCallback(task.getUuid());
@@ -522,7 +525,9 @@ public class PrestoImpl implements Presto {
                         taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                okCount.set(Util.countNumberOfOccurences(stdOut, "Started"));
+                                if (stdOut.contains("Started")) {
+                                    okCount.incrementAndGet();
+                                }
 
                                 if (okCount.get() == config.getAllNodes().size()) {
                                     taskRunner.removeTaskCallback(task.getUuid());
