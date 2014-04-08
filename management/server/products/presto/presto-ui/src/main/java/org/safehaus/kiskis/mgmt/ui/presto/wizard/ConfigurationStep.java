@@ -36,6 +36,9 @@ public class ConfigurationStep extends Panel {
     private final TwinColSelect workersSelect;
     private final ComboBox coordinatorNodeCombo;
 
+    final Property.ValueChangeListener coordinatorComboChangeListener;
+    final Property.ValueChangeListener workersSelectChangeListener;
+
     public ConfigurationStep(final Wizard wizard) {
 
         setSizeFull();
@@ -129,28 +132,67 @@ public class ConfigurationStep extends Panel {
             coordinatorNodeCombo.setValue(wizard.getConfig().getCoordinatorNode());
         }
 
-        coordinatorNodeCombo.addListener(new Property.ValueChangeListener() {
+        coordinatorComboChangeListener = new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Agent coordinator = (Agent) event.getProperty().getValue();
                     wizard.getConfig().setCoordinatorNode(coordinator);
+
+                    //clear workers
+                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
+                    wizard.getConfig().getWorkers().remove(coordinator);
+                    List<Agent> hadoopNodes = hadoopInfo.getAllAgents();
+                    hadoopNodes.remove(coordinator);
+                    workersSelect.setContainerDataSource(
+                            new BeanItemContainer<Agent>(
+                                    Agent.class, hadoopNodes));
+                    if (workersSelect.getValue() != null) {
+                        Set<Agent> workers = new HashSet((Collection) workersSelect.getValue());
+                        workers.remove(coordinator);
+                        workersSelect.removeListener(workersSelectChangeListener);
+                        workersSelect.setValue(workers);
+                        workersSelect.addListener(workersSelectChangeListener);
+                    }
+
                 }
             }
-        });
+        };
+        coordinatorNodeCombo.addListener(coordinatorComboChangeListener);
 
         if (!Util.isCollectionEmpty(wizard.getConfig().getWorkers())) {
             workersSelect.setValue(wizard.getConfig().getWorkers());
         }
-        workersSelect.addListener(new Property.ValueChangeListener() {
+
+        workersSelectChangeListener = new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
                     wizard.getConfig().setWorkers(agentList);
+
+                    //clear workers
+                    if (wizard.getConfig().getCoordinatorNode() != null) {
+                        if (wizard.getConfig().getWorkers().contains(wizard.getConfig().getCoordinatorNode())) {
+                            wizard.getConfig().setCoordinatorNode(null);
+                            coordinatorNodeCombo.removeListener(coordinatorComboChangeListener);
+                            coordinatorNodeCombo.setValue(null);
+                            coordinatorNodeCombo.addListener(coordinatorComboChangeListener);
+
+                            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
+                            List<Agent> hadoopNodes = hadoopInfo.getAllAgents();
+                            hadoopNodes.removeAll(wizard.getConfig().getWorkers());
+                            coordinatorNodeCombo.removeAllItems();
+                            for (Agent agent : hadoopNodes) {
+                                coordinatorNodeCombo.addItem(agent);
+                                coordinatorNodeCombo.setItemCaption(agent, agent.getHostname());
+                            }
+                        }
+                    }
                 }
             }
-        });
+        };
+        workersSelect.addListener(workersSelectChangeListener);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
