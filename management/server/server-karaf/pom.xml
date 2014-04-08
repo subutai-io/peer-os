@@ -173,7 +173,7 @@
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
             <version>3.2</version>
-        </dependency>        
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -526,7 +526,7 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>shark-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>                                
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>spark-api</artifactId>
@@ -541,7 +541,7 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>spark-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>                                
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>mongodb-api</artifactId>

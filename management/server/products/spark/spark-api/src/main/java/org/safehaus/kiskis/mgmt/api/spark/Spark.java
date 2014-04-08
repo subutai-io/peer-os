@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
 public interface Spark {
@@ -28,7 +27,6 @@ public interface Spark {
      * Returns list of configurations of installed clusters
      *
      * @return - list of configurations of installed clusters
-     *
      */
     public List<Config> getClusters();
 
@@ -37,10 +35,9 @@ public interface Spark {
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @param master - specifies if this commands affects master or slave
-     * running on this node true - master, false - slave
+     * @param master      - specifies if this commands affects master or slave
+     *                    running on this node true - master, false - slave
      * @return - UUID of operation to track
-     *
      */
     public UUID startNode(String clusterName, String lxcHostName, boolean master);
 
@@ -49,10 +46,9 @@ public interface Spark {
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @param master - specifies if this commands affects master or slave
-     * running on this node true - master, false - slave
+     * @param master      - specifies if this commands affects master or slave
+     *                    running on this node true - master, false - slave
      * @return - UUID of operation to track
-     *
      */
     public UUID stopNode(String clusterName, String lxcHostName, boolean master);
 
@@ -62,7 +58,6 @@ public interface Spark {
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
      * @return - UUID of operation to track
-     *
      */
     public UUID checkNode(String clusterName, String lxcHostName);
 }

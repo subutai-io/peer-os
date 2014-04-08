@@ -21,7 +21,7 @@ class HostFilter {
         for (int i = 0; i < hits.size(); i++) {
             JsonNode source = hits.get(i).get("_source");
 
-            if ( filter(nodes, source, host, maxSize) ) {
+            if (filter(nodes, source, host, maxSize)) {
                 break;
             }
         }
@@ -42,7 +42,7 @@ class HostFilter {
 
     private static boolean filter(List<JsonNode> nodes, JsonNode node, String host, int maxSize) {
 
-        if ( !hostEquals( node, host ) ) {
+        if (!hostEquals(node, host)) {
             return false;
         }
 

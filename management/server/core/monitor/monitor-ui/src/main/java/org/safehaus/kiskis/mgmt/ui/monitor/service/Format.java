@@ -20,11 +20,11 @@ class Format {
         String str = "";
 
         for (int i = 0; i < nodes.size(); i++) {
-            if ( !str.isEmpty() ) {
+            if (!str.isEmpty()) {
                 str += ", ";
             }
 
-            str += getPoint( nodes.get(i), i - nodes.size() );
+            str += getPoint(nodes.get(i), i - nodes.size());
         }
 
         return String.format("[%s]", str);
@@ -32,7 +32,7 @@ class Format {
 
     private static String getPoint(JsonNode node, int i) {
 
-        long time = parseTime( node.get("@timestamp").asText() );
+        long time = parseTime(node.get("@timestamp").asText());
         double value = node.get("val").asDouble();
 
         return String.format("{ x: %s, y: %s }", time, value);

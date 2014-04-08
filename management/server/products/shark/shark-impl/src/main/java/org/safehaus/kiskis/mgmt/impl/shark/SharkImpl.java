@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
@@ -24,7 +25,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  */
 public class SharkImpl implements Shark {
@@ -62,7 +62,7 @@ public class SharkImpl implements Shark {
     public UUID installCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", clusterName));
+                String.format("Installing cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -79,7 +79,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -150,7 +150,7 @@ public class SharkImpl implements Shark {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -201,7 +201,7 @@ public class SharkImpl implements Shark {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -265,7 +265,7 @@ public class SharkImpl implements Shark {
     public UUID addNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -290,7 +290,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -360,7 +360,7 @@ public class SharkImpl implements Shark {
     public UUID actualizeMasterIP(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Actualizing master IP of %s", clusterName));
+                String.format("Actualizing master IP of %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -373,7 +373,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;

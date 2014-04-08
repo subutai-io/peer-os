@@ -35,7 +35,7 @@ class HttpPost {
             return "";
         }
 
-        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         StringBuffer buffer = new StringBuffer();
         String inputLine;
 

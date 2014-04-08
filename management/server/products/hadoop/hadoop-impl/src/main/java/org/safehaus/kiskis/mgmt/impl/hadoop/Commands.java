@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -60,36 +61,36 @@ public class Commands {
         return req;
     }
 
-    public static Request getSetMastersCommand(Config cfg) {
+    public static Request getSetMastersCommand(Agent nameNode, Agent jobTracker, String replicationFactor) {
         Request req = getRequestTemplate();
         req.setProgram(
                 ". /etc/profile && " +
                         "hadoop-configure.sh"
         );
         req.setArgs(Arrays.asList(
-                String.format("%s:%d", cfg.getNameNode().getHostname(), Config.NAME_NODE_PORT),
-                String.format("%s:%d", cfg.getJobTracker().getHostname(), Config.JOB_TRACKER_PORT),
-                String.format("%d", cfg.getReplicationFactor())
+                String.format("%s:%d", nameNode.getHostname(), Config.NAME_NODE_PORT),
+                String.format("%s:%d", jobTracker.getHostname(), Config.JOB_TRACKER_PORT),
+                String.format("%d", replicationFactor)
         ));
         req.setStdOut(OutputRedirection.NO);
         return req;
     }
 
-    public static Request getAddSecondaryNamenodeCommand(Config cfg) {
+    public static Request getAddSecondaryNamenodeCommand(Agent secondaryNameNode) {
         Request req = getRequestTemplate();
         req.setProgram(String.format(
                 ". /etc/profile && " +
                         "hadoop-master-slave.sh masters %s",
-                cfg.getSecondaryNameNode().getHostname()
+                secondaryNameNode.getHostname()
         ));
         return req;
     }
 
-    public static Request getAddSlaveCommand(String host) {
+    public static Request getAddSlaveCommand(Agent agent) {
         Request req = getRequestTemplate();
         req.setProgram(String.format(
                 ". /etc/profile && " +
-                        "hadoop-master-slave.sh slaves %s", host
+                        "hadoop-master-slave.sh slaves %s", agent.getHostname()
         ));
         return req;
     }

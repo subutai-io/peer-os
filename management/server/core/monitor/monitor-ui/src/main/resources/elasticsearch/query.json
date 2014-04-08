@@ -1,9 +1,13 @@
 {
-    "query" : {
-        "term" : { "name" : "$metricName" }
+    "query": {
+        "term": {
+            "name": "$metricName"
+        }
+    }, "sort": {
+    "@timestamp": {
+        "order": "desc",
+        "ignore_unmapped": true
     }
-    ,"sort": {
-        "@timestamp": { "order": "desc", "ignore_unmapped" : true }
-    },
-    "size" : 500
+},
+    "size": 500
 }

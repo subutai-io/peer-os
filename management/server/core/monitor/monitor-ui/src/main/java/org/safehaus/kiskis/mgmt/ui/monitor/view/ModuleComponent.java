@@ -15,7 +15,7 @@ public class ModuleComponent extends CustomComponent {
 
     public ModuleComponent() {
         setHeight("100%");
-        setCompositionRoot( getLayout() );
+        setCompositionRoot(getLayout());
     }
 
     public Layout getLayout() {
@@ -35,7 +35,7 @@ public class ModuleComponent extends CustomComponent {
 
         metricListSelect = UIUtil.addListSelect(layout, "Metric:", "left: 20px; top: 50px;", "150px", "270px");
 
-        for ( Metric metric : Metric.values() ) {
+        for (Metric metric : Metric.values()) {
             metricListSelect.addItem(metric);
         }
     }
@@ -66,10 +66,10 @@ public class ModuleComponent extends CustomComponent {
     private void submitButtonClicked() {
 
         if (chart == null) {
-            chart = new Chart( getWindow() );
+            chart = new Chart(getWindow());
         }
 
-        chart.load( getSelectedNode(), getSelectedMetric() );
+        chart.load(getSelectedNode(), getSelectedMetric());
     }
 
     private String getSelectedNode() {

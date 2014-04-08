@@ -1,31 +1,23 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
-import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.solr.Solr;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SolrImpl implements Solr {
 
@@ -130,7 +122,7 @@ public class SolrImpl implements Solr {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -169,7 +161,7 @@ public class SolrImpl implements Solr {
     public UUID startNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostName, clusterName));
+                String.format("Starting node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -248,7 +240,7 @@ public class SolrImpl implements Solr {
     public UUID stopNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostName, clusterName));
+                String.format("Stopping node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -325,7 +317,7 @@ public class SolrImpl implements Solr {
     public UUID checkNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking node %s in %s", lxcHostName, clusterName));
+                String.format("Checking node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -379,7 +371,7 @@ public class SolrImpl implements Solr {
     public UUID destroyNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostName, clusterName));
+                String.format("Destroying %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -411,7 +403,8 @@ public class SolrImpl implements Solr {
                 if (physicalAgent == null) {
                     po.addLog(
                             String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                                    agent.getHostname()));
+                                    agent.getHostname())
+                    );
                 } else {
                     if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
                         po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
@@ -437,7 +430,7 @@ public class SolrImpl implements Solr {
     public UUID addNode(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 

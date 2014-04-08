@@ -20,6 +20,8 @@ public class Config {
     private Agent nameNode, jobTracker, secondaryNameNode;
     private List<Agent> dataNodes, taskTrackers;
     private Integer replicationFactor;
+    private HashSet<Agent> nodes;
+    private int nodeSize;
 
     public List<Agent> getAllNodes() {
         Set<Agent> allAgents = new HashSet<Agent>();
@@ -117,6 +119,22 @@ public class Config {
 
     public void setReplicationFactor(Integer replicationFactor) {
         this.replicationFactor = replicationFactor;
+    }
+
+    public HashSet<Agent> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(HashSet<Agent> nodes) {
+        this.nodes = nodes;
+    }
+
+    public int getNodeSize() {
+        return nodeSize;
+    }
+
+    public void setNodeSize(int nodeSize) {
+        this.nodeSize = nodeSize;
     }
 
     @Override
