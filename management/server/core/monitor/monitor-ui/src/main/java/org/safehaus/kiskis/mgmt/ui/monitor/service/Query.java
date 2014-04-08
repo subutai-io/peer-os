@@ -48,7 +48,7 @@ public class Query {
 
         LOG.info("nodes count: {}", nodes.size());
 
-        // Reverse the list b/c the query returns the data in desc order (to get the latest values first).
+        // Reversing the list b/c the query returns the data in desc order (to get the latest values first).
         Collections.reverse(nodes);
 
         return toMap(nodes);

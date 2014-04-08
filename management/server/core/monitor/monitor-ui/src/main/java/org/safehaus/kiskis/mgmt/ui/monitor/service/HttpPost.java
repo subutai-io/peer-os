@@ -1,55 +1,55 @@
 package org.safehaus.kiskis.mgmt.ui.monitor.service;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-// TODO refactor
 class HttpPost {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpPost.class);
 
     private static final String URL = "http://127.0.0.1:9200/_all/logs/_search";
-//    private static final String URL = "http://172.16.11.35:9200/_all/logs/_search";
 
-    static String execute(String params) throws Exception {
+    static String execute(String params) throws IOException {
 
-//        String url = "http://127.0.0.1:9200/_all/logs/_search";
-//        URL obj = new URL(url);
-        URL obj = new URL(URL);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        HttpURLConnection connect = getConnect();
 
-        con.setRequestMethod("POST");
+        writeParams(connect, params);
 
-        con.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-        wr.writeBytes(params);
-        wr.flush();
-        wr.close();
+        return readResponse(connect);
+    }
 
-        int responseCode = con.getResponseCode();
+    private static String readResponse(HttpURLConnection connect) throws IOException {
+
+        int responseCode = connect.getResponseCode();
         LOG.info("responseCode: {}", responseCode);
 
-        if (responseCode != 200) {
-            return "";
-        }
+        return responseCode == HttpURLConnection.HTTP_OK
+            ? IOUtils.toString(connect.getInputStream(), "UTF-8")
+            : "";
+    }
 
-        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
-        StringBuffer buffer = new StringBuffer();
-        String inputLine;
+    private static void writeParams(HttpURLConnection connect, String params) throws IOException {
 
-        while ((inputLine = in.readLine()) != null) {
-            buffer.append(inputLine);
-        }
+        DataOutputStream outputStream = new DataOutputStream( connect.getOutputStream() );
+        outputStream.writeBytes(params);
+        outputStream.flush();
+        outputStream.close();
+    }
 
-        in.close();
+    private static HttpURLConnection getConnect() throws IOException {
 
-        return buffer.toString();
+        URL url = new URL(URL);
+
+        HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+        connect.setRequestMethod("POST");
+        connect.setDoOutput(true);
+
+        return connect;
     }
 
 }

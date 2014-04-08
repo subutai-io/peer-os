@@ -71,6 +71,7 @@
         <org.apache.activemq.version>5.9.0</org.apache.activemq.version>
         <org.apache.cassandra.version>2.0.5</org.apache.cassandra.version>
         <org.apache.commons.version>3.2.1</org.apache.commons.version>
+        <commons.io.version>2.4</commons.io.version>
         <org.apache.cxf.version>2.7.10</org.apache.cxf.version>
         <org.apache.felix.gogo.version>0.4.0</org.apache.felix.gogo.version>
         <org.apache.felix.version>2.4.0</org.apache.felix.version>
