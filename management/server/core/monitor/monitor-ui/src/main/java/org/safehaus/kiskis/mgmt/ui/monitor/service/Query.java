@@ -6,6 +6,9 @@ import org.safehaus.kiskis.mgmt.ui.monitor.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Query {
@@ -31,12 +34,38 @@ public class Query {
 
     private static String doExecute(String host, String metricName, int maxSize) throws Exception {
 
-        String query = QUERY.replace("$metricName", metricName);
+        String query = QUERY
+                .replace("$host", host)
+                .replace("$metricName", metricName);
+
         String response = HttpPost.execute(query);
-        JsonNode json = OBJECT_MAPPER.readTree(response);
-        List<JsonNode> nodes = HostFilter.filter(json, host, maxSize);
+
+        List<JsonNode> nodes = toNodes(response);
+
+        LOG.info("nodes count: {}", nodes.size());
+
+        // We need reverse the list b/c the query returns data in desc order
+        Collections.reverse(nodes);
 
         return nodes.isEmpty() ? "" : Format.toPoints(nodes);
     }
+
+    static List<JsonNode> toNodes(String response) throws IOException {
+
+        JsonNode json = OBJECT_MAPPER.readTree(response);
+        JsonNode hits = json.get("hits").get("hits");
+
+        ArrayList<JsonNode> nodes = new ArrayList<JsonNode>();
+
+        for (int i = 0; i < hits.size(); i++) {
+            JsonNode node = hits.get(i).get("_source");
+            nodes.add(node);
+
+            LOG.info("node: {}", node);
+        }
+
+        return nodes;
+    }
+
 
 }

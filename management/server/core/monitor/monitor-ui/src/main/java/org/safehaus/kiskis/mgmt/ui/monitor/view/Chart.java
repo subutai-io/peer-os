@@ -31,10 +31,6 @@ class Chart {
     void load(String host, Metric metric) {
         LOG.info("host: {}; metric: {}", host, metric);
 
-        if (host == null || metric == null) {
-            return;
-        }
-
         String data = Query.execute(host, metric.toString(), 25);
 
         if ( StringUtils.isEmpty(data) ) {

@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.ui.monitor.view;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.apache.commons.lang3.StringUtils;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.ui.monitor.service.Metric;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -65,11 +66,33 @@ public class ModuleComponent extends CustomComponent {
 
     private void submitButtonClicked() {
 
+        String host = getSelectedNode();
+        Metric metric = getSelectedMetric();
+
+        if ( !validParams(host, metric) ) {
+            return;
+        }
+
         if (chart == null) {
             chart = new Chart( getWindow() );
         }
 
-        chart.load( getSelectedNode(), getSelectedMetric() );
+        chart.load(host, metric);
+    }
+
+    private boolean validParams(String host, Metric metric) {
+
+        boolean success = true;
+
+        if ( StringUtils.isEmpty(host) ) {
+            getWindow().showNotification("Please select a node");
+            success = false;
+        } else if (metric == null) {
+            getWindow().showNotification("Please select a metric");
+            success = false;
+        }
+
+        return success;
     }
 
     private String getSelectedNode() {
@@ -77,8 +100,8 @@ public class ModuleComponent extends CustomComponent {
         Set<Agent> agents = MgmtApplication.getSelectedAgents();
 
         return agents == null || agents.size() == 0
-                ? "py453399588"
-//                ? null
+//                ? "py453399588"
+                ? null
                 : agents.iterator().next().getHostname();
     }
 
