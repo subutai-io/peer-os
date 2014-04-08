@@ -228,6 +228,13 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
+                for (Agent node : config.getAllNodes()) {
+                    if (agentManager.getAgentByHostname(node.getHostname()) == null) {
+                        po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
+                        return;
+                    }
+                }
+
                 po.addLog("Uninstalling Spark...");
 
                 Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getAllNodes()));
