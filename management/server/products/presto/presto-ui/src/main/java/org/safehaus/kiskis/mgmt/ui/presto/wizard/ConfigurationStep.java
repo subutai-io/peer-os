@@ -117,6 +117,7 @@ public class ConfigurationStep extends Panel {
                             new BeanItemContainer<Agent>(
                                     Agent.class, hadoopInfo.getAllAgents()));
                     coordinatorNodeCombo.setValue(null);
+                    coordinatorNodeCombo.removeAllItems();
                     for (Agent agent : hadoopInfo.getAllAgents()) {
                         coordinatorNodeCombo.addItem(agent);
                         coordinatorNodeCombo.setItemCaption(agent, agent.getHostname());
