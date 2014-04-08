@@ -41,15 +41,15 @@ public class CheckTask implements Runnable {
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
                     if (master) {
-                        if (po.getLog().contains("SparkMaster is Running")) {
+                        if (po.getLog().contains("Spark Master is running")) {
                             state = NodeState.RUNNING;
-                        } else if (po.getLog().contains("SparkMaster is NOT Running")) {
+                        } else if (po.getLog().contains("Spark Master is NOT running")) {
                             state = NodeState.STOPPED;
                         }
                     } else {
-                        if (po.getLog().contains("SparkWorker is Running")) {
+                        if (po.getLog().contains("Spark Worker is running")) {
                             state = NodeState.RUNNING;
-                        } else if (po.getLog().contains("SparkWorker is NOT Running")) {
+                        } else if (po.getLog().contains("Spark Worker is NOT running")) {
                             state = NodeState.STOPPED;
                         }
                     }
