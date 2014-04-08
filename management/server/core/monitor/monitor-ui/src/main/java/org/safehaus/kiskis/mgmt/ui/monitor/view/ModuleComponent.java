@@ -30,12 +30,17 @@ public class ModuleComponent extends CustomComponent {
         layout.setWidth(1000, Sizeable.UNITS_PIXELS);
         layout.setHeight(1000, Sizeable.UNITS_PIXELS);
 
+        addNote(layout);
         addDateFields(layout);
         addMetricList(layout);
         addSubmitButton(layout);
         addChartLayout(layout);
 
         return layout;
+    }
+
+    private void addNote(AbsoluteLayout layout) {
+        UIUtil.addLabel(layout, "<i>Note: the chart displays only recent 500 values.</i>", "left: 20px; top: 10px;");
     }
 
     private void addDateFields(AbsoluteLayout layout) {
@@ -76,7 +81,7 @@ public class ModuleComponent extends CustomComponent {
         chartLayout.setHeight(400, Sizeable.UNITS_PIXELS);
         chartLayout.setDebugId("chart");
 
-        layout.addComponent(chartLayout, "left: 200px; top: 20px;");
+        layout.addComponent(chartLayout, "left: 200px; top: 50px;");
     }
 
     private void submitButtonClicked() {
