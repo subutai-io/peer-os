@@ -57,7 +57,7 @@ class Chart {
                 str += ", ";
             }
 
-            // Passing date as str so we don't deal with timezone issues
+            // Pass date as string so we don't deal with timezone issues between javascript and the server
             str += String.format( "{ x: Date.parse('%s'), y: %s }", DATE_FORMAT.format(date), values.get(date) );
         }
 
