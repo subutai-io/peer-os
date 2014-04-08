@@ -20,19 +20,17 @@ import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 public class StopTask implements Runnable {
 
     private final String clusterName, lxcHostname;
-    private final boolean master;
     private final CompleteEvent completeEvent;
 
-    public StopTask(String clusterName, String lxcHostname, boolean master, CompleteEvent completeEvent) {
+    public StopTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
-        this.master = master;
     }
 
     public void run() {
 
-        UUID trackID = PrestoUI.getPrestoManager().stopNode(clusterName, lxcHostname, master);
+        UUID trackID = PrestoUI.getPrestoManager().stopNode(clusterName, lxcHostname);
 
         long start = System.currentTimeMillis();
         NodeState state = NodeState.UNKNOWN;

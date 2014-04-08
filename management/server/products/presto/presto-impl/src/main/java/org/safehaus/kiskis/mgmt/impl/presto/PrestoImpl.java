@@ -87,7 +87,7 @@ public class PrestoImpl implements Presto {
                 }
 
                 if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
-                    po.addLogFailed("Master node is not connected\nInstallation aborted");
+                    po.addLogFailed("Coordinator node is not connected\nInstallation aborted");
                     return;
                 }
 
@@ -118,8 +118,8 @@ public class PrestoImpl implements Presto {
                 for (Iterator<Agent> it = allNodes.iterator(); it.hasNext();) {
                     Agent node = it.next();
                     Result result = checkInstalled.getResults().get(node.getUuid());
-                    if (result.getStdOut().contains("ksks-spark")) {
-                        po.addLog(String.format("Node %s already has Spark installed. Omitting this node from installation", node.getHostname()));
+                    if (result.getStdOut().contains("ksks-presto")) {
+                        po.addLog(String.format("Node %s already has Presto installed. Omitting this node from installation", node.getHostname()));
                         config.getWorkers().remove(node);
                         it.remove();
                     } else if (!result.getStdOut().contains("ksks-hadoop")) {
@@ -134,34 +134,34 @@ public class PrestoImpl implements Presto {
                     return;
                 }
                 if (!allNodes.contains(config.getCoordinatorNode())) {
-                    po.addLogFailed("Master node was omitted\nInstallation aborted");
+                    po.addLogFailed("Coordinator node was omitted\nInstallation aborted");
                     return;
                 }
 
                 po.addLog("Updating db...");
                 //save to db
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog("Cluster info saved to DB\nInstalling Spark...");
-                    //install spark            
+                    po.addLog("Cluster info saved to DB\nInstalling Presto...");
+                    //install presto            
 
                     Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getAllNodes()));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Installation succeeded\nSetting master IP...");
+                        po.addLog("Installation succeeded\nConfiguring cSoordinator...");
 
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getAllNodes(), config.getCoordinatorNode()));
+                        Task configureCoordinatorTask = taskRunner.executeTask(Tasks.getSetCoordinatorTask(config.getCoordinatorNode()));
 
-                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Setting master IP succeeded\nRegistering slaves...");
+                        if (configureCoordinatorTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLog("Coordinator configured succeessfully\nConfiguring workers...");
 
-                            Task registerSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(config.getCoordinatorNode(), config.getWorkers()));
+                            Task configureWorkersTask = taskRunner.executeTask(Tasks.getSetWorkerTask(config.getCoordinatorNode(), config.getWorkers()));
 
-                            if (registerSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                                po.addLog("Slaves successfully registered\nStarting Spark...");
+                            if (configureWorkersTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                po.addLog("Workers configured successfully\nStarting Presto...");
 
-                                Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getCoordinatorNode()));
+                                Task startPrestoTask = Tasks.getStartTask(config.getAllNodes());
                                 final AtomicInteger okCount = new AtomicInteger(0);
-                                taskRunner.executeTask(startSparkTask, new TaskCallback() {
+                                taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                         okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
@@ -181,23 +181,23 @@ public class PrestoImpl implements Presto {
                                     }
                                 });
 
-                                synchronized (startSparkTask) {
+                                synchronized (startPrestoTask) {
                                     try {
-                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
+                                        startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
                                     } catch (InterruptedException ex) {
                                     }
                                 }
                                 if (okCount.get() >= config.getAllNodes().size()) {
-                                    po.addLogDone("Spark started successfully\nDone");
+                                    po.addLogDone("Presto started successfully\nDone");
                                 } else {
-                                    po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
+                                    po.addLogFailed(String.format("Failed to start Presto, %s", startPrestoTask.getFirstError()));
                                 }
 
                             } else {
-                                po.addLogFailed(String.format("Failed to register slaves with master, %s", registerSlavesTask.getFirstError()));
+                                po.addLogFailed(String.format("Failed to configure workers, %s", configureWorkersTask.getFirstError()));
                             }
                         } else {
-                            po.addLogFailed(String.format("Setting master IP failed, %s", setMasterIPTask.getFirstError()));
+                            po.addLogFailed(String.format("Failed to configure coordinator, %s", configureCoordinatorTask.getFirstError()));
                         }
 
                     } else {
@@ -227,7 +227,7 @@ public class PrestoImpl implements Presto {
                     return;
                 }
 
-                po.addLog("Uninstalling Spark...");
+                po.addLog("Uninstalling Presto...");
 
                 Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getAllNodes()));
 
@@ -236,11 +236,11 @@ public class PrestoImpl implements Presto {
                         Result result = res.getValue();
                         Agent agent = agentManager.getAgentByUUID(res.getKey());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
-                            if (result.getStdOut().contains("Package ksks-spark is not installed, so not removed")) {
-                                po.addLog(String.format("Spark is not installed, so not removed on node %s", result.getStdErr(),
+                            if (result.getStdOut().contains("Package ksks-presto is not installed, so not removed")) {
+                                po.addLog(String.format("Presto is not installed, so not removed on node %s", result.getStdErr(),
                                         agent == null ? res.getKey() : agent.getHostname()));
                             } else {
-                                po.addLog(String.format("Spark is removed from node %s",
+                                po.addLog(String.format("Presto is removed from node %s",
                                         agent == null ? res.getKey() : agent.getHostname()));
                             }
                         } else {
@@ -279,7 +279,7 @@ public class PrestoImpl implements Presto {
                 }
 
                 if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
-                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getCoordinatorNode().getHostname()));
+                    po.addLogFailed(String.format("Coordinator node %s is not connected\nOperation aborted", config.getCoordinatorNode().getHostname()));
                     return;
                 }
 
@@ -297,8 +297,6 @@ public class PrestoImpl implements Presto {
 
                 po.addLog("Checking prerequisites...");
 
-                boolean install = !agent.equals(config.getCoordinatorNode());
-
                 //check installed ksks packages
                 Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
 
@@ -309,8 +307,8 @@ public class PrestoImpl implements Presto {
 
                 Result result = checkInstalled.getResults().get(agent.getUuid());
 
-                if (result.getStdOut().contains("ksks-spark") && install) {
-                    po.addLogFailed(String.format("Node %s already has Spark installed\nOperation aborted", lxcHostname));
+                if (result.getStdOut().contains("ksks-presto")) {
+                    po.addLogFailed(String.format("Node %s already has Presto installed\nOperation aborted", lxcHostname));
                     return;
                 } else if (!result.getStdOut().contains("ksks-hadoop")) {
                     po.addLogFailed(String.format("Node %s has no Hadoop installation\nOperation aborted", lxcHostname));
@@ -322,82 +320,62 @@ public class PrestoImpl implements Presto {
                 //save to db
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info updated in DB");
-                    //install spark            
+                    //install presto            
 
-                    if (install) {
-                        po.addLog("Installing Spark...");
-                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                    po.addLog("Installing Presto...");
+                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
-                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Installation succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
-                            return;
-                        }
+                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Installation succeeded");
+                    } else {
+                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                        return;
                     }
 
-                    po.addLog("Setting master IP on slave...");
-                    Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getCoordinatorNode()));
+                    po.addLog("Configuring worker...");
+                    Task configureWorkerTask = taskRunner.executeTask(Tasks.getSetWorkerTask(config.getCoordinatorNode(), Util.wrapAgentToSet(agent)));
 
-                    if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Master IP successfully set\nRegistering slave with master...");
+                    if (configureWorkerTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Worker configured successfully\nStarting Presto on new node...");
 
-                        Task registerSlaveTask = taskRunner.executeTask(Tasks.getAddSlaveTask(config.getCoordinatorNode(), agent));
+                        Task startPrestoTask = Tasks.getStartTask(Util.wrapAgentToSet(agent));
+                        final AtomicInteger okCount = new AtomicInteger(0);
+                        taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
-                        if (registerSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Registration succeeded\nRestarting master...");
-
-                            Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getCoordinatorNode()));
-
-                            if (restartMasterTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                                po.addLog("Master restarted successfully\nStarting Spark on new node...");
-
-                                Task startSparkTask = Tasks.getStartSlaveTask(Util.wrapAgentToSet(agent));
-                                final AtomicInteger okCount = new AtomicInteger(0);
-                                taskRunner.executeTask(startSparkTask, new TaskCallback() {
-
-                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        if (stdOut.contains("starting")) {
-                                            okCount.incrementAndGet();
-                                        }
-
-                                        if (okCount.get() >= 0) {
-                                            taskRunner.removeTaskCallback(task.getUuid());
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
-                                        } else if (task.isCompleted()) {
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
-                                        }
-
-                                        return null;
-                                    }
-                                });
-
-                                synchronized (startSparkTask) {
-                                    try {
-                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
-                                    } catch (InterruptedException ex) {
-                                    }
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                if (stdOut.contains("starting")) {
+                                    okCount.incrementAndGet();
                                 }
 
                                 if (okCount.get() >= 0) {
-                                    po.addLogDone("Spark started successfully\nDone");
-                                } else {
-                                    po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
+                                    taskRunner.removeTaskCallback(task.getUuid());
+                                    synchronized (task) {
+                                        task.notifyAll();
+                                    }
+                                } else if (task.isCompleted()) {
+                                    synchronized (task) {
+                                        task.notifyAll();
+                                    }
                                 }
 
-                            } else {
-                                po.addLogFailed(String.format("Master restart failed, %s", restartMasterTask.getFirstError()));
+                                return null;
                             }
+                        });
 
+                        synchronized (startPrestoTask) {
+                            try {
+                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
+                            } catch (InterruptedException ex) {
+                            }
+                        }
+
+                        if (okCount.get() >= 0) {
+                            po.addLogDone("Presto started successfully\nDone");
                         } else {
-                            po.addLogFailed(String.format("Registration failed, %s", registerSlaveTask.getFirstError()));
+                            po.addLogFailed(String.format("Failed to start Presto, %s", startPrestoTask.getFirstError()));
                         }
                     } else {
-                        po.addLogFailed(String.format("Failed to set master IP, %s", setMasterIPTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to configure worker, %s", configureWorkerTask.getFirstError()));
                     }
 
                 } else {
@@ -441,67 +419,29 @@ public class PrestoImpl implements Presto {
                     return;
                 }
 
-                po.addLog("Unregistering slave from master...");
+                po.addLog("Uninstalling Presto...");
 
-                if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) != null) {
+                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
 
-                    Task unregisterSlaveTask = taskRunner.executeTask(Tasks.getRemoveSlaveTask(config.getCoordinatorNode(), agent));
-
-                    if (unregisterSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Successfully unregistered slave from master\nRestarting master...");
-
-                        Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getCoordinatorNode()));
-
-                        if (restartMasterTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Master restarted successfully");
+                if (uninstallTask.isCompleted()) {
+                    Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
+                    Result result = res.getValue();
+                    if (result.getExitCode() != null && result.getExitCode() == 0) {
+                        if (result.getStdOut().contains("Package ksks-presto is not installed, so not removed")) {
+                            po.addLog(String.format("Presto is not installed, so not removed on node %s", result.getStdErr(),
+                                    agent.getHostname()));
                         } else {
-                            po.addLog(String.format("Master restart failed, %s, skipping...", restartMasterTask.getFirstError()));
-                        }
-                    } else {
-                        po.addLog(String.format("Failed to unregister slave from master: %s, skipping...",
-                                unregisterSlaveTask.getFirstError()));
-                    }
-                } else {
-                    po.addLog("Failed to unregister slave from master: Master is not connected, skipping...");
-                }
-
-                boolean uninstall = !agent.equals(config.getCoordinatorNode());
-
-                if (uninstall) {
-                    po.addLog("Uninstalling Spark...");
-
-                    Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
-
-                    if (uninstallTask.isCompleted()) {
-                        Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
-                        Result result = res.getValue();
-                        if (result.getExitCode() != null && result.getExitCode() == 0) {
-                            if (result.getStdOut().contains("Package ksks-spark is not installed, so not removed")) {
-                                po.addLog(String.format("Spark is not installed, so not removed on node %s", result.getStdErr(),
-                                        agent.getHostname()));
-                            } else {
-                                po.addLog(String.format("Spark is removed from node %s",
-                                        agent.getHostname()));
-                            }
-                        } else {
-                            po.addLog(String.format("Error %s on node %s", result.getStdErr(),
+                            po.addLog(String.format("Presto is removed from node %s",
                                     agent.getHostname()));
                         }
-
                     } else {
-                        po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
-                        return;
+                        po.addLog(String.format("Error %s on node %s", result.getStdErr(),
+                                agent.getHostname()));
                     }
+
                 } else {
-                    po.addLog("Stopping slave...");
-
-                    Task stopSlaveTask = taskRunner.executeTask(Tasks.getStopSlaveTask(Util.wrapAgentToSet(agent)));
-
-                    if (stopSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Slave stopped successfully");
-                    } else {
-                        po.addLog(String.format("Failed to stop slave, %s, skipping...", stopSlaveTask.getFirstError()));
-                    }
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                    return;
                 }
 
                 config.getWorkers().remove(agent);
@@ -519,10 +459,10 @@ public class PrestoImpl implements Presto {
         return po.getId();
     }
 
-    public UUID changeCoordinatorNode(final String clusterName, final String newMasterHostname) {
+    public UUID changeCoordinatorNode(final String clusterName, final String newCoordinatorHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Changing master to %s in %s", newMasterHostname, clusterName));
+                        String.format("Changing coordinator to %s in %s", newCoordinatorHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -534,103 +474,92 @@ public class PrestoImpl implements Presto {
                 }
 
                 if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
-                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getCoordinatorNode().getHostname()));
+                    po.addLogFailed(String.format("Coordinator %s is not connected\nOperation aborted", config.getCoordinatorNode().getHostname()));
                     return;
                 }
 
-                Agent newMaster = agentManager.getAgentByHostname(newMasterHostname);
-                if (newMaster == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", newMasterHostname));
+                Agent newCoordinator = agentManager.getAgentByHostname(newCoordinatorHostname);
+                if (newCoordinator == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", newCoordinatorHostname));
                     return;
                 }
 
-                if (newMaster.equals(config.getCoordinatorNode())) {
-                    po.addLogFailed(String.format("Node %s is already a master node\nOperation aborted", newMasterHostname));
+                if (newCoordinator.equals(config.getCoordinatorNode())) {
+                    po.addLogFailed(String.format("Node %s is already a coordinator node\nOperation aborted", newCoordinatorHostname));
                     return;
                 }
 
                 //check if node is in the cluster
-                if (!config.getAllNodes().contains(newMaster)) {
-                    po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted", newMasterHostname));
+                if (!config.getWorkers().contains(newCoordinator)) {
+                    po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted", newCoordinatorHostname));
                     return;
                 }
 
                 po.addLog("Stopping all nodes...");
                 //stop all nodes
-                Task stopAllNodesTask = taskRunner.executeTask(Tasks.getStopAllTask(Util.wrapAgentToSet(config.getCoordinatorNode())));
+                Task stopAllNodesTask = taskRunner.executeTask(Tasks.getStopTask(config.getAllNodes()));
                 if (stopAllNodesTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLog("All nodes stopped\nClearing slaves on old master...");
-                    //clear slaves from old master
-                    Task clearSlavesTask = taskRunner.executeTask(Tasks.getClearSlavesTask(config.getCoordinatorNode()));
-                    if (clearSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Slaves cleared successfully");
+                    po.addLog("All nodes stopped\nConfiguring coordinator...");
+                    Task configureCoordinatorTask = taskRunner.executeTask(Tasks.getSetCoordinatorTask(newCoordinator));
+                    if (configureCoordinatorTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Coordinator configured successfully");
                     } else {
-                        po.addLog(String.format("Clearing slaves failed, %s, skipping...", clearSlavesTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to configure coordinator, %s\nOperation aborted", configureCoordinatorTask.getFirstError()));
+                        return;
                     }
-                    //add slaves to new master, if keepSlave=true then master node is also added as slave
+
                     config.getWorkers().add(config.getCoordinatorNode());
-                    config.setCoordinatorNode(newMaster);
-//                    if (keepSlave) {
-//                        config.getSlaveNodes().add(newMaster);
-//                    } else {
-//                        config.getSlaveNodes().remove(newMaster);
-//                    }
-                    po.addLog("Adding nodes to new master...");
-                    Task addSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(newMaster, config.getWorkers()));
-                    if (addSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLog("Nodes added successfully\nSetting new master IP...");
-                        //modify master ip on all nodes
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getAllNodes(), newMaster));
-                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Master IP set successfully\nStarting cluster...");
-                            //start master & slaves
+                    config.getWorkers().remove(newCoordinator);
+                    config.setCoordinatorNode(newCoordinator);
 
-                            Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getCoordinatorNode()));
-                            final AtomicInteger okCount = new AtomicInteger(0);
-                            taskRunner.executeTask(startSparkTask, new TaskCallback() {
+                    po.addLog("Configuring workers...");
+                    Task configureWorkersTask = taskRunner.executeTask(Tasks.getSetWorkerTask(newCoordinator, config.getWorkers()));
+                    if (configureWorkersTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Workers configured successfully\nStarting cluster...");
 
-                                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                    okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+                        Task startPrestoTask = Tasks.getStartTask(Util.wrapAgentToSet(config.getCoordinatorNode()));
+                        final AtomicInteger okCount = new AtomicInteger(0);
+                        taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
-                                    if (okCount.get() >= config.getAllNodes().size()) {
-                                        taskRunner.removeTaskCallback(task.getUuid());
-                                        synchronized (task) {
-                                            task.notifyAll();
-                                        }
-                                    } else if (task.isCompleted()) {
-                                        synchronized (task) {
-                                            task.notifyAll();
-                                        }
+                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                                okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+
+                                if (okCount.get() >= config.getAllNodes().size()) {
+                                    taskRunner.removeTaskCallback(task.getUuid());
+                                    synchronized (task) {
+                                        task.notifyAll();
                                     }
-
-                                    return null;
+                                } else if (task.isCompleted()) {
+                                    synchronized (task) {
+                                        task.notifyAll();
+                                    }
                                 }
-                            });
 
-                            synchronized (startSparkTask) {
-                                try {
-                                    startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
-                                } catch (InterruptedException ex) {
-                                }
+                                return null;
                             }
-                            if (okCount.get() >= config.getAllNodes().size()) {
-                                po.addLog("Cluster started successfully");
-                            } else {
-                                po.addLog(String.format("Start of cluster failed, %s, skipping...", startSparkTask.getFirstError()));
-                            }
+                        });
 
-                            po.addLog("Updating db...");
-                            //update db
-                            if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
-                                po.addLogDone("Cluster info updated in DB\nDone");
-                            } else {
-                                po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
+                        synchronized (startPrestoTask) {
+                            try {
+                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
+                            } catch (InterruptedException ex) {
                             }
+                        }
+                        if (okCount.get() >= config.getAllNodes().size()) {
+                            po.addLog("Cluster started successfully");
                         } else {
-                            po.addLogFailed(String.format("Failed to set master IP on all nodes, %s\nOperation aborted", setMasterIPTask.getFirstError()));
+                            po.addLog(String.format("Start of cluster failed, %s, skipping...", startPrestoTask.getFirstError()));
+                        }
+
+                        po.addLog("Updating db...");
+                        //update db
+                        if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+                            po.addLogDone("Cluster info updated in DB\nDone");
+                        } else {
+                            po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                         }
                     } else {
-                        po.addLogFailed(String.format("Failed to add slaves to new master, %s\nOperation aborted", addSlavesTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to configure workers, %s\nOperation aborted", configureWorkersTask.getFirstError()));
                     }
 
                 } else {
@@ -642,7 +571,7 @@ public class PrestoImpl implements Presto {
         return po.getId();
     }
 
-    public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
+    public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Starting node %s in %s", lxcHostname, clusterName));
@@ -667,22 +596,9 @@ public class PrestoImpl implements Presto {
                     return;
                 }
 
-                if (master && !config.getCoordinatorNode().equals(node)) {
-                    po.addLogFailed(String.format("Node %s is not a master node\nOperation aborted", node.getHostname()));
-                    return;
-                } else if (!master && !config.getWorkers().contains(node)) {
-                    po.addLogFailed(String.format("Node %s is not a slave node\nOperation aborted", node.getHostname()));
-                    return;
-                }
+                po.addLog(String.format("Starting node %s...", node.getHostname()));
 
-                po.addLog(String.format("Starting %s on %s...", master ? "master" : "slave", node.getHostname()));
-
-                Task startTask;
-                if (master) {
-                    startTask = Tasks.getStartMasterTask(Util.wrapAgentToSet(node));
-                } else {
-                    startTask = Tasks.getStartSlaveTask(Util.wrapAgentToSet(node));
-                }
+                Task startTask = Tasks.getStartTask(Util.wrapAgentToSet(node));
 
                 final AtomicInteger okCount = new AtomicInteger(0);
                 taskRunner.executeTask(startTask, new TaskCallback() {
@@ -724,7 +640,7 @@ public class PrestoImpl implements Presto {
 
     }
 
-    public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
+    public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Stopping node %s in %s", lxcHostname, clusterName));
@@ -749,22 +665,9 @@ public class PrestoImpl implements Presto {
                     return;
                 }
 
-                if (master && !config.getCoordinatorNode().equals(node)) {
-                    po.addLogFailed(String.format("Node %s is not a master node\nOperation aborted", node.getHostname()));
-                    return;
-                } else if (!master && !config.getWorkers().contains(node)) {
-                    po.addLogFailed(String.format("Node %s is not a slave node\nOperation aborted", node.getHostname()));
-                    return;
-                }
+                po.addLog(String.format("Stopping node %s...", node.getHostname()));
 
-                po.addLog(String.format("Stopping %s on %s...", master ? "master" : "slave", node.getHostname()));
-
-                Task stopTask;
-                if (master) {
-                    stopTask = taskRunner.executeTask(Tasks.getStopMasterTask(Util.wrapAgentToSet(node)));
-                } else {
-                    stopTask = taskRunner.executeTask(Tasks.getStopSlaveTask(Util.wrapAgentToSet(node)));
-                }
+                Task stopTask = taskRunner.executeTask(Tasks.getStopTask(Util.wrapAgentToSet(node)));
 
                 if (stopTask.getTaskStatus() == TaskStatus.SUCCESS) {
                     po.addLogDone(String.format("Node %s stopped", node.getHostname()));
@@ -806,7 +709,7 @@ public class PrestoImpl implements Presto {
                 po.addLog("Checking node...");
 
                 Task checkNodeTask = taskRunner.executeTask(
-                        Tasks.getStatusAllTask(Util.wrapAgentToSet(node)));
+                        Tasks.getStatusTask(Util.wrapAgentToSet(node)));
 
                 Result res = checkNodeTask.getResults().get(node.getUuid());
                 if (checkNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {

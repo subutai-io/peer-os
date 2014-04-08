@@ -33,8 +33,8 @@ import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 public class ConfigurationStep extends Panel {
 
     private final ComboBox hadoopClustersCombo;
-    private final TwinColSelect slaveNodesSelect;
-    private final ComboBox masterNodeCombo;
+    private final TwinColSelect workersSelect;
+    private final ComboBox coordinatorNodeCombo;
 
     public ConfigurationStep(final Wizard wizard) {
 
@@ -46,14 +46,14 @@ public class ConfigurationStep extends Panel {
         content.setMargin(true);
 
         hadoopClustersCombo = new ComboBox("Hadoop cluster");
-        masterNodeCombo = new ComboBox("Master node");
-        slaveNodesSelect = new TwinColSelect("Slave nodes", new ArrayList<Agent>());
+        coordinatorNodeCombo = new ComboBox("Coordinator");
+        workersSelect = new TwinColSelect("Workers", new ArrayList<Agent>());
 
-        masterNodeCombo.setMultiSelect(false);
-        masterNodeCombo.setImmediate(true);
-        masterNodeCombo.setTextInputAllowed(false);
-        masterNodeCombo.setRequired(true);
-        masterNodeCombo.setNullSelectionAllowed(false);
+        coordinatorNodeCombo.setMultiSelect(false);
+        coordinatorNodeCombo.setImmediate(true);
+        coordinatorNodeCombo.setTextInputAllowed(false);
+        coordinatorNodeCombo.setRequired(true);
+        coordinatorNodeCombo.setNullSelectionAllowed(false);
 
         hadoopClustersCombo.setMultiSelect(false);
         hadoopClustersCombo.setImmediate(true);
@@ -61,15 +61,15 @@ public class ConfigurationStep extends Panel {
         hadoopClustersCombo.setRequired(true);
         hadoopClustersCombo.setNullSelectionAllowed(false);
 
-        slaveNodesSelect.setItemCaptionPropertyId("hostname");
-        slaveNodesSelect.setRows(7);
-        slaveNodesSelect.setNullSelectionAllowed(false);
-        slaveNodesSelect.setMultiSelect(true);
-        slaveNodesSelect.setImmediate(true);
-        slaveNodesSelect.setLeftColumnCaption("Available Nodes");
-        slaveNodesSelect.setRightColumnCaption("Selected Nodes");
-        slaveNodesSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        slaveNodesSelect.setRequired(true);
+        workersSelect.setItemCaptionPropertyId("hostname");
+        workersSelect.setRows(7);
+        workersSelect.setNullSelectionAllowed(false);
+        workersSelect.setMultiSelect(true);
+        workersSelect.setImmediate(true);
+        workersSelect.setLeftColumnCaption("Available Nodes");
+        workersSelect.setRightColumnCaption("Selected Nodes");
+        workersSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        workersSelect.setRequired(true);
 
         List<HadoopClusterInfo> clusters = PrestoUI.getDbManager().
                 getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
@@ -95,12 +95,12 @@ public class ConfigurationStep extends Panel {
         if (hadoopClustersCombo.getValue() != null) {
             HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClustersCombo.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-            slaveNodesSelect.setContainerDataSource(
+            workersSelect.setContainerDataSource(
                     new BeanItemContainer<Agent>(
                             Agent.class, hadoopInfo.getAllAgents()));
             for (Agent agent : hadoopInfo.getAllAgents()) {
-                masterNodeCombo.addItem(agent);
-                masterNodeCombo.setItemCaption(agent, agent.getHostname());
+                coordinatorNodeCombo.addItem(agent);
+                coordinatorNodeCombo.setItemCaption(agent, agent.getHostname());
             }
         }
 
@@ -109,34 +109,40 @@ public class ConfigurationStep extends Panel {
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
-                    slaveNodesSelect.setValue(null);
-                    slaveNodesSelect.setContainerDataSource(
+                    workersSelect.setValue(null);
+                    workersSelect.setContainerDataSource(
                             new BeanItemContainer<Agent>(
                                     Agent.class, hadoopInfo.getAllAgents()));
+                    coordinatorNodeCombo.setValue(null);
+                    for (Agent agent : hadoopInfo.getAllAgents()) {
+                        coordinatorNodeCombo.addItem(agent);
+                        coordinatorNodeCombo.setItemCaption(agent, agent.getHostname());
+                    }
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setWorkers(new HashSet<Agent>());
+                    wizard.getConfig().setCoordinatorNode(null);
                 }
             }
         });
 
         if (wizard.getConfig().getCoordinatorNode() != null) {
-            masterNodeCombo.setValue(wizard.getConfig().getCoordinatorNode());
+            coordinatorNodeCombo.setValue(wizard.getConfig().getCoordinatorNode());
         }
 
-        masterNodeCombo.addListener(new Property.ValueChangeListener() {
+        coordinatorNodeCombo.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    Agent master = (Agent) event.getProperty().getValue();
-                    wizard.getConfig().setCoordinatorNode(master);
+                    Agent coordinator = (Agent) event.getProperty().getValue();
+                    wizard.getConfig().setCoordinatorNode(coordinator);
                 }
             }
         });
 
         if (!Util.isCollectionEmpty(wizard.getConfig().getWorkers())) {
-            slaveNodesSelect.setValue(wizard.getConfig().getWorkers());
+            workersSelect.setValue(wizard.getConfig().getWorkers());
         }
-        slaveNodesSelect.addListener(new Property.ValueChangeListener() {
+        workersSelect.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
@@ -155,9 +161,9 @@ public class ConfigurationStep extends Panel {
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
                 } else if (wizard.getConfig().getCoordinatorNode() == null) {
-                    show("Please, select master node");
+                    show("Please, select coordinator node");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getWorkers())) {
-                    show("Please, select slave nodes");
+                    show("Please, select worker nodes");
                 } else {
                     wizard.next();
                 }
@@ -182,8 +188,8 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent(next);
 
         content.addComponent(hadoopClustersCombo);
-        content.addComponent(masterNodeCombo);
-        content.addComponent(slaveNodesSelect);
+        content.addComponent(coordinatorNodeCombo);
+        content.addComponent(workersSelect);
         content.addComponent(buttons);
 
         addComponent(layout);

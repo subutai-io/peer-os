@@ -113,8 +113,14 @@ public class ConfigurationStep extends Panel {
                     slaveNodesSelect.setContainerDataSource(
                             new BeanItemContainer<Agent>(
                                     Agent.class, hadoopInfo.getAllAgents()));
+                    masterNodeCombo.setValue(null);
+                    for (Agent agent : hadoopInfo.getAllAgents()) {
+                        masterNodeCombo.addItem(agent);
+                        masterNodeCombo.setItemCaption(agent, agent.getHostname());
+                    }
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setSlaveNodes(new HashSet<Agent>());
+                    wizard.getConfig().setMasterNode(null);
                 }
             }
         });

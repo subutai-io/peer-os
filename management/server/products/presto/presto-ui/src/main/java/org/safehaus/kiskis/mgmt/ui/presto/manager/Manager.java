@@ -45,7 +45,7 @@ public class Manager {
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private Config config;
-    private final String MASTER_PREFIX = "Master: ";
+    private final String COORDINATOR_PREFIX = "Coordinator: ";
 
     public Manager() {
 
@@ -170,7 +170,7 @@ public class Manager {
                                 }
                             });
                         } else {
-                            show("All nodes in corresponding Hadoop cluster have Spark installed");
+                            show("All nodes in corresponding Hadoop cluster have Presto installed");
                         }
                     } else {
                         show("Hadoop cluster info not found");
@@ -197,20 +197,17 @@ public class Manager {
         contentRoot.getWindow().showNotification(notification);
     }
 
-    /*
-     * @todo separate master from slaves
-     */
-    private void populateTable(final Table table, Set<Agent> agents, final Agent master) {
+    private void populateTable(final Table table, Set<Agent> workers, final Agent coordinator) {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext();) {
+        for (Iterator it = workers.iterator(); it.hasNext();) {
             final Agent agent = (Agent) it.next();
 
             final Button checkBtn = new Button("Check");
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
-            final Button setMasterBtn = new Button("Set As Master");
+            final Button setCoordinatorBtn = new Button("Set As Coordinator");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             stopBtn.setEnabled(false);
@@ -222,7 +219,7 @@ public class Manager {
                 checkBtn,
                 startBtn,
                 stopBtn,
-                master.equals(agent) ? null : setMasterBtn,
+                setCoordinatorBtn,
                 destroyBtn,
                 progressIcon},
                     null);
@@ -233,10 +230,10 @@ public class Manager {
                     progressIcon.setVisible(true);
                     startBtn.setEnabled(false);
                     stopBtn.setEnabled(false);
-                    setMasterBtn.setEnabled(false);
+                    setCoordinatorBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    PrestoUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+                    PrestoUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -245,7 +242,7 @@ public class Manager {
                                 } else if (state == NodeState.STOPPED) {
                                     startBtn.setEnabled(true);
                                 }
-                                setMasterBtn.setEnabled(true);
+                                setCoordinatorBtn.setEnabled(true);
                                 destroyBtn.setEnabled(true);
                                 progressIcon.setVisible(false);
                             }
@@ -260,10 +257,10 @@ public class Manager {
                     progressIcon.setVisible(true);
                     startBtn.setEnabled(false);
                     stopBtn.setEnabled(false);
-                    setMasterBtn.setEnabled(false);
+                    setCoordinatorBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    PrestoUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+                    PrestoUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -272,7 +269,7 @@ public class Manager {
                                 } else if (state == NodeState.STOPPED) {
                                     startBtn.setEnabled(true);
                                 }
-                                setMasterBtn.setEnabled(true);
+                                setCoordinatorBtn.setEnabled(true);
                                 destroyBtn.setEnabled(true);
                                 progressIcon.setVisible(false);
                             }
@@ -287,10 +284,10 @@ public class Manager {
                     progressIcon.setVisible(true);
                     startBtn.setEnabled(false);
                     stopBtn.setEnabled(false);
-                    setMasterBtn.setEnabled(false);
+                    setCoordinatorBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    PrestoUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+                    PrestoUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -299,7 +296,7 @@ public class Manager {
                                 } else if (state == NodeState.STOPPED) {
                                     startBtn.setEnabled(true);
                                 }
-                                setMasterBtn.setEnabled(true);
+                                setCoordinatorBtn.setEnabled(true);
                                 destroyBtn.setEnabled(true);
                                 progressIcon.setVisible(false);
                             }
@@ -308,12 +305,12 @@ public class Manager {
                 }
             });
 
-            setMasterBtn.addListener(new Button.ClickListener() {
+            setCoordinatorBtn.addListener(new Button.ClickListener() {
 
                 public void buttonClick(Button.ClickEvent event) {
                     MgmtApplication.showConfirmationDialog(
-                            "Master change confirmation",
-                            String.format("Do you want to set %s as master node?", agent.getHostname()),
+                            "Coordinator change confirmation",
+                            String.format("Do you want to set %s as coordinator node?", agent.getHostname()),
                             "Yes", "No", new ConfirmationDialogCallback() {
 
                                 @Override
@@ -371,7 +368,7 @@ public class Manager {
         progressIcon.setVisible(false);
 
         final Object rowId = table.addItem(new Object[]{
-            MASTER_PREFIX + master.getHostname(),
+            COORDINATOR_PREFIX + coordinator.getHostname(),
             checkBtn,
             startBtn,
             stopBtn,
@@ -387,7 +384,7 @@ public class Manager {
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(false);
 
-                PrestoUI.getExecutor().execute(new CheckTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+                PrestoUI.getExecutor().execute(new CheckTask(config.getClusterName(), coordinator.getHostname(), new CompleteEvent() {
 
                     public void onComplete(NodeState state) {
                         synchronized (progressIcon) {
@@ -410,7 +407,7 @@ public class Manager {
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(false);
 
-                PrestoUI.getExecutor().execute(new StartTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+                PrestoUI.getExecutor().execute(new StartTask(config.getClusterName(), coordinator.getHostname(), new CompleteEvent() {
 
                     public void onComplete(NodeState state) {
                         synchronized (progressIcon) {
@@ -433,7 +430,7 @@ public class Manager {
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(false);
 
-                PrestoUI.getExecutor().execute(new StopTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+                PrestoUI.getExecutor().execute(new StopTask(config.getClusterName(), coordinator.getHostname(), new CompleteEvent() {
 
                     public void onComplete(NodeState state) {
                         synchronized (progressIcon) {
@@ -502,7 +499,7 @@ public class Manager {
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                    lxcHostname = lxcHostname.replaceAll(MASTER_PREFIX, "");
+                    lxcHostname = lxcHostname.replaceAll(COORDINATOR_PREFIX, "");
                     Agent lxcAgent = PrestoUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));

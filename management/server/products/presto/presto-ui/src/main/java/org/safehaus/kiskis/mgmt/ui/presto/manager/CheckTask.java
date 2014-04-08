@@ -20,14 +20,12 @@ import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 public class CheckTask implements Runnable {
 
     private final String clusterName, lxcHostname;
-    private final boolean master;
     private final CompleteEvent completeEvent;
 
-    public CheckTask(String clusterName, String lxcHostname, boolean master, CompleteEvent completeEvent) {
+    public CheckTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
-        this.master = master;
     }
 
     public void run() {
@@ -40,18 +38,10 @@ public class CheckTask implements Runnable {
             ProductOperationView po = PrestoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    if (master) {
-                        if (po.getLog().contains("Spark Master is running")) {
-                            state = NodeState.RUNNING;
-                        } else if (po.getLog().contains("Spark Master is NOT running")) {
-                            state = NodeState.STOPPED;
-                        }
-                    } else {
-                        if (po.getLog().contains("Spark Worker is running")) {
-                            state = NodeState.RUNNING;
-                        } else if (po.getLog().contains("Spark Worker is NOT running")) {
-                            state = NodeState.STOPPED;
-                        }
+                    if (po.getLog().contains("Spark Worker is running")) {
+                        state = NodeState.RUNNING;
+                    } else if (po.getLog().contains("Spark Worker is NOT running")) {
+                        state = NodeState.STOPPED;
                     }
                     break;
                 }

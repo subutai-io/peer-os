@@ -37,24 +37,20 @@ public interface Presto {
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @param master - specifies if this commands affects master or slave
-     * running on this node true - master, false - slave
      * @return - UUID of operation to track
      *
      */
-    public UUID startNode(String clusterName, String lxcHostName, boolean master);
+    public UUID startNode(String clusterName, String lxcHostName);
 
     /**
      * Stops the specified node
      *
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
-     * @param master - specifies if this commands affects master or slave
-     * running on this node true - master, false - slave
      * @return - UUID of operation to track
      *
      */
-    public UUID stopNode(String clusterName, String lxcHostName, boolean master);
+    public UUID stopNode(String clusterName, String lxcHostName);
 
     /**
      * Checks status of the specified node
