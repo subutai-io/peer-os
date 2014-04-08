@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.spark;
+package org.safehaus.kiskis.mgmt.impl.presto;
 
 import java.util.Iterator;
 import java.util.List;
@@ -15,8 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.spark.Config;
-import org.safehaus.kiskis.mgmt.api.spark.Spark;
+import org.safehaus.kiskis.mgmt.api.presto.Config;
+import org.safehaus.kiskis.mgmt.api.presto.Presto;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -31,9 +31,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 /**
  *
  * @author dilshat
- * @todo check destroy slave on master & stop slave in manager
  */
-public class SparkImpl implements Spark {
+public class PrestoImpl implements Presto {
 
     private TaskRunner taskRunner;
     private AgentManager agentManager;
@@ -77,7 +76,7 @@ public class SparkImpl implements Spark {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (config == null || Util.isStringEmpty(config.getClusterName()) ||Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
+                if (config == null || Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getWorkers()) || config.getCoordinatorNode() == null) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -87,13 +86,13 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) == null) {
+                if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
                     po.addLogFailed("Master node is not connected\nInstallation aborted");
                     return;
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getSlaveNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getWorkers().iterator(); it.hasNext();) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -101,7 +100,7 @@ public class SparkImpl implements Spark {
                     }
                 }
 
-                if (config.getSlaveNodes().isEmpty()) {
+                if (config.getWorkers().isEmpty()) {
                     po.addLogFailed("No nodes eligible for installation\nInstallation aborted");
                     return;
                 }
@@ -121,20 +120,20 @@ public class SparkImpl implements Spark {
                     Result result = checkInstalled.getResults().get(node.getUuid());
                     if (result.getStdOut().contains("ksks-spark")) {
                         po.addLog(String.format("Node %s already has Spark installed. Omitting this node from installation", node.getHostname()));
-                        config.getSlaveNodes().remove(node);
+                        config.getWorkers().remove(node);
                         it.remove();
                     } else if (!result.getStdOut().contains("ksks-hadoop")) {
                         po.addLog(String.format("Node %s has no Hadoop installation. Omitting this node from installation", node.getHostname()));
-                        config.getSlaveNodes().remove(node);
+                        config.getWorkers().remove(node);
                         it.remove();
                     }
                 }
 
-                if (config.getSlaveNodes().isEmpty()) {
+                if (config.getWorkers().isEmpty()) {
                     po.addLogFailed("No nodes eligible for installation\nInstallation aborted");
                     return;
                 }
-                if (!allNodes.contains(config.getMasterNode())) {
+                if (!allNodes.contains(config.getCoordinatorNode())) {
                     po.addLogFailed("Master node was omitted\nInstallation aborted");
                     return;
                 }
@@ -150,17 +149,17 @@ public class SparkImpl implements Spark {
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Installation succeeded\nSetting master IP...");
 
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getAllNodes(), config.getMasterNode()));
+                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getAllNodes(), config.getCoordinatorNode()));
 
                         if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Setting master IP succeeded\nRegistering slaves...");
 
-                            Task registerSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(config.getMasterNode(), config.getSlaveNodes()));
+                            Task registerSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(config.getCoordinatorNode(), config.getWorkers()));
 
                             if (registerSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                                 po.addLog("Slaves successfully registered\nStarting Spark...");
 
-                                Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
+                                Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getCoordinatorNode()));
                                 final AtomicInteger okCount = new AtomicInteger(0);
                                 taskRunner.executeTask(startSparkTask, new TaskCallback() {
 
@@ -264,7 +263,7 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    public UUID addSlaveNode(final String clusterName, final String lxcHostname) {
+    public UUID addWorkerNode(final String clusterName, final String lxcHostname) {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -279,8 +278,8 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) == null) {
-                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getMasterNode().getHostname()));
+                if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
+                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getCoordinatorNode().getHostname()));
                     return;
                 }
 
@@ -291,14 +290,14 @@ public class SparkImpl implements Spark {
                 }
 
                 //check if node is in the cluster
-                if (config.getSlaveNodes().contains(agent)) {
+                if (config.getWorkers().contains(agent)) {
                     po.addLogFailed(String.format("Node %s already belongs to this cluster\nOperation aborted", agent.getHostname()));
                     return;
                 }
 
                 po.addLog("Checking prerequisites...");
 
-                boolean install = !agent.equals(config.getMasterNode());
+                boolean install = !agent.equals(config.getCoordinatorNode());
 
                 //check installed ksks packages
                 Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
@@ -318,7 +317,7 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                config.getSlaveNodes().add(agent);
+                config.getWorkers().add(agent);
                 po.addLog("Updating db...");
                 //save to db
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
@@ -338,17 +337,17 @@ public class SparkImpl implements Spark {
                     }
 
                     po.addLog("Setting master IP on slave...");
-                    Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getMasterNode()));
+                    Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getCoordinatorNode()));
 
                     if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Master IP successfully set\nRegistering slave with master...");
 
-                        Task registerSlaveTask = taskRunner.executeTask(Tasks.getAddSlaveTask(config.getMasterNode(), agent));
+                        Task registerSlaveTask = taskRunner.executeTask(Tasks.getAddSlaveTask(config.getCoordinatorNode(), agent));
 
                         if (registerSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Registration succeeded\nRestarting master...");
 
-                            Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getMasterNode()));
+                            Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getCoordinatorNode()));
 
                             if (restartMasterTask.getTaskStatus() == TaskStatus.SUCCESS) {
                                 po.addLog("Master restarted successfully\nStarting Spark on new node...");
@@ -410,7 +409,7 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
+    public UUID destroyWorkerNode(final String clusterName, final String lxcHostname) {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -431,27 +430,27 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (config.getSlaveNodes().size() == 1) {
+                if (config.getWorkers().size() == 1) {
                     po.addLogFailed("This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
                 }
 
                 //check if node is in the cluster
-                if (!config.getSlaveNodes().contains(agent)) {
+                if (!config.getWorkers().contains(agent)) {
                     po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted", agent.getHostname()));
                     return;
                 }
 
                 po.addLog("Unregistering slave from master...");
 
-                if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) != null) {
+                if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) != null) {
 
-                    Task unregisterSlaveTask = taskRunner.executeTask(Tasks.getRemoveSlaveTask(config.getMasterNode(), agent));
+                    Task unregisterSlaveTask = taskRunner.executeTask(Tasks.getRemoveSlaveTask(config.getCoordinatorNode(), agent));
 
                     if (unregisterSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Successfully unregistered slave from master\nRestarting master...");
 
-                        Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getMasterNode()));
+                        Task restartMasterTask = taskRunner.executeTask(Tasks.getRestartMasterTask(config.getCoordinatorNode()));
 
                         if (restartMasterTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Master restarted successfully");
@@ -466,7 +465,7 @@ public class SparkImpl implements Spark {
                     po.addLog("Failed to unregister slave from master: Master is not connected, skipping...");
                 }
 
-                boolean uninstall = !agent.equals(config.getMasterNode());
+                boolean uninstall = !agent.equals(config.getCoordinatorNode());
 
                 if (uninstall) {
                     po.addLog("Uninstalling Spark...");
@@ -505,7 +504,7 @@ public class SparkImpl implements Spark {
                     }
                 }
 
-                config.getSlaveNodes().remove(agent);
+                config.getWorkers().remove(agent);
                 po.addLog("Updating db...");
 
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
@@ -520,7 +519,7 @@ public class SparkImpl implements Spark {
         return po.getId();
     }
 
-    public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
+    public UUID changeCoordinatorNode(final String clusterName, final String newMasterHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
                         String.format("Changing master to %s in %s", newMasterHostname, clusterName));
@@ -534,8 +533,8 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) == null) {
-                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getMasterNode().getHostname()));
+                if (agentManager.getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
+                    po.addLogFailed(String.format("Master node %s is not connected\nOperation aborted", config.getCoordinatorNode().getHostname()));
                     return;
                 }
 
@@ -545,7 +544,7 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (newMaster.equals(config.getMasterNode())) {
+                if (newMaster.equals(config.getCoordinatorNode())) {
                     po.addLogFailed(String.format("Node %s is already a master node\nOperation aborted", newMasterHostname));
                     return;
                 }
@@ -558,26 +557,26 @@ public class SparkImpl implements Spark {
 
                 po.addLog("Stopping all nodes...");
                 //stop all nodes
-                Task stopAllNodesTask = taskRunner.executeTask(Tasks.getStopAllTask(Util.wrapAgentToSet(config.getMasterNode())));
+                Task stopAllNodesTask = taskRunner.executeTask(Tasks.getStopAllTask(Util.wrapAgentToSet(config.getCoordinatorNode())));
                 if (stopAllNodesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                     po.addLog("All nodes stopped\nClearing slaves on old master...");
                     //clear slaves from old master
-                    Task clearSlavesTask = taskRunner.executeTask(Tasks.getClearSlavesTask(config.getMasterNode()));
+                    Task clearSlavesTask = taskRunner.executeTask(Tasks.getClearSlavesTask(config.getCoordinatorNode()));
                     if (clearSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Slaves cleared successfully");
                     } else {
                         po.addLog(String.format("Clearing slaves failed, %s, skipping...", clearSlavesTask.getFirstError()));
                     }
                     //add slaves to new master, if keepSlave=true then master node is also added as slave
-                    config.getSlaveNodes().add(config.getMasterNode());
-                    config.setMasterNode(newMaster);
-                    if (keepSlave) {
-                        config.getSlaveNodes().add(newMaster);
-                    } else {
-                        config.getSlaveNodes().remove(newMaster);
-                    }
+                    config.getWorkers().add(config.getCoordinatorNode());
+                    config.setCoordinatorNode(newMaster);
+//                    if (keepSlave) {
+//                        config.getSlaveNodes().add(newMaster);
+//                    } else {
+//                        config.getSlaveNodes().remove(newMaster);
+//                    }
                     po.addLog("Adding nodes to new master...");
-                    Task addSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(newMaster, config.getSlaveNodes()));
+                    Task addSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(newMaster, config.getWorkers()));
                     if (addSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Nodes added successfully\nSetting new master IP...");
                         //modify master ip on all nodes
@@ -586,7 +585,7 @@ public class SparkImpl implements Spark {
                             po.addLog("Master IP set successfully\nStarting cluster...");
                             //start master & slaves
 
-                            Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
+                            Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getCoordinatorNode()));
                             final AtomicInteger okCount = new AtomicInteger(0);
                             taskRunner.executeTask(startSparkTask, new TaskCallback() {
 
@@ -668,10 +667,10 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (master && !config.getMasterNode().equals(node)) {
+                if (master && !config.getCoordinatorNode().equals(node)) {
                     po.addLogFailed(String.format("Node %s is not a master node\nOperation aborted", node.getHostname()));
                     return;
-                } else if (!master && !config.getSlaveNodes().contains(node)) {
+                } else if (!master && !config.getWorkers().contains(node)) {
                     po.addLogFailed(String.format("Node %s is not a slave node\nOperation aborted", node.getHostname()));
                     return;
                 }
@@ -750,10 +749,10 @@ public class SparkImpl implements Spark {
                     return;
                 }
 
-                if (master && !config.getMasterNode().equals(node)) {
+                if (master && !config.getCoordinatorNode().equals(node)) {
                     po.addLogFailed(String.format("Node %s is not a master node\nOperation aborted", node.getHostname()));
                     return;
-                } else if (!master && !config.getSlaveNodes().contains(node)) {
+                } else if (!master && !config.getWorkers().contains(node)) {
                     po.addLogFailed(String.format("Node %s is not a slave node\nOperation aborted", node.getHostname()));
                     return;
                 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.spark.wizard;
+package org.safehaus.kiskis.mgmt.ui.presto.wizard;
 
 import com.vaadin.data.Item;
 import com.vaadin.ui.TreeTable;

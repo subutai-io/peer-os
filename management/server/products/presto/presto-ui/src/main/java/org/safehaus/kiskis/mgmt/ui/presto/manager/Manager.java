@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.spark.manager;
+package org.safehaus.kiskis.mgmt.ui.presto.manager;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.spark.Config;
+import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
@@ -33,7 +33,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
-import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
+import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 
 /**
  *
@@ -127,7 +127,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = SparkUI.getSparkManager().uninstallCluster(config.getClusterName());
+                                        UUID trackID = PrestoUI.getPrestoManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -153,13 +153,13 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    HadoopClusterInfo info = SparkUI.getDbManager().
+                    HadoopClusterInfo info = PrestoUI.getDbManager().
                             getInfo(HadoopClusterInfo.SOURCE,
                                     config.getClusterName(),
                                     HadoopClusterInfo.class);
                     if (info != null) {
                         Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
-                        nodes.removeAll(config.getSlaveNodes());
+                        nodes.removeAll(config.getWorkers());
                         if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
                             MgmtApplication.addCustomWindow(addNodeWindow);
@@ -236,7 +236,7 @@ public class Manager {
                     setMasterBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    SparkUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+                    PrestoUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -263,7 +263,7 @@ public class Manager {
                     setMasterBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    SparkUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+                    PrestoUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -290,7 +290,7 @@ public class Manager {
                     setMasterBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    SparkUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
+                    PrestoUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), false, new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -320,24 +320,13 @@ public class Manager {
                                 public void response(boolean ok) {
                                     if (ok) {
 
-                                        MgmtApplication.showConfirmationDialog(
-                                                "Setup slave confirmation",
-                                                "Do you want to have a slave on the master node?",
-                                                "Yes", "No", new ConfirmationDialogCallback() {
+                                        UUID trackID = PrestoUI.getPrestoManager().changeCoordinatorNode(config.getClusterName(), agent.getHostname());
+                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
-                                                    @Override
-                                                    public void response(boolean ok) {
-
-                                                        UUID trackID = SparkUI.getSparkManager().changeMasterNode(config.getClusterName(), agent.getHostname(), ok);
-                                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                                            public void windowClose(Window.CloseEvent e) {
-                                                                refreshClustersInfo();
-                                                            }
-                                                        });
-
-                                                    }
-                                                });
+                                            public void windowClose(Window.CloseEvent e) {
+                                                refreshClustersInfo();
+                                            }
+                                        });
                                     }
                                 }
                             });
@@ -357,7 +346,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = SparkUI.getSparkManager().destroySlaveNode(config.getClusterName(), agent.getHostname());
+                                        UUID trackID = PrestoUI.getPrestoManager().destroyWorkerNode(config.getClusterName(), agent.getHostname());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -398,7 +387,7 @@ public class Manager {
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(false);
 
-                SparkUI.getExecutor().execute(new CheckTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+                PrestoUI.getExecutor().execute(new CheckTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
 
                     public void onComplete(NodeState state) {
                         synchronized (progressIcon) {
@@ -421,7 +410,7 @@ public class Manager {
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(false);
 
-                SparkUI.getExecutor().execute(new StartTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+                PrestoUI.getExecutor().execute(new StartTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
 
                     public void onComplete(NodeState state) {
                         synchronized (progressIcon) {
@@ -444,7 +433,7 @@ public class Manager {
                 startBtn.setEnabled(false);
                 stopBtn.setEnabled(false);
 
-                SparkUI.getExecutor().execute(new StopTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
+                PrestoUI.getExecutor().execute(new StopTask(config.getClusterName(), master.getHostname(), true, new CompleteEvent() {
 
                     public void onComplete(NodeState state) {
                         synchronized (progressIcon) {
@@ -464,14 +453,14 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(nodesTable, config.getSlaveNodes(), config.getMasterNode());
+            populateTable(nodesTable, config.getWorkers(), config.getCoordinatorNode());
         } else {
             nodesTable.removeAllItems();
         }
     }
 
     public void refreshClustersInfo() {
-        List<Config> clustersInfo = SparkUI.getSparkManager().getClusters();
+        List<Config> clustersInfo = PrestoUI.getPrestoManager().getClusters();
         Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (clustersInfo != null && clustersInfo.size() > 0) {
@@ -514,7 +503,7 @@ public class Manager {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
                     lxcHostname = lxcHostname.replaceAll(MASTER_PREFIX, "");
-                    Agent lxcAgent = SparkUI.getAgentManager().getAgentByHostname(lxcHostname);
+                    Agent lxcAgent = PrestoUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
                         MgmtApplication.addCustomWindow(terminal);

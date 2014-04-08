@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.spark;
+package org.safehaus.kiskis.mgmt.impl.presto;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;

@@ -3,25 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.spark;
+package org.safehaus.kiskis.mgmt.ui.presto;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import org.safehaus.kiskis.mgmt.ui.spark.manager.Manager;
-import org.safehaus.kiskis.mgmt.ui.spark.wizard.Wizard;
+import org.safehaus.kiskis.mgmt.ui.presto.manager.Manager;
+import org.safehaus.kiskis.mgmt.ui.presto.wizard.Wizard;
 
 /**
  *
  * @author dilshat
  */
-public class SparkForm extends CustomComponent {
+public class PrestoForm extends CustomComponent {
 
     private final Wizard wizard;
     private final Manager manager;
 
-    public SparkForm() {
+    public PrestoForm() {
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);

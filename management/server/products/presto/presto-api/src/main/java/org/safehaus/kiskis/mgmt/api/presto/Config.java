@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.api.spark;
+package org.safehaus.kiskis.mgmt.api.presto;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,18 +15,18 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public class Config {
 
-    public static final String PRODUCT_KEY = "Spark";
+    public static final String PRODUCT_KEY = "Presto";
     private String clusterName = "";
 
-    private Agent masterNode;
-    private Set<Agent> slaves;
+    private Agent coordinatorNode;
+    private Set<Agent> workers;
 
-    public Agent getMasterNode() {
-        return masterNode;
+    public Agent getCoordinatorNode() {
+        return coordinatorNode;
     }
 
-    public void setMasterNode(Agent masterNode) {
-        this.masterNode = masterNode;
+    public void setCoordinatorNode(Agent coordinatorNode) {
+        this.coordinatorNode = coordinatorNode;
     }
 
     public String getClusterName() {
@@ -37,21 +37,21 @@ public class Config {
         this.clusterName = clusterName;
     }
 
-    public Set<Agent> getSlaveNodes() {
-        return slaves;
+    public Set<Agent> getWorkers() {
+        return workers;
     }
 
-    public void setSlaveNodes(Set<Agent> slaves) {
-        this.slaves = slaves;
+    public void setWorkers(Set<Agent> workers) {
+        this.workers = workers;
     }
 
     public Set<Agent> getAllNodes() {
         Set<Agent> allNodes = new HashSet<Agent>();
-        if (slaves != null) {
-            allNodes.addAll(slaves);
+        if (workers != null) {
+            allNodes.addAll(workers);
         }
-        if (masterNode != null) {
-            allNodes.add(masterNode);
+        if (coordinatorNode != null) {
+            allNodes.add(coordinatorNode);
         }
 
         return allNodes;
@@ -59,7 +59,7 @@ public class Config {
 
     @Override
     public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
+        return "Config{" + "clusterName=" + clusterName + ", coordinatorNode=" + coordinatorNode + ", workers=" + workers + '}';
     }
 
 }

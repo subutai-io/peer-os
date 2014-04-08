@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.spark.manager;
+package org.safehaus.kiskis.mgmt.ui.presto.manager;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
@@ -17,13 +17,13 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 import java.util.Set;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.spark.Config;
+import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
+import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 
 /**
  *
@@ -79,12 +79,12 @@ public class AddNodeWindow extends Window {
                 addNodeBtn.setEnabled(false);
                 showProgress();
                 Agent agent = (Agent) hadoopNodes.getValue();
-                final UUID trackID = SparkUI.getSparkManager().addSlaveNode(config.getClusterName(), agent.getHostname());
-                SparkUI.getExecutor().execute(new Runnable() {
+                final UUID trackID = PrestoUI.getPrestoManager().addWorkerNode(config.getClusterName(), agent.getHostname());
+                PrestoUI.getExecutor().execute(new Runnable() {
 
                     public void run() {
                         while (track) {
-                            ProductOperationView po = SparkUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+                            ProductOperationView po = PrestoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
                             if (po != null) {
                                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                                 if (po.getState() != ProductOperationState.RUNNING) {

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.spark.wizard;
+package org.safehaus.kiskis.mgmt.ui.presto.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -24,7 +24,7 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
+import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 
 /**
  *
@@ -71,7 +71,7 @@ public class ConfigurationStep extends Panel {
         slaveNodesSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         slaveNodesSelect.setRequired(true);
 
-        List<HadoopClusterInfo> clusters = SparkUI.getDbManager().
+        List<HadoopClusterInfo> clusters = PrestoUI.getDbManager().
                 getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
         if (clusters.size() > 0) {
             for (HadoopClusterInfo hadoopClusterInfo : clusters) {
@@ -81,7 +81,7 @@ public class ConfigurationStep extends Panel {
             }
         }
 
-        HadoopClusterInfo info = SparkUI.getDbManager().
+        HadoopClusterInfo info = PrestoUI.getDbManager().
                 getInfo(HadoopClusterInfo.SOURCE,
                         wizard.getConfig().getClusterName(),
                         HadoopClusterInfo.class);
@@ -114,13 +114,13 @@ public class ConfigurationStep extends Panel {
                             new BeanItemContainer<Agent>(
                                     Agent.class, hadoopInfo.getAllAgents()));
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-                    wizard.getConfig().setSlaveNodes(new HashSet<Agent>());
+                    wizard.getConfig().setWorkers(new HashSet<Agent>());
                 }
             }
         });
 
-        if (wizard.getConfig().getMasterNode() != null) {
-            masterNodeCombo.setValue(wizard.getConfig().getMasterNode());
+        if (wizard.getConfig().getCoordinatorNode() != null) {
+            masterNodeCombo.setValue(wizard.getConfig().getCoordinatorNode());
         }
 
         masterNodeCombo.addListener(new Property.ValueChangeListener() {
@@ -128,20 +128,20 @@ public class ConfigurationStep extends Panel {
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Agent master = (Agent) event.getProperty().getValue();
-                    wizard.getConfig().setMasterNode(master);
+                    wizard.getConfig().setCoordinatorNode(master);
                 }
             }
         });
 
-        if (!Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
-            slaveNodesSelect.setValue(wizard.getConfig().getSlaveNodes());
+        if (!Util.isCollectionEmpty(wizard.getConfig().getWorkers())) {
+            slaveNodesSelect.setValue(wizard.getConfig().getWorkers());
         }
         slaveNodesSelect.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
-                    wizard.getConfig().setSlaveNodes(agentList);
+                    wizard.getConfig().setWorkers(agentList);
                 }
             }
         });
@@ -154,9 +154,9 @@ public class ConfigurationStep extends Panel {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
-                } else if (wizard.getConfig().getMasterNode() == null) {
+                } else if (wizard.getConfig().getCoordinatorNode() == null) {
                     show("Please, select master node");
-                } else if (Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getWorkers())) {
                     show("Please, select slave nodes");
                 } else {
                     wizard.next();

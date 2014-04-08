@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.spark;
+package org.safehaus.kiskis.mgmt.impl.presto;
 
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -45,7 +45,7 @@ public class Commands {
 
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("apt-get --force-yes --assume-yes install ksks-spark");
+        req.setProgram("apt-get --force-yes --assume-yes install ksks-presto");
         req.setStdOut(OutputRedirection.NO);
         req.setTimeout(90);
         return req;
@@ -53,11 +53,54 @@ public class Commands {
 
     public static Request getUninstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("service spark-all kill;apt-get --force-yes --assume-yes purge ksks-spark");
+        req.setProgram("service presto stop ; apt-get --force-yes --assume-yes purge ksks-presto");
         req.setTimeout(60);
         return req;
     }
 
+    public static Request getStartCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service presto start");
+        req.setTimeout(60);
+        return req;
+    }
+
+    public static Request getStopCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service presto stop");
+        req.setTimeout(60);
+        return req;
+    }
+
+    public static Request getRestartCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service presto restart");
+        req.setTimeout(60);
+        return req;
+    }
+
+    public static Request getStatusCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("service presto status");
+        req.setTimeout(60);
+        return req;
+    }
+
+    public static Request getSetCoordinatorCommand(Agent coordinatorNode) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format("presto-config.sh coordinator %s", coordinatorNode.getHostname()));
+        req.setTimeout(60);
+        return req;
+    }
+
+    public static Request getSetWorkerCommand(Agent workerNode) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format("presto-config.sh worker %s", workerNode.getHostname()));
+        req.setTimeout(60);
+        return req;
+    }
+
+    /*=================ALL BELOW TO BE DELETED==================*/
     public static Request getStartAllCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service spark-all start");

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.spark.wizard;
+package org.safehaus.kiskis.mgmt.ui.presto.wizard;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
@@ -11,10 +11,10 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.spark.Config;
+import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
+import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 
 /**
  *
@@ -37,8 +37,8 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        cfgView.addStringCfg("Master Node", wizard.getConfig().getMasterNode().getHostname());
-        for (Agent agent : wizard.getConfig().getSlaveNodes()) {
+        cfgView.addStringCfg("Master Node", wizard.getConfig().getCoordinatorNode().getHostname());
+        for (Agent agent : wizard.getConfig().getWorkers()) {
             cfgView.addStringCfg("Slave nodes", agent.getHostname() + "");
         }
 
@@ -48,7 +48,7 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                UUID trackID = SparkUI.getSparkManager().installCluster(wizard.getConfig());
+                UUID trackID = PrestoUI.getPrestoManager().installCluster(wizard.getConfig());
                 MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }
