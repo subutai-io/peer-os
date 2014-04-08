@@ -7,8 +7,8 @@
             {
                 "range" : {
                     "@timestamp" : {
-                        "from" : "2014-01-01T23:55:00.000Z",
-                        "to" : "2014-04-10T23:59:00.000Z"
+                        "from" : "$startDate",
+                        "to" : "$endDate"
                     }
                 }
             },
@@ -22,5 +22,5 @@
     "sort" : {
         "@timestamp" : { "order" : "desc", "ignore_unmapped" : true }
     },
-    "size" : 25
+    "size" : 500
 }

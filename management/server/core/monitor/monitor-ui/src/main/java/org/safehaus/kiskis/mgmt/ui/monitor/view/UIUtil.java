@@ -1,9 +1,8 @@
 package org.safehaus.kiskis.mgmt.ui.monitor.view;
 
-import com.vaadin.ui.AbsoluteLayout;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.*;
+
+import java.util.Date;
 
 public class UIUtil {
 
@@ -38,5 +37,16 @@ public class UIUtil {
         parent.addComponent(list, position);
 
         return list;
+    }
+
+    public static PopupDateField addDateField(AbsoluteLayout parent, String label, String position, Date value) {
+
+        PopupDateField dateField = new PopupDateField(label, value);
+        dateField.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        dateField.setResolution(PopupDateField.RESOLUTION_SEC);
+
+        parent.addComponent(dateField, position);
+
+        return dateField;
     }
 }
