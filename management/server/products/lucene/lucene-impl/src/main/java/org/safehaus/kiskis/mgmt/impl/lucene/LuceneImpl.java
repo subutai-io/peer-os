@@ -68,6 +68,11 @@ public class LuceneImpl implements Lucene {
         executor.execute(new Runnable() {
 
             public void run() {
+                if (config == null || Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
+                    po.addLogFailed("Malformed configuration\nInstallation aborted");
+                    return;
+                }
+
                 if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
@@ -126,14 +131,7 @@ public class LuceneImpl implements Lucene {
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : installTask.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Installation failed, %s", err));
+                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
                 } else {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
@@ -186,14 +184,7 @@ public class LuceneImpl implements Lucene {
                         po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
                     }
                 } else {
-                    String err = "";
-                    for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                            err = res.getValue().getStdErr();
-                            break;
-                        }
-                    }
-                    po.addLogFailed(String.format("Uninstallation failed, %s", err));
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                 }
 
             }
@@ -219,6 +210,11 @@ public class LuceneImpl implements Lucene {
                 Agent agent = agentManager.getAgentByHostname(lxcHostname);
                 if (agent == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
+                    return;
+                }
+
+                if (!config.getNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
                     return;
                 }
 
@@ -254,14 +250,8 @@ public class LuceneImpl implements Lucene {
                         po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                     }
                 } else {
-                    String err = "";
-                    for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                            err = res.getValue().getStdErr();
-                            break;
-                        }
-                    }
-                    po.addLogFailed(String.format("Uninstallation failed, %s", err));
+
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                 }
             }
         });
@@ -287,6 +277,11 @@ public class LuceneImpl implements Lucene {
                 Agent agent = agentManager.getAgentByHostname(lxcHostname);
                 if (agent == null) {
                     po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", lxcHostname));
+                    return;
+                }
+
+                if (config.getNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName));
                     return;
                 }
 
@@ -322,14 +317,7 @@ public class LuceneImpl implements Lucene {
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : installTask.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Installation failed, %s", err));
+                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                     }
                 } else {
                     po.addLogFailed("Could not update cluster info in DB! Please see logs\nInstallation aborted");

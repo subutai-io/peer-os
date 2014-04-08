@@ -149,21 +149,6 @@
             <artifactId>snappy-java</artifactId>
             <version>${org.xerial.snappy.version}</version>
         </dependency>
-        <!--        <dependency>
-            <groupId>org.apache.felix.gogo</groupId>
-            <artifactId>org.apache.felix.gogo.commands</artifactId>
-            <version>${org.apache.felix.gogo.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.shell</groupId>
-            <artifactId>org.apache.karaf.shell.console</artifactId>
-            <version>${karaf.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix.gogo</groupId>
-            <artifactId>org.apache.felix.gogo.runtime</artifactId>
-            <version>${org.apache.felix.gogo.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
@@ -184,23 +169,6 @@
             <artifactId>com.springsource.org.doomdark.uuid</artifactId>
             <version>${org.doomdark.version}</version>
         </dependency>
-
-        <!--        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>${org.apache.cxf.version}</version>
-        </dependency>-->
-        <!--        <dependency>
-            <groupId>org.apache.karaf.shell</groupId>
-            <artifactId>org.apache.karaf.shell.osgi</artifactId>
-            <version>${karaf.version}</version>
-        </dependency>-->
-        <!--        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-osgi-annotation</artifactId>
-            <version>${org.springframework.osgi.version}</version>
-        </dependency>-->
-        
         <dependency>
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
@@ -277,6 +245,7 @@
                         <configuration>
                             <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
                             <artifactItems>
+
                                 <artifactItem>
                                     <groupId>org.doomdark</groupId>
                                     <artifactId>com.springsource.org.doomdark.uuid</artifactId>
@@ -293,297 +262,17 @@
                                     <version>${org.elasticsearch.version}</version>
                                 </artifactItem>
 
-                                <!--UI Modules-->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lucene-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lucene-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lucene-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>pig-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>pig-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>pig-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mahout-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mahout-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mahout-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>solr-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>solr-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>solr-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>tracker-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>tracker-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>tracker-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>task-runner-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lxc-manager-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>cassandra-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>logs-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hadoop-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-<!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>pig-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hbase-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>sqoop-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>oozie-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hive-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>flume-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-<!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lucene-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>monitor-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <!--UI Modules-->
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-core</artifactId>
+                                    <version>${com.sun.jersey.version}</version>
 
-                                <!--UI Dependencies-->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>ui-vaadin-bridge</artifactId>
-                                    <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>ui-vaadin-services</artifactId>
-                                    <version>${project.version}</version>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-server</artifactId>
+                                    <version>${com.sun.jersey.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>ui-vaadin-theme</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>ui-vaadin</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-
-                                <artifactItem>
-                                    <groupId>com.datastax.cassandra</groupId>
-                                    <artifactId>cassandra-driver-core</artifactId>
-                                    <version>${com.datastax.cassandra.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.cassandra</groupId>
-                                    <artifactId>cassandra-all</artifactId>
-                                    <version>${org.apache.cassandra.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.cassandra</groupId>
-                                    <artifactId>cassandra-thrift</artifactId>
-                                    <version>${org.apache.cassandra.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>net.jpountz.lz4</groupId>
-                                    <artifactId>lz4</artifactId>
-                                    <version>${net.jpountz.lz4.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.google.guava</groupId>
-                                    <artifactId>guava</artifactId>
-                                    <version>${com.google.guava.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>io.netty</groupId>
-                                    <artifactId>netty</artifactId>
-                                    <version>${io.netty.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.codahale.metrics</groupId>
-                                    <artifactId>metrics-core</artifactId>
-                                    <version>${com.codahale.metrics.metrics-core.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.codehaus.jackson</groupId>
-                                    <artifactId>jackson-core-asl</artifactId>
-                                    <version>${org.codehaus.jackson.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.codehaus.jackson</groupId>
-                                    <artifactId>jackson-mapper-asl</artifactId>
-                                    <version>${org.codehaus.jackson.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.commons</groupId>
-                                    <artifactId>commons-lang3</artifactId>
-                                    <version>${org.apache.commons.version}</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <!--UI Dependencies-->
-
-                                <!--Shared Dependencies-->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>communication-manager-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>communication-manager-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>                                
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lxc-manager-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>lxc-manager-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>                                
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-shared-protocol</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>task-runner-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>task-runner-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>agent-manager-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>agent-manager-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>db-manager-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>db-manager-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>api-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>impl-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>cli-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <!--Shared Dependencies-->
-
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin</artifactId>
@@ -649,80 +338,325 @@
                                     <artifactId>gson</artifactId>
                                     <version>${com.google.code.gson.version}</version>
                                 </artifactItem>
-                                <!--                                <artifactItem>
-                                    <groupId>org.apache.felix.gogo</groupId>
-                                    <artifactId>org.apache.felix.gogo.commands</artifactId>
-                                    <version>${org.apache.felix.gogo.version}</version>
+                                <artifactItem>
+                                    <groupId>net.jpountz.lz4</groupId>
+                                    <artifactId>lz4</artifactId>
+                                    <version>${net.jpountz.lz4.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.apache.karaf.shell</groupId>
-                                    <artifactId>org.apache.karaf.shell.console</artifactId>
-                                    <version>${karaf.version}</version>
+                                    <groupId>com.google.guava</groupId>
+                                    <artifactId>guava</artifactId>
+                                    <version>${com.google.guava.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.apache.felix.gogo</groupId>
-                                    <artifactId>org.apache.felix.gogo.runtime</artifactId>
-                                    <version>${org.apache.felix.gogo.version}</version>
-                                </artifactItem>-->
-                                <artifactItem>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-core</artifactId>
-                                    <version>${com.sun.jersey.version}</version>
+                                    <groupId>io.netty</groupId>
+                                    <artifactId>netty</artifactId>
+                                    <version>${io.netty.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-server</artifactId>
-                                    <version>${com.sun.jersey.version}</version>
+                                    <groupId>com.codahale.metrics</groupId>
+                                    <artifactId>metrics-core</artifactId>
+                                    <version>${com.codahale.metrics.metrics-core.version}</version>
                                 </artifactItem>
-
-                                <!--Web Server-->
-                                <!--                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>web-server</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <!--Web Server-->
-
-                                <!--                                <artifactItem>
-                                    <groupId>org.apache.cxf</groupId>
-                                    <artifactId>cxf-rt-bindings-soap</artifactId>
-                                    <version>${org.apache.cxf.version}</version>
-                                </artifactItem>-->
-                                <!--                                <artifactItem>
-                                    <groupId>org.apache.karaf.shell</groupId>
-                                    <artifactId>org.apache.karaf.shell.osgi</artifactId>
-                                    <version>${karaf.version}</version>
-                                </artifactItem>-->
-                                <!--                                <artifactItem>
-                                    <groupId>org.springframework.osgi</groupId>
-                                    <artifactId>spring-osgi-annotation</artifactId>
-                                    <version>${org.springframework.osgi.version}</version>
-                                </artifactItem>-->
-                                
-                                <!-- PRODUCTS -->
-                                <!--MONGO-->
                                 <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>                                
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-core-asl</artifactId>
+                                    <version>${org.codehaus.jackson.version}</version>
+                                </artifactItem>
                                 <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>                                
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-mapper-asl</artifactId>
+                                    <version>${org.codehaus.jackson.version}</version>
+                                </artifactItem>
                                 <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>            
-                                <!--MONGO-->
-                                <!-- PRODUCTS -->
+                                    <groupId>org.apache.commons</groupId>
+                                    <artifactId>commons-lang3</artifactId>
+                                    <version>${org.apache.commons.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>com.eaio.uuid</groupId>
                                     <artifactId>uuid</artifactId>
                                     <version>3.2</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.datastax.cassandra</groupId>
+                                    <artifactId>cassandra-driver-core</artifactId>
+                                    <version>${com.datastax.cassandra.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.cassandra</groupId>
+                                    <artifactId>cassandra-all</artifactId>
+                                    <version>${org.apache.cassandra.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.cassandra</groupId>
+                                    <artifactId>cassandra-thrift</artifactId>
+                                    <version>${org.apache.cassandra.version}</version>
+                                </artifactItem>
+
+                                <!-- Vaadin - START -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin-bridge</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin-services</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin-theme</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>ui-vaadin</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!-- Vaadin - END -->
+
+                                <!-- Core Modules - START -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>tracker-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>tracker-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>tracker-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>task-runner-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>task-runner-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>task-runner-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-shared-protocol</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>agent-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>agent-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>db-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>db-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>communication-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>communication-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lxc-manager-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lxc-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lxc-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>monitor-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!-- Core Modules - END -->
+
+                                <!-- Products Modules - START -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>shark-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>shark-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>shark-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>spark-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>spark-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>spark-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>                                
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lucene-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lucene-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lucene-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>pig-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>pig-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>pig-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mahout-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mahout-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mahout-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>solr-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>solr-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>solr-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!-- Products Modules - END -->
+
+                                <!-- TODO for API - START -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>cassandra-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hadoop-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hbase-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>sqoop-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>oozie-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hive-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>flume-module</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!-- TODO for API - END -->
+
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -741,121 +675,6 @@
                                     <outputDirectory>target/dependencies</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
-                        </configuration>
-                    </execution>
-
-                    <!--
-                        ElasticSearch has a problem to access classes in other jar files.
-                        To fix this we unpack all its dependencies and later create a single jar from.
-                    -->
-                    <execution>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/dependencies/elasticsearch</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.eclipse.jetty.orbit</groupId>
-                                    <artifactId>javax.servlet</artifactId>
-                                    <version>${org.eclipse.jetty.orbit.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.doomdark</groupId>
-                                    <artifactId>com.springsource.org.doomdark.uuid</artifactId>
-                                    <version>${org.doomdark.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch</groupId>
-                                    <artifactId>elasticsearch</artifactId>
-                                    <version>${org.elasticsearch.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-analyzers-common</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-codecs</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-core</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-grouping</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-highlighter</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-join</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-memory</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-misc</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-queries</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-queryparser</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-sandbox</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-spatial</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-suggest</artifactId>
-                                    <version>${org.apache.lucene.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Create a single jar with all elasticsearch dependencies -->
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>${maven-antrun-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <jar destfile="target/dependencies/kiskis-server/elasticsearch-bundle.jar"
-                                     basedir="target/dependencies/elasticsearch"/>
-                            </tasks>
                         </configuration>
                     </execution>
                 </executions>

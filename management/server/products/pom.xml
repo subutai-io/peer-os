@@ -16,10 +16,11 @@
 
     <modules>
         <module>mongodb</module>
-        <module>solr</module>
-        <module>mahout</module>
-        <module>pig</module>
-        <module>lucene</module>
-        <module>hadoop</module>
+        <module>solr</module> 
+	<module>mahout</module> 
+	<module>pig</module> 
+	<module>lucene</module>
+	<module>spark</module>
+	<module>shark</module>
     </modules>
 </project>

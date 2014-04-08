@@ -33,7 +33,6 @@ import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -120,6 +119,20 @@ public class MongoImpl implements Mongo {
         executor.execute(new Runnable() {
 
             public void run() {
+
+                if (config == null
+                        || Util.isStringEmpty(config.getClusterName())
+                        || Util.isStringEmpty(config.getReplicaSetName())
+                        || Util.isStringEmpty(config.getDomainName())
+                        || config.getNumberOfConfigServers() <= 0
+                        || config.getNumberOfRouters() <= 0
+                        || config.getNumberOfDataNodes() <= 0
+                        || config.getCfgSrvPort() <= 0
+                        || config.getDataNodePort() <= 0
+                        || config.getRouterPort() <= 0) {
+                    po.addLogFailed("Malformed configuration\nInstallation aborted");
+                    return;
+                }
 
                 //check if mongo cluster with the same name already exists
                 if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
@@ -244,14 +257,9 @@ public class MongoImpl implements Mongo {
 
                         }
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : task.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s", task.getDescription(), installOperation.getDescription(), err));
+
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s",
+                                task.getDescription(), installOperation.getDescription(), task.getFirstError()));
 
                     }
                 }
@@ -381,14 +389,8 @@ public class MongoImpl implements Mongo {
                             po.addLogDone(String.format("Operation %s completed\nDone", operation.getDescription()));
                         }
                     } else {
-                        String err = "";
-                        for (Map.Entry<UUID, Result> res : task.getResults().entrySet()) {
-                            if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                err = res.getValue().getStdErr();
-                                break;
-                            }
-                        }
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s\nUse LXC module to cleanup", task.getDescription(), operation.getDescription(), err));
+                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s\nUse LXC module to cleanup",
+                                task.getDescription(), operation.getDescription(), task.getFirstError()));
                     }
                 }
 
@@ -458,6 +460,10 @@ public class MongoImpl implements Mongo {
                 Agent agent = agentManager.getAgentByHostname(lxcHostname);
                 if (agent == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+                if (!config.getAllNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
                     return;
                 }
 
@@ -612,6 +618,10 @@ public class MongoImpl implements Mongo {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
                     return;
                 }
+                if (!config.getAllNodes().contains(node)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
+                    return;
+                }
 
                 Task startNodeTask;
                 NodeType nodeType = getNodeType(config, node);
@@ -691,6 +701,10 @@ public class MongoImpl implements Mongo {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
                     return;
                 }
+                if (!config.getAllNodes().contains(node)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
+                    return;
+                }
 
                 po.addLog("Stopping node...");
                 Task stopNodeTask = taskRunner.executeTask(
@@ -730,6 +744,10 @@ public class MongoImpl implements Mongo {
                 Agent node = agentManager.getAgentByHostname(lxcHostname);
                 if (node == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+                    return;
+                }
+                if (!config.getAllNodes().contains(node)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
                     return;
                 }
                 po.addLog("Checking node...");

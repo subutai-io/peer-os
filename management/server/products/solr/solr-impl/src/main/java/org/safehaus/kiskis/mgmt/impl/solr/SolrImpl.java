@@ -71,6 +71,12 @@ public class SolrImpl implements Solr {
         executor.execute(new Runnable() {
 
             public void run() {
+
+                if (config == null || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                    po.addLogFailed("Malformed configuration\nInstallation aborted");
+                    return;
+                }
+
                 if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
@@ -95,14 +101,7 @@ public class SolrImpl implements Solr {
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded");
                         } else {
-                            String err = "";
-                            for (Map.Entry<UUID, Result> res : installTask.getResults().entrySet()) {
-                                if (!Util.isStringEmpty(res.getValue().getStdErr())) {
-                                    err = res.getValue().getStdErr();
-                                    break;
-                                }
-                            }
-                            po.addLogFailed(String.format("Installation failed, %s", err));
+                            po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                         }
 
                     } else {
@@ -186,6 +185,12 @@ public class SolrImpl implements Solr {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
+
+                if (!config.getNodes().contains(node)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
+                    return;
+                }
+
                 po.addLog("Starting node...");
                 Task startNodeTask = Tasks.getStartTask(node);
                 final Task checkNodeTask = Tasks.getStatusTask(node);
@@ -257,6 +262,10 @@ public class SolrImpl implements Solr {
                 final Agent node = agentManager.getAgentByHostname(lxcHostName);
                 if (node == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
+                    return;
+                }
+                if (!config.getNodes().contains(node)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
                     return;
                 }
                 po.addLog("Stopping node...");
@@ -332,6 +341,10 @@ public class SolrImpl implements Solr {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
+                if (!config.getNodes().contains(node)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
+                    return;
+                }
                 po.addLog("Checking node...");
                 final Task checkNodeTask = taskRunner.executeTask(Tasks.getStatusTask(node));
 
@@ -380,6 +393,10 @@ public class SolrImpl implements Solr {
                 Agent agent = agentManager.getAgentByHostname(lxcHostName);
                 if (agent == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
+                    return;
+                }
+                if (!config.getNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
                     return;
                 }
 
