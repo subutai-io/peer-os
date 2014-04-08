@@ -13,7 +13,7 @@ public class FlumeUI implements Module {
 
     private static AgentManager agentManager;
     private static Tracker tracker;
-    private static Flume flumeManager;
+    private static Flume manager;
     private static ExecutorService executor;
 
     public void init() {
@@ -23,7 +23,7 @@ public class FlumeUI implements Module {
     public void destroy() {
         agentManager = null;
         tracker = null;
-        flumeManager = null;
+        manager = null;
         executor.shutdown();
     }
 
@@ -31,7 +31,7 @@ public class FlumeUI implements Module {
         return agentManager;
     }
 
-    public static void setAgentManager(AgentManager agentManager) {
+    public void setAgentManager(AgentManager agentManager) {
         FlumeUI.agentManager = agentManager;
     }
 
@@ -39,16 +39,16 @@ public class FlumeUI implements Module {
         return tracker;
     }
 
-    public static void setTracker(Tracker tracker) {
+    public void setTracker(Tracker tracker) {
         FlumeUI.tracker = tracker;
     }
 
     public static Flume getFlumeManager() {
-        return flumeManager;
+        return manager;
     }
 
-    public static void setFlumeManager(Flume flumeManager) {
-        FlumeUI.flumeManager = flumeManager;
+    public void setManager(Flume manager) {
+        FlumeUI.manager = manager;
     }
 
     public static ExecutorService getExecutor() {
