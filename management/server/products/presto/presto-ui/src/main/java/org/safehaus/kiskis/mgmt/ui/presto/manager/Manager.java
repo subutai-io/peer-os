@@ -159,7 +159,7 @@ public class Manager {
                                     HadoopClusterInfo.class);
                     if (info != null) {
                         Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
-                        nodes.removeAll(config.getWorkers());
+                        nodes.removeAll(config.getAllNodes());
                         if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
                             MgmtApplication.addCustomWindow(addNodeWindow);

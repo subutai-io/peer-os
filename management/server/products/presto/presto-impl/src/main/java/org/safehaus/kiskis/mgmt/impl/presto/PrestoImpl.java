@@ -517,7 +517,7 @@ public class PrestoImpl implements Presto {
                     if (configureWorkersTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Workers configured successfully\nStarting cluster...");
 
-                        Task startPrestoTask = Tasks.getStartTask(Util.wrapAgentToSet(config.getCoordinatorNode()));
+                        Task startPrestoTask = Tasks.getStartTask(config.getAllNodes());
                         final AtomicInteger okCount = new AtomicInteger(0);
                         taskRunner.executeTask(startPrestoTask, new TaskCallback() {
 
@@ -714,7 +714,7 @@ public class PrestoImpl implements Presto {
                         Tasks.getStatusTask(Util.wrapAgentToSet(node)));
 
                 Result res = checkNodeTask.getResults().get(node.getUuid());
-                if (checkNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (checkNodeTask.isCompleted()) {
                     po.addLogDone(String.format("%s", res.getStdOut()));
                 } else {
                     po.addLogFailed(String.format("Faied to check status, %s", res.getStdErr()));
