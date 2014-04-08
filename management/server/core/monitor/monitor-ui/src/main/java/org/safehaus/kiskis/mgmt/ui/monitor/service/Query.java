@@ -8,11 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Query {
 
@@ -24,9 +22,9 @@ public class Query {
 
     private static final String QUERY = FileUtil.getContent("elasticsearch/query.json");
 
-    public static String execute(String host, String metric, Date startDate, Date endDate) {
+    public static Map<Date, Double> execute(String host, String metric, Date startDate, Date endDate) {
 
-        String data = "";
+        Map<Date, Double> data = Collections.emptyMap();
 
         try {
             data = doExecute(host, metric, startDate, endDate);
@@ -37,26 +35,26 @@ public class Query {
         return data;
     }
 
-    private static String doExecute(String host, String metricName, Date startDate, Date endDate) throws Exception {
+    private static Map<Date, Double> doExecute(String host, String metricName, Date startDate, Date endDate) throws Exception {
 
         String query = QUERY
                 .replace("$host", host)
                 .replace("$metricName", metricName)
-                .replace("$startDate", dateToString(startDate) )
-                .replace("$endDate", dateToString(endDate) );
+                .replace("$startDate", dateToStr(startDate) )
+                .replace("$endDate", dateToStr(endDate) );
 
         String response = HttpPost.execute(query);
         List<JsonNode> nodes = toNodes(response);
 
         LOG.info("nodes count: {}", nodes.size());
 
-        // We need reverse the list b/c the query returns data in desc order
+        // We need reverse the list b/c the query returns the data in desc order (to get the latest values first).
         Collections.reverse(nodes);
 
-        return nodes.isEmpty() ? "" : Format.toPoints(nodes);
+        return toMap(nodes);
     }
 
-    static List<JsonNode> toNodes(String response) throws IOException {
+    private static List<JsonNode> toNodes(String response) throws IOException {
 
         JsonNode json = OBJECT_MAPPER.readTree(response);
         JsonNode hits = json.get("hits").get("hits");
@@ -73,7 +71,34 @@ public class Query {
         return nodes;
     }
 
-    private static String dateToString(Date date) {
+    private static Map<Date, Double> toMap(List<JsonNode> nodes) {
+
+        Map<Date, Double> values = new LinkedHashMap<Date, Double>();
+
+        for (JsonNode node : nodes) {
+            Date date = strToDate( node.get("@timestamp").asText() );
+            double value = node.get("val").asDouble();
+            values.put(date, value);
+        }
+
+        return values;
+    }
+
+    private static Date strToDate(String dateStr) {
+
+        String target = dateStr.replace("T", " ").replace("Z", "");
+        Date date = null;
+
+        try {
+            date = DATE_FORMAT.parse(target);
+        } catch (ParseException e) {
+            LOG.error("Error while parsing time: ", e);
+        }
+
+        return date;
+    }
+
+    private static String dateToStr(Date date) {
         return DATE_FORMAT.format(date)
                 .replace(" ", "T");
     }
