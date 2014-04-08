@@ -10,6 +10,8 @@ import org.safehaus.kiskis.mgmt.ui.monitor.util.JavaScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 class Chart {
 
     private final static Logger LOG = LoggerFactory.getLogger(Chart.class);
@@ -28,14 +30,10 @@ class Chart {
         javaScript.loadFile("js/highcharts.js");
     }
 
-    void load(String host, Metric metric) {
-        LOG.info("host: {}; metric: {}", host, metric);
+    void load(String host, Metric metric, Date startDate, Date endDate) {
+        LOG.info("host: {}, metric: {}, startDate: {}, endDate: {}", host, metric, startDate, endDate);
 
-        if (host == null || metric == null) {
-            return;
-        }
-
-        String data = Query.execute(host, metric.toString(), 25);
+        String data = Query.execute(host, metric.toString(), startDate, endDate);
 
         if ( StringUtils.isEmpty(data) ) {
             return;

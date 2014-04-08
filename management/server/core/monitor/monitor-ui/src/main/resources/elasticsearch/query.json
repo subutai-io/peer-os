@@ -1,9 +1,26 @@
 {
     "query" : {
         "term" : { "name" : "$metricName" }
-    }
-    ,"sort": {
-        "@timestamp": { "order": "desc", "ignore_unmapped" : true }
+    },
+    "filter" : {
+        "and" : [
+            {
+                "range" : {
+                    "@timestamp" : {
+                        "from" : "$startDate",
+                        "to" : "$endDate"
+                    }
+                }
+            },
+            {
+                "script" : {
+                    "script" : "_source.log_host == \"$host\""
+                }
+            }
+        ]
+    },
+    "sort" : {
+        "@timestamp" : { "order" : "desc", "ignore_unmapped" : true }
     },
     "size" : 500
 }

@@ -12,12 +12,16 @@ import java.net.URL;
 // TODO refactor
 class HttpPost {
 
-    private final static Logger LOG = LoggerFactory.getLogger(HttpPost.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpPost.class);
+
+    private static final String URL = "http://127.0.0.1:9200/_all/logs/_search";
+//    private static final String URL = "http://172.16.11.35:9200/_all/logs/_search";
 
     static String execute(String params) throws Exception {
 
-        String url = "http://127.0.0.1:9200/_all/logs/_search";
-        URL obj = new URL(url);
+//        String url = "http://127.0.0.1:9200/_all/logs/_search";
+//        URL obj = new URL(url);
+        URL obj = new URL(URL);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
         con.setRequestMethod("POST");
