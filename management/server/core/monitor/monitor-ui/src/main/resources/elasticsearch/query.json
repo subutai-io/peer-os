@@ -22,5 +22,5 @@
     "sort" : {
         "@timestamp" : { "order" : "desc", "ignore_unmapped" : true }
     },
-    "size" : 500
+    "size" : 10000 // Limiting size to prevent from too much data.
 }

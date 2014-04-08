@@ -13,6 +13,8 @@ import java.util.Set;
 
 public class ModuleComponent extends CustomComponent {
 
+    private static final int MAX_SIZE = 500;
+
     private Chart chart;
 
     private PopupDateField startDateField;
@@ -40,7 +42,7 @@ public class ModuleComponent extends CustomComponent {
     }
 
     private void addNote(AbsoluteLayout layout) {
-        UIUtil.addLabel(layout, "<i>Note: the chart displays only recent 500 values.</i>", "left: 20px; top: 10px;");
+        UIUtil.addLabel(layout, String.format("<i>Note: the chart displays only recent %s values.</i>", MAX_SIZE), "left: 20px; top: 10px;");
     }
 
     private void addDateFields(AbsoluteLayout layout) {
@@ -94,7 +96,7 @@ public class ModuleComponent extends CustomComponent {
         }
 
         if (chart == null) {
-            chart = new Chart( getWindow() );
+            chart = new Chart(getWindow(), MAX_SIZE);
         }
 
         Date startDate = (Date) startDateField.getValue();

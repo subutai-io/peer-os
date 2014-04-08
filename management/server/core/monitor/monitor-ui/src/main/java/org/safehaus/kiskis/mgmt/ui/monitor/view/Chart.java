@@ -22,9 +22,11 @@ class Chart {
 
     private static final String CHART_TEMPLATE = FileUtil.getContent("js/chart.js");
 
+    private final int maxSize;
     private final JavaScript javaScript;
 
-    Chart(Window window) {
+    Chart(Window window, int maxSize) {
+        this.maxSize = maxSize;
         javaScript = new JavaScript(window);
         loadScripts();
     }
@@ -48,9 +50,10 @@ class Chart {
         javaScript.execute(chart);
     }
 
-    private static String toPoints(Map<Date, Double> values) {
+    private String toPoints(Map<Date, Double> values) {
 
         String str = "";
+        int i = 0;
 
         for ( Date date : values.keySet() ) {
             if ( !str.isEmpty() ) {
@@ -59,6 +62,11 @@ class Chart {
 
             // Pass date as string so we don't deal with timezone issues between javascript and the server
             str += String.format( "{ x: Date.parse('%s'), y: %s }", DATE_FORMAT.format(date), values.get(date) );
+
+            i++;
+            if (i > maxSize) {
+                break;
+            }
         }
 
         return String.format("[%s]", str);
