@@ -39,7 +39,7 @@ class Chart {
     void load(String host, Metric metric, Date startDate, Date endDate) {
         LOG.info("host: {}, metric: {}, startDate: {}, endDate: {}", host, metric, startDate, endDate);
 
-        Map<Date, Double> values = Query.execute(host, metric.toString(), startDate, endDate);
+        Map<Date, Double> values = Query.execute(host, metric, startDate, endDate);
         String data = toPoints(values);
 
         String chart = CHART_TEMPLATE

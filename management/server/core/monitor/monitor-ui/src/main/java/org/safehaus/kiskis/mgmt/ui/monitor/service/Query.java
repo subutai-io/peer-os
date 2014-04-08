@@ -22,7 +22,7 @@ public class Query {
 
     private static final String QUERY = FileUtil.getContent("elasticsearch/query.json");
 
-    public static Map<Date, Double> execute(String host, String metric, Date startDate, Date endDate) {
+    public static Map<Date, Double> execute(String host, Metric metric, Date startDate, Date endDate) {
 
         Map<Date, Double> data = Collections.emptyMap();
 
@@ -35,18 +35,18 @@ public class Query {
         return data;
     }
 
-    private static Map<Date, Double> doExecute(String host, String metricName, Date startDate, Date endDate) throws Exception {
+    private static Map<Date, Double> doExecute(String host, Metric metric, Date startDate, Date endDate) throws Exception {
 
         String query = QUERY
-                .replace("$host", host)
-                .replace("$metricName", metricName)
-                .replace("$startDate", dateToStr(startDate) )
-                .replace("$endDate", dateToStr(endDate) );
+                .replace( "$host", host )
+                .replace( "$metricName", metric.toString().toLowerCase() )
+                .replace( "$startDate", dateToStr(startDate) )
+                .replace( "$endDate", dateToStr(endDate) );
 
         String response = HttpPost.execute(query);
         List<JsonNode> nodes = toNodes(response);
 
-        LOG.info("nodes count: {}", nodes.size());
+        LOG.info( "nodes count: {}", nodes.size() );
 
         // Reversing the list b/c the query returns the data in desc order (to get the latest values first).
         Collections.reverse(nodes);
