@@ -5,9 +5,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class Config {
 
-    public static final String PRODUCT_KEY = "Flume v2";
+    public static final String PRODUCT_KEY = "Flume";
     private String clusterName = "";
-    private int numberOfNodes = 3;
     private Set<Agent> nodes;
 
     public String getClusterName() {
@@ -16,14 +15,6 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
-    }
-
-    public int getNumberOfNodes() {
-        return numberOfNodes;
-    }
-
-    public void setNumberOfNodes(int numberOfNodes) {
-        this.numberOfNodes = numberOfNodes;
     }
 
     public Set<Agent> getNodes() {
@@ -36,7 +27,7 @@ public class Config {
 
     @Override
     public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", numberOfNodes=" + numberOfNodes + ", nodes=" + nodes + '}';
+        return "Config{" + "clusterName=" + clusterName + '}';
     }
 
 }

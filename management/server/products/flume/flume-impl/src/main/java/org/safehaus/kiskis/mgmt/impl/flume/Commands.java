@@ -30,8 +30,15 @@ public class Commands {
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
         req.setProgram("sleep 10; apt-get update && apt-get --force-yes --assume-yes install ksks-flume");
-        req.setStdOut(OutputRedirection.NO);
+        req.setStdOut(OutputRedirection.NO); // TODO:
         req.setTimeout(90);
+        return req;
+    }
+
+    public static Request getUninstallCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("apt-get --force-yes --assume-yes purge ksks-flume");
+        req.setTimeout(60);
         return req;
     }
 

@@ -15,6 +15,15 @@ public class Tasks {
         return task;
     }
 
+    public static Task getUninstallTask(Set<Agent> agents) {
+        Task task = new Task("Uninstall Flume");
+        task.setData(TaskType.UNINSTALL);
+        for(Agent agent : agents) {
+            task.addRequest(Commands.getUninstallCommand(), agent);
+        }
+        return task;
+    }
+
     public static Task getStartTask(Agent agent) {
         Task task = new Task("Start Flume");
         task.setData(TaskType.START);
@@ -33,6 +42,14 @@ public class Tasks {
         Task task = new Task("Status of Flume");
         task.setData(TaskType.STATUS);
         task.addRequest(Commands.getStatusCommand(), agent);
+        return task;
+    }
+
+    public static Task getStatusTask(Set<Agent> agents) {
+        Task task = new Task("Status of Flume");
+        task.setData(TaskType.STATUS);
+        for(Agent agent : agents)
+            task.addRequest(Commands.getStatusCommand(), agent);
         return task;
     }
 }

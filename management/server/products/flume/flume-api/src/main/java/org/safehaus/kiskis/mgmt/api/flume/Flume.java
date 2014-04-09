@@ -15,7 +15,7 @@ public interface Flume {
 
     public UUID checkNode(String clusterName, String lxcHostname);
 
-    public UUID addNode(String clusterName);
+    public UUID addNode(String clusterName, String lxcHostname);
 
     public UUID destroyNode(String clusterName, String lxcHostname);
 

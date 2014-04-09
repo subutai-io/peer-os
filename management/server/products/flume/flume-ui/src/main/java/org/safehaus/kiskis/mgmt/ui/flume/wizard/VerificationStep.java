@@ -4,6 +4,7 @@ import com.vaadin.ui.*;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.flume.FlumeUI;
 
 public class VerificationStep extends Panel {
@@ -23,7 +24,9 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        cfgView.addStringCfg("Number of nodes", wizard.getConfig().getNumberOfNodes() + "");
+        for(Agent agent : wizard.getConfig().getNodes()) {
+            cfgView.addStringCfg("Node to install", agent.getHostname() + "");
+        }
 
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
@@ -31,7 +34,7 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                UUID trackID = FlumeUI.getFlumeManager().installCluster(wizard.getConfig());
+                UUID trackID = FlumeUI.getManager().installCluster(wizard.getConfig());
                 MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }
@@ -50,9 +53,7 @@ public class VerificationStep extends Panel {
         buttons.addComponent(install);
 
         grid.addComponent(confirmationLbl, 0, 0);
-
         grid.addComponent(cfgView.getCfgTable(), 0, 1, 0, 3);
-
         grid.addComponent(buttons, 0, 4);
 
         addComponent(grid);

@@ -1,17 +1,16 @@
 package org.safehaus.kiskis.mgmt.ui.flume.manager;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.flume.FlumeUI;
 
 public class Manager {
@@ -73,18 +72,6 @@ public class Manager {
 
         controlsContent.addComponent(refreshClustersBtn);
 
-        Button checkAllBtn = new Button("Check all");
-        checkAllBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                checkNodesStatus(nodesTable);
-            }
-
-        });
-
-        controlsContent.addComponent(checkAllBtn);
-
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
 
@@ -99,7 +86,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if(ok) {
-                                        UUID trackID = FlumeUI.getFlumeManager().uninstallCluster(config.getClusterName());
+                                        UUID trackID = FlumeUI.getManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -119,30 +106,33 @@ public class Manager {
         controlsContent.addComponent(destroyClusterBtn);
 
         Button addNodeBtn = new Button("Add Node");
-
         addNodeBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if(config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Confirm adding node",
-                            String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
+                    HadoopClusterInfo info = FlumeUI.getDbManager().
+                            getInfo(HadoopClusterInfo.SOURCE,
+                                    config.getClusterName(),
+                                    HadoopClusterInfo.class);
+                    if(info != null) {
+                        Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
+                        nodes.removeAll(config.getNodes());
+                        if(!nodes.isEmpty()) {
+                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
+                            MgmtApplication.addCustomWindow(addNodeWindow);
+                            addNodeWindow.addListener(new Window.CloseListener() {
 
-                                @Override
-                                public void response(boolean ok) {
-                                    if(ok) {
-                                        UUID trackID = FlumeUI.getFlumeManager().addNode(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
+                                public void windowClose(Window.CloseEvent e) {
+                                    refreshClustersInfo();
                                 }
                             });
+                        } else {
+                            show("All nodes in corresponding Hadoop cluster have Flume installed");
+                        }
+                    } else {
+                        show("Hadoop cluster info not found");
+                    }
                 } else {
                     show("Please, select cluster");
                 }
@@ -152,7 +142,6 @@ public class Manager {
         controlsContent.addComponent(addNodeBtn);
 
         content.addComponent(controlsContent);
-
         content.addComponent(nodesTable);
 
     }
@@ -171,106 +160,8 @@ public class Manager {
 
         for(Iterator it = agents.iterator(); it.hasNext();) {
             final Agent agent = (Agent) it.next();
-
-            final Button checkBtn = new Button("Check");
-            final Button startBtn = new Button("Start");
-            final Button stopBtn = new Button("Stop");
             final Button destroyBtn = new Button("Destroy");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-            stopBtn.setEnabled(false);
-            startBtn.setEnabled(false);
-            progressIcon.setVisible(false);
-
-            final Object rowId = table.addItem(new Object[]{
-                agent.getHostname(),
-                checkBtn,
-                startBtn,
-                stopBtn,
-                destroyBtn,
-                progressIcon},
-                    null);
-
-            checkBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    FlumeUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized(progressIcon) {
-                                if(state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else if(state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
-
-            startBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    FlumeUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized(progressIcon) {
-                                if(state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-
-                }
-            });
-
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    FlumeUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized(progressIcon) {
-                                if(state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                } else {
-                                    stopBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
+            table.addItem(new Object[]{agent.getHostname(), destroyBtn}, null);
 
             destroyBtn.addListener(new Button.ClickListener() {
 
@@ -285,7 +176,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if(ok) {
-                                        UUID trackID = FlumeUI.getFlumeManager().destroyNode(config.getClusterName(), agent.getHostname());
+                                        UUID trackID = FlumeUI.getManager().destroyNode(config.getClusterName(), agent.getHostname());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -310,45 +201,31 @@ public class Manager {
     }
 
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = FlumeUI.getFlumeManager().getClusters();
+        List<Config> clustersInfo = FlumeUI.getManager().getClusters();
         Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if(mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
-            for(Config mongoClusterInfo : mongoClusterInfos) {
-                clusterCombo.addItem(mongoClusterInfo);
-                clusterCombo.setItemCaption(mongoClusterInfo,
-                        mongoClusterInfo.getClusterName());
+        if(clustersInfo != null && clustersInfo.size() > 0) {
+            for(Config ci : clustersInfo) {
+                clusterCombo.addItem(ci);
+                clusterCombo.setItemCaption(ci, ci.getClusterName());
             }
             if(clusterInfo != null) {
-                for(Config mongoClusterInfo : mongoClusterInfos) {
-                    if(mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
-                        clusterCombo.setValue(mongoClusterInfo);
+                for(Config ci : clustersInfo) {
+                    if(ci.getClusterName().equals(clusterInfo.getClusterName())) {
+                        clusterCombo.setValue(ci);
                         return;
                     }
                 }
             } else {
-                clusterCombo.setValue(mongoClusterInfos.iterator().next());
+                clusterCombo.setValue(clustersInfo.iterator().next());
             }
-        }
-    }
-
-    public static void checkNodesStatus(Table table) {
-        for(Iterator it = table.getItemIds().iterator(); it.hasNext();) {
-            int rowId = (Integer) it.next();
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-            checkBtn.click();
         }
     }
 
     private Table createTableTemplate(String caption, int size) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);

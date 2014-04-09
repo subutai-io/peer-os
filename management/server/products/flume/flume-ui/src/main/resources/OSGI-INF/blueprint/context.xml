@@ -7,12 +7,15 @@
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>       
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>               
+    <reference id="dbManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
         
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.flume.FlumeUI"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager" />
         <property name="tracker" ref="tracker"/>
         <property name="manager" ref="manager"/>
+        <property name="dbManager" ref="dbManager"/>
     </bean>
     
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
