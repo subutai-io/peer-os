@@ -1,20 +1,26 @@
 package org.safehaus.kiskis.mgmt.ui.monitor;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.ui.monitor.view.ModuleComponent;
+import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
-public class Monitor implements Module {
+public class MonitorModule implements Module {
 
     private static final String MODULE_NAME = "Monitor";
+
+    private Monitor monitor;
 
     @Override
     public String getName() {
         return MODULE_NAME;
     }
 
+    public void setMonitor(Monitor monitor) {
+        this.monitor = monitor;
+    }
+
     @Override
     public Component createComponent() {
-        return new ModuleComponent();
+        return new ModuleView(monitor);
     }
 }

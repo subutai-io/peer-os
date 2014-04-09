@@ -145,6 +145,11 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>${org.xerial.snappy.version}</version>
@@ -245,7 +250,6 @@
                         <configuration>
                             <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
                             <artifactItems>
-
                                 <artifactItem>
                                     <groupId>org.doomdark</groupId>
                                     <artifactId>com.springsource.org.doomdark.uuid</artifactId>
@@ -261,12 +265,10 @@
                                     <artifactId>elasticsearch</artifactId>
                                     <version>${org.elasticsearch.version}</version>
                                 </artifactItem>
-
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
                                     <version>${com.sun.jersey.version}</version>
-
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
@@ -373,6 +375,11 @@
                                     <artifactId>commons-lang3</artifactId>
                                     <version>${org.apache.commons.version}</version>
                                     <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-io</groupId>
+                                    <artifactId>commons-io</artifactId>
+                                    <version>${commons.io.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.eaio.uuid</groupId>
@@ -488,6 +495,8 @@
                                     <artifactId>communication-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- LXC Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>lxc-manager-ui</artifactId>
@@ -504,6 +513,17 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Monitor -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>monitor-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>monitor-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>monitor-ui</artifactId>

@@ -1,5 +1,6 @@
-package org.safehaus.kiskis.mgmt.ui.monitor.view;
+package org.safehaus.kiskis.mgmt.ui.monitor.util;
 
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 
 import java.util.Date;
@@ -48,5 +49,15 @@ public class UIUtil {
         parent.addComponent(dateField, position);
 
         return dateField;
+    }
+
+    public static Label addLabel(AbsoluteLayout parent, String text, String position) {
+
+        Label label = new Label(text);
+        label.setContentMode(Label.CONTENT_XHTML);
+
+        parent.addComponent(label, position);
+
+        return label;
     }
 }
