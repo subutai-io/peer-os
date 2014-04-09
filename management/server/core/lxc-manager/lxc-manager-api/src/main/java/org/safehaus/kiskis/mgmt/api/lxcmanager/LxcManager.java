@@ -15,7 +15,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  *
  * @author dilshat
  *
- * TODO: add async analogs
  */
 public interface LxcManager {
 
@@ -38,4 +37,6 @@ public interface LxcManager {
     public Map<Agent, Set<Agent>> createLxcs(int count) throws LxcCreateException;
 
     public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException;
+
+    public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy(LxcPlacementStrategy strategy) throws LxcCreateException;
 }

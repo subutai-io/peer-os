@@ -120,9 +120,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     new Date(System.currentTimeMillis() - Common.AGENT_FRESHNESS_MIN * 60 * 1000));
             Row row = rs.one();
             if (row != null) {
-                agent = new Agent();
-                agent.setUuid(row.getUUID("uuid"));
-                agent.setHostname(row.getString("hostname"));
+                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
+//                agent.setUuid(row.getUUID("uuid"));
+//                agent.setHostname(row.getString("hostname"));
                 agent.setIsLXC(row.getBool("islxc"));
                 agent.setLastHeartbeat(row.getDate("lastheartbeat"));
                 agent.setListIP(row.getList("listip", String.class));
@@ -143,9 +143,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     new Date(System.currentTimeMillis() - Common.AGENT_FRESHNESS_MIN * 60 * 1000));
             Row row = rs.one();
             if (row != null) {
-                agent = new Agent();
-                agent.setUuid(row.getUUID("uuid"));
-                agent.setHostname(row.getString("hostname"));
+                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
+//                agent.setUuid(row.getUUID("uuid"));
+//                agent.setHostname(row.getString("hostname"));
                 agent.setIsLXC(row.getBool("islxc"));
                 agent.setLastHeartbeat(row.getDate("lastheartbeat"));
                 agent.setListIP(row.getList("listip", String.class));
@@ -159,11 +159,13 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     }
 
     public Agent getAgentByUUIDFromDB(UUID uuid) {
-        Agent agent = new Agent();
+        Agent agent = null;
         try {
             String cql = "select * from agents where uuid = ?";
             ResultSet rs = dbManagerService.executeQuery(cql, uuid);
-            for (Row row : rs) {
+            Row row = rs.one();
+            if (row != null) {
+                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
                 agent.setUuid(row.getUUID("uuid"));
                 agent.setHostname(row.getString("hostname"));
                 agent.setIsLXC(row.getBool("islxc"));
@@ -279,9 +281,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     agents.put(response.getUuid(), checkAgent);
                     return;
                 }
-                Agent agent = new Agent();
-                agent.setUuid(response.getUuid());
-                agent.setHostname(response.getHostname());
+                Agent agent = new Agent(response.getUuid(),response.getHostname());
+//                agent.setUuid(response.getUuid());
+//                agent.setHostname(response.getHostname());
                 agent.setMacAddress(response.getMacAddress());
                 agent.setTransportId(response.getTransportId());
                 if (response.isIsLxc() == null) {
