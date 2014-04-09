@@ -63,7 +63,7 @@ public class ConfigurationStep extends Panel {
 
         slaveNodesSelect.setItemCaptionPropertyId("hostname");
         slaveNodesSelect.setRows(7);
-        slaveNodesSelect.setNullSelectionAllowed(false);
+//        slaveNodesSelect.setNullSelectionAllowed(false);
         slaveNodesSelect.setMultiSelect(true);
         slaveNodesSelect.setImmediate(true);
         slaveNodesSelect.setLeftColumnCaption("Available Nodes");

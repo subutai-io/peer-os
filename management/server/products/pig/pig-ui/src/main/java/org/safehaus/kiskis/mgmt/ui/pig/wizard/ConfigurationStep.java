@@ -99,7 +99,7 @@ public class ConfigurationStep extends Panel {
 
         select.setItemCaptionPropertyId("hostname");
         select.setRows(7);
-        select.setNullSelectionAllowed(false);
+//        select.setNullSelectionAllowed(false);
         select.setMultiSelect(true);
         select.setImmediate(true);
         select.setLeftColumnCaption("Available Nodes");
