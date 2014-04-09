@@ -70,6 +70,6 @@ public class HadoopUI implements Module {
 
     @Override
     public Component createComponent() {
-        return null;
+        return new HadoopForm();
     }
 }

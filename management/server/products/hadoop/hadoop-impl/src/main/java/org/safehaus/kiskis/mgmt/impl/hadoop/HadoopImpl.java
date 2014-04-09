@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Installation;
-import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Preparation;
 
 import java.util.List;
 import java.util.UUID;
@@ -90,10 +89,6 @@ public class HadoopImpl implements Hadoop {
         return new Deletion(this).execute(clusterName);
     }
 
-    @Override
-    public UUID createNodes(final Config config) {
-        return new Preparation(this, config).execute();
-    }
 
     @Override
     public List<Config> getClusters() {

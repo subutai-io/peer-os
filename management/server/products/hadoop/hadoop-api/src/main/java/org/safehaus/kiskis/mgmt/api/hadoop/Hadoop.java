@@ -11,8 +11,6 @@ public interface Hadoop {
 
     public UUID uninstallCluster(String clusterName);
 
-    public UUID createNodes(Config config);
-
     /**
      * Returns list of configurations of installed clusters
      *

@@ -2,10 +2,7 @@ package org.safehaus.kiskis.mgmt.api.hadoop;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by daralbaev on 02.04.14.
@@ -19,9 +16,13 @@ public class Config {
     private String clusterName, domainName;
     private Agent nameNode, jobTracker, secondaryNameNode;
     private List<Agent> dataNodes, taskTrackers;
-    private Integer replicationFactor;
-    private HashSet<Agent> nodes;
-    private int nodeSize;
+    private Integer replicationFactor, countOfSlaveNodes;
+
+    public Config() {
+        domainName = "intra.lan";
+        dataNodes = new ArrayList<Agent>();
+        taskTrackers = new ArrayList<Agent>();
+    }
 
     public List<Agent> getAllNodes() {
         Set<Agent> allAgents = new HashSet<Agent>();
@@ -121,20 +122,12 @@ public class Config {
         this.replicationFactor = replicationFactor;
     }
 
-    public HashSet<Agent> getNodes() {
-        return nodes;
+    public Integer getCountOfSlaveNodes() {
+        return countOfSlaveNodes;
     }
 
-    public void setNodes(HashSet<Agent> nodes) {
-        this.nodes = nodes;
-    }
-
-    public int getNodeSize() {
-        return nodeSize;
-    }
-
-    public void setNodeSize(int nodeSize) {
-        this.nodeSize = nodeSize;
+    public void setCountOfSlaveNodes(Integer countOfSlaveNodes) {
+        this.countOfSlaveNodes = countOfSlaveNodes;
     }
 
     @Override
