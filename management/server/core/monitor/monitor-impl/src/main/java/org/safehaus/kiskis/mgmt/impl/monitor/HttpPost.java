@@ -1,10 +1,11 @@
-package org.safehaus.kiskis.mgmt.ui.monitor.service;
+package org.safehaus.kiskis.mgmt.impl.monitor;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 

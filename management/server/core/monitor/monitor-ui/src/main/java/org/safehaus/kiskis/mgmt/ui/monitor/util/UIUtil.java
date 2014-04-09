@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.monitor.view;
+package org.safehaus.kiskis.mgmt.ui.monitor.util;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;

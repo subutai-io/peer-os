@@ -1,8 +1,9 @@
-package org.safehaus.kiskis.mgmt.ui.monitor.service;
+package org.safehaus.kiskis.mgmt.impl.monitor;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.safehaus.kiskis.mgmt.ui.monitor.util.FileUtil;
+import org.safehaus.kiskis.mgmt.api.monitor.Metric;
+import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +13,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Query {
+public class MonitorImpl implements Monitor {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Query.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MonitorImpl.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -22,12 +23,13 @@ public class Query {
 
     private static final String QUERY = FileUtil.getContent("elasticsearch/query.json");
 
-    public static Map<Date, Double> execute(String host, Metric metric, Date startDate, Date endDate) {
+    @Override
+    public Map<Date, Double> getData(String host, Metric metric, Date startDate, Date endDate) {
 
         Map<Date, Double> data = Collections.emptyMap();
 
         try {
-            data = doExecute(host, metric, startDate, endDate);
+            data = execute(host, metric, startDate, endDate);
         } catch (Exception e) {
             LOG.error("Error while executing query: ", e);
         }
@@ -35,7 +37,7 @@ public class Query {
         return data;
     }
 
-    private static Map<Date, Double> doExecute(String host, Metric metric, Date startDate, Date endDate) throws Exception {
+    private static Map<Date, Double> execute(String host, Metric metric, Date startDate, Date endDate) throws Exception {
 
         String query = QUERY
                 .replace( "$host", host )
