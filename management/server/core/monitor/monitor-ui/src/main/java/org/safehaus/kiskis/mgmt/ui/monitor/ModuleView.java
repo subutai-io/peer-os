@@ -18,8 +18,6 @@ import java.util.Set;
 
 public class ModuleView extends CustomComponent {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModuleView.class);
-
     private static final int MAX_SIZE = 500;
 
     private Chart chart;
@@ -105,19 +103,6 @@ public class ModuleView extends CustomComponent {
         if ( validParams(host, metric) ) {
             loadChart(host, metric);
         }
-
-//        if ( !validParams(host, metric) ) {
-//            return;
-//        }
-
-//        if (chart == null) {
-//            chart = new Chart(getWindow(), MAX_SIZE);
-//        }
-//
-//        Date startDate = (Date) startDateField.getValue();
-//        Date endDate = (Date) endDateField.getValue();
-//
-//        chart.load(host, metric, startDate, endDate);
     }
 
     private void loadChart(String host, Metric metric) {
@@ -128,8 +113,6 @@ public class ModuleView extends CustomComponent {
 
         Date startDate = (Date) startDateField.getValue();
         Date endDate = (Date) endDateField.getValue();
-
-        LOG.info("host: {}, metric: {}, startDate: {}, endDate: {}", host, metric, startDate, endDate);
 
         Map<Date, Double> values = monitor.getData(host, metric, startDate, endDate);
         chart.load(host, metric, values);

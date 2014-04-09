@@ -8,13 +8,13 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FileUtil {
+class FileUtil {
 
     private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
 
     private static URLClassLoader classLoader;
 
-    public static String getContent(String filePath) {
+    static String getContent(String filePath) {
         String content = "";
 
         try {

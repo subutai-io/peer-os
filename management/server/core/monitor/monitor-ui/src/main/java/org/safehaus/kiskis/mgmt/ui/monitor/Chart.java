@@ -13,8 +13,6 @@ import java.util.Map;
 
 class Chart {
 
-//    private static final Logger LOG = LoggerFactory.getLogger(Chart.class);
-
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final String CHART_TEMPLATE = FileUtil.getContent("js/chart.js");
@@ -32,20 +30,6 @@ class Chart {
         javaScript.loadFile("js/jquery.min.js");
         javaScript.loadFile("js/highcharts.js");
     }
-
-//    void load(String host, Metric metric, Date startDate, Date endDate) {
-//        LOG.info("host: {}, metric: {}, startDate: {}, endDate: {}", host, metric, startDate, endDate);
-//
-//        Map<Date, Double> values = Query.execute(host, metric, startDate, endDate);
-//        String data = toPoints(values);
-//
-//        String chart = CHART_TEMPLATE
-//                .replace( "$mainTitle", String.format("%s for %s", metric, host) )
-//                .replace( "$yTitle", metric.getUnit() )
-//                .replace( "$data", data );
-//
-//        javaScript.execute(chart);
-//    }
 
     void load(String host, Metric metric, Map<Date, Double> values) {
 
@@ -80,5 +64,4 @@ class Chart {
 
         return String.format("[%s]", str);
     }
-
 }

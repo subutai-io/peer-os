@@ -25,6 +25,7 @@ public class MonitorImpl implements Monitor {
 
     @Override
     public Map<Date, Double> getData(String host, Metric metric, Date startDate, Date endDate) {
+        LOG.info("host: {}, metric: {}, startDate: {}, endDate: {}", host, metric, startDate, endDate);
 
         Map<Date, Double> data = Collections.emptyMap();
 
@@ -37,13 +38,15 @@ public class MonitorImpl implements Monitor {
         return data;
     }
 
-    private static Map<Date, Double> execute(String host, Metric metric, Date startDate, Date endDate) throws Exception {
+    private Map<Date, Double> execute(String host, Metric metric, Date startDate, Date endDate) throws Exception {
 
         String query = QUERY
                 .replace( "$host", host )
                 .replace( "$metricName", metric.toString().toLowerCase() )
                 .replace( "$startDate", dateToStr(startDate) )
                 .replace( "$endDate", dateToStr(endDate) );
+
+        LOG.info("query: {}", query);
 
         String response = HttpPost.execute(query);
         List<JsonNode> nodes = toNodes(response);
