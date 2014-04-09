@@ -50,14 +50,6 @@
 
     <properties>
 
-        <!-- TODO add
-        <modelVersion>4.0.0</modelVersion>
-        <parent>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <version>0.0.1-SNAPSHOT</version>
-        </parent>
-        -->
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <com.codahale.metrics.metrics-core.version>3.0.2</com.codahale.metrics.metrics-core.version>
