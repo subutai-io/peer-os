@@ -28,7 +28,7 @@ public abstract class LxcPlacementStrategy {
         if (Util.isStringEmpty(nodeType)) {
             throw new LxcCreateException("Node type is null or empty");
         }
-        if (numberOfLxcsToCreate >= 0) {
+        if (numberOfLxcsToCreate <= 0) {
             throw new LxcCreateException("Number of lxcs must be greater than 0");
         }
 
