@@ -54,7 +54,7 @@ public class Manager {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                config = (Config) event.getProperty().getValue();
+                config = (Config)event.getProperty().getValue();
                 refreshUI();
             }
         });
@@ -80,7 +80,8 @@ public class Manager {
                 if(config != null) {
                     MgmtApplication.showConfirmationDialog(
                             "Cluster destruction confirmation",
-                            String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
+                            String.format("Do you want to destroy the %s cluster?",
+                                    config.getClusterName()),
                             "Yes", "No", new ConfirmationDialogCallback() {
 
                                 @Override
@@ -159,7 +160,7 @@ public class Manager {
         table.removeAllItems();
 
         for(Iterator it = agents.iterator(); it.hasNext();) {
-            final Agent agent = (Agent) it.next();
+            final Agent agent = (Agent)it.next();
             final Button destroyBtn = new Button("Destroy");
             table.addItem(new Object[]{agent.getHostname(), destroyBtn}, null);
 
@@ -202,7 +203,7 @@ public class Manager {
 
     public void refreshClustersInfo() {
         List<Config> clustersInfo = FlumeUI.getManager().getClusters();
-        Config clusterInfo = (Config) clusterCombo.getValue();
+        Config clusterInfo = (Config)clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if(clustersInfo != null && clustersInfo.size() > 0) {
             for(Config ci : clustersInfo) {
@@ -236,7 +237,7 @@ public class Manager {
 
             public void itemClick(ItemClickEvent event) {
                 if(event.isDoubleClick()) {
-                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                    String lxcHostname = (String)table.getItem(event.getItemId()).getItemProperty("Host").getValue();
                     Agent lxcAgent = FlumeUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if(lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));

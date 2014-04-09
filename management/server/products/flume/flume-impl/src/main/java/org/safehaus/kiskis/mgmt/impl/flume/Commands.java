@@ -57,8 +57,7 @@ public class Commands {
 
     public static Request getStatusCommand() {
         Request req = getRequestTemplate();
-        // TODO: 'ksks-flume' may be used
-        req.setProgram("dpkg -l | grep ksks");
+        req.setProgram("dpkg -l | grep '^ii' | grep ksks");
         return req;
     }
 
