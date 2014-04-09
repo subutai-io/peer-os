@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.hadoop.wizard;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -29,7 +30,9 @@ public class ConfigurationStep extends Panel {
         clusterNameTxtFld.setInputPrompt("Cluster name");
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength(20);
-        clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
+        if (!Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
+            clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
+        }
         clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -69,6 +72,7 @@ public class ConfigurationStep extends Panel {
 
         TextField domain = new TextField("Enter domain name");
         domain.setInputPrompt(wizard.getConfig().getDomainName());
+        domain.setValue(wizard.getConfig().getDomainName());
         domain.setMaxLength(20);
         domain.addListener(new Property.ValueChangeListener() {
             @Override

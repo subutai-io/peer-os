@@ -38,7 +38,7 @@ public class Deletion {
                 po.addLog("Destroying lxc containers...");
 
                 Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getNodes()) {
+                for (Agent lxcAgent : config.getAllNodes()) {
                     lxcHostnames.add(lxcAgent.getHostname());
                 }
                 try {
