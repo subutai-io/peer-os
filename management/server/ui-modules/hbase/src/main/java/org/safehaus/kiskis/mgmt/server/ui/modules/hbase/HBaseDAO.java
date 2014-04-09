@@ -54,7 +54,9 @@ public class HBaseDAO {
         Set<Agent> list = new HashSet<Agent>();
         for (UUID uuid : uuids) {
             Agent agent = HBaseModule.getAgentManager().getAgentByUUIDFromDB(uuid);
-            list.add(agent);
+            if (agent != null) {
+                list.add(agent);
+            }
         }
         return list;
     }
