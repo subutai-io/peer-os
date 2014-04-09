@@ -26,7 +26,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.ui.monitor</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.impl.monitor</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
