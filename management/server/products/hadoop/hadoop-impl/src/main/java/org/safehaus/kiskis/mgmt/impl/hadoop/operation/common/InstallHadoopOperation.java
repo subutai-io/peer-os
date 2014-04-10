@@ -5,6 +5,8 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: daralbaev
@@ -25,10 +27,12 @@ public class InstallHadoopOperation extends Operation {
         addTask(Tasks.getClearSlaveTask(config));
         addTask(Tasks.getSetMastersTask(config));
         addTask(Tasks.getSecondaryNameNodeTask(config));
-        for (Task task : Tasks.getSetDataNodeTask(config)) {
+        List<Task> tasks = Tasks.getSetDataNodeTask(config);
+        for (Task task : tasks) {
             addTask(task);
         }
-        for (Task task : Tasks.getSetTaskTrackerTask(config)) {
+        tasks = Tasks.getSetTaskTrackerTask(config);
+        for (Task task : tasks) {
             addTask(task);
         }
         addTask(Tasks.getFormatNameNodeTask(config));
