@@ -37,4 +37,11 @@ public class InstallHadoopOperation extends Operation {
         }
         addTask(Tasks.getFormatNameNodeTask(config));
     }
+
+    @Override
+    public String toString() {
+        return "InstallHadoopOperation{" +
+                "config=" + config +
+                "} " + super.toString();
+    }
 }
