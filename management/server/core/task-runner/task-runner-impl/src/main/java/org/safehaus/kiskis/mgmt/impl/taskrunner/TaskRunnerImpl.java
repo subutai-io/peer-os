@@ -48,7 +48,7 @@ class TaskRunnerImpl implements ResponseListener, TaskRunner {
     }
 
     /**
-     * Initalizes TaskRunnerImpl. Registers as a listener with communication
+     * Initializes TaskRunnerImpl. Registers as a listener with communication
      * manager service
      */
     public void init() {

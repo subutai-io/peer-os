@@ -35,7 +35,7 @@ class ExpiringCache<KeyType, ValueType> {
      *
      * @param evictor - executor service used to evict expired entries
      */
-    public ExpiringCache(ExecutorService evictor) {
+    public ExpiringCache(final ExecutorService evictor) {
         evictor.execute(new Runnable() {
 
             public void run() {
@@ -43,20 +43,26 @@ class ExpiringCache<KeyType, ValueType> {
                     try {
                         for (Iterator<Map.Entry<KeyType, CacheEntry<ValueType>>> it
                                 = entries.entrySet().iterator(); it.hasNext();) {
-                            Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
+                            final Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
                             if (entry.getValue().isExpired()) {
                                 it.remove();
                                 if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
-                                    try {
-                                        ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
-                                    } catch (Exception e) {
-                                    }
+                                    evictor.execute(new Runnable() {
+
+                                        public void run() {
+                                            try {
+                                                ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
+                                            } catch (Exception e) {
+                                            }
+                                        }
+                                    });
                                 }
                             }
                         }
 
                         Thread.sleep(evictionRunIntervalMs);
-                    } catch (Exception ex) {
+                    } catch (InterruptedException ex) {
+                        break;
                     }
                 }
             }
