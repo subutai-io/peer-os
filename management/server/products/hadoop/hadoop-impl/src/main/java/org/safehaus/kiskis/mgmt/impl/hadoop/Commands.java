@@ -76,7 +76,7 @@ public class Commands {
                         nameNode.getHostname() + ":" + Config.NAME_NODE_PORT,
                         jobTracker.getHostname() + ":" + Config.JOB_TRACKER_PORT,
                         replicationFactor + "")
-        ));
+        );
         System.out.println(req.toString());
         return req;
     }
