@@ -73,9 +73,9 @@ public class Commands {
         System.out.println(Config.NAME_NODE_PORT);
         System.out.println(Config.JOB_TRACKER_PORT);
         req.setArgs(Arrays.asList(
-                String.format("%s:%d", nameNode.getHostname(), Config.NAME_NODE_PORT),
-                String.format("%s:%d", jobTracker.getHostname(), Config.JOB_TRACKER_PORT),
-                String.format("%d", replicationFactor)
+                        nameNode.getHostname() + ":" + Config.NAME_NODE_PORT,
+                        jobTracker.getHostname() + ":" + Config.JOB_TRACKER_PORT,
+                        replicationFactor + "")
         ));
         System.out.println(req.toString());
         return req;
