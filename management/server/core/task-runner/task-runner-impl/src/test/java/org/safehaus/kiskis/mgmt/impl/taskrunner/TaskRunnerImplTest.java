@@ -29,6 +29,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  *
  * @author dilshat
  */
+@Ignore
 public class TaskRunnerImplTest {
 
     CommunicationManager communicationService;
