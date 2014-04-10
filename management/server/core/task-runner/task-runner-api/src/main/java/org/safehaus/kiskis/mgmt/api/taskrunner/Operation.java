@@ -72,13 +72,4 @@ public class Operation {
     public boolean hasNextTask() {
         return currentTaskId < tasks.size() - 1;
     }
-
-    @Override
-    public String toString() {
-        return "Operation{" +
-                "currentTaskId=" + currentTaskId +
-                ", tasks=" + tasks +
-                ", description='" + description + '\'' +
-                '}';
-    }
 }

@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -96,12 +95,8 @@ public class Installation {
                             parent.getNetworkManager().configSshOnAgents(config.getAllNodes())) {
                         po.addLog("Cluster network configured");
 
-                        Operation installOperation = new InstallHadoopOperation(config);
-                        po.addLog("installOperation OK");
-                        po.addLog(installOperation.toString());
-
-                        while (installOperation.hasNextTask()) {
-                            Task task = installOperation.getNextTask();
+                        InstallHadoopOperation installOperation = new InstallHadoopOperation(config);
+                        for (Task task : installOperation.getTaskList()) {
                             po.addLog((String.format("%s started...", task.getDescription())));
                             parent.getTaskRunner().executeTask(task);
 
