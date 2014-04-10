@@ -70,8 +70,6 @@ public class Installation {
         parent.getExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Executor started to run");
-                System.out.println(config);
 
                 if (config == null ||
                         Strings.isNullOrEmpty(config.getClusterName()) ||
