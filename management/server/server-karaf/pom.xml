@@ -521,7 +521,7 @@
                                 <!-- Core Modules - END -->
 
                                 <!-- Products Modules - START -->
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>shark-api</artifactId>
                                     <version>${project.version}</version>
@@ -625,7 +625,7 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-api</artifactId>
