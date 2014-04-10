@@ -32,7 +32,8 @@ public class HostManager {
     }
 
     private boolean write() {
-        Task task = Tasks.getWriteHostTask(agentList, prepareHost());
+        String hosts = prepareHost();
+        Task task = Tasks.getWriteHostTask(agentList, hosts);
 
         taskRunner.executeTask(task, new TaskCallback() {
 

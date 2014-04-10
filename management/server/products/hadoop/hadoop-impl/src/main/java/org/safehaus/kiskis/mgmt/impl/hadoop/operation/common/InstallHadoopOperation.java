@@ -20,6 +20,7 @@ public class InstallHadoopOperation extends Operation {
     public InstallHadoopOperation(Config config) {
         super("Install Hadoop cluster");
 
+        System.out.println("InstallHadoopOperation started");
         this.config = config;
 
         addTask(Tasks.getInstallTask(config));
@@ -36,6 +37,7 @@ public class InstallHadoopOperation extends Operation {
             addTask(task);
         }
         addTask(Tasks.getFormatNameNodeTask(config));
+        System.out.println("InstallHadoopOperation finished");
     }
 
     @Override
