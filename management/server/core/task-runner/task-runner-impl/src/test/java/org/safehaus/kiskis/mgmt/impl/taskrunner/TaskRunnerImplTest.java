@@ -6,6 +6,8 @@
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -144,11 +146,11 @@ public class TaskRunnerImplTest {
 
         instance.destroy();
 
-        assertTrue(task.getTaskStatus() == TaskStatus.TIMEDOUT);
+        assertEquals(task.getTaskStatus(), TaskStatus.TIMEDOUT);
     }
 
     @Test
-//    @Ignore
+    @Ignore
     public void testExecuteTask4() throws InterruptedException {
         System.out.println("testExecuteTask4");
         TaskRunnerImpl instance = new TaskRunnerImpl();
@@ -182,7 +184,7 @@ public class TaskRunnerImplTest {
 
         instance.destroy();
 
-        assertTrue(task.getTaskStatus() == TaskStatus.FAIL);
+        assertEquals(task.getTaskStatus(), TaskStatus.FAIL);
     }
 
     @Test
@@ -220,7 +222,51 @@ public class TaskRunnerImplTest {
 
         instance.destroy();
 
-        assertTrue(task.getTaskStatus() == TaskStatus.SUCCESS);
+        assertEquals(task.getTaskStatus(), TaskStatus.SUCCESS);
+    }
+
+    @Test
+//    @Ignore
+    public void testExecuteTask6() throws InterruptedException {
+        System.out.println("testExecuteTask6");
+        final TaskRunnerImpl instance = new TaskRunnerImpl();
+        instance.setCommunicationService(communicationService);
+        instance.init();
+
+        Task task = new Task();
+        UUID agentID = UUID.randomUUID();
+        Agent agent = new Agent(agentID, "testhost");
+        Request req = getRequestTemplate();
+        req.setTimeout(3);
+        task.addRequest(req, agent);
+
+        final Response response = new Response();
+        response.setUuid(agentID);
+        response.setTaskUuid(task.getUuid());
+        response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
+        response.setExitCode(0);
+
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    Thread.sleep(100);
+                    instance.onResponse(response);
+                } catch (InterruptedException ex) {
+                }
+            }
+        });
+
+        t.start();
+
+        instance.executeTask(task);
+
+        Thread.sleep(200);
+
+        instance.destroy();
+        System.out.println(task);
+
+        assertEquals(task.getTaskStatus(), TaskStatus.SUCCESS);
     }
 
 }
