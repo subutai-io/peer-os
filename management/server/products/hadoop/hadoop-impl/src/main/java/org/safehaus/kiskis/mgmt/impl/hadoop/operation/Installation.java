@@ -96,34 +96,29 @@ public class Installation {
                             parent.getNetworkManager().configSshOnAgents(config.getAllNodes())) {
                         po.addLog("Cluster network configured");
 
+                        Operation installOperation = new InstallHadoopOperation(config);
+                        while (installOperation.hasNextTask()) {
+                            Task task = installOperation.getNextTask();
+                            po.addLog((String.format("%s started...", task.getDescription())));
+                            parent.getTaskRunner().executeTask(task);
+
+                            if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                                po.addLogDone(String.format("%s succeeded", task.getDescription()));
+                            } else {
+                                po.addLogFailed(String.format("%s failed, %s", task.getDescription(), task.getFirstError()));
+                            }
+                        }
+
                         if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                             po.addLog("Cluster info saved to DB");
                         } else {
-                            destroyLXC(po, "Could not save cluster info to DB! Please see logs\nLXC creation aborted");
+                            destroyLXC(po, "Could not save cluster info to DB! Please see logs\nInstallation aborted");
                         }
                     } else {
                         destroyLXC(po, "Could not configure network! Please see logs\nLXC creation aborted");
                     }
                 } catch (LxcCreateException ex) {
                     po.addLogFailed(ex.getMessage());
-                }
-
-                Operation installOperation = new InstallHadoopOperation(config);
-                while (installOperation.hasNextTask()) {
-                    Task task = installOperation.getNextTask();
-                    parent.getTaskRunner().executeTask(task);
-
-                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLogDone(String.format("%s succeeded", task.getDescription()));
-                    } else {
-                        po.addLogFailed(String.format("%s failed, %s", task.getDescription(), task.getFirstError()));
-                    }
-                }
-
-                if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog("Cluster info saved to DB");
-                } else {
-                    destroyLXC(po, "Could not save cluster info to DB! Please see logs\nInstallation aborted");
                 }
             }
         });
