@@ -23,7 +23,7 @@ import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
  *
  * @author dilshat
  */
-class TaskRunnerImpl implements ResponseListener, TaskRunner {
+public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     private static final Logger LOG = Logger.getLogger(TaskRunnerImpl.class.getName());
 
