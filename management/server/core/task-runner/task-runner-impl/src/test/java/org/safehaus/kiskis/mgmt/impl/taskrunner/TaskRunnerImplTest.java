@@ -24,12 +24,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
  *
  * @author dilshat
  */
-@Ignore
+//@Ignore
 public class TaskRunnerImplTest {
 
     CommunicationManager communicationService;
@@ -77,7 +78,7 @@ public class TaskRunnerImplTest {
      * Test of testInitDestroyTaskRunner method, of class TaskRunnerImpl.
      */
     @Test
-//    @Ignore
+    @Ignore
     public void testInitDestroyTaskRunner() {
         System.out.println("testInitDestroyTaskRunner");
         TaskRunnerImpl instance = new TaskRunnerImpl();
@@ -92,7 +93,7 @@ public class TaskRunnerImplTest {
      * Test of testExecuteTask method, of class TaskRunnerImpl.
      */
     @Test(expected = RuntimeException.class)
-//    @Ignore
+    @Ignore
     public void testExecuteTask() {
         System.out.println("testExecuteTask");
         TaskRunnerImpl instance = new TaskRunnerImpl();
@@ -109,7 +110,7 @@ public class TaskRunnerImplTest {
      * Test of testExecuteTask2 method, of class TaskRunnerImpl.
      */
     @Test(expected = RuntimeException.class)
-//    @Ignore
+    @Ignore
     public void testExecuteTask2() {
         System.out.println("testExecuteTask2");
         TaskRunnerImpl instance = new TaskRunnerImpl();
@@ -127,7 +128,7 @@ public class TaskRunnerImplTest {
      * Test of testExecuteTask3 method, of class TaskRunnerImpl.
      */
     @Test
-//    @Ignore
+    @Ignore
     public void testExecuteTask3() {
         System.out.println("testExecuteTask3");
         TaskRunnerImpl instance = new TaskRunnerImpl();
@@ -145,6 +146,82 @@ public class TaskRunnerImplTest {
         instance.destroy();
 
         assertTrue(task.getTaskStatus() == TaskStatus.TIMEDOUT);
+    }
+
+    @Test
+    @Ignore
+    public void testExecuteTask4() throws InterruptedException {
+        System.out.println("testExecuteTask4");
+        TaskRunnerImpl instance = new TaskRunnerImpl();
+        instance.setCommunicationService(communicationService);
+        instance.init();
+
+        Task task = new Task();
+        UUID agentID = UUID.randomUUID();
+        Agent agent = new Agent(agentID, "testhost");
+        Request req = getRequestTemplate();
+        req.setTimeout(1);
+        task.addRequest(req, agent);
+
+        Response response = new Response();
+        response.setUuid(agentID);
+        response.setTaskUuid(task.getUuid());
+        response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
+        response.setExitCode(123);
+
+        instance.executeTask(task, new TaskCallback() {
+
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                return null;
+            }
+        });
+
+        Thread.sleep(100);
+        instance.onResponse(response);
+
+        Thread.sleep(100);
+
+        instance.destroy();
+
+        assertTrue(task.getTaskStatus() == TaskStatus.FAIL);
+    }
+
+    @Test
+//    @Ignore
+    public void testExecuteTask5() throws InterruptedException {
+        System.out.println("testExecuteTask5");
+        TaskRunnerImpl instance = new TaskRunnerImpl();
+        instance.setCommunicationService(communicationService);
+        instance.init();
+
+        Task task = new Task();
+        UUID agentID = UUID.randomUUID();
+        Agent agent = new Agent(agentID, "testhost");
+        Request req = getRequestTemplate();
+        req.setTimeout(1);
+        task.addRequest(req, agent);
+
+        Response response = new Response();
+        response.setUuid(agentID);
+        response.setTaskUuid(task.getUuid());
+        response.setType(ResponseType.EXECUTE_RESPONSE_DONE);
+        response.setExitCode(0);
+
+        instance.executeTask(task, new TaskCallback() {
+
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                return null;
+            }
+        });
+
+        Thread.sleep(100);
+        instance.onResponse(response);
+
+        Thread.sleep(100);
+
+        instance.destroy();
+
+        assertTrue(task.getTaskStatus() == TaskStatus.SUCCESS);
     }
 
 }

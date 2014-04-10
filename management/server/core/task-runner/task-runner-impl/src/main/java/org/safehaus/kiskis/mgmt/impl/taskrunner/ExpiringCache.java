@@ -78,18 +78,20 @@ class ExpiringCache<KeyType, ValueType> {
      * @return value of entry or null
      */
     public ValueType get(KeyType key) {
-        try {
-            CacheEntry<ValueType> entry = entries.get(key);
-            if (entry != null && !entry.isExpired()) {
-                return entry.getValue();
-            }
+        if (key != null) {
+            try {
+                CacheEntry<ValueType> entry = entries.get(key);
+                if (entry != null && !entry.isExpired()) {
+                    return entry.getValue();
+                }
 //            else {
 //                entries.remove(key);
 //            }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in get", ex);
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Error in get", ex);
 //        } finally {
 //            runEviction();
+            }
         }
         return null;
     }
