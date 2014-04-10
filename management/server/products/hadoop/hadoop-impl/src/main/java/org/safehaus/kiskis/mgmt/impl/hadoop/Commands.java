@@ -64,19 +64,15 @@ public class Commands {
     public static Request getSetMastersCommand(Agent nameNode, Agent jobTracker, Integer replicationFactor) {
         Request req = getRequestTemplate();
 
-        System.out.println(req.toString());
         req.setProgram(
                 ". /etc/profile && " +
                         "hadoop-configure.sh"
         );
-        System.out.println(req.toString());
-        System.out.println(Config.NAME_NODE_PORT);
-        System.out.println(Config.JOB_TRACKER_PORT);
         req.setArgs(Arrays.asList(
-                        nameNode.getHostname() + ":" + Config.NAME_NODE_PORT,
-                        jobTracker.getHostname() + ":" + Config.JOB_TRACKER_PORT,
-                        replicationFactor + "")
-        );
+                String.format("%s:%d", nameNode.getHostname(), Config.NAME_NODE_PORT),
+                String.format("%s:%d", jobTracker.getHostname(), Config.JOB_TRACKER_PORT),
+                String.format("%d", replicationFactor)
+        ));
         System.out.println(req.toString());
         return req;
     }

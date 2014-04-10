@@ -46,6 +46,7 @@ public class Tasks {
         Task task = new Task("Set Master Nodes");
         task.setData(TaskType.CONFIGURE);
         for (Agent agent : cfg.getAllNodes()) {
+            System.out.println(String.format("%s\n%\n%s\n", cfg.getNameNode(), cfg.getJobTracker(), cfg.getReplicationFactor()));
             task.addRequest(Commands.getSetMastersCommand(cfg.getNameNode(), cfg.getJobTracker(), cfg.getReplicationFactor()), agent);
         }
         return task;
