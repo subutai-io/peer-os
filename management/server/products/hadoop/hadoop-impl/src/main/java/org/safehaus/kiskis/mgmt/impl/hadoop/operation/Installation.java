@@ -60,6 +60,7 @@ public class Installation {
                     config.getDataNodes().add(agent);
                     config.getTaskTrackers().add(agent);
                 }
+                ++index;
             }
         }
     }
