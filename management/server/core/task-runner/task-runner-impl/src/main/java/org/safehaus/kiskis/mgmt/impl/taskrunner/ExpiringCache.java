@@ -80,7 +80,7 @@ class ExpiringCache<KeyType, ValueType> {
     public ValueType get(KeyType key) {
         try {
             CacheEntry<ValueType> entry = entries.get(key);
-            if (!entry.isExpired()) {
+            if (entry != null && !entry.isExpired()) {
                 return entry.getValue();
             }
 //            else {
@@ -128,7 +128,10 @@ class ExpiringCache<KeyType, ValueType> {
 
     public ValueType remove(KeyType key) {
         try {
-            return entries.remove(key).getValue();
+            CacheEntry<ValueType> entry = entries.remove(key);
+            if (entry != null) {
+                return entry.getValue();
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in remove", ex);
 //        } finally {

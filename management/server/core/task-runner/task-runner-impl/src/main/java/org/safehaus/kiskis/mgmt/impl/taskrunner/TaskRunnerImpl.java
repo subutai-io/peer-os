@@ -173,30 +173,33 @@ class TaskRunnerImpl implements ResponseListener, TaskRunner {
      */
     @Override
     public void executeTask(final Task task, final TaskCallback taskCallback) {
-        ExecutorService taskExecutor = taskExecutors.get(task.getUuid());
-        if (taskExecutor == null) {
-            taskExecutor = Executors.newSingleThreadExecutor();
-            taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 1000, new EntryExpiryCallback<ExecutorService>() {
+        if (task != null && !task.getRequests().isEmpty()) {
+            ExecutorService taskExecutor = taskExecutors.get(task.getUuid());
+            if (taskExecutor == null) {
+                taskExecutor = Executors.newSingleThreadExecutor();
+                taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 1000, new EntryExpiryCallback<ExecutorService>() {
 
-                @Override
-                public void onEntryExpiry(ExecutorService entry) {
-                    try {
-                        taskExecutors.remove(task.getUuid());
-                        entry.shutdown();
+                    @Override
+                    public void onEntryExpiry(ExecutorService entry) {
+                        try {
+                            taskExecutors.remove(task.getUuid());
+                            entry.shutdown();
 
-                    } catch (Exception e) {
+                        } catch (Exception e) {
+                        }
                     }
+                });
+            }
+
+            taskExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    taskMediator.executeTask(task, taskCallback);
                 }
             });
+        } else {
+            throw new RuntimeException("Task is null or has no requests");
         }
-
-        taskExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                taskMediator.executeTask(task, taskCallback);
-            }
-        });
-
     }
 
     /**

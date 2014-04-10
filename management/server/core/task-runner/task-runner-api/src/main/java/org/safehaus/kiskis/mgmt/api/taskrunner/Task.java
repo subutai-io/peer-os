@@ -48,7 +48,7 @@ public class Task implements Serializable {
     private Map<UUID, Result> results;
 
     /**
-     * Initalizes a newly created {@code Task}.
+     * Initializes a newly created {@code Task}.
      */
     public Task() {
         taskStatus = TaskStatus.NEW;
