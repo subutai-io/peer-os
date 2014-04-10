@@ -1,8 +1,10 @@
 package org.safehaus.kiskis.mgmt.impl.flume;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
@@ -15,6 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 public class FlumeImpl implements Flume {
 
@@ -153,24 +156,23 @@ public class FlumeImpl implements Flume {
 
                 po.addLog("Uninstalling Flume...");
 
-                Task uninstallTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getNodes()));
 
                 if(uninstallTask.isCompleted()) {
-                    for(Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        Result result = res.getValue();
-                        Agent agent = agentManager.getAgentByUUID(res.getKey());
+                    for(Agent agent : config.getNodes()) {
+                        Result result = uninstallTask.getResults().get(agent.getUuid());
                         if(result.getExitCode() != null && result.getExitCode() == 0) {
                             if(result.getStdOut().contains("ksks-flume is not installed")) {
                                 po.addLog(String.format(
                                         "Flume is not installed, so not removed on node %s",
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent.getHostname()));
                             } else {
                                 po.addLog(String.format("Flume is removed from node %s",
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent.getHostname()));
                             }
                         } else {
-                            po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                                    agent == null ? res.getKey() : agent.getHostname()));
+                            po.addLog(String.format("Error on node %s: %s",
+                                    agent.getHostname(), result.getStdErr()));
                         }
                     }
 
@@ -212,44 +214,28 @@ public class FlumeImpl implements Flume {
 
                 po.addLog("Starting node...");
                 final Task startNodeTask = Tasks.getStartTask(node);
-                final Task checkNodeTask = Tasks.getStatusTask(node);
-
+                final CountDownLatch latch = new CountDownLatch(1);
                 taskRunner.executeTask(startNodeTask, new TaskCallback() {
 
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                        if(task.getData() == TaskType.START && task.isCompleted()) {
-                            //run status check task
-                            return checkNodeTask;
-
-                        } else if(task.getData() == TaskType.STATUS) {
-                            if(Util.isFinalResponse(response)) {
-                                if(stdOut.contains("is running")) {
-                                    task.setData(NodeState.RUNNING);
-                                } else if(stdOut.contains("is not running")) {
-                                    task.setData(NodeState.STOPPED);
-                                }
-
-                                synchronized(task) {
-                                    task.notifyAll();
-                                }
-                            }
-
+                    public Task onResponse(Task task, Response resp, String stdOut, String stdErr) {
+                        if(resp.getStdOut() != null) po.addLog(resp.getStdOut());
+                        if(resp.getStdErr() != null) po.addLog(resp.getStdErr());
+                        if(resp.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                            po.addLogFailed("Command execution timeout");
+                            latch.countDown();
+                        } else if(resp.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                            latch.countDown();
                         }
-
                         return null;
                     }
                 });
-
-                synchronized(checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch(InterruptedException ex) {
-                    }
+                try {
+                    latch.await(startNodeTask.getTotalTimeout(), TimeUnit.SECONDS);
+                } catch(InterruptedException ex) {
+                    po.addLogFailed("Operation timeout");
                 }
 
-                if(NodeState.RUNNING.equals(checkNodeTask.getData())) {
+                if(startNodeTask.isCompleted()) {
                     po.addLogDone(String.format("Node on %s started", lxcHostname));
                 } else {
                     po.addLogFailed(String.format("Failed to start node %s. %s",
@@ -285,44 +271,28 @@ public class FlumeImpl implements Flume {
 
                 po.addLog("Stopping node...");
                 final Task stopNodeTask = Tasks.getStopTask(node);
-                final Task checkNodeTask = Tasks.getStatusTask(node);
-
+                final CountDownLatch latch = new CountDownLatch(1);
                 taskRunner.executeTask(stopNodeTask, new TaskCallback() {
 
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                        if(task.getData() == TaskType.STOP && task.isCompleted()) {
-                            //run status check task
-                            return checkNodeTask;
-
-                        } else if(task.getData() == TaskType.STATUS) {
-                            if(Util.isFinalResponse(response)) {
-                                if(stdOut.contains("is running")) {
-                                    task.setData(NodeState.RUNNING);
-                                } else if(stdOut.contains("is not running")) {
-                                    task.setData(NodeState.STOPPED);
-                                }
-
-                                synchronized(task) {
-                                    task.notifyAll();
-                                }
-                            }
-
+                    public Task onResponse(Task task, Response resp, String stdOut, String stdErr) {
+                        if(resp.getStdOut() != null) po.addLog(resp.getStdOut());
+                        if(resp.getStdErr() != null) po.addLog(resp.getStdErr());
+                        if(resp.getType() == ResponseType.EXECUTE_TIMEOUTED) {
+                            po.addLogFailed("Command execution timeout");
+                            latch.countDown();
+                        } else if(resp.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                            latch.countDown();
                         }
-
                         return null;
                     }
                 });
-
-                synchronized(checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch(InterruptedException ex) {
-                    }
+                try {
+                    latch.await(stopNodeTask.getTotalTimeout(), TimeUnit.SECONDS);
+                } catch(InterruptedException ex) {
+                    po.addLogFailed("Operation timeout");
                 }
 
-                if(NodeState.STOPPED.equals(checkNodeTask.getData())) {
+                if(stopNodeTask.isCompleted()) {
                     po.addLogDone(String.format("Node on %s stopped", lxcHostname));
                 } else {
                     po.addLogFailed(String.format("Failed to stop node %s. %s",

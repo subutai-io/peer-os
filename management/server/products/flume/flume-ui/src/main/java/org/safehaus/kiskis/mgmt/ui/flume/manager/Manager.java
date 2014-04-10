@@ -6,6 +6,8 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
@@ -162,7 +164,71 @@ public class Manager {
         for(Iterator it = agents.iterator(); it.hasNext();) {
             final Agent agent = (Agent)it.next();
             final Button destroyBtn = new Button("Destroy");
-            table.addItem(new Object[]{agent.getHostname(), destroyBtn}, null);
+            final Button startBtn = new Button("Start");
+            final Button stopBtn = new Button("Stop");
+            stopBtn.setEnabled(true);
+            startBtn.setEnabled(true);
+
+            table.addItem(new Object[]{agent.getHostname(),
+                startBtn, stopBtn, destroyBtn}, null);
+
+            startBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
+                    final UUID trackId = FlumeUI.getManager().startNode(
+                            config.getClusterName(), agent.getHostname());
+
+                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackId,
+                            new Window.CloseListener() {
+
+                                public void windowClose(Window.CloseEvent e) {
+                                    ProductOperationView po = FlumeUI.getTracker()
+                                            .getProductOperation(Config.PRODUCT_KEY, trackId);
+                                    if(po.getState() == ProductOperationState.SUCCEEDED) {
+                                        stopBtn.setEnabled(true);
+                                    } else {
+                                        startBtn.setEnabled(true);
+                                    }
+                                    destroyBtn.setEnabled(true);
+                                }
+                            });
+                }
+            });
+
+            stopBtn.addListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+
+                    startBtn.setEnabled(false);
+                    stopBtn.setEnabled(false);
+                    destroyBtn.setEnabled(false);
+
+                    final UUID trackId = FlumeUI.getManager().stopNode(
+                            config.getClusterName(), agent.getHostname());
+
+                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackId,
+                            new Window.CloseListener() {
+
+                                public void windowClose(Window.CloseEvent e) {
+                                    ProductOperationView po = FlumeUI.getTracker()
+                                            .getProductOperation(Config.PRODUCT_KEY, trackId);
+                                    if(po.getState() == ProductOperationState.SUCCEEDED) {
+                                        startBtn.setEnabled(true);
+                                    } else {
+                                        stopBtn.setEnabled(true);
+                                    }
+                                    destroyBtn.setEnabled(true);
+                                }
+                            });
+                }
+            });
 
             destroyBtn.addListener(new Button.ClickListener() {
 
@@ -226,6 +292,8 @@ public class Manager {
     private Table createTableTemplate(String caption, int size) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("Start", Button.class, null);
+        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);

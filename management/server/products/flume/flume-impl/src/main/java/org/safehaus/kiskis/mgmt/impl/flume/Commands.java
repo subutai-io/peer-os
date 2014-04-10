@@ -45,13 +45,14 @@ public class Commands {
     public static Request getStartCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service flume-ng start agent");
-        req.setStdOut(OutputRedirection.NO);
+        req.setTimeout(90);
         return req;
     }
 
     public static Request getStopCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service flume-ng stop agent");
+        req.setTimeout(60);
         return req;
     }
 
