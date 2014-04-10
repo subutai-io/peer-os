@@ -63,7 +63,7 @@ public class ConfigurationStep extends Panel {
         replicationFactorComboBox.setNullSelectionAllowed(false);
         replicationFactorComboBox.setValue(wizard.getConfig().getReplicationFactor());
 
-        slaveNodesComboBox.addListener(new Property.ValueChangeListener() {
+        replicationFactorComboBox.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setReplicationFactor((Integer) event.getProperty().getValue());
