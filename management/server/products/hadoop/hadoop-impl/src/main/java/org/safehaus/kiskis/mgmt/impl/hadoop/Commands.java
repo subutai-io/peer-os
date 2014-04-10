@@ -63,16 +63,19 @@ public class Commands {
 
     public static Request getSetMastersCommand(Agent nameNode, Agent jobTracker, String replicationFactor) {
         Request req = getRequestTemplate();
+
+        System.out.println(req.toString());
         req.setProgram(
                 ". /etc/profile && " +
                         "hadoop-configure.sh"
         );
+        System.out.println(req.toString());
         req.setArgs(Arrays.asList(
                 String.format("%s:%d", nameNode.getHostname(), Config.NAME_NODE_PORT),
                 String.format("%s:%d", jobTracker.getHostname(), Config.JOB_TRACKER_PORT),
                 String.format("%d", replicationFactor)
         ));
-        req.setStdOut(OutputRedirection.NO);
+        System.out.println(req.toString());
         return req;
     }
 
