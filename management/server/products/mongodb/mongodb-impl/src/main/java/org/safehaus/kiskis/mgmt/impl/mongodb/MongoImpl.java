@@ -360,7 +360,7 @@ public class MongoImpl implements Mongo {
                             Request registerSecondaryWithPrimaryCmd = operation.peekNextTask().getRequests().iterator().next();
                             registerSecondaryWithPrimaryCmd.setUuid(primaryNodeAgent.getUuid());
                         } else {
-                            task.setTaskStatus(TaskStatus.FAIL);
+                            taskSucceeded = false;
                         }
                     }
                 } else if (task.getData() == TaskType.START_REPLICA_SET

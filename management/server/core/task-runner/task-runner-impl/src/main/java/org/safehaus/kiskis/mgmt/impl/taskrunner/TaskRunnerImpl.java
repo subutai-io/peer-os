@@ -17,7 +17,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  * Implementation of {@code TaskRunner} interface
@@ -55,7 +54,7 @@ class TaskRunnerImpl implements ResponseListener, TaskRunner {
     public void init() {
         try {
             if (communicationService != null) {
-                executor = Executors.newFixedThreadPool(2);
+                executor = Executors.newCachedThreadPool();
                 taskExecutors = new ExpiringCache<UUID, ExecutorService>(executor);
                 taskMediator = new TaskMediator(communicationService, executor);
                 communicationService.addListener(this);
@@ -184,10 +183,6 @@ class TaskRunnerImpl implements ResponseListener, TaskRunner {
                     try {
                         taskExecutors.remove(task.getUuid());
                         entry.shutdown();
-
-                        if (task.getTaskStatus() == TaskStatus.RUNNING) {
-                            task.setTaskStatus(TaskStatus.TIMEDOUT);
-                        }
 
                     } catch (Exception e) {
                     }
