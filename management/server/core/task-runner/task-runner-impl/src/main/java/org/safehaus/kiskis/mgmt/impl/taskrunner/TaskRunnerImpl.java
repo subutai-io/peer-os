@@ -177,7 +177,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             ExecutorService taskExecutor = taskExecutors.get(task.getUuid());
             if (taskExecutor == null) {
                 taskExecutor = Executors.newSingleThreadExecutor();
-                taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 1000, new EntryExpiryCallback<ExecutorService>() {
+                taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 2000, new EntryExpiryCallback<ExecutorService>() {
 
                     @Override
                     public void onEntryExpiry(ExecutorService entry) {
@@ -242,7 +242,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
         });
         synchronized (task) {
             try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
+                task.wait(task.getAvgTimeout() * 1000 + 3000);
             } catch (InterruptedException ex) {
             }
         }

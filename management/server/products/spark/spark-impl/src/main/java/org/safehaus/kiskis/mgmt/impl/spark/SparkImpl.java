@@ -184,7 +184,7 @@ public class SparkImpl implements Spark {
 
                                 synchronized (startSparkTask) {
                                     try {
-                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
+                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
                                     } catch (InterruptedException ex) {
                                     }
                                 }
@@ -381,7 +381,7 @@ public class SparkImpl implements Spark {
 
                             synchronized (restartMasterTask) {
                                 try {
-                                    restartMasterTask.wait(restartMasterTask.getAvgTimeout() * 1000 + 1000);
+                                    restartMasterTask.wait(restartMasterTask.getAvgTimeout() * 1000 + 3000);
                                 } catch (InterruptedException ex) {
                                 }
                             }
@@ -415,7 +415,7 @@ public class SparkImpl implements Spark {
 
                                 synchronized (startSparkTask) {
                                     try {
-                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
+                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
                                     } catch (InterruptedException ex) {
                                     }
                                 }
@@ -513,7 +513,7 @@ public class SparkImpl implements Spark {
 
                         synchronized (restartMasterTask) {
                             try {
-                                restartMasterTask.wait(restartMasterTask.getAvgTimeout() * 1000 + 1000);
+                                restartMasterTask.wait(restartMasterTask.getAvgTimeout() * 1000 + 3000);
                             } catch (InterruptedException ex) {
                             }
                         }
@@ -675,7 +675,7 @@ public class SparkImpl implements Spark {
 
                             synchronized (startSparkTask) {
                                 try {
-                                    startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 1000);
+                                    startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
                                 } catch (InterruptedException ex) {
                                 }
                             }
@@ -775,7 +775,7 @@ public class SparkImpl implements Spark {
 
                 synchronized (startTask) {
                     try {
-                        startTask.wait(startTask.getAvgTimeout() * 1000 + 1000);
+                        startTask.wait(startTask.getAvgTimeout() * 1000 + 3000);
                     } catch (InterruptedException ex) {
                     }
                 }

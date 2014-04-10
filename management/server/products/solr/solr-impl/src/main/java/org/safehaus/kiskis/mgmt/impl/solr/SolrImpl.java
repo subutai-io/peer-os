@@ -225,7 +225,7 @@ public class SolrImpl implements Solr {
 
                 synchronized (checkNodeTask) {
                     try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 1000);
+                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 3000);
                     } catch (InterruptedException ex) {
                     }
                 }
@@ -302,7 +302,7 @@ public class SolrImpl implements Solr {
 
                 synchronized (checkNodeTask) {
                     try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 1000);
+                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 3000);
                     } catch (InterruptedException ex) {
                     }
                 }

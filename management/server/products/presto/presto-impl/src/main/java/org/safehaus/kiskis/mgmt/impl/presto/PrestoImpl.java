@@ -186,7 +186,7 @@ public class PrestoImpl implements Presto {
 
                                 synchronized (startPrestoTask) {
                                     try {
-                                        startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
+                                        startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 3000);
                                     } catch (InterruptedException ex) {
                                     }
                                 }
@@ -374,7 +374,7 @@ public class PrestoImpl implements Presto {
 
                         synchronized (startPrestoTask) {
                             try {
-                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
+                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 3000);
                             } catch (InterruptedException ex) {
                             }
                         }
@@ -553,7 +553,7 @@ public class PrestoImpl implements Presto {
 
                         synchronized (startPrestoTask) {
                             try {
-                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
+                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 3000);
                             } catch (InterruptedException ex) {
                             }
                         }
@@ -637,7 +637,7 @@ public class PrestoImpl implements Presto {
 
                 synchronized (startTask) {
                     try {
-                        startTask.wait(startTask.getAvgTimeout() * 1000 + 1000);
+                        startTask.wait(startTask.getAvgTimeout() * 1000 + 3000);
                     } catch (InterruptedException ex) {
                     }
                 }

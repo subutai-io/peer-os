@@ -185,7 +185,7 @@ public class LxcManagerImpl implements LxcManager {
             });
             synchronized (getMetricsTask) {
                 try {
-                    getMetricsTask.wait(getMetricsTask.getAvgTimeout() * 1000 + 1000);
+                    getMetricsTask.wait(getMetricsTask.getAvgTimeout() * 1000 + 3000);
                 } catch (InterruptedException ex) {
                 }
             }
@@ -299,7 +299,7 @@ public class LxcManagerImpl implements LxcManager {
 
             synchronized (getLxcListTask) {
                 try {
-                    getLxcListTask.wait(getLxcListTask.getAvgTimeout() * 1000 + 1000);
+                    getLxcListTask.wait(getLxcListTask.getAvgTimeout() * 1000 + 3000);
                 } catch (InterruptedException ex) {
                 }
             }
@@ -326,7 +326,7 @@ public class LxcManagerImpl implements LxcManager {
 
             synchronized (cloneTask) {
                 try {
-                    cloneTask.wait(cloneTask.getAvgTimeout() * 1000 + 1000);
+                    cloneTask.wait(cloneTask.getAvgTimeout() * 1000 + 3000);
                 } catch (InterruptedException ex) {
                 }
             }
@@ -362,7 +362,7 @@ public class LxcManagerImpl implements LxcManager {
             });
             synchronized (getLxcInfoTask) {
                 try {
-                    getLxcInfoTask.wait((startLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 1000);
+                    getLxcInfoTask.wait((startLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 3000);
                 } catch (InterruptedException ex) {
                 }
             }
@@ -398,7 +398,7 @@ public class LxcManagerImpl implements LxcManager {
             });
             synchronized (getLxcInfoTask) {
                 try {
-                    getLxcInfoTask.wait((stopLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 1000);
+                    getLxcInfoTask.wait((stopLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 3000);
                 } catch (InterruptedException ex) {
                 }
             }
@@ -434,7 +434,7 @@ public class LxcManagerImpl implements LxcManager {
             });
             synchronized (getLxcInfoTask) {
                 try {
-                    getLxcInfoTask.wait((destroyLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 1000);
+                    getLxcInfoTask.wait((destroyLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 3000);
                 } catch (InterruptedException ex) {
                 }
             }
@@ -489,7 +489,7 @@ public class LxcManagerImpl implements LxcManager {
             });
             synchronized (startNCloneTask) {
                 try {
-                    startNCloneTask.wait(startNCloneTask.getAvgTimeout() * 1000 + 1000);
+                    startNCloneTask.wait(startNCloneTask.getAvgTimeout() * 1000 + 3000);
                 } catch (InterruptedException ex) {
                 }
             }

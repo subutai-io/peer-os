@@ -522,7 +522,7 @@ public class MongoImpl implements Mongo {
 
                         synchronized (startRoutersTask) {
                             try {
-                                startRoutersTask.wait(startRoutersTask.getAvgTimeout() * 1000 + 1000);
+                                startRoutersTask.wait(startRoutersTask.getAvgTimeout() * 1000 + 3000);
                             } catch (InterruptedException ex) {
                             }
                         }
@@ -668,7 +668,7 @@ public class MongoImpl implements Mongo {
 
                 synchronized (startNodeTask) {
                     try {
-                        startNodeTask.wait(startNodeTask.getAvgTimeout() * 1000 + 1000);
+                        startNodeTask.wait(startNodeTask.getAvgTimeout() * 1000 + 3000);
                     } catch (InterruptedException ex) {
                     }
                 }

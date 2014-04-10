@@ -17,7 +17,6 @@ import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
-import org.safehaus.kiskis.mgmt.impl.communicationmanager.CommunicationManagerImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -149,7 +148,7 @@ public class TaskRunnerImplTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void testExecuteTask4() throws InterruptedException {
         System.out.println("testExecuteTask4");
         TaskRunnerImpl instance = new TaskRunnerImpl();
