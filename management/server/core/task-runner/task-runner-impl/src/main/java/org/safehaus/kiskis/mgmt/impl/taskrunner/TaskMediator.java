@@ -19,9 +19,10 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  * This class is used internally by {@code TaskRunner}. {@code TaskMediator}
- * acts as a mediator to communication manager service It sends all requests and
- * processes all responses routing them to corresponding {@code TaskListener}
- * For this purpose it holds a map of all {@code TaskListener}.
+ * acts as a mediator to communication manager service. It sends all requests to
+ * and processes all responses from agents routing them to corresponding
+ * {@code TaskListener} For this purpose it holds a map of all
+ * {@code TaskListener}.
  *
  * @author dilshat
  */
