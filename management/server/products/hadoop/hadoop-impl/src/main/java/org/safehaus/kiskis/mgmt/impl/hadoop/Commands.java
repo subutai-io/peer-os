@@ -61,7 +61,7 @@ public class Commands {
         return req;
     }
 
-    public static Request getSetMastersCommand(Agent nameNode, Agent jobTracker, String replicationFactor) {
+    public static Request getSetMastersCommand(Agent nameNode, Agent jobTracker, int replicationFactor) {
         Request req = getRequestTemplate();
 
         System.out.println(req.toString());
