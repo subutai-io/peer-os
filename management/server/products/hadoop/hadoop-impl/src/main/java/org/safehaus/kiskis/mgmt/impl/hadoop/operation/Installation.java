@@ -71,13 +71,12 @@ public class Installation {
         parent.getExecutor().execute(new Runnable() {
             @Override
             public void run() {
-
-                config = parent.getDbManager().getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class);
+                System.out.println("Executor started to run");
+                System.out.println(config);
 
                 if (config == null ||
                         Strings.isNullOrEmpty(config.getClusterName()) ||
-                        Strings.isNullOrEmpty(config.getDomainName()) ||
-                        config.getAllNodes().isEmpty()) {
+                        Strings.isNullOrEmpty(config.getDomainName())) {
                     po.addLogFailed("Malformed configuration\nHadoop installation aborted");
                     return;
                 }

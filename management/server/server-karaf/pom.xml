@@ -644,16 +644,16 @@
                                 <!-- Products Modules - END -->
 
                                 <!-- TODO for API - START -->
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>cassandra-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hbase-module</artifactId>
@@ -678,7 +678,7 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>flume-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <!-- TODO for API - END -->
 
                             </artifactItems>

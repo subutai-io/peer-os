@@ -141,6 +141,7 @@ public class Config {
                 ", dataNodes=" + dataNodes +
                 ", taskTrackers=" + taskTrackers +
                 ", replicationFactor=" + replicationFactor +
+                ", countOfSlaveNodes=" + countOfSlaveNodes +
                 '}';
     }
 }
