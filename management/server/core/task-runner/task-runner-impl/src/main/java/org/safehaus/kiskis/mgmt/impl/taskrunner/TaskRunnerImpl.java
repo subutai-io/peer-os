@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
@@ -27,7 +26,6 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     private static final Logger LOG = Logger.getLogger(TaskRunnerImpl.class.getName());
 
-    private static final String MODULE_NAME = "TaskRunner";
     private CommunicationManager communicationService;
     private ChainedTaskRunner taskRunner;
     private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
@@ -43,7 +41,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
                 communicationService.addListener(this);
                 LOG.info(MODULE_NAME + " started");
             } else {
-                throw new Exception("Missing CommandManager service");
+                throw new Exception("Missing CommunicationManager service");
             }
 
         } catch (Exception e) {
@@ -58,6 +56,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             if (communicationService != null) {
                 communicationService.removeListener(this);
             }
+            LOG.info(MODULE_NAME + " stopped");
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in destroy", e);
         }
@@ -125,9 +124,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             });
         }
 
-        for (Request cmd : task.getRequests()) {
-            cmd.setSource(MODULE_NAME);
-        }
+        task.setTaskStatus(TaskStatus.RUNNING);
 
         executor.execute(new Runnable() {
             @Override

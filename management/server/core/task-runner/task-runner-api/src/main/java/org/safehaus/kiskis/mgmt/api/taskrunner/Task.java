@@ -167,7 +167,10 @@ public class Task implements Serializable {
     public void addRequest(Request request, Agent agent) {
         if (request != null && agent != null) {
             request.setUuid(agent.getUuid());
-            addRequest(request);
+            request.setTaskUuid(uuid);
+            request.setRequestSequenceNumber(getIncrementedReqSeqNumber());
+            request.setSource(TaskRunner.MODULE_NAME);
+            requests.add(request);
         }
     }
 
