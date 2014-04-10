@@ -58,7 +58,7 @@ class TaskRunnerImpl implements ResponseListener, TaskRunner {
                 taskExecutors = new ExpiringCache<UUID, ExecutorService>(executor);
                 taskMediator = new TaskMediator(communicationService, executor);
                 communicationService.addListener(this);
-                LOG.info(MODULE_NAME + " started");
+                LOG.info(TaskRunner.MODULE_NAME + " started");
             } else {
                 throw new Exception("Missing CommunicationManager service");
             }
