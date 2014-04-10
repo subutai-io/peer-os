@@ -93,6 +93,7 @@ public class Installation {
                             parent.getNetworkManager().configSshOnAgents(config.getAllNodes())) {
                         po.addLog("Cluster network configured");
 
+                        po.addLog("Hadoop installation started");
                         InstallHadoopOperation installOperation = new InstallHadoopOperation(config);
                         for (Task task : installOperation.getTaskList()) {
                             po.addLog((String.format("%s started...", task.getDescription())));
