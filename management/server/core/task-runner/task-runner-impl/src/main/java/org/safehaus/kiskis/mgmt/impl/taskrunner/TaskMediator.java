@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -17,24 +18,48 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
+ * This class is used internally by {@code TaskRunner}. {@code TaskMediator}
+ * acts as a mediator to communication manager service It sends all requests and
+ * processes all responses routing them to corresponding {@code TaskListener}
+ * For this purpose it holds a map of all {@code TaskListener}.
  *
  * @author dilshat
  */
-public class ChainedTaskRunner {
+class TaskMediator {
 
-    private static final Logger LOG = Logger.getLogger(ChainedTaskRunner.class.getName());
+    private static final Logger LOG = Logger.getLogger(TaskMediator.class.getName());
 
-    private final ExpiringCache<UUID, ChainedTaskListener> taskListenerCache = new ExpiringCache<UUID, ChainedTaskListener>();
+    /**
+     * Map of {@code TaskListener} where key is UUID of agent/node
+     */
+    private final ExpiringCache<UUID, TaskListener> taskListenerCache;
+    /**
+     * reference to communication manager service
+     */
     private final CommunicationManager communicationService;
 
-    public ChainedTaskRunner(CommunicationManager communicationService) {
+    /**
+     * Initalizes {@code TaskMediator}
+     *
+     * @param communicationService
+     */
+    public TaskMediator(CommunicationManager communicationService, ExecutorService executor) {
         this.communicationService = communicationService;
+        taskListenerCache = new ExpiringCache<UUID, TaskListener>(executor);
     }
 
-    public ChainedTaskListener feedResponse(Response response) {
+    /**
+     * This method is used to feed response coming from agent(s) for processing
+     * by corresponding {@code TaskListener}.
+     *
+     * @param response
+     * @return null, current {@code TaskListener} of new {@code TaskListener} if
+     * corresponding {@code TaskCallback} returned new task for execution.
+     */
+    public TaskListener feedResponse(Response response) {
         try {
             if (response != null && response.getTaskUuid() != null && response.getUuid() != null && response.getType() != null) {
-                ChainedTaskListener tl = taskListenerCache.get(response.getTaskUuid());
+                TaskListener tl = taskListenerCache.get(response.getTaskUuid());
                 if (tl != null) {
 
                     tl.appendStreams(response);
@@ -60,7 +85,7 @@ public class ChainedTaskRunner {
 
                     Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(response), tl.getStdErr(response));
 
-                    return nextTask == null ? tl : new ChainedTaskListener(nextTask, tl.getTaskCallback());
+                    return nextTask == null ? tl : new TaskListener(nextTask, tl.getTaskCallback());
                 }
             }
         } catch (Exception e) {
@@ -69,9 +94,15 @@ public class ChainedTaskRunner {
         return null;
     }
 
+    /**
+     * Returns task by its UUID or null
+     *
+     * @param taskUUID
+     * @return {@code Task}
+     */
     public Task getTask(UUID taskUUID) {
         if (taskUUID != null) {
-            ChainedTaskListener tl = taskListenerCache.get(taskUUID);
+            TaskListener tl = taskListenerCache.get(taskUUID);
             if (tl != null) {
                 return tl.getTask();
             }
@@ -79,23 +110,38 @@ public class ChainedTaskRunner {
         return null;
     }
 
+    /**
+     * Removes {@code TaskCallback} by its task's UUID
+     *
+     * @param taskUUID
+     */
     public void removeTaskCallback(UUID taskUUID) {
         if (taskUUID != null) {
             taskListenerCache.remove(taskUUID);
         }
     }
 
+    /**
+     * Removes all {@code TaskCallback}
+     */
     public void removeAllTaskCallbacks() {
         taskListenerCache.clear();
     }
 
+    /**
+     * Submits {@code Task} for execution
+     *
+     * @param task - task to execute
+     * @param taskCallback - callback or null
+     */
     public void executeTask(Task task, TaskCallback taskCallback) {
         try {
             if (task != null && task.getUuid() != null) {
                 if (taskListenerCache.get(task.getUuid()) == null && task.hasNextRequest()) {
+                    task.setTaskStatus(TaskStatus.RUNNING);
                     if (taskCallback != null) {
                         taskListenerCache.put(task.getUuid(),
-                                new ChainedTaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
+                                new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 10000);
                     }
                     while (task.hasNextRequest()) {
                         communicationService.sendRequest(task.getNextRequest());

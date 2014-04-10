@@ -215,6 +215,9 @@ public class MongoImpl implements Mongo {
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
+                boolean taskCompleted = task.isCompleted();
+                boolean taskSucceeded = task.getTaskStatus() == TaskStatus.SUCCESS;
+
                 if (task.getData() != null) {
                     boolean taskOk = false;
                     if (task.getData() == TaskType.START_CONFIG_SERVERS) {
@@ -240,14 +243,14 @@ public class MongoImpl implements Mongo {
                         }
                     }
                     if (taskOk) {
-                        task.setCompleted(true);
-                        task.setTaskStatus(TaskStatus.SUCCESS);
+                        taskCompleted = true;
+                        taskSucceeded = true;
                         taskRunner.removeTaskCallback(task.getUuid());
                     }
                 }
 
-                if (task.isCompleted()) {
-                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (taskCompleted) {
+                    if (taskSucceeded) {
                         po.addLog(String.format("Task %s succeeded", task.getDescription()));
                         if (installOperation.hasNextTask()) {
                             po.addLog(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
@@ -335,6 +338,10 @@ public class MongoImpl implements Mongo {
 
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+
+                boolean taskCompleted = task.isCompleted();
+                boolean taskSucceeded = task.getTaskStatus() == TaskStatus.SUCCESS;
+
                 if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
 
                     if (task.isCompleted()) {
@@ -371,14 +378,14 @@ public class MongoImpl implements Mongo {
                             || (task.getData() != TaskType.RESTART_ROUTERS
                             && stdOut.indexOf(
                                     "child process started successfully, parent exiting") > -1)) {
-                        task.setTaskStatus(TaskStatus.SUCCESS);
-                        task.setCompleted(true);
+                        taskCompleted = true;
+                        taskSucceeded = true;
                         taskRunner.removeTaskCallback(task.getUuid());
                     }
                 }
 
-                if (task.isCompleted()) {
-                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (taskCompleted) {
+                    if (taskSucceeded) {
                         po.addLog(String.format("Task %s succeeded", task.getDescription()));
 
                         if (operation.hasNextTask()) {

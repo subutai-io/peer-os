@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,25 +20,44 @@ import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
+ * Implementation of {@code TaskRunner} interface
  *
  * @author dilshat
  */
-public class TaskRunnerImpl implements ResponseListener, TaskRunner {
+class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     private static final Logger LOG = Logger.getLogger(TaskRunnerImpl.class.getName());
 
+    /**
+     * reference to communication manager service
+     */
     private CommunicationManager communicationService;
-    private ChainedTaskRunner taskRunner;
-    private final ExpiringCache<UUID, ExecutorService> executors = new ExpiringCache<UUID, ExecutorService>();
+    /**
+     * taskMediator
+     */
+    private TaskMediator taskMediator;
+
+    /**
+     * map of executors for processing responses and triggering corresponding
+     * {@code TaskCallback} where key is UUID of agent/node
+     */
+    private ExecutorService executor;
+    private ExpiringCache<UUID, ExecutorService> taskExecutors;
 
     public void setCommunicationService(CommunicationManager communicationService) {
         this.communicationService = communicationService;
     }
 
+    /**
+     * Initalizes TaskRunnerImpl. Registers as a listener with communication
+     * manager service
+     */
     public void init() {
         try {
             if (communicationService != null) {
-                taskRunner = new ChainedTaskRunner(communicationService);
+                executor = Executors.newFixedThreadPool(2);
+                taskExecutors = new ExpiringCache<UUID, ExecutorService>(executor);
+                taskMediator = new TaskMediator(communicationService, executor);
                 communicationService.addListener(this);
                 LOG.info(MODULE_NAME + " started");
             } else {
@@ -49,19 +69,37 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
         }
     }
 
+    /**
+     * Disposes TaskRunnerImpl. Unregisters from communication manager service
+     */
     public void destroy() {
         try {
-            executors.clear();
-            taskRunner.removeAllTaskCallbacks();
+            Map<UUID, CacheEntry<ExecutorService>> entries = taskExecutors.getEntries();
+
+            for (Map.Entry<UUID, CacheEntry<ExecutorService>> entry : entries.entrySet()) {
+                try {
+                    entry.getValue().getValue().shutdown();
+                } catch (Exception e) {
+                }
+            }
+            taskExecutors.clear();
+            taskMediator.removeAllTaskCallbacks();
             if (communicationService != null) {
                 communicationService.removeListener(this);
             }
+            executor.shutdown();
             LOG.info(MODULE_NAME + " stopped");
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in destroy", e);
         }
     }
 
+    /**
+     * This method is called by communication manager whenever a new response
+     * arrives from agents/nodes
+     *
+     * @param response - response from node
+     */
     @Override
     public void onResponse(Response response) {
         switch (response.getType()) {
@@ -78,21 +116,33 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     }
 
+    /**
+     * This method processes responses from agents/nodes.
+     *
+     * For each response its single threaded executor is retrieved from
+     * executors map. The response is submitted for further processing by means
+     * of this executor. If task completes or new task is submitted by its
+     * {@code TaskCallback} the current executor gets disposed. For new task new
+     * executor is bootstrapped.
+     *
+     *
+     * @param response - response from node
+     */
     private void processResponse(final Response response) {
-        final ExecutorService executor = executors.get(response.getTaskUuid());
-        if (executor != null) {
+        final ExecutorService taskExecutor = taskExecutors.get(response.getTaskUuid());
+        if (taskExecutor != null) {
             try {
-                executor.execute(new Runnable() {
+                taskExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            ChainedTaskListener tl = taskRunner.feedResponse(response);
+                            TaskListener tl = taskMediator.feedResponse(response);
                             if (tl == null || tl.getTask().isCompleted()) {
-                                executors.remove(response.getTaskUuid());
-                                executor.shutdown();
+                                taskExecutors.remove(response.getTaskUuid());
+                                taskExecutor.shutdown();
                             } else if (tl.getTask().getUuid().compareTo(response.getTaskUuid()) != 0) {
-                                executors.remove(response.getTaskUuid());
-                                executor.shutdown();
+                                taskExecutors.remove(response.getTaskUuid());
+                                taskExecutor.shutdown();
 
                                 //run new task
                                 executeTask(tl.getTask(), tl.getTaskCallback());
@@ -106,47 +156,80 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
         }
     }
 
+    /**
+     * Executes {@code Task} asynchronously to the calling party. The supplied
+     * {@code TaskCallBack} is triggered every time a response is received for
+     * this task. If null for callback is supplied, then calling this method is
+     * the same as calling executeTaskNForget. This methods adds response for
+     * processing to the queue of corresponding executor. This guarantees order
+     * of processing of responses for each particular task without much overhead
+     * of synchronizing various threads in thread pools. If task never
+     * completes, it gets expired and its executor is disposed at the moment
+     * when expiry callback for this executor is called by {@code ExpiringCache}
+     * If task has not completed during its timeout
+     * {@code task.getAverageTimeout()} interval, its status is set as TIMEDOUT.
+     *
+     * @param task
+     * @param taskCallback
+     */
     @Override
     public void executeTask(final Task task, final TaskCallback taskCallback) {
-        ExecutorService executor = executors.get(task.getUuid());
-        if (executor == null) {
-            executor = Executors.newSingleThreadExecutor();
-            executors.put(task.getUuid(), executor, task.getAvgTimeout() * 1000 + 10000, new EntryExpiryCallback<ExecutorService>() {
+        ExecutorService taskExecutor = taskExecutors.get(task.getUuid());
+        if (taskExecutor == null) {
+            taskExecutor = Executors.newSingleThreadExecutor();
+            taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 1000, new EntryExpiryCallback<ExecutorService>() {
 
                 @Override
                 public void onEntryExpiry(ExecutorService entry) {
                     try {
-                        executors.remove(task.getUuid());
+                        taskExecutors.remove(task.getUuid());
                         entry.shutdown();
+
+                        if (task.getTaskStatus() == TaskStatus.RUNNING) {
+                            task.setTaskStatus(TaskStatus.TIMEDOUT);
+                        }
+
                     } catch (Exception e) {
                     }
                 }
             });
         }
 
-        task.setTaskStatus(TaskStatus.RUNNING);
-
-        executor.execute(new Runnable() {
+        taskExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                taskRunner.executeTask(task, taskCallback);
+                taskMediator.executeTask(task, taskCallback);
             }
         });
 
     }
 
+    /**
+     * Removes {@code TaskCallback} for the supplied task UUID
+     *
+     * @param taskUUID
+     */
     @Override
     public void removeTaskCallback(UUID taskUUID) {
         try {
-            taskRunner.removeTaskCallback(taskUUID);
-            ExecutorService executor = executors.remove(taskUUID);
-            if (executor != null) {
-                executor.shutdown();
+            taskMediator.removeTaskCallback(taskUUID);
+            ExecutorService taskExecutor = taskExecutors.remove(taskUUID);
+            if (taskExecutor != null) {
+                taskExecutor.shutdown();
             }
         } catch (Exception e) {
         }
     }
 
+    /**
+     * Executes {@code Task} synchronously to the calling party. The method
+     * returns when either task is completed or timed out. Calling party should
+     * examine the returned/supplied task to see its status after this method
+     * returns.
+     *
+     * @param task - task to execute
+     * @return task which is supplied when calling this method;
+     */
     public Task executeTask(Task task) {
         executeTask(task, new TaskCallback() {
 
@@ -161,18 +244,19 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
         });
         synchronized (task) {
             try {
-                task.wait(task.getAvgTimeout() * 1000 + 3000);
+                task.wait(task.getAvgTimeout() * 1000 + 1000);
             } catch (InterruptedException ex) {
             }
-        }
-
-        if (!task.isCompleted()) {
-            task.setTaskStatus(TaskStatus.FAIL);
         }
 
         return task;
     }
 
+    /**
+     * Executes supplied task asynchronously to the calling party.
+     *
+     * @param task
+     */
     public void executeTaskNForget(Task task) {
         executeTask(task, null);
     }

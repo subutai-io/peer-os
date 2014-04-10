@@ -12,5 +12,5 @@ package org.safehaus.kiskis.mgmt.api.taskrunner;
  */
 public enum TaskStatus {
 
-    NEW, RUNNING, SUCCESS, FAIL
+    NEW, RUNNING, TIMEDOUT, SUCCESS, FAIL
 }
