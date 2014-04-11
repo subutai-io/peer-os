@@ -690,6 +690,8 @@
                                     <artifactId>hbase-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                
+                                <!-- Flume -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>flume-api</artifactId>
@@ -705,20 +707,21 @@
                                     <artifactId>flume-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!-- HBase -->
+                                
+                                <!-- Hive -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hbase-api</artifactId>
+                                    <artifactId>hive-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hbase-impl</artifactId>
+                                    <artifactId>hive-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hbase-ui</artifactId>
+                                    <artifactId>hive-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!-- Products Modules - END -->
