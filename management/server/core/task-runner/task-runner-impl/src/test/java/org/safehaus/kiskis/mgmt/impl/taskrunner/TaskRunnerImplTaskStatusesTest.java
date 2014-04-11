@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -156,6 +155,8 @@ public class TaskRunnerImplTaskStatusesTest {
 
         //wait until background thread is initialized
         Thread.sleep(10);
+
+        //complete the task
         ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
 
         //wait till background thread processes response
@@ -165,58 +166,18 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testExecuteSucceededTaskAsync() throws InterruptedException {
-
-        Task task = getDummyTask(1);
-
-        taskrunner.executeTask(task, dummyCallback);
-
-        //wait until background thread is initialized
-        Thread.sleep(10);
-        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task));
-
-        //wait till background thread processes response
-        Thread.sleep(10);
-
-        assertEquals(TaskStatus.SUCCESS, task.getTaskStatus());
-    }
-
-    @Test
-    public void testExecuteSucceededTaskSync() throws InterruptedException {
+    public void testExecuteFailedTaskSync() throws InterruptedException {
 
         final Task task = getDummyTask(1);
 
+        //run in a thread to have delay before response "arrives"
         Thread t = new Thread(new Runnable() {
 
             public void run() {
                 try {
+                    //"delay"
                     Thread.sleep(10);
-                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task));
-                } catch (InterruptedException ex) {
-                }
-            }
-        });
-
-        t.start();
-
-        taskrunner.executeTask(task);
-
-        //wait till background thread processes response
-        Thread.sleep(20);
-
-        assertEquals(TaskStatus.SUCCESS, task.getTaskStatus());
-    }
-
-    @Test
-    public void testExecuteFailedTaskSync() throws InterruptedException {
-
-        final Task task = getDummyTask(3);
-
-        Thread t = new Thread(new Runnable() {
-
-            public void run() {
-                try {
-                    Thread.sleep(10);
+                    //complete the task
                     ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
                 } catch (InterruptedException ex) {
                 }
@@ -234,10 +195,107 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
+    public void testExecuteSucceededTaskAsync() throws InterruptedException {
+
+        Task task = getDummyTask(1);
+
+        taskrunner.executeTask(task, dummyCallback);
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        //complete the task
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        assertEquals(TaskStatus.SUCCESS, task.getTaskStatus());
+    }
+
+    @Test
+    public void testExecuteSucceededTaskSync() throws InterruptedException {
+
+        final Task task = getDummyTask(1);
+
+        //run in a thread to have delay before response "arrives"
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    //"delay"
+                    Thread.sleep(10);
+                    //complete the task
+                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task));
+                } catch (InterruptedException ex) {
+                }
+            }
+        });
+
+        t.start();
+
+        taskrunner.executeTask(task);
+
+        //wait till background thread processes response
+        Thread.sleep(20);
+
+        assertEquals(TaskStatus.SUCCESS, task.getTaskStatus());
+    }
+
+    @Test
+    public void testExecuteCompletedTaskAsync() throws InterruptedException {
+
+        Task task = getDummyTask(1);
+
+        taskrunner.executeTask(task, dummyCallback);
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        //complete the task
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        assertTrue(task.isCompleted());
+    }
+
+    @Test
+    public void testExecuteCompletedTaskSync() throws InterruptedException {
+
+        final Task task = getDummyTask(1);
+
+        //run in a thread to have delay before response "arrives"
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    //"delay"
+                    Thread.sleep(10);
+                    //complete the task
+                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task));
+                } catch (InterruptedException ex) {
+                }
+            }
+        });
+
+        t.start();
+
+        taskrunner.executeTask(task);
+
+        //wait till background thread processes response
+        Thread.sleep(20);
+
+        assertTrue(task.isCompleted());
+    }
+
+    @Test
     public void testCheckRunningTaskSync() throws InterruptedException {
 
-        final Task task = getDummyTask(3);
+        final Task task = getDummyTask(1);
 
+        //run in a thread since this call blocks until task completes or times out
         Thread t = new Thread(new Runnable() {
 
             public void run() {
@@ -256,7 +314,7 @@ public class TaskRunnerImplTaskStatusesTest {
     @Test
     public void testCheckRunningTaskAsync() throws InterruptedException {
 
-        final Task task = getDummyTask(3);
+        final Task task = getDummyTask(1);
 
         taskrunner.executeTask(task, dummyCallback);
 
@@ -266,4 +324,53 @@ public class TaskRunnerImplTaskStatusesTest {
         assertEquals(TaskStatus.RUNNING, task.getTaskStatus());
     }
 
+    @Test
+    public void testCheckIgnoreExitCodeAsync() throws InterruptedException {
+
+        Task task = getDummyTask(1);
+        task.setIgnoreExitCode(true);
+
+        taskrunner.executeTask(task, dummyCallback);
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        //complete the task
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        assertEquals(TaskStatus.SUCCESS, task.getTaskStatus());
+    }
+
+    @Test
+    public void testCheckIgnoreExitCodeSync() throws InterruptedException {
+
+        final Task task = getDummyTask(1);
+        task.setIgnoreExitCode(true);
+
+        //run in a thread to have delay before response "arrives"
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    //"delay"
+                    Thread.sleep(10);
+                    //complete the task
+                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
+                } catch (InterruptedException ex) {
+                }
+            }
+        });
+
+        t.start();
+
+        taskrunner.executeTask(task);
+
+        //wait till background thread processes response
+        Thread.sleep(20);
+
+        assertEquals(TaskStatus.SUCCESS, task.getTaskStatus());
+    }
 }

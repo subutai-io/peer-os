@@ -151,7 +151,7 @@ class TaskMediator {
                     task.setTaskStatus(TaskStatus.RUNNING);
                     if (taskCallback != null) {
                         taskListenerCache.put(task.getUuid(),
-                                new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 1000, new EntryExpiryCallback<TaskListener>() {
+                                new TaskListener(task, taskCallback), task.getAvgTimeout() * 1000 + 500, new EntryExpiryCallback<TaskListener>() {
 
                                     public void onEntryExpiry(TaskListener entry) {
                                         Task task = entry.getTask();

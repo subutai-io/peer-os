@@ -15,9 +15,9 @@ import java.util.logging.Logger;
 
 /**
  * This class is used internally by {@code TaskRunnerImpl}. This is a cache with
- * entries having time-to-live setting After the specified interval entry gets
- * evicted (expires) It is possible to add expiry callback to an entry to handle
- * the expiration event
+ * entries having time-to-live setting. After the specified interval entry gets
+ * evicted (expires). It is possible to add expiry callback to an entry to
+ * handle the expiration event
  *
  * @author dilshat
  */
@@ -25,13 +25,12 @@ class ExpiringCache<KeyType, ValueType> {
 
     private static final Logger LOG = Logger.getLogger(ExpiringCache.class.getName());
 
-    private final long evictionRunIntervalMs = 200;
+    private final long evictionRunIntervalMs = 100;
     private final Map<KeyType, CacheEntry<ValueType>> entries = new ConcurrentHashMap<KeyType, CacheEntry<ValueType>>();
-//    private volatile long lastEvictionRun = System.currentTimeMillis();
-//    private final AtomicBoolean lock = new AtomicBoolean(true);
 
     /**
-     * Initializes {@code ExpiringCache}
+     * Initializes {@code ExpiringCache}. Starts evictor thread using supplied
+     * executor service
      *
      * @param evictor - executor service used to evict expired entries
      */
@@ -84,13 +83,8 @@ class ExpiringCache<KeyType, ValueType> {
                 if (entry != null && !entry.isExpired()) {
                     return entry.getValue();
                 }
-//            else {
-//                entries.remove(key);
-//            }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Error in get", ex);
-//        } finally {
-//            runEviction();
             }
         }
         return null;
@@ -110,8 +104,6 @@ class ExpiringCache<KeyType, ValueType> {
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in put", ex);
-//        } finally {
-//            runEviction();
         }
         return false;
     }
@@ -122,8 +114,6 @@ class ExpiringCache<KeyType, ValueType> {
             return true;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in put", ex);
-//        } finally {
-//            runEviction();
         }
         return false;
     }
@@ -136,8 +126,6 @@ class ExpiringCache<KeyType, ValueType> {
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in remove", ex);
-//        } finally {
-//            runEviction();
         }
         return null;
     }
@@ -147,14 +135,6 @@ class ExpiringCache<KeyType, ValueType> {
     }
 
     public void clear() {
-//        for (Map.Entry<KeyType, CacheEntry<ValueType>> entry : entries.entrySet()) {
-//            if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
-//                try {
-//                    ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
-//                } catch (Exception e) {
-//                }
-//            }
-//        }
         entries.clear();
     }
 
@@ -162,35 +142,4 @@ class ExpiringCache<KeyType, ValueType> {
         return entries.size();
     }
 
-//    private void runEviction() {
-//        if (System.currentTimeMillis() - lastEvictionRun > evictionRunIntervalMs
-//                && lock.compareAndSet(true, false)) {
-//            lastEvictionRun = System.currentTimeMillis();
-//            Thread evictor = new Thread(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    try {
-//                        for (Iterator<Map.Entry<KeyType, CacheEntry<ValueType>>> it
-//                                = entries.entrySet().iterator(); it.hasNext();) {
-//                            Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
-//                            if (entry.getValue().isExpired()) {
-//                                it.remove();
-//                                if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
-//                                    try {
-//                                        ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
-//                                    } catch (Exception e) {
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    } catch (Exception ignore) {
-//                    } finally {
-//                        lock.set(true);
-//                    }
-//                }
-//            });
-//            evictor.start();
-//        }
-//    }
 }

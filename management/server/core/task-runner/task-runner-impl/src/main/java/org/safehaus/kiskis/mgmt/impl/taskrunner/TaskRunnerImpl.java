@@ -174,33 +174,36 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      */
     @Override
     public void executeTask(final Task task, final TaskCallback taskCallback) {
-        if (task != null && !task.getRequests().isEmpty()) {
-            ExecutorService taskExecutor = taskExecutors.get(task.getUuid());
-            if (taskExecutor == null) {
-                taskExecutor = Executors.newSingleThreadExecutor();
-                taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 2000, new EntryExpiryCallback<ExecutorService>() {
+        if (task == null) {
+            throw new RuntimeException("Task is null");
+        }
+        if (task.getRequests().isEmpty()) {
+            throw new RuntimeException("Task has no requests");
+        }
 
-                    @Override
-                    public void onEntryExpiry(ExecutorService entry) {
-                        try {
-                            taskExecutors.remove(task.getUuid());
-                            entry.shutdown();
+        ExecutorService taskExecutor = taskExecutors.get(task.getUuid());
+        if (taskExecutor == null) {
+            taskExecutor = Executors.newSingleThreadExecutor();
+            taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 1000, new EntryExpiryCallback<ExecutorService>() {
 
-                        } catch (Exception e) {
-                        }
-                    }
-                });
-            }
-
-            taskExecutor.execute(new Runnable() {
                 @Override
-                public void run() {
-                    taskMediator.executeTask(task, taskCallback);
+                public void onEntryExpiry(ExecutorService entry) {
+                    try {
+                        taskExecutors.remove(task.getUuid());
+                        entry.shutdown();
+
+                    } catch (Exception e) {
+                    }
                 }
             });
-        } else {
-            throw new RuntimeException("Task is null or has no requests");
         }
+
+        taskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                taskMediator.executeTask(task, taskCallback);
+            }
+        });
     }
 
     /**
@@ -255,27 +258,20 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      */
     @Override
     public void executeTaskNWait(Task task, TaskCallback callback) {
-        executeTask(task, callback);
+        if (callback != null) {
+            executeTask(task, callback);
 
-        synchronized (callback) {
-            try {
-                callback.wait(3600 * 1000); //wait 1 hr maximum
-            } catch (InterruptedException ex) {
+            synchronized (callback) {
+                try {
+                    callback.wait(3600 * 1000); //wait 1 hr maximum
+                } catch (InterruptedException ex) {
+                }
             }
+
+            removeTaskCallback(task.getUuid());
+        } else {
+            throw new RuntimeException("Callback is null");
         }
-
-        removeTaskCallback(task.getUuid());
-
-    }
-
-    /**
-     * Executes supplied task asynchronously to the calling party.
-     *
-     * @param task
-     */
-    @Override
-    public void executeTaskNForget(Task task) {
-        executeTask(task, null);
     }
 
 }

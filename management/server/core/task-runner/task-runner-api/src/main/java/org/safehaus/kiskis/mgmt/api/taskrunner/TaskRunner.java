@@ -8,7 +8,9 @@ package org.safehaus.kiskis.mgmt.api.taskrunner;
 import java.util.UUID;
 
 /**
- * This class is used to execute tasks on agent nodes
+ * This class is used to execute tasks on agent nodes. TODO rename public Task
+ * executeTask(Task task) to executeTaskNWait rename public void
+ * executeTaskNForget(Task task) to executeTask
  *
  * @author dilshat
  */
@@ -42,13 +44,6 @@ public interface TaskRunner {
      * @return task which is supplied when calling this method;
      */
     public Task executeTask(Task task);
-
-    /**
-     * Executes supplied task asynchronously to the calling party.
-     *
-     * @param task
-     */
-    public void executeTaskNForget(Task task);
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
