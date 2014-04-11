@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -65,16 +64,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             setMainWindow(window);
 
             VerticalLayout layout = new VerticalLayout();
-            layout.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-            layout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-//            HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
-//            horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
-
-//            layout.setExpandRatio(horizontalSplit, 1);
-//            horizontalSplit.setSplitPosition(200, Sizeable.UNITS_PIXELS);
-//            agentList = new MgmtAgentManager(agentManager, true);
-            //add listener
-//            horizontalSplit.setFirstComponent(agentList);
+            layout.setSizeFull();
             tabs = new TabSheet();
             tabs.setSizeFull();
             tabs.setImmediate(true);
@@ -83,7 +73,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 tabs.addTab(component, module.getName(), null);
             }
             layout.addComponent(tabs);
-//            horizontalSplit.setSecondComponent(tabs);
+            layout.setExpandRatio(tabs, 1f);
 
             getMainWindow().setContent(layout);
             //add listener
@@ -147,7 +137,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                     }
                 }
             }
-//            agentList.dispose();
             moduleNotifier.removeListener(this);
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Application closing, removing module service listener");
         } catch (Exception e) {
