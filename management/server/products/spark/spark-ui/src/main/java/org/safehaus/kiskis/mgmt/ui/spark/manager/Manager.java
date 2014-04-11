@@ -222,7 +222,7 @@ public class Manager {
                 checkBtn,
                 startBtn,
                 stopBtn,
-                setMasterBtn,
+                master.equals(agent) ? null : setMasterBtn,
                 destroyBtn,
                 progressIcon},
                     null);

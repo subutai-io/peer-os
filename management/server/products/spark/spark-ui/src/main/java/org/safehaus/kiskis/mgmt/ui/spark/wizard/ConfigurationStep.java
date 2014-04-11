@@ -63,7 +63,7 @@ public class ConfigurationStep extends Panel {
 
         slaveNodesSelect.setItemCaptionPropertyId("hostname");
         slaveNodesSelect.setRows(7);
-        slaveNodesSelect.setNullSelectionAllowed(false);
+//        slaveNodesSelect.setNullSelectionAllowed(false);
         slaveNodesSelect.setMultiSelect(true);
         slaveNodesSelect.setImmediate(true);
         slaveNodesSelect.setLeftColumnCaption("Available Nodes");
@@ -113,8 +113,15 @@ public class ConfigurationStep extends Panel {
                     slaveNodesSelect.setContainerDataSource(
                             new BeanItemContainer<Agent>(
                                     Agent.class, hadoopInfo.getAllAgents()));
+                    masterNodeCombo.setValue(null);
+                    masterNodeCombo.removeAllItems();
+                    for (Agent agent : hadoopInfo.getAllAgents()) {
+                        masterNodeCombo.addItem(agent);
+                        masterNodeCombo.setItemCaption(agent, agent.getHostname());
+                    }
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setSlaveNodes(new HashSet<Agent>());
+                    wizard.getConfig().setMasterNode(null);
                 }
             }
         });

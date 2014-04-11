@@ -43,7 +43,7 @@ public class Commands {
 
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("sleep 10; apt-get --force-yes --assume-yes install ksks-pig");
+        req.setProgram("apt-get --force-yes --assume-yes install ksks-pig");
         req.setStdOut(OutputRedirection.NO);
         req.setTimeout(90);
         return req;

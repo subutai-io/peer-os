@@ -68,6 +68,11 @@ public class MahoutImpl implements Mahout {
         executor.execute(new Runnable() {
 
             public void run() {
+                if (config == null || Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
+                    po.addLogFailed("Malformed configuration\nInstallation aborted");
+                    return;
+                }
+
                 if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
@@ -151,6 +156,13 @@ public class MahoutImpl implements Mahout {
                     return;
                 }
 
+                for (Agent node : config.getNodes()) {
+                    if (agentManager.getAgentByHostname(node.getHostname()) == null) {
+                        po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
+                        return;
+                    }
+                }
+
                 po.addLog("Uninstalling Mahout...");
 
                 Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getNodes()));
@@ -205,6 +217,11 @@ public class MahoutImpl implements Mahout {
                 Agent agent = agentManager.getAgentByHostname(lxcHostname);
                 if (agent == null) {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
+                    return;
+                }
+
+                if (!config.getNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
                     return;
                 }
 
@@ -266,6 +283,11 @@ public class MahoutImpl implements Mahout {
                 Agent agent = agentManager.getAgentByHostname(lxcHostname);
                 if (agent == null) {
                     po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", lxcHostname));
+                    return;
+                }
+
+                if (config.getNodes().contains(agent)) {
+                    po.addLogFailed(String.format("Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName));
                     return;
                 }
 
