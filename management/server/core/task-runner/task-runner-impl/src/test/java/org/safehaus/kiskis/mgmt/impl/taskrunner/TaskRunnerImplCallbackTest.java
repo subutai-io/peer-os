@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -210,6 +211,68 @@ public class TaskRunnerImplCallbackTest {
     }
 
     @Test
+//    @Ignore
+    public void testInterruptableCallbackWithChainedTasks() throws InterruptedException {
+
+        final Task task1 = getDummyTask(1);
+        final Task task2 = getDummyTask(1);
+
+        final AtomicInteger count = new AtomicInteger(0);
+
+        //execute in a thread since this call blocks until task is completed or times out
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                taskrunner.executeTaskNWait(task1, new InterruptableTaskCallback() {
+
+                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                        if (task.equals(task2)) {
+                            interrupt();
+                        }
+                        //should be called only once
+                        if (task.isCompleted()) {
+                            count.incrementAndGet();
+                            if (task.equals(task1)) {
+                                return task2;
+                            }
+                        }
+                        return null;
+                    }
+                });
+            }
+        });
+
+        t.start();
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task1));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        //complete the task - this should not affect the result
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task1));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task2));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        //complete the task - this should not affect the result
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task2));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
     public void testRemoveCallback() throws InterruptedException {
 
         final Task task1 = getDummyTask(1);
@@ -246,6 +309,59 @@ public class TaskRunnerImplCallbackTest {
     }
 
     @Test
+    public void testRemoveCallbackWithChainedTasks() throws InterruptedException {
+
+        final Task task1 = getDummyTask(1);
+        final Task task2 = getDummyTask(1);
+
+        final AtomicInteger count = new AtomicInteger(0);
+
+        taskrunner.executeTask(task1, new TaskCallback() {
+
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                if (task.equals(task2)) {
+                    taskrunner.removeTaskCallback(task.getUuid());
+                }
+                //should only be called once
+                if (task.isCompleted()) {
+                    count.incrementAndGet();
+                    if (task.equals(task1)) {
+                        return task2;
+                    }
+                }
+                return null;
+            }
+        });
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task1));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        //complete the task - this should not affect the result
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task1));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task2));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        //complete the task - this should not affect the result
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task2));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
     public void testChainedTasksAsync() throws InterruptedException {
 
         final Task task1 = getDummyTask(1);
@@ -259,7 +375,7 @@ public class TaskRunnerImplCallbackTest {
                 if (task.equals(task1)) {
                     return task2;
                 }
-                //should be called only once
+                //should be called only once by task2
                 if (task.isCompleted()) {
                     count.incrementAndGet();
                 }

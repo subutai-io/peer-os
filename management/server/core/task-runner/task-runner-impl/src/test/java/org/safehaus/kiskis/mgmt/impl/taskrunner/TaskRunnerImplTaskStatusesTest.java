@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,6 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
@@ -372,5 +375,119 @@ public class TaskRunnerImplTaskStatusesTest {
         Thread.sleep(20);
 
         assertEquals(TaskStatus.SUCCESS, task.getTaskStatus());
+    }
+
+    @Test
+    public void testTaskResults() throws InterruptedException {
+
+        Task task = getDummyTask(1);
+
+        taskrunner.executeTask(task, dummyCallback);
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        Response response = getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task);
+        response.setStdOut("stdout");
+        response.setStdErr("stderr");
+
+        //supply outs
+        ((ResponseListener) taskrunner).onResponse(response);
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        //complete the task
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        Result result = task.getResults().get(response.getUuid());
+
+        assertEquals("stdout", result.getStdOut());
+        assertEquals("stderr", result.getStdErr());
+        assertEquals(new Integer(1), result.getExitCode());
+    }
+
+    @Test
+    public void testCumulatedTaskResults() throws InterruptedException {
+
+        Task task = getDummyTask(1);
+
+        taskrunner.executeTask(task, dummyCallback);
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        Response response = getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task);
+        response.setStdOut("stdout1");
+        response.setStdErr("stderr1");
+
+        //supply outs
+        ((ResponseListener) taskrunner).onResponse(response);
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        response = getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task);
+        response.setStdOut("stdout2");
+        response.setStdErr("stderr2");
+
+        //supply outs
+        ((ResponseListener) taskrunner).onResponse(response);
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        //complete the task
+        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        Result result = task.getResults().get(response.getUuid());
+
+        assertEquals("stdout1stdout2", result.getStdOut());
+        assertEquals("stderr1stderr2", result.getStdErr());
+    }
+
+    @Test
+    public void testCallbackParams() throws InterruptedException {
+
+        Task task = getDummyTask(1);
+        final StringBuilder out = new StringBuilder();
+        final StringBuilder err = new StringBuilder();
+        final List<Task> tasks = new ArrayList<Task>();
+        final List<Response> responses = new ArrayList<Response>();
+
+        taskrunner.executeTask(task, new TaskCallback() {
+
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                out.append(stdOut);
+                err.append(stdErr);
+                tasks.add(task);
+                responses.add(response);
+                return null;
+            }
+        });
+
+        //wait until background thread is initialized
+        Thread.sleep(10);
+
+        Response response = getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task);
+        response.setStdOut("stdout1");
+        response.setStdErr("stderr1");
+
+        //supply outs
+        ((ResponseListener) taskrunner).onResponse(response);
+
+        //wait till background thread processes response
+        Thread.sleep(10);
+
+        assertEquals("stdout1", out.toString());
+        assertEquals("stderr1", err.toString());
+        assertEquals(task, tasks.get(0));
+        assertEquals(response, responses.get(0));
     }
 }

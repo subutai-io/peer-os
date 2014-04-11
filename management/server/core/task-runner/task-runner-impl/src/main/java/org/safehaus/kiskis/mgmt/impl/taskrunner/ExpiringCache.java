@@ -35,38 +35,42 @@ class ExpiringCache<KeyType, ValueType> {
      * @param evictor - executor service used to evict expired entries
      */
     public ExpiringCache(final ExecutorService evictor) {
-        evictor.execute(new Runnable() {
+        if (evictor != null) {
+            evictor.execute(new Runnable() {
 
-            public void run() {
-                while (!Thread.interrupted()) {
-                    try {
-                        for (Iterator<Map.Entry<KeyType, CacheEntry<ValueType>>> it
-                                = entries.entrySet().iterator(); it.hasNext();) {
-                            final Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
-                            if (entry.getValue().isExpired()) {
-                                it.remove();
-                                if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
-                                    evictor.execute(new Runnable() {
+                public void run() {
+                    while (!Thread.interrupted()) {
+                        try {
+                            for (Iterator<Map.Entry<KeyType, CacheEntry<ValueType>>> it
+                                    = entries.entrySet().iterator(); it.hasNext();) {
+                                final Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
+                                if (entry.getValue().isExpired()) {
+                                    it.remove();
+                                    if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
+                                        evictor.execute(new Runnable() {
 
-                                        public void run() {
-                                            try {
-                                                ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
-                                            } catch (Exception e) {
+                                            public void run() {
+                                                try {
+                                                    ((CacheEntryWithExpiryCallback) entry.getValue()).callExpiryCallback();
+                                                } catch (Exception e) {
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
                             }
-                        }
 
-                        Thread.sleep(evictionRunIntervalMs);
-                    } catch (InterruptedException ex) {
-                        break;
+                            Thread.sleep(evictionRunIntervalMs);
+                        } catch (InterruptedException ex) {
+                            break;
+                        }
                     }
                 }
-            }
 
-        });
+            });
+        } else {
+            throw new RuntimeException("Evictor is null");
+        }
 
     }
 
@@ -100,29 +104,51 @@ class ExpiringCache<KeyType, ValueType> {
      */
     public boolean put(KeyType key, ValueType value, long ttlMs) {
         try {
-            entries.put(key, new CacheEntry<ValueType>(value, ttlMs));
-            return true;
+            if (key != null && value != null && ttlMs > 0) {
+                entries.put(key, new CacheEntry<ValueType>(value, ttlMs));
+                return true;
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in put", ex);
         }
         return false;
     }
 
+    /**
+     * adds entry to the cache.
+     *
+     * @param key - key for the entry
+     * @param value - entry value
+     * @param ttlMs - time-to-live in milliseconds
+     * @param callback - expiry callback which is called when entry is being
+     * evicted
+     * @return - return true if added successfully and false in case of error
+     */
     public boolean put(KeyType key, ValueType value, long ttlMs, EntryExpiryCallback<ValueType> callback) {
         try {
-            entries.put(key, new CacheEntryWithExpiryCallback<ValueType>(value, ttlMs, callback));
-            return true;
+            if (key != null && value != null && ttlMs > 0) {
+                entries.put(key, new CacheEntryWithExpiryCallback<ValueType>(value, ttlMs, callback));
+                return true;
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in put", ex);
         }
         return false;
     }
 
+    /**
+     * Removes and return value from the cache by key or null if missing.
+     *
+     * @param key
+     * @return entry value
+     */
     public ValueType remove(KeyType key) {
         try {
-            CacheEntry<ValueType> entry = entries.remove(key);
-            if (entry != null) {
-                return entry.getValue();
+            if (key != null) {
+                CacheEntry<ValueType> entry = entries.remove(key);
+                if (entry != null) {
+                    return entry.getValue();
+                }
             }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in remove", ex);
@@ -130,14 +156,27 @@ class ExpiringCache<KeyType, ValueType> {
         return null;
     }
 
+    /**
+     * Returns map of entries.
+     *
+     * @return map of entries
+     */
     public Map<KeyType, CacheEntry<ValueType>> getEntries() {
         return Collections.unmodifiableMap(entries);
     }
 
+    /**
+     * clears all cache entries
+     */
     public void clear() {
         entries.clear();
     }
 
+    /**
+     * Returns number of cache entries.
+     *
+     * @return number of cache entries
+     */
     public int size() {
         return entries.size();
     }

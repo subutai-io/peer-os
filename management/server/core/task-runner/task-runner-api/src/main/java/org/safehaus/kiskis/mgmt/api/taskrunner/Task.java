@@ -59,7 +59,7 @@ public class Task implements Serializable {
     }
 
     /**
-     * Initalizes a newly created {@code Task} with supplied description.
+     * Initializes a newly created {@code Task} with supplied description.
      *
      * @param description - task description
      */
@@ -99,7 +99,7 @@ public class Task implements Serializable {
     /**
      * Lets attach custom object to this task
      *
-     * @param data
+     * @param data - custom object
      */
     public void setData(Object data) {
         this.data = data;
@@ -202,7 +202,7 @@ public class Task implements Serializable {
      * Return next request from the list of requests added to this task or null
      * if no requests are left. Request is returned in LIFO order
      *
-     * @return
+     * @return next request
      */
     public Request getNextRequest() {
         if (hasNextRequest()) {
@@ -218,7 +218,7 @@ public class Task implements Serializable {
      * This method is usable when it is needed to modify contents of next
      * request based on the outcome of the previous request(s)
      *
-     * @return
+     * @return next request
      */
     public Request peekNextRequest() {
         if (hasNextRequest()) {
@@ -230,7 +230,7 @@ public class Task implements Serializable {
     /**
      * Returns previous request.
      *
-     * @return
+     * @return previous request
      */
     public Request peekPreviousRequest() {
         if (currentCmdId > 0) {
@@ -242,7 +242,7 @@ public class Task implements Serializable {
     /**
      * Returns current request.
      *
-     * @return
+     * @return current request
      */
     public Request peekCurrentRequest() {
         if (currentCmdId >= 0) {
@@ -296,7 +296,7 @@ public class Task implements Serializable {
      * EXECURE_RESPONSE_DONE responses have been received. Completed task will
      * have SUCCESS or FAIL status
      *
-     * @return
+     * @return true if task is completed, false otherwise
      */
     public boolean isCompleted() {
         return completed;

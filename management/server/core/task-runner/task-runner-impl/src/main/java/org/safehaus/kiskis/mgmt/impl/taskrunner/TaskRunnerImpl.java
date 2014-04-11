@@ -17,11 +17,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 
 /**
  * Implementation of {@code TaskRunner} interface.
  *
- * TODO add synchronous execute task with callback. Wait on callback.
  *
  * @author dilshat
  */
@@ -50,8 +50,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
     }
 
     /**
-     * Initializes TaskRunnerImpl. Registers as a listener with communication
-     * manager service
+     * Initializes TaskRunnerImpl.
      */
     public void init() {
         try {
@@ -71,7 +70,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
     }
 
     /**
-     * Disposes TaskRunnerImpl. Unregisters from communication manager service
+     * Disposes TaskRunnerImpl.
      */
     public void destroy() {
         try {
@@ -161,8 +160,8 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
     /**
      * Executes {@code Task} asynchronously to the calling party. The supplied
      * {@code TaskCallBack} is triggered every time a response is received for
-     * this task. If null for callback is supplied, then calling this method is
-     * the same as calling executeTaskNForget. This methods adds response for
+     * this task. If null for callback is supplied, then no further processing
+     * or responses for this task is done. This methods adds response for
      * processing to the queue of corresponding executor. This guarantees order
      * of processing of responses for each particular task without much overhead
      * of synchronizing various threads in thread pools. If task never
@@ -184,12 +183,11 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
         ExecutorService taskExecutor = taskExecutors.get(task.getUuid());
         if (taskExecutor == null) {
             taskExecutor = Executors.newSingleThreadExecutor();
-            taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 1000, new EntryExpiryCallback<ExecutorService>() {
+            taskExecutors.put(task.getUuid(), taskExecutor, task.getAvgTimeout() * 1000 + 500, new EntryExpiryCallback<ExecutorService>() {
 
                 @Override
                 public void onEntryExpiry(ExecutorService entry) {
                     try {
-                        taskExecutors.remove(task.getUuid());
                         entry.shutdown();
 
                     } catch (Exception e) {
@@ -270,6 +268,36 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             }
 
             removeTaskCallback(task.getUuid());
+        } else {
+            throw new RuntimeException("Callback is null");
+        }
+    }
+
+    /**
+     * Executes {@code Task} synchronously to the calling party. The method
+     * returns when either task is completed or timed out. This method waits 1
+     * hour maximum and them times out. Calling party should examine the
+     * returned/supplied task to see its status after this method returns.
+     *
+     * @param task - task to execute
+     * @param callback - task callback
+     */
+    @Override
+    public void executeTaskNWait(Task task, final InterruptableTaskCallback interruptableCallback) {
+        if (interruptableCallback != null) {
+            executeTask(task, interruptableCallback.getCallback());
+
+            synchronized (interruptableCallback.getCallback()) {
+                try {
+                    interruptableCallback.getCallback().wait(3600 * 1000); //wait 1 hr maximum
+                } catch (InterruptedException ex) {
+                }
+            }
+            if (interruptableCallback.getLastTask() != null) {
+                removeTaskCallback(interruptableCallback.getLastTask().getUuid());
+            } else {
+                removeTaskCallback(task.getUuid());
+            }
         } else {
             throw new RuntimeException("Callback is null");
         }

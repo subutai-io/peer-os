@@ -43,7 +43,7 @@ class TaskListener {
     private final Map<UUID, StringBuilder> stdErr;
 
     /**
-     * Initalizes the {@code TaskListener}
+     * Initializes the {@code TaskListener}
      *
      * @param task - task
      * @param taskCallback - task callback
