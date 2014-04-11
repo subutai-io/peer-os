@@ -26,3 +26,12 @@ then
 else
         echo "export PATH=$PATH:$accumuloPathEcho" >> "${FilePath}"
 fi
+
+cp -a $accumuloHomeEcho/conf/examples/512MB/native-standalone/* $accumuloHomeEcho/conf/
+
+$accumuloHomeEcho/bin/accumulo-property.sh add JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk-amd64
+$accumuloHomeEcho/bin/accumulo-property.sh add HADOOP_HOME /opt/hadoop-1.2.1
+$accumuloHomeEcho/bin/accumulo-property.sh add ZOOKEEPER_HOME /opt/zookeeper-3.4.5
+$accumuloHomeEcho/bin/accumulo-property.sh add ACCUMULO_HOME /opt/accumulo-1.4.2
+
+. $FilePath
