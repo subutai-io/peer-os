@@ -103,7 +103,7 @@ public class TaskRunnerImplCallbackTest {
 
         final AtomicInteger count = new AtomicInteger(0);
 
-        //execute in a thread since this call blocks until task is completed or timed out
+        //execute in a thread since this call blocks until task is completed or times out
         Thread t = new Thread(new Runnable() {
 
             public void run() {
@@ -172,7 +172,7 @@ public class TaskRunnerImplCallbackTest {
 
         final AtomicInteger count = new AtomicInteger(0);
 
-        //execute in a thread since this call blocks until task is completed or timed out
+        //execute in a thread since this call blocks until task is completed or times out
         Thread t = new Thread(new Runnable() {
 
             public void run() {
@@ -292,8 +292,8 @@ public class TaskRunnerImplCallbackTest {
         final Task task2 = getDummyTask(1);
 
         final AtomicInteger count = new AtomicInteger(0);
-        
-        //execute in a thread since this call blocks until task is completed or timed out
+
+        //execute in a thread since this call blocks until task is completed or times out
         Thread t = new Thread(new Runnable() {
 
             public void run() {
@@ -337,7 +337,7 @@ public class TaskRunnerImplCallbackTest {
 
         final Task task1 = getDummyTask(1);
 
-        //execute in a thread since this call blocks until task is completed or timed out
+        //execute in a thread since this call blocks until task is completed or times out
         Thread t = new Thread(new Runnable() {
 
             public void run() {
