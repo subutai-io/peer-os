@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -27,7 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 
 @SuppressWarnings("serial")
 public class MgmtApplication extends Application implements ModuleServiceListener, HttpServletRequestListener {
-
+    
     private static final Logger LOG = Logger.getLogger(MgmtApplication.class.getName());
     private static final ThreadLocal<MgmtApplication> threadLocal = new ThreadLocal<MgmtApplication>();
     private final ModuleNotifier moduleNotifier;
@@ -48,23 +49,24 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private final String title;
     private TabSheet tabs;
     private static String APP_URL;
-
+    
     public static String getAPP_URL() {
         return APP_URL;
     }
-
+    
     @Override
     public void init() {
         APP_URL = getURL().getHost();
         setInstance(this);
         try {
             setTheme(Runo.themeName());
-
+            
             window = new Window(title);
             setMainWindow(window);
-
+            
             GridLayout layout = new GridLayout();
             layout.setSizeFull();
+            layout.setHeight(100, Sizeable.UNITS_PIXELS);
 //            HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
 //            horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
 
@@ -102,14 +104,14 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             //            
 
             tabs.addListener(new TabSheet.SelectedTabChangeListener() {
-
+                
                 public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
                     TabSheet tabsheet = event.getTabSheet();
                     Tab selectedTab = tabsheet.getTab(event.getTabSheet().getSelectedTab());
                     notifyTabListeners(selectedTab);
                 }
             });
-
+            
             if (tabs.getSelectedTab() != null) {
                 notifyTabListeners(tabs.getTab(tabs.getSelectedTab()));
             }
@@ -117,7 +119,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         } finally {
         }
     }
-
+    
     private void notifyTabListeners(Tab selectedTab) {
         Iterator<Component> it = tabs.getComponentIterator();
         while (it.hasNext()) {
@@ -130,7 +132,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             }
         }
     }
-
+    
     @Override
     public void close() {
         try {
@@ -152,7 +154,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error closing", e);
         }
     }
-
+    
     @Override
     public void moduleRegistered(Module module) {
         try {
@@ -163,7 +165,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error registering module{0}", e);
         }
     }
-
+    
     @Override
     public void moduleUnregistered(Module module) {
         try {
@@ -182,49 +184,49 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                     return;
                 }
             }
-
+            
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error unregistering module{0}", e);
         }
     }
-
+    
     private static MgmtApplication getInstance() {
         return threadLocal.get();
     }
-
+    
     private static void setInstance(MgmtApplication application) {
         threadLocal.set(application);
     }
-
+    
     @Override
     public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
         MgmtApplication.setInstance(this);
     }
-
+    
     @Override
     public void onRequestEnd(HttpServletRequest request, HttpServletResponse response) {
         threadLocal.remove();
     }
-
+    
     public static Set<Agent> getSelectedAgents() {
         if (getInstance() != null) {
             return Collections.unmodifiableSet(getInstance().selectedAgents);
         }
         return new HashSet<Agent>();
     }
-
+    
     static void setSelectedAgents(Set<Agent> agents) {
         if (getInstance() != null && agents != null) {
             getInstance().selectedAgents = agents;
         }
     }
-
+    
     static void clearSelectedAgents() {
         if (getInstance() != null) {
             getInstance().selectedAgents.clear();
         }
     }
-
+    
     public static void showConfirmationDialog(final String caption, final String question,
             final String okLabel, final String cancelLabel, final ConfirmationDialogCallback callback) {
         try {
@@ -236,14 +238,14 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 getInstance().getMainWindow().addWindow(cd);
                 cd.bringToFront();
             }
-
+            
         } catch (IllegalArgumentException e) {
             LOG.log(Level.SEVERE, "Error in showConfirmationDialog", e);
         } catch (NullPointerException e) {
             LOG.log(Level.SEVERE, "Error in showConfirmationDialog", e);
         }
     }
-
+    
     public static void addCustomWindow(Window window) {
         try {
             if (getInstance() != null && window != null) {
@@ -256,7 +258,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             LOG.log(Level.SEVERE, "Error in addCustomWindow", e);
         }
     }
-
+    
     public static void removeCustomWindow(Window window) {
         try {
             if (getInstance() != null && window != null) {
@@ -266,34 +268,34 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             LOG.log(Level.SEVERE, "Error in removeCustomWindow", e);
         }
     }
-
+    
     public static MgmtAgentManager createAgentTree() {
         if (getInstance() != null) {
             return new MgmtAgentManager(getInstance().agentManager, false);
         }
         return null;
     }
-
+    
     public static Window createTerminalWindow(final Set<Agent> agents) {
         if (getInstance() != null) {
             return new TerminalWindow(agents, getInstance().taskRunner, getInstance().agentManager);
         }
         return null;
     }
-
+    
     public static Window createProgressWindow(String source, UUID trackID) {
         if (getInstance() != null) {
             return new ProgressWindow(getInstance().tracker, trackID, source);
         }
         return null;
     }
-
+    
     public static void showProgressWindow(String source, UUID trackID, final Window.CloseListener closeCallback) {
         Window progressWindow = MgmtApplication.createProgressWindow(source, trackID);
         MgmtApplication.addCustomWindow(progressWindow);
         if (closeCallback != null) {
             progressWindow.addListener(new Window.CloseListener() {
-
+                
                 @Override
                 public void windowClose(Window.CloseEvent e) {
                     closeCallback.windowClose(e);
@@ -301,5 +303,5 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             });
         }
     }
-
+    
 }
