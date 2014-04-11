@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -37,7 +36,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private final Tracker tracker;
     private Window window;
     private Set<Agent> selectedAgents = new HashSet<Agent>();
-    private MgmtAgentManager agentList;
+//    private MgmtAgentManager agentList;
 
     public MgmtApplication(String title, AgentManager agentManager, TaskRunner taskRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
         this.agentManager = agentManager;
@@ -66,17 +65,14 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
             VerticalLayout layout = new VerticalLayout();
             layout.setSizeFull();
-            HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
-            horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
-            layout.addComponent(horizontalSplit);
+//            HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+//            horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
 
-            layout.setExpandRatio(horizontalSplit, 1);
-            horizontalSplit.setSplitPosition(200, Sizeable.UNITS_PIXELS);
-
-            agentList = new MgmtAgentManager(agentManager, true);
+//            layout.setExpandRatio(horizontalSplit, 1);
+//            horizontalSplit.setSplitPosition(200, Sizeable.UNITS_PIXELS);
+//            agentList = new MgmtAgentManager(agentManager, true);
             //add listener
-            horizontalSplit.setFirstComponent(agentList);
-
+//            horizontalSplit.setFirstComponent(agentList);
             tabs = new TabSheet();
             tabs.setSizeFull();
             tabs.setImmediate(true);
@@ -84,7 +80,8 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 Component component = module.createComponent();
                 tabs.addTab(component, module.getName(), null);
             }
-            horizontalSplit.setSecondComponent(tabs);
+            layout.addComponent(tabs);
+//            horizontalSplit.setSecondComponent(tabs);
 
             getMainWindow().setContent(layout);
             //add listener
@@ -148,7 +145,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                     }
                 }
             }
-            agentList.dispose();
+//            agentList.dispose();
             moduleNotifier.removeListener(this);
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Application closing, removing module service listener");
         } catch (Exception e) {
