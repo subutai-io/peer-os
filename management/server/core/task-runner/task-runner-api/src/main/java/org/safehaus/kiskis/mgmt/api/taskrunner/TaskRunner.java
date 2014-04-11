@@ -34,9 +34,9 @@ public interface TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. Calling party should
-     * examine the returned/supplied task to see its status after this method
-     * returns
+     * returns when either task is completed or timed out. This method waits 1
+     * hour maximum and them times out. Calling party should examine the
+     * returned/supplied task to see its status after this method returns
      *
      * @param task - task to execute
      * @return task which is supplied when calling this method;
@@ -49,6 +49,17 @@ public interface TaskRunner {
      * @param task
      */
     public void executeTaskNForget(Task task);
+
+    /**
+     * Executes {@code Task} synchronously to the calling party. The method
+     * returns when either task is completed or timed out. This method waits 1
+     * hour maximum and them times out. Calling party should examine the
+     * returned/supplied task to see its status after this method returns.
+     *
+     * @param task - task to execute
+     * @param callback - task callback
+     */
+    public void executeTaskNWait(Task task, TaskCallback callback);
 
     /**
      * Removes callback for a task if any with the supplied UUID

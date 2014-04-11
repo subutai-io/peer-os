@@ -40,7 +40,7 @@ class TaskMediator {
     private final CommunicationManager communicationService;
 
     /**
-     * Initalizes {@code TaskMediator}
+     * Initializes {@code TaskMediator}
      *
      * @param communicationService
      */
@@ -85,6 +85,13 @@ class TaskMediator {
                     }
 
                     Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(response), tl.getStdErr(response));
+
+                    if (nextTask == null && tl.getTask().isCompleted()) {
+                        //notify in case someone is waiting on this task callback
+                        synchronized (tl.getTaskCallback()) {
+                            tl.getTaskCallback().notifyAll();
+                        }
+                    }
 
                     return nextTask == null ? tl : new TaskListener(nextTask, tl.getTaskCallback());
                 }

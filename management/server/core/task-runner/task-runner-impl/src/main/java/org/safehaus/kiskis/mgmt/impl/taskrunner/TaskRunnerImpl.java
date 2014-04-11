@@ -141,12 +141,6 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
                             if (tl == null || tl.getTask().isCompleted()) {
                                 taskExecutors.remove(response.getTaskUuid());
                                 taskExecutor.shutdown();
-                                if (tl != null) {
-                                    //notify in case someone is waiting on this task callback
-                                    synchronized (tl.getTaskCallback()) {
-                                        tl.getTaskCallback().notifyAll();
-                                    }
-                                }
 
                             } else if (tl.getTask().getUuid().compareTo(response.getTaskUuid()) != 0) {
                                 taskExecutors.remove(response.getTaskUuid());
@@ -228,28 +222,28 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. Calling party should
-     * examine the returned/supplied task to see its status after this method
-     * returns.
+     * returns when either task is completed or timed out. This method waits 1
+     * hour maximum and them times out. Calling party should examine the
+     * returned/supplied task to see its status after this method returns.
      *
      * @param task - task to execute
      * @return task which is supplied when calling this method;
      */
+    @Override
     public Task executeTask(Task task) {
-        executeTask(task, new TaskCallback() {
+        TaskCallback callback = new TaskCallback() {
 
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
-                    }
-                }
+                //dummy callback
                 return null;
             }
-        });
-        synchronized (task) {
+        };
+
+        executeTask(task, callback);
+
+        synchronized (callback) {
             try {
-                task.wait(task.getAvgTimeout() * 1000 + 3000);
+                callback.wait(3600 * 1000); //wait 1 hr maximum
             } catch (InterruptedException ex) {
             }
         }
@@ -258,10 +252,33 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
     }
 
     /**
+     * Executes {@code Task} synchronously to the calling party. The method
+     * returns when either task is completed or timed out. This method waits 1
+     * hour maximum and them times out. Calling party should examine the
+     * returned/supplied task to see its status after this method returns.
+     *
+     * @param task - task to execute
+     * @param callback - task callback
+     */
+    @Override
+    public void executeTaskNWait(Task task, TaskCallback callback) {
+        executeTask(task, callback);
+
+        synchronized (callback) {
+            try {
+                callback.wait(3600 * 1000); //wait 1 hr maximum
+            } catch (InterruptedException ex) {
+            }
+        }
+
+    }
+
+    /**
      * Executes supplied task asynchronously to the calling party.
      *
      * @param task
      */
+    @Override
     public void executeTaskNForget(Task task) {
         executeTask(task, null);
     }
