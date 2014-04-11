@@ -212,9 +212,6 @@ public class SolrImpl implements Solr {
                                     task.setData(NodeState.STOPPED);
                                 }
 
-//                                synchronized (task) {
-//                                    task.notifyAll();
-//                                }
                             }
 
                         }
@@ -223,12 +220,6 @@ public class SolrImpl implements Solr {
                     }
                 });
 
-//                synchronized (checkNodeTask) {
-//                    try {
-//                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 3000);
-//                    } catch (InterruptedException ex) {
-//                    }
-//                }
                 if (NodeState.RUNNING.equals(checkNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s started", lxcHostName));
                 } else {
@@ -288,9 +279,6 @@ public class SolrImpl implements Solr {
                                     task.setData(NodeState.STOPPED);
                                 }
 
-//                                synchronized (task) {
-//                                    task.notifyAll();
-//                                }
                             }
 
                         }
@@ -299,12 +287,6 @@ public class SolrImpl implements Solr {
                     }
                 });
 
-//                synchronized (checkNodeTask) {
-//                    try {
-//                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 3000);
-//                    } catch (InterruptedException ex) {
-//                    }
-//                }
                 if (NodeState.STOPPED.equals(checkNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s stopped", lxcHostName));
                 } else {

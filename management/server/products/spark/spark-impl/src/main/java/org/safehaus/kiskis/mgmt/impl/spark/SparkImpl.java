@@ -17,6 +17,7 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.api.spark.Spark;
+import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
@@ -162,32 +163,34 @@ public class SparkImpl implements Spark {
 
                                 Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
                                 final AtomicInteger okCount = new AtomicInteger(0);
-                                taskRunner.executeTask(startSparkTask, new TaskCallback() {
+                                taskRunner.executeTaskNWait(startSparkTask, new InterruptableTaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                         okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
 
                                         if (okCount.get() >= config.getAllNodes().size()) {
                                             taskRunner.removeTaskCallback(task.getUuid());
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
-                                        } else if (task.isCompleted()) {
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
+                                            interrupt();
+//                                            synchronized (task) {
+//                                                task.notifyAll();
+//                                            }
                                         }
+//                                        else if (task.isCompleted()) {
+//                                            synchronized (task) {
+//                                                task.notifyAll();
+//                                            }
+//                                        }
 
                                         return null;
                                     }
                                 });
 
-                                synchronized (startSparkTask) {
-                                    try {
-                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
-                                    } catch (InterruptedException ex) {
-                                    }
-                                }
+//                                synchronized (startSparkTask) {
+//                                    try {
+//                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
+//                                    } catch (InterruptedException ex) {
+//                                    }
+//                                }
                                 if (okCount.get() >= config.getAllNodes().size()) {
                                     po.addLogDone("Spark started successfully\nDone");
                                 } else {
