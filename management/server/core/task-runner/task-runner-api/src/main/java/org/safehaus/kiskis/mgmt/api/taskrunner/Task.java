@@ -293,7 +293,8 @@ public class Task implements Serializable {
     /**
      * Returns boolean indicating if this task completed. This method will
      * return true if for all sent requests in this task corresponding
-     * EXECURE_RESPONSE_DONE responses have been received
+     * EXECURE_RESPONSE_DONE responses have been received. Completed task will
+     * have SUCCESS or FAIL status
      *
      * @return
      */

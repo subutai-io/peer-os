@@ -130,7 +130,9 @@ class TaskMediator {
     }
 
     /**
-     * Submits {@code Task} for execution
+     * Submits {@code Task} for execution. If task is not completed after its
+     * timeout {@code task.getAverageTimeout()} interval, its status is set as
+     * TIMEDOUT.
      *
      * @param task - task to execute
      * @param taskCallback - callback or null
@@ -148,6 +150,10 @@ class TaskMediator {
                                         Task task = entry.getTask();
                                         if (task.getTaskStatus() == TaskStatus.RUNNING) {
                                             task.setTaskStatus(TaskStatus.TIMEDOUT);
+                                        }
+                                        //notify in case someone is waiting on this task callback
+                                        synchronized (entry.getTaskCallback()) {
+                                            entry.getTaskCallback().notifyAll();
                                         }
                                     }
                                 });

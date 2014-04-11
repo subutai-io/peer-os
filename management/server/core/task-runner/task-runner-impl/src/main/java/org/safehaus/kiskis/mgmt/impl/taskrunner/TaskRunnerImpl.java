@@ -19,7 +19,9 @@ import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 
 /**
- * Implementation of {@code TaskRunner} interface
+ * Implementation of {@code TaskRunner} interface.
+ *
+ * TODO add synchronous execute task with callback. Wait on callback.
  *
  * @author dilshat
  */
@@ -139,6 +141,13 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
                             if (tl == null || tl.getTask().isCompleted()) {
                                 taskExecutors.remove(response.getTaskUuid());
                                 taskExecutor.shutdown();
+                                if (tl != null) {
+                                    //notify in case someone is waiting on this task callback
+                                    synchronized (tl.getTaskCallback()) {
+                                        tl.getTaskCallback().notifyAll();
+                                    }
+                                }
+
                             } else if (tl.getTask().getUuid().compareTo(response.getTaskUuid()) != 0) {
                                 taskExecutors.remove(response.getTaskUuid());
                                 taskExecutor.shutdown();
@@ -165,8 +174,6 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * of synchronizing various threads in thread pools. If task never
      * completes, it gets expired and its executor is disposed at the moment
      * when expiry callback for this executor is called by {@code ExpiringCache}
-     * If task has not completed during its timeout
-     * {@code task.getAverageTimeout()} interval, its status is set as TIMEDOUT.
      *
      * @param task
      * @param taskCallback
