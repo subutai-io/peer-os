@@ -6,10 +6,17 @@
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 /**
+ * This interface should be implemented for supplying expiry callbacks for
+ * entries to {@code ExpiringCache}
  *
  * @author dilshat
  */
-public interface EntryExpiryCallback<ValueType> {
+interface EntryExpiryCallback<ValueType> {
 
+    /**
+     * This method of callback is called when entry expires
+     *
+     * @param entry
+     */
     public void onEntryExpiry(ValueType entry);
 }

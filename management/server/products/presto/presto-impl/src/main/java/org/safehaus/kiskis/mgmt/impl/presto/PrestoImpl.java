@@ -18,9 +18,9 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.api.presto.Presto;
+import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -161,7 +161,7 @@ public class PrestoImpl implements Presto {
 
                                 Task startPrestoTask = Tasks.getStartTask(config.getAllNodes());
                                 final AtomicInteger okCount = new AtomicInteger(0);
-                                taskRunner.executeTask(startPrestoTask, new TaskCallback() {
+                                taskRunner.executeTaskNWait(startPrestoTask, new InterruptableTaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
@@ -170,26 +170,13 @@ public class PrestoImpl implements Presto {
                                         }
 
                                         if (okCount.get() == config.getAllNodes().size()) {
-                                            taskRunner.removeTaskCallback(task.getUuid());
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
-                                        } else if (task.isCompleted()) {
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
+                                            interrupt();
                                         }
 
                                         return null;
                                     }
                                 });
 
-                                synchronized (startPrestoTask) {
-                                    try {
-                                        startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
-                                    } catch (InterruptedException ex) {
-                                    }
-                                }
                                 if (okCount.get() == config.getAllNodes().size()) {
                                     po.addLogDone("Presto started successfully\nDone");
                                 } else {
@@ -350,7 +337,7 @@ public class PrestoImpl implements Presto {
 
                         Task startPrestoTask = Tasks.getStartTask(Util.wrapAgentToSet(agent));
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTask(startPrestoTask, new TaskCallback() {
+                        taskRunner.executeTaskNWait(startPrestoTask, new InterruptableTaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                 if (stdOut.contains("Started")) {
@@ -358,26 +345,12 @@ public class PrestoImpl implements Presto {
                                 }
 
                                 if (okCount.get() > 0) {
-                                    taskRunner.removeTaskCallback(task.getUuid());
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
-                                } else if (task.isCompleted()) {
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
+                                    interrupt();
                                 }
 
                                 return null;
                             }
                         });
-
-                        synchronized (startPrestoTask) {
-                            try {
-                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
-                            } catch (InterruptedException ex) {
-                            }
-                        }
 
                         if (okCount.get() > 0) {
                             po.addLogDone("Presto started successfully\nDone");
@@ -529,7 +502,7 @@ public class PrestoImpl implements Presto {
 
                         Task startPrestoTask = Tasks.getStartTask(config.getAllNodes());
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTask(startPrestoTask, new TaskCallback() {
+                        taskRunner.executeTaskNWait(startPrestoTask, new InterruptableTaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                 if (stdOut.contains("Started")) {
@@ -537,26 +510,13 @@ public class PrestoImpl implements Presto {
                                 }
 
                                 if (okCount.get() == config.getAllNodes().size()) {
-                                    taskRunner.removeTaskCallback(task.getUuid());
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
-                                } else if (task.isCompleted()) {
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
+                                    interrupt();
                                 }
 
                                 return null;
                             }
                         });
 
-                        synchronized (startPrestoTask) {
-                            try {
-                                startPrestoTask.wait(startPrestoTask.getAvgTimeout() * 1000 + 1000);
-                            } catch (InterruptedException ex) {
-                            }
-                        }
                         if (okCount.get() == config.getAllNodes().size()) {
                             po.addLog("Cluster started successfully");
                         } else {
@@ -613,7 +573,7 @@ public class PrestoImpl implements Presto {
                 Task startTask = Tasks.getStartTask(Util.wrapAgentToSet(node));
 
                 final AtomicInteger okCount = new AtomicInteger(0);
-                taskRunner.executeTask(startTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(startTask, new InterruptableTaskCallback() {
 
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (stdOut.contains("Started")) {
@@ -621,26 +581,13 @@ public class PrestoImpl implements Presto {
                         }
 
                         if (okCount.get() > 0) {
-                            taskRunner.removeTaskCallback(task.getUuid());
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
-                        } else if (task.isCompleted()) {
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
+                            interrupt();
                         }
 
                         return null;
                     }
                 });
 
-                synchronized (startTask) {
-                    try {
-                        startTask.wait(startTask.getAvgTimeout() * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
                 if (okCount.get() > 0) {
                     po.addLogDone(String.format("Node %s started", node.getHostname()));
                 } else {

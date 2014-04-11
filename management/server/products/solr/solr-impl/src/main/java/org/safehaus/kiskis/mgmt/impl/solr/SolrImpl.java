@@ -187,7 +187,7 @@ public class SolrImpl implements Solr {
                 Task startNodeTask = Tasks.getStartTask(node);
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
-                taskRunner.executeTask(startNodeTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(startNodeTask, new TaskCallback() {
 
                     @Override
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -204,9 +204,6 @@ public class SolrImpl implements Solr {
                                     task.setData(NodeState.STOPPED);
                                 }
 
-                                synchronized (task) {
-                                    task.notifyAll();
-                                }
                             }
 
                         }
@@ -214,13 +211,6 @@ public class SolrImpl implements Solr {
                         return null;
                     }
                 });
-
-                synchronized (checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
 
                 if (NodeState.RUNNING.equals(checkNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s started", lxcHostName));
@@ -264,7 +254,7 @@ public class SolrImpl implements Solr {
                 Task stopNodeTask = Tasks.getStopTask(node);
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
-                taskRunner.executeTask(stopNodeTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(stopNodeTask, new TaskCallback() {
 
                     @Override
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -281,9 +271,6 @@ public class SolrImpl implements Solr {
                                     task.setData(NodeState.STOPPED);
                                 }
 
-                                synchronized (task) {
-                                    task.notifyAll();
-                                }
                             }
 
                         }
@@ -291,13 +278,6 @@ public class SolrImpl implements Solr {
                         return null;
                     }
                 });
-
-                synchronized (checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
 
                 if (NodeState.STOPPED.equals(checkNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s stopped", lxcHostName));

@@ -1,14 +1,19 @@
-/* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
-*/
+ /* To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.safehaus.kiskis.mgmt.api.taskrunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * This is just a utility class used to group tasks into one sequence of tasks
+ * related to each other -> operation 
+ *
  * @author dilshat
+ *
  */
 public class Operation {
 
@@ -72,4 +77,5 @@ public class Operation {
     public boolean hasNextTask() {
         return currentTaskId < tasks.size() - 1;
     }
+
 }

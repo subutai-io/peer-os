@@ -5,36 +5,45 @@
  */
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
+import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
-import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
-import org.safehaus.kiskis.mgmt.api.taskrunner.*;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.TaskType;
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddDataNodeOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddRouterOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
+import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
+ *
  * @author dilshat
  */
 public class MongoImpl implements Mongo {
@@ -106,7 +115,7 @@ public class MongoImpl implements Mongo {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", config.getClusterName()));
+                        String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -207,6 +216,9 @@ public class MongoImpl implements Mongo {
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
 
+                boolean taskCompleted = task.isCompleted();
+                boolean taskSucceeded = task.getTaskStatus() == TaskStatus.SUCCESS;
+
                 if (task.getData() != null) {
                     boolean taskOk = false;
                     if (task.getData() == TaskType.START_CONFIG_SERVERS) {
@@ -232,14 +244,14 @@ public class MongoImpl implements Mongo {
                         }
                     }
                     if (taskOk) {
-                        task.setCompleted(true);
-                        task.setTaskStatus(TaskStatus.SUCCESS);
+                        taskCompleted = true;
+                        taskSucceeded = true;
                         taskRunner.removeTaskCallback(task.getUuid());
                     }
                 }
 
-                if (task.isCompleted()) {
-                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (taskCompleted) {
+                    if (taskSucceeded) {
                         po.addLog(String.format("Task %s succeeded", task.getDescription()));
                         if (installOperation.hasNextTask()) {
                             po.addLog(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
@@ -265,7 +277,7 @@ public class MongoImpl implements Mongo {
     public UUID addNode(final String clusterName, final NodeType nodeType) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Adding %s to %s", nodeType, clusterName));
+                        String.format("Adding %s to %s", nodeType, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -327,6 +339,10 @@ public class MongoImpl implements Mongo {
 
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+
+                boolean taskCompleted = task.isCompleted();
+                boolean taskSucceeded = task.getTaskStatus() == TaskStatus.SUCCESS;
+
                 if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
 
                     if (task.isCompleted()) {
@@ -345,7 +361,7 @@ public class MongoImpl implements Mongo {
                             Request registerSecondaryWithPrimaryCmd = operation.peekNextTask().getRequests().iterator().next();
                             registerSecondaryWithPrimaryCmd.setUuid(primaryNodeAgent.getUuid());
                         } else {
-                            task.setTaskStatus(TaskStatus.FAIL);
+                            taskSucceeded = false;
                         }
                     }
                 } else if (task.getData() == TaskType.START_REPLICA_SET
@@ -358,19 +374,19 @@ public class MongoImpl implements Mongo {
 
                     if ((task.getData() == TaskType.RESTART_ROUTERS
                             && Util.countNumberOfOccurences(routersOutput.toString(),
-                            "child process started successfully, parent exiting")
+                                    "child process started successfully, parent exiting")
                             == config.getRouterServers().size())
                             || (task.getData() != TaskType.RESTART_ROUTERS
                             && stdOut.indexOf(
-                            "child process started successfully, parent exiting") > -1)) {
-                        task.setTaskStatus(TaskStatus.SUCCESS);
-                        task.setCompleted(true);
+                                    "child process started successfully, parent exiting") > -1)) {
+                        taskCompleted = true;
+                        taskSucceeded = true;
                         taskRunner.removeTaskCallback(task.getUuid());
                     }
                 }
 
-                if (task.isCompleted()) {
-                    if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (taskCompleted) {
+                    if (taskSucceeded) {
                         po.addLog(String.format("Task %s succeeded", task.getDescription()));
 
                         if (operation.hasNextTask()) {
@@ -395,7 +411,7 @@ public class MongoImpl implements Mongo {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+                        String.format("Destroying cluster %s", clusterName));
         executor.execute(new Runnable() {
 
             public void run() {
@@ -437,7 +453,7 @@ public class MongoImpl implements Mongo {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying %s in %s", lxcHostname, clusterName));
+                        String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         //go on operation
         executor.execute(new Runnable() {
@@ -481,10 +497,10 @@ public class MongoImpl implements Mongo {
                     if (stopMongoTask.isCompleted()) {
                         Task startRoutersTask = taskRunner.
                                 executeTask(Tasks.getStartRoutersTask(config.getRouterServers(),
-                                        config.getConfigServers(), config));
+                                                config.getConfigServers(), config));
 
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTask(startRoutersTask, new TaskCallback() {
+                        taskRunner.executeTaskNWait(startRoutersTask, new InterruptableTaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                 if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
@@ -492,25 +508,11 @@ public class MongoImpl implements Mongo {
                                     okCount.incrementAndGet();
                                 }
                                 if (okCount.get() == config.getRouterServers().size()) {
-                                    taskRunner.removeTaskCallback(task.getUuid());
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
-                                } else if (task.isCompleted()) {
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
+                                    interrupt();
                                 }
                                 return null;
                             }
                         });
-
-                        synchronized (startRoutersTask) {
-                            try {
-                                startRoutersTask.wait(startRoutersTask.getAvgTimeout() * 1000 + 1000);
-                            } catch (InterruptedException ex) {
-                            }
-                        }
 
                         if (okCount.get() != config.getRouterServers().size()) {
                             po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
@@ -543,8 +545,7 @@ public class MongoImpl implements Mongo {
                                         = taskRunner.
                                         executeTask(
                                                 Tasks.getUnregisterSecondaryFromPrimaryTask(
-                                                        primaryNodeAgent, agent, config)
-                                        );
+                                                        primaryNodeAgent, agent, config));
                                 if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
                                     po.addLog("Could not unregister this node from replica set, skipping...");
                                 }
@@ -565,8 +566,7 @@ public class MongoImpl implements Mongo {
                 if (physicalAgent == null) {
                     po.addLog(
                             String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                                    agent.getHostname())
-                    );
+                                    agent.getHostname()));
                 } else {
                     if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
                         po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
@@ -596,7 +596,7 @@ public class MongoImpl implements Mongo {
     public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting node %s in %s", lxcHostname, clusterName));
+                        String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -634,31 +634,17 @@ public class MongoImpl implements Mongo {
                             config);
                 }
                 po.addLog("Starting node...");
-                taskRunner.executeTask(startNodeTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(startNodeTask, new InterruptableTaskCallback() {
 
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
 
-                            taskRunner.removeTaskCallback(task.getUuid());
                             task.setData(NodeState.RUNNING);
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
-                        } else if (task.isCompleted()) {
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
+                            interrupt();
                         }
                         return null;
                     }
                 });
-
-                synchronized (startNodeTask) {
-                    try {
-                        startNodeTask.wait(startNodeTask.getAvgTimeout() * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
 
                 if (NodeState.RUNNING.equals(startNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s started", lxcHostname));
@@ -679,7 +665,7 @@ public class MongoImpl implements Mongo {
     public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -724,7 +710,7 @@ public class MongoImpl implements Mongo {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
