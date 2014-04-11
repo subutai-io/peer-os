@@ -6,8 +6,11 @@
 package org.safehaus.kiskis.mgmt.api.taskrunner;
 
 /**
- * @author bahadyr
+ * This enum holds possible statuses of task
+ *
+ * @author dilshat
  */
 public enum TaskStatus {
-    NEW, SUCCESS, FAIL
+
+    NEW, RUNNING, TIMEDOUT, SUCCESS, FAIL
 }
