@@ -124,7 +124,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testCheckTimedOutTaskSync() {
+    public void testTimedOutTaskSync() {
         Task task = getDummyTask(1);
 
         taskrunner.executeTask(task);
@@ -134,7 +134,7 @@ public class TaskRunnerImplTaskStatusesTest {
 
     @Test
 //    @Ignore
-    public void testCheckTimedOutTaskAsync() throws InterruptedException {
+    public void testTimedOutTaskAsync() throws InterruptedException {
 
         Task task = getDummyTask(1);
 
@@ -166,7 +166,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testExecuteFailedTaskSync() throws InterruptedException {
+    public void testFailedTaskSync() throws InterruptedException {
 
         final Task task = getDummyTask(1);
 
@@ -195,7 +195,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testExecuteSucceededTaskAsync() throws InterruptedException {
+    public void testSucceededTaskAsync() throws InterruptedException {
 
         Task task = getDummyTask(1);
 
@@ -214,7 +214,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testExecuteSucceededTaskSync() throws InterruptedException {
+    public void testSucceededTaskSync() throws InterruptedException {
 
         final Task task = getDummyTask(1);
 
@@ -243,7 +243,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testExecuteCompletedTaskAsync() throws InterruptedException {
+    public void testCompletedTaskAsync() throws InterruptedException {
 
         Task task = getDummyTask(1);
 
@@ -262,7 +262,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testExecuteCompletedTaskSync() throws InterruptedException {
+    public void testCompletedTaskSync() throws InterruptedException {
 
         final Task task = getDummyTask(1);
 
@@ -291,7 +291,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testCheckRunningTaskSync() throws InterruptedException {
+    public void testRunningTaskSync() throws InterruptedException {
 
         final Task task = getDummyTask(1);
 
@@ -312,7 +312,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testCheckRunningTaskAsync() throws InterruptedException {
+    public void testRunningTaskAsync() throws InterruptedException {
 
         final Task task = getDummyTask(1);
 
@@ -325,7 +325,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testCheckIgnoreExitCodeAsync() throws InterruptedException {
+    public void testIgnoreExitCodeAsync() throws InterruptedException {
 
         Task task = getDummyTask(1);
         task.setIgnoreExitCode(true);
@@ -345,7 +345,7 @@ public class TaskRunnerImplTaskStatusesTest {
     }
 
     @Test
-    public void testCheckIgnoreExitCodeSync() throws InterruptedException {
+    public void testIgnoreExitCodeSync() throws InterruptedException {
 
         final Task task = getDummyTask(1);
         task.setIgnoreExitCode(true);

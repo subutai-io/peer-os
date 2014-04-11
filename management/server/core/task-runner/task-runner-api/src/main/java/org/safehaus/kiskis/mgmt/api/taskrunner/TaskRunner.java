@@ -57,7 +57,8 @@ public interface TaskRunner {
     public void executeTaskNWait(Task task, TaskCallback callback);
 
     /**
-     * Removes callback for a task if any with the supplied UUID
+     * Removes callback for a task if any with the supplied UUID. Should be used
+     * only with asynchronous executeTask
      *
      * @param taskUUID - uuid of the task
      */

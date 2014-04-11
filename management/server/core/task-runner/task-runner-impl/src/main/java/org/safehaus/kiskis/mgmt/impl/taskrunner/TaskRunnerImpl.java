@@ -207,7 +207,8 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
     }
 
     /**
-     * Removes {@code TaskCallback} for the supplied task UUID
+     * Removes {@code TaskCallback} for the supplied task UUID. Should be used
+     * only with asynchronous executeTask
      *
      * @param taskUUID
      */
