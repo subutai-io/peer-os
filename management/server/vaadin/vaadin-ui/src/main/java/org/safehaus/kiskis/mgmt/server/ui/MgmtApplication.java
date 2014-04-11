@@ -63,8 +63,8 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             window = new Window(title);
             setMainWindow(window);
 
-//            VerticalLayout layout = new VerticalLayout();
-//            layout.setSizeFull();
+            GridLayout layout = new GridLayout();
+            layout.setSizeFull();
 //            HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
 //            horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
 
@@ -80,10 +80,10 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 Component component = module.createComponent();
                 tabs.addTab(component, module.getName(), null);
             }
-//            layout.addComponent(tabs);
+            layout.addComponent(tabs);
 //            horizontalSplit.setSecondComponent(tabs);
 
-            getMainWindow().setContent(tabs);
+            getMainWindow().setContent(layout);
             //add listener
             moduleNotifier.addListener(this);
             getMainWindow().addListener(new Window.CloseListener() {
