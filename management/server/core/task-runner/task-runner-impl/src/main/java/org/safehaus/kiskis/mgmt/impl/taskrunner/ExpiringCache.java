@@ -166,7 +166,7 @@ class ExpiringCache<KeyType, ValueType> {
     }
 
     /**
-     * clears all cache entries
+     * Clears all cache entries.
      */
     public void clear() {
         entries.clear();
