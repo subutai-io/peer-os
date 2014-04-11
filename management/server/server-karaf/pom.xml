@@ -650,11 +650,6 @@
                                     <artifactId>hive-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>flume-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
                                 <!-- TODO for API - END -->
 
                             </artifactItems>

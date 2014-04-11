@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class FlumeUI implements Module {
 
-    public static final String MODULE_NAME = "Flume v2";
+    public static final String MODULE_NAME = "Flume";
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Flume manager;
