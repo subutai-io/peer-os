@@ -230,9 +230,9 @@ public class FlumeImpl implements Flume {
                     }
                 });
                 try {
-                    latch.await(startNodeTask.getTotalTimeout(), TimeUnit.SECONDS);
+                    boolean b = latch.await(startNodeTask.getTotalTimeout(), TimeUnit.SECONDS);
+                    if(!b) po.addLogFailed("Operation timeout");
                 } catch(InterruptedException ex) {
-                    po.addLogFailed("Operation timeout");
                 }
 
                 if(startNodeTask.isCompleted()) {
@@ -287,9 +287,9 @@ public class FlumeImpl implements Flume {
                     }
                 });
                 try {
-                    latch.await(stopNodeTask.getTotalTimeout(), TimeUnit.SECONDS);
+                    boolean b = latch.await(stopNodeTask.getTotalTimeout(), TimeUnit.SECONDS);
+                    if(!b) po.addLogFailed("Operation timeout");
                 } catch(InterruptedException ex) {
-                    po.addLogFailed("Operation timeout");
                 }
 
                 if(stopNodeTask.isCompleted()) {
