@@ -16,6 +16,12 @@
 
     <modules>
         <module>mongodb</module>
+        <module>solr</module> 
+	<module>mahout</module> 
+	<module>pig</module> 
+	<module>lucene</module>
+        <module>flume</module>
+	<module>spark</module>
         <module>solr</module>
         <module>mahout</module>
         <module>pig</module>

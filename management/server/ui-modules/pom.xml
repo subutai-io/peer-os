@@ -18,7 +18,6 @@
         <module>sqoop</module>
         <module>oozie</module>
         <module>hive</module>
-        <module>flume</module>
     </modules>
    
 </project>
