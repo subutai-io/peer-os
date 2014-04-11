@@ -64,9 +64,8 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             window = new Window(title);
             setMainWindow(window);
             
-            GridLayout layout = new GridLayout();
-            layout.setSizeFull();
-            layout.setHeight(100, Sizeable.UNITS_PIXELS);
+            VerticalLayout layout = new VerticalLayout();
+            layout.setSizeUndefined();
 //            HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
 //            horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
 
