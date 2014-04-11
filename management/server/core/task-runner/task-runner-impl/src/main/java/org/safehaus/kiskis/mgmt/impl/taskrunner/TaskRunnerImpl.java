@@ -239,14 +239,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             }
         };
 
-        executeTask(task, callback);
-
-        synchronized (callback) {
-            try {
-                callback.wait(3600 * 1000); //wait 1 hr maximum
-            } catch (InterruptedException ex) {
-            }
-        }
+        executeTaskNWait(task, callback);
 
         return task;
     }
@@ -270,6 +263,8 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
             } catch (InterruptedException ex) {
             }
         }
+
+        removeTaskCallback(task.getUuid());
 
     }
 

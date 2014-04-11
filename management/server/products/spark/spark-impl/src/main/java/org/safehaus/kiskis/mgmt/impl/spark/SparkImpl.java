@@ -20,7 +20,6 @@ import org.safehaus.kiskis.mgmt.api.spark.Spark;
 import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -169,28 +168,13 @@ public class SparkImpl implements Spark {
                                         okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
 
                                         if (okCount.get() >= config.getAllNodes().size()) {
-                                            taskRunner.removeTaskCallback(task.getUuid());
                                             interrupt();
-//                                            synchronized (task) {
-//                                                task.notifyAll();
-//                                            }
                                         }
-//                                        else if (task.isCompleted()) {
-//                                            synchronized (task) {
-//                                                task.notifyAll();
-//                                            }
-//                                        }
 
                                         return null;
                                     }
                                 });
 
-//                                synchronized (startSparkTask) {
-//                                    try {
-//                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
-//                                    } catch (InterruptedException ex) {
-//                                    }
-//                                }
                                 if (okCount.get() >= config.getAllNodes().size()) {
                                     po.addLogDone("Spark started successfully\nDone");
                                 } else {
@@ -360,7 +344,7 @@ public class SparkImpl implements Spark {
 
                             Task restartMasterTask = Tasks.getRestartMasterTask(config.getMasterNode());
                             final AtomicInteger okCount = new AtomicInteger(0);
-                            taskRunner.executeTask(restartMasterTask, new TaskCallback() {
+                            taskRunner.executeTaskNWait(restartMasterTask, new InterruptableTaskCallback() {
 
                                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                     if (stdOut.contains("starting")) {
@@ -368,33 +352,19 @@ public class SparkImpl implements Spark {
                                     }
 
                                     if (okCount.get() > 0) {
-                                        taskRunner.removeTaskCallback(task.getUuid());
-                                        synchronized (task) {
-                                            task.notifyAll();
-                                        }
-                                    } else if (task.isCompleted()) {
-                                        synchronized (task) {
-                                            task.notifyAll();
-                                        }
+                                        interrupt();
                                     }
 
                                     return null;
                                 }
                             });
 
-                            synchronized (restartMasterTask) {
-                                try {
-                                    restartMasterTask.wait(restartMasterTask.getAvgTimeout() * 1000 + 3000);
-                                } catch (InterruptedException ex) {
-                                }
-                            }
-
                             if (okCount.get() > 0) {
                                 po.addLog("Master restarted successfully\nStarting Spark on new node...");
 
                                 Task startSparkTask = Tasks.getStartSlaveTask(Util.wrapAgentToSet(agent));
                                 okCount.set(0);
-                                taskRunner.executeTask(startSparkTask, new TaskCallback() {
+                                taskRunner.executeTaskNWait(startSparkTask, new InterruptableTaskCallback() {
 
                                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                         if (stdOut.contains("starting")) {
@@ -402,26 +372,12 @@ public class SparkImpl implements Spark {
                                         }
 
                                         if (okCount.get() > 0) {
-                                            taskRunner.removeTaskCallback(task.getUuid());
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
-                                        } else if (task.isCompleted()) {
-                                            synchronized (task) {
-                                                task.notifyAll();
-                                            }
+                                            interrupt();
                                         }
 
                                         return null;
                                     }
                                 });
-
-                                synchronized (startSparkTask) {
-                                    try {
-                                        startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
-                                    } catch (InterruptedException ex) {
-                                    }
-                                }
 
                                 if (okCount.get() > 0) {
                                     po.addLogDone("Spark started successfully\nDone");
@@ -492,7 +448,7 @@ public class SparkImpl implements Spark {
 
                         Task restartMasterTask = Tasks.getRestartMasterTask(config.getMasterNode());
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTask(restartMasterTask, new TaskCallback() {
+                        taskRunner.executeTaskNWait(restartMasterTask, new InterruptableTaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                 if (stdOut.contains("starting")) {
@@ -500,26 +456,12 @@ public class SparkImpl implements Spark {
                                 }
 
                                 if (okCount.get() > 0) {
-                                    taskRunner.removeTaskCallback(task.getUuid());
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
-                                } else if (task.isCompleted()) {
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
+                                    interrupt();
                                 }
 
                                 return null;
                             }
                         });
-
-                        synchronized (restartMasterTask) {
-                            try {
-                                restartMasterTask.wait(restartMasterTask.getAvgTimeout() * 1000 + 3000);
-                            } catch (InterruptedException ex) {
-                            }
-                        }
 
                         if (okCount.get() > 0) {
                             po.addLog("Master restarted successfully");
@@ -656,32 +598,19 @@ public class SparkImpl implements Spark {
 
                             Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
                             final AtomicInteger okCount = new AtomicInteger(0);
-                            taskRunner.executeTask(startSparkTask, new TaskCallback() {
+                            taskRunner.executeTaskNWait(startSparkTask, new InterruptableTaskCallback() {
 
                                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                     okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
 
                                     if (okCount.get() >= config.getAllNodes().size()) {
-                                        taskRunner.removeTaskCallback(task.getUuid());
-                                        synchronized (task) {
-                                            task.notifyAll();
-                                        }
-                                    } else if (task.isCompleted()) {
-                                        synchronized (task) {
-                                            task.notifyAll();
-                                        }
+                                        interrupt();
                                     }
 
                                     return null;
                                 }
                             });
 
-                            synchronized (startSparkTask) {
-                                try {
-                                    startSparkTask.wait(startSparkTask.getAvgTimeout() * 1000 + 3000);
-                                } catch (InterruptedException ex) {
-                                }
-                            }
                             if (okCount.get() >= config.getAllNodes().size()) {
                                 po.addLog("Cluster started successfully");
                             } else {
@@ -754,7 +683,7 @@ public class SparkImpl implements Spark {
                 }
 
                 final AtomicInteger okCount = new AtomicInteger(0);
-                taskRunner.executeTask(startTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(startTask, new InterruptableTaskCallback() {
 
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (stdOut.contains("starting")) {
@@ -762,26 +691,13 @@ public class SparkImpl implements Spark {
                         }
 
                         if (okCount.get() > 0) {
-                            taskRunner.removeTaskCallback(task.getUuid());
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
-                        } else if (task.isCompleted()) {
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
+                            interrupt();
                         }
 
                         return null;
                     }
                 });
 
-                synchronized (startTask) {
-                    try {
-                        startTask.wait(startTask.getAvgTimeout() * 1000 + 3000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
                 if (okCount.get() > 0) {
                     po.addLogDone(String.format("Node %s started", node.getHostname()));
                 } else {

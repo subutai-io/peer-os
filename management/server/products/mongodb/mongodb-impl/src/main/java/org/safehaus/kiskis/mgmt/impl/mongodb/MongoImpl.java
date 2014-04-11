@@ -33,6 +33,7 @@ import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -499,7 +500,7 @@ public class MongoImpl implements Mongo {
                                                 config.getConfigServers(), config));
 
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTask(startRoutersTask, new TaskCallback() {
+                        taskRunner.executeTaskNWait(startRoutersTask, new InterruptableTaskCallback() {
 
                             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                                 if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
@@ -507,25 +508,11 @@ public class MongoImpl implements Mongo {
                                     okCount.incrementAndGet();
                                 }
                                 if (okCount.get() == config.getRouterServers().size()) {
-                                    taskRunner.removeTaskCallback(task.getUuid());
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
-                                } else if (task.isCompleted()) {
-                                    synchronized (task) {
-                                        task.notifyAll();
-                                    }
+                                    interrupt();
                                 }
                                 return null;
                             }
                         });
-
-                        synchronized (startRoutersTask) {
-                            try {
-                                startRoutersTask.wait(startRoutersTask.getAvgTimeout() * 1000 + 3000);
-                            } catch (InterruptedException ex) {
-                            }
-                        }
 
                         if (okCount.get() != config.getRouterServers().size()) {
                             po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
@@ -647,31 +634,17 @@ public class MongoImpl implements Mongo {
                             config);
                 }
                 po.addLog("Starting node...");
-                taskRunner.executeTask(startNodeTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(startNodeTask, new InterruptableTaskCallback() {
 
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                         if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
 
-                            taskRunner.removeTaskCallback(task.getUuid());
                             task.setData(NodeState.RUNNING);
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
-                        } else if (task.isCompleted()) {
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
+                            interrupt();
                         }
                         return null;
                     }
                 });
-
-                synchronized (startNodeTask) {
-                    try {
-                        startNodeTask.wait(startNodeTask.getAvgTimeout() * 1000 + 3000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
 
                 if (NodeState.RUNNING.equals(startNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s started", lxcHostname));

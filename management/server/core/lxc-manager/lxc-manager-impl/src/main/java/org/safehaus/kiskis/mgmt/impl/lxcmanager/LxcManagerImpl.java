@@ -29,6 +29,7 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
+import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -90,7 +91,7 @@ public class LxcManagerImpl implements LxcManager {
 
             Task getMetricsTask = Tasks.getMetricsTask(agents);
 
-            taskRunner.executeTask(getMetricsTask, new TaskCallback() {
+            taskRunner.executeTaskNWait(getMetricsTask, new TaskCallback() {
                 private final Map<UUID, String> stdOuts = new HashMap<UUID, String>();
 
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -176,19 +177,10 @@ public class LxcManagerImpl implements LxcManager {
                             }
                         }
 
-                        synchronized (task) {
-                            task.notifyAll();
-                        }
                     }
                     return null;
                 }
             });
-            synchronized (getMetricsTask) {
-                try {
-                    getMetricsTask.wait(getMetricsTask.getAvgTimeout() * 1000 + 3000);
-                } catch (InterruptedException ex) {
-                }
-            }
 
             if (!serverMetrics.isEmpty()) {
                 Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
@@ -247,7 +239,7 @@ public class LxcManagerImpl implements LxcManager {
 
             Task getLxcListTask = Tasks.getLxcListTask(pAgents);
 
-            taskRunner.executeTask(getLxcListTask, new TaskCallback() {
+            taskRunner.executeTaskNWait(getLxcListTask, new TaskCallback() {
                 private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
 
                 @Override
@@ -288,21 +280,12 @@ public class LxcManagerImpl implements LxcManager {
                             }
                             agentFamilies.put(parentHostname, lxcs);
                         }
-                        synchronized (task) {
-                            task.notifyAll();
-                        }
                     }
 
                     return null;
                 }
             });
 
-            synchronized (getLxcListTask) {
-                try {
-                    getLxcListTask.wait(getLxcListTask.getAvgTimeout() * 1000 + 3000);
-                } catch (InterruptedException ex) {
-                }
-            }
         }
 
         return agentFamilies;
@@ -310,27 +293,7 @@ public class LxcManagerImpl implements LxcManager {
 
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
-            Task cloneTask = Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostname);
-            taskRunner.executeTask(cloneTask, new TaskCallback() {
-
-                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                    if (task.isCompleted()) {
-                        synchronized (task) {
-                            task.notifyAll();
-                        }
-                    }
-
-                    return null;
-                }
-            });
-
-            synchronized (cloneTask) {
-                try {
-                    cloneTask.wait(cloneTask.getAvgTimeout() * 1000 + 3000);
-                } catch (InterruptedException ex) {
-                }
-            }
-
+            Task cloneTask = taskRunner.executeTask(Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostname));
             return cloneTask.getTaskStatus() == TaskStatus.SUCCESS;
         }
         return false;
@@ -340,7 +303,7 @@ public class LxcManagerImpl implements LxcManager {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
             final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
-            taskRunner.executeTask(startLxcTask, new TaskCallback() {
+            taskRunner.executeTaskNWait(startLxcTask, new TaskCallback() {
 
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                     if (task.isCompleted()) {
@@ -351,21 +314,12 @@ public class LxcManagerImpl implements LxcManager {
                             if (stdOut.indexOf("RUNNING") != -1) {
                                 task.setData(LxcState.RUNNING);
                             }
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
                         }
                     }
 
                     return null;
                 }
             });
-            synchronized (getLxcInfoTask) {
-                try {
-                    getLxcInfoTask.wait((startLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 3000);
-                } catch (InterruptedException ex) {
-                }
-            }
 
             return LxcState.RUNNING.equals(getLxcInfoTask.getData());
         }
@@ -376,7 +330,7 @@ public class LxcManagerImpl implements LxcManager {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task stopLxcTask = Tasks.getLxcStopTask(physicalAgent, lxcHostname);
             final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
-            taskRunner.executeTask(stopLxcTask, new TaskCallback() {
+            taskRunner.executeTaskNWait(stopLxcTask, new TaskCallback() {
 
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                     if (task.isCompleted()) {
@@ -387,21 +341,12 @@ public class LxcManagerImpl implements LxcManager {
                             if (stdOut.indexOf("STOPPED") != -1) {
                                 task.setData(LxcState.STOPPED);
                             }
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
                         }
                     }
 
                     return null;
                 }
             });
-            synchronized (getLxcInfoTask) {
-                try {
-                    getLxcInfoTask.wait((stopLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 3000);
-                } catch (InterruptedException ex) {
-                }
-            }
 
             return LxcState.STOPPED.equals(getLxcInfoTask.getData());
         }
@@ -412,7 +357,7 @@ public class LxcManagerImpl implements LxcManager {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
             final Task getLxcInfoTask = Tasks.getLxcInfoWithWaitTask(physicalAgent, lxcHostname);
-            taskRunner.executeTask(destroyLxcTask, new TaskCallback() {
+            taskRunner.executeTaskNWait(destroyLxcTask, new TaskCallback() {
 
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                     if (task.isCompleted()) {
@@ -423,21 +368,12 @@ public class LxcManagerImpl implements LxcManager {
                             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                                 task.setData(LxcState.STOPPED);
                             }
-                            synchronized (task) {
-                                task.notifyAll();
-                            }
                         }
                     }
 
                     return null;
                 }
             });
-            synchronized (getLxcInfoTask) {
-                try {
-                    getLxcInfoTask.wait((destroyLxcTask.getAvgTimeout() + getLxcInfoTask.getAvgTimeout()) * 1000 + 3000);
-                } catch (InterruptedException ex) {
-                }
-            }
 
             return LxcState.STOPPED.equals(getLxcInfoTask.getData());
         }
@@ -471,7 +407,7 @@ public class LxcManagerImpl implements LxcManager {
     public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task startNCloneTask = Tasks.getLxcCloneNStartTask(physicalAgent, lxcHostname);
-            taskRunner.executeTask(startNCloneTask, new TaskCallback() {
+            taskRunner.executeTaskNWait(startNCloneTask, new TaskCallback() {
 
                 public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                     if (task.isCompleted()) {
@@ -479,20 +415,11 @@ public class LxcManagerImpl implements LxcManager {
                         if (stdOut.indexOf("RUNNING") != -1) {
                             task.setData(LxcState.RUNNING);
                         }
-                        synchronized (task) {
-                            task.notifyAll();
-                        }
                     }
 
                     return null;
                 }
             });
-            synchronized (startNCloneTask) {
-                try {
-                    startNCloneTask.wait(startNCloneTask.getAvgTimeout() * 1000 + 3000);
-                } catch (InterruptedException ex) {
-                }
-            }
 
             return LxcState.RUNNING.equals(startNCloneTask.getData());
         }
