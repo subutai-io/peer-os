@@ -16,19 +16,18 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
 
 /**
+ *
  * @author dilshat
  */
 public class ConfigurationStep extends Panel {
@@ -64,7 +63,7 @@ public class ConfigurationStep extends Panel {
 
         slaveNodesSelect.setItemCaptionPropertyId("hostname");
         slaveNodesSelect.setRows(7);
-        slaveNodesSelect.setNullSelectionAllowed(false);
+//        slaveNodesSelect.setNullSelectionAllowed(false);
         slaveNodesSelect.setMultiSelect(true);
         slaveNodesSelect.setImmediate(true);
         slaveNodesSelect.setLeftColumnCaption("Available Nodes");
@@ -98,8 +97,7 @@ public class ConfigurationStep extends Panel {
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             slaveNodesSelect.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents())
-            );
+                            Agent.class, hadoopInfo.getAllAgents()));
             for (Agent agent : hadoopInfo.getAllAgents()) {
                 masterNodeCombo.addItem(agent);
                 masterNodeCombo.setItemCaption(agent, agent.getHostname());
@@ -114,10 +112,16 @@ public class ConfigurationStep extends Panel {
                     slaveNodesSelect.setValue(null);
                     slaveNodesSelect.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents())
-                    );
+                                    Agent.class, hadoopInfo.getAllAgents()));
+                    masterNodeCombo.setValue(null);
+                    masterNodeCombo.removeAllItems();
+                    for (Agent agent : hadoopInfo.getAllAgents()) {
+                        masterNodeCombo.addItem(agent);
+                        masterNodeCombo.setItemCaption(agent, agent.getHostname());
+                    }
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setSlaveNodes(new HashSet<Agent>());
+                    wizard.getConfig().setMasterNode(null);
                 }
             }
         });

@@ -96,7 +96,7 @@ public class Commands {
     public static Request getRestartMasterCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service spark-master stop && service spark-master start");
-        req.setTimeout(120);
+        req.setTimeout(60);
         return req;
     }
 

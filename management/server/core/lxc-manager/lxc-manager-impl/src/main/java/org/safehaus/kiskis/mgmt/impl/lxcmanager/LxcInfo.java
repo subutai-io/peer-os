@@ -15,11 +15,17 @@ public class LxcInfo {
 
     private final Agent physicalAgent;
     private final String lxcHostname;
+    private final String nodeType;
     private boolean result;
 
-    public LxcInfo(Agent physicalAgent, String lxcHostname) {
+    public LxcInfo(Agent physicalAgent, String lxcHostname, String nodeType) {
         this.physicalAgent = physicalAgent;
         this.lxcHostname = lxcHostname;
+        this.nodeType = nodeType;
+    }
+
+    public String getNodeType() {
+        return nodeType;
     }
 
     public boolean isResult() {

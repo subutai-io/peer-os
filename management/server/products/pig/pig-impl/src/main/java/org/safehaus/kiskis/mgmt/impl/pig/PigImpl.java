@@ -156,6 +156,13 @@ public class PigImpl implements Pig {
                     return;
                 }
 
+                for (Agent node : config.getNodes()) {
+                    if (agentManager.getAgentByHostname(node.getHostname()) == null) {
+                        po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
+                        return;
+                    }
+                }
+
                 po.addLog("Uninstalling Pig...");
 
                 Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getNodes()));

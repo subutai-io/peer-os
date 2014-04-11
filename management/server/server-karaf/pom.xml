@@ -145,6 +145,11 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>${org.xerial.snappy.version}</version>
@@ -173,7 +178,7 @@
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
             <version>3.2</version>
-        </dependency>
+        </dependency>        
     </dependencies>
     <build>
         <resources>
@@ -245,7 +250,6 @@
                         <configuration>
                             <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
                             <artifactItems>
-
                                 <artifactItem>
                                     <groupId>org.doomdark</groupId>
                                     <artifactId>com.springsource.org.doomdark.uuid</artifactId>
@@ -261,12 +265,10 @@
                                     <artifactId>elasticsearch</artifactId>
                                     <version>${org.elasticsearch.version}</version>
                                 </artifactItem>
-
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
                                     <version>${com.sun.jersey.version}</version>
-
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
@@ -375,6 +377,11 @@
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
+                                    <groupId>commons-io</groupId>
+                                    <artifactId>commons-io</artifactId>
+                                    <version>${commons.io.version}</version>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>com.eaio.uuid</groupId>
                                     <artifactId>uuid</artifactId>
                                     <version>3.2</version>
@@ -421,6 +428,13 @@
                                 <!-- Core Modules - START -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mgmt-shared-protocol</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!-- Tracker -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>tracker-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -435,6 +449,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Task Runner -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>task-runner-ui</artifactId>
@@ -451,12 +466,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>mgmt-shared-protocol</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-
+                                <!-- Agent Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>agent-manager-api</artifactId>
@@ -467,6 +477,8 @@
                                     <artifactId>agent-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- DB Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>db-manager-api</artifactId>
@@ -478,6 +490,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Communication Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>communication-manager-api</artifactId>
@@ -488,6 +501,8 @@
                                     <artifactId>communication-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- LXC Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>lxc-manager-ui</artifactId>
@@ -503,14 +518,16 @@
                                     <artifactId>lxc-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- Monitor -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>network-manager-api</artifactId>
+                                    <artifactId>monitor-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>network-manager-impl</artifactId>
+                                    <artifactId>monitor-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -521,7 +538,26 @@
                                 <!-- Core Modules - END -->
 
                                 <!-- Products Modules - START -->
-                                <!--<artifactItem>
+
+                                <!-- Presto -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>presto-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>presto-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>presto-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!-- Shark -->
+                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>shark-api</artifactId>
                                     <version>${project.version}</version>
@@ -536,6 +572,8 @@
                                     <artifactId>shark-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- Spark -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>spark-api</artifactId>
@@ -551,6 +589,8 @@
                                     <artifactId>spark-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- MongoDB -->
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>mongodb-api</artifactId>
@@ -566,6 +606,8 @@
                                     <artifactId>mongodb-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- Lucene -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>lucene-api</artifactId>
@@ -581,6 +623,8 @@
                                     <artifactId>lucene-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- Pig -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>pig-api</artifactId>
@@ -596,6 +640,8 @@
                                     <artifactId>pig-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- Mahout -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mahout-api</artifactId>
@@ -611,6 +657,8 @@
                                     <artifactId>mahout-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- Solr -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>solr-api</artifactId>
@@ -625,26 +673,58 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
+                                <!-- HBase -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hadoop-api</artifactId>
+                                    <artifactId>hbase-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hadoop-impl</artifactId>
+                                    <artifactId>hbase-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hadoop-ui</artifactId>
+                                    <artifactId>hbase-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>flume-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>flume-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>flume-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!-- HBase -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hbase-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hbase-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hbase-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!-- Products Modules - END -->
 
                                 <!-- TODO for API - START -->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>cassandra-module</artifactId>
                                     <version>${project.version}</version>
@@ -652,11 +732,6 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hbase-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -674,11 +749,6 @@
                                     <artifactId>hive-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>flume-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
                                 <!-- TODO for API - END -->
 
                             </artifactItems>

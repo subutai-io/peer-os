@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,11 @@ public class Agent implements Serializable, Comparable<Agent> {
     private Date lastHeartbeat;
     private String parentHostName;
     private String transportId;
+
+    public Agent(UUID uuid, String hostname) {
+        this.uuid = uuid;
+        this.hostname = hostname;
+    }
 
     public String getTransportId() {
         return transportId;
@@ -77,7 +83,7 @@ public class Agent implements Serializable, Comparable<Agent> {
     }
 
     public List<String> getListIP() {
-        return listIP;
+        return Collections.unmodifiableList(listIP);
     }
 
     public void setListIP(List<String> listIP) {
@@ -111,6 +117,7 @@ public class Agent implements Serializable, Comparable<Agent> {
         return hash;
     }
 
+    @Override
     public int compareTo(Agent o) {
         if (hostname != null && o != null) {
             return hostname.compareTo(o.getHostname());
