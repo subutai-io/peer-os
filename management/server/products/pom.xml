@@ -20,8 +20,10 @@
 	<module>mahout</module> 
 	<module>pig</module> 
 	<module>lucene</module>
+        <module>flume</module>
 	<module>spark</module>
-	<module>shark</module>
-	<module>presto</module>
+        <module>shark</module>
+        <module>presto</module>
+        <module>hbase</module>
     </modules>
 </project>
