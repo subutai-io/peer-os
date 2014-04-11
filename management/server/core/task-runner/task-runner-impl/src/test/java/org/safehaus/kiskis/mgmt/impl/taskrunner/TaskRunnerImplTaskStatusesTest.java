@@ -20,7 +20,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
-import static org.safehaus.kiskis.mgmt.impl.taskrunner.TaskRunnerImplCallbackTest.getRequestTemplate;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
