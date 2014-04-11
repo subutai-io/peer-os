@@ -64,6 +64,7 @@ class TaskMediator {
                 if (tl != null) {
 
                     tl.appendStreams(response);
+                    tl.getTask().addResult(response.getUuid(), new Result(tl.getStdOut(response), tl.getStdErr(response), response.getExitCode()));
 
                     if (Util.isFinalResponse(response)) {
                         tl.getTask().incrementCompletedRequestsCount();
@@ -81,7 +82,6 @@ class TaskMediator {
                             taskListenerCache.remove(tl.getTask().getUuid());
                         }
 
-                        tl.getTask().addResult(response.getUuid(), new Result(tl.getStdOut(response), tl.getStdErr(response), response.getExitCode()));
                     }
 
                     Task nextTask = tl.getTaskCallback().onResponse(tl.getTask(), response, tl.getStdOut(response), tl.getStdErr(response));
