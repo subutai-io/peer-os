@@ -36,9 +36,9 @@ class Chart {
         String data = toPoints(values);
 
         String chart = CHART_TEMPLATE
-                .replace( "$mainTitle", String.format("%s for %s", metric, host) )
-                .replace( "$yTitle", metric.getUnit() )
-                .replace( "$data", data );
+                .replace("$mainTitle", String.format("%s for %s", metric, host))
+                .replace("$yTitle", metric.getUnit())
+                .replace("$data", data);
 
         javaScript.execute(chart);
     }
@@ -48,13 +48,13 @@ class Chart {
         String str = "";
         int i = 0;
 
-        for ( Date date : values.keySet() ) {
-            if ( !str.isEmpty() ) {
+        for (Date date : values.keySet()) {
+            if (!str.isEmpty()) {
                 str += ", ";
             }
 
             // Pass date as string so we don't deal with timezone issues between javascript and the server
-            str += String.format( "{ x: Date.parse('%s'), y: %s }", DATE_FORMAT.format(date), values.get(date) );
+            str += String.format("{ x: Date.parse('%s'), y: %s }", DATE_FORMAT.format(date), values.get(date));
 
             i++;
             if (i > maxSize) {

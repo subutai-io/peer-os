@@ -72,7 +72,7 @@ public class Tasks {
     public static Task getConfigQuorumTask(Set<Agent> agents, Set<Agent> quorums) {
         StringBuilder sb = new StringBuilder();
         for (Iterator<Agent> iterator = agents.iterator(); iterator.hasNext(); ) {
-            Agent next =  iterator.next();
+            Agent next = iterator.next();
             sb.append(next.getHostname());
             sb.append(" ");
         }

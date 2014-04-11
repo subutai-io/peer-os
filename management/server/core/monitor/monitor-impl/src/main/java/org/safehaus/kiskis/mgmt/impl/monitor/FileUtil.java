@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 class FileUtil {
 
-    private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
+    private static final Logger log = Logger.getLogger(FileUtil.class.getName());
 
     private static URLClassLoader classLoader;
 
@@ -43,7 +43,7 @@ class FileUtil {
 
         // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
         URL url = new FileUtil().getClass().getProtectionDomain().getCodeSource().getLocation();
-        classLoader = new URLClassLoader( new URL[]{ url }, Thread.currentThread().getContextClassLoader() );
+        classLoader = new URLClassLoader(new URL[]{url}, Thread.currentThread().getContextClassLoader());
 
         return classLoader;
     }

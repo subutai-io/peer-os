@@ -155,7 +155,7 @@ public class LuceneImpl implements Lucene {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
-                
+
                 for (Agent node : config.getNodes()) {
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));

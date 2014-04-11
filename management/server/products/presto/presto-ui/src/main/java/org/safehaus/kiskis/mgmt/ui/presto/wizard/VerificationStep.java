@@ -10,14 +10,15 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 
 /**
- *
  * @author dilshat
  */
 public class VerificationStep extends Panel {

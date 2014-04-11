@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
@@ -39,10 +41,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
- *
  * @author dilshat
- *
- *
  */
 public class LxcManagerImpl implements LxcManager {
 
@@ -80,7 +79,7 @@ public class LxcManagerImpl implements LxcManager {
         final Map<Agent, ServerMetric> serverMetrics = new HashMap<Agent, ServerMetric>();
         Set<Agent> agents = agentManager.getPhysicalAgents();
         //omit management server
-        for (Iterator<Agent> it = agents.iterator(); it.hasNext();) {
+        for (Iterator<Agent> it = agents.iterator(); it.hasNext(); ) {
             Agent agent = it.next();
             if (!agent.getHostname().matches("^py.*")) {
                 it.remove();
@@ -192,7 +191,7 @@ public class LxcManagerImpl implements LxcManager {
 
             if (!serverMetrics.isEmpty()) {
                 Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
-                for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext();) {
+                for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext(); ) {
                     Map.Entry<Agent, ServerMetric> entry = it.next();
                     EnumMap<LxcState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
                     if (info != null) {
@@ -237,7 +236,7 @@ public class LxcManagerImpl implements LxcManager {
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
         final Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
         Set<Agent> pAgents = agentManager.getPhysicalAgents();
-        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext();) {
+        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext(); ) {
             Agent agent = it.next();
             if (!agent.getHostname().matches("^py.*")) {
                 it.remove();

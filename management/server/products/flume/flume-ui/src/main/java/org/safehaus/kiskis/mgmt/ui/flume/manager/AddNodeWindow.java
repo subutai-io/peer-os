@@ -3,8 +3,10 @@ package org.safehaus.kiskis.mgmt.ui.flume.manager;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
+
 import java.util.Set;
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
@@ -45,7 +47,7 @@ class AddNodeWindow extends Window {
         hadoopNodes.setNullSelectionAllowed(false);
         hadoopNodes.setRequired(true);
         hadoopNodes.setWidth(200, Sizeable.UNITS_PIXELS);
-        for(Agent node : nodes) {
+        for (Agent node : nodes) {
             hadoopNodes.addItem(node);
             hadoopNodes.setItemCaption(node, node.getHostname());
         }
@@ -62,16 +64,16 @@ class AddNodeWindow extends Window {
             public void buttonClick(Button.ClickEvent event) {
                 addNodeBtn.setEnabled(false);
                 showProgress();
-                Agent agent = (Agent)hadoopNodes.getValue();
+                Agent agent = (Agent) hadoopNodes.getValue();
                 final UUID trackID = FlumeUI.getManager().addNode(config.getClusterName(), agent.getHostname());
                 FlumeUI.getExecutor().execute(new Runnable() {
 
                     public void run() {
-                        while(track) {
+                        while (track) {
                             ProductOperationView po = FlumeUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
-                            if(po != null) {
+                            if (po != null) {
                                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                                if(po.getState() != ProductOperationState.RUNNING) {
+                                if (po.getState() != ProductOperationState.RUNNING) {
                                     hideProgress();
                                     break;
                                 }
@@ -80,7 +82,7 @@ class AddNodeWindow extends Window {
                             }
                             try {
                                 Thread.sleep(1000);
-                            } catch(InterruptedException ex) {
+                            } catch (InterruptedException ex) {
                                 break;
                             }
                         }
@@ -143,7 +145,7 @@ class AddNodeWindow extends Window {
     }
 
     private void setOutput(String output) {
-        if(!Util.isStringEmpty(output)) {
+        if (!Util.isStringEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }

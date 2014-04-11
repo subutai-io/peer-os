@@ -1,26 +1,31 @@
 {
-    "query" : {
-        "term" : { "name" : "$metricName" }
+    "query": {
+        "term": {
+            "name": "$metricName"
+        }
     },
-    "filter" : {
-        "and" : [
+    "filter": {
+        "and": [
             {
-                "range" : {
-                    "@timestamp" : {
-                        "from" : "$startDate",
-                        "to" : "$endDate"
+                "range": {
+                    "@timestamp": {
+                        "from": "$startDate",
+                        "to": "$endDate"
                     }
                 }
             },
             {
-                "script" : {
-                    "script" : "_source.log_host == \"$host\""
+                "script": {
+                    "script": "_source.log_host == \"$host\""
                 }
             }
         ]
     },
-    "sort" : {
-        "@timestamp" : { "order" : "desc", "ignore_unmapped" : true }
+    "sort": {
+        "@timestamp": {
+            "order": "desc",
+            "ignore_unmapped": true
+        }
     },
-    "size" : 10000 // Limiting size to prevent from too much data.
+    "size": 10000 // Limiting size to prevent from too much data.
 }

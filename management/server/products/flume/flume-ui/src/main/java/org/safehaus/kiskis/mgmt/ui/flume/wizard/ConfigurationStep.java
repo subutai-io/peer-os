@@ -4,7 +4,9 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+
 import java.util.*;
+
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -35,8 +37,8 @@ public class ConfigurationStep extends Panel {
 
         List<HadoopClusterInfo> clusters = FlumeUI.getDbManager().
                 getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
-        if(clusters.size() > 0) {
-            for(HadoopClusterInfo hadoopClusterInfo : clusters) {
+        if (clusters.size() > 0) {
+            for (HadoopClusterInfo hadoopClusterInfo : clusters) {
                 hadoopClusters.addItem(hadoopClusterInfo);
                 hadoopClusters.setItemCaption(hadoopClusterInfo,
                         hadoopClusterInfo.getClusterName());
@@ -48,29 +50,31 @@ public class ConfigurationStep extends Panel {
                         wizard.getConfig().getClusterName(),
                         HadoopClusterInfo.class);
 
-        if(info != null) {
+        if (info != null) {
             hadoopClusters.setValue(info);
-        } else if(clusters.size() > 0) {
+        } else if (clusters.size() > 0) {
             hadoopClusters.setValue(clusters.iterator().next());
         }
 
-        if(hadoopClusters.getValue() != null) {
-            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo)hadoopClusters.getValue();
+        if (hadoopClusters.getValue() != null) {
+            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClusters.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             select.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents()));
+                            Agent.class, hadoopInfo.getAllAgents())
+            );
         }
 
         hadoopClusters.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                if(event.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo)event.getProperty().getValue();
+                if (event.getProperty().getValue() != null) {
+                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
                     select.setValue(null);
                     select.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents()));
+                                    Agent.class, hadoopInfo.getAllAgents())
+                    );
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setNodes(new HashSet<Agent>());
                 }
@@ -85,14 +89,14 @@ public class ConfigurationStep extends Panel {
         select.setRightColumnCaption("Selected Nodes");
         select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         select.setRequired(true);
-        if(!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
+        if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
             select.setValue(wizard.getConfig().getNodes());
         }
         select.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
-                if(event.getProperty().getValue() != null) {
-                    Set<Agent> agentList = new HashSet((Collection)event.getProperty().getValue());
+                if (event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
                     wizard.getConfig().setNodes(agentList);
                 }
             }
@@ -104,9 +108,9 @@ public class ConfigurationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if(Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
-                } else if(Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
                     show("Please, select target nodes");
                 } else {
                     wizard.next();

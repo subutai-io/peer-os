@@ -32,7 +32,7 @@ public class ModuleView extends CustomComponent {
         this.monitor = monitor;
 
         setHeight("100%");
-        setCompositionRoot( getLayout() );
+        setCompositionRoot(getLayout());
     }
 
     public Layout getLayout() {
@@ -67,7 +67,7 @@ public class ModuleView extends CustomComponent {
 
         metricListSelect = UIUtil.addListSelect(layout, "Metric:", "left: 20px; top: 150px;", "150px", "270px");
 
-        for ( Metric metric : Metric.values() ) {
+        for (Metric metric : Metric.values()) {
             metricListSelect.addItem(metric);
         }
     }
@@ -100,7 +100,7 @@ public class ModuleView extends CustomComponent {
         String host = getSelectedNode();
         Metric metric = getSelectedMetric();
 
-        if ( validParams(host, metric) ) {
+        if (validParams(host, metric)) {
             loadChart(host, metric);
         }
     }
@@ -122,7 +122,7 @@ public class ModuleView extends CustomComponent {
 
         boolean success = true;
 
-        if ( StringUtils.isEmpty(host) ) {
+        if (StringUtils.isEmpty(host)) {
             getWindow().showNotification("Please select a node");
             success = false;
         } else if (metric == null) {
