@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.presto.Config;
@@ -29,7 +30,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  */
 public class PrestoImpl implements Presto {
@@ -71,7 +71,7 @@ public class PrestoImpl implements Presto {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -92,7 +92,7 @@ public class PrestoImpl implements Presto {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getWorkers().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getWorkers().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -115,7 +115,7 @@ public class PrestoImpl implements Presto {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
                 }
-                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     Result result = checkInstalled.getResults().get(node.getUuid());
                     if (result.getStdOut().contains("ksks-presto")) {
@@ -206,7 +206,7 @@ public class PrestoImpl implements Presto {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -264,7 +264,7 @@ public class PrestoImpl implements Presto {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node %s to %s", lxcHostname, clusterName));
+                String.format("Adding node %s to %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -374,7 +374,7 @@ public class PrestoImpl implements Presto {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -445,7 +445,7 @@ public class PrestoImpl implements Presto {
     public UUID changeCoordinatorNode(final String clusterName, final String newCoordinatorHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Changing coordinator to %s in %s", newCoordinatorHostname, clusterName));
+                String.format("Changing coordinator to %s in %s", newCoordinatorHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -546,7 +546,7 @@ public class PrestoImpl implements Presto {
     public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostname, clusterName));
+                String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -604,7 +604,7 @@ public class PrestoImpl implements Presto {
     public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -645,7 +645,7 @@ public class PrestoImpl implements Presto {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 

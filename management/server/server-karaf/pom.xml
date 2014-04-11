@@ -178,7 +178,7 @@
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
             <version>3.2</version>
-        </dependency>        
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -519,6 +519,18 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!--Network Manager -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>network-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>network-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Monitor -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -674,6 +686,7 @@
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
                                 <!-- HBase -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -690,6 +703,8 @@
                                     <artifactId>hbase-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
+                                <!-- Flume -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>flume-api</artifactId>
@@ -705,6 +720,7 @@
                                     <artifactId>flume-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+
                                 <!-- HBase -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -719,6 +735,23 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hbase-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!-- Hadoop -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hadoop-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hadoop-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hadoop-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!-- Products Modules - END -->

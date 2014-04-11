@@ -13,13 +13,14 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+
 import java.util.List;
+
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
 /**
- *
  * @author dilshat
  */
 public class ConfigurationStep extends Panel {
@@ -64,7 +65,7 @@ public class ConfigurationStep extends Panel {
                 }
             }
         });
-        
+
         Config info = SharkUI.getDbManager().
                 getInfo(Config.PRODUCT_KEY,
                         wizard.getConfig().getClusterName(),

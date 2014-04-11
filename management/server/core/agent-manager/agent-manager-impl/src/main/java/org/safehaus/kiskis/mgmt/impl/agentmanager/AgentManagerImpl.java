@@ -9,6 +9,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -33,13 +35,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.AGENT_DISCONNECT;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.HEARTBEAT_RESPONSE;
 import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.REGISTRATION_REQUEST;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
- *
  * @author dilshat
  */
 public class AgentManagerImpl implements ResponseListener, AgentManager {
@@ -217,7 +220,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                             if (notifyAgentListeners) {
                                 notifyAgentListeners = false;
                                 Set<Agent> freshAgents = new HashSet(agents.asMap().values());
-                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
+                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); ) {
                                     AgentListener listener = it.next();
                                     try {
                                         listener.onAgent(freshAgents);
@@ -281,7 +284,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     agents.put(response.getUuid(), checkAgent);
                     return;
                 }
-                Agent agent = new Agent(response.getUuid(),response.getHostname());
+                Agent agent = new Agent(response.getUuid(), response.getHostname());
 //                agent.setUuid(response.getUuid());
 //                agent.setHostname(response.getHostname());
                 agent.setMacAddress(response.getMacAddress());

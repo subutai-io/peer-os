@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class UIUtil {
 
-    public static ComboBox getComboBox(String label, String ... values) {
+    public static ComboBox getComboBox(String label, String... values) {
 
         ComboBox comboBox = new ComboBox(label);
         comboBox.setInputPrompt(values[0]);

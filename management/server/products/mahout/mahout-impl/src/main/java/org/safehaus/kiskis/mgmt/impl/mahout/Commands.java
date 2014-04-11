@@ -11,7 +11,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
- *
  * @author dilshat
  */
 public class Commands {

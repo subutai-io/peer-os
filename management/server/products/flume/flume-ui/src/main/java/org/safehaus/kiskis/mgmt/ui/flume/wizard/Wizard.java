@@ -59,19 +59,19 @@ public class Wizard {
     private void putForm() {
         grid.removeComponent(0, 1);
         Component component = null;
-        switch(step) {
+        switch (step) {
             case 1: {
                 progressBar.setValue(0f);
                 component = new WelcomeStep(this);
                 break;
             }
             case 2: {
-                progressBar.setValue((float)(step - 1) / (NUMBER_OF_STEPS - 1));
+                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
                 component = new ConfigurationStep(this);
                 break;
             }
             case 3: {
-                progressBar.setValue((float)(step - 1) / (NUMBER_OF_STEPS - 1));
+                progressBar.setValue((float) (step - 1) / (NUMBER_OF_STEPS - 1));
                 component = new VerificationStep(this);
                 break;
             }
@@ -80,7 +80,7 @@ public class Wizard {
             }
         }
 
-        if(component != null) {
+        if (component != null) {
             grid.addComponent(component, 0, 1, 0, 19);
         }
     }

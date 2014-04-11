@@ -7,10 +7,10 @@ package org.safehaus.kiskis.mgmt.api.spark;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
- *
  * @author dilshat
  */
 public class Config {

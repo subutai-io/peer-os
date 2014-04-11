@@ -13,7 +13,6 @@ import com.vaadin.ui.ProgressIndicator;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 
 /**
- *
  * @author dilshat
  */
 public class Wizard {

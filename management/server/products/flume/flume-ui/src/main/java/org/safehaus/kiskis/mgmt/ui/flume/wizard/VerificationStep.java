@@ -1,7 +1,9 @@
 package org.safehaus.kiskis.mgmt.ui.flume.wizard;
 
 import com.vaadin.ui.*;
+
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -24,7 +26,7 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        for(Agent agent : wizard.getConfig().getNodes()) {
+        for (Agent agent : wizard.getConfig().getNodes()) {
             cfgView.addStringCfg("Node to install", agent.getHostname() + "");
         }
 

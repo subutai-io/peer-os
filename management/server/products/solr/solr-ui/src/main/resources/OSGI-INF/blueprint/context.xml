@@ -4,19 +4,18 @@
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
 
     <reference id="solrManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.solr.Solr"/>   
+               interface="org.safehaus.kiskis.mgmt.api.solr.Solr"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>       
+               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>               
-        
+               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.solr.SolrUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager" />
+        <property name="agentManager" ref="agentManager"/>
         <property name="tracker" ref="tracker"/>
         <property name="solrManager" ref="solrManager"/>
     </bean>
-    
 
-    
+
 </blueprint>

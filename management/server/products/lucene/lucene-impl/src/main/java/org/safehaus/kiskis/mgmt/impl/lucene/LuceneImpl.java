@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lucene.Config;
@@ -25,7 +26,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  */
 public class LuceneImpl implements Lucene {
@@ -63,7 +63,7 @@ public class LuceneImpl implements Lucene {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -79,7 +79,7 @@ public class LuceneImpl implements Lucene {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -102,7 +102,7 @@ public class LuceneImpl implements Lucene {
                     return;
                 }
 
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
 
                     Result result = checkInstalled.getResults().get(node.getUuid());
@@ -145,7 +145,7 @@ public class LuceneImpl implements Lucene {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -155,7 +155,7 @@ public class LuceneImpl implements Lucene {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
-                
+
                 for (Agent node : config.getNodes()) {
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
@@ -203,7 +203,7 @@ public class LuceneImpl implements Lucene {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -269,7 +269,7 @@ public class LuceneImpl implements Lucene {
     public UUID addNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 
