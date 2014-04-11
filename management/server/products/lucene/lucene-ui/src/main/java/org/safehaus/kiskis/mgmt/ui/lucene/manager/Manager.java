@@ -45,6 +45,7 @@ public class Manager {
     public Manager() {
 
         contentRoot = new VerticalLayout();
+        contentRoot.setSizeFull();
         contentRoot.setSpacing(true);
         contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
         contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
