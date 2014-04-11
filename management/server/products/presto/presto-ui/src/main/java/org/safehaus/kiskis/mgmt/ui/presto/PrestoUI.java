@@ -6,8 +6,10 @@
 package org.safehaus.kiskis.mgmt.ui.presto;
 
 import com.vaadin.ui.Component;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.presto.Presto;
@@ -15,7 +17,6 @@ import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 /**
- *
  * @author dilshat
  */
 public class PrestoUI implements Module {

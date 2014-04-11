@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
@@ -29,7 +30,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  * @todo check destroy slave on master & stop slave in manager
  */
@@ -72,7 +72,7 @@ public class SparkImpl implements Spark {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -93,7 +93,7 @@ public class SparkImpl implements Spark {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getSlaveNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getSlaveNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -116,7 +116,7 @@ public class SparkImpl implements Spark {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
                 }
-                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     Result result = checkInstalled.getResults().get(node.getUuid());
                     if (result.getStdOut().contains("ksks-spark")) {
@@ -204,7 +204,7 @@ public class SparkImpl implements Spark {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -262,7 +262,7 @@ public class SparkImpl implements Spark {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node %s to %s", lxcHostname, clusterName));
+                String.format("Adding node %s to %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -409,7 +409,7 @@ public class SparkImpl implements Spark {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -533,7 +533,7 @@ public class SparkImpl implements Spark {
     public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Changing master to %s in %s", newMasterHostname, clusterName));
+                String.format("Changing master to %s in %s", newMasterHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -643,7 +643,7 @@ public class SparkImpl implements Spark {
     public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostname, clusterName));
+                String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -714,7 +714,7 @@ public class SparkImpl implements Spark {
     public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -768,7 +768,7 @@ public class SparkImpl implements Spark {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 

@@ -6,10 +6,10 @@
 package org.safehaus.kiskis.mgmt.api.shark;
 
 import java.util.Set;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
- *
  * @author dilshat
  */
 public class Config {

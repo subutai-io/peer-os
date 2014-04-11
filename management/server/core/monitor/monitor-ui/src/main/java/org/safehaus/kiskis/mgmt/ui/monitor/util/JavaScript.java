@@ -15,6 +15,6 @@ public class JavaScript {
     }
 
     public void loadFile(String filePath) {
-        execute( FileUtil.getContent(filePath) );
+        execute(FileUtil.getContent(filePath));
     }
 }

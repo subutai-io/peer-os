@@ -13,7 +13,6 @@ import org.safehaus.kiskis.mgmt.ui.spark.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.spark.wizard.Wizard;
 
 /**
- *
  * @author dilshat
  */
 public class SparkForm extends CustomComponent {

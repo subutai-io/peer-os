@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.api.flume;
 
 import java.util.Set;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class Config {

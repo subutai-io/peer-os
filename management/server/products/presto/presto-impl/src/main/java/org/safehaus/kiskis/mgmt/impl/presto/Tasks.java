@@ -6,11 +6,11 @@
 package org.safehaus.kiskis.mgmt.impl.presto;
 
 import java.util.Set;
+
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
- *
  * @author dilshat
  */
 public class Tasks {

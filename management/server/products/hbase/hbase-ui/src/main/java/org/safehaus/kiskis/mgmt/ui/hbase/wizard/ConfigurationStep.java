@@ -120,8 +120,7 @@ public class ConfigurationStep extends Panel {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
-                } else
-                if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
                     show("Please, select target nodes");
                 } else {
                     wizard.next();

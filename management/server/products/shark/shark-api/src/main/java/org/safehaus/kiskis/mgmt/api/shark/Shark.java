@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
 public interface Shark {
@@ -28,7 +27,6 @@ public interface Shark {
      * Returns list of configurations of installed clusters
      *
      * @return - list of configurations of installed clusters
-     *
      */
     public List<Config> getClusters();
 }

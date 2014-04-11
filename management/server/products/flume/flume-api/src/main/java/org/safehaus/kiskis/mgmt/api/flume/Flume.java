@@ -23,7 +23,6 @@ public interface Flume {
      * Returns list of configurations of installed clusters
      *
      * @return - list of configurations of installed clusters
-     *
      */
     public List<Config> getClusters();
 }

@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.spark;
 
 import java.util.Set;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -13,7 +14,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
- *
  * @author dilshat
  */
 public class Commands {

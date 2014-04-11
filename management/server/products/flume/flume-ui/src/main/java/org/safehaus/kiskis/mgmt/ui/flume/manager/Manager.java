@@ -4,7 +4,9 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+
 import java.util.*;
+
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
@@ -56,7 +58,7 @@ public class Manager {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                config = (Config)event.getProperty().getValue();
+                config = (Config) event.getProperty().getValue();
                 refreshUI();
             }
         });
@@ -79,7 +81,7 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if(config != null) {
+                if (config != null) {
                     MgmtApplication.showConfirmationDialog(
                             "Cluster destruction confirmation",
                             String.format("Do you want to destroy the %s cluster?",
@@ -88,7 +90,7 @@ public class Manager {
 
                                 @Override
                                 public void response(boolean ok) {
-                                    if(ok) {
+                                    if (ok) {
                                         UUID trackID = FlumeUI.getManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
@@ -98,7 +100,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
                 } else {
                     show("Please, select cluster");
                 }
@@ -113,15 +116,15 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if(config != null) {
+                if (config != null) {
                     HadoopClusterInfo info = FlumeUI.getDbManager().
                             getInfo(HadoopClusterInfo.SOURCE,
                                     config.getClusterName(),
                                     HadoopClusterInfo.class);
-                    if(info != null) {
+                    if (info != null) {
                         Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
                         nodes.removeAll(config.getNodes());
-                        if(!nodes.isEmpty()) {
+                        if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
                             MgmtApplication.addCustomWindow(addNodeWindow);
                             addNodeWindow.addListener(new Window.CloseListener() {
@@ -161,8 +164,8 @@ public class Manager {
 
         table.removeAllItems();
 
-        for(Iterator it = agents.iterator(); it.hasNext();) {
-            final Agent agent = (Agent)it.next();
+        for (Iterator it = agents.iterator(); it.hasNext(); ) {
+            final Agent agent = (Agent) it.next();
             final Button destroyBtn = new Button("Destroy");
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
@@ -170,7 +173,7 @@ public class Manager {
             startBtn.setEnabled(true);
 
             table.addItem(new Object[]{agent.getHostname(),
-                startBtn, stopBtn, destroyBtn}, null);
+                    startBtn, stopBtn, destroyBtn}, null);
 
             startBtn.addListener(new Button.ClickListener() {
 
@@ -190,14 +193,15 @@ public class Manager {
                                 public void windowClose(Window.CloseEvent e) {
                                     ProductOperationView po = FlumeUI.getTracker()
                                             .getProductOperation(Config.PRODUCT_KEY, trackId);
-                                    if(po.getState() == ProductOperationState.SUCCEEDED) {
+                                    if (po.getState() == ProductOperationState.SUCCEEDED) {
                                         stopBtn.setEnabled(true);
                                     } else {
                                         startBtn.setEnabled(true);
                                     }
                                     destroyBtn.setEnabled(true);
                                 }
-                            });
+                            }
+                    );
                 }
             });
 
@@ -219,14 +223,15 @@ public class Manager {
                                 public void windowClose(Window.CloseEvent e) {
                                     ProductOperationView po = FlumeUI.getTracker()
                                             .getProductOperation(Config.PRODUCT_KEY, trackId);
-                                    if(po.getState() == ProductOperationState.SUCCEEDED) {
+                                    if (po.getState() == ProductOperationState.SUCCEEDED) {
                                         startBtn.setEnabled(true);
                                     } else {
                                         stopBtn.setEnabled(true);
                                     }
                                     destroyBtn.setEnabled(true);
                                 }
-                            });
+                            }
+                    );
                 }
             });
 
@@ -242,7 +247,7 @@ public class Manager {
 
                                 @Override
                                 public void response(boolean ok) {
-                                    if(ok) {
+                                    if (ok) {
                                         UUID trackID = FlumeUI.getManager().destroyNode(config.getClusterName(), agent.getHostname());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
@@ -252,7 +257,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
 
                 }
             });
@@ -260,7 +266,7 @@ public class Manager {
     }
 
     private void refreshUI() {
-        if(config != null) {
+        if (config != null) {
             populateTable(nodesTable, config.getNodes());
         } else {
             nodesTable.removeAllItems();
@@ -269,16 +275,16 @@ public class Manager {
 
     public void refreshClustersInfo() {
         List<Config> clustersInfo = FlumeUI.getManager().getClusters();
-        Config clusterInfo = (Config)clusterCombo.getValue();
+        Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if(clustersInfo != null && clustersInfo.size() > 0) {
-            for(Config ci : clustersInfo) {
+        if (clustersInfo != null && clustersInfo.size() > 0) {
+            for (Config ci : clustersInfo) {
                 clusterCombo.addItem(ci);
                 clusterCombo.setItemCaption(ci, ci.getClusterName());
             }
-            if(clusterInfo != null) {
-                for(Config ci : clustersInfo) {
-                    if(ci.getClusterName().equals(clusterInfo.getClusterName())) {
+            if (clusterInfo != null) {
+                for (Config ci : clustersInfo) {
+                    if (ci.getClusterName().equals(clusterInfo.getClusterName())) {
                         clusterCombo.setValue(ci);
                         return;
                     }
@@ -304,10 +310,10 @@ public class Manager {
         table.addListener(new ItemClickEvent.ItemClickListener() {
 
             public void itemClick(ItemClickEvent event) {
-                if(event.isDoubleClick()) {
-                    String lxcHostname = (String)table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                if (event.isDoubleClick()) {
+                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
                     Agent lxcAgent = FlumeUI.getAgentManager().getAgentByHostname(lxcHostname);
-                    if(lxcAgent != null) {
+                    if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
                         MgmtApplication.addCustomWindow(terminal);
                     } else {
