@@ -53,6 +53,7 @@ public class NameNodeConfiguration {
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                     String[] array = response.getStdOut().split("\n");
+                    System.out.println(response.getStdOut());
 
                     for (String status : array) {
                         if (status.contains("NameNode")) {
@@ -61,6 +62,7 @@ public class NameNodeConfiguration {
                                     replaceAll("NameNode is ", "");
                         }
                     }
+                    System.out.println(gStatus[0]);
                 }
 
                 return null;
