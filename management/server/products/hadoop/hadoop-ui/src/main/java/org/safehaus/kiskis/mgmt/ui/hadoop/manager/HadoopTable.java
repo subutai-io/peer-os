@@ -56,6 +56,7 @@ public class HadoopTable extends TreeTable {
                 null
         });
         List<Config> list = HadoopUI.getHadoopManager().getClusters();
+        System.out.println(list);
         for (Config cluster : list) {
             Object rowId = addItem(new Object[]{
                     cluster.getClusterName(),
