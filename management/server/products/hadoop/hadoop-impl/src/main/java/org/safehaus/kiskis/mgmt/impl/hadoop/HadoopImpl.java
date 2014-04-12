@@ -92,17 +92,17 @@ public class HadoopImpl implements Hadoop {
     }
 
     @Override
-    public UUID startNameNode(Config config) {
+    public boolean startNameNode(Config config) {
         return new NameNodeConfiguration(this, config).startNameNode();
     }
 
     @Override
-    public UUID stopNameNode(Config config) {
+    public boolean stopNameNode(Config config) {
         return new NameNodeConfiguration(this, config).stopNameNode();
     }
 
     @Override
-    public UUID restartNameNode(Config config) {
+    public boolean restartNameNode(Config config) {
         return new NameNodeConfiguration(this, config).restartNameNode();
     }
 
@@ -122,17 +122,17 @@ public class HadoopImpl implements Hadoop {
     }
 
     @Override
-    public UUID startJobTracker(Config config) {
+    public boolean startJobTracker(Config config) {
         return new NameNodeConfiguration(this, config).startJobTracker();
     }
 
     @Override
-    public UUID stopJobTracker(Config config) {
+    public boolean stopJobTracker(Config config) {
         return new NameNodeConfiguration(this, config).stopJobTracker();
     }
 
     @Override
-    public UUID restartJobTracker(Config config) {
+    public boolean restartJobTracker(Config config) {
         return new NameNodeConfiguration(this, config).restartJobTracker();
     }
 

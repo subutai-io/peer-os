@@ -13,11 +13,11 @@ public interface Hadoop {
 
     public UUID uninstallCluster(String clusterName);
 
-    public UUID startNameNode(Config config);
+    public boolean startNameNode(Config config);
 
-    public UUID stopNameNode(Config config);
+    public boolean stopNameNode(Config config);
 
-    public UUID restartNameNode(Config config);
+    public boolean restartNameNode(Config config);
 
     public boolean statusNameNode(Config config);
 
@@ -25,11 +25,11 @@ public interface Hadoop {
 
     public boolean statusDataNode(Agent agent);
 
-    public UUID startJobTracker(Config config);
+    public boolean startJobTracker(Config config);
 
-    public UUID stopJobTracker(Config config);
+    public boolean stopJobTracker(Config config);
 
-    public UUID restartJobTracker(Config config);
+    public boolean restartJobTracker(Config config);
 
     public boolean statusJobTracker(Config config);
 

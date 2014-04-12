@@ -24,6 +24,8 @@ public class NameNode extends ClusterNode {
         addComponent(getStartButton());
         addComponent(getStopButton());
         addComponent(getRestartButton());
+
+        getStatus();
     }
 
     private Embedded getProgressIcon() {
@@ -39,8 +41,10 @@ public class NameNode extends ClusterNode {
         startButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                HadoopUI.getHadoopManager().startNameNode(cluster);
-                getStatus();
+                setLoading(true);
+                if (HadoopUI.getHadoopManager().startNameNode(cluster)) {
+                    getStatus();
+                }
             }
         });
 
@@ -54,8 +58,10 @@ public class NameNode extends ClusterNode {
         stopButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                HadoopUI.getHadoopManager().stopNameNode(cluster);
-                getStatus();
+                setLoading(true);
+                if (HadoopUI.getHadoopManager().stopNameNode(cluster)) {
+                    getStatus();
+                }
             }
         });
 
@@ -68,8 +74,10 @@ public class NameNode extends ClusterNode {
         restartButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                HadoopUI.getHadoopManager().restartNameNode(cluster);
-                getStatus();
+                setLoading(true);
+                if (HadoopUI.getHadoopManager().restartNameNode(cluster)) {
+                    getStatus();
+                }
             }
         });
 
@@ -78,19 +86,20 @@ public class NameNode extends ClusterNode {
 
     @Override
     public void getStatus() {
-        startButton.setVisible(false);
-        stopButton.setVisible(false);
-        restartButton.setVisible(false);
-        progressIcon.setVisible(true);
+        setLoading(true);
 
         boolean isRunning = HadoopUI.getHadoopManager().statusNameNode(cluster);
         startButton.setEnabled(isRunning);
         restartButton.setEnabled(!isRunning);
         stopButton.setEnabled(isRunning);
 
-        startButton.setVisible(false);
-        stopButton.setVisible(false);
-        restartButton.setVisible(false);
-        progressIcon.setVisible(true);
+        setLoading(false);
+    }
+
+    private void setLoading(boolean isLoading) {
+        startButton.setVisible(!isLoading);
+        stopButton.setVisible(!isLoading);
+        restartButton.setVisible(!isLoading);
+        progressIcon.setVisible(isLoading);
     }
 }

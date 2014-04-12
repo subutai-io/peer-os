@@ -4,13 +4,11 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
 import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -25,67 +23,25 @@ public class NameNodeConfiguration {
         this.config = config;
     }
 
-    public UUID startNameNode() {
-        final ProductOperation po
-                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting cluster's %s NameNode", config.getClusterName()));
+    public boolean startNameNode() {
+        Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "start");
+        parent.getTaskRunner().executeTask(task);
 
-        parent.getExecutor().execute(new Runnable() {
-
-            public void run() {
-                Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "start");
-                parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        return null;
-                    }
-                });
-            }
-        });
-
-        return po.getId();
+        return task.getTaskStatus() == TaskStatus.SUCCESS;
     }
 
-    public UUID stopNameNode() {
-        final ProductOperation po
-                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping cluster's %s NameNode", config.getClusterName()));
+    public boolean stopNameNode() {
+        Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "stop");
+        parent.getTaskRunner().executeTask(task);
 
-        parent.getExecutor().execute(new Runnable() {
-
-            public void run() {
-                Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "stop");
-                parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        return null;
-                    }
-                });
-            }
-        });
-
-        return po.getId();
+        return task.getTaskStatus() == TaskStatus.SUCCESS;
     }
 
-    public UUID restartNameNode() {
-        final ProductOperation po
-                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Restarting cluster's %s NameNode", config.getClusterName()));
+    public boolean restartNameNode() {
+        Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "restart");
+        parent.getTaskRunner().executeTask(task);
 
-        parent.getExecutor().execute(new Runnable() {
-
-            public void run() {
-                Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "restart");
-                parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        return null;
-                    }
-                });
-            }
-        });
-
-        return po.getId();
+        return task.getTaskStatus() == TaskStatus.SUCCESS;
     }
 
     public boolean statusNameNode() {
@@ -164,67 +120,25 @@ public class NameNodeConfiguration {
         return !gStatus[0].toLowerCase().contains("not");
     }
 
-    public UUID startJobTracker() {
-        final ProductOperation po
-                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting cluster's %s JobTracker", config.getClusterName()));
+    public boolean startJobTracker() {
+        Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "start");
+        parent.getTaskRunner().executeTask(task);
 
-        parent.getExecutor().execute(new Runnable() {
-
-            public void run() {
-                Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "start");
-                parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        return null;
-                    }
-                });
-            }
-        });
-
-        return po.getId();
+        return task.getTaskStatus() == TaskStatus.SUCCESS;
     }
 
-    public UUID stopJobTracker() {
-        final ProductOperation po
-                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping cluster's %s JobTracker", config.getClusterName()));
+    public boolean stopJobTracker() {
+        Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "stop");
+        parent.getTaskRunner().executeTask(task);
 
-        parent.getExecutor().execute(new Runnable() {
-
-            public void run() {
-                Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "stop");
-                parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        return null;
-                    }
-                });
-            }
-        });
-
-        return po.getId();
+        return task.getTaskStatus() == TaskStatus.SUCCESS;
     }
 
-    public UUID restartJobTracker() {
-        final ProductOperation po
-                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Restarting cluster's %s JobTracker", config.getClusterName()));
+    public boolean restartJobTracker() {
+        Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "restart");
+        parent.getTaskRunner().executeTask(task);
 
-        parent.getExecutor().execute(new Runnable() {
-
-            public void run() {
-                Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "restart");
-                parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        return null;
-                    }
-                });
-            }
-        });
-
-        return po.getId();
+        return task.getTaskStatus() == TaskStatus.SUCCESS;
     }
 
     public boolean statusJobTracker() {
