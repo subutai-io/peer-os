@@ -26,6 +26,7 @@ public class Manager extends Panel {
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                System.out.println("Refresh Button Click");
                 table.refreshDataSource();
             }
         });

@@ -56,6 +56,5 @@ public class HadoopTable extends TreeTable {
             setParent(parentId, rowId);
             setCollapsed(rowId, false);
         }
-        indicator.setVisible(false);
     }
 }
