@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class JobTracker extends HorizontalLayout {
+public class JobTracker extends HorizontalLayout implements ClusterNode {
     private Embedded progressIcon;
     private Config cluster;
     private Button startButton, stopButton, restartButton;
@@ -52,5 +52,10 @@ public class JobTracker extends HorizontalLayout {
         restartButton.setIcon(new ThemeResource("icons/buttons/restart.png"));
 
         return restartButton;
+    }
+
+    @Override
+    public void getStatus() {
+
     }
 }

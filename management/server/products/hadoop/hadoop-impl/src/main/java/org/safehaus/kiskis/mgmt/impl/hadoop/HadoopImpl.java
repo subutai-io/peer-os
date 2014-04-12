@@ -9,6 +9,8 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Installation;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.NameNodeConfiguration;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.List;
 import java.util.UUID;
@@ -87,6 +89,61 @@ public class HadoopImpl implements Hadoop {
     @Override
     public UUID uninstallCluster(final String clusterName) {
         return new Deletion(this).execute(clusterName);
+    }
+
+    @Override
+    public UUID startNameNode(Config config) {
+        return new NameNodeConfiguration(this, config).startNameNode();
+    }
+
+    @Override
+    public UUID stopNameNode(Config config) {
+        return new NameNodeConfiguration(this, config).stopNameNode();
+    }
+
+    @Override
+    public UUID restartNameNode(Config config) {
+        return new NameNodeConfiguration(this, config).restartNameNode();
+    }
+
+    @Override
+    public boolean statusNameNode(Config config) {
+        return new NameNodeConfiguration(this, config).statusNameNode();
+    }
+
+    @Override
+    public boolean statusSecondaryNameNode(Config config) {
+        return new NameNodeConfiguration(this, config).statusSecondaryNameNode();
+    }
+
+    @Override
+    public boolean statusDataNode(Agent agent) {
+        return new NameNodeConfiguration(this, null).statusDataNode(agent);
+    }
+
+    @Override
+    public UUID startJobTracker(Config config) {
+        return new NameNodeConfiguration(this, config).startJobTracker();
+    }
+
+    @Override
+    public UUID stopJobTracker(Config config) {
+        return new NameNodeConfiguration(this, config).stopJobTracker();
+    }
+
+    @Override
+    public UUID restartJobTracker(Config config) {
+        return new NameNodeConfiguration(this, config).restartJobTracker();
+    }
+
+    @Override
+    public boolean statusJobTracker(Config config) {
+        return new NameNodeConfiguration(this, config).statusJobTracker();
+    }
+
+    @Override
+    public boolean statusTaskTracker(Agent agent) {
+        return new NameNodeConfiguration(this, null).statusTaskTracker(agent);
     }
 
 

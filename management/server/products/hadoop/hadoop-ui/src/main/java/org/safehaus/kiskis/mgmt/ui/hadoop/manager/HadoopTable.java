@@ -1,11 +1,11 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.JobTracker;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.NameNode;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.SecondaryNameNode;
@@ -39,9 +39,9 @@ public class HadoopTable extends TreeTable {
 
         addContainerProperty(CLUSTER_NAME_PROPERTY, String.class, null);
         addContainerProperty(DOMAIN_NAME_PROPERTY, String.class, null);
-        addContainerProperty(NAMENODE_PROPERTY, HorizontalLayout.class, null);
-        addContainerProperty(SECONDARY_NAMENODE_PROPERTY, HorizontalLayout.class, null);
-        addContainerProperty(JOBTRACKER_PROPERTY, HorizontalLayout.class, null);
+        addContainerProperty(NAMENODE_PROPERTY, ClusterNode.class, null);
+        addContainerProperty(SECONDARY_NAMENODE_PROPERTY, ClusterNode.class, null);
+        addContainerProperty(JOBTRACKER_PROPERTY, ClusterNode.class, null);
         addContainerProperty(REPLICATION_PROPERTY, Integer.class, null);
 
         refreshDataSource();
@@ -68,8 +68,8 @@ public class HadoopTable extends TreeTable {
                             cluster.getClusterName(),
                             cluster.getDomainName(),
                             new NameNode(cluster),
-                            new JobTracker(cluster),
                             new SecondaryNameNode(cluster),
+                            new JobTracker(cluster),
                             cluster.getReplicationFactor()},
                     null
             );

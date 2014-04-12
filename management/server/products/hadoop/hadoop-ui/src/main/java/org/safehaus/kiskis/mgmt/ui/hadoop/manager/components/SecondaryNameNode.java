@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class SecondaryNameNode extends HorizontalLayout {
+public class SecondaryNameNode extends HorizontalLayout implements ClusterNode {
     private Embedded progressIcon;
     private Config cluster;
     private Button startButton, stopButton;
@@ -46,5 +46,10 @@ public class SecondaryNameNode extends HorizontalLayout {
         stopButton.setEnabled(false);
 
         return stopButton;
+    }
+
+    @Override
+    public void getStatus() {
+
     }
 }
