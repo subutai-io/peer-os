@@ -8,12 +8,15 @@ package org.safehaus.kiskis.mgmt.impl.taskrunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -29,7 +32,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
- *
  * @author dilshat
  */
 //@Ignore
@@ -117,7 +119,8 @@ public class TaskRunnerImplTaskStatusesTest {
 
     @Test(expected = RuntimeException.class)
     public void testExecuteEmptyTaskSync() {
-        taskrunner.executeTask(new Task());;
+        taskrunner.executeTask(new Task());
+        ;
     }
 
     @Test(expected = RuntimeException.class)
