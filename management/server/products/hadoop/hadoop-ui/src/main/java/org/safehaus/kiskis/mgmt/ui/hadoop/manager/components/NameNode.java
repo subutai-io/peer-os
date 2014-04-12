@@ -42,9 +42,10 @@ public class NameNode extends ClusterNode {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 setLoading(true);
-                if (HadoopUI.getHadoopManager().startNameNode(cluster)) {
+                /*if (HadoopUI.getHadoopManager().startNameNode(cluster)) {
                     getStatus();
-                }
+                }*/
+                getStatus();
             }
         });
 
