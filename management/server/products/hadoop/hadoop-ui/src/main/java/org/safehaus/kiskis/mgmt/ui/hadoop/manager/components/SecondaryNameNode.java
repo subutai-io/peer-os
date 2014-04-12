@@ -3,13 +3,12 @@ package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
-import com.vaadin.ui.HorizontalLayout;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class SecondaryNameNode extends HorizontalLayout implements ClusterNode {
+public class SecondaryNameNode extends ClusterNode {
     private Embedded progressIcon;
     private Config cluster;
     private Button startButton, stopButton;
