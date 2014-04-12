@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 
@@ -15,8 +16,21 @@ public class Manager extends Panel {
     public Manager() {
         setSizeFull();
 
+        addComponent(getButtonRefresh());
         addComponent(getIndicator());
         addComponent(getHadoopTable());
+    }
+
+    private Button getButtonRefresh() {
+        Button button = new Button("Refresh Hadoop Cluster Table");
+        button.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                table.refreshDataSource();
+            }
+        });
+
+        return button;
     }
 
     private Label getIndicator() {
