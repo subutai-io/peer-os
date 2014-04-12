@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 public class NameNodeConfiguration {
     private HadoopImpl parent;
     private Config config;
+    private String globalStatus;
 
     public NameNodeConfiguration(HadoopImpl parent, Config config) {
         this.parent = parent;
@@ -46,25 +47,20 @@ public class NameNodeConfiguration {
 
     public boolean statusNameNode() {
         Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "status");
-        final String[] gStatus = new String[1];
 
-        parent.getTaskRunner().executeTask(task, new TaskCallback() {
+        parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 if (task.isCompleted()) {
-                    synchronized (task) {
-                        String[] array = response.getStdOut().split("\n");
-                        System.out.println(response.getStdOut());
+                    String[] array = response.getStdOut().split("\n");
+                    System.out.println(response.getStdOut());
 
-                        for (String status : array) {
-                            if (status.contains("NameNode")) {
-                                gStatus[0] = status.
-                                        replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
-                                        replaceAll("NameNode is ", "");
-                            }
+                    for (String status : array) {
+                        if (status.contains("NameNode")) {
+                            globalStatus = status.
+                                    replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
+                                    replaceAll("NameNode is ", "");
                         }
-
-                        task.notifyAll();
                     }
                 }
 
@@ -72,16 +68,8 @@ public class NameNodeConfiguration {
             }
         });
 
-        synchronized (task) {
-            try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-                return false;
-            }
-        }
-
-        System.out.println(gStatus[0]);
-        return !gStatus[0].toLowerCase().contains("not");
+        System.out.println(globalStatus);
+        return !globalStatus.toLowerCase().contains("not");
     }
 
     public boolean statusSecondaryNameNode() {
