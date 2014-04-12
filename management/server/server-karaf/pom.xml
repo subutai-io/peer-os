@@ -762,11 +762,11 @@
                                     <artifactId>cassandra-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                <artifactItem>
+                                <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>sqoop-module</artifactId>
