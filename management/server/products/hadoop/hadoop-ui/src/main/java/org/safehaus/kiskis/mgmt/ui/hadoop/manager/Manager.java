@@ -46,7 +46,7 @@ public class Manager extends Panel {
 
     private HadoopTable getHadoopTable() {
         if (table == null) {
-            table = new HadoopTable("Hadoop Clusters");
+            table = new HadoopTable("Hadoop Clusters", indicator);
         }
 
         return table;
