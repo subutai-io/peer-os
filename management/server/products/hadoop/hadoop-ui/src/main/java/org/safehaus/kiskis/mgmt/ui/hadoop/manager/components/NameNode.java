@@ -25,7 +25,7 @@ public class NameNode extends ClusterNode {
         addComponent(getStopButton());
         addComponent(getRestartButton());
 
-        getStatus();
+//        getStatus();
     }
 
     private Embedded getProgressIcon() {
