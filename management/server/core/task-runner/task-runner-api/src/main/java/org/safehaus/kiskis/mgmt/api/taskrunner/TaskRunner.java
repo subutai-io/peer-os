@@ -28,9 +28,9 @@ public interface TaskRunner {
      * this task. If null for callback is supplied this call is the same as
      * calling executeTaskNForget.
      *
-     * @param task - task to execute
+     * @param task         - task to execute
      * @param taskCallback - callback to trigger when response from agent is
-     * received
+     *                     received
      */
     public void executeTask(Task task, TaskCallback taskCallback);
 
@@ -51,7 +51,7 @@ public interface TaskRunner {
      * hour maximum and them times out. Calling party should examine the
      * returned/supplied task to see its status after this method returns.
      *
-     * @param task - task to execute
+     * @param task     - task to execute
      * @param callback - task callback
      */
     public void executeTaskNWait(Task task, TaskCallback callback);
@@ -62,7 +62,7 @@ public interface TaskRunner {
      * hour maximum and them times out. Calling party should examine the
      * returned/supplied task to see its status after this method returns.
      *
-     * @param task - task to execute
+     * @param task     - task to execute
      * @param callback - task callback
      */
     public void executeTaskNWait(Task task, InterruptableTaskCallback callback);

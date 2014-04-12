@@ -7,12 +7,15 @@ package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
 import org.junit.Ignore;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
@@ -28,7 +31,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 /**
- *
  * @author dilshat
  */
 //@Ignore

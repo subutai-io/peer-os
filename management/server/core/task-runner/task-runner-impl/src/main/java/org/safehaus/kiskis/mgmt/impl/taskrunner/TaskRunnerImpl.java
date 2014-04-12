@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -21,7 +22,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 
 /**
  * Implementation of {@code TaskRunner} interface.
- *
  *
  * @author dilshat
  */
@@ -118,13 +118,12 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * This method processes responses from agents/nodes.
-     *
+     * <p/>
      * For each response its single threaded executor is retrieved from
      * executors map. The response is submitted for further processing by means
      * of this executor. If task completes or new task is submitted by its
      * {@code TaskCallback} the current executor gets disposed. For new task new
      * executor is bootstrapped.
-     *
      *
      * @param response - response from node
      */
@@ -252,7 +251,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * hour maximum and them times out. Calling party should examine the
      * returned/supplied task to see its status after this method returns.
      *
-     * @param task - task to execute
+     * @param task     - task to execute
      * @param callback - task callback
      */
     @Override
@@ -279,7 +278,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * hour maximum and them times out. Calling party should examine the
      * returned/supplied task to see its status after this method returns.
      *
-     * @param task - task to execute
+     * @param task     - task to execute
      * @param callback - task callback
      */
     @Override
