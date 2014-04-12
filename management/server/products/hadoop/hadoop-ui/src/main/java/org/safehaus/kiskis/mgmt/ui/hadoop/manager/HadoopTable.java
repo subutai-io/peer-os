@@ -40,8 +40,8 @@ public class HadoopTable extends TreeTable {
         addContainerProperty(CLUSTER_NAME_PROPERTY, String.class, null);
         addContainerProperty(DOMAIN_NAME_PROPERTY, String.class, null);
         addContainerProperty(NAMENODE_PROPERTY, HorizontalLayout.class, null);
-        addContainerProperty(SECONDARY_NAMENODE_PROPERTY, Label.class, null);
-        addContainerProperty(JOBTRACKER_PROPERTY, Label.class, null);
+        addContainerProperty(SECONDARY_NAMENODE_PROPERTY, HorizontalLayout.class, null);
+        addContainerProperty(JOBTRACKER_PROPERTY, HorizontalLayout.class, null);
         addContainerProperty(REPLICATION_PROPERTY, Integer.class, null);
 
         refreshDataSource();
