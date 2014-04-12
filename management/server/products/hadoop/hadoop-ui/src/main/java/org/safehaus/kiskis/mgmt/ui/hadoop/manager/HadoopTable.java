@@ -20,7 +20,10 @@ public class HadoopTable extends TreeTable {
     protected static final String JOBTRACKER_PROPERTY = "JobTracker/TaskTrackers";
     protected static final String REPLICATION_PROPERTY = "Replication Factor";
 
-    public HadoopTable(String caption) {
+    private Label indicator;
+
+    public HadoopTable(String caption, Label indicator) {
+        this.indicator = indicator;
         setCaption(caption);
 
         this.setWidth("100%");
@@ -41,6 +44,7 @@ public class HadoopTable extends TreeTable {
     }
 
     public void refreshDataSource() {
+        indicator.setVisible(true);
         removeAllItems();
 
         final Object parentId = addItem(new Object[]{
@@ -63,5 +67,6 @@ public class HadoopTable extends TreeTable {
             });
             setParent(parentId, rowId);
         }
+        indicator.setVisible(false);
     }
 }
