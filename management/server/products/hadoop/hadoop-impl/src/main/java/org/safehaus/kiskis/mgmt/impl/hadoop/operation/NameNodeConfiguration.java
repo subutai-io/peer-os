@@ -48,25 +48,37 @@ public class NameNodeConfiguration {
         Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "status");
         final String[] gStatus = new String[1];
 
-        parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
+        parent.getTaskRunner().executeTask(task, new TaskCallback() {
             @Override
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    String[] array = response.getStdOut().split("\n");
-                    System.out.println(response.getStdOut());
+                if (task.isCompleted()) {
+                    synchronized (task) {
+                        String[] array = response.getStdOut().split("\n");
+                        System.out.println(response.getStdOut());
 
-                    for (String status : array) {
-                        if (status.contains("NameNode")) {
-                            gStatus[0] = status.
-                                    replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
-                                    replaceAll("NameNode is ", "");
+                        for (String status : array) {
+                            if (status.contains("NameNode")) {
+                                gStatus[0] = status.
+                                        replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
+                                        replaceAll("NameNode is ", "");
+                            }
                         }
+
+                        task.notifyAll();
                     }
                 }
 
                 return null;
             }
         });
+
+        synchronized (task) {
+            try {
+                task.wait(task.getAvgTimeout() * 1000 + 1000);
+            } catch (InterruptedException ex) {
+                return false;
+            }
+        }
 
         System.out.println(gStatus[0]);
         return !gStatus[0].toLowerCase().contains("not");
