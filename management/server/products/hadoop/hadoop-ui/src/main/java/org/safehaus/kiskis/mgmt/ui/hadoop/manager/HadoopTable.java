@@ -1,10 +1,12 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.NameNode;
 
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class HadoopTable extends TreeTable {
 
         addContainerProperty(CLUSTER_NAME_PROPERTY, String.class, null);
         addContainerProperty(DOMAIN_NAME_PROPERTY, String.class, null);
-        addContainerProperty(NAMENODE_PROPERTY, Label.class, null);
+        addContainerProperty(NAMENODE_PROPERTY, HorizontalLayout.class, null);
         addContainerProperty(SECONDARY_NAMENODE_PROPERTY, Label.class, null);
         addContainerProperty(JOBTRACKER_PROPERTY, Label.class, null);
         addContainerProperty(REPLICATION_PROPERTY, Integer.class, null);
@@ -47,13 +49,29 @@ public class HadoopTable extends TreeTable {
         indicator.setVisible(true);
         removeAllItems();
 
-        final Object parentId = addItem(new Object[]{"All clusters", null, null, null, null, null}, null);
+        final Object parentId = addItem(new Object[]{
+                        "All clusters",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null},
+                null
+        );
         setCollapsed(parentId, false);
 
         List<Config> list = HadoopUI.getHadoopManager().getClusters();
         for (Config cluster : list) {
-            Object rowId = addItem(new Object[]{cluster.getClusterName(), cluster.getDomainName(), null, null, null, null}, null);
-            setParent(parentId, rowId);
+            Object rowId = addItem(new Object[]{
+                            cluster.getClusterName(),
+                            cluster.getDomainName(),
+                            new NameNode(cluster),
+                            null,
+                            null,
+                            null},
+                    null
+            );
+            setParent(rowId, parentId);
             setCollapsed(rowId, false);
         }
         indicator.setVisible(false);
