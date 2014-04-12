@@ -47,14 +47,15 @@ public class HadoopTable extends TreeTable {
         indicator.setVisible(true);
         removeAllItems();
 
-        final Object parentId = addItem(new Object[]{"All clusters", null, null, null, null, null});
+        final Object parentId = addItem(new Object[]{"All clusters", null, null, null, null, null}, null);
         setCollapsed(parentId, false);
 
         List<Config> list = HadoopUI.getHadoopManager().getClusters();
         for (Config cluster : list) {
-            Object rowId = addItem(new Object[]{cluster.getClusterName(), cluster.getDomainName(), null, null, null, null});
+            Object rowId = addItem(new Object[]{cluster.getClusterName(), cluster.getDomainName(), null, null, null, null}, null);
             setParent(parentId, rowId);
             setCollapsed(rowId, false);
         }
+        indicator.setVisible(false);
     }
 }
