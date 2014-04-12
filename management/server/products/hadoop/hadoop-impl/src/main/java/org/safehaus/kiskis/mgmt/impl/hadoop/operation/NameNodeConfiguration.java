@@ -62,13 +62,13 @@ public class NameNodeConfiguration {
                                     replaceAll("NameNode is ", "");
                         }
                     }
-                    System.out.println(gStatus[0]);
                 }
 
                 return null;
             }
         });
 
+        System.out.println(gStatus[0]);
         return !gStatus[0].toLowerCase().contains("not");
     }
 
