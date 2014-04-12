@@ -6,7 +6,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.JobTracker;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.NameNode;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.SecondaryNameNode;
 
 import java.util.List;
 
@@ -66,9 +68,9 @@ public class HadoopTable extends TreeTable {
                             cluster.getClusterName(),
                             cluster.getDomainName(),
                             new NameNode(cluster),
-                            null,
-                            null,
-                            null},
+                            new JobTracker(cluster),
+                            new SecondaryNameNode(cluster),
+                            cluster.getReplicationFactor()},
                     null
             );
             setParent(rowId, parentId);
