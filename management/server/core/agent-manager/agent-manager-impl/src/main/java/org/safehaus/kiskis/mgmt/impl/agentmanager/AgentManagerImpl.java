@@ -49,11 +49,27 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     private static final Logger LOG = Logger.getLogger(AgentManagerImpl.class.getName());
 
+    /**
+     * reference to communication manager
+     */
     private CommunicationManager communicationService;
+    /**
+     * reference to db manager
+     */
     private DbManager dbManagerService;
+    /**
+     * list of agent listeners
+     */
     private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
+    /**
+     * executor for notifying agent listeners
+     */
     private ExecutorService exec;
+    /**
+     * cache of currently connected agents with expiry ttl
+     */
     private Cache<UUID, Agent> agents;
+
     private volatile boolean notifyAgentListeners = true;
 
     public void setCommunicationService(CommunicationManager communicationService) {
@@ -64,10 +80,21 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         this.dbManagerService = dbManagerService;
     }
 
+    /**
+     * Returns all agents currently connected to the mgmt server.
+     *
+     * @return set of all agents connected to the mgmt server.
+     */
     public Set<Agent> getAgents() {
         return new HashSet(agents.asMap().values());
     }
 
+    /**
+     * Returns all physical agents currently connected to the mgmt server.
+     *
+     * @return set of all physical agents currently connected to the mgmt
+     * server.
+     */
     public Set<Agent> getPhysicalAgents() {
         Set<Agent> physicalAgents = new HashSet<Agent>();
         for (Agent agent : agents.asMap().values()) {
@@ -78,6 +105,27 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         return physicalAgents;
     }
 
+    /**
+     * Returns all lxc agents currently connected to the mgmt server.
+     *
+     * @return set of all lxc agents currently connected to the mgmt server.
+     */
+    public Set<Agent> getLxcAgents() {
+        Set<Agent> lxcAgents = new HashSet<Agent>();
+        for (Agent agent : agents.asMap().values()) {
+            if (agent.isIsLXC()) {
+                lxcAgents.add(agent);
+            }
+        }
+        return lxcAgents;
+    }
+
+    /**
+     * Returns agent by its node's hostname or null if agent is not connected
+     *
+     * @param hostname - hostname of agent's node
+     * @return agent
+     */
     public Agent getAgentByHostname(String hostname) {
         if (!Util.isStringEmpty(hostname)) {
             for (Agent agent : agents.asMap().values()) {
@@ -89,20 +137,23 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         return null;
     }
 
+    /**
+     * Returns agent by its UUID or null if agent is not connected
+     *
+     * @param hostname - UUID of agent
+     * @return agent
+     */
     public Agent getAgentByUUID(UUID uuid) {
         return agents.getIfPresent(uuid);
     }
 
-    public Set<Agent> getLxcAgents() {
-        Set<Agent> lxcAgents = new HashSet<Agent>();
-        for (Agent agent : agents.asMap().values()) {
-            if (agent.isIsLXC()) {
-                lxcAgents.add(agent);
-            }
-        }
-        return lxcAgents;
-    }
-
+    /**
+     * Returns agent by its physical parent node's hostname or null if agent is
+     * not connected
+     *
+     * @param hostname - hostname of agent's node physical parent node
+     * @return agent
+     */
     public Set<Agent> getLxcAgentsByParentHostname(String parentHostname) {
         Set<Agent> lxcAgents = new HashSet<Agent>();
         if (!Util.isStringEmpty(parentHostname)) {
@@ -115,75 +166,11 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         return lxcAgents;
     }
 
-    public Agent getLxcAgentByHostnameFromDB(String hostname) {
-        Agent agent = null;
-        try {
-            String cql = "select * from agents where islxc = true and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
-            ResultSet rs = dbManagerService.executeQuery(cql, hostname,
-                    new Date(System.currentTimeMillis() - Common.AGENT_FRESHNESS_MIN * 60 * 1000));
-            Row row = rs.one();
-            if (row != null) {
-                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
-//                agent.setUuid(row.getUUID("uuid"));
-//                agent.setHostname(row.getString("hostname"));
-                agent.setIsLXC(row.getBool("islxc"));
-                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
-                agent.setListIP(row.getList("listip", String.class));
-                agent.setMacAddress(row.getString("macaddress"));
-                agent.setParentHostName(row.getString("parenthostname"));
-            }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getLxcAgentByHostnameFromDB", ex);
-        }
-        return agent;
-    }
-
-    public Agent getPhysicalAgentByHostnameFromDB(String hostname) {
-        Agent agent = null;
-        try {
-            String cql = "select * from agents where islxc = false and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
-            ResultSet rs = dbManagerService.executeQuery(cql, hostname,
-                    new Date(System.currentTimeMillis() - Common.AGENT_FRESHNESS_MIN * 60 * 1000));
-            Row row = rs.one();
-            if (row != null) {
-                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
-//                agent.setUuid(row.getUUID("uuid"));
-//                agent.setHostname(row.getString("hostname"));
-                agent.setIsLXC(row.getBool("islxc"));
-                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
-                agent.setListIP(row.getList("listip", String.class));
-                agent.setMacAddress(row.getString("macaddress"));
-                agent.setParentHostName(row.getString("parenthostname"));
-            }
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getPhysicalAgentByHostnameFromDB", ex);
-        }
-        return agent;
-    }
-
-    public Agent getAgentByUUIDFromDB(UUID uuid) {
-        Agent agent = null;
-        try {
-            String cql = "select * from agents where uuid = ?";
-            ResultSet rs = dbManagerService.executeQuery(cql, uuid);
-            Row row = rs.one();
-            if (row != null) {
-                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
-                agent.setUuid(row.getUUID("uuid"));
-                agent.setHostname(row.getString("hostname"));
-                agent.setIsLXC(row.getBool("islxc"));
-                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
-                agent.setListIP(row.getList("listip", String.class));
-                agent.setMacAddress(row.getString("macaddress"));
-                agent.setParentHostName(row.getString("parenthostname"));
-            }
-
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error in getAgentByUUIDFromDB", ex);
-        }
-        return agent;
-    }
-
+    /**
+     * Adds listener which wants to be notified when agents connect/disconnect
+     *
+     * @param listener
+     */
     @Override
     public void addListener(AgentListener listener) {
         try {
@@ -193,6 +180,11 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Removes listener
+     *
+     * @param listener
+     */
     @Override
     public void removeListener(AgentListener listener) {
         try {
@@ -202,6 +194,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Initialized agent manager
+     */
     public void init() {
         try {
 
@@ -220,7 +215,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                             if (notifyAgentListeners) {
                                 notifyAgentListeners = false;
                                 Set<Agent> freshAgents = new HashSet(agents.asMap().values());
-                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); ) {
+                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
                                     AgentListener listener = it.next();
                                     try {
                                         listener.onAgent(freshAgents);
@@ -242,6 +237,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Disposes agent manager
+     */
     public void destroy() {
         try {
             agents.invalidateAll();
@@ -252,6 +250,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Communication manager event when response from agent arrives
+     */
     public void onResponse(Response response) {
         switch (response.getType()) {
             case REGISTRATION_REQUEST: {
@@ -272,6 +273,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Adds agent to the cache of connected agents
+     */
     private void addAgent(Response response, boolean register) {
         try {
             if (response != null) {
@@ -285,8 +289,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     return;
                 }
                 Agent agent = new Agent(response.getUuid(), response.getHostname());
-//                agent.setUuid(response.getUuid());
-//                agent.setHostname(response.getHostname());
                 agent.setMacAddress(response.getMacAddress());
                 agent.setTransportId(response.getTransportId());
                 if (response.isIsLxc() == null) {
@@ -315,6 +317,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Sends ack to agent when it is registered with the mgmt server
+     */
     private void sendAck(UUID agentUUID) {
         Request ack = CommandFactory.newRequest(
                 RequestType.REGISTRATION_REQUEST_DONE,
@@ -326,6 +331,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         communicationService.sendRequest(ack);
     }
 
+    /**
+     * Removes agent from the cache of connected agents
+     */
     private void removeAgent(Response response) {
         try {
             if (response != null && response.getTransportId() != null) {
@@ -343,6 +351,97 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Returns lxc agent by its node's hostname from DB or null if agent is not
+     * connected
+     *
+     * @param hostname - hostname of agent's node
+     * @return agent
+     */
+    @Deprecated
+    public Agent getLxcAgentByHostnameFromDB(String hostname) {
+        Agent agent = null;
+        try {
+            String cql = "select * from agents where islxc = true and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
+            ResultSet rs = dbManagerService.executeQuery(cql, hostname,
+                    new Date(System.currentTimeMillis() - Common.AGENT_FRESHNESS_MIN * 60 * 1000));
+            Row row = rs.one();
+            if (row != null) {
+                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getLxcAgentByHostnameFromDB", ex);
+        }
+        return agent;
+    }
+
+    /**
+     * Returns physical agent by its node's hostname from DB or null if agent is
+     * not connected
+     *
+     * @param hostname - hostname of agent's node
+     * @return agent
+     */
+    @Deprecated
+    public Agent getPhysicalAgentByHostnameFromDB(String hostname) {
+        Agent agent = null;
+        try {
+            String cql = "select * from agents where islxc = false and hostname = ? and lastheartbeat >= ? LIMIT 1 ALLOW FILTERING";
+            ResultSet rs = dbManagerService.executeQuery(cql, hostname,
+                    new Date(System.currentTimeMillis() - Common.AGENT_FRESHNESS_MIN * 60 * 1000));
+            Row row = rs.one();
+            if (row != null) {
+                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getPhysicalAgentByHostnameFromDB", ex);
+        }
+        return agent;
+    }
+
+    /**
+     * Returns agent by its UUIDe from DB or null if agent is not connected
+     *
+     * @param hostname - UUID of agent's node
+     * @return agent
+     */
+    @Deprecated
+    public Agent getAgentByUUIDFromDB(UUID uuid) {
+        Agent agent = null;
+        try {
+            String cql = "select * from agents where uuid = ?";
+            ResultSet rs = dbManagerService.executeQuery(cql, uuid);
+            Row row = rs.one();
+            if (row != null) {
+                agent = new Agent(row.getUUID("uuid"), row.getString("hostname"));
+                agent.setUuid(row.getUUID("uuid"));
+                agent.setHostname(row.getString("hostname"));
+                agent.setIsLXC(row.getBool("islxc"));
+                agent.setLastHeartbeat(row.getDate("lastheartbeat"));
+                agent.setListIP(row.getList("listip", String.class));
+                agent.setMacAddress(row.getString("macaddress"));
+                agent.setParentHostName(row.getString("parenthostname"));
+            }
+
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getAgentByUUIDFromDB", ex);
+        }
+        return agent;
+    }
+
+    /**
+     * Persist agent to DB
+     */
     private void saveAgent(Agent agent) {
         try {
             String cql = "select uuid from agents where hostname = ?";
@@ -370,6 +469,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
     }
 
+    /**
+     * Removes agent from DB
+     */
     private void deleteAgent(Agent agent) {
 
         String cql = "select uuid from agents where transportid = ?";
