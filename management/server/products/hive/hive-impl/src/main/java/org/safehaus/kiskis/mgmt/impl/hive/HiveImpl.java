@@ -1,12 +1,10 @@
-
 package org.safehaus.kiskis.mgmt.impl.hive;
 
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.hive.Hive;
 
-public class HiveImpl implements Hive {
+public class HiveImpl extends HiveBase {
 
     public UUID installCluster(Config config) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

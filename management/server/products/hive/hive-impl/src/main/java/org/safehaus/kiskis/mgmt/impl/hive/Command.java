@@ -18,11 +18,11 @@ class Command {
         RESTART;
     }
 
-    static Request makeCommand(Type type, Product product) {
-        return makeCommand(type, product, 0);
+    static Request make(Type type, Product product) {
+        return make(type, product, 0);
     }
 
-    static Request makeCommand(Type type, Product product, int timeout) {
+    static Request make(Type type, Product product, int timeout) {
         Request req = getRequestTemplate();
         StringBuilder sb;
         switch(type) {
@@ -49,13 +49,13 @@ class Command {
         return req;
     }
 
-    static Request configureServerCommand() {
+    static Request configureServer(String host) {
         Request req = getRequestTemplate();
-        req.setProgram("hive-configure.sh %s"); // provide IP address of server
+        req.setProgram("hive-configure.sh " + host); // provide IP address of server
         return req;
     }
 
-    static Request addPopertyCommand(String cmd, String propFile, String property, String value) {
+    static Request addPoperty(String cmd, String propFile, String property, String value) {
         StringBuilder sb = new StringBuilder();
         sb.append("hive-property.sh ").append(cmd).append(" ").append(propFile);
         sb.append(" ").append(propFile);
@@ -66,7 +66,7 @@ class Command {
         return req;
     }
 
-    static Request packageListCommand() {
+    static Request packageList() {
         Request req = getRequestTemplate();
         req.setProgram("dpkg -l | grep '^ii' | grep ksks");
         return req;
