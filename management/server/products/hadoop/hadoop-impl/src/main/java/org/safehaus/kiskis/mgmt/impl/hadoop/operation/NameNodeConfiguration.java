@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 public class NameNodeConfiguration {
     private HadoopImpl parent;
     private Config config;
-    private String globalStatus;
 
     public NameNodeConfiguration(HadoopImpl parent, Config config) {
         this.parent = parent;
@@ -45,7 +44,7 @@ public class NameNodeConfiguration {
                 parent.getTaskRunner().executeTask(task);
 
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLog(String.format("Task's operation %s finished", task.getDescription()));
+                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
                 } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
@@ -75,7 +74,7 @@ public class NameNodeConfiguration {
                 parent.getTaskRunner().executeTask(task);
 
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLog(String.format("Task's operation %s finished", task.getDescription()));
+                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
                 } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
@@ -104,7 +103,7 @@ public class NameNodeConfiguration {
                 parent.getTaskRunner().executeTask(task);
 
                 if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLog(String.format("Task's operation %s finished", task.getDescription()));
+                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
                 } else if (task.getTaskStatus() == TaskStatus.FAIL) {
                     po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
                 } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
@@ -138,7 +137,6 @@ public class NameNodeConfiguration {
                     Result result = task.getResults().entrySet().iterator().next().getValue();
                     if (result.getStdOut().contains("NameNode")) {
                         String[] array = result.getStdOut().split("\n");
-                        System.out.println(result.getStdOut());
 
                         for (String status : array) {
                             if (status.contains("NameNode")) {
