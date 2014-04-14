@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
+package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.namenode;
 
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
@@ -22,13 +22,26 @@ public class CheckTask implements Runnable {
 
     private final Config config;
     private final CompleteEvent completeEvent;
+    private final UUID prevTaskID;
 
-    public CheckTask(Config config, CompleteEvent completeEvent) {
+    public CheckTask(Config config, CompleteEvent completeEvent, UUID previousTaskId) {
         this.config = config;
         this.completeEvent = completeEvent;
+        this.prevTaskID = previousTaskId;
     }
 
     public void run() {
+
+        if (prevTaskID != null) {
+            ProductOperationView prevPo = HadoopUI.getTracker().getProductOperation(Config.PRODUCT_KEY, prevTaskID);
+            while (prevPo.getState() == ProductOperationState.RUNNING) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    break;
+                }
+            }
+        }
 
         UUID trackID = HadoopUI.getHadoopManager().statusNameNode(config);
 
@@ -46,6 +59,7 @@ public class CheckTask implements Runnable {
                     break;
                 }
             }
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {

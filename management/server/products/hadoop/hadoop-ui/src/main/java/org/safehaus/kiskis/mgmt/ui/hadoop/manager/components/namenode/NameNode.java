@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
+package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.namenode;
 
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
@@ -7,6 +7,9 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
+
+import java.util.UUID;
 
 /**
  * Created by daralbaev on 12.04.14.
@@ -27,7 +30,7 @@ public class NameNode extends ClusterNode {
         addComponent(getStopButton());
         addComponent(getRestartButton());
 
-        getStatus();
+        getStatus(null);
     }
 
     private Embedded getProgressIcon() {
@@ -44,8 +47,7 @@ public class NameNode extends ClusterNode {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 setLoading(true);
-                HadoopUI.getHadoopManager().startNameNode(cluster);
-                getStatus();
+                getStatus(HadoopUI.getHadoopManager().startNameNode(cluster));
             }
         });
 
@@ -60,8 +62,7 @@ public class NameNode extends ClusterNode {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 setLoading(true);
-                HadoopUI.getHadoopManager().stopNameNode(cluster);
-                getStatus();
+                getStatus(HadoopUI.getHadoopManager().stopNameNode(cluster));
             }
         });
 
@@ -75,8 +76,7 @@ public class NameNode extends ClusterNode {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 setLoading(true);
-                HadoopUI.getHadoopManager().restartNameNode(cluster);
-                getStatus();
+                getStatus(HadoopUI.getHadoopManager().restartNameNode(cluster));
             }
         });
 
@@ -84,7 +84,7 @@ public class NameNode extends ClusterNode {
     }
 
     @Override
-    public void getStatus() {
+    public void getStatus(UUID trackID) {
         setLoading(true);
 
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
@@ -105,7 +105,7 @@ public class NameNode extends ClusterNode {
                     setLoading(false);
                 }
             }
-        }));
+        }, trackID));
     }
 
     private void setLoading(boolean isLoading) {
