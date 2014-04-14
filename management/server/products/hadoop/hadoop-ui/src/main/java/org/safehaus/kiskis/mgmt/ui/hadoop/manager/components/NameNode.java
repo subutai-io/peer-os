@@ -4,6 +4,8 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 
 /**
@@ -25,7 +27,7 @@ public class NameNode extends ClusterNode {
         addComponent(getStopButton());
         addComponent(getRestartButton());
 
-//        getStatus();
+        getStatus();
     }
 
     private Embedded getProgressIcon() {
@@ -42,9 +44,7 @@ public class NameNode extends ClusterNode {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 setLoading(true);
-                /*if (HadoopUI.getHadoopManager().startNameNode(cluster)) {
-                    getStatus();
-                }*/
+                HadoopUI.getHadoopManager().startNameNode(cluster);
                 getStatus();
             }
         });
@@ -60,9 +60,8 @@ public class NameNode extends ClusterNode {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 setLoading(true);
-                if (HadoopUI.getHadoopManager().stopNameNode(cluster)) {
-                    getStatus();
-                }
+                HadoopUI.getHadoopManager().stopNameNode(cluster);
+                getStatus();
             }
         });
 
@@ -76,9 +75,8 @@ public class NameNode extends ClusterNode {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 setLoading(true);
-                if (HadoopUI.getHadoopManager().restartNameNode(cluster)) {
-                    getStatus();
-                }
+                HadoopUI.getHadoopManager().restartNameNode(cluster);
+                getStatus();
             }
         });
 
@@ -89,12 +87,25 @@ public class NameNode extends ClusterNode {
     public void getStatus() {
         setLoading(true);
 
-        boolean isRunning = HadoopUI.getHadoopManager().statusNameNode(cluster);
-        startButton.setEnabled(isRunning);
-        restartButton.setEnabled(!isRunning);
-        stopButton.setEnabled(isRunning);
+        HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
-        setLoading(false);
+            public void onComplete(NodeState state) {
+                synchronized (progressIcon) {
+                    boolean isRunning = false;
+                    if (state == NodeState.RUNNING) {
+                        isRunning = true;
+                    } else if (state == NodeState.STOPPED) {
+                        isRunning = false;
+                    }
+
+                    startButton.setEnabled(!isRunning);
+                    restartButton.setEnabled(isRunning);
+                    stopButton.setEnabled(isRunning);
+
+                    setLoading(false);
+                }
+            }
+        }));
     }
 
     private void setLoading(boolean isLoading) {
