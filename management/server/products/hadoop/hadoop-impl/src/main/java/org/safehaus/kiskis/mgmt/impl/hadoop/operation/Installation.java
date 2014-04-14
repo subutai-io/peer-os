@@ -99,7 +99,7 @@ public class Installation {
                         InstallHadoopOperation installOperation = new InstallHadoopOperation(config);
                         for (Task task : installOperation.getTaskList()) {
                             po.addLog((String.format("%s started...", task.getDescription())));
-                            parent.getTaskRunner().executeTask(task);
+                            parent.getTaskRunner().executeTaskNWait(task);
 
                             if (task.getTaskStatus() == TaskStatus.SUCCESS) {
                                 po.addLogDone(String.format("%s succeeded", task.getDescription()));

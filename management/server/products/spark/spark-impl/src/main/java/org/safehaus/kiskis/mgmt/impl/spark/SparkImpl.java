@@ -110,7 +110,7 @@ public class SparkImpl implements Spark {
 
                 //check installed ksks packages
                 Set<Agent> allNodes = config.getAllNodes();
-                Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(allNodes));
+                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(allNodes));
 
                 if (!checkInstalled.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
@@ -145,17 +145,17 @@ public class SparkImpl implements Spark {
                     po.addLog("Cluster info saved to DB\nInstalling Spark...");
                     //install spark            
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getAllNodes()));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getAllNodes()));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Installation succeeded\nSetting master IP...");
 
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getAllNodes(), config.getMasterNode()));
+                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getAllNodes(), config.getMasterNode()));
 
                         if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Setting master IP succeeded\nRegistering slaves...");
 
-                            Task registerSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(config.getMasterNode(), config.getSlaveNodes()));
+                            Task registerSlavesTask = taskRunner.executeTaskNWait(Tasks.getAddSlavesTask(config.getMasterNode(), config.getSlaveNodes()));
 
                             if (registerSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                                 po.addLog("Slaves successfully registered\nStarting Spark...");
@@ -224,7 +224,7 @@ public class SparkImpl implements Spark {
 
                 po.addLog("Uninstalling Spark...");
 
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getAllNodes()));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(config.getAllNodes()));
 
                 if (uninstallTask.isCompleted()) {
                     for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
@@ -295,7 +295,7 @@ public class SparkImpl implements Spark {
                 boolean install = !agent.equals(config.getMasterNode());
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
+                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
 
                 if (!checkInstalled.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nOperation aborted");
@@ -321,7 +321,7 @@ public class SparkImpl implements Spark {
 
                     if (install) {
                         po.addLog("Installing Spark...");
-                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Installation succeeded");
@@ -332,12 +332,12 @@ public class SparkImpl implements Spark {
                     }
 
                     po.addLog("Setting master IP on slave...");
-                    Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getMasterNode()));
+                    Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getMasterNode()));
 
                     if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Master IP successfully set\nRegistering slave with master...");
 
-                        Task registerSlaveTask = taskRunner.executeTask(Tasks.getAddSlaveTask(config.getMasterNode(), agent));
+                        Task registerSlaveTask = taskRunner.executeTaskNWait(Tasks.getAddSlaveTask(config.getMasterNode(), agent));
 
                         if (registerSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Registration succeeded\nRestarting master...");
@@ -441,7 +441,7 @@ public class SparkImpl implements Spark {
 
                 if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) != null) {
 
-                    Task unregisterSlaveTask = taskRunner.executeTask(Tasks.getRemoveSlaveTask(config.getMasterNode(), agent));
+                    Task unregisterSlaveTask = taskRunner.executeTaskNWait(Tasks.getRemoveSlaveTask(config.getMasterNode(), agent));
 
                     if (unregisterSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Successfully unregistered slave from master\nRestarting master...");
@@ -481,7 +481,7 @@ public class SparkImpl implements Spark {
                 if (uninstall) {
                     po.addLog("Uninstalling Spark...");
 
-                    Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                    Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
 
                     if (uninstallTask.isCompleted()) {
                         Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
@@ -506,7 +506,7 @@ public class SparkImpl implements Spark {
                 } else {
                     po.addLog("Stopping slave...");
 
-                    Task stopSlaveTask = taskRunner.executeTask(Tasks.getStopSlaveTask(Util.wrapAgentToSet(agent)));
+                    Task stopSlaveTask = taskRunner.executeTaskNWait(Tasks.getStopSlaveTask(Util.wrapAgentToSet(agent)));
 
                     if (stopSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Slave stopped successfully");
@@ -568,11 +568,11 @@ public class SparkImpl implements Spark {
 
                 po.addLog("Stopping all nodes...");
                 //stop all nodes
-                Task stopAllNodesTask = taskRunner.executeTask(Tasks.getStopAllTask(Util.wrapAgentToSet(config.getMasterNode())));
+                Task stopAllNodesTask = taskRunner.executeTaskNWait(Tasks.getStopAllTask(Util.wrapAgentToSet(config.getMasterNode())));
                 if (stopAllNodesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                     po.addLog("All nodes stopped\nClearing slaves on old master...");
                     //clear slaves from old master
-                    Task clearSlavesTask = taskRunner.executeTask(Tasks.getClearSlavesTask(config.getMasterNode()));
+                    Task clearSlavesTask = taskRunner.executeTaskNWait(Tasks.getClearSlavesTask(config.getMasterNode()));
                     if (clearSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Slaves cleared successfully");
                     } else {
@@ -587,11 +587,11 @@ public class SparkImpl implements Spark {
                         config.getSlaveNodes().remove(newMaster);
                     }
                     po.addLog("Adding nodes to new master...");
-                    Task addSlavesTask = taskRunner.executeTask(Tasks.getAddSlavesTask(newMaster, config.getSlaveNodes()));
+                    Task addSlavesTask = taskRunner.executeTaskNWait(Tasks.getAddSlavesTask(newMaster, config.getSlaveNodes()));
                     if (addSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Nodes added successfully\nSetting new master IP...");
                         //modify master ip on all nodes
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getAllNodes(), newMaster));
+                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getAllNodes(), newMaster));
                         if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLog("Master IP set successfully\nStarting cluster...");
                             //start master & slaves
@@ -748,9 +748,9 @@ public class SparkImpl implements Spark {
 
                 Task stopTask;
                 if (master) {
-                    stopTask = taskRunner.executeTask(Tasks.getStopMasterTask(Util.wrapAgentToSet(node)));
+                    stopTask = taskRunner.executeTaskNWait(Tasks.getStopMasterTask(Util.wrapAgentToSet(node)));
                 } else {
-                    stopTask = taskRunner.executeTask(Tasks.getStopSlaveTask(Util.wrapAgentToSet(node)));
+                    stopTask = taskRunner.executeTaskNWait(Tasks.getStopSlaveTask(Util.wrapAgentToSet(node)));
                 }
 
                 if (stopTask.getTaskStatus() == TaskStatus.SUCCESS) {
@@ -792,7 +792,7 @@ public class SparkImpl implements Spark {
 
                 po.addLog("Checking node...");
 
-                Task checkNodeTask = taskRunner.executeTask(
+                Task checkNodeTask = taskRunner.executeTaskNWait(
                         Tasks.getStatusAllTask(Util.wrapAgentToSet(node)));
 
                 Result res = checkNodeTask.getResults().get(node.getUuid());

@@ -107,7 +107,7 @@ public class TaskRunnerImplTaskStatusesTest {
 
     @Test(expected = RuntimeException.class)
     public void testExecuteNullTaskAsync() {
-        taskrunner.executeTask(null);
+        taskrunner.executeTaskNWait(null);
     }
 
     @Test(expected = RuntimeException.class)
@@ -117,7 +117,7 @@ public class TaskRunnerImplTaskStatusesTest {
 
     @Test(expected = RuntimeException.class)
     public void testExecuteEmptyTaskSync() {
-        taskrunner.executeTask(new Task());;
+        taskrunner.executeTaskNWait(new Task());;
     }
 
     @Test(expected = RuntimeException.class)
@@ -129,7 +129,7 @@ public class TaskRunnerImplTaskStatusesTest {
     public void testTimedOutTaskSync() {
         Task task = getDummyTask(1);
 
-        taskrunner.executeTask(task);
+        taskrunner.executeTaskNWait(task);
 
         assertEquals(TaskStatus.TIMEDOUT, task.getTaskStatus());
     }
@@ -188,7 +188,7 @@ public class TaskRunnerImplTaskStatusesTest {
 
         t.start();
 
-        taskrunner.executeTask(task);
+        taskrunner.executeTaskNWait(task);
 
         //wait till background thread processes response
         Thread.sleep(20);
@@ -236,7 +236,7 @@ public class TaskRunnerImplTaskStatusesTest {
 
         t.start();
 
-        taskrunner.executeTask(task);
+        taskrunner.executeTaskNWait(task);
 
         //wait till background thread processes response
         Thread.sleep(20);
@@ -284,7 +284,7 @@ public class TaskRunnerImplTaskStatusesTest {
 
         t.start();
 
-        taskrunner.executeTask(task);
+        taskrunner.executeTaskNWait(task);
 
         //wait till background thread processes response
         Thread.sleep(20);
@@ -301,7 +301,7 @@ public class TaskRunnerImplTaskStatusesTest {
         Thread t = new Thread(new Runnable() {
 
             public void run() {
-                taskrunner.executeTask(task);
+                taskrunner.executeTaskNWait(task);
             }
         });
 
@@ -368,7 +368,7 @@ public class TaskRunnerImplTaskStatusesTest {
 
         t.start();
 
-        taskrunner.executeTask(task);
+        taskrunner.executeTaskNWait(task);
 
         //wait till background thread processes response
         Thread.sleep(20);

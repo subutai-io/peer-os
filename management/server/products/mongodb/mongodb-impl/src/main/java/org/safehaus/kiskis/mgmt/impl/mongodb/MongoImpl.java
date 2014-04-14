@@ -491,12 +491,10 @@ public class MongoImpl implements Mongo {
                     config.getConfigServers().remove(agent);
                     //restart routers
                     po.addLog("Restarting routers...");
-                    Task stopMongoTask = taskRunner.
-                            executeTask(Tasks.getStopMongoTask(config.getRouterServers()));
+                    Task stopMongoTask = taskRunner.executeTaskNWait(Tasks.getStopMongoTask(config.getRouterServers()));
                     //don't check status of this task since this task always ends with execute_timeouted
                     if (stopMongoTask.isCompleted()) {
-                        Task startRoutersTask = taskRunner.
-                                executeTask(Tasks.getStartRoutersTask(config.getRouterServers(),
+                        Task startRoutersTask = taskRunner.executeTaskNWait(Tasks.getStartRoutersTask(config.getRouterServers(),
                                                 config.getConfigServers(), config));
 
                         final AtomicInteger okCount = new AtomicInteger(0);
@@ -525,8 +523,7 @@ public class MongoImpl implements Mongo {
                     config.getDataNodes().remove(agent);
                     //unregister from primary
                     po.addLog("Unregistering this node from replica set...");
-                    Task findPrimaryNodeTask = taskRunner.
-                            executeTask(Tasks.getFindPrimaryNodeTask(agent, config));
+                    Task findPrimaryNodeTask = taskRunner.executeTaskNWait(Tasks.getFindPrimaryNodeTask(agent, config));
 
                     if (findPrimaryNodeTask.isCompleted()) {
                         Pattern p = Pattern.compile("primary\" : \"(.*)\"");
@@ -542,8 +539,7 @@ public class MongoImpl implements Mongo {
                         if (primaryNodeAgent != null) {
                             if (primaryNodeAgent != agent) {
                                 Task unregisterSecondaryNodeFromPrimaryTask
-                                        = taskRunner.
-                                        executeTask(
+                                        = taskRunner.executeTaskNWait(
                                                 Tasks.getUnregisterSecondaryFromPrimaryTask(
                                                         primaryNodeAgent, agent, config));
                                 if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
@@ -687,7 +683,7 @@ public class MongoImpl implements Mongo {
                 }
 
                 po.addLog("Stopping node...");
-                Task stopNodeTask = taskRunner.executeTask(
+                Task stopNodeTask = taskRunner.executeTaskNWait(
                         Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
 
                 if (stopNodeTask.isCompleted()) {
@@ -731,7 +727,7 @@ public class MongoImpl implements Mongo {
                     return;
                 }
                 po.addLog("Checking node...");
-                Task checkNodeTask = taskRunner.executeTask(
+                Task checkNodeTask = taskRunner.executeTaskNWait(
                         Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
 
                 if (checkNodeTask.isCompleted()) {

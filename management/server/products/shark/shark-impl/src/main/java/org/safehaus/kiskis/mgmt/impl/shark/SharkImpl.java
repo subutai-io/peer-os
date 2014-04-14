@@ -99,7 +99,7 @@ public class SharkImpl implements Shark {
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(config.getNodes()));
+                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(config.getNodes()));
 
                 if (!checkInstalled.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
@@ -123,12 +123,12 @@ public class SharkImpl implements Shark {
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info saved to DB\nInstalling Shark...");
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Installation succeeded\nSetting Master IP...");
 
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
+                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
 
                         if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Master IP successfully set\nDone");
@@ -170,7 +170,7 @@ public class SharkImpl implements Shark {
 
                 po.addLog("Uninstalling Shark...");
 
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getNodes()));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(config.getNodes()));
 
                 if (uninstallTask.isCompleted()) {
                     for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
@@ -235,7 +235,7 @@ public class SharkImpl implements Shark {
                     return;
                 }
                 po.addLog("Uninstalling Shark...");
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
 
                 if (uninstallTask.isCompleted()) {
                     Result result = uninstallTask.getResults().get(agent.getUuid());
@@ -311,7 +311,7 @@ public class SharkImpl implements Shark {
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
+                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
 
                 if (!checkInstalled.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
@@ -334,12 +334,12 @@ public class SharkImpl implements Shark {
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info updated in DB\nInstalling Shark...");
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLog("Installation succeeded\nSetting Master IP...");
 
-                        Task setMasterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), sparkConfig.getMasterNode()));
+                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), sparkConfig.getMasterNode()));
 
                         if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Master IP successfully set\nDone");
@@ -393,7 +393,7 @@ public class SharkImpl implements Shark {
                     }
                 }
 
-                Task setMaterIPTask = taskRunner.executeTask(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
+                Task setMaterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
 
                 if (setMaterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
                     po.addLogDone("Master IP actualized successfully\nDone");

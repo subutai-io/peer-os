@@ -88,7 +88,7 @@ public class SolrImpl implements Solr {
                         po.addLog("Cluster info saved to DB\nInstalling Solr...");
 
                         //install
-                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded");
@@ -318,7 +318,7 @@ public class SolrImpl implements Solr {
                     return;
                 }
                 po.addLog("Checking node...");
-                final Task checkNodeTask = taskRunner.executeTask(Tasks.getStatusTask(node));
+                final Task checkNodeTask = taskRunner.executeTaskNWait(Tasks.getStatusTask(node));
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (checkNodeTask.isCompleted()) {
@@ -434,7 +434,7 @@ public class SolrImpl implements Solr {
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
                         po.addLog("Cluster info updated in DB\nInstalling Solr...");
 
-                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
+                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded\nDone");
