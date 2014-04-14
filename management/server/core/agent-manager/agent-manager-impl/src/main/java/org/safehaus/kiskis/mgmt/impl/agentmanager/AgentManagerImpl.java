@@ -9,6 +9,8 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import java.util.Collection;
+import java.util.Collections;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -78,6 +80,10 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     public void setDbManagerService(DbManager dbManagerService) {
         this.dbManagerService = dbManagerService;
+    }
+
+    public Collection<AgentListener> getListeners() {
+        return Collections.unmodifiableCollection(listeners);
     }
 
     /**
@@ -445,12 +451,14 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     private void saveAgent(Agent agent) {
         try {
             String cql = "select uuid from agents where hostname = ?";
-            ResultSet rs = dbManagerService.executeQuery(cql, agent.getHostname());
             Set<UUID> uuids = new HashSet<UUID>();
-            for (Row row : rs) {
-                uuids.add(row.getUUID("uuid"));
-            }
+            ResultSet rs = dbManagerService.executeQuery(cql, agent.getHostname());
+            if (rs != null) {
+                for (Row row : rs) {
+                    uuids.add(row.getUUID("uuid"));
+                }
 
+            }
             cql = "delete from agents where uuid = ?";
 
             for (UUID uuid : uuids) {
@@ -477,8 +485,10 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         String cql = "select uuid from agents where transportid = ?";
         ResultSet rs = dbManagerService.executeQuery(cql, agent.getTransportId());
         Set<UUID> uuids = new HashSet<UUID>();
-        for (Row row : rs) {
-            uuids.add(row.getUUID("uuid"));
+        if (rs != null) {
+            for (Row row : rs) {
+                uuids.add(row.getUUID("uuid"));
+            }
         }
 
         cql = "delete from agents where uuid = ?";
