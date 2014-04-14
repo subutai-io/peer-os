@@ -1,14 +1,18 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop.operation;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
 import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -24,52 +28,149 @@ public class NameNodeConfiguration {
         this.config = config;
     }
 
-    public boolean startNameNode() {
-        Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "start");
-        parent.getTaskRunner().executeTask(task);
+    public UUID startNameNode() {
+        final ProductOperation po
+                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                String.format("Starting cluster's %s NameNode", config.getClusterName()));
 
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        parent.getExecutor().execute(new Runnable() {
+
+            public void run() {
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    return;
+                }
+
+                Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "start");
+                parent.getTaskRunner().executeTask(task);
+
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLog(String.format("Task's operation %s finished", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
+                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
+                }
+            }
+        });
+
+        return po.getId();
     }
 
-    public boolean stopNameNode() {
-        Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "stop");
-        parent.getTaskRunner().executeTask(task);
+    public UUID stopNameNode() {
 
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        final ProductOperation po
+                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                String.format("Stopping cluster's %s NameNode", config.getClusterName()));
+
+        parent.getExecutor().execute(new Runnable() {
+
+            public void run() {
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    return;
+                }
+
+                Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "stop");
+                parent.getTaskRunner().executeTask(task);
+
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLog(String.format("Task's operation %s finished", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
+                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
+                }
+            }
+        });
+
+        return po.getId();
     }
 
-    public boolean restartNameNode() {
-        Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "restart");
-        parent.getTaskRunner().executeTask(task);
+    public UUID restartNameNode() {
+        final ProductOperation po
+                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                String.format("Restarting cluster's %s NameNode", config.getClusterName()));
 
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        parent.getExecutor().execute(new Runnable() {
+
+            public void run() {
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    return;
+                }
+
+                Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "restart");
+                parent.getTaskRunner().executeTask(task);
+
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLog(String.format("Task's operation %s finished", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
+                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
+                }
+            }
+        });
+
+        return po.getId();
     }
 
-    public boolean statusNameNode() {
-        Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "status");
+    public UUID statusNameNode() {
 
-        parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+        final ProductOperation po
+                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                String.format("Restarting cluster's %s NameNode", config.getClusterName()));
+
+        parent.getExecutor().execute(new Runnable() {
+
+            public void run() {
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    return;
+                }
+                Task task = Tasks.getNameNodeCommandTask(config.getNameNode(), "status");
+
+                parent.getTaskRunner().executeTask(task);
+
+                NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {
-                    String[] array = response.getStdOut().split("\n");
-                    System.out.println(response.getStdOut());
+                    Result result = task.getResults().entrySet().iterator().next().getValue();
+                    if (result.getStdOut().contains("NameNode")) {
+                        String[] array = result.getStdOut().split("\n");
+                        System.out.println(result.getStdOut());
 
-                    for (String status : array) {
-                        if (status.contains("NameNode")) {
-                            globalStatus = status.
-                                    replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
-                                    replaceAll("NameNode is ", "");
+                        for (String status : array) {
+                            if (status.contains("NameNode")) {
+                                String temp = status.
+                                        replaceAll(Pattern.quote("!(SecondaryNameNode is not running on this machine)"), "").
+                                        replaceAll("NameNode is ", "");
+                                if (temp.toLowerCase().contains("not")) {
+                                    nodeState = NodeState.STOPPED;
+                                } else {
+                                    nodeState = NodeState.RUNNING;
+                                }
+                            }
                         }
                     }
                 }
 
-                return null;
+                if (NodeState.UNKNOWN.equals(nodeState)) {
+                    po.addLogFailed(String.format("Failed to check status of %s, %s",
+                            config.getClusterName(),
+                            config.getNameNode().getHostname()
+                    ));
+                } else {
+                    po.addLogDone(String.format("NameNode of %s is %s",
+                            config.getNameNode().getHostname(),
+                            nodeState
+                    ));
+                }
             }
         });
 
-        System.out.println(globalStatus);
-        return !globalStatus.toLowerCase().contains("not");
+        return po.getId();
+
     }
 
     public boolean statusSecondaryNameNode() {

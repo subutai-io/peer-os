@@ -92,22 +92,22 @@ public class HadoopImpl implements Hadoop {
     }
 
     @Override
-    public boolean startNameNode(Config config) {
+    public UUID startNameNode(Config config) {
         return new NameNodeConfiguration(this, config).startNameNode();
     }
 
     @Override
-    public boolean stopNameNode(Config config) {
+    public UUID stopNameNode(Config config) {
         return new NameNodeConfiguration(this, config).stopNameNode();
     }
 
     @Override
-    public boolean restartNameNode(Config config) {
+    public UUID restartNameNode(Config config) {
         return new NameNodeConfiguration(this, config).restartNameNode();
     }
 
     @Override
-    public boolean statusNameNode(Config config) {
+    public UUID statusNameNode(Config config) {
         return new NameNodeConfiguration(this, config).statusNameNode();
     }
 

@@ -13,13 +13,13 @@ public interface Hadoop {
 
     public UUID uninstallCluster(String clusterName);
 
-    public boolean startNameNode(Config config);
+    public UUID startNameNode(Config config);
 
-    public boolean stopNameNode(Config config);
+    public UUID stopNameNode(Config config);
 
-    public boolean restartNameNode(Config config);
+    public UUID restartNameNode(Config config);
 
-    public boolean statusNameNode(Config config);
+    public UUID statusNameNode(Config config);
 
     public boolean statusSecondaryNameNode(Config config);
 
