@@ -232,7 +232,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * @return task which is supplied when calling this method;
      */
     @Override
-    public Task executeTask(Task task) {
+    public Task executeTaskNWait(Task task) {
         TaskCallback callback = new TaskCallback() {
 
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {

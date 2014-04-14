@@ -292,7 +292,7 @@ public class LxcManagerImpl implements LxcManager {
 
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
-            Task cloneTask = taskRunner.executeTask(Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostname));
+            Task cloneTask = taskRunner.executeTaskNWait(Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostname));
             return cloneTask.getTaskStatus() == TaskStatus.SUCCESS;
         }
         return false;

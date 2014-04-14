@@ -90,7 +90,7 @@ public class FlumeImpl implements Flume {
 
                 po.addLog("Checking prerequisites...");
                 //check installed ksks packages
-                Task statusTask = taskRunner.executeTask(Tasks.getStatusTask(config.getNodes()));
+                Task statusTask = taskRunner.executeTaskNWait(Tasks.getStatusTask(config.getNodes()));
                 if (!statusTask.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
@@ -122,7 +122,7 @@ public class FlumeImpl implements Flume {
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info saved to DB\nInstalling Flume...");
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
@@ -157,7 +157,7 @@ public class FlumeImpl implements Flume {
 
                 po.addLog("Uninstalling Flume...");
 
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getNodes()));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(config.getNodes()));
 
                 if (uninstallTask.isCompleted()) {
                     for (Agent agent : config.getNodes()) {
@@ -328,7 +328,7 @@ public class FlumeImpl implements Flume {
                 }
 
                 po.addLog("Checking node...");
-                final Task checkNodeTask = taskRunner.executeTask(Tasks.getStatusTask(node));
+                final Task checkNodeTask = taskRunner.executeTaskNWait(Tasks.getStatusTask(node));
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (checkNodeTask.isCompleted()) {
@@ -384,7 +384,7 @@ public class FlumeImpl implements Flume {
                 }
 
                 po.addLog("Checking prerequisites...");
-                Task statusTask = taskRunner.executeTask(Tasks.getStatusTask(agent));
+                Task statusTask = taskRunner.executeTaskNWait(Tasks.getStatusTask(agent));
                 if (!statusTask.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
@@ -406,7 +406,7 @@ public class FlumeImpl implements Flume {
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info updated in DB\nInstalling Flume...");
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
@@ -454,7 +454,7 @@ public class FlumeImpl implements Flume {
                 }
 
                 po.addLog("Uninstalling Flume...");
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
 
                 if (uninstallTask.isCompleted()) {
                     Result result = uninstallTask.getResults().get(agent.getUuid());
