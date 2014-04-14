@@ -5,6 +5,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
+import java.util.UUID;
+
 /**
  * Created by daralbaev on 12.04.14.
  */
@@ -54,7 +56,7 @@ public class JobTracker extends ClusterNode {
     }
 
     @Override
-    public void getStatus() {
+    public void getStatus(UUID trackID) {
 
     }
 }
