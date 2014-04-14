@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
 public interface Presto {
@@ -28,7 +27,6 @@ public interface Presto {
      * Returns list of configurations of installed clusters
      *
      * @return - list of configurations of installed clusters
-     *
      */
     public List<Config> getClusters();
 
@@ -38,7 +36,6 @@ public interface Presto {
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
      * @return - UUID of operation to track
-     *
      */
     public UUID startNode(String clusterName, String lxcHostName);
 
@@ -48,7 +45,6 @@ public interface Presto {
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
      * @return - UUID of operation to track
-     *
      */
     public UUID stopNode(String clusterName, String lxcHostName);
 
@@ -58,7 +54,6 @@ public interface Presto {
      * @param clusterName - name of cluster
      * @param lxcHostName - hostname of node
      * @return - UUID of operation to track
-     *
      */
     public UUID checkNode(String clusterName, String lxcHostName);
 }

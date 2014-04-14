@@ -8,11 +8,11 @@ package org.safehaus.kiskis.mgmt.api.lxcmanager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  */
 public abstract class LxcPlacementStrategy {

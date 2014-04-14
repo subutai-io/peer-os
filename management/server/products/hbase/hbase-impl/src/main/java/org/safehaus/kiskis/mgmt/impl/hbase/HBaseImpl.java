@@ -79,7 +79,7 @@ public class HBaseImpl implements HBase {
                     po.addLog("Cluster info saved to DB\nInstalling HBase...");
 
                     // Updating repository
-                    Task repositoryUpdateTask = taskRunner.executeTask(Tasks.getAptUpdate(allNodes));
+                    Task repositoryUpdateTask = taskRunner.executeTaskNWait(Tasks.getAptUpdate(allNodes));
 
                     if (repositoryUpdateTask.getTaskStatus() != TaskStatus.SUCCESS) {
                         po.addLogFailed(String.format("Installation failed, %s", repositoryUpdateTask.getFirstError()));
@@ -88,7 +88,7 @@ public class HBaseImpl implements HBase {
                     po.addLog("Installation succeeded\nSetting master...");
 
                     // Installing HBase
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(allNodes));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(allNodes));
 
                     if (installTask.getTaskStatus() != TaskStatus.SUCCESS) {
                         po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
@@ -97,7 +97,7 @@ public class HBaseImpl implements HBase {
                     po.addLog("Installation succeeded\nConfiguring master...");
 
                     // Configuring master
-                    Task configMasterTask = taskRunner.executeTask(Tasks.getConfigMasterTask(allNodes, config.getHadoopNameNode(), config.getMaster()));
+                    Task configMasterTask = taskRunner.executeTaskNWait(Tasks.getConfigMasterTask(allNodes, config.getHadoopNameNode(), config.getMaster()));
 
                     if (configMasterTask.getTaskStatus() != TaskStatus.SUCCESS) {
                         po.addLogFailed(String.format("Configuration failed, %s", configMasterTask.getFirstError()));
@@ -106,7 +106,7 @@ public class HBaseImpl implements HBase {
                     po.addLog("Configuring master succeeded\nConfiguring region...");
 
                     // Configuring region
-                    Task configRegionTask = taskRunner.executeTask(Tasks.getConfigRegionTask(allNodes, config.getRegion()));
+                    Task configRegionTask = taskRunner.executeTaskNWait(Tasks.getConfigRegionTask(allNodes, config.getRegion()));
 
                     if (configRegionTask.getTaskStatus() != TaskStatus.SUCCESS) {
                         po.addLogFailed(String.format("Configuring failed, %s", configRegionTask.getFirstError()));
@@ -115,7 +115,7 @@ public class HBaseImpl implements HBase {
                     po.addLog("Configuring region succeeded\nSetting quorum...");
 
                     // Configuring quorum
-                    Task configQuorumTask = taskRunner.executeTask(Tasks.getConfigQuorumTask(allNodes, config.getQuorum()));
+                    Task configQuorumTask = taskRunner.executeTaskNWait(Tasks.getConfigQuorumTask(allNodes, config.getQuorum()));
 
                     if (configQuorumTask.getTaskStatus() != TaskStatus.SUCCESS) {
                         po.addLogFailed(String.format("Installation failed, %s", configQuorumTask.getFirstError()));
@@ -124,7 +124,7 @@ public class HBaseImpl implements HBase {
                     po.addLog("Setting quorum succeeded\nSetting backup masters...");
 
                     // Configuring backup master
-                    Task configBackupMastersTask = taskRunner.executeTask(Tasks.getConfigBackupMastersTask(allNodes, config.getBackupMasters()));
+                    Task configBackupMastersTask = taskRunner.executeTaskNWait(Tasks.getConfigBackupMastersTask(allNodes, config.getBackupMasters()));
 
                     if (configBackupMastersTask.getTaskStatus() != TaskStatus.SUCCESS) {
                         po.addLogFailed(String.format("Installation failed, %s", configBackupMastersTask.getFirstError()));
@@ -164,7 +164,7 @@ public class HBaseImpl implements HBase {
                     return;
                 }
 
-                Task installTask = taskRunner.executeTask(Tasks.getInstallTask(allNodes));
+                Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(allNodes));
 
                 if (installTask.getTaskStatus() != TaskStatus.SUCCESS) {
                     po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
@@ -351,7 +351,7 @@ public class HBaseImpl implements HBase {
                     return;
                 }
                 po.addLog("Checking node...");
-                final Task checkNodeTask = taskRunner.executeTask(Tasks.getStatusTask(node));
+                final Task checkNodeTask = taskRunner.executeTaskNWait(Tasks.getStatusTask(node));
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (checkNodeTask.isCompleted()) {
@@ -463,7 +463,7 @@ public class HBaseImpl implements HBase {
                     if (dbManager.saveInfo(HBaseConfig.PRODUCT_KEY, clusterName, config)) {
                         po.addLog("Cluster info updated in DB\nInstalling Solr...");
 
-                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
+                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded\nDone");

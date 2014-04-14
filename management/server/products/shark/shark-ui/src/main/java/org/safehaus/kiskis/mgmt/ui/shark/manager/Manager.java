@@ -17,11 +17,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -30,7 +32,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
 /**
- *
  * @author dilshat
  */
 public class Manager {
@@ -44,7 +45,7 @@ public class Manager {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 
         VerticalLayout content = new VerticalLayout();
@@ -115,7 +116,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
                 } else {
                     show("Please, select cluster");
                 }
@@ -180,7 +182,8 @@ public class Manager {
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                                     }
                                 }
-                            });
+                            }
+                    );
                 } else {
                     show("Please, select cluster");
                 }
@@ -207,16 +210,17 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext();) {
+        for (Iterator it = agents.iterator(); it.hasNext(); ) {
             final Agent agent = (Agent) it.next();
 
             final Button destroyBtn = new Button("Destroy");
 
             final Object rowId = table.addItem(new Object[]{
-                agent.getHostname(),
-                destroyBtn
-            },
-                    null);
+                            agent.getHostname(),
+                            destroyBtn
+                    },
+                    null
+            );
 
             destroyBtn.addListener(new Button.ClickListener() {
 
@@ -240,7 +244,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
 
                 }
             });

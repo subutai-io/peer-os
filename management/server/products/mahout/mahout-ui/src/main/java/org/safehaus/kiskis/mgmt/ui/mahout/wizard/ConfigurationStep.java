@@ -16,18 +16,19 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
 
 /**
- *
  * @author dilshat
  */
 public class ConfigurationStep extends Panel {
@@ -79,7 +80,8 @@ public class ConfigurationStep extends Panel {
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             select.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents()));
+                            Agent.class, hadoopInfo.getAllAgents())
+            );
         }
 
         hadoopClusters.addListener(new Property.ValueChangeListener() {
@@ -90,7 +92,8 @@ public class ConfigurationStep extends Panel {
                     select.setValue(null);
                     select.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents()));
+                                    Agent.class, hadoopInfo.getAllAgents())
+                    );
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setNodes(new HashSet<Agent>());
                 }

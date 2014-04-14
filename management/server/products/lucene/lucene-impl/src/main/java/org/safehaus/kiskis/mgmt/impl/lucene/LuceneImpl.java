@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lucene.Config;
@@ -25,7 +26,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  */
 public class LuceneImpl implements Lucene {
@@ -63,7 +63,7 @@ public class LuceneImpl implements Lucene {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -79,7 +79,7 @@ public class LuceneImpl implements Lucene {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -95,14 +95,14 @@ public class LuceneImpl implements Lucene {
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(config.getNodes()));
+                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(config.getNodes()));
 
                 if (!checkInstalled.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
                 }
 
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
 
                     Result result = checkInstalled.getResults().get(node.getUuid());
@@ -126,7 +126,7 @@ public class LuceneImpl implements Lucene {
                     po.addLog("Cluster info saved to DB\nInstalling Lucene...");
                     //install lucene            
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");
@@ -145,7 +145,7 @@ public class LuceneImpl implements Lucene {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -155,7 +155,7 @@ public class LuceneImpl implements Lucene {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
-                
+
                 for (Agent node : config.getNodes()) {
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
@@ -165,7 +165,7 @@ public class LuceneImpl implements Lucene {
 
                 po.addLog("Uninstalling Lucene...");
 
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(config.getNodes()));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(config.getNodes()));
 
                 if (uninstallTask.isCompleted()) {
                     for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
@@ -203,7 +203,7 @@ public class LuceneImpl implements Lucene {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -230,7 +230,7 @@ public class LuceneImpl implements Lucene {
                     return;
                 }
                 po.addLog("Uninstalling Lucene...");
-                Task uninstallTask = taskRunner.executeTask(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
 
                 if (uninstallTask.isCompleted()) {
                     Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
@@ -269,7 +269,7 @@ public class LuceneImpl implements Lucene {
     public UUID addNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -295,7 +295,7 @@ public class LuceneImpl implements Lucene {
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTask(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
+                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
 
                 if (!checkInstalled.isCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
@@ -319,7 +319,7 @@ public class LuceneImpl implements Lucene {
                     po.addLog("Cluster info updated in DB\nInstalling Lucene...");
                     //install lucene            
 
-                    Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
 
                     if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                         po.addLogDone("Installation succeeded\nDone");

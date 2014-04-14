@@ -1,31 +1,23 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
-import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.solr.Solr;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SolrImpl implements Solr {
 
@@ -96,7 +88,7 @@ public class SolrImpl implements Solr {
                         po.addLog("Cluster info saved to DB\nInstalling Solr...");
 
                         //install
-                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(config.getNodes()));
+                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded");
@@ -130,7 +122,7 @@ public class SolrImpl implements Solr {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -169,7 +161,7 @@ public class SolrImpl implements Solr {
     public UUID startNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostName, clusterName));
+                String.format("Starting node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -195,7 +187,7 @@ public class SolrImpl implements Solr {
                 Task startNodeTask = Tasks.getStartTask(node);
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
-                taskRunner.executeTask(startNodeTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(startNodeTask, new TaskCallback() {
 
                     @Override
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -212,9 +204,6 @@ public class SolrImpl implements Solr {
                                     task.setData(NodeState.STOPPED);
                                 }
 
-                                synchronized (task) {
-                                    task.notifyAll();
-                                }
                             }
 
                         }
@@ -222,13 +211,6 @@ public class SolrImpl implements Solr {
                         return null;
                     }
                 });
-
-                synchronized (checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
 
                 if (NodeState.RUNNING.equals(checkNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s started", lxcHostName));
@@ -248,7 +230,7 @@ public class SolrImpl implements Solr {
     public UUID stopNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostName, clusterName));
+                String.format("Stopping node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -272,7 +254,7 @@ public class SolrImpl implements Solr {
                 Task stopNodeTask = Tasks.getStopTask(node);
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
-                taskRunner.executeTask(stopNodeTask, new TaskCallback() {
+                taskRunner.executeTaskNWait(stopNodeTask, new TaskCallback() {
 
                     @Override
                     public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
@@ -289,9 +271,6 @@ public class SolrImpl implements Solr {
                                     task.setData(NodeState.STOPPED);
                                 }
 
-                                synchronized (task) {
-                                    task.notifyAll();
-                                }
                             }
 
                         }
@@ -299,13 +278,6 @@ public class SolrImpl implements Solr {
                         return null;
                     }
                 });
-
-                synchronized (checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
 
                 if (NodeState.STOPPED.equals(checkNodeTask.getData())) {
                     po.addLogDone(String.format("Node on %s stopped", lxcHostName));
@@ -325,7 +297,7 @@ public class SolrImpl implements Solr {
     public UUID checkNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking node %s in %s", lxcHostName, clusterName));
+                String.format("Checking node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -346,7 +318,7 @@ public class SolrImpl implements Solr {
                     return;
                 }
                 po.addLog("Checking node...");
-                final Task checkNodeTask = taskRunner.executeTask(Tasks.getStatusTask(node));
+                final Task checkNodeTask = taskRunner.executeTaskNWait(Tasks.getStatusTask(node));
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (checkNodeTask.isCompleted()) {
@@ -379,7 +351,7 @@ public class SolrImpl implements Solr {
     public UUID destroyNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostName, clusterName));
+                String.format("Destroying %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -411,7 +383,8 @@ public class SolrImpl implements Solr {
                 if (physicalAgent == null) {
                     po.addLog(
                             String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                                    agent.getHostname()));
+                                    agent.getHostname())
+                    );
                 } else {
                     if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
                         po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
@@ -437,7 +410,7 @@ public class SolrImpl implements Solr {
     public UUID addNode(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -461,7 +434,7 @@ public class SolrImpl implements Solr {
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
                         po.addLog("Cluster info updated in DB\nInstalling Solr...");
 
-                        Task installTask = taskRunner.executeTask(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
+                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Installation succeeded\nDone");

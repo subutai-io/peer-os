@@ -13,7 +13,6 @@ import org.safehaus.kiskis.mgmt.ui.shark.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.shark.wizard.Wizard;
 
 /**
- *
  * @author dilshat
  */
 public class SharkForm extends CustomComponent {

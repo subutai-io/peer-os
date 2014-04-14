@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    
+
     <reference id="sharkManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.shark.Shark"/>   
+               interface="org.safehaus.kiskis.mgmt.api.shark.Shark"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>       
+               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>     
+               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>                  
-        
+               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
+
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.shark.SharkUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager" />
+        <property name="agentManager" ref="agentManager"/>
         <property name="tracker" ref="tracker"/>
         <property name="dbManager" ref="dbManager"/>
         <property name="sharkManager" ref="sharkManager"/>
     </bean>
-    
+
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
-    
+
 </blueprint>

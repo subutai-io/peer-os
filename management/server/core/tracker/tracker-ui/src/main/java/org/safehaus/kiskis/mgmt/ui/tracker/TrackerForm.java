@@ -61,7 +61,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     public TrackerForm() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         contentRoot.setMargin(true);
 

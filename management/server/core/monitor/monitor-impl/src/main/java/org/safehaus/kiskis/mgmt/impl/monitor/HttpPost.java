@@ -30,13 +30,13 @@ class HttpPost {
         LOG.info("responseCode: {}", responseCode);
 
         return responseCode == HttpURLConnection.HTTP_OK
-            ? IOUtils.toString(connect.getInputStream(), "UTF-8")
-            : "";
+                ? IOUtils.toString(connect.getInputStream(), "UTF-8")
+                : "";
     }
 
     private static void writeParams(HttpURLConnection connect, String params) throws IOException {
 
-        DataOutputStream outputStream = new DataOutputStream( connect.getOutputStream() );
+        DataOutputStream outputStream = new DataOutputStream(connect.getOutputStream());
         outputStream.writeBytes(params);
         outputStream.flush();
         outputStream.close();

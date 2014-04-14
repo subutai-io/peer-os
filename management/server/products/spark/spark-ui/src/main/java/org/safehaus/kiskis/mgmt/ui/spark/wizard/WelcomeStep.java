@@ -14,7 +14,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 
 /**
- *
  * @author dilshat
  */
 public class WelcomeStep extends Panel {

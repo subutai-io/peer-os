@@ -13,7 +13,6 @@ import org.safehaus.kiskis.mgmt.ui.presto.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.presto.wizard.Wizard;
 
 /**
- *
  * @author dilshat
  */
 public class PrestoForm extends CustomComponent {

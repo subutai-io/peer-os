@@ -20,11 +20,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -36,7 +38,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
 
 /**
- *
  * @author dilshat
  */
 public class Manager {
@@ -51,7 +52,7 @@ public class Manager {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 
         VerticalLayout content = new VerticalLayout();
@@ -103,7 +104,7 @@ public class Manager {
         checkAllBtn.addListener(new Button.ClickListener() {
 
             public void buttonClick(Button.ClickEvent event) {
-                for (Iterator it = nodesTable.getItemIds().iterator(); it.hasNext();) {
+                for (Iterator it = nodesTable.getItemIds().iterator(); it.hasNext(); ) {
                     int rowId = (Integer) it.next();
                     Item row = nodesTable.getItem(rowId);
                     Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
@@ -136,7 +137,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
                 } else {
                     show("Please, select cluster");
                 }
@@ -204,7 +206,7 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext();) {
+        for (Iterator it = agents.iterator(); it.hasNext(); ) {
             final Agent agent = (Agent) it.next();
 
             final Button checkBtn = new Button("Check");
@@ -218,14 +220,15 @@ public class Manager {
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                agent.getHostname(),
-                checkBtn,
-                startBtn,
-                stopBtn,
-                master.equals(agent) ? null : setMasterBtn,
-                destroyBtn,
-                progressIcon},
-                    null);
+                            agent.getHostname(),
+                            checkBtn,
+                            startBtn,
+                            stopBtn,
+                            master.equals(agent) ? null : setMasterBtn,
+                            destroyBtn,
+                            progressIcon},
+                    null
+            );
 
             checkBtn.addListener(new Button.ClickListener() {
 
@@ -337,10 +340,12 @@ public class Manager {
                                                         });
 
                                                     }
-                                                });
+                                                }
+                                        );
                                     }
                                 }
-                            });
+                            }
+                    );
                 }
             });
 
@@ -366,7 +371,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
 
                 }
             });
@@ -382,14 +388,15 @@ public class Manager {
         progressIcon.setVisible(false);
 
         final Object rowId = table.addItem(new Object[]{
-            MASTER_PREFIX + master.getHostname(),
-            checkBtn,
-            startBtn,
-            stopBtn,
-            null,
-            null,
-            progressIcon},
-                null);
+                        MASTER_PREFIX + master.getHostname(),
+                        checkBtn,
+                        startBtn,
+                        stopBtn,
+                        null,
+                        null,
+                        progressIcon},
+                null
+        );
 
         checkBtn.addListener(new Button.ClickListener() {
 

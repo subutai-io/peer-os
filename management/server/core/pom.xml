@@ -20,7 +20,8 @@
         <module>communication-manager</module>
         <module>task-runner</module>
         <module>lxc-manager</module>
-	    <module>tracker</module>
-	    <module>monitor</module>
+        <module>network-manager</module>
+        <module>tracker</module>
+        <module>monitor</module>
     </modules>
 </project>
