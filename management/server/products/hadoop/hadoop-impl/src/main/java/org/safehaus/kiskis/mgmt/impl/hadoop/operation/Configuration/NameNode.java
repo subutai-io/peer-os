@@ -3,13 +3,11 @@ package org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
 import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 import java.util.UUID;
@@ -193,57 +191,5 @@ public class NameNode {
 
         return po.getId();
 
-    }
-
-
-
-    public boolean statusDataNode(Agent agent) {
-        Task task = Tasks.getNameNodeCommandTask(agent, "status");
-        final String[] gStatus = new String[1];
-
-        parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    String[] array = response.getStdOut().split("\n");
-
-                    for (String status : array) {
-                        if (status.contains("DataNode")) {
-                            gStatus[0] = status.
-                                    replaceAll("DataNode is ", "");
-                        }
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        return !gStatus[0].toLowerCase().contains("not");
-    }
-
-    public boolean statusTaskTracker(Agent agent) {
-        Task task = Tasks.getJobTrackerCommand(agent, "status");
-        final String[] gStatus = new String[1];
-
-        parent.getTaskRunner().executeTaskNWait(task, new TaskCallback() {
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    String[] array = response.getStdOut().split("\n");
-
-                    for (String status : array) {
-                        if (status.contains("TaskTracker")) {
-                            gStatus[0] = status.
-                                    replaceAll("TaskTracker is ", "");
-                        }
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        return !gStatus[0].toLowerCase().contains("not");
     }
 }
