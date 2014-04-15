@@ -5,8 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
-import java.util.Set;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -79,7 +77,7 @@ public class Commands {
 
     public static Request getUpdateSettingsCommand(String zkNames, int id) {
         Request req = getRequestTemplate();
-        req.setProgram(String.format(". /etc/profile & zookeeper-conf.sh %s & zookeeper-setID.sh %s", zkNames, id));
+        req.setProgram(String.format(". /etc/profile && zookeeper-conf.sh %s && zookeeper-setID.sh %s", zkNames, id));
         return req;
     }
 
