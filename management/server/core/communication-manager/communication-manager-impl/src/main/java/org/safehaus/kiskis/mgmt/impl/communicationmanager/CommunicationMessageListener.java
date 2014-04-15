@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
@@ -85,6 +87,10 @@ public class CommunicationMessageListener implements MessageListener {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in removeListener", ex);
         }
+    }
+
+    public Collection<ResponseListener> getListeners() {
+        return Collections.unmodifiableCollection(listeners);
     }
 
     public void destroy() {

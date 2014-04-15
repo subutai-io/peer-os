@@ -21,9 +21,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 public class CommunicationManagerImpl implements CommunicationManager {
 
     private static final Logger LOG = Logger.getLogger(CommunicationManagerImpl.class.getName());
-    private BrokerService broker;
-    private PooledConnectionFactory pooledConnectionFactory;
-    private CommunicationMessageListener communicationMessageListener;
+    BrokerService broker;
+    PooledConnectionFactory pooledConnectionFactory;
+    CommunicationMessageListener communicationMessageListener;
     private ExecutorService exec;
     private String amqBindAddress;
     private String amqServiceQueue;

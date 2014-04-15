@@ -91,6 +91,15 @@ public class CommandJson {
         return null;
     }
 
+    public static String getResponse(Response cmd) {
+        try {
+            return gson.toJson(new CommandImpl(cmd));
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getResponse", ex);
+        }
+        return null;
+    }
+
     public static String getJson(Command cmd) {
         try {
             return gson.toJson(cmd);
