@@ -9,8 +9,7 @@ import java.util.UUID;
 
 /**
  * This class is used to execute tasks on agent nodes. TODO rename public Task
- * executeTask(Task task) to executeTaskNWait rename public void
- * executeTaskNForget(Task task) to executeTask
+ * executeTask(Task task) to executeTaskNWait
  *
  * @author dilshat
  */
@@ -43,7 +42,7 @@ public interface TaskRunner {
      * @param task - task to execute
      * @return task which is supplied when calling this method;
      */
-    public Task executeTask(Task task);
+    public Task executeTaskNWait(Task task);
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
@@ -69,7 +68,9 @@ public interface TaskRunner {
 
     /**
      * Removes callback for a task if any with the supplied UUID. Should be used
-     * only with asynchronous executeTask
+     * only with asynchronous executeTask for pulling current callback out of
+     * the processing pipe of taskrunner to stop processing the task or to
+     * supply new task for processing via return new Task();
      *
      * @param taskUUID - uuid of the task
      */

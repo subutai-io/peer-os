@@ -10,7 +10,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 /**
  * This class is used when task needs to be interrupted earlier then it
  * completes or times out. One can call interrupt() which will cause TaskRunner
- * to return from executeNWait method immediately.
+ * to return from executeNWait method immediately. Should be used only with
+ * taskrunner.executeNWait call
  *
  * @author dilshat
  */

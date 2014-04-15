@@ -458,7 +458,7 @@ public class TaskRunnerImplCallbackTest {
         Thread t = new Thread(new Runnable() {
 
             public void run() {
-                taskrunner.executeTask(task1);
+                taskrunner.executeTaskNWait(task1);
             }
         });
 

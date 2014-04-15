@@ -61,7 +61,11 @@
             <artifactId>communication-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+            <version>${org.apache.activemq.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

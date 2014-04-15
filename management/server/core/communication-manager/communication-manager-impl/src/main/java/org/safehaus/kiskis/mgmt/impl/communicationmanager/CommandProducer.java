@@ -19,10 +19,12 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
+ * This class is used internally by CommunicationManagerImpl for sending
+ * requests to agents.
  *
  * @author dilshat
  */
-public class CommandProducer implements Runnable {
+class CommandProducer implements Runnable {
 
     private final Request command;
     private final CommunicationManagerImpl communicationManagerImpl;
@@ -33,6 +35,9 @@ public class CommandProducer implements Runnable {
         this.command = command;
     }
 
+    /**
+     * Called by executor to send message to agent
+     */
     public void run() {
         Connection connection = null;
         Session session = null;

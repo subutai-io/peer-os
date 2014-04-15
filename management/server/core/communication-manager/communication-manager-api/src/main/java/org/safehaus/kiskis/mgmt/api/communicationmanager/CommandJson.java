@@ -14,6 +14,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
+ * This is simple utility class for serializing/deserializing object to/from
+ * json.
+ *
  * @author dilshat
  */
 public class CommandJson {
@@ -46,6 +49,12 @@ public class CommandJson {
 
     }
 
+    /**
+     * Returns deserialized request from json string
+     *
+     * @param json - request in json format
+     * @return request
+     */
     public static Request getRequest(String json) {
         try {
             Command cmd = gson.fromJson(escape(json), CommandImpl.class);
@@ -59,6 +68,12 @@ public class CommandJson {
         return null;
     }
 
+    /**
+     * Returns deserialized response from json string
+     *
+     * @param json - response in json format
+     * @return response
+     */
     public static Response getResponse(String json) {
         try {
             Command cmd = gson.fromJson(escape(json), CommandImpl.class);
@@ -72,6 +87,12 @@ public class CommandJson {
         return null;
     }
 
+    /**
+     * Returns deserialized command from json string
+     *
+     * @param json - command in json format
+     * @return command
+     */
     public static Command getCommand(String json) {
         try {
             return gson.fromJson(escape(json), CommandImpl.class);
@@ -82,6 +103,12 @@ public class CommandJson {
         return null;
     }
 
+    /**
+     * Returns serialized request from Request POJO
+     *
+     * @param json - request in pojo format
+     * @return request in json format
+     */
     public static String getJson(Request cmd) {
         try {
             return gson.toJson(new CommandImpl(cmd));
@@ -91,6 +118,27 @@ public class CommandJson {
         return null;
     }
 
+    /**
+     * Returns serialized response from Response POJO
+     *
+     * @param json - response in pojo format
+     * @return response in json format
+     */
+    public static String getResponse(Response cmd) {
+        try {
+            return gson.toJson(new CommandImpl(cmd));
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error in getResponse", ex);
+        }
+        return null;
+    }
+
+    /**
+     * Returns serialized command from Command POJO
+     *
+     * @param json - command in pojo format
+     * @return request in command format
+     */
     public static String getJson(Command cmd) {
         try {
             return gson.toJson(cmd);
@@ -100,6 +148,12 @@ public class CommandJson {
         return null;
     }
 
+    /**
+     * Returns serialized agent from Agent POJO
+     *
+     * @param json - agent in pojo format
+     * @return agent in json format
+     */
     public static String getAgentJson(Object agent) {
         try {
             return gson.toJson(agent);
@@ -109,6 +163,12 @@ public class CommandJson {
         return null;
     }
 
+    /**
+     * Returns deserialized agent from Agent json
+     *
+     * @param json - agent in json format
+     * @return agent in pojo format
+     */
     public static Agent getAgent(String json) {
         try {
             Agent agent = gson.fromJson(escape(json), Agent.class);
@@ -122,6 +182,12 @@ public class CommandJson {
         return null;
     }
 
+    /**
+     * Escapes symbols in json string
+     *
+     * @param string
+     * @return escaped json string
+     */
     private static String escape(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
