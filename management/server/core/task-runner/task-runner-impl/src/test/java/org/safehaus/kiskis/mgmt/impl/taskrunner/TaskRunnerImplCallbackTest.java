@@ -7,8 +7,6 @@ package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -104,8 +102,6 @@ public class TaskRunnerImplCallbackTest {
     public void testFailedTaskCompletion() throws InterruptedException {
         final Task task1 = getDummyTask(1);
 
-        final AtomicInteger count = new AtomicInteger(0);
-
         //execute in a thread since this call blocks until task is completed or times out
         Thread t = new Thread(new Runnable() {
 
@@ -137,8 +133,6 @@ public class TaskRunnerImplCallbackTest {
     @Test
     public void testSuccessfulTaskCompletion() throws InterruptedException {
         final Task task1 = getDummyTask(1);
-
-        final AtomicInteger count = new AtomicInteger(0);
 
         //execute in a thread since this call blocks until task is completed or times out
         Thread t = new Thread(new Runnable() {

@@ -35,7 +35,7 @@ public interface TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
      * returned/supplied task to see its status after this method returns
      *
@@ -46,7 +46,7 @@ public interface TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
      * supplied task to see its status after this method returns.
      *
@@ -57,7 +57,7 @@ public interface TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
      * supplied task to see its status after this method returns.
      *
