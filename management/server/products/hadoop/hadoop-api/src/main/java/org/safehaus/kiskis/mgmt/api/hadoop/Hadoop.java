@@ -21,19 +21,19 @@ public interface Hadoop {
 
     public UUID statusNameNode(Config config);
 
-    public boolean statusSecondaryNameNode(Config config);
+    public UUID statusSecondaryNameNode(Config config);
 
-    public boolean statusDataNode(Agent agent);
+    public UUID statusDataNode(Agent agent);
 
-    public boolean startJobTracker(Config config);
+    public UUID startJobTracker(Config config);
 
-    public boolean stopJobTracker(Config config);
+    public UUID stopJobTracker(Config config);
 
-    public boolean restartJobTracker(Config config);
+    public UUID restartJobTracker(Config config);
 
-    public boolean statusJobTracker(Config config);
+    public UUID statusJobTracker(Config config);
 
-    public boolean statusTaskTracker(Agent agent);
+    public UUID statusTaskTracker(Agent agent);
 
     /**
      * Returns list of configurations of installed clusters

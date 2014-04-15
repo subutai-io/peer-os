@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.namenode;
+package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;

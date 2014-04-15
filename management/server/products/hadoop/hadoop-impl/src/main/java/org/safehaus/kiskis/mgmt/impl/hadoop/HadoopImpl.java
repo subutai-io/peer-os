@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop;
 
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
@@ -7,9 +8,12 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration.DataNode;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration.JobTracker;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration.NameNode;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration.SecondaryNameNode;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Installation;
-import org.safehaus.kiskis.mgmt.impl.hadoop.operation.NameNodeConfiguration;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.List;
@@ -23,6 +27,7 @@ import java.util.concurrent.Executors;
 public class HadoopImpl implements Hadoop {
     public static final String MODULE_NAME = "Hadoop";
     private TaskRunner taskRunner;
+    private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
@@ -35,6 +40,10 @@ public class HadoopImpl implements Hadoop {
 
     public void destroy() {
         executor.shutdown();
+    }
+
+    public void setAgentManager(AgentManager agentManager) {
+        this.agentManager = agentManager;
     }
 
     public void setTaskRunner(TaskRunner taskRunner) {
@@ -81,6 +90,10 @@ public class HadoopImpl implements Hadoop {
         return executor;
     }
 
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
     @Override
     public UUID installCluster(final Config config) {
         return new Installation(this, config).execute();
@@ -93,57 +106,57 @@ public class HadoopImpl implements Hadoop {
 
     @Override
     public UUID startNameNode(Config config) {
-        return new NameNodeConfiguration(this, config).startNameNode();
+        return new NameNode(this, config).start();
     }
 
     @Override
     public UUID stopNameNode(Config config) {
-        return new NameNodeConfiguration(this, config).stopNameNode();
+        return new NameNode(this, config).stop();
     }
 
     @Override
     public UUID restartNameNode(Config config) {
-        return new NameNodeConfiguration(this, config).restartNameNode();
+        return new NameNode(this, config).restart();
     }
 
     @Override
     public UUID statusNameNode(Config config) {
-        return new NameNodeConfiguration(this, config).statusNameNode();
+        return new NameNode(this, config).status();
     }
 
     @Override
-    public boolean statusSecondaryNameNode(Config config) {
-        return new NameNodeConfiguration(this, config).statusSecondaryNameNode();
+    public UUID statusSecondaryNameNode(Config config) {
+        return new SecondaryNameNode(this, config).status();
     }
 
     @Override
-    public boolean statusDataNode(Agent agent) {
-        return new NameNodeConfiguration(this, null).statusDataNode(agent);
+    public UUID statusDataNode(Agent agent) {
+        return new DataNode(this, null).status(agent);
     }
 
     @Override
-    public boolean startJobTracker(Config config) {
-        return new NameNodeConfiguration(this, config).startJobTracker();
+    public UUID startJobTracker(Config config) {
+        return new JobTracker(this, config).start();
     }
 
     @Override
-    public boolean stopJobTracker(Config config) {
-        return new NameNodeConfiguration(this, config).stopJobTracker();
+    public UUID stopJobTracker(Config config) {
+        return new JobTracker(this, config).stop();
     }
 
     @Override
-    public boolean restartJobTracker(Config config) {
-        return new NameNodeConfiguration(this, config).restartJobTracker();
+    public UUID restartJobTracker(Config config) {
+        return new JobTracker(this, config).restart();
     }
 
     @Override
-    public boolean statusJobTracker(Config config) {
-        return new NameNodeConfiguration(this, config).statusJobTracker();
+    public UUID statusJobTracker(Config config) {
+        return new JobTracker(this, config).status();
     }
 
     @Override
-    public boolean statusTaskTracker(Agent agent) {
-        return new NameNodeConfiguration(this, null).statusTaskTracker(agent);
+    public UUID statusTaskTracker(Agent agent) {
+        return new NameNode(this, null).statusTaskTracker(agent);
     }
 
 

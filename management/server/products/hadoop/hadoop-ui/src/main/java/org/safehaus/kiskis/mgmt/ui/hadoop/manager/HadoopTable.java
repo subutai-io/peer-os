@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.JobTracker;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.namenode.NameNode;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.NameNode;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.SecondaryNameNode;
 
 import java.util.List;

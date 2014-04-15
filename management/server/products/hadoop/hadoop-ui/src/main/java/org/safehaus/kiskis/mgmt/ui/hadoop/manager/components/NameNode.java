@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.namenode;
+package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
@@ -7,7 +7,6 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
 
 import java.util.UUID;
 
