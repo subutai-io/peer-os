@@ -5,45 +5,36 @@
  */
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Operation;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.TaskType;
-import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddDataNodeOperation;
-import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddRouterOperation;
-import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
-import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.impl.mongodb.common.TaskType;
+import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
+import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddDataNodeOperation;
+import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddRouterOperation;
+import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- *
  * @author dilshat
  */
 public class MongoImpl implements Mongo {
@@ -115,7 +106,7 @@ public class MongoImpl implements Mongo {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -277,7 +268,7 @@ public class MongoImpl implements Mongo {
     public UUID addNode(final String clusterName, final NodeType nodeType) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding %s to %s", nodeType, clusterName));
+                String.format("Adding %s to %s", nodeType, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -374,11 +365,11 @@ public class MongoImpl implements Mongo {
 
                     if ((task.getData() == TaskType.RESTART_ROUTERS
                             && Util.countNumberOfOccurences(routersOutput.toString(),
-                                    "child process started successfully, parent exiting")
+                            "child process started successfully, parent exiting")
                             == config.getRouterServers().size())
                             || (task.getData() != TaskType.RESTART_ROUTERS
                             && stdOut.indexOf(
-                                    "child process started successfully, parent exiting") > -1)) {
+                            "child process started successfully, parent exiting") > -1)) {
                         taskCompleted = true;
                         taskSucceeded = true;
                         taskRunner.removeTaskCallback(task.getUuid());
@@ -411,7 +402,7 @@ public class MongoImpl implements Mongo {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
         executor.execute(new Runnable() {
 
             public void run() {
@@ -453,7 +444,7 @@ public class MongoImpl implements Mongo {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         //go on operation
         executor.execute(new Runnable() {
@@ -495,7 +486,7 @@ public class MongoImpl implements Mongo {
                     //don't check status of this task since this task always ends with execute_timeouted
                     if (stopMongoTask.isCompleted()) {
                         Task startRoutersTask = taskRunner.executeTaskNWait(Tasks.getStartRoutersTask(config.getRouterServers(),
-                                                config.getConfigServers(), config));
+                                config.getConfigServers(), config));
 
                         final AtomicInteger okCount = new AtomicInteger(0);
                         taskRunner.executeTaskNWait(startRoutersTask, new InterruptableTaskCallback() {
@@ -540,8 +531,9 @@ public class MongoImpl implements Mongo {
                             if (primaryNodeAgent != agent) {
                                 Task unregisterSecondaryNodeFromPrimaryTask
                                         = taskRunner.executeTaskNWait(
-                                                Tasks.getUnregisterSecondaryFromPrimaryTask(
-                                                        primaryNodeAgent, agent, config));
+                                        Tasks.getUnregisterSecondaryFromPrimaryTask(
+                                                primaryNodeAgent, agent, config)
+                                );
                                 if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
                                     po.addLog("Could not unregister this node from replica set, skipping...");
                                 }
@@ -562,7 +554,8 @@ public class MongoImpl implements Mongo {
                 if (physicalAgent == null) {
                     po.addLog(
                             String.format("Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                                    agent.getHostname()));
+                                    agent.getHostname())
+                    );
                 } else {
                     if (!lxcManager.destroyLxcOnHost(physicalAgent, agent.getHostname())) {
                         po.addLog("Could not destroy lxc container. Use LXC module to cleanup, skipping...");
@@ -592,7 +585,7 @@ public class MongoImpl implements Mongo {
     public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostname, clusterName));
+                String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -661,7 +654,7 @@ public class MongoImpl implements Mongo {
     public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -706,7 +699,7 @@ public class MongoImpl implements Mongo {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 

@@ -5,41 +5,21 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
-
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
-import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author dilshat

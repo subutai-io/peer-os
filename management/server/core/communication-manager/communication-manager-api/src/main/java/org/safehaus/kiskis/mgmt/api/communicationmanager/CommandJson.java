@@ -6,12 +6,12 @@ package org.safehaus.kiskis.mgmt.api.communicationmanager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is simple utility class for serializing/deserializing object to/from

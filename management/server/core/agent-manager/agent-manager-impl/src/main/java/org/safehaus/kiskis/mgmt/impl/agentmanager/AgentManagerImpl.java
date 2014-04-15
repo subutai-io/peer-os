@@ -9,40 +9,23 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import java.util.Collection;
-import java.util.Collections;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.AGENT_DISCONNECT;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.HEARTBEAT_RESPONSE;
-import static org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType.REGISTRATION_REQUEST;
-
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * @author dilshat
@@ -221,7 +204,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                             if (notifyAgentListeners) {
                                 notifyAgentListeners = false;
                                 Set<Agent> freshAgents = new HashSet(agents.asMap().values());
-                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
+                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); ) {
                                     AgentListener listener = it.next();
                                     try {
                                         listener.onAgent(freshAgents);

@@ -1,20 +1,23 @@
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-
-import javax.jms.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is used internally by CommunicationManagerImpl to notify response
@@ -70,7 +73,7 @@ class CommunicationMessageListener implements MessageListener {
      */
     private void notifyListeners(Response response) {
         try {
-            for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext();) {
+            for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext(); ) {
                 ResponseListener ai = it.next();
                 try {
                     ai.onResponse(response);

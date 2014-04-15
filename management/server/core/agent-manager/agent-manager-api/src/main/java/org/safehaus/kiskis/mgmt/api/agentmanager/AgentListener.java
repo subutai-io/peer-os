@@ -1,7 +1,8 @@
 package org.safehaus.kiskis.mgmt.api.agentmanager;
 
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+import java.util.Set;
 
 /**
  * This interface is used by clients which want to be notified when connected
