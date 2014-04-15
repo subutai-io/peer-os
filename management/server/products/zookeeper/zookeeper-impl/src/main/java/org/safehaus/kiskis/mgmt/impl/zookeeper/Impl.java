@@ -57,7 +57,7 @@ public class Impl implements Api {
     }
 
     public UUID installCluster(final Config config) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", Config.PRODUCT_KEY));
+        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
