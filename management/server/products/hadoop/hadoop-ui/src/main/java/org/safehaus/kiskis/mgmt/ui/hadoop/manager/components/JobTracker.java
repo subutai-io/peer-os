@@ -45,7 +45,7 @@ public class JobTracker extends ClusterNode {
     protected void getStatus(UUID prevTrackID) {
         setLoading(true);
 
-        UUID trackID = HadoopUI.getHadoopManager().startJobTracker(cluster);
+        UUID trackID = HadoopUI.getHadoopManager().statusJobTracker(cluster);
         HadoopUI.getExecutor().execute(new CheckTask(new CompleteEvent() {
 
             public void onComplete(NodeState state) {
