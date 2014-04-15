@@ -107,7 +107,7 @@ public class Impl implements Api {
                                     po.addLogFailed(String.format("Starting %s failed, %s", Config.PRODUCT_KEY, startTask.getFirstError()));
                                 }
                             } else {
-                                po.addLogFailed(String.format("Failed to update settings, %s\nPlease update settings manually and restart the cluster, %s", updateSettingsTask.getFirstError()));
+                                po.addLogFailed(String.format("Failed to update settings, %s\nPlease update settings manually and restart the cluster", updateSettingsTask.getFirstError()));
                             }
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));

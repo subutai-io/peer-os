@@ -77,7 +77,7 @@ public class Commands {
 
     public static Request getUpdateSettingsCommand(String zkNames, int id) {
         Request req = getRequestTemplate();
-        req.setProgram(String.format(". /etc/profile && zookeeper-conf.sh %s && zookeeper-setID.sh %s", zkNames, id));
+        req.setProgram(String.format(". /etc/profile & zookeeper-conf.sh %s & zookeeper-setID.sh %s", zkNames, id));
         return req;
     }
 
