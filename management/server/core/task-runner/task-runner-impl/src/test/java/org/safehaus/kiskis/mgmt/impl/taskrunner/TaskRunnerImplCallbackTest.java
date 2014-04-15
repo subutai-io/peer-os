@@ -7,6 +7,8 @@ package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,6 +20,7 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -95,6 +98,74 @@ public class TaskRunnerImplCallbackTest {
                 null, //                        arg
                 null, //                        env vars
                 30); //  
+    }
+
+    @Test
+    public void testFailedTaskCompletion() throws InterruptedException {
+        final Task task1 = getDummyTask(1);
+
+        final AtomicInteger count = new AtomicInteger(0);
+
+        //execute in a thread since this call blocks until task is completed or times out
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    //wait until background thread is initialized
+                    Thread.sleep(10);
+
+                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task1));
+
+                    //wait till background thread processes response
+                    Thread.sleep(10);
+
+                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 123, task1));
+
+                    //wait till background thread processes response
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+                }
+            }
+        });
+        t.start();
+
+        taskrunner.executeTaskNWait(task1);
+
+        assertTrue(task1.isCompleted());
+    }
+
+    @Test
+    public void testSuccessfulTaskCompletion() throws InterruptedException {
+        final Task task1 = getDummyTask(1);
+
+        final AtomicInteger count = new AtomicInteger(0);
+
+        //execute in a thread since this call blocks until task is completed or times out
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    //wait until background thread is initialized
+                    Thread.sleep(10);
+
+                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE, null, task1));
+
+                    //wait till background thread processes response
+                    Thread.sleep(10);
+
+                    ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 0, task1));
+
+                    //wait till background thread processes response
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+                }
+            }
+        });
+        t.start();
+
+        taskrunner.executeTaskNWait(task1);
+
+        assertEquals(TaskStatus.SUCCESS, task1.getTaskStatus());
     }
 
     @Test
