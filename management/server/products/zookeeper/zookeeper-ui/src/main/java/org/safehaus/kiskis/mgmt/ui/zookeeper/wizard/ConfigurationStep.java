@@ -105,6 +105,7 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent(back);
         buttons.addComponent(next);
 
+        content.addComponent(clusterNameTxtFld);
         content.addComponent(zkNameTxtFld);
         content.addComponent(nodesCountCombo);
         content.addComponent(buttons);
