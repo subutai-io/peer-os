@@ -42,9 +42,10 @@ public class NameNode extends ClusterNode {
     }
 
     @Override
-    protected void getStatus(UUID trackID) {
+    protected void getStatus(UUID prevTrackID) {
         setLoading(true);
 
+        UUID trackID = HadoopUI.getHadoopManager().statusNameNode(cluster);
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
             public void onComplete(NodeState state) {
@@ -63,7 +64,7 @@ public class NameNode extends ClusterNode {
                     setLoading(false);
                 }
             }
-        }, trackID));
+        }, prevTrackID, trackID));
     }
 
     @Override

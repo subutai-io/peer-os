@@ -23,11 +23,13 @@ public class CheckTask implements Runnable {
     private final Config config;
     private final CompleteEvent completeEvent;
     private final UUID prevTaskID;
+    private final UUID trackID;
 
-    public CheckTask(Config config, CompleteEvent completeEvent, UUID previousTaskId) {
+    public CheckTask(Config config, CompleteEvent completeEvent, UUID previousTaskId, UUID trackID) {
         this.config = config;
         this.completeEvent = completeEvent;
         this.prevTaskID = previousTaskId;
+        this.trackID = trackID;
     }
 
     public void run() {
@@ -47,8 +49,6 @@ public class CheckTask implements Runnable {
                 }
             }
         }
-
-        UUID trackID = HadoopUI.getHadoopManager().statusNameNode(config);
 
         NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
