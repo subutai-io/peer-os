@@ -24,17 +24,30 @@ public class Tasks {
         return task;
     }
 
-    public static Task getStartTask(Agent agent) {
+    public static Task getStartTask(Set<Agent> agents) {
         Task task = new Task();
         task.setData(TaskType.START);
-        task.addRequest(Commands.getStartCommand(), agent);
+        for (Agent agent : agents) {
+            task.addRequest(Commands.getStartCommand(), agent);
+        }
         return task;
     }
 
-    public static Task getStopTask(Agent agent) {
+    public static Task getRestartTask(Set<Agent> agents) {
+        Task task = new Task();
+        task.setData(TaskType.RESTART);
+        for (Agent agent : agents) {
+            task.addRequest(Commands.getRestartCommand(), agent);
+        }
+        return task;
+    }
+
+    public static Task getStopTask(Set<Agent> agents) {
         Task task = new Task();
         task.setData(TaskType.STOP);
-        task.addRequest(Commands.getStopCommand(), agent);
+        for (Agent agent : agents) {
+            task.addRequest(Commands.getStopCommand(), agent);
+        }
         return task;
     }
 
@@ -45,10 +58,38 @@ public class Tasks {
         return task;
     }
 
-    public static Task getCatCfgFileTask(Agent agent) {
+    public static Task getReadSettingsTask(Agent agent) {
         Task task = new Task();
-        task.setData(TaskType.CAT_CFG_FILE);
-        task.addRequest(Commands.getCatCfgFileCommand(), agent);
+        task.setData(TaskType.GET_SETTINGS);
+        task.addRequest(Commands.getReadSettingsCommand(), agent);
+        return task;
+    }
+
+//    public static Task getSetZkIdTask(Set<Agent> agents) {
+//        Task task = new Task();
+//        task.setData(TaskType.SET_ZK_ID);
+//        int id = 0;
+//        for (Agent agent : agents) {
+//            task.addRequest(Commands.getSetZkIdCommand(++id), agent);
+//        }
+//        return task;
+//    }
+//
+//    public static Task getUpdateCfgFileTask(Set<Agent> agents) {
+//        Task task = new Task();
+//        task.setData(TaskType.UPDATE_CFG_FILE);
+//        for (Agent agent : agents) {
+//            task.addRequest(Commands.getUpdateCfgFileCommand(agents), agent);
+//        }
+//        return task;
+//    }
+    public static Task getUpdateSettingsTask(Set<Agent> agents) {
+        Task task = new Task();
+        task.setData(TaskType.UPDATE_SETTINGS);
+        int id = 0;
+        for (Agent agent : agents) {
+            task.addRequest(Commands.getUpdateSettingsCommand(agents, ++id), agent);
+        }
         return task;
     }
 }

@@ -11,5 +11,5 @@ package org.safehaus.kiskis.mgmt.impl.zookeeper;
  */
 public enum TaskType {
 
-    CHECK, INSTALL, UNINSTALL, START, STOP, STATUS, CAT_CFG_FILE
+    CHECK, INSTALL, UNINSTALL, START, RESTART, STOP, STATUS, GET_SETTINGS, UPDATE_SETTINGS
 }

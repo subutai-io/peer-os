@@ -63,7 +63,7 @@ public class Impl implements Api {
 
             public void run() {
 
-                if (config == null || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                if (config == null || Util.isStringEmpty(config.getZkName()) || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -90,7 +90,25 @@ public class Impl implements Api {
                         Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Installation succeeded");
+                            po.addLog("Installation succeeded\nUpdating settings...");
+
+                            //update settings
+                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes()));
+
+                            if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
+
+                                po.addLog(String.format("Settings updated\nStarting %s...", Config.PRODUCT_KEY));
+                                //start all nodes
+                                Task startTask = taskRunner.executeTaskNWait(Tasks.getStartTask(config.getNodes()));
+
+                                if (startTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                    po.addLogDone(String.format("Starting %s succeeded\nDone", Config.PRODUCT_KEY));
+                                } else {
+                                    po.addLogFailed(String.format("Starting %s failed, %s", Config.PRODUCT_KEY, startTask.getFirstError()));
+                                }
+                            } else {
+                                po.addLogFailed(String.format("Failed to update settings, %s\nPlease update settings manually and restart the cluster, %s", updateSettingsTask.getFirstError()));
+                            }
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
                         }
@@ -183,7 +201,7 @@ public class Impl implements Api {
                 }
 
                 po.addLog("Starting node...");
-                Task startNodeTask = Tasks.getStartTask(node);
+                Task startNodeTask = Tasks.getStartTask(Util.wrapAgentToSet(node));
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
                 taskRunner.executeTaskNWait(startNodeTask, new TaskCallback() {
@@ -250,7 +268,7 @@ public class Impl implements Api {
                     return;
                 }
                 po.addLog("Stopping node...");
-                Task stopNodeTask = Tasks.getStopTask(node);
+                Task stopNodeTask = Tasks.getStopTask(Util.wrapAgentToSet(node));
                 final Task checkNodeTask = Tasks.getStatusTask(node);
 
                 taskRunner.executeTaskNWait(stopNodeTask, new TaskCallback() {
@@ -391,9 +409,32 @@ public class Impl implements Api {
                         po.addLog("Lxc container destroyed successfully");
                     }
                 }
+
+                config.getNodes().remove(agent);
+
+                //update settings
+                po.addLog("Updating settings...");
+                Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes()));
+
+                if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLog("Settings updated\nRestarting cluster...");
+                    //restart all other nodes with new configuration
+                    Task restartTask = taskRunner.executeTaskNWait(Tasks.getRestartTask(config.getNodes()));
+
+                    if (restartTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Cluster successfully restarted");
+                    } else {
+                        po.addLog(String.format("Failed to restart cluster, %s, skipping...", restartTask.getFirstError()));
+                    }
+                } else {
+                    po.addLog(
+                            String.format(
+                                    "Settings update failed, %s\nPlease update settings manually and restart the cluster, skipping...",
+                                    updateSettingsTask.getFirstError()));
+                }
+
                 //update db
                 po.addLog("Updating db...");
-                config.getNodes().remove(agent);
                 if (!dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
                             config.getClusterName()));
@@ -422,6 +463,7 @@ public class Impl implements Api {
 
                 try {
 
+                    //create lxc
                     po.addLog("Creating lxc container...");
 
                     Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(1);
@@ -429,21 +471,42 @@ public class Impl implements Api {
                     Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
                     config.getNodes().add(lxcAgent);
-                    po.addLog("Lxc container created successfully\nUpdating db...");
-                    if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
-                        po.addLog(String.format("Cluster info updated in DB\nInstalling %s...", Config.PRODUCT_KEY));
 
-                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
+                    po.addLog(String.format("Lxc container created successfully\nInstalling %s...", Config.PRODUCT_KEY));
 
-                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Installation succeeded\nDone");
+                    //install
+                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
 
+                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Installation succeeded\nUpdating db...");
+                        //update db
+                        if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+                            po.addLog("Cluster info updated in DB\nUpdating settings...");
+
+                            //update settings
+                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes()));
+
+                            if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                po.addLog("Settings updated\nRestarting cluster...");
+                                //restart all nodes
+                                Task restartTask = taskRunner.executeTaskNWait(Tasks.getRestartTask(config.getNodes()));
+                                if (restartTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                    po.addLogDone("Cluster restarted successfully\nDone");
+                                } else {
+                                    po.addLogFailed("Failed to restart cluster");
+                                }
+                            } else {
+                                po.addLogFailed(
+                                        String.format(
+                                                "Settings update failed, %s.\nPlease update settings manually and restart the cluster",
+                                                installTask.getFirstError()));
+                            }
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s",
-                                    installTask.getFirstError()));
+                            po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
                         }
                     } else {
-                        po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
+                        po.addLogFailed(String.format("Installation failed, %s\nUse LXC Module to cleanup",
+                                installTask.getFirstError()));
                     }
 
                 } catch (LxcCreateException ex) {
