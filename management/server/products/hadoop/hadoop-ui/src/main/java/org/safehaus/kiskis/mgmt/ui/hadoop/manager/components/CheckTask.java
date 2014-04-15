@@ -20,13 +20,11 @@ import java.util.UUID;
  */
 public class CheckTask implements Runnable {
 
-    private final Config config;
     private final CompleteEvent completeEvent;
     private final UUID prevTaskID;
     private final UUID trackID;
 
-    public CheckTask(Config config, CompleteEvent completeEvent, UUID previousTaskId, UUID trackID) {
-        this.config = config;
+    public CheckTask(CompleteEvent completeEvent, UUID previousTaskId, UUID trackID) {
         this.completeEvent = completeEvent;
         this.prevTaskID = previousTaskId;
         this.trackID = trackID;
