@@ -93,7 +93,7 @@ public class Impl implements Api {
                             po.addLog("Installation succeeded\nUpdating settings...");
 
                             //update settings
-                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes()));
+                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes(), config.getZkName()));
 
                             if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
 
@@ -414,7 +414,7 @@ public class Impl implements Api {
 
                 //update settings
                 po.addLog("Updating settings...");
-                Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes()));
+                Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes(), config.getZkName()));
 
                 if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
                     po.addLog("Settings updated\nRestarting cluster...");
@@ -484,7 +484,7 @@ public class Impl implements Api {
                             po.addLog("Cluster info updated in DB\nUpdating settings...");
 
                             //update settings
-                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes()));
+                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes(), config.getZkName()));
 
                             if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
                                 po.addLog("Settings updated\nRestarting cluster...");

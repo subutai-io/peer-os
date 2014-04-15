@@ -43,8 +43,19 @@ public class ConfigurationStep extends Panel {
                 wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
             }
         });
+        final TextField zkNameTxtFld = new TextField("Enter zk name");
+        zkNameTxtFld.setInputPrompt("ZK name");
+        zkNameTxtFld.setRequired(true);
+        zkNameTxtFld.setMaxLength(20);
+        zkNameTxtFld.setValue(wizard.getConfig().getZkName());
+        zkNameTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setZkName(event.getProperty().getValue().toString().trim());
+            }
+        });
 
-        //configuration servers number
+        //number of nodes
         ComboBox nodesCountCombo = new ComboBox("Choose number of nodes", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate(true);
@@ -67,6 +78,9 @@ public class ConfigurationStep extends Panel {
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
+
+                } else if (Util.isStringEmpty(wizard.getConfig().getZkName())) {
+                    show("Please provide zk name");
 
                 } else {
                     wizard.next();
@@ -91,7 +105,7 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent(back);
         buttons.addComponent(next);
 
-        content.addComponent(clusterNameTxtFld);
+        content.addComponent(zkNameTxtFld);
         content.addComponent(nodesCountCombo);
         content.addComponent(buttons);
 

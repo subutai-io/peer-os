@@ -5,8 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
@@ -75,33 +73,13 @@ public class Commands {
 
     public static Request getReadSettingsCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("cat /opt/zookeeper-3.4.5/zoo.cfg");
+        req.setProgram("cat $ZOOKEEPER_HOME/zoo.cfg");
         return req;
     }
 
-    public static Request getUpdateCfgFileCommand(Set<Agent> nodes) {
+    public static Request getUpdateSettingsCommand(String zkNames, int id) {
         Request req = getRequestTemplate();
-        StringBuilder nodesStr = new StringBuilder();
-        for (Agent node : nodes) {
-            nodesStr.append(node.getHostname()).append(" ");
-        }
-        req.setProgram(String.format(". /etc/profile & zookeeper-conf.sh %s", nodesStr));
-        return req;
-    }
-
-    public static Request getUpdateSettingsCommand(Set<Agent> nodes, int id) {
-        Request req = getRequestTemplate();
-        StringBuilder nodesStr = new StringBuilder();
-        for (Agent node : nodes) {
-            nodesStr.append(node.getHostname()).append(" ");
-        }
-        req.setProgram(String.format(". /etc/profile & zookeeper-conf.sh %s & zookeeper-setID.sh %s", nodesStr, id));
-        return req;
-    }
-
-    public static Request getSetZkIdCommand(int id) {
-        Request req = getRequestTemplate();
-        req.setProgram(String.format(". /etc/profile & zookeeper-setID.sh %s", id));
+        req.setProgram(String.format(". /etc/profile & zookeeper-conf.sh %s & zookeeper-setID.sh %s", zkNames, id));
         return req;
     }
 

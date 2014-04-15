@@ -24,8 +24,8 @@ public interface TaskRunner {
     /**
      * Executes {@code Task} asynchronously to the calling party. The supplied
      * {@code TaskCallBack} is triggered every time a response is received for
-     * this task. If null for callback is supplied this call is the same as
-     * calling executeTaskNForget.
+     * this task. Calling party should examine the supplied task to see its
+     * status after this task is completed.
      *
      * @param task - task to execute
      * @param taskCallback - callback to trigger when response from agent is
@@ -48,7 +48,7 @@ public interface TaskRunner {
      * Executes {@code Task} synchronously to the calling party. The method
      * returns when either task is completed or timed out. This method waits 1
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
      * @param task - task to execute
      * @param callback - task callback
@@ -59,7 +59,7 @@ public interface TaskRunner {
      * Executes {@code Task} synchronously to the calling party. The method
      * returns when either task is completed or timed out. This method waits 1
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
      * @param task - task to execute
      * @param callback - task callback

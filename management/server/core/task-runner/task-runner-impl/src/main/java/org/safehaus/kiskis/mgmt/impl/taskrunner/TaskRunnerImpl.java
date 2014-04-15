@@ -250,7 +250,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * Executes {@code Task} synchronously to the calling party. The method
      * returns when either task is completed or timed out. This method waits 1
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
      * @param task - task to execute
      * @param callback - task callback
@@ -277,7 +277,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * Executes {@code Task} synchronously to the calling party. The method
      * returns when either task is completed or timed out. This method waits 1
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
      * @param task - task to execute
      * @param callback - task callback

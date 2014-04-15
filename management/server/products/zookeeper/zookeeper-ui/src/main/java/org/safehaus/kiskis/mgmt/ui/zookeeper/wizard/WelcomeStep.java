@@ -12,6 +12,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 
 /**
  *
@@ -28,12 +29,12 @@ public class WelcomeStep extends Panel {
         grid.setMargin(true);
         grid.setSizeFull();
 
-        Label welcomeMsg = new Label("<center><h2>Welcome to Solr Installation Wizard!</h2>");
+        Label welcomeMsg = new Label(String.format("<center><h2>Welcome to %s Installation Wizard!</h2>", Config.PRODUCT_KEY));
         welcomeMsg.setContentMode(Label.CONTENT_XHTML);
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/solr.png"));
+        logoImg.setIcon(new ThemeResource("icons/modules/zk.jpg"));
         logoImg.setContentMode(Label.CONTENT_XHTML);
         logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
         logoImg.setWidth(150, Sizeable.UNITS_PIXELS);

@@ -65,30 +65,16 @@ public class Tasks {
         return task;
     }
 
-//    public static Task getSetZkIdTask(Set<Agent> agents) {
-//        Task task = new Task();
-//        task.setData(TaskType.SET_ZK_ID);
-//        int id = 0;
-//        for (Agent agent : agents) {
-//            task.addRequest(Commands.getSetZkIdCommand(++id), agent);
-//        }
-//        return task;
-//    }
-//
-//    public static Task getUpdateCfgFileTask(Set<Agent> agents) {
-//        Task task = new Task();
-//        task.setData(TaskType.UPDATE_CFG_FILE);
-//        for (Agent agent : agents) {
-//            task.addRequest(Commands.getUpdateCfgFileCommand(agents), agent);
-//        }
-//        return task;
-//    }
-    public static Task getUpdateSettingsTask(Set<Agent> agents) {
+    public static Task getUpdateSettingsTask(Set<Agent> agents, String zkName) {
+        StringBuilder zkNames = new StringBuilder();
+        for (int i = 1; i <= agents.size(); i++) {
+            zkNames.append(zkName).append(i).append(" ");
+        }
         Task task = new Task();
         task.setData(TaskType.UPDATE_SETTINGS);
         int id = 0;
         for (Agent agent : agents) {
-            task.addRequest(Commands.getUpdateSettingsCommand(agents, ++id), agent);
+            task.addRequest(Commands.getUpdateSettingsCommand(zkNames.toString(), ++id), agent);
         }
         return task;
     }
