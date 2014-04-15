@@ -215,9 +215,9 @@ public class Impl implements Api {
 
                         } else if (task.getData() == TaskType.STATUS) {
                             if (Util.isFinalResponse(response)) {
-                                if (stdOut.contains("is running")) {
+                                if (stdOut.contains("is Running")) {
                                     task.setData(NodeState.RUNNING);
-                                } else if (stdOut.contains("is not running")) {
+                                } else if (stdOut.contains("is NOT Running")) {
                                     task.setData(NodeState.STOPPED);
                                 }
 
@@ -282,9 +282,9 @@ public class Impl implements Api {
 
                         } else if (task.getData() == TaskType.STATUS) {
                             if (Util.isFinalResponse(response)) {
-                                if (stdOut.contains("is running")) {
+                                if (stdOut.contains("is Running")) {
                                     task.setData(NodeState.RUNNING);
-                                } else if (stdOut.contains("is not running")) {
+                                } else if (stdOut.contains("is NOT Running")) {
                                     task.setData(NodeState.STOPPED);
                                 }
 
@@ -340,9 +340,9 @@ public class Impl implements Api {
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (checkNodeTask.isCompleted()) {
                     Result result = checkNodeTask.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut().contains("is running")) {
+                    if (result.getStdOut().contains("is Running")) {
                         nodeState = NodeState.RUNNING;
-                    } else if (result.getStdOut().contains("is not running")) {
+                    } else if (result.getStdOut().contains("is NOT Running")) {
                         nodeState = NodeState.STOPPED;
                     }
                 }
