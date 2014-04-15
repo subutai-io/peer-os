@@ -186,7 +186,6 @@ public class Commands {
 
     public static Request getAddSlavesCommand(Set<Agent> slaveNodes) {
         Request req = getRequestTemplate();
-//        String slaves = Arrays.toString(slaveHostnames.toArray(new String[slaveHostnames.size()])).substring(1).replaceAll("\\]$", "");
         StringBuilder slaves = new StringBuilder();
         for (Agent slaveNode : slaveNodes) {
             slaves.append(slaveNode.getHostname()).append(" ");
