@@ -18,25 +18,83 @@ import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
+/**
+ * This class is implementation of Communication Manager.
+ *
+ * @author dilshat
+ */
 public class CommunicationManagerImpl implements CommunicationManager {
 
     private static final Logger LOG = Logger.getLogger(CommunicationManagerImpl.class.getName());
+    /**
+     * broker
+     */
     BrokerService broker;
+    /**
+     * pooled connection factory to hold connection to broker
+     */
     PooledConnectionFactory pooledConnectionFactory;
+    /**
+     * message listenere to receive messages from broker
+     */
     CommunicationMessageListener communicationMessageListener;
+    /**
+     * executor used to send requests to agents
+     */
     private ExecutorService exec;
+    /**
+     * bind address
+     */
     private String amqBindAddress;
+    /**
+     * service queue to listen on responses from agents
+     */
     private String amqServiceQueue;
+    /**
+     * ssl certificate name
+     */
     private String amqBrokerCertificateName;
+    /**
+     * ssl truststore name
+     */
     private String amqBrokerTrustStoreName;
+
+    /**
+     * ssl certificate password
+     */
     private String amqBrokerCertificatePwd;
+    /**
+     * ssl truststore password
+     */
     private String amqBrokerTrustStorePwd;
+    /**
+     * broker port
+     */
     private int amqPort;
+    /**
+     * ttl of message from server to agent
+     */
     private int amqMaxMessageToAgentTtlSec;
+    /**
+     * ttl for offline agents after which they get evicted
+     */
     private int amqMaxOfflineAgentTtlSec;
+    /**
+     * ttl for slow acking agents after which they get evicted
+     */
     private int amqMaxSlowAgentConnectionTtlSec;
+    /**
+     * size of connection pool to broker
+     */
     private int amqMaxPooledConnections;
+    /**
+     * size of executor pool to send request to agents
+     */
     private int amqMaxSenderPoolSize;
+
+    /**
+     * timeout to drop inactive queues
+     */
     private int amqInactiveQueuesDropTimeoutSec;
 
     PooledConnectionFactory getPooledConnectionFactory() {
@@ -99,10 +157,18 @@ public class CommunicationManagerImpl implements CommunicationManager {
         this.amqInactiveQueuesDropTimeoutSec = amqInactiveQueuesDropTimeoutSec;
     }
 
+    /**
+     * Sends request to agent
+     *
+     * @param request
+     */
     public void sendRequest(Request request) {
         exec.submit(new CommandProducer(request, this));
     }
 
+    /**
+     * Initialized communication manager
+     */
     public void init() {
 
         if (pooledConnectionFactory != null) {
@@ -176,6 +242,9 @@ public class CommunicationManagerImpl implements CommunicationManager {
 
     }
 
+    /**
+     * Disposes communcation manager
+     */
     public void destroy() {
         try {
             if (pooledConnectionFactory != null) {
@@ -204,6 +273,9 @@ public class CommunicationManagerImpl implements CommunicationManager {
         }
     }
 
+    /**
+     * Sets up listener to receive messages from agents
+     */
     private void setupListener() {
         try {
             Connection connection = pooledConnectionFactory.createConnection();
@@ -223,6 +295,11 @@ public class CommunicationManagerImpl implements CommunicationManager {
         }
     }
 
+    /**
+     * Adds listener
+     *
+     * @param listener
+     */
     @Override
     public void addListener(ResponseListener listener) {
         try {
@@ -234,6 +311,11 @@ public class CommunicationManagerImpl implements CommunicationManager {
         }
     }
 
+    /**
+     * Removes listener
+     *
+     * @param listener
+     */
     @Override
     public void removeListener(ResponseListener listener) {
         try {

@@ -16,13 +16,19 @@ import org.apache.activemq.command.RemoveInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-public class CommunicationMessageListener implements MessageListener {
+/**
+ * This class is used internally by CommunicationManagerImpl to notify response
+ * listener on new message.
+ *
+ * @author dilshat
+ */
+class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
     private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<ResponseListener>();
 
     /**
-     * Distributes incoming message to appropriate bundles.
+     * New message handler called by amq broker
      *
      * @param message
      */
@@ -57,6 +63,11 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Notifies listeners on new response
+     *
+     * @param response
+     */
     private void notifyListeners(Response response) {
         try {
             for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext();) {
@@ -73,6 +84,11 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Adds response listener
+     *
+     * @param listener
+     */
     public void addListener(ResponseListener listener) {
         try {
             listeners.add(listener);
@@ -81,6 +97,11 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Removes response listener
+     *
+     * @param listener
+     */
     public void removeListener(ResponseListener listener) {
         try {
             listeners.remove(listener);
@@ -89,10 +110,18 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
-    public Collection<ResponseListener> getListeners() {
+    /**
+     * Returns collection of listeners
+     *
+     * @return
+     */
+    Collection<ResponseListener> getListeners() {
         return Collections.unmodifiableCollection(listeners);
     }
 
+    /**
+     * Disposes message listener
+     */
     public void destroy() {
         if (listeners != null) {
             listeners.clear();
