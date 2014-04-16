@@ -51,11 +51,6 @@ public class CheckTask implements Runnable {
                         break;
                     }
                 } else {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
                     break;
                 }
             }
