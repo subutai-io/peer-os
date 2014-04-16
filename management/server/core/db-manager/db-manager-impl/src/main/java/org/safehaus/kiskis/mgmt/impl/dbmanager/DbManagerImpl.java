@@ -31,10 +31,25 @@ public class DbManagerImpl implements DbManager {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(DbManagerImpl.class.getName());
     private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<String, PreparedStatement>();
+    /**
+     * Cassandra cluster
+     */
     private Cluster cluster;
+    /**
+     * Cassandra session
+     */
     private Session session;
+    /**
+     * Cassandra host
+     */
     private String cassandraHost;
+    /**
+     * Cassandra keyspace
+     */
     private String cassandraKeyspace;
+    /**
+     * Cassandra port
+     */
     private int cassandraPort;
 
     public void setCassandraKeyspace(String cassandraKeyspace) {
@@ -49,6 +64,9 @@ public class DbManagerImpl implements DbManager {
         this.cassandraPort = cassandraPort;
     }
 
+    /**
+     * Initializes db manager
+     */
     public void init() {
         try {
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
@@ -59,6 +77,13 @@ public class DbManagerImpl implements DbManager {
         }
     }
 
+    void setTestSession(Session session) {
+        this.session = session;
+    }
+
+    /**
+     * Disposes db manager
+     */
     public void destroy() {
         try {
             session.close();
@@ -71,6 +96,13 @@ public class DbManagerImpl implements DbManager {
         LOG.log(Level.INFO, "DbManager stopped");
     }
 
+    /**
+     * Executes a select query against db
+     *
+     * @param cql - sql query with placeholders for bind parameters in form of ?
+     * @param values - bind parameters
+     * @return - resultset
+     */
     public ResultSet executeQuery(String cql, Object... values) {
         try {
             PreparedStatement stmt = statements.get(cql);
@@ -89,6 +121,13 @@ public class DbManagerImpl implements DbManager {
         return null;
     }
 
+    /**
+     * Executes CUD (insert update delete) query against DB
+     *
+     * @param cql - sql query with placeholders for bind parameters in form of ?
+     * @param values - bind parameters
+     * @return true if all went well and false if exception was raised
+     */
     public boolean executeUpdate(String cql, Object... values) {
         try {
             PreparedStatement stmt = statements.get(cql);
@@ -108,6 +147,14 @@ public class DbManagerImpl implements DbManager {
         return false;
     }
 
+    /**
+     * Saves POJO to DB
+     *
+     * @param source - source key
+     * @param values - POJO key
+     * @param info - custom object
+     * @return true if all went well and false if exception was raised
+     */
     public boolean saveInfo(String source, String key, Object info) {
         return executeUpdate("insert into product_info(source,key,info) values (?,?,?)",
                 source,
@@ -115,6 +162,14 @@ public class DbManagerImpl implements DbManager {
                 gson.toJson(info));
     }
 
+    /**
+     * Returns POJO from DB
+     *
+     * @param source - source key
+     * @param key - pojo key
+     * @param clazz - class of POJO
+     * @return - POJO
+     */
     public <T> T getInfo(String source, String key, Class<T> clazz) {
         try {
 
@@ -133,6 +188,13 @@ public class DbManagerImpl implements DbManager {
         return null;
     }
 
+    /**
+     * Returns all POJOs from DB identified by source key
+     *
+     * @param source - source key
+     * @param clazz - class of POJO
+     * @return - list of POJOs
+     */
     public <T> List<T> getInfo(String source, Class<T> clazz) {
         List<T> list = new ArrayList<T>();
         try {
@@ -149,6 +211,13 @@ public class DbManagerImpl implements DbManager {
         return list;
     }
 
+    /**
+     * deletes POJO from DB
+     *
+     * @param source - source key
+     * @param values - POJO key
+     * @return true if all went well and false if exception was raised
+     */
     public boolean deleteInfo(String source, String key) {
         return executeUpdate("delete from product_info where source = ? and key = ?", source, key);
     }
