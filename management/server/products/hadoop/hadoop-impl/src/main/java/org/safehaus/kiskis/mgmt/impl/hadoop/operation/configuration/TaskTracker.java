@@ -49,7 +49,7 @@ public class TaskTracker {
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {
                     Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut().contains("TaskTracker")) {
+                    if (result.getStdOut() != null && result.getStdOut().contains("TaskTracker")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {

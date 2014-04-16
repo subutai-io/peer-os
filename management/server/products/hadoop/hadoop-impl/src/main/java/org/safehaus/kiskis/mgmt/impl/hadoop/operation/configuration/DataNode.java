@@ -49,13 +49,13 @@ public class DataNode {
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {
                     Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut().contains("DataNode")) {
+                    if (result.getStdOut() != null && result.getStdOut().contains("DataNode")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {
                             if (status.contains("DataNode")) {
                                 String temp = status.
-                                        replaceAll("JobTracker is ", "");
+                                        replaceAll("DataNode is ", "");
                                 if (temp.toLowerCase().contains("not")) {
                                     nodeState = NodeState.STOPPED;
                                 } else {
