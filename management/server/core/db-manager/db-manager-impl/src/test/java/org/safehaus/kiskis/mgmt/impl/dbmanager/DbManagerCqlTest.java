@@ -106,7 +106,7 @@ public class DbManagerCqlTest {
 
         dbManager.saveInfo(source, key, myPojo);
 
-        MyPojo myPojo2 = new MyPojo(content);
+        MyPojo myPojo2 = new MyPojo("test");
 
         dbManager.executeUpdate("update product_info set info = ? where source = ? and key = ?", gson.toJson(myPojo2), source, key);
 
