@@ -27,15 +27,11 @@ public class DataNode {
 
         final ProductOperation po
                 = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Getting status of clusters %s DataNode", config.getClusterName()));
+                String.format("Getting status of clusters %s DataNode", agent.getHostname()));
 
         parent.getExecutor().execute(new Runnable() {
 
             public void run() {
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
-                    return;
-                }
 
                 final Agent node = parent.getAgentManager().getAgentByHostname(agent.getHostname());
                 if (node == null) {
