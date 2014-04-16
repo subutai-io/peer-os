@@ -41,7 +41,7 @@ public class SecondaryNameNode extends ClusterNode {
                     stopButton.setVisible(!isRunning);
                 }
             }
-        }, trackID, cluster.getJobTracker()));
+        }, trackID, cluster.getSecondaryNameNode()));
     }
 
     @Override
