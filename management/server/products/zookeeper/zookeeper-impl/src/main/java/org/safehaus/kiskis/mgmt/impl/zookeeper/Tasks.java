@@ -27,6 +27,7 @@ public class Tasks {
     public static Task getStartTask(Set<Agent> agents) {
         Task task = new Task();
         task.setData(TaskType.START);
+        task.setIgnoreExitCode(true);
         for (Agent agent : agents) {
             task.addRequest(Commands.getStartCommand(), agent);
         }
@@ -35,6 +36,7 @@ public class Tasks {
 
     public static Task getRestartTask(Set<Agent> agents) {
         Task task = new Task();
+        task.setIgnoreExitCode(true);
         task.setData(TaskType.RESTART);
         for (Agent agent : agents) {
             task.addRequest(Commands.getRestartCommand(), agent);

@@ -46,14 +46,14 @@ public class Commands {
     public static Request getStartCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service zookeeper start");
-        req.setStdOut(OutputRedirection.NO);
+        req.setTimeout(15);
         return req;
     }
 
     public static Request getRestartCommand() {
         Request req = getRequestTemplate();
         req.setProgram("service zookeeper restart");
-        req.setStdOut(OutputRedirection.NO);
+        req.setTimeout(15);
         return req;
     }
 
@@ -71,7 +71,7 @@ public class Commands {
 
     public static Request getReadSettingsCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("cat $ZOOKEEPER_HOME/zoo.cfg");
+        req.setProgram(". /etc/profile && cat $ZOOKEEPER_HOME/conf/zoo.cfg");
         return req;
     }
 
