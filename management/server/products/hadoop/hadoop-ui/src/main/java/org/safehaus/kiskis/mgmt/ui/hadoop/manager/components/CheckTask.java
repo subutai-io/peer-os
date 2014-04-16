@@ -9,6 +9,7 @@ package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
@@ -21,29 +22,22 @@ import java.util.UUID;
 public class CheckTask implements Runnable {
 
     private final CompleteEvent completeEvent;
-    private final UUID prevTaskID;
     private UUID trackID;
     private Config config;
+    private Agent agent;
 
-    public CheckTask(CompleteEvent completeEvent, UUID previousTaskId, UUID trackID) {
+    public CheckTask(Config config, CompleteEvent completeEvent, UUID trackID, Agent agent) {
         this.completeEvent = completeEvent;
-        this.prevTaskID = previousTaskId;
-        this.trackID = trackID;
-    }
-
-    public CheckTask(Config config, CompleteEvent completeEvent, UUID previousTaskId, UUID trackID) {
-        this.completeEvent = completeEvent;
-        this.prevTaskID = previousTaskId;
         this.trackID = trackID;
         this.config = config;
+        this.agent = agent;
     }
 
     public void run() {
 
-        if (prevTaskID != null) {
-
+        if (trackID != null) {
             while (true) {
-                ProductOperationView prevPo = HadoopUI.getTracker().getProductOperation(Config.PRODUCT_KEY, prevTaskID);
+                ProductOperationView prevPo = HadoopUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
                 if (prevPo.getState() == ProductOperationState.RUNNING) {
                     try {
                         Thread.sleep(1000);
@@ -56,8 +50,14 @@ public class CheckTask implements Runnable {
             }
         }
 
-        if (trackID == null && config != null) {
+        if (agent.equals(config.getNameNode())) {
             trackID = HadoopUI.getHadoopManager().statusNameNode(config);
+        } else if (agent.equals(config.getJobTracker())) {
+            trackID = HadoopUI.getHadoopManager().statusJobTracker(config);
+        } else if (config.getDataNodes().contains(agent)) {
+            trackID = HadoopUI.getHadoopManager().statusDataNode(agent);
+        } else if (config.getTaskTrackers().contains(agent)) {
+            trackID = HadoopUI.getHadoopManager().statusTaskTracker(agent);
         }
 
         NodeState state = NodeState.UNKNOWN;
