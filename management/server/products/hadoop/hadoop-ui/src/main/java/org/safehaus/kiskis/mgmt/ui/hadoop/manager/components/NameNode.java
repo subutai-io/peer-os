@@ -39,6 +39,8 @@ public class NameNode extends ClusterNode {
                 getStatus(HadoopUI.getHadoopManager().restartNameNode(cluster));
             }
         });
+
+        getStatus(null);
     }
 
     @Override

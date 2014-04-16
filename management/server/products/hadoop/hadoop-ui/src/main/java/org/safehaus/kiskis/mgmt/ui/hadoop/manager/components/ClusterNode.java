@@ -27,8 +27,6 @@ public class ClusterNode extends HorizontalLayout {
         addComponent(getStartButton());
         addComponent(getStopButton());
         addComponent(getRestartButton());
-
-        getStatus(null);
     }
 
     private Embedded getProgressIcon() {

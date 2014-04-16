@@ -73,7 +73,6 @@ public class HadoopTable extends TreeTable {
             );
 
             for (Agent agent : cluster.getDataNodes()) {
-                System.out.println(String.format("\nData node: %s\n", agent.getHostname()));
                 Object childID = addItem(new Object[]{
                                 null,
                                 null,
@@ -89,7 +88,6 @@ public class HadoopTable extends TreeTable {
             }
 
             for (Agent agent : cluster.getTaskTrackers()) {
-                System.out.println(String.format("\nTask tracker: %s\n", agent.getHostname()));
                 Object childID = addItem(new Object[]{
                                 null,
                                 null,

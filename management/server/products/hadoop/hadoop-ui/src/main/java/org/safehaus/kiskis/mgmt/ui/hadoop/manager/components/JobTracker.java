@@ -39,6 +39,8 @@ public class JobTracker extends ClusterNode {
                 getStatus(HadoopUI.getHadoopManager().restartJobTracker(cluster));
             }
         });
+
+        getStatus(null);
     }
 
     @Override
