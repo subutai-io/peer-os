@@ -24,6 +24,7 @@ public class SecondaryNameNode extends ClusterNode {
     @Override
     protected void getStatus(UUID trackID) {
         setLoading(true);
+        System.out.println(cluster.getSecondaryNameNode());
 
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
