@@ -5,24 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
-import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import org.apache.activemq.command.ActiveMQTextMessage;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
@@ -30,10 +13,15 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
+
+import javax.jms.*;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.*;
 
 /**
- *
  * @author dilshat
  */
 public class CommunicationManagerImplTest {

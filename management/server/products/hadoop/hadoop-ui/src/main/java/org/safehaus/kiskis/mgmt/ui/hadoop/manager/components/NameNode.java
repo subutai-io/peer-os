@@ -1,0 +1,77 @@
+package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
+
+import com.vaadin.ui.Button;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
+
+import java.util.UUID;
+
+/**
+ * Created by daralbaev on 12.04.14.
+ */
+public class NameNode extends ClusterNode {
+
+    public NameNode(final Config cluster) {
+        super(cluster);
+
+        startButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                setLoading(true);
+                getStatus(HadoopUI.getHadoopManager().startNameNode(cluster));
+            }
+        });
+
+        stopButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                setLoading(true);
+                getStatus(HadoopUI.getHadoopManager().stopNameNode(cluster));
+            }
+        });
+
+        restartButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                setLoading(true);
+                getStatus(HadoopUI.getHadoopManager().restartNameNode(cluster));
+            }
+        });
+    }
+
+    @Override
+    protected void getStatus(UUID prevTrackID) {
+        setLoading(true);
+
+        UUID trackID = HadoopUI.getHadoopManager().statusNameNode(cluster);
+        HadoopUI.getExecutor().execute(new CheckTask(new CompleteEvent() {
+
+            public void onComplete(NodeState state) {
+                synchronized (progressIcon) {
+                    boolean isRunning = false;
+                    if (state == NodeState.RUNNING) {
+                        isRunning = true;
+                    } else if (state == NodeState.STOPPED) {
+                        isRunning = false;
+                    }
+
+                    startButton.setEnabled(!isRunning);
+                    restartButton.setEnabled(isRunning);
+                    stopButton.setEnabled(isRunning);
+
+                    setLoading(false);
+                }
+            }
+        }, prevTrackID, trackID));
+    }
+
+    @Override
+    protected void setLoading(boolean isLoading) {
+        startButton.setVisible(!isLoading);
+        stopButton.setVisible(!isLoading);
+        restartButton.setVisible(!isLoading);
+        progressIcon.setVisible(isLoading);
+    }
+}

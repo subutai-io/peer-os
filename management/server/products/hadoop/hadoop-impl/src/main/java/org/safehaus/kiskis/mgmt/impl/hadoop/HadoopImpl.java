@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop;
 
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
@@ -9,6 +10,8 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Installation;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +24,7 @@ import java.util.concurrent.Executors;
 public class HadoopImpl implements Hadoop {
     public static final String MODULE_NAME = "Hadoop";
     private TaskRunner taskRunner;
+    private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
@@ -33,6 +37,10 @@ public class HadoopImpl implements Hadoop {
 
     public void destroy() {
         executor.shutdown();
+    }
+
+    public void setAgentManager(AgentManager agentManager) {
+        this.agentManager = agentManager;
     }
 
     public void setTaskRunner(TaskRunner taskRunner) {
@@ -79,6 +87,10 @@ public class HadoopImpl implements Hadoop {
         return executor;
     }
 
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
     @Override
     public UUID installCluster(final Config config) {
         return new Installation(this, config).execute();
@@ -87,6 +99,61 @@ public class HadoopImpl implements Hadoop {
     @Override
     public UUID uninstallCluster(final String clusterName) {
         return new Deletion(this).execute(clusterName);
+    }
+
+    @Override
+    public UUID startNameNode(Config config) {
+        return new NameNode(this, config).start();
+    }
+
+    @Override
+    public UUID stopNameNode(Config config) {
+        return new NameNode(this, config).stop();
+    }
+
+    @Override
+    public UUID restartNameNode(Config config) {
+        return new NameNode(this, config).restart();
+    }
+
+    @Override
+    public UUID statusNameNode(Config config) {
+        return new NameNode(this, config).status();
+    }
+
+    @Override
+    public UUID statusSecondaryNameNode(Config config) {
+        return new SecondaryNameNode(this, config).status();
+    }
+
+    @Override
+    public UUID statusDataNode(Agent agent) {
+        return new DataNode(this, null).status(agent);
+    }
+
+    @Override
+    public UUID startJobTracker(Config config) {
+        return new JobTracker(this, config).start();
+    }
+
+    @Override
+    public UUID stopJobTracker(Config config) {
+        return new JobTracker(this, config).stop();
+    }
+
+    @Override
+    public UUID restartJobTracker(Config config) {
+        return new JobTracker(this, config).restart();
+    }
+
+    @Override
+    public UUID statusJobTracker(Config config) {
+        return new JobTracker(this, config).status();
+    }
+
+    @Override
+    public UUID statusTaskTracker(Agent agent) {
+        return new TaskTracker(this, null).status(agent);
     }
 
 

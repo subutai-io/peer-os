@@ -90,7 +90,7 @@ public class Tasks {
     public static Task getJobTrackerCommand(Agent agent, String command) {
         Task task = new Task("Run command on JobTracker or TaskTracker");
         task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getNameNodeCommand(command), agent);
+        task.addRequest(Commands.getJobTrackerCommand(command), agent);
         return task;
     }
 }

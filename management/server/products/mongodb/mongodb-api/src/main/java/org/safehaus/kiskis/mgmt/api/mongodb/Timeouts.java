@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.api.mongodb;
 
 /**
- *
  * @author dilshat
  */
 public class Timeouts {

@@ -20,10 +20,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -34,9 +36,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.solr.SolrUI;
 
 /**
- *
  * @author dilshat
- *
  */
 public class Manager {
 
@@ -132,7 +132,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
                 } else {
                     show("Please, select cluster");
                 }
@@ -166,7 +167,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
                 } else {
                     show("Please, select cluster");
                 }
@@ -193,7 +195,7 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext();) {
+        for (Iterator it = agents.iterator(); it.hasNext(); ) {
             final Agent agent = (Agent) it.next();
 
             final Button checkBtn = new Button("Check");
@@ -206,13 +208,14 @@ public class Manager {
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                agent.getHostname(),
-                checkBtn,
-                startBtn,
-                stopBtn,
-                destroyBtn,
-                progressIcon},
-                    null);
+                            agent.getHostname(),
+                            checkBtn,
+                            startBtn,
+                            stopBtn,
+                            destroyBtn,
+                            progressIcon},
+                    null
+            );
 
             checkBtn.addListener(new Button.ClickListener() {
 
@@ -318,7 +321,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
 
                 }
             });
@@ -357,7 +361,7 @@ public class Manager {
     }
 
     public static void checkNodesStatus(Table table) {
-        for (Iterator it = table.getItemIds().iterator(); it.hasNext();) {
+        for (Iterator it = table.getItemIds().iterator(); it.hasNext(); ) {
             int rowId = (Integer) it.next();
             Item row = table.getItem(rowId);
             Button checkBtn = (Button) (row.getItemProperty("Check").getValue());

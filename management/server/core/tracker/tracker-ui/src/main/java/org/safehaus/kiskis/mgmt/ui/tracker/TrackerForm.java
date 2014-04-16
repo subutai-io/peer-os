@@ -21,6 +21,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,13 +31,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  */
 public class TrackerForm extends CustomComponent implements MainUISelectedTabChangeListener {

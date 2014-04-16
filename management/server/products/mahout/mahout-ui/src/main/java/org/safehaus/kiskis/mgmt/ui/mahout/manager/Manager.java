@@ -19,11 +19,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.mahout.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -33,7 +35,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
 
 /**
- *
  * @author dilshat
  * @todo add hadoop node selection for addNode
  */
@@ -119,7 +120,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
                 } else {
                     show("Please, select cluster");
                 }
@@ -184,16 +186,17 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext();) {
+        for (Iterator it = agents.iterator(); it.hasNext(); ) {
             final Agent agent = (Agent) it.next();
 
             final Button destroyBtn = new Button("Destroy");
 
             final Object rowId = table.addItem(new Object[]{
-                agent.getHostname(),
-                destroyBtn
-            },
-                    null);
+                            agent.getHostname(),
+                            destroyBtn
+                    },
+                    null
+            );
 
             destroyBtn.addListener(new Button.ClickListener() {
 
@@ -217,7 +220,8 @@ public class Manager {
                                         });
                                     }
                                 }
-                            });
+                            }
+                    );
 
                 }
             });
