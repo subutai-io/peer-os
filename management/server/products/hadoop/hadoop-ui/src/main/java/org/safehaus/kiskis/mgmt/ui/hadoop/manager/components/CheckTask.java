@@ -54,6 +54,8 @@ public class CheckTask implements Runnable {
             trackID = HadoopUI.getHadoopManager().statusNameNode(config);
         } else if (agent.equals(config.getJobTracker())) {
             trackID = HadoopUI.getHadoopManager().statusJobTracker(config);
+        } else if (agent.equals(config.getSecondaryNameNode())) {
+            trackID = HadoopUI.getHadoopManager().statusSecondaryNameNode(config);
         } else if (config.getDataNodes().contains(agent)) {
             trackID = HadoopUI.getHadoopManager().statusDataNode(agent);
         } else if (config.getTaskTrackers().contains(agent)) {
