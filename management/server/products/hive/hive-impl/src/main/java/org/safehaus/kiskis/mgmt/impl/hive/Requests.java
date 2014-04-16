@@ -6,7 +6,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-class Command {
+class Requests {
 
     enum Type {
 
@@ -90,4 +90,5 @@ class Command {
                 null, //                        env vars
                 30); //
     }
+
 }

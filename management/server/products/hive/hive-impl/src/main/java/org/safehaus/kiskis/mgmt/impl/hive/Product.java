@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.hive;
 
-enum Product {
+public enum Product {
 
     HIVE("ksks-hive", "hive-thrift"),
     DERBY("ksks-derby", "derby");

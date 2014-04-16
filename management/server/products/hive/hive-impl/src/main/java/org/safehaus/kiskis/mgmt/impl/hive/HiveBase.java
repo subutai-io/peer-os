@@ -8,14 +8,14 @@ import org.safehaus.kiskis.mgmt.api.hive.Hive;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
-abstract class HiveBase implements Hive {
+public abstract class HiveBase implements Hive {
 
-    private TaskRunner taskRunner;
-    private AgentManager agentManager;
-    private Tracker tracker;
-    private DbManager dbManager;
+    protected TaskRunner taskRunner;
+    protected AgentManager agentManager;
+    protected Tracker tracker;
+    protected DbManager dbManager;
 
-    private ExecutorService executor;
+    protected ExecutorService executor;
 
     public void init() {
         executor = Executors.newCachedThreadPool();

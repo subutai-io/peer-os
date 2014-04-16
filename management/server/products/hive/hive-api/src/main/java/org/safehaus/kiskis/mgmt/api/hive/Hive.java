@@ -9,17 +9,17 @@ public interface Hive {
 
     public UUID uninstallCluster(String clusterName);
 
-    public UUID statusCheck(String clusterName, String lxcHostname);
+    public UUID statusCheck(String clusterName, String hostname);
 
-    public UUID startNode(String clusterName, String lxcHostname);
+    public UUID startNode(String clusterName, String hostname);
 
-    public UUID stopNode(String clusterName, String lxcHostname);
+    public UUID stopNode(String clusterName, String hostname);
 
-    public UUID restartNode(String clusterName, String lxcHostname);
+    public UUID restartNode(String clusterName, String hostname);
 
-    public UUID addNode(String clusterName, String lxcHostname);
+    public UUID addNode(String clusterName, String hostname);
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
+    public UUID destroyNode(String clusterName, String hostname);
 
     /**
      * Returns list of configurations of installed clusters
