@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration;
+package org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
@@ -44,7 +44,7 @@ public class SecondaryNameNode {
                 }
 
                 Task task = Tasks.getNameNodeCommandTask(config.getSecondaryNameNode(), "status");
-                parent.getTaskRunner().executeTask(task);
+                parent.getTaskRunner().executeTaskNWait(task);
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {

@@ -8,9 +8,9 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration.*;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Installation;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.List;

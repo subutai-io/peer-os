@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.hadoop.operation.Configuration;
+package org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
@@ -14,11 +14,11 @@ import java.util.UUID;
 /**
  * Created by daralbaev on 15.04.14.
  */
-public class DataNode {
+public class TaskTracker {
     private HadoopImpl parent;
     private Config config;
 
-    public DataNode(HadoopImpl parent, Config config) {
+    public TaskTracker(HadoopImpl parent, Config config) {
         this.parent = parent;
         this.config = config;
     }
@@ -27,7 +27,7 @@ public class DataNode {
 
         final ProductOperation po
                 = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Getting status of clusters %s DataNode", config.getClusterName()));
+                String.format("Getting status of clusters %s TaskTracker", config.getClusterName()));
 
         parent.getExecutor().execute(new Runnable() {
 
@@ -44,16 +44,16 @@ public class DataNode {
                 }
 
                 Task task = Tasks.getNameNodeCommandTask(agent, "status");
-                parent.getTaskRunner().executeTask(task);
+                parent.getTaskRunner().executeTaskNWait(task);
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {
                     Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut().contains("DataNode")) {
+                    if (result.getStdOut().contains("TaskTracker")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {
-                            if (status.contains("DataNode")) {
+                            if (status.contains("TaskTracker")) {
                                 String temp = status.
                                         replaceAll("JobTracker is ", "");
                                 if (temp.toLowerCase().contains("not")) {
