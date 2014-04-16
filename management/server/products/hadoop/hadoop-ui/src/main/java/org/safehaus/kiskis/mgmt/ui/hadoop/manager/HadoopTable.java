@@ -4,11 +4,9 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.JobTracker;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.NameNode;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.SecondaryNameNode;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.*;
 
 import java.util.List;
 
@@ -73,6 +71,37 @@ public class HadoopTable extends TreeTable {
                             cluster.getReplicationFactor()},
                     null
             );
+
+            for (Agent agent : cluster.getDataNodes()) {
+                Object childID = addItem(new Object[]{
+                                null,
+                                null,
+                                new SlaveNode(cluster, agent),
+                                null,
+                                null,
+                                null},
+                        null
+                );
+
+                setParent(childID, rowId);
+                setCollapsed(childID, false);
+            }
+
+            for (Agent agent : cluster.getTaskTrackers()) {
+                Object childID = addItem(new Object[]{
+                                null,
+                                null,
+                                null,
+                                null,
+                                new SlaveNode(cluster, agent),
+                                null},
+                        null
+                );
+
+                setParent(childID, rowId);
+                setCollapsed(childID, false);
+            }
+
             setParent(rowId, parentId);
             setCollapsed(rowId, false);
         }

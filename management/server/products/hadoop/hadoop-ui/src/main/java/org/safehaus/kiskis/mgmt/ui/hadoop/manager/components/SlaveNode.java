@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
@@ -10,10 +11,13 @@ import java.util.UUID;
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class SecondaryNameNode extends ClusterNode {
+public class SlaveNode extends ClusterNode {
 
-    public SecondaryNameNode(Config cluster) {
+    private Agent agent;
+
+    public SlaveNode(Config cluster, Agent agent) {
         super(cluster);
+        this.agent = agent;
 
         restartButton.setVisible(false);
         startButton.setEnabled(false);
@@ -41,7 +45,7 @@ public class SecondaryNameNode extends ClusterNode {
                     stopButton.setVisible(!isRunning);
                 }
             }
-        }, trackID, cluster.getSecondaryNameNode()));
+        }, trackID, agent));
     }
 
     @Override
