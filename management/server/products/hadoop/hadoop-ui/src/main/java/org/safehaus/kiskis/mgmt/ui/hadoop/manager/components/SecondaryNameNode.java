@@ -16,8 +16,6 @@ public class SecondaryNameNode extends ClusterNode {
         super(cluster);
 
         restartButton.setVisible(false);
-        startButton.setEnabled(false);
-        stopButton.setEnabled(false);
     }
 
 
