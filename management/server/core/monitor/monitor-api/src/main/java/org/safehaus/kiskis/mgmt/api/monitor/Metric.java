@@ -13,7 +13,8 @@ public enum Metric {
     PKTS_IN("packets/sec"),
     PKTS_OUT("packets/sec"),
     BYTES_IN("bytes/sec"),
-    BYTES_OUT("bytes/sec");
+    BYTES_OUT("bytes/sec"),
+    PART_MAX_USED("%");
 
     private String unit = "";
 
