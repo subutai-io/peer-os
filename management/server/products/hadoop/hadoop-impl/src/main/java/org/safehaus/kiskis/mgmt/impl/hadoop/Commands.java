@@ -36,7 +36,6 @@ public class Commands {
         Request req = getRequestTemplate();
         req.setProgram(
                 "sleep 10;" +
-                        "apt-get update && " +
                         "apt-get --force-yes --assume-yes install ksks-hadoop"
         );
         req.setTimeout(180);

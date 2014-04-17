@@ -39,11 +39,16 @@ public class JobTracker extends ClusterNode {
                 getStatus(HadoopUI.getHadoopManager().restartJobTracker(cluster));
             }
         });
+
+        getStatus(null);
     }
 
     @Override
     protected void getStatus(UUID trackID) {
         setLoading(true);
+        for (SlaveNode slaveNode : slaveNodes) {
+            slaveNode.setLoading(true);
+        }
 
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
@@ -59,6 +64,10 @@ public class JobTracker extends ClusterNode {
                     startButton.setEnabled(!isRunning);
                     restartButton.setEnabled(isRunning);
                     stopButton.setEnabled(isRunning);
+
+                    for (SlaveNode slaveNode : slaveNodes) {
+                        slaveNode.getStatus(null);
+                    }
 
                     setLoading(false);
                 }

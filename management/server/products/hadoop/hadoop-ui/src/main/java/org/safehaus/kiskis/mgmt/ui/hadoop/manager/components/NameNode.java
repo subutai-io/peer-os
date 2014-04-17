@@ -39,11 +39,16 @@ public class NameNode extends ClusterNode {
                 getStatus(HadoopUI.getHadoopManager().restartNameNode(cluster));
             }
         });
+
+        getStatus(null);
     }
 
     @Override
     protected void getStatus(UUID trackID) {
         setLoading(true);
+        for (SlaveNode slaveNode : slaveNodes) {
+            slaveNode.setLoading(true);
+        }
 
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
@@ -60,10 +65,15 @@ public class NameNode extends ClusterNode {
                     restartButton.setEnabled(isRunning);
                     stopButton.setEnabled(isRunning);
 
+                    for (SlaveNode slaveNode : slaveNodes) {
+                        slaveNode.getStatus(null);
+                    }
+
                     setLoading(false);
                 }
             }
         }, trackID, cluster.getNameNode()));
+
     }
 
     @Override

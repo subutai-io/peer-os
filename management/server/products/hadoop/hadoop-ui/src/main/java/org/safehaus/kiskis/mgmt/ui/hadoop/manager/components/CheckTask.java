@@ -25,12 +25,21 @@ public class CheckTask implements Runnable {
     private UUID trackID;
     private Config config;
     private Agent agent;
+    private Boolean isDataNode;
 
     public CheckTask(Config config, CompleteEvent completeEvent, UUID trackID, Agent agent) {
         this.completeEvent = completeEvent;
         this.trackID = trackID;
         this.config = config;
         this.agent = agent;
+    }
+
+    public CheckTask(Config config, CompleteEvent completeEvent, UUID trackID, Agent agent, boolean isDataNode) {
+        this.completeEvent = completeEvent;
+        this.trackID = trackID;
+        this.config = config;
+        this.agent = agent;
+        this.isDataNode = isDataNode;
     }
 
     public void run() {
@@ -50,41 +59,47 @@ public class CheckTask implements Runnable {
             }
         }
 
-        if (agent.equals(config.getNameNode())) {
-            trackID = HadoopUI.getHadoopManager().statusNameNode(config);
-        } else if (agent.equals(config.getJobTracker())) {
-            trackID = HadoopUI.getHadoopManager().statusJobTracker(config);
-        } else if (config.getDataNodes().contains(agent)) {
-            trackID = HadoopUI.getHadoopManager().statusDataNode(agent);
-        } else if (config.getTaskTrackers().contains(agent)) {
-            trackID = HadoopUI.getHadoopManager().statusTaskTracker(agent);
-        }
-
         NodeState state = NodeState.UNKNOWN;
-        long start = System.currentTimeMillis();
-        while (!Thread.interrupted()) {
-            ProductOperationView po = HadoopUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
-            if (po != null) {
-                if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains(NodeState.STOPPED.toString())) {
-                        state = NodeState.STOPPED;
-                    } else if (po.getLog().contains(NodeState.RUNNING.toString())) {
-                        state = NodeState.RUNNING;
-                    }
-                    break;
+        if (agent != null) {
+            if (agent.equals(config.getNameNode())) {
+                trackID = HadoopUI.getHadoopManager().statusNameNode(config);
+            } else if (agent.equals(config.getJobTracker())) {
+                trackID = HadoopUI.getHadoopManager().statusJobTracker(config);
+            } else if (agent.equals(config.getSecondaryNameNode())) {
+                trackID = HadoopUI.getHadoopManager().statusSecondaryNameNode(config);
+            } else if (isDataNode != null) {
+                if (isDataNode) {
+                    trackID = HadoopUI.getHadoopManager().statusDataNode(agent);
+                } else {
+                    trackID = HadoopUI.getHadoopManager().statusTaskTracker(agent);
                 }
             }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                break;
-            }
-            if (System.currentTimeMillis() - start > (30 + 3) * 1000) {
-                break;
+
+            long start = System.currentTimeMillis();
+            while (!Thread.interrupted()) {
+                ProductOperationView po = HadoopUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+                if (po != null) {
+                    if (po.getState() != ProductOperationState.RUNNING) {
+                        if (po.getLog().contains(NodeState.STOPPED.toString())) {
+                            state = NodeState.STOPPED;
+                        } else if (po.getLog().contains(NodeState.RUNNING.toString())) {
+                            state = NodeState.RUNNING;
+                        }
+                        break;
+                    }
+                }
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    break;
+                }
+                if (System.currentTimeMillis() - start > (30 + 3) * 1000) {
+                    break;
+                }
             }
         }
-
         completeEvent.onComplete(state);
     }
 
