@@ -10,6 +10,7 @@ import java.util.Map;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 
 /**
+ * Class which contains metrics for physical server
  *
  * @author dilshat
  */
