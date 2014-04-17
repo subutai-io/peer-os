@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 
 /**
  * @author dilshat
@@ -27,18 +28,12 @@ import java.util.regex.Pattern;
 public class LxcManagerImpl implements LxcManager {
 
     private final Pattern p = Pattern.compile("load average: (.*)");
-    private final double MIN_HDD_LXC_MB = 15 * 1024;         // 15G
-    private final double MIN_HDD_IN_RESERVE_MB = 100 * 1024; // 100G
-    private final double MIN_RAM_LXC_MB = 1 * 1024;          // 1G
-    private final double MIN_RAM_IN_RESERVE_MB = 2 * 1024;   // 2G
-    private final double MIN_CPU_LXC_PERCENT = 15;           // 15%
-    private final double MIN_CPU_IN_RESERVE_PERCENT = 30;    // 30%
-    private final int MAX_NUMBER_OF_LXCS_PER_HOST = 5;       // 5
-    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 60;
+    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 90;
 
     private TaskRunner taskRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
+    private Monitor monitor;
 
     public void init() {
         executor = Executors.newCachedThreadPool();
@@ -46,6 +41,10 @@ public class LxcManagerImpl implements LxcManager {
 
     public void destroy() {
         executor.shutdown();
+    }
+
+    public void setMonitor(Monitor monitor) {
+        this.monitor = monitor;
     }
 
     public void setTaskRunner(TaskRunner taskRunner) {
@@ -60,7 +59,7 @@ public class LxcManagerImpl implements LxcManager {
         final Map<Agent, ServerMetric> serverMetrics = new HashMap<Agent, ServerMetric>();
         Set<Agent> agents = agentManager.getPhysicalAgents();
         //omit management server
-        for (Iterator<Agent> it = agents.iterator(); it.hasNext(); ) {
+        for (Iterator<Agent> it = agents.iterator(); it.hasNext();) {
             Agent agent = it.next();
             if (!agent.getHostname().matches("^py.*")) {
                 it.remove();
@@ -163,7 +162,7 @@ public class LxcManagerImpl implements LxcManager {
 
             if (!serverMetrics.isEmpty()) {
                 Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
-                for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext(); ) {
+                for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext();) {
                     Map.Entry<Agent, ServerMetric> entry = it.next();
                     EnumMap<LxcState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
                     if (info != null) {
@@ -185,30 +184,27 @@ public class LxcManagerImpl implements LxcManager {
         final Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
         Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
 
-        if (!metrics.isEmpty()) {
-            for (Map.Entry<Agent, ServerMetric> entry : metrics.entrySet()) {
-                ServerMetric metric = entry.getValue();
-//                int numOfLxcByLxcLimit = MAX_NUMBER_OF_LXCS_PER_HOST - metric.getNumOfLxcs();
-                int numOfLxcByRam = (int) ((metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
-                int numOfLxcByHdd = (int) ((metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
-                int numOfLxcByCpu = (int) (((100 - metric.getCpuLoadPercent()) - (MIN_CPU_IN_RESERVE_PERCENT / metric.getNumOfProcessors())) / (MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors()));
-                if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
-                    int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
-                    bestServers.put(entry.getKey(), minNumOfLxcs);
+        DefaultLxcPlacementStrategy placementStrategy = new DefaultLxcPlacementStrategy(99999);
+        try {
+            placementStrategy.calculatePlacement(metrics);
+
+            Map<Agent, Map<String, Integer>> placementNodes = placementStrategy.getPlacementInfoMap();
+
+            if (!placementNodes.isEmpty()) {
+                for (Map.Entry<Agent, Map<String, Integer>> placementInfo : placementNodes.entrySet()) {
+                    bestServers.put(placementInfo.getKey(), placementInfo.getValue().get(DefaultLxcPlacementStrategy.defaultNodeType));
                 }
-//                if (numOfLxcByLxcLimit > 0 && numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
-//                    int minNumOfLxcs = Math.min(Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam), numOfLxcByLxcLimit);
-//                    bestServers.put(entry.getKey(), minNumOfLxcs);
-//                }
             }
+        } catch (LxcCreateException ex) {
         }
+
         return bestServers;
     }
 
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
         final Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
         Set<Agent> pAgents = agentManager.getPhysicalAgents();
-        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext(); ) {
+        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext();) {
             Agent agent = it.next();
             if (!agent.getHostname().matches("^py.*")) {
                 it.remove();

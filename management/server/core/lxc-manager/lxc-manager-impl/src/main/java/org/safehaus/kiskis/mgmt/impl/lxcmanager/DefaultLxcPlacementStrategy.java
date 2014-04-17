@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcPlacementStrategy;
@@ -20,16 +19,15 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  */
 public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
 
-    private final Pattern p = Pattern.compile("load average: (.*)");
     private final double MIN_HDD_LXC_MB = 15 * 1024;         // 15G
-    private final double MIN_HDD_IN_RESERVE_MB = 100 * 1024; // 100G
+    private final double MIN_HDD_IN_RESERVE_MB = 50 * 1024;  // 50G
     private final double MIN_RAM_LXC_MB = 1 * 1024;          // 1G
     private final double MIN_RAM_IN_RESERVE_MB = 2 * 1024;   // 2G
-    private final double MIN_CPU_LXC_PERCENT = 15;           // 15%
-    private final double MIN_CPU_IN_RESERVE_PERCENT = 30;    // 30%
+    private final double MIN_CPU_LXC_PERCENT = 10;           // 10%
+    private final double MIN_CPU_IN_RESERVE_PERCENT = 20;    // 20%
     //    private final int MAX_NUMBER_OF_LXCS_PER_HOST = 5;       // 5
     private final int numOfNodes;
-    private final String defaultNodeType = "default";
+    public static final String defaultNodeType = "default";
 
     public DefaultLxcPlacementStrategy(int numOfNodes) {
         this.numOfNodes = numOfNodes;
@@ -37,7 +35,6 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
 
     @Override
     public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
-        //implement default simple lxc placement strategy here
 
         if (serverMetrics != null && !serverMetrics.isEmpty()) {
             Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
