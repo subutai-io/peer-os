@@ -49,10 +49,10 @@ public class HadoopTable extends TreeTable {
 
             public void handleAction(Action action, Object sender, Object target) {
                 if (action == REMOVE_ITEM_ACTION) {
-                    removeItem(target);
-
                     Item row = getItem(target);
                     System.out.println(row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+
+                    removeItem(target);
                 }
             }
 
