@@ -10,3 +10,4 @@ target
 agent/agent/KiskisAgent/Debug/*
 agent/agent/KiskisAgent/Release/*
 
+/management/server/core/communication-manager/communication-manager-impl/activemq-data/

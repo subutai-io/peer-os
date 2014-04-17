@@ -223,7 +223,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
      * returned/supplied task to see its status after this method returns.
      *
@@ -247,9 +247,9 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
      * @param task     - task to execute
      * @param callback - task callback
@@ -261,7 +261,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
             synchronized (callback) {
                 try {
-                    callback.wait(3600 * 1000); //wait 1 hr maximum
+                    callback.wait(100 * 3600 * 1000); //wait 100 hr maximum
                 } catch (InterruptedException ex) {
                 }
             }
@@ -274,9 +274,9 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
      * @param task     - task to execute
      * @param callback - task callback
@@ -288,7 +288,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
             synchronized (interruptableCallback.getCallback()) {
                 try {
-                    interruptableCallback.getCallback().wait(3600 * 1000); //wait 1 hr maximum
+                    interruptableCallback.getCallback().wait(100 * 3600 * 1000); //wait 100 hr maximum
                 } catch (InterruptedException ex) {
                 }
             }
