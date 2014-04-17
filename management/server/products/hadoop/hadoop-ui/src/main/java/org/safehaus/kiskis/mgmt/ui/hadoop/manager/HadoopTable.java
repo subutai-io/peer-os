@@ -8,10 +8,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by daralbaev on 12.04.14.
@@ -52,8 +55,13 @@ public class HadoopTable extends TreeTable {
                 if (action == REMOVE_ITEM_ACTION) {
                     Item row = getItem(target);
 
-                    HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
-                    refreshDataSource();
+                    UUID trackID = HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+                    HadoopUI.getExecutor().execute(new WaitTask(trackID, new CompleteEvent() {
+
+                        public void onComplete(NodeState state) {
+                            refreshDataSource();
+                        }
+                    }));
                 }
             }
 
