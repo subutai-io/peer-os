@@ -221,7 +221,7 @@ public class LxcManagerImpl implements LxcManager {
         final Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
         Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
 
-        DefaultLxcPlacementStrategy placementStrategy = new DefaultLxcPlacementStrategy(99999);
+        DefaultLxcPlacementStrategy placementStrategy = new DefaultLxcPlacementStrategy(1);
         try {
             placementStrategy.calculatePlacement(metrics);
 
