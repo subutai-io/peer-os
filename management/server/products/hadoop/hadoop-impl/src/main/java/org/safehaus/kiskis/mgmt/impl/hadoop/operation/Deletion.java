@@ -35,6 +35,13 @@ public class Deletion {
                     return;
                 }
 
+                po.addLog("Updating db...");
+                if (parent.getDbManager().deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
+                    po.addLogDone("Cluster info deleted from DB\nDone");
+                } else {
+                    po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+                }
+
                 po.addLog("Destroying lxc containers...");
 
                 Set<String> lxcHostnames = new HashSet<String>();
@@ -47,13 +54,6 @@ public class Deletion {
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
                 }
-                po.addLog("Updating db...");
-                if (parent.getDbManager().deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
-                    po.addLogDone("Cluster info deleted from DB\nDone");
-                } else {
-                    po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
-                }
-
             }
         });
 

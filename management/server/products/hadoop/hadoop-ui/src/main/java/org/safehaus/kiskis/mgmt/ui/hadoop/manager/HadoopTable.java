@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.event.Action;
 import com.vaadin.terminal.Sizeable;
@@ -10,7 +11,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.*;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -52,20 +52,18 @@ public class HadoopTable extends TreeTable {
                 if (action == REMOVE_ITEM_ACTION) {
                     Item row = getItem(target);
 
-                    removeItem(target);
-                    if (hasChildren(target)) {
-                        for (Iterator it = getChildren(target).iterator(); it.hasNext(); ) {
-                            removeItem(it.next());
-                        }
-                    }
-//                    HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+                    HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+                    refreshDataSource();
                 }
             }
 
             public Action[] getActions(Object target, Object sender) {
 
                 if (target != null && areChildrenAllowed(target)) {
-                    return new Action[]{REMOVE_ITEM_ACTION};
+                    Item row = getItem(target);
+                    if (!Strings.isNullOrEmpty((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue())) {
+                        return new Action[]{REMOVE_ITEM_ACTION};
+                    }
                 }
 
                 return null;
