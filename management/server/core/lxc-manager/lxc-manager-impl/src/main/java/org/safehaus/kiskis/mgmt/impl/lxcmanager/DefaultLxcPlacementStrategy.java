@@ -36,6 +36,28 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
         this.numOfNodes = numOfNodes;
     }
 
+    public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> serverMetrics) {
+        Map<Agent, Integer> serverSlots = new HashMap<Agent, Integer>();
+        if (serverMetrics != null && !serverMetrics.isEmpty()) {
+            for (Map.Entry<Agent, ServerMetric> entry : serverMetrics.entrySet()) {
+                ServerMetric metric = entry.getValue();
+//                int numOfLxcByLxcLimit = MAX_NUMBER_OF_LXCS_PER_HOST - metric.getNumOfLxcs();
+                int numOfLxcByRam = (int) ((metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
+                int numOfLxcByHdd = (int) ((metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
+                int numOfLxcByCpu = (int) (((100 - metric.getCpuLoadPercent()) - (MIN_CPU_IN_RESERVE_PERCENT / metric.getNumOfProcessors())) / (MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors()));
+                if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
+                    int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
+                    serverSlots.put(entry.getKey(), minNumOfLxcs);
+                }
+//                if (numOfLxcByLxcLimit > 0 && numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
+//                    int minNumOfLxcs = Math.min(Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam), numOfLxcByLxcLimit);
+//                    bestServers.put(entry.getKey(), minNumOfLxcs);
+//                }
+            }
+        }
+        return serverSlots;
+    }
+
     /**
      * This method calculates on which physical server to places lxc, the number
      * of lxcs to place and their type
@@ -46,54 +68,37 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
     @Override
     public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
 
-        if (serverMetrics != null && !serverMetrics.isEmpty()) {
-            Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
-            for (Map.Entry<Agent, ServerMetric> entry : serverMetrics.entrySet()) {
-                ServerMetric metric = entry.getValue();
-//                int numOfLxcByLxcLimit = MAX_NUMBER_OF_LXCS_PER_HOST - metric.getNumOfLxcs();
-                int numOfLxcByRam = (int) ((metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB) / MIN_RAM_LXC_MB);
-                int numOfLxcByHdd = (int) ((metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB) / MIN_HDD_LXC_MB);
-                int numOfLxcByCpu = (int) (((100 - metric.getCpuLoadPercent()) - (MIN_CPU_IN_RESERVE_PERCENT / metric.getNumOfProcessors())) / (MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors()));
-                if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
-                    int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
-                    bestServers.put(entry.getKey(), minNumOfLxcs);
-                }
-//                if (numOfLxcByLxcLimit > 0 && numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
-//                    int minNumOfLxcs = Math.min(Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam), numOfLxcByLxcLimit);
-//                    bestServers.put(entry.getKey(), minNumOfLxcs);
-//                }
+        Map<Agent, Integer> serversWithSlots = calculateSlots(serverMetrics);
+
+        if (!serversWithSlots.isEmpty()) {
+            int numOfAvailableLxcSlots = 0;
+            for (Map.Entry<Agent, Integer> srv : serversWithSlots.entrySet()) {
+                numOfAvailableLxcSlots += srv.getValue();
             }
 
-            if (!bestServers.isEmpty()) {
-                int numOfAvailableLxcSlots = 0;
-                for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
-                    numOfAvailableLxcSlots += srv.getValue();
-                }
+            if (numOfAvailableLxcSlots >= numOfNodes) {
 
-                if (numOfAvailableLxcSlots >= numOfNodes) {
+                for (int i = 0; i < numOfNodes; i++) {
+                    Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(serversWithSlots);
 
-                    for (int i = 0; i < numOfNodes; i++) {
-                        Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+                    Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                    Agent physicalNode = entry.getKey();
+                    Integer numOfLxcSlots = entry.getValue();
+                    serversWithSlots.put(physicalNode, numOfLxcSlots - 1);
 
-                        Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                        Agent physicalNode = entry.getKey();
-                        Integer numOfLxcSlots = entry.getValue();
-                        bestServers.put(physicalNode, numOfLxcSlots - 1);
+                    Map<String, Integer> info = getPlacementInfoMap().get(physicalNode);
 
-                        Map<String, Integer> info = getPlacementInfoMap().get(physicalNode);
+                    if (info == null) {
 
-                        if (info == null) {
-
-                            addPlacementInfo(physicalNode, defaultNodeType, 1);
-                        } else {
-                            addPlacementInfo(physicalNode, defaultNodeType, info.get(defaultNodeType) + 1);
-                        }
-
+                        addPlacementInfo(physicalNode, defaultNodeType, 1);
+                    } else {
+                        addPlacementInfo(physicalNode, defaultNodeType, info.get(defaultNodeType) + 1);
                     }
 
                 }
 
             }
+
         }
 
     }
