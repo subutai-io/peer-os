@@ -15,6 +15,9 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
+ * This is a default lxc placement strategy. According to metrics and limits
+ * calculates number of lxcs each connected physical host can accommodate
+ *
  * @author dilshat
  */
 public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
@@ -33,6 +36,13 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
         this.numOfNodes = numOfNodes;
     }
 
+    /**
+     * This method calculates on which physical server to places lxc, the number
+     * of lxcs to place and their type
+     *
+     * @param serverMetrics
+     * @throws LxcCreateException
+     */
     @Override
     public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
 

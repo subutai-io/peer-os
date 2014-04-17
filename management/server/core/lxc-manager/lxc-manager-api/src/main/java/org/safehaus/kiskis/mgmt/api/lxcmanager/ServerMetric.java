@@ -5,6 +5,10 @@
  */
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
+import java.util.Collections;
+import java.util.Map;
+import org.safehaus.kiskis.mgmt.api.monitor.Metric;
+
 /**
  *
  * @author dilshat
@@ -16,12 +20,22 @@ public class ServerMetric {
     private int cpuLoadPercent;
     private int numOfProcessors;
     private int numOfLxcs;
+    private final Map<Metric, Double> averageMetrics;
 
-    public ServerMetric(int freeHddMb, int freeRamMb, int cpuLoadPercent, int numOfProcessors) {
+    public ServerMetric(int freeHddMb, int freeRamMb, int cpuLoadPercent, int numOfProcessors, Map<Metric, Double> averageMetrics) {
         this.freeHddMb = freeHddMb;
         this.freeRamMb = freeRamMb;
         this.cpuLoadPercent = cpuLoadPercent;
         this.numOfProcessors = numOfProcessors;
+        this.averageMetrics = averageMetrics;
+    }
+
+    public Map<Metric, Double> getAverageMetrics() {
+        return Collections.unmodifiableMap(averageMetrics);
+    }
+
+    public Double getAverageMetric(Metric metricKey) {
+        return averageMetrics.get(metricKey);
     }
 
     public int getNumOfProcessors() {

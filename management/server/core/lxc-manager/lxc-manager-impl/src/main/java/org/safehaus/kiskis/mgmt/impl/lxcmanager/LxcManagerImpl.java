@@ -20,9 +20,12 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 
 /**
+ * This is an implementation of LxcManager
+ *
  * @author dilshat
  */
 public class LxcManagerImpl implements LxcManager {
@@ -55,6 +58,13 @@ public class LxcManagerImpl implements LxcManager {
         this.agentManager = agentManager;
     }
 
+    /**
+     * Returns metrics of all physical servers connected to the management
+     * server
+     *
+     * @return map of metrics where key is a physical agent and value is a
+     * metric metric
+     */
     public Map<Agent, ServerMetric> getPhysicalServerMetrics() {
         final Map<Agent, ServerMetric> serverMetrics = new HashMap<Agent, ServerMetric>();
         Set<Agent> agents = agentManager.getPhysicalAgents();
@@ -147,9 +157,27 @@ public class LxcManagerImpl implements LxcManager {
                                 }
                             }
                             if (serverOK) {
-                                ServerMetric serverMetric = new ServerMetric(freeHddMb, freeRamMb, (int) cpuLoadPercent, numOfProc);
+                                //get metrics from elastic search for a one week period
                                 Agent agent = agentManager.getAgentByUUID(out.getKey());
                                 if (agent != null) {
+                                    Calendar cal = Calendar.getInstance();
+                                    cal.add(Calendar.DATE, -7);
+                                    Date startDate = cal.getTime();
+                                    Date endDate = Calendar.getInstance().getTime();
+                                    Map<Metric, Double> averageMetrics = new EnumMap<Metric, Double>(Metric.class);
+                                    for (Metric metricKey : Metric.values()) {
+                                        Map<Date, Double> metricMap = monitor.getData(agent.getHostname(), metricKey, startDate, endDate);
+                                        if (!metricMap.isEmpty()) {
+                                            double avg = 0;
+                                            for (Map.Entry<Date, Double> metricEntry : metricMap.entrySet()) {
+                                                avg += metricEntry.getValue();
+                                            }
+                                            avg /= metricMap.size();
+
+                                            averageMetrics.put(metricKey, avg);
+                                        }
+                                    }
+                                    ServerMetric serverMetric = new ServerMetric(freeHddMb, freeRamMb, (int) cpuLoadPercent, numOfProc, averageMetrics);
                                     serverMetrics.put(agent, serverMetric);
                                 }
                             }
@@ -161,6 +189,7 @@ public class LxcManagerImpl implements LxcManager {
             });
 
             if (!serverMetrics.isEmpty()) {
+                //get number of lxcs currently present on servers
                 Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
                 for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext();) {
                     Map.Entry<Agent, ServerMetric> entry = it.next();
@@ -180,6 +209,14 @@ public class LxcManagerImpl implements LxcManager {
         return serverMetrics;
     }
 
+    /**
+     * Returns number of lxc slots that each currently connected physical server
+     * can host. This method uses default lxc placement strategy for
+     * calculations
+     *
+     * @return map where key is a physical server and value is the number of lxc
+     * slots
+     */
     public Map<Agent, Integer> getPhysicalServersWithLxcSlots() {
         final Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
         Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
@@ -201,6 +238,13 @@ public class LxcManagerImpl implements LxcManager {
         return bestServers;
     }
 
+    /**
+     * Returns information about what lxc containers each physical servers has
+     * at present
+     *
+     * @return map where key is a hostname of physical server and value is a map
+     * where key is state of lxc and value is a list of lxc hostnames
+     */
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
         final Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
         Set<Agent> pAgents = agentManager.getPhysicalAgents();
@@ -266,6 +310,13 @@ public class LxcManagerImpl implements LxcManager {
         return agentFamilies;
     }
 
+    /**
+     * Clones lxc on a given physical server and set its hostname
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname to set for a new lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task cloneTask = taskRunner.executeTaskNWait(Tasks.getCloneSingleLxcTask(physicalAgent, lxcHostname));
@@ -274,6 +325,13 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
+    /**
+     * Starts lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task startLxcTask = Tasks.getLxcStartTask(physicalAgent, lxcHostname);
@@ -301,6 +359,13 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
+    /**
+     * Stops lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task stopLxcTask = Tasks.getLxcStopTask(physicalAgent, lxcHostname);
@@ -328,6 +393,13 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
+    /**
+     * Destroys lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task destroyLxcTask = Tasks.getLxcDestroyTask(physicalAgent, lxcHostname);
@@ -355,6 +427,14 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
+    /**
+     * Creates specified number of lxs and starts them. Uses default placement
+     * strategy for calculating location of lxcs on physical servers
+     *
+     * @param count
+     * @return map where key is physical agent and value is a set of lxc agents
+     * on it
+     */
     public Map<Agent, Set<Agent>> createLxcs(int count) throws LxcCreateException {
         Map<Agent, Set<Agent>> lxcAgents = new HashMap<Agent, Set<Agent>>();
 
@@ -379,6 +459,13 @@ public class LxcManagerImpl implements LxcManager {
         return lxcAgents;
     }
 
+    /**
+     * Clones and starts lxc on a given physical server, sets hostname of lxc
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return boolean if all went ok, false otherwise
+     */
     public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname) {
         if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
             Task startNCloneTask = Tasks.getLxcCloneNStartTask(physicalAgent, lxcHostname);
@@ -401,6 +488,11 @@ public class LxcManagerImpl implements LxcManager {
         return false;
     }
 
+    /**
+     * Destroys specified lxcs
+     *
+     * @param lxcHostnames - hostnames of lxc to destroy
+     */
     public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException {
         if (lxcHostnames != null && !lxcHostnames.isEmpty()) {
             CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
@@ -452,6 +544,14 @@ public class LxcManagerImpl implements LxcManager {
 
     }
 
+    /**
+     * Creates lxcs baed on a supplied strategy.
+     *
+     * @param strategy
+     * @return map where key is type of node and values is a map where key is a
+     * physical server and value is set of lxcs on it
+     * @throws LxcCreateException
+     */
     public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy(LxcPlacementStrategy strategy) throws LxcCreateException {
         if (strategy == null) {
             throw new LxcCreateException("Lxc placement strategy is null");
