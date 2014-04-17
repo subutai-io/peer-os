@@ -66,6 +66,10 @@ public class JobTracker extends ClusterNode {
                 }
             }
         }, trackID, cluster.getJobTracker()));
+
+        for (SlaveNode slaveNode : slaveNodes) {
+            slaveNode.getStatus(null);
+        }
     }
 
     @Override

@@ -15,12 +15,12 @@ import java.util.List;
  */
 public class HadoopTable extends TreeTable {
 
-    protected static final String CLUSTER_NAME_PROPERTY = "Cluster Name";
-    protected static final String DOMAIN_NAME_PROPERTY = "Domain Name";
-    protected static final String NAMENODE_PROPERTY = "NameNode/DataNodes";
-    protected static final String SECONDARY_NAMENODE_PROPERTY = "Secondary NameNode";
-    protected static final String JOBTRACKER_PROPERTY = "JobTracker/TaskTrackers";
-    protected static final String REPLICATION_PROPERTY = "Replication Factor";
+    public static final String CLUSTER_NAME_PROPERTY = "Cluster Name";
+    public static final String DOMAIN_NAME_PROPERTY = "Domain Name";
+    public static final String NAMENODE_PROPERTY = "NameNode/DataNodes";
+    public static final String SECONDARY_NAMENODE_PROPERTY = "Secondary NameNode";
+    public static final String JOBTRACKER_PROPERTY = "JobTracker/TaskTrackers";
+    public static final String REPLICATION_PROPERTY = "Replication Factor";
 
     private Label indicator;
 
@@ -62,29 +62,38 @@ public class HadoopTable extends TreeTable {
 
         List<Config> list = HadoopUI.getHadoopManager().getClusters();
         for (Config cluster : list) {
+            NameNode nameNode = new NameNode(cluster);
+            JobTracker jobTracker = new JobTracker(cluster);
+
             Object rowId = addItem(new Object[]{
                             cluster.getClusterName(),
                             cluster.getDomainName(),
-                            new NameNode(cluster),
+                            nameNode,
                             new SecondaryNameNode(cluster),
-                            new JobTracker(cluster),
+                            jobTracker,
                             cluster.getReplicationFactor()},
                     null
             );
 
             for (Agent agent : cluster.getDataNodes()) {
+                SlaveNode dataNode = new SlaveNode(cluster, agent, true);
+                SlaveNode taskTracker = new SlaveNode(cluster, agent, false);
+
+                nameNode.addSlaveNode(dataNode);
+                jobTracker.addSlaveNode(taskTracker);
+
                 Object childID = addItem(new Object[]{
                                 null,
                                 null,
-                                new SlaveNode(cluster, agent, true),
+                                dataNode,
                                 null,
-                                new SlaveNode(cluster, agent, false),
+                                taskTracker,
                                 null},
                         null
                 );
 
                 setParent(childID, rowId);
-                setCollapsed(childID, false);
+                setCollapsed(childID, true);
             }
 
             setParent(rowId, parentId);

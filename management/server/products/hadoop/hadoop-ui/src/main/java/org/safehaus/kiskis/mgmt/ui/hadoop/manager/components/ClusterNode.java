@@ -6,6 +6,8 @@ import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,9 +18,11 @@ public class ClusterNode extends HorizontalLayout {
     protected Embedded progressIcon;
     protected Config cluster;
     protected Button startButton, stopButton, restartButton;
+    protected List<SlaveNode> slaveNodes;
 
     public ClusterNode(Config cluster) {
         this.cluster = cluster;
+        slaveNodes = new ArrayList<SlaveNode>();
 
         setMargin(true);
         setSpacing(true);
@@ -57,8 +61,11 @@ public class ClusterNode extends HorizontalLayout {
         return restartButton;
     }
 
-    protected void getStatus(UUID trackID) {
+    public void addSlaveNode(SlaveNode slaveNode) {
+        slaveNodes.add(slaveNode);
+    }
 
+    protected void getStatus(UUID trackID) {
     }
 
     protected void setLoading(boolean isLoading) {

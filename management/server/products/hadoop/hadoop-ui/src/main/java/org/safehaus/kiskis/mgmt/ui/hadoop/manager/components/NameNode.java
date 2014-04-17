@@ -66,6 +66,10 @@ public class NameNode extends ClusterNode {
                 }
             }
         }, trackID, cluster.getNameNode()));
+
+        for (SlaveNode slaveNode : slaveNodes) {
+            slaveNode.getStatus(null);
+        }
     }
 
     @Override
