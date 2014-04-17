@@ -2,15 +2,15 @@ package org.safehaus.kiskis.mgmt.ui.monitor;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.Runo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.monitor.util.UIUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
@@ -24,18 +24,31 @@ public class ModuleView extends CustomComponent {
 
     private final Monitor monitor;
 
+    private MgmtAgentManager agentTree;
     private PopupDateField startDateField;
     private PopupDateField endDateField;
     private ListSelect metricListSelect;
 
     public ModuleView(Monitor monitor) {
         this.monitor = monitor;
-
-        setHeight("100%");
-        setCompositionRoot(getLayout());
+        initContent();
     }
 
-    public Layout getLayout() {
+    private void initContent() {
+
+        setHeight("100%");
+
+        HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+        splitPanel.setSplitPosition(20);
+
+        agentTree = MgmtApplication.createAgentTree();
+        splitPanel.setFirstComponent(agentTree);
+        splitPanel.setSecondComponent( getMainLayout() );
+
+        setCompositionRoot(splitPanel);
+    }
+
+    private Layout getMainLayout() {
 
         AbsoluteLayout layout = new AbsoluteLayout();
         layout.setWidth(1200, Sizeable.UNITS_PIXELS);
@@ -135,7 +148,7 @@ public class ModuleView extends CustomComponent {
 
     private String getSelectedNode() {
 
-        Set<Agent> agents = MgmtApplication.getSelectedAgents();
+        Set<Agent> agents = agentTree.getSelectedAgents();
 
         return agents == null || agents.size() == 0
                 ? null
@@ -144,13 +157,5 @@ public class ModuleView extends CustomComponent {
 
     private Metric getSelectedMetric() {
         return (Metric) metricListSelect.getValue();
-    }
-
-    public static void main(String[] args) {
-
-        System.out.println( "name: " + Metric.CPU_USER.name() );
-        System.out.println( "toString: " + Metric.CPU_USER );
-
-
     }
 }
