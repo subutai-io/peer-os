@@ -76,24 +76,9 @@ public class HadoopTable extends TreeTable {
                 Object childID = addItem(new Object[]{
                                 null,
                                 null,
-                                new SlaveNode(cluster, agent),
+                                new SlaveNode(cluster, agent, true),
                                 null,
-                                null,
-                                null},
-                        null
-                );
-
-                setParent(childID, rowId);
-                setCollapsed(childID, false);
-            }
-
-            for (Agent agent : cluster.getTaskTrackers()) {
-                Object childID = addItem(new Object[]{
-                                null,
-                                null,
-                                null,
-                                null,
-                                new SlaveNode(cluster, agent),
+                                new SlaveNode(cluster, agent, false),
                                 null},
                         null
                 );

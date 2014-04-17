@@ -14,10 +14,12 @@ import java.util.UUID;
 public class SlaveNode extends ClusterNode {
 
     private Agent agent;
+    private boolean isDataNode;
 
-    public SlaveNode(Config cluster, Agent agent) {
+    public SlaveNode(Config cluster, Agent agent, boolean isDataNode) {
         super(cluster);
         this.agent = agent;
+        this.isDataNode = isDataNode;
 
         restartButton.setVisible(false);
         startButton.setEnabled(false);
@@ -47,7 +49,7 @@ public class SlaveNode extends ClusterNode {
                     stopButton.setVisible(!isRunning);
                 }
             }
-        }, trackID, agent));
+        }, trackID, agent, isDataNode));
     }
 
     @Override

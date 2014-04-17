@@ -25,12 +25,21 @@ public class CheckTask implements Runnable {
     private UUID trackID;
     private Config config;
     private Agent agent;
+    private Boolean isDataNode;
 
     public CheckTask(Config config, CompleteEvent completeEvent, UUID trackID, Agent agent) {
         this.completeEvent = completeEvent;
         this.trackID = trackID;
         this.config = config;
         this.agent = agent;
+    }
+
+    public CheckTask(Config config, CompleteEvent completeEvent, UUID trackID, Agent agent, boolean isDataNode) {
+        this.completeEvent = completeEvent;
+        this.trackID = trackID;
+        this.config = config;
+        this.agent = agent;
+        this.isDataNode = isDataNode;
     }
 
     public void run() {
@@ -58,10 +67,12 @@ public class CheckTask implements Runnable {
                 trackID = HadoopUI.getHadoopManager().statusJobTracker(config);
             } else if (agent.equals(config.getSecondaryNameNode())) {
                 trackID = HadoopUI.getHadoopManager().statusSecondaryNameNode(config);
-            } else if (config.getDataNodes().contains(agent)) {
-                trackID = HadoopUI.getHadoopManager().statusDataNode(agent);
-            } else if (config.getTaskTrackers().contains(agent)) {
-                trackID = HadoopUI.getHadoopManager().statusTaskTracker(agent);
+            } else if (isDataNode != null) {
+                if (isDataNode) {
+                    trackID = HadoopUI.getHadoopManager().statusDataNode(agent);
+                } else {
+                    trackID = HadoopUI.getHadoopManager().statusTaskTracker(agent);
+                }
             }
 
 
