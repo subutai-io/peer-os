@@ -36,6 +36,14 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
         this.numOfNodes = numOfNodes;
     }
 
+    /**
+     * Optional method to implement if placement uses simple logic to calculate
+     * lxc slots on a physical server
+     *
+     * @param serverMetrics
+     * @return map where key is a physical agent and value is a number of lxcs
+     * this physical server can accommodate
+     */
     @Override
     public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> serverMetrics) {
         Map<Agent, Integer> serverSlots = new HashMap<Agent, Integer>();
@@ -60,10 +68,14 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
     }
 
     /**
-     * This method calculates on which physical server to places lxc, the number
-     * of lxcs to place and their type
+     * This method calculates placement of lxcs on physical servers. Code should
+     * check passed server metrics to figure out strategy for lxc placement This
+     * is done by calling addPlacementInfo method.This method calculates on
+     * which physical server to places lxc, the number of lxcs to place and
+     * their type
      *
-     * @param serverMetrics
+     * @param serverMetrics - map where key is a physical agent and value is a
+     * metric
      * @throws LxcCreateException
      */
     @Override
