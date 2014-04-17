@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
+import com.vaadin.data.Item;
+import com.vaadin.event.Action;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
@@ -14,6 +16,7 @@ import java.util.List;
  * Created by daralbaev on 12.04.14.
  */
 public class HadoopTable extends TreeTable {
+    private static final Action REMOVE_ITEM_ACTION = new Action("Remove cluster");
 
     public static final String CLUSTER_NAME_PROPERTY = "Cluster Name";
     public static final String DOMAIN_NAME_PROPERTY = "Domain Name";
@@ -41,6 +44,27 @@ public class HadoopTable extends TreeTable {
         addContainerProperty(SECONDARY_NAMENODE_PROPERTY, ClusterNode.class, null);
         addContainerProperty(JOBTRACKER_PROPERTY, ClusterNode.class, null);
         addContainerProperty(REPLICATION_PROPERTY, Integer.class, null);
+
+        addActionHandler(new Action.Handler() {
+
+            public void handleAction(Action action, Object sender, Object target) {
+                if (action == REMOVE_ITEM_ACTION) {
+                    removeItem(target);
+
+                    Item row = (Item) target;
+                    System.out.println(row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+                }
+            }
+
+            public Action[] getActions(Object target, Object sender) {
+
+                if (target != null && areChildrenAllowed(target)) {
+                    return new Action[]{REMOVE_ITEM_ACTION};
+                }
+
+                return null;
+            }
+        });
 
         refreshDataSource();
     }
@@ -94,6 +118,7 @@ public class HadoopTable extends TreeTable {
 
                 setParent(childID, rowId);
                 setCollapsed(childID, true);
+                setChildrenAllowed(childID, false);
             }
 
             setParent(rowId, parentId);

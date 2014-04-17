@@ -46,6 +46,9 @@ public class JobTracker extends ClusterNode {
     @Override
     protected void getStatus(UUID trackID) {
         setLoading(true);
+        for (SlaveNode slaveNode : slaveNodes) {
+            slaveNode.setLoading(true);
+        }
 
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
