@@ -53,10 +53,11 @@ public class HadoopTable extends TreeTable {
                     Item row = getItem(target);
 
                     removeItem(target);
-                    for (Iterator it = getChildren(target).iterator(); it.hasNext(); ) {
-                        removeItem(it.next());
+                    if (hasChildren(target)) {
+                        for (Iterator it = getChildren(target).iterator(); it.hasNext(); ) {
+                            removeItem(it.next());
+                        }
                     }
-
 //                    HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
                 }
             }
