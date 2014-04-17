@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.api.tracker;
 
 /**
+ * State of operation
  *
  * @author dilshat
  */

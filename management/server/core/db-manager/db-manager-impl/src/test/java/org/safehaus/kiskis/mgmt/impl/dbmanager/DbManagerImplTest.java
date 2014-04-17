@@ -30,7 +30,7 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 public class DbManagerImplTest {
 
     @Rule
-    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("table.sql", true, true, "test"));
+    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("pi.sql", true, true, "test"));
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private final DbManager dbManager = new DbManagerImpl();
