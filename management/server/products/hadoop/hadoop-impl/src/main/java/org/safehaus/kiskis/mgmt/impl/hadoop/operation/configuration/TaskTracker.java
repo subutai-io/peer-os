@@ -63,8 +63,7 @@ public class TaskTracker {
                 }
 
                 if (NodeState.UNKNOWN.equals(nodeState)) {
-                    po.addLogFailed(String.format("Failed to check status of %s, %s",
-                            config.getClusterName(),
+                    po.addLogFailed(String.format("Failed to check status of %s",
                             agent.getHostname()
                     ));
                 } else {
