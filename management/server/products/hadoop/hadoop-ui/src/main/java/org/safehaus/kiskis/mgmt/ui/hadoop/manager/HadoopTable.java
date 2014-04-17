@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.*;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -53,12 +53,11 @@ public class HadoopTable extends TreeTable {
                     Item row = getItem(target);
 
                     removeItem(target);
-                    Collection<?> children = getChildren(target);
-                    for (Object childID : children) {
-                        removeItem(childID);
+                    for (Iterator it = getChildren(target).iterator(); it.hasNext(); ) {
+                        removeItem(it.next());
                     }
 
-                    HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+//                    HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
                 }
             }
 
