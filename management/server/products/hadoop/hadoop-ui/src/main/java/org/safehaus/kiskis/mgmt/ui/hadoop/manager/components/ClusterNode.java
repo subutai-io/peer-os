@@ -41,8 +41,6 @@ public class ClusterNode extends HorizontalLayout {
         progressIcon.setHeight(11, Sizeable.UNITS_PIXELS);
         progressIcon.setWidth(50, Sizeable.UNITS_PIXELS);
         progressIcon.setVisible(false);
-        /*progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-        progressIcon.setVisible(false);*/
 
         return progressIcon;
     }
