@@ -10,7 +10,6 @@ import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
 /**
- *
  * @author dilshat
  */
 public class CommunicationManagerMock implements CommunicationManager {

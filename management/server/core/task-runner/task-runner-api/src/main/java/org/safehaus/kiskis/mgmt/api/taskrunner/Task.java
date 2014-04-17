@@ -22,7 +22,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 /**
  * This class represents a task which is essentially a single request to a group
  * (one or more) of agents(nodes) to be executed in parallel.
- *
+ * <p/>
  * The following code creates a task and adds a request for an agent to it:
  * <p>
  * <blockquote><pre>
@@ -81,7 +81,7 @@ public class Task implements Serializable {
     /**
      * Add result to results map.
      *
-     * @param id UUID of agent/node
+     * @param id     UUID of agent/node
      * @param result {@code Result}
      */
     public void addResult(UUID id, Result result) {

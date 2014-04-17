@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.impl.taskrunner;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -38,14 +39,13 @@ class TaskListener {
     /**
      * map which holds all cumulated stderrs for this task where key is UUID of
      * agent/node. Each std err contains last 10000 cumulated symbols
-     *
      */
     private final Map<UUID, StringBuilder> stdErr;
 
     /**
      * Initializes the {@code TaskListener}
      *
-     * @param task - task
+     * @param task         - task
      * @param taskCallback - task callback
      */
     public TaskListener(Task task, TaskCallback taskCallback) {

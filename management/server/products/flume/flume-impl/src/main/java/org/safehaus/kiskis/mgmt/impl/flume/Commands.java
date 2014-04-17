@@ -29,7 +29,7 @@ public class Commands {
 
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("sleep 10; apt-get update && apt-get --force-yes --assume-yes install ksks-flume");
+        req.setProgram("apt-get --force-yes --assume-yes install ksks-flume");
         req.setStdOut(OutputRedirection.NO); // TODO:
         req.setTimeout(90);
         return req;

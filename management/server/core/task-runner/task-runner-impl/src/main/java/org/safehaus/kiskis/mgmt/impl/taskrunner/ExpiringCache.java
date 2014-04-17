@@ -42,7 +42,7 @@ class ExpiringCache<KeyType, ValueType> {
                     while (!Thread.interrupted()) {
                         try {
                             for (Iterator<Map.Entry<KeyType, CacheEntry<ValueType>>> it
-                                    = entries.entrySet().iterator(); it.hasNext();) {
+                                         = entries.entrySet().iterator(); it.hasNext(); ) {
                                 final Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
                                 if (entry.getValue().isExpired()) {
                                     it.remove();
@@ -97,7 +97,7 @@ class ExpiringCache<KeyType, ValueType> {
     /**
      * adds entry to the cache.
      *
-     * @param key - key for the entry
+     * @param key   - key for the entry
      * @param value - entry value
      * @param ttlMs - time-to-live in milliseconds
      * @return - return true if added successfully and false in case of error
@@ -117,11 +117,11 @@ class ExpiringCache<KeyType, ValueType> {
     /**
      * adds entry to the cache.
      *
-     * @param key - key for the entry
-     * @param value - entry value
-     * @param ttlMs - time-to-live in milliseconds
+     * @param key      - key for the entry
+     * @param value    - entry value
+     * @param ttlMs    - time-to-live in milliseconds
      * @param callback - expiry callback which is called when entry is being
-     * evicted
+     *                 evicted
      * @return - return true if added successfully and false in case of error
      */
     public boolean put(KeyType key, ValueType value, long ttlMs, EntryExpiryCallback<ValueType> callback) {

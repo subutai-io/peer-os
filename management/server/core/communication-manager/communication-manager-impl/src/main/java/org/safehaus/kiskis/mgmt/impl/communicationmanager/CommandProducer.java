@@ -5,24 +5,21 @@
  */
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.jms.Connection;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
+import javax.jms.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
+ * This class is used internally by CommunicationManagerImpl for sending
+ * requests to agents.
  *
  * @author dilshat
  */
-public class CommandProducer implements Runnable {
+class CommandProducer implements Runnable {
 
     private final Request command;
     private final CommunicationManagerImpl communicationManagerImpl;
@@ -33,6 +30,9 @@ public class CommandProducer implements Runnable {
         this.command = command;
     }
 
+    /**
+     * Called by executor to send message to agent
+     */
     public void run() {
         Connection connection = null;
         Session session = null;

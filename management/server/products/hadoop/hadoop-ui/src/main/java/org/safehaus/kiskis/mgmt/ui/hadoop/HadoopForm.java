@@ -4,6 +4,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.hadoop.wizard.Wizard;
 
 /**
@@ -11,6 +12,7 @@ import org.safehaus.kiskis.mgmt.ui.hadoop.wizard.Wizard;
  */
 public class HadoopForm extends CustomComponent {
     private final Wizard wizard;
+    private final Manager manager;
 
     public HadoopForm() {
         setSizeFull();
@@ -23,8 +25,10 @@ public class HadoopForm extends CustomComponent {
         sheet.setStyleName(Runo.TABSHEET_SMALL);
         sheet.setSizeFull();
 
+        manager = new Manager();
         wizard = new Wizard();
         sheet.addTab(wizard.getContent(), "Install");
+        sheet.addTab(manager, "Manage");
 
 
         verticalLayout.addComponent(sheet);

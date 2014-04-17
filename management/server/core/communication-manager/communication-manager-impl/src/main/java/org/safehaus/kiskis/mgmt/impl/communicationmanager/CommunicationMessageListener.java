@@ -1,26 +1,37 @@
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
-import java.util.Iterator;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-
-import javax.jms.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
-public class CommunicationMessageListener implements MessageListener {
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * This class is used internally by CommunicationManagerImpl to notify response
+ * listener on new message.
+ *
+ * @author dilshat
+ */
+class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger(CommunicationMessageListener.class.getName());
     private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<ResponseListener>();
 
     /**
-     * Distributes incoming message to appropriate bundles.
+     * New message handler called by amq broker
      *
      * @param message
      */
@@ -55,9 +66,14 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Notifies listeners on new response
+     *
+     * @param response
+     */
     private void notifyListeners(Response response) {
         try {
-            for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext();) {
+            for (Iterator<ResponseListener> it = listeners.iterator(); it.hasNext(); ) {
                 ResponseListener ai = it.next();
                 try {
                     ai.onResponse(response);
@@ -71,6 +87,11 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Adds response listener
+     *
+     * @param listener
+     */
     public void addListener(ResponseListener listener) {
         try {
             listeners.add(listener);
@@ -79,6 +100,11 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Removes response listener
+     *
+     * @param listener
+     */
     public void removeListener(ResponseListener listener) {
         try {
             listeners.remove(listener);
@@ -87,6 +113,18 @@ public class CommunicationMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Returns collection of listeners
+     *
+     * @return
+     */
+    Collection<ResponseListener> getListeners() {
+        return Collections.unmodifiableCollection(listeners);
+    }
+
+    /**
+     * Disposes message listener
+     */
     public void destroy() {
         if (listeners != null) {
             listeners.clear();

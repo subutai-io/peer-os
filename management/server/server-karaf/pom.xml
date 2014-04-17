@@ -686,6 +686,23 @@
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                
+                                <!-- Zookeeper -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>zookeeper-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>zookeeper-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>zookeeper-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- HBase -->
                                 <artifactItem>
@@ -703,7 +720,7 @@
                                     <artifactId>hbase-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                
+
                                 <!-- Flume -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -718,23 +735,6 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>flume-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                
-                                <!-- Hive -->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hive-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hive-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hive-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -763,7 +763,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>

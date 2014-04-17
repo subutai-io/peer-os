@@ -78,10 +78,10 @@ public class MonitorImpl implements Monitor {
 
     private static Map<Date, Double> toMap(List<JsonNode> nodes) {
 
-        Map<Date, Double> values = new LinkedHashMap<Date, Double>();
+        Map<Date, Double> values = new TreeMap<Date, Double>();
 
         for (JsonNode node : nodes) {
-            Date date = strToDate(node.get("@timestamp").asText());
+            Date date = strToDate( node.get("@timestamp").asText() );
             double value = node.get("val").asDouble();
             values.put(date, value);
         }

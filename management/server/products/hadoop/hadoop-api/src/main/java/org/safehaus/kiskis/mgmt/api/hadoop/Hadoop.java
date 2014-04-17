@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.api.hadoop;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +12,28 @@ public interface Hadoop {
     public UUID installCluster(Config config);
 
     public UUID uninstallCluster(String clusterName);
+
+    public UUID startNameNode(Config config);
+
+    public UUID stopNameNode(Config config);
+
+    public UUID restartNameNode(Config config);
+
+    public UUID statusNameNode(Config config);
+
+    public UUID statusSecondaryNameNode(Config config);
+
+    public UUID statusDataNode(Agent agent);
+
+    public UUID startJobTracker(Config config);
+
+    public UUID stopJobTracker(Config config);
+
+    public UUID restartJobTracker(Config config);
+
+    public UUID statusJobTracker(Config config);
+
+    public UUID statusTaskTracker(Agent agent);
 
     /**
      * Returns list of configurations of installed clusters

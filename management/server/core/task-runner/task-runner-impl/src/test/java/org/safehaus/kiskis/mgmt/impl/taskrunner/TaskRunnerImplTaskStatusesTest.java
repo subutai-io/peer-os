@@ -5,21 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -28,8 +16,14 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
- *
  * @author dilshat
  */
 //@Ignore
@@ -117,7 +111,8 @@ public class TaskRunnerImplTaskStatusesTest {
 
     @Test(expected = RuntimeException.class)
     public void testExecuteEmptyTaskSync() {
-        taskrunner.executeTaskNWait(new Task());;
+        taskrunner.executeTaskNWait(new Task());
+        ;
     }
 
     @Test(expected = RuntimeException.class)

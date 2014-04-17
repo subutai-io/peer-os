@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -141,7 +142,7 @@ class TaskMediator {
      * timeout {@code task.getAverageTimeout()} interval, its status is set as
      * TIMEDOUT.
      *
-     * @param task - task to execute
+     * @param task         - task to execute
      * @param taskCallback - callback or null
      */
     public void executeTask(Task task, TaskCallback taskCallback) {
@@ -163,7 +164,8 @@ class TaskMediator {
                                             entry.getTaskCallback().notifyAll();
                                         }
                                     }
-                                });
+                                }
+                        );
                     }
                     while (task.hasNextRequest()) {
                         communicationService.sendRequest(task.getNextRequest());

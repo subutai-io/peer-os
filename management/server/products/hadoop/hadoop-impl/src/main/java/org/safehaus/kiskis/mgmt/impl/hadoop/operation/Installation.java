@@ -95,7 +95,7 @@ public class Installation {
                         po.addLog("Cluster network configured");
 
                         po.addLog("Hadoop installation started");
-                        System.out.println(config);
+
                         InstallHadoopOperation installOperation = new InstallHadoopOperation(config);
                         for (Task task : installOperation.getTaskList()) {
                             po.addLog((String.format("%s started...", task.getDescription())));

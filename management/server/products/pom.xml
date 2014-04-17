@@ -27,5 +27,6 @@
         <module>hbase</module>
         <module>hadoop</module>
         <module>hive</module>
+	<module>zookeeper</module>
     </modules>
 </project>

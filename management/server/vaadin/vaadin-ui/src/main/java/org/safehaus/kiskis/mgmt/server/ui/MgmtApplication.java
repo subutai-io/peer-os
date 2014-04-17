@@ -5,12 +5,15 @@ import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.Runo;
+
 import java.util.Collections;
+
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashSet;
@@ -19,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
@@ -45,6 +49,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         this.moduleNotifier = moduleNotifier;
         this.title = title;
     }
+
     private final String title;
     private TabSheet tabs;
     private static String APP_URL;
@@ -217,7 +222,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     }
 
     public static void showConfirmationDialog(final String caption, final String question,
-            final String okLabel, final String cancelLabel, final ConfirmationDialogCallback callback) {
+                                              final String okLabel, final String cancelLabel, final ConfirmationDialogCallback callback) {
         try {
             if (getInstance() != null) {
                 final ConfirmationDialog cd = new ConfirmationDialog(

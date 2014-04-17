@@ -5,23 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
+import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
 
 /**
  * Implementation of {@code TaskRunner} interface.
- *
  *
  * @author dilshat
  */
@@ -118,13 +118,12 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * This method processes responses from agents/nodes.
-     *
+     * <p/>
      * For each response its single threaded executor is retrieved from
      * executors map. The response is submitted for further processing by means
      * of this executor. If task completes or new task is submitted by its
      * {@code TaskCallback} the current executor gets disposed. For new task new
      * executor is bootstrapped.
-     *
      *
      * @param response - response from node
      */
@@ -224,7 +223,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
      * returned/supplied task to see its status after this method returns.
      *
@@ -248,11 +247,11 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
-     * @param task - task to execute
+     * @param task     - task to execute
      * @param callback - task callback
      */
     @Override
@@ -262,7 +261,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
             synchronized (callback) {
                 try {
-                    callback.wait(3600 * 1000); //wait 1 hr maximum
+                    callback.wait(100 * 3600 * 1000); //wait 100 hr maximum
                 } catch (InterruptedException ex) {
                 }
             }
@@ -275,11 +274,11 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
     /**
      * Executes {@code Task} synchronously to the calling party. The method
-     * returns when either task is completed or timed out. This method waits 1
+     * returns when either task is completed or timed out. This method waits 100
      * hour maximum and them times out. Calling party should examine the
-     * returned/supplied task to see its status after this method returns.
+     * supplied task to see its status after this method returns.
      *
-     * @param task - task to execute
+     * @param task     - task to execute
      * @param callback - task callback
      */
     @Override
@@ -289,7 +288,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
 
             synchronized (interruptableCallback.getCallback()) {
                 try {
-                    interruptableCallback.getCallback().wait(3600 * 1000); //wait 1 hr maximum
+                    interruptableCallback.getCallback().wait(100 * 3600 * 1000); //wait 100 hr maximum
                 } catch (InterruptedException ex) {
                 }
             }
