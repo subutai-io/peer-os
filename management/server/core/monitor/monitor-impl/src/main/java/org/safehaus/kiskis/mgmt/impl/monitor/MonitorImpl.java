@@ -41,17 +41,17 @@ public class MonitorImpl implements Monitor {
     private Map<Date, Double> execute(String host, Metric metric, Date startDate, Date endDate) throws Exception {
 
         String query = QUERY
-                .replace("$host", host)
-                .replace("$metricName", metric.toString().toLowerCase())
-                .replace("$startDate", dateToStr(startDate))
-                .replace("$endDate", dateToStr(endDate));
+                .replace( "$host", host )
+                .replace( "$metricName", metric.name().toLowerCase() )
+                .replace( "$startDate", dateToStr(startDate) )
+                .replace( "$endDate", dateToStr(endDate) );
 
         LOG.info("query: {}", query);
 
         String response = HttpPost.execute(query);
         List<JsonNode> nodes = toNodes(response);
 
-        LOG.info("nodes count: {}", nodes.size());
+        LOG.info( "nodes count: {}", nodes.size() );
 
         // Reversing the list b/c the query returns the data in desc order (to get the latest values first).
         Collections.reverse(nodes);
@@ -78,10 +78,10 @@ public class MonitorImpl implements Monitor {
 
     private static Map<Date, Double> toMap(List<JsonNode> nodes) {
 
-        Map<Date, Double> values = new LinkedHashMap<Date, Double>();
+        Map<Date, Double> values = new TreeMap<Date, Double>();
 
         for (JsonNode node : nodes) {
-            Date date = strToDate(node.get("@timestamp").asText());
+            Date date = strToDate( node.get("@timestamp").asText() );
             double value = node.get("val").asDouble();
             values.put(date, value);
         }

@@ -38,7 +38,7 @@ public class ModuleView extends CustomComponent {
     public Layout getLayout() {
 
         AbsoluteLayout layout = new AbsoluteLayout();
-        layout.setWidth(1000, Sizeable.UNITS_PIXELS);
+        layout.setWidth(1200, Sizeable.UNITS_PIXELS);
         layout.setHeight(1000, Sizeable.UNITS_PIXELS);
 
         addNote(layout);
@@ -65,9 +65,9 @@ public class ModuleView extends CustomComponent {
 
     private void addMetricList(AbsoluteLayout layout) {
 
-        metricListSelect = UIUtil.addListSelect(layout, "Metric:", "left: 20px; top: 150px;", "150px", "270px");
+        metricListSelect = UIUtil.addListSelect(layout, "Metric:", "left: 20px; top: 150px;", "200px", "270px");
 
-        for (Metric metric : Metric.values()) {
+        for ( Metric metric : Metric.values() ) {
             metricListSelect.addItem(metric);
         }
     }
@@ -92,7 +92,7 @@ public class ModuleView extends CustomComponent {
         chartLayout.setHeight(400, Sizeable.UNITS_PIXELS);
         chartLayout.setDebugId("chart");
 
-        layout.addComponent(chartLayout, "left: 200px; top: 50px;");
+        layout.addComponent(chartLayout, "left: 250px; top: 50px;");
     }
 
     private void submitButtonClicked() {
@@ -144,5 +144,13 @@ public class ModuleView extends CustomComponent {
 
     private Metric getSelectedMetric() {
         return (Metric) metricListSelect.getValue();
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println( "name: " + Metric.CPU_USER.name() );
+        System.out.println( "toString: " + Metric.CPU_USER );
+
+
     }
 }
