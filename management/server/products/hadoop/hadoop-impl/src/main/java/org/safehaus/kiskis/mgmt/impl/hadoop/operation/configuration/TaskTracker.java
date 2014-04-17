@@ -39,7 +39,7 @@ public class TaskTracker {
                     return;
                 }
 
-                Task task = Tasks.getNameNodeCommandTask(agent, "status");
+                Task task = Tasks.getJobTrackerCommand(agent, "status");
                 parent.getTaskRunner().executeTaskNWait(task);
 
                 NodeState nodeState = NodeState.UNKNOWN;
