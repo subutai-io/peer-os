@@ -5,17 +5,18 @@
  */
 package org.safehaus.kiskis.mgmt.impl.dbmanager;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.List;
 import org.cassandraunit.CassandraCQLUnit;
-import org.cassandraunit.dataset.cql.FileCQLDataSet;
+import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.Rule;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -23,12 +24,13 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 /**
  *
  * @author dilshat
+ * @todo use classpath sql file with one single table
  */
-@Ignore
+//@Ignore
 public class DbManagerImplTest {
 
     @Rule
-    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new FileCQLDataSet("../../../../../keyspace/kiskis.sql", false, true, "kiskis"));
+    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("pi.sql", true, true, "test"));
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private final DbManager dbManager = new DbManagerImpl();
@@ -137,6 +139,34 @@ public class DbManagerImplTest {
         List<MyPojo> list = dbManager.getInfo(source, MyPojo.class);
 
         assertTrue(list.isEmpty());
+    }
+
+    @Test
+    public void testExecuteUpdate() {
+        MyPojo myPojo = new MyPojo(content);
+
+        dbManager.saveInfo(source, key, myPojo);
+
+        MyPojo myPojo2 = new MyPojo("test");
+
+        dbManager.executeUpdate("update product_info set info = ? where source = ? and key = ?", gson.toJson(myPojo2), source, key);
+
+        MyPojo myPojo3 = dbManager.getInfo(source, key, MyPojo.class);
+
+        assertEquals(myPojo2.content, myPojo3.content);
+    }
+
+    @Test
+    public void testExecuteQuery() {
+        MyPojo myPojo = new MyPojo(content);
+
+        dbManager.saveInfo(source, key, myPojo);
+
+        ResultSet rs = dbManager.executeQuery("select * from product_info where source = ? and key = ?", source, key);
+
+        Row row = rs.one();
+
+        assertNotNull(row);
     }
 
 }

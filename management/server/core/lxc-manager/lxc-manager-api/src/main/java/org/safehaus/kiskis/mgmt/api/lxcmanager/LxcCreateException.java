@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
 /**
+ * Exception which can be thrown while creating lxcs
  *
  * @author dilshat
  */

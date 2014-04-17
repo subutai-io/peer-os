@@ -12,15 +12,31 @@ import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 
 /**
+ * This is an implementation of ProductOperationView
  *
  * @author dilshat
  */
 public class ProductOperationViewImpl implements ProductOperationView {
 
+    /**
+     * id of product operation
+     */
     private final UUID id;
+    /**
+     * description of product operation
+     */
     private final String description;
+    /**
+     * log of product operation
+     */
     private final String log;
+    /**
+     * state of product operation
+     */
     private final ProductOperationState state;
+    /**
+     * Creation date of product operation
+     */
     private final Date createDate;
 
     public ProductOperationViewImpl(ProductOperation po) {

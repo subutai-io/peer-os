@@ -2,27 +2,34 @@ package org.safehaus.kiskis.mgmt.api.monitor;
 
 public enum Metric {
 
-    CPU_USER("%"),
-    CPU_SYSTEM("%"),
-    CPU_IDLE("%"),
-    CPU_WIO("%"),
-    MEM_FREE("KB"),
-    MEM_CACHED("KB"),
-    MEM_BUFFERS("KB"),
-    SWAP_FREE("KB"),
-    PKTS_IN("packets/sec"),
-    PKTS_OUT("packets/sec"),
-    BYTES_IN("bytes/sec"),
-    BYTES_OUT("bytes/sec"),
-    PART_MAX_USED("%");
+    CPU_USER("CPU User", "%"),
+    CPU_SYSTEM("CPU System", "%"),
+    CPU_IDLE("CPU Idle", "%"),
+    CPU_WIO("CPU wio", "%"),
+    MEM_FREE("Free Memory", "KB"),
+    MEM_CACHED("Cached Memory", "KB"),
+    MEM_BUFFERS("Memory Buffers", "KB"),
+    SWAP_FREE("Free Swap Space", "KB"),
+    PKTS_IN("Packets Received", "packets/sec"),
+    PKTS_OUT("Packets Sent", "packets/sec"),
+    BYTES_IN("Bytes Received", "bytes/sec"),
+    BYTES_OUT("Bytes Sent", "bytes/sec"),
+    PART_MAX_USED("Maximum Disk Space Used", "%");
 
     private String unit = "";
+    private String description = "";
 
-    private Metric(String unit) {
+    private Metric(String description, String unit) {
+        this.description = description;
         this.unit = unit;
     }
 
     public String getUnit() {
         return unit;
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
 }

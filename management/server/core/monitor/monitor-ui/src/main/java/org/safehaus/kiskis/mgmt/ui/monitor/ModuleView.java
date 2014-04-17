@@ -2,15 +2,15 @@ package org.safehaus.kiskis.mgmt.ui.monitor;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.Runo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.monitor.util.UIUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
@@ -24,21 +24,34 @@ public class ModuleView extends CustomComponent {
 
     private final Monitor monitor;
 
+    private MgmtAgentManager agentTree;
     private PopupDateField startDateField;
     private PopupDateField endDateField;
     private ListSelect metricListSelect;
 
     public ModuleView(Monitor monitor) {
         this.monitor = monitor;
-
-        setHeight("100%");
-        setCompositionRoot(getLayout());
+        initContent();
     }
 
-    public Layout getLayout() {
+    private void initContent() {
+
+        setHeight("100%");
+
+        HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+        splitPanel.setSplitPosition(20);
+
+        agentTree = MgmtApplication.createAgentTree();
+        splitPanel.setFirstComponent(agentTree);
+        splitPanel.setSecondComponent( getMainLayout() );
+
+        setCompositionRoot(splitPanel);
+    }
+
+    private Layout getMainLayout() {
 
         AbsoluteLayout layout = new AbsoluteLayout();
-        layout.setWidth(1000, Sizeable.UNITS_PIXELS);
+        layout.setWidth(1200, Sizeable.UNITS_PIXELS);
         layout.setHeight(1000, Sizeable.UNITS_PIXELS);
 
         addNote(layout);
@@ -65,9 +78,9 @@ public class ModuleView extends CustomComponent {
 
     private void addMetricList(AbsoluteLayout layout) {
 
-        metricListSelect = UIUtil.addListSelect(layout, "Metric:", "left: 20px; top: 150px;", "150px", "270px");
+        metricListSelect = UIUtil.addListSelect(layout, "Metric:", "left: 20px; top: 150px;", "200px", "270px");
 
-        for (Metric metric : Metric.values()) {
+        for ( Metric metric : Metric.values() ) {
             metricListSelect.addItem(metric);
         }
     }
@@ -92,7 +105,7 @@ public class ModuleView extends CustomComponent {
         chartLayout.setHeight(400, Sizeable.UNITS_PIXELS);
         chartLayout.setDebugId("chart");
 
-        layout.addComponent(chartLayout, "left: 200px; top: 50px;");
+        layout.addComponent(chartLayout, "left: 250px; top: 50px;");
     }
 
     private void submitButtonClicked() {
@@ -135,7 +148,7 @@ public class ModuleView extends CustomComponent {
 
     private String getSelectedNode() {
 
-        Set<Agent> agents = MgmtApplication.getSelectedAgents();
+        Set<Agent> agents = agentTree.getSelectedAgents();
 
         return agents == null || agents.size() == 0
                 ? null

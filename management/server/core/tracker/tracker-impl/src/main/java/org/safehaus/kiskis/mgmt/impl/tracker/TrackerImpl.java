@@ -22,19 +22,35 @@ import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 
 /**
+ * This is an implementation of Tracker
  *
  * @author dilshat
  */
 public class TrackerImpl implements Tracker {
 
+    /**
+     * Used to serialize/deserialize product operation to/from json format
+     */
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger(TrackerImpl.class.getName());
+
+    /**
+     * reference to dbmanager
+     */
     private DbManager dbManager;
 
     public void setDbManager(DbManager dbManager) {
         this.dbManager = dbManager;
     }
 
+    /**
+     * Get view of product operation by operation id
+     *
+     * @param source - source of product operation, usually this is a module
+     * name
+     * @param operationTrackId - id of operation
+     * @return - product operation view
+     */
     public ProductOperationView getProductOperation(String source, UUID operationTrackId) {
         try {
             ResultSet rs = dbManager.executeQuery(
@@ -58,12 +74,26 @@ public class TrackerImpl implements Tracker {
         return null;
     }
 
+    /**
+     * Saves product operation o DB
+     *
+     * @param source - source of product operation, usually this is a module
+     * @param po - product operation
+     * @return - true if all went well, false otherwise
+     */
     boolean saveProductOperation(String source, ProductOperationImpl po) {
         return dbManager.executeUpdate(
                 "insert into product_operation(source,id,info) values(?,?,?)",
                 source, po.getId(), gson.toJson(po));
     }
 
+    /**
+     * Creates product operation and save it to DB
+     *
+     * @param source - source of product operation, usually this is a module
+     * @param description - description of operation
+     * @return - returns created product operation
+     */
     public ProductOperation createProductOperation(String source, String description) {
         ProductOperationImpl po = new ProductOperationImpl(source, description, this);
         if (saveProductOperation(source, po)) {
@@ -72,6 +102,16 @@ public class TrackerImpl implements Tracker {
         return null;
     }
 
+    /**
+     * Returns list of product operations (views) filtering them by date
+     * interval
+     *
+     * @param source - source of product operation, usually this is a module
+     * @param fromDate - beginning date of filter
+     * @param toDate - ending date of filter
+     * @param limit - limit of records to return
+     * @return - list of product operation views
+     */
     public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate, int limit) {
         List<ProductOperationView> list = new ArrayList<ProductOperationView>();
         try {
@@ -100,6 +140,12 @@ public class TrackerImpl implements Tracker {
         return list;
     }
 
+    /**
+     * Returns list of all sources of product operations for which product
+     * operations exist in DB
+     *
+     * @return list of product operation sources
+     */
     public List<String> getProductOperationSources() {
         List<String> sources = new ArrayList<String>();
         ResultSet rs = dbManager.executeQuery(
