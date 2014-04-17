@@ -12,27 +12,51 @@ import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
+ * This is an implementaion of ProductOperation
  *
  * @author dilshat
  */
 public class ProductOperationImpl implements ProductOperation {
 
+    /**
+     * product operation id
+     */
     private final UUID id;
+    /**
+     * product operation description
+     */
     private final String description;
-    private final transient TrackerImpl dbManager;
+    /**
+     * reference to tracker
+     */
+    private final transient TrackerImpl tracker;
+
+    /**
+     * log of product operation
+     */
     private final StringBuilder log;
+    /**
+     * Creation date of product operation
+     */
     private final Date createDate;
+
+    /**
+     * State of product operation
+     */
     private ProductOperationState state;
+
+    /**
+     * Source of product operation
+     */
     private final String source;
 
-    public ProductOperationImpl(String source, String description, TrackerImpl dbManager) {
+    public ProductOperationImpl(String source, String description, TrackerImpl tracker) {
         this.description = description;
         this.source = source;
-        this.dbManager = dbManager;
+        this.tracker = tracker;
         log = new StringBuilder();
         state = ProductOperationState.RUNNING;
         id = UUID.fromString(new com.eaio.uuid.UUID().toString());
-//        id = java.util.UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
         createDate = new Date();
     }
 
@@ -61,7 +85,7 @@ public class ProductOperationImpl implements ProductOperation {
             log.append(logString);
         }
         this.state = state;
-        dbManager.saveProductOperation(source, this);
+        tracker.saveProductOperation(source, this);
     }
 
     public ProductOperationState getState() {

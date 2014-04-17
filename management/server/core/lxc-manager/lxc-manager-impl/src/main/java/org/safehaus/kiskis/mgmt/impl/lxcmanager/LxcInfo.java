@@ -8,6 +8,8 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
+ * Contains lxc info for LxcActor
+ *
  * @author dilshat
  */
 public class LxcInfo {

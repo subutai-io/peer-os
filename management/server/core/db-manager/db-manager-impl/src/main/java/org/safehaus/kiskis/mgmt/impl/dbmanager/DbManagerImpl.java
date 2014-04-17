@@ -77,7 +77,7 @@ public class DbManagerImpl implements DbManager {
         }
     }
 
-    void setTestSession(Session session) {
+    public void setTestSession(Session session) {
         this.session = session;
     }
 

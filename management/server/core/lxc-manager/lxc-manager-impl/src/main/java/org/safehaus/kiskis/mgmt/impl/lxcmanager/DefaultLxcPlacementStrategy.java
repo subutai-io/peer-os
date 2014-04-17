@@ -7,7 +7,6 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcPlacementStrategy;
@@ -16,31 +15,39 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
+ * This is a default lxc placement strategy. According to metrics and limits
+ * calculates number of lxcs that each connected physical host can accommodate
+ *
  * @author dilshat
  */
 public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
 
-    private final Pattern p = Pattern.compile("load average: (.*)");
     private final double MIN_HDD_LXC_MB = 15 * 1024;         // 15G
-    private final double MIN_HDD_IN_RESERVE_MB = 100 * 1024; // 100G
+    private final double MIN_HDD_IN_RESERVE_MB = 50 * 1024;  // 50G
     private final double MIN_RAM_LXC_MB = 1 * 1024;          // 1G
     private final double MIN_RAM_IN_RESERVE_MB = 2 * 1024;   // 2G
-    private final double MIN_CPU_LXC_PERCENT = 15;           // 15%
-    private final double MIN_CPU_IN_RESERVE_PERCENT = 30;    // 30%
+    private final double MIN_CPU_LXC_PERCENT = 10;           // 10%
+    private final double MIN_CPU_IN_RESERVE_PERCENT = 20;    // 20%
     //    private final int MAX_NUMBER_OF_LXCS_PER_HOST = 5;       // 5
     private final int numOfNodes;
-    private final String defaultNodeType = "default";
+    public static final String defaultNodeType = "default";
 
     public DefaultLxcPlacementStrategy(int numOfNodes) {
         this.numOfNodes = numOfNodes;
     }
 
+    /**
+     * Optional method to implement if placement uses simple logic to calculate
+     * lxc slots on a physical server
+     *
+     * @param serverMetrics
+     * @return map where key is a physical agent and value is a number of lxcs
+     * this physical server can accommodate
+     */
     @Override
-    public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
-        //implement default simple lxc placement strategy here
-
+    public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> serverMetrics) {
+        Map<Agent, Integer> serverSlots = new HashMap<Agent, Integer>();
         if (serverMetrics != null && !serverMetrics.isEmpty()) {
-            Map<Agent, Integer> bestServers = new HashMap<Agent, Integer>();
             for (Map.Entry<Agent, ServerMetric> entry : serverMetrics.entrySet()) {
                 ServerMetric metric = entry.getValue();
 //                int numOfLxcByLxcLimit = MAX_NUMBER_OF_LXCS_PER_HOST - metric.getNumOfLxcs();
@@ -49,44 +56,62 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
                 int numOfLxcByCpu = (int) (((100 - metric.getCpuLoadPercent()) - (MIN_CPU_IN_RESERVE_PERCENT / metric.getNumOfProcessors())) / (MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors()));
                 if (numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
                     int minNumOfLxcs = Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam);
-                    bestServers.put(entry.getKey(), minNumOfLxcs);
+                    serverSlots.put(entry.getKey(), minNumOfLxcs);
                 }
 //                if (numOfLxcByLxcLimit > 0 && numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0) {
 //                    int minNumOfLxcs = Math.min(Math.min(Math.min(numOfLxcByCpu, numOfLxcByHdd), numOfLxcByRam), numOfLxcByLxcLimit);
 //                    bestServers.put(entry.getKey(), minNumOfLxcs);
 //                }
             }
+        }
+        return serverSlots;
+    }
 
-            if (!bestServers.isEmpty()) {
-                int numOfAvailableLxcSlots = 0;
-                for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
-                    numOfAvailableLxcSlots += srv.getValue();
-                }
+    /**
+     * This method calculates placement of lxcs on physical servers. Code should
+     * check passed server metrics to figure out strategy for lxc placement This
+     * is done by calling addPlacementInfo method.This method calculates on
+     * which physical server to places lxc, the number of lxcs to place and
+     * their type
+     *
+     * @param serverMetrics - map where key is a physical agent and value is a
+     * metric
+     * @throws LxcCreateException
+     */
+    @Override
+    public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
 
-                if (numOfAvailableLxcSlots >= numOfNodes) {
+        Map<Agent, Integer> serversWithSlots = calculateSlots(serverMetrics);
 
-                    for (int i = 0; i < numOfNodes; i++) {
-                        Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(bestServers);
+        if (!serversWithSlots.isEmpty()) {
+            int numOfAvailableLxcSlots = 0;
+            for (Map.Entry<Agent, Integer> srv : serversWithSlots.entrySet()) {
+                numOfAvailableLxcSlots += srv.getValue();
+            }
 
-                        Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                        Agent physicalNode = entry.getKey();
-                        Integer numOfLxcSlots = entry.getValue();
-                        bestServers.put(physicalNode, numOfLxcSlots - 1);
+            if (numOfAvailableLxcSlots >= numOfNodes) {
 
-                        Map<String, Integer> info = getPlacementInfoMap().get(physicalNode);
+                for (int i = 0; i < numOfNodes; i++) {
+                    Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc(serversWithSlots);
 
-                        if (info == null) {
+                    Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                    Agent physicalNode = entry.getKey();
+                    Integer numOfLxcSlots = entry.getValue();
+                    serversWithSlots.put(physicalNode, numOfLxcSlots - 1);
 
-                            addPlacementInfo(physicalNode, defaultNodeType, 1);
-                        } else {
-                            addPlacementInfo(physicalNode, defaultNodeType, info.get(defaultNodeType) + 1);
-                        }
+                    Map<String, Integer> info = getPlacementInfoMap().get(physicalNode);
 
+                    if (info == null) {
+
+                        addPlacementInfo(physicalNode, defaultNodeType, 1);
+                    } else {
+                        addPlacementInfo(physicalNode, defaultNodeType, info.get(defaultNodeType) + 1);
                     }
 
                 }
 
             }
+
         }
 
     }

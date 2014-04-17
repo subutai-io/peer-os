@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 
 /**
+ * Clones or destroys lxc
  *
  * @author dilshat
  */

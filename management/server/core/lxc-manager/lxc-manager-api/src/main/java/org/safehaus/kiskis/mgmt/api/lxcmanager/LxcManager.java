@@ -17,25 +17,103 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
  */
 public interface LxcManager {
 
+    /**
+     * Returns number of lxc slots that each currently connected physical server
+     * can host. This method uses default lxc placement strategy for
+     * calculations
+     *
+     * @return map where key is a physical server and value is the number of lxc
+     * slots
+     */
     public Map<Agent, Integer> getPhysicalServersWithLxcSlots();
 
+    /**
+     * Returns metrics of all physical servers connected to the management
+     * server
+     *
+     * @return map of metrics where key is a physical agent and value is a
+     * metric metric
+     */
     public Map<Agent, ServerMetric> getPhysicalServerMetrics();
 
+    /**
+     * Returns information about what lxc containers each physical servers has
+     * at present
+     *
+     * @return map where key is a hostname of physical server and value is a map
+     * where key is state of lxc and value is a list of lxc hostnames
+     */
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers();
 
+    /**
+     * Clones lxc on a given physical server and set its hostname
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname to set for a new lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname);
 
+    /**
+     * Starts lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname);
 
+    /**
+     * Stops lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname);
 
+    /**
+     * Destroys lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return true if all went ok, false otherwise
+     */
     public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname);
 
+    /**
+     * Clones and starts lxc on a given physical server, sets hostname of lxc
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     * @return boolean if all went ok, false otherwise
+     */
     public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname);
 
+    /**
+     * Creates specified number of lxs and starts them. Uses default placement
+     * strategy for calculating location of lxcs on physical servers
+     *
+     * @param count
+     * @return map where key is physical agent and value is a set of lxc agents
+     * on it
+     */
     public Map<Agent, Set<Agent>> createLxcs(int count) throws LxcCreateException;
 
+    /**
+     * Destroys specified lxcs
+     *
+     * @param lxcHostnames - hostnames of lxc to destroy
+     */
     public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException;
 
+    /**
+     * Creates lxcs baed on a supplied strategy.
+     *
+     * @param strategy
+     * @return map where key is type of node and values is a map where key is a
+     * physical server and value is set of lxcs on it
+     * @throws LxcCreateException
+     */
     public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy(LxcPlacementStrategy strategy) throws LxcCreateException;
 }
