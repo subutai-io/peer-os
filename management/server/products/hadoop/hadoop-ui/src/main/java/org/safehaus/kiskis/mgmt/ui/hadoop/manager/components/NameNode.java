@@ -62,14 +62,15 @@ public class NameNode extends ClusterNode {
                     restartButton.setEnabled(isRunning);
                     stopButton.setEnabled(isRunning);
 
+                    for (SlaveNode slaveNode : slaveNodes) {
+                        slaveNode.getStatus(null);
+                    }
+
                     setLoading(false);
                 }
             }
         }, trackID, cluster.getNameNode()));
 
-        for (SlaveNode slaveNode : slaveNodes) {
-            slaveNode.getStatus(null);
-        }
     }
 
     @Override

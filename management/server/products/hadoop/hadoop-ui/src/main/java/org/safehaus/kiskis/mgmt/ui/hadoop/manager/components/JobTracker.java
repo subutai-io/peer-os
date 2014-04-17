@@ -62,14 +62,14 @@ public class JobTracker extends ClusterNode {
                     restartButton.setEnabled(isRunning);
                     stopButton.setEnabled(isRunning);
 
+                    for (SlaveNode slaveNode : slaveNodes) {
+                        slaveNode.getStatus(null);
+                    }
+
                     setLoading(false);
                 }
             }
         }, trackID, cluster.getJobTracker()));
-
-        for (SlaveNode slaveNode : slaveNodes) {
-            slaveNode.getStatus(null);
-        }
     }
 
     @Override
