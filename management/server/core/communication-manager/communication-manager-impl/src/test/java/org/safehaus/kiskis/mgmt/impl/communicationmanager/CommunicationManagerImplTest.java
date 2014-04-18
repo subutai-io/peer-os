@@ -8,11 +8,8 @@ package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import javax.jms.*;
 import java.util.UUID;
@@ -96,25 +93,6 @@ public class CommunicationManagerImplTest {
         assertTrue(communicationManagerImpl.getListeners().isEmpty());
     }
 
-    public static Request getRequestTemplate() {
-        return CommandFactory.newRequest(
-                RequestType.EXECUTE_REQUEST, // type
-                null, //                        !! agent uuid
-                null, //                        source
-                null, //                        !! task uuid 
-                1, //                           !! request sequence number
-                "/", //                         cwd
-                "pwd", //                        program
-                OutputRedirection.RETURN, //    std output redirection 
-                OutputRedirection.RETURN, //    std error redirection
-                null, //                        stdout capture file path
-                null, //                        stderr capture file path
-                "root", //                      runas
-                null, //                        arg
-                null, //                        env vars
-                30); //  
-    }
-
     @Test
     public void testSendRequest() throws JMSException {
         Connection connection = null;
@@ -126,7 +104,7 @@ public class CommunicationManagerImplTest {
         Destination testQueue = session.createQueue(uuid.toString());
         MessageConsumer consumer = session.createConsumer(testQueue);
 
-        Request request = getRequestTemplate();
+        Request request = TestUtils.getRequestTemplate();
 
         request.setUuid(uuid);
 
