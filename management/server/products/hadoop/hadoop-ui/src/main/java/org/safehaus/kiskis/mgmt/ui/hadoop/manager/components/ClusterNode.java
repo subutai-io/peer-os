@@ -1,8 +1,10 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
+import com.vaadin.event.MouseEvents;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
@@ -19,6 +21,7 @@ public class ClusterNode extends HorizontalLayout {
     protected Label progressIcon;
     protected Config cluster;
     protected Button startButton, stopButton, restartButton;
+    protected Embedded image;
     protected List<ClusterNode> slaveNodes;
 
     public ClusterNode(Config cluster) {
@@ -32,6 +35,22 @@ public class ClusterNode extends HorizontalLayout {
         addComponent(getStartButton());
         addComponent(getStopButton());
         addComponent(getRestartButton());
+        addComponent(getImage());
+    }
+
+    private Embedded getImage() {
+        image = new Embedded("", new ThemeResource("icons/buttons/start.png"));
+        image.setWidth(16, Sizeable.UNITS_PIXELS);
+        image.setHeight(16, Sizeable.UNITS_PIXELS);
+        image.addListener(new MouseEvents.ClickListener() {
+
+            @Override
+            public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
+                setLoading(true);
+            }
+        });
+
+        return image;
     }
 
     private Label getProgressIcon() {
