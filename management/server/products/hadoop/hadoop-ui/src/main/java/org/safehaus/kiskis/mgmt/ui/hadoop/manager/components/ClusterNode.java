@@ -48,8 +48,8 @@ public class ClusterNode extends HorizontalLayout {
     private Button getStartButton() {
         startButton = new Button();
         startButton.setIcon(new ThemeResource("icons/buttons/start.png"));
-        startButton.setWidth(51, Sizeable.UNITS_PIXELS);
-        startButton.setHeight(24, Sizeable.UNITS_PIXELS);
+        startButton.setWidth(50, Sizeable.UNITS_PIXELS);
+        startButton.setHeight(11, Sizeable.UNITS_PIXELS);
 
         return startButton;
     }
@@ -57,8 +57,8 @@ public class ClusterNode extends HorizontalLayout {
     private Button getStopButton() {
         stopButton = new Button();
         stopButton.setIcon(new ThemeResource("icons/buttons/stop.png"));
-        stopButton.setWidth(51, Sizeable.UNITS_PIXELS);
-        stopButton.setHeight(24, Sizeable.UNITS_PIXELS);
+        stopButton.setWidth(50, Sizeable.UNITS_PIXELS);
+        stopButton.setHeight(11, Sizeable.UNITS_PIXELS);
 
         return stopButton;
     }
@@ -66,8 +66,8 @@ public class ClusterNode extends HorizontalLayout {
     private Button getRestartButton() {
         restartButton = new Button();
         restartButton.setIcon(new ThemeResource("icons/buttons/restart.png"));
-        restartButton.setWidth(51, Sizeable.UNITS_PIXELS);
-        restartButton.setHeight(24, Sizeable.UNITS_PIXELS);
+        restartButton.setWidth(50, Sizeable.UNITS_PIXELS);
+        restartButton.setHeight(11, Sizeable.UNITS_PIXELS);
 
         return restartButton;
     }
