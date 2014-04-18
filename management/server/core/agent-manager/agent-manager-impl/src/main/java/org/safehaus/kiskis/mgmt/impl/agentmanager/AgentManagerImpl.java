@@ -179,7 +179,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     public void init() {
         try {
 
-            Preconditions.checkNotNull(communicationService);
+            Preconditions.checkNotNull(communicationService, "Communication service is null");
 
             agents = CacheBuilder.newBuilder().
                     expireAfterWrite(Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES).

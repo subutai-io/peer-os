@@ -65,7 +65,7 @@ public class CommunicationManagerImplTest {
     @Test
     public void testInit() {
 
-        assertTrue(communicationManagerImpl.broker.isStarted());
+        assertTrue(communicationManagerImpl.isBrokerStarted());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class CommunicationManagerImplTest {
             }
         });
 
-        assertFalse(communicationManagerImpl.communicationMessageListener.getListeners().isEmpty());
+        assertFalse(communicationManagerImpl.getListeners().isEmpty());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class CommunicationManagerImplTest {
 
         communicationManagerImpl.removeListener(listener);
 
-        assertTrue(communicationManagerImpl.communicationMessageListener.getListeners().isEmpty());
+        assertTrue(communicationManagerImpl.getListeners().isEmpty());
     }
 
     public static Request getRequestTemplate() {
@@ -120,7 +120,7 @@ public class CommunicationManagerImplTest {
         Connection connection = null;
         UUID uuid = UUID.randomUUID();
         //setup listener
-        connection = communicationManagerImpl.pooledConnectionFactory.createConnection();
+        connection = communicationManagerImpl.createConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination testQueue = session.createQueue(uuid.toString());
@@ -165,7 +165,7 @@ public class CommunicationManagerImplTest {
         UUID uuid = UUID.randomUUID();
         //setup listener
 
-        connection = communicationManagerImpl.pooledConnectionFactory.createConnection();
+        connection = communicationManagerImpl.createConnection();
         connection.start();
         final Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination testQueue = session.createQueue("SERVICE_QUEUE");

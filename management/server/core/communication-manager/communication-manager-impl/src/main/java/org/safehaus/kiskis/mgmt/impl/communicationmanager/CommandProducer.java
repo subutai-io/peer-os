@@ -38,7 +38,7 @@ class CommandProducer implements Runnable {
         Session session = null;
         MessageProducer producer = null;
         try {
-            connection = communicationManagerImpl.getPooledConnectionFactory().createConnection();
+            connection = communicationManagerImpl.createConnection();
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createQueue(command.getUuid().toString());

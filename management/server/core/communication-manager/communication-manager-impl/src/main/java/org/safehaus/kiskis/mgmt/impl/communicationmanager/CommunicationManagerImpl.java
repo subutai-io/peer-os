@@ -1,5 +1,8 @@
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import java.util.Collection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.broker.BrokerService;
@@ -14,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * This class is implementation of Communication Manager.
@@ -26,15 +30,15 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * broker
      */
-    BrokerService broker;
+    private BrokerService broker;
     /**
      * pooled connection factory to hold connection to broker
      */
-    PooledConnectionFactory pooledConnectionFactory;
+    private PooledConnectionFactory pooledConnectionFactory;
     /**
-     * message listenere to receive messages from broker
+     * message listener to receive messages from broker
      */
-    CommunicationMessageListener communicationMessageListener;
+    private CommunicationMessageListener communicationMessageListener;
     /**
      * executor used to send requests to agents
      */
@@ -94,8 +98,8 @@ public class CommunicationManagerImpl implements CommunicationManager {
      */
     private int amqInactiveQueuesDropTimeoutSec;
 
-    PooledConnectionFactory getPooledConnectionFactory() {
-        return pooledConnectionFactory;
+    public Connection createConnection() throws JMSException {
+        return pooledConnectionFactory.createConnection();
     }
 
     int getAmqMaxMessageToAgentTtlSec() {
@@ -163,10 +167,26 @@ public class CommunicationManagerImpl implements CommunicationManager {
         exec.submit(new CommandProducer(request, this));
     }
 
+    public boolean isBrokerStarted() {
+        return broker.isStarted();
+    }
+
+    public Collection getListeners() {
+        return communicationMessageListener.getListeners();
+    }
+
     /**
      * Initialized communication manager
      */
     public void init() {
+
+        Preconditions.checkNotNull(amqBindAddress);
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(amqBindAddress), "Bind address is null or empty");
+        Preconditions.checkArgument(amqBindAddress.matches(Common.HOSTNAME_REGEX), "Invalid bind address");
+        Preconditions.checkArgument(amqPort >= 1024 && amqPort <= 65536, "Port must be n range 1024 and 65536");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(amqServiceQueue), "Service queue name is null or empty");
+        Preconditions.checkArgument(amqMaxPooledConnections >= 1, "Max Pool Connections size must be greater than 0");
+        Preconditions.checkArgument(amqMaxSenderPoolSize >= 1, "Max Sender Pool size must be greater than 0");
 
         if (pooledConnectionFactory != null) {
             try {
