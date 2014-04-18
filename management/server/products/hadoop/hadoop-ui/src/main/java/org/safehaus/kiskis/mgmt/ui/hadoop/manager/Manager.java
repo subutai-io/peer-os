@@ -20,10 +20,10 @@ public class Manager extends Panel {
         horizontalLayout.setMargin(true);
         horizontalLayout.setSpacing(true);
 
-        horizontalLayout.addComponent(getButtonRefresh());
-        horizontalLayout.setComponentAlignment(refreshButton, Alignment.MIDDLE_LEFT);
         horizontalLayout.addComponent(getIndicator());
         horizontalLayout.setComponentAlignment(indicator, Alignment.MIDDLE_LEFT);
+        horizontalLayout.addComponent(getButtonRefresh());
+        horizontalLayout.setComponentAlignment(refreshButton, Alignment.MIDDLE_LEFT);
 
         addComponent(horizontalLayout);
         addComponent(getHadoopTable());
