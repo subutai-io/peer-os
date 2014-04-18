@@ -47,7 +47,7 @@ public class TrackerImplTest {
 
     @Before
     public void setUp() {
-        ((DbManagerImpl) dbManager).setTestSession(cassandraCQLUnit.session);
+        ((DbManagerImpl) dbManager).setSession(cassandraCQLUnit.session);
         ((TrackerImpl) tracker).setDbManager(dbManager);
     }
 
