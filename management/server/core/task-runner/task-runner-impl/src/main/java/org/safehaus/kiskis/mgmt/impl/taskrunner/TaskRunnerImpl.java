@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
+import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.api.taskrunner.InterruptableTaskCallback;
@@ -53,16 +54,13 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * Initializes TaskRunnerImpl.
      */
     public void init() {
+        Preconditions.checkNotNull(communicationService, "Communication Manager is null");
         try {
-            if (communicationService != null) {
-                executor = Executors.newCachedThreadPool();
-                taskExecutors = new ExpiringCache<UUID, ExecutorService>(executor);
-                taskMediator = new TaskMediator(communicationService, executor);
-                communicationService.addListener(this);
-                LOG.info(TaskRunner.MODULE_NAME + " started");
-            } else {
-                throw new Exception("Missing CommunicationManager service");
-            }
+            executor = Executors.newCachedThreadPool();
+            taskExecutors = new ExpiringCache<UUID, ExecutorService>(executor);
+            taskMediator = new TaskMediator(communicationService, executor);
+            communicationService.addListener(this);
+            LOG.info(TaskRunner.MODULE_NAME + " started");
 
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error in init", e);
@@ -251,7 +249,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * hour maximum and them times out. Calling party should examine the
      * supplied task to see its status after this method returns.
      *
-     * @param task     - task to execute
+     * @param task - task to execute
      * @param callback - task callback
      */
     @Override
@@ -278,7 +276,7 @@ public class TaskRunnerImpl implements ResponseListener, TaskRunner {
      * hour maximum and them times out. Calling party should examine the
      * supplied task to see its status after this method returns.
      *
-     * @param task     - task to execute
+     * @param task - task to execute
      * @param callback - task callback
      */
     @Override

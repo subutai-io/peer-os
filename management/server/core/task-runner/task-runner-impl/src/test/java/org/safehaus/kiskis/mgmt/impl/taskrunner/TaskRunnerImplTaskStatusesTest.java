@@ -71,7 +71,7 @@ public class TaskRunnerImplTaskStatusesTest {
     @Before
     public void setUp() {
         taskrunner = new TaskRunnerImpl();
-        ((TaskRunnerImpl) taskrunner).setCommunicationService(new CommunicationManagerMock());
+        ((TaskRunnerImpl) taskrunner).setCommunicationService(new CommunicationManagerStub());
         ((TaskRunnerImpl) taskrunner).init();
     }
 
@@ -112,7 +112,6 @@ public class TaskRunnerImplTaskStatusesTest {
     @Test(expected = RuntimeException.class)
     public void testExecuteEmptyTaskSync() {
         taskrunner.executeTaskNWait(new Task());
-        ;
     }
 
     @Test(expected = RuntimeException.class)
@@ -391,9 +390,6 @@ public class TaskRunnerImplTaskStatusesTest {
         //wait till background thread processes response
         Thread.sleep(10);
 
-        //complete the task
-//        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
-
         //wait till background thread processes response
         Thread.sleep(10);
 
@@ -433,9 +429,6 @@ public class TaskRunnerImplTaskStatusesTest {
 
         //wait till background thread processes response
         Thread.sleep(10);
-
-        //complete the task
-//        ((ResponseListener) taskrunner).onResponse(getDummyResponse(ResponseType.EXECUTE_RESPONSE_DONE, 1, task));
 
         //wait till background thread processes response
         Thread.sleep(10);
