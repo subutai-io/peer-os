@@ -2,10 +2,7 @@ package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.*;
 
 /**
  * Created by daralbaev on 12.04.14.
@@ -13,6 +10,7 @@ import com.vaadin.ui.Panel;
 public class Manager extends Panel {
     private HorizontalLayout horizontalLayout;
     private Label indicator;
+    private Button refreshButton;
     private HadoopTable table;
 
     public Manager() {
@@ -23,26 +21,28 @@ public class Manager extends Panel {
         horizontalLayout.setSpacing(true);
 
         horizontalLayout.addComponent(getButtonRefresh());
+        horizontalLayout.setComponentAlignment(refreshButton, Alignment.MIDDLE_LEFT);
         horizontalLayout.addComponent(getIndicator());
+        horizontalLayout.setComponentAlignment(indicator, Alignment.MIDDLE_LEFT);
 
         addComponent(horizontalLayout);
         addComponent(getHadoopTable());
     }
 
     private Button getButtonRefresh() {
-        Button button = new Button("Refresh");
-        button.addListener(new Button.ClickListener() {
+        refreshButton = new Button("Refresh");
+        refreshButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 table.refreshDataSource();
             }
         });
 
-        return button;
+        return refreshButton;
     }
 
     private Label getIndicator() {
-        indicator = new Label();
+        indicator = new Label("Label");
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
         indicator.setContentMode(Label.CONTENT_XHTML);
         indicator.setHeight(11, Sizeable.UNITS_PIXELS);
