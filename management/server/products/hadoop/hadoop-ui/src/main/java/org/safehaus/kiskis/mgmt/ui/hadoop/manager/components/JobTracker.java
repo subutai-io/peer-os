@@ -46,7 +46,7 @@ public class JobTracker extends ClusterNode {
     @Override
     protected void getStatus(UUID trackID) {
         setLoading(true);
-        for (SlaveNode slaveNode : slaveNodes) {
+        for (ClusterNode slaveNode : slaveNodes) {
             slaveNode.setLoading(true);
         }
 
@@ -65,7 +65,7 @@ public class JobTracker extends ClusterNode {
                     restartButton.setEnabled(isRunning);
                     stopButton.setEnabled(isRunning);
 
-                    for (SlaveNode slaveNode : slaveNodes) {
+                    for (ClusterNode slaveNode : slaveNodes) {
                         slaveNode.getStatus(null);
                     }
 
