@@ -30,7 +30,7 @@ public class Manager extends Panel {
     }
 
     private Button getButtonRefresh() {
-        Button button = new Button("Refresh Hadoop Cluster Table");
+        Button button = new Button("Refresh");
         button.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
