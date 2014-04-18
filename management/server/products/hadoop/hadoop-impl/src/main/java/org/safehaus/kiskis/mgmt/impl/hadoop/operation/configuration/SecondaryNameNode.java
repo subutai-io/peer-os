@@ -49,7 +49,7 @@ public class SecondaryNameNode {
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {
                     Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut().contains("NameNode")) {
+                    if (result.getStdOut() != null && result.getStdOut().contains("NameNode")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {

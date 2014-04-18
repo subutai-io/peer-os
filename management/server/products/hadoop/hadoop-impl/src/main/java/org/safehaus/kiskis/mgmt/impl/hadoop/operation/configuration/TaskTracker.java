@@ -27,15 +27,11 @@ public class TaskTracker {
 
         final ProductOperation po
                 = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Getting status of clusters %s TaskTracker", config.getClusterName()));
+                String.format("Getting status of clusters %s TaskTracker", agent.getHostname()));
 
         parent.getExecutor().execute(new Runnable() {
 
             public void run() {
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
-                    return;
-                }
 
                 final Agent node = parent.getAgentManager().getAgentByHostname(agent.getHostname());
                 if (node == null) {
@@ -43,13 +39,13 @@ public class TaskTracker {
                     return;
                 }
 
-                Task task = Tasks.getNameNodeCommandTask(agent, "status");
+                Task task = Tasks.getJobTrackerCommand(agent, "status");
                 parent.getTaskRunner().executeTaskNWait(task);
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {
                     Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut().contains("TaskTracker")) {
+                    if (result.getStdOut() != null && result.getStdOut().contains("TaskTracker")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {
@@ -67,8 +63,7 @@ public class TaskTracker {
                 }
 
                 if (NodeState.UNKNOWN.equals(nodeState)) {
-                    po.addLogFailed(String.format("Failed to check status of %s, %s",
-                            config.getClusterName(),
+                    po.addLogFailed(String.format("Failed to check status of %s",
                             agent.getHostname()
                     ));
                 } else {

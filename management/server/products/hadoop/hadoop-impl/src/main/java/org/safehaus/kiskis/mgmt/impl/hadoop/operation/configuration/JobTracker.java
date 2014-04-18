@@ -156,7 +156,7 @@ public class JobTracker {
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (task.isCompleted()) {
                     Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut().contains("JobTracker")) {
+                    if (result.getStdOut() != null && result.getStdOut().contains("JobTracker")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {
