@@ -10,9 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -31,9 +29,6 @@ public class LxcManagerImplTest {
 
     private final static LxcManager lxcManager = new LxcManagerImpl();
 
-    public LxcManagerImplTest() {
-    }
-
     @BeforeClass
     public static void setUpClass() {
         ((LxcManagerImpl) lxcManager).setAgentManager(new AgentManagerFake());
@@ -45,14 +40,6 @@ public class LxcManagerImplTest {
     @AfterClass
     public static void tearDownClass() {
         ((LxcManagerImpl) lxcManager).destroy();
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
     }
 
     @Test
