@@ -23,22 +23,10 @@ import static org.junit.Assert.*;
  */
 public class CommunicationManagerImplTest {
 
-    private CommunicationManagerImpl communicationManagerImpl = null;
-
-    public CommunicationManagerImplTest() {
-    }
+    private static CommunicationManagerImpl communicationManagerImpl = null;
 
     @BeforeClass
     public static void setUpClass() {
-
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
         communicationManagerImpl = new CommunicationManagerImpl();
         communicationManagerImpl.setAmqBindAddress("0.0.0.0");
         communicationManagerImpl.setAmqPort(61616);
@@ -52,11 +40,9 @@ public class CommunicationManagerImplTest {
         communicationManagerImpl.init();
     }
 
-    @After
-    public void tearDown() {
-        if (communicationManagerImpl != null) {
-            communicationManagerImpl.destroy();
-        }
+    @AfterClass
+    public static void tearDownClass() {
+        communicationManagerImpl.destroy();
     }
 
     @Test
@@ -67,30 +53,23 @@ public class CommunicationManagerImplTest {
 
     @Test
     public void testAddListener() {
+        ResponseListener listener = TestUtils.getResponseListener();
 
-        communicationManagerImpl.addListener(new ResponseListener() {
+        communicationManagerImpl.addListener(listener);
 
-            public void onResponse(Response response) {
+        assertTrue(communicationManagerImpl.getListeners().contains(listener));
 
-            }
-        });
-
-        assertFalse(communicationManagerImpl.getListeners().isEmpty());
     }
 
     @Test
     public void testRemoveListener() {
-        ResponseListener listener = new ResponseListener() {
+        ResponseListener listener = TestUtils.getResponseListener();
 
-            public void onResponse(Response response) {
-
-            }
-        };
         communicationManagerImpl.addListener(listener);
 
         communicationManagerImpl.removeListener(listener);
 
-        assertTrue(communicationManagerImpl.getListeners().isEmpty());
+        assertFalse(communicationManagerImpl.getListeners().contains(listener));
     }
 
     @Test

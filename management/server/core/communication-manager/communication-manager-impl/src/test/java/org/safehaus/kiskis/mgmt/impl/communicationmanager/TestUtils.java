@@ -5,8 +5,10 @@
  */
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
@@ -33,5 +35,16 @@ public class TestUtils {
                 null, //                        arg
                 null, //                        env vars
                 30); //  
+    }
+
+    public static ResponseListener getResponseListener() {
+        ResponseListener listener = new ResponseListener() {
+
+            public void onResponse(Response response) {
+
+            }
+        };
+
+        return listener;
     }
 }

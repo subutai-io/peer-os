@@ -8,9 +8,7 @@ package org.safehaus.kiskis.mgmt.impl.agentmanager;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
@@ -31,17 +29,6 @@ public class AgentManagerImplTest {
     private AgentManager agentManager;
     private CommunicationManagerSpy communicationManager;
 
-    public AgentManagerImplTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
     @Before
     public void setUp() {
         agentManager = new AgentManagerImpl();
@@ -61,7 +48,7 @@ public class AgentManagerImplTest {
     }
 
     @Test
-    public void testUnRegistrationFRomCommunication() {
+    public void testUnRegistrationFfomCommunication() {
         ((AgentManagerImpl) agentManager).destroy();
         assertTrue(communicationManager.isIsListenerRemoved());
     }
