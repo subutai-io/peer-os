@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
+import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -39,6 +40,9 @@ public class LxcManagerImpl implements LxcManager {
     private Monitor monitor;
 
     public void init() {
+        Preconditions.checkNotNull(agentManager, "Agent manager is null");
+        Preconditions.checkNotNull(taskRunner, "Task runner is null");
+
         executor = Executors.newCachedThreadPool();
     }
 
