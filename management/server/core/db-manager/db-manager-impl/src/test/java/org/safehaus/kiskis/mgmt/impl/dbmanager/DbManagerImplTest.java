@@ -61,46 +61,6 @@ public class DbManagerImplTest {
         dbManager.deleteInfo(source, key);
     }
 
-    private static class MyPojo {
-
-        private String content;
-
-        public MyPojo(String test) {
-            this.content = test;
-        }
-
-        public String getTest() {
-            return content;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 5;
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final MyPojo other = (MyPojo) obj;
-            if ((this.content == null) ? (other.content != null) : !this.content.equals(other.content)) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return "MyPojo{" + "content=" + content + '}';
-        }
-
-    }
-
     @Test
     public void testSaveInfo() {
         assertTrue(dbManager.saveInfo(source, key, new MyPojo(content)));
@@ -153,7 +113,7 @@ public class DbManagerImplTest {
 
         MyPojo myPojo3 = dbManager.getInfo(source, key, MyPojo.class);
 
-        assertEquals(myPojo2.content, myPojo3.content);
+        assertEquals(myPojo2.getContent(), myPojo3.getContent());
     }
 
     @Test
