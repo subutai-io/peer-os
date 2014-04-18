@@ -24,16 +24,14 @@ public class Result {
     }
 
     /**
-     * @return - cumulated last 10000 symbols of std out, if all std out is more
-     * than 10000, only last 10000 is returned
+     * @return - cumulated std out
      */
     public String getStdOut() {
         return stdOut;
     }
 
     /**
-     * @return - cumulated last 10000 symbols of std err, if all std err is more
-     * than 10000, only last 10000 is returned
+     * @return - cumulated std err
      */
     public String getStdErr() {
         return stdErr;

@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 /**
  * @author dilshat
  */
-public class CommunicationManagerMock implements CommunicationManager {
+public class CommunicationManagerStub implements CommunicationManager {
 
     public void sendRequest(Request request) {
 

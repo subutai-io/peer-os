@@ -8,11 +8,8 @@ package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import javax.jms.*;
 import java.util.UUID;
@@ -26,22 +23,10 @@ import static org.junit.Assert.*;
  */
 public class CommunicationManagerImplTest {
 
-    private CommunicationManagerImpl communicationManagerImpl = null;
-
-    public CommunicationManagerImplTest() {
-    }
+    private static CommunicationManagerImpl communicationManagerImpl = null;
 
     @BeforeClass
     public static void setUpClass() {
-
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
         communicationManagerImpl = new CommunicationManagerImpl();
         communicationManagerImpl.setAmqBindAddress("0.0.0.0");
         communicationManagerImpl.setAmqPort(61616);
@@ -55,64 +40,36 @@ public class CommunicationManagerImplTest {
         communicationManagerImpl.init();
     }
 
-    @After
-    public void tearDown() {
-        if (communicationManagerImpl != null) {
-            communicationManagerImpl.destroy();
-        }
+    @AfterClass
+    public static void tearDownClass() {
+        communicationManagerImpl.destroy();
     }
 
     @Test
     public void testInit() {
 
-        assertTrue(communicationManagerImpl.broker.isStarted());
+        assertTrue(communicationManagerImpl.isBrokerStarted());
     }
 
     @Test
     public void testAddListener() {
+        ResponseListener listener = TestUtils.getResponseListener();
 
-        communicationManagerImpl.addListener(new ResponseListener() {
+        communicationManagerImpl.addListener(listener);
 
-            public void onResponse(Response response) {
+        assertTrue(communicationManagerImpl.getListeners().contains(listener));
 
-            }
-        });
-
-        assertFalse(communicationManagerImpl.communicationMessageListener.getListeners().isEmpty());
     }
 
     @Test
     public void testRemoveListener() {
-        ResponseListener listener = new ResponseListener() {
+        ResponseListener listener = TestUtils.getResponseListener();
 
-            public void onResponse(Response response) {
-
-            }
-        };
         communicationManagerImpl.addListener(listener);
 
         communicationManagerImpl.removeListener(listener);
 
-        assertTrue(communicationManagerImpl.communicationMessageListener.getListeners().isEmpty());
-    }
-
-    public static Request getRequestTemplate() {
-        return CommandFactory.newRequest(
-                RequestType.EXECUTE_REQUEST, // type
-                null, //                        !! agent uuid
-                null, //                        source
-                null, //                        !! task uuid 
-                1, //                           !! request sequence number
-                "/", //                         cwd
-                "pwd", //                        program
-                OutputRedirection.RETURN, //    std output redirection 
-                OutputRedirection.RETURN, //    std error redirection
-                null, //                        stdout capture file path
-                null, //                        stderr capture file path
-                "root", //                      runas
-                null, //                        arg
-                null, //                        env vars
-                30); //  
+        assertFalse(communicationManagerImpl.getListeners().contains(listener));
     }
 
     @Test
@@ -120,13 +77,13 @@ public class CommunicationManagerImplTest {
         Connection connection = null;
         UUID uuid = UUID.randomUUID();
         //setup listener
-        connection = communicationManagerImpl.pooledConnectionFactory.createConnection();
+        connection = communicationManagerImpl.createConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination testQueue = session.createQueue(uuid.toString());
         MessageConsumer consumer = session.createConsumer(testQueue);
 
-        Request request = getRequestTemplate();
+        Request request = TestUtils.getRequestTemplate();
 
         request.setUuid(uuid);
 
@@ -165,7 +122,7 @@ public class CommunicationManagerImplTest {
         UUID uuid = UUID.randomUUID();
         //setup listener
 
-        connection = communicationManagerImpl.pooledConnectionFactory.createConnection();
+        connection = communicationManagerImpl.createConnection();
         connection.start();
         final Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination testQueue = session.createQueue("SERVICE_QUEUE");

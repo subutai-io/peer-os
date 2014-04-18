@@ -76,32 +76,4 @@ public interface AgentManager {
      */
     public void removeListener(AgentListener listener);
 
-    /**
-     * Returns physical agent by its node's hostname from DB or null if agent is
-     * not connected
-     *
-     * @param hostname - hostname of agent's node
-     * @return agent
-     */
-    @Deprecated
-    public Agent getPhysicalAgentByHostnameFromDB(String hostname);
-
-    /**
-     * Returns lxc agent by its node's hostname from DB or null if agent is not
-     * connected
-     *
-     * @param hostname - hostname of agent's node
-     * @return agent
-     */
-    @Deprecated
-    public Agent getLxcAgentByHostnameFromDB(String hostname);
-
-    /**
-     * Returns agent by its UUIDe from DB or null if agent is not connected
-     *
-     * @param hostname - UUID of agent's node
-     * @return agent
-     */
-    @Deprecated
-    public Agent getAgentByUUIDFromDB(UUID uuid);
 }

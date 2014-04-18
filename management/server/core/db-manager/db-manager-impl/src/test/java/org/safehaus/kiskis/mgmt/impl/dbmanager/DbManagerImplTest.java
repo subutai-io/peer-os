@@ -13,10 +13,8 @@ import java.util.List;
 import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Rule;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -39,66 +37,14 @@ public class DbManagerImplTest {
     private final String key = "key";
     private final String content = "content";
 
-    public DbManagerImplTest() {
-
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
     @Before
     public void setUp() {
-        ((DbManagerImpl) dbManager).setTestSession(cassandraCQLUnit.session);
+        ((DbManagerImpl) dbManager).setSession(cassandraCQLUnit.session);
     }
 
     @After
     public void tearDown() {
         dbManager.deleteInfo(source, key);
-    }
-
-    private static class MyPojo {
-
-        private String content;
-
-        public MyPojo(String test) {
-            this.content = test;
-        }
-
-        public String getTest() {
-            return content;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 5;
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final MyPojo other = (MyPojo) obj;
-            if ((this.content == null) ? (other.content != null) : !this.content.equals(other.content)) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return "MyPojo{" + "content=" + content + '}';
-        }
-
     }
 
     @Test
@@ -153,7 +99,7 @@ public class DbManagerImplTest {
 
         MyPojo myPojo3 = dbManager.getInfo(source, key, MyPojo.class);
 
-        assertEquals(myPojo2.content, myPojo3.content);
+        assertEquals(myPojo2.getContent(), myPojo3.getContent());
     }
 
     @Test

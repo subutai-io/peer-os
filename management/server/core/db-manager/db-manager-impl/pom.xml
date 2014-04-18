@@ -98,6 +98,11 @@
             <version>2.0.2.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${com.google.guava.version}</version>
+        </dependency>        
     </dependencies>
 
     <build>
