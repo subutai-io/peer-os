@@ -69,13 +69,19 @@ public class HadoopTable extends TreeTable {
 
             public Action[] getActions(Object target, Object sender) {
 
-                if (target != null && areChildrenAllowed(target)) {
+                if (target != null) {
                     Item row = getItem(target);
-                    if (!Strings.isNullOrEmpty((String) row.getItemProperty(DOMAIN_NAME_PROPERTY).getValue())) {
-                        return new Action[]{UNINSTALL_ITEM_ACTION, ADD_ITEM_ACTION};
-                    } else if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
-                            row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
-                        return new Action[]{REMOVE_ITEM_ACTION};
+                    if (areChildrenAllowed(target)) {
+                        if (!Strings.isNullOrEmpty((String) row.getItemProperty(DOMAIN_NAME_PROPERTY).getValue())) {
+                            return new Action[]{UNINSTALL_ITEM_ACTION, ADD_ITEM_ACTION};
+                        }
+                    }
+
+                    if (!areChildrenAllowed(target)) {
+                        if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
+                                row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
+                            return new Action[]{REMOVE_ITEM_ACTION};
+                        }
                     }
                 }
 
@@ -105,12 +111,14 @@ public class HadoopTable extends TreeTable {
         for (Config cluster : list) {
             NameNode nameNode = new NameNode(cluster);
             JobTracker jobTracker = new JobTracker(cluster);
+            SecondaryNameNode secondaryNameNode = new SecondaryNameNode(cluster);
+            nameNode.addSlaveNode(secondaryNameNode);
 
             Object rowId = addItem(new Object[]{
                             cluster.getClusterName(),
                             cluster.getDomainName(),
                             nameNode,
-                            new SecondaryNameNode(cluster),
+                            secondaryNameNode,
                             jobTracker,
                             cluster.getReplicationFactor()},
                     null
