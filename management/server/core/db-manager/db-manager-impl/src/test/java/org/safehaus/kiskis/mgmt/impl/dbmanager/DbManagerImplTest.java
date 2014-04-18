@@ -13,10 +13,8 @@ import java.util.List;
 import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Rule;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
@@ -38,18 +36,6 @@ public class DbManagerImplTest {
     private final String source = "source";
     private final String key = "key";
     private final String content = "content";
-
-    public DbManagerImplTest() {
-
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
 
     @Before
     public void setUp() {
