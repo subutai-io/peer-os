@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 
 /**
  * This is an implementation of LxcManager
@@ -42,6 +43,7 @@ public class LxcManagerImpl implements LxcManager {
     public void init() {
         Preconditions.checkNotNull(agentManager, "Agent manager is null");
         Preconditions.checkNotNull(taskRunner, "Task runner is null");
+        Preconditions.checkNotNull(monitor, "Monitor is null");
 
         executor = Executors.newCachedThreadPool();
     }
@@ -83,114 +85,103 @@ public class LxcManagerImpl implements LxcManager {
 
             Task getMetricsTask = Tasks.getMetricsTask(agents);
 
-            taskRunner.executeTaskNWait(getMetricsTask, new TaskCallback() {
-                private final Map<UUID, String> stdOuts = new HashMap<UUID, String>();
+            taskRunner.executeTaskNWait(getMetricsTask);
 
-                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                    if (Util.isFinalResponse(response)) {
-                        stdOuts.put(response.getUuid(), stdOut);
-                    }
-
-                    if (task.isCompleted()) {
-
-                        for (Map.Entry<UUID, String> out : stdOuts.entrySet()) {
-                            String[] metrics = out.getValue().split("\n");
-                            int freeRamMb = 0;
-                            int freeHddMb = 0;
-                            int numOfProc = 0;
-                            double loadAvg = 0;
-                            double cpuLoadPercent = 100;
-                            boolean serverOK = false;
-                            if (metrics.length == 4) {
-                                int line = 0;
-                                for (String metric : metrics) {
-                                    line++;
-                                    if (line == 1) {
-                                        //   -/+ buffers/cache:       1829       5810
-                                        String[] ramMetric = metric.split("\\s+");
-                                        String freeRamMbStr = ramMetric[ramMetric.length - 1];
-                                        if (Util.isNumeric(freeRamMbStr)) {
-                                            freeRamMb = Integer.parseInt(freeRamMbStr);
-                                        } else {
-                                            break;
-                                        }
-                                    } else if (line == 2) {
-                                        //   /dev/sda1       449G  3.8G  422G   1% /
-                                        String[] hddMetric = metric.split("\\s+");
-                                        if (hddMetric.length == 6) {
-                                            String hddMetricKbStr = hddMetric[3];
-                                            if (Util.isNumeric(hddMetricKbStr)) {
-                                                freeHddMb = Integer.parseInt(hddMetricKbStr) / 1024;
-                                            } else {
-                                                break;
-                                            }
-                                        } else {
-                                            break;
-                                        }
-                                    } else if (line == 3) {
-                                        //    15:10:33 up 18:51,  0 users,  load average: 0.03, 0.08, 0.06
-
-                                        Matcher m = p.matcher(metric);
-                                        if (m.find()) {
-                                            String[] loads = m.group(1).split(",");
-                                            if (loads.length == 3) {
-                                                if (Util.isNumeric(loads[0]) && Util.isNumeric(loads[1]) && Util.isNumeric(loads[2])) {
-                                                    loadAvg = (Double.parseDouble(loads[0]) + Double.parseDouble(loads[1]) + Double.parseDouble(loads[2])) / 3;
-                                                } else {
-                                                    break;
-                                                }
-                                            } else {
-                                                break;
-                                            }
-                                        } else {
-                                            break;
-                                        }
-                                    } else if (line == 4) {
-                                        if (Util.isNumeric(metric)) {
-                                            numOfProc = Integer.parseInt(metric);
-                                            if (numOfProc > 0) {
-                                                cpuLoadPercent = (loadAvg / numOfProc) * 100;
-                                                serverOK = true;
-                                            } else {
-                                                break;
-                                            }
-                                        } else {
-                                            break;
-                                        }
-                                    }
+            if (getMetricsTask.isCompleted()) {
+                for (Map.Entry<UUID, Result> resultEntry : getMetricsTask.getResults().entrySet()) {
+                    String[] metrics = resultEntry.getValue().getStdOut().split("\n");
+                    int freeRamMb = 0;
+                    int freeHddMb = 0;
+                    int numOfProc = 0;
+                    double loadAvg = 0;
+                    double cpuLoadPercent = 100;
+                    boolean serverOK = false;
+                    if (metrics.length == 4) {
+                        int line = 0;
+                        for (String metric : metrics) {
+                            line++;
+                            if (line == 1) {
+                                //   -/+ buffers/cache:       1829       5810
+                                String[] ramMetric = metric.split("\\s+");
+                                String freeRamMbStr = ramMetric[ramMetric.length - 1];
+                                if (Util.isNumeric(freeRamMbStr)) {
+                                    freeRamMb = Integer.parseInt(freeRamMbStr);
+                                } else {
+                                    break;
                                 }
-                            }
-                            if (serverOK) {
-                                //get metrics from elastic search for a one week period
-                                Agent agent = agentManager.getAgentByUUID(out.getKey());
-                                if (agent != null) {
-                                    Calendar cal = Calendar.getInstance();
-                                    cal.add(Calendar.DATE, -7);
-                                    Date startDate = cal.getTime();
-                                    Date endDate = Calendar.getInstance().getTime();
-                                    Map<Metric, Double> averageMetrics = new EnumMap<Metric, Double>(Metric.class);
-                                    for (Metric metricKey : Metric.values()) {
-                                        Map<Date, Double> metricMap = monitor.getData(agent.getHostname(), metricKey, startDate, endDate);
-                                        if (!metricMap.isEmpty()) {
-                                            double avg = 0;
-                                            for (Map.Entry<Date, Double> metricEntry : metricMap.entrySet()) {
-                                                avg += metricEntry.getValue();
-                                            }
-                                            avg /= metricMap.size();
-
-                                            averageMetrics.put(metricKey, avg);
-                                        }
+                            } else if (line == 2) {
+                                //   /dev/sda1       449G  3.8G  422G   1% /
+                                String[] hddMetric = metric.split("\\s+");
+                                if (hddMetric.length == 6) {
+                                    String hddMetricKbStr = hddMetric[3];
+                                    if (Util.isNumeric(hddMetricKbStr)) {
+                                        freeHddMb = Integer.parseInt(hddMetricKbStr) / 1024;
+                                    } else {
+                                        break;
                                     }
-                                    ServerMetric serverMetric = new ServerMetric(freeHddMb, freeRamMb, (int) cpuLoadPercent, numOfProc, averageMetrics);
-                                    serverMetrics.put(agent, serverMetric);
+                                } else {
+                                    break;
+                                }
+                            } else if (line == 3) {
+                                //    15:10:33 up 18:51,  0 users,  load average: 0.03, 0.08, 0.06
+
+                                Matcher m = p.matcher(metric);
+                                if (m.find()) {
+                                    String[] loads = m.group(1).split(",");
+                                    if (loads.length == 3) {
+                                        if (Util.isNumeric(loads[0]) && Util.isNumeric(loads[1]) && Util.isNumeric(loads[2])) {
+                                            loadAvg = (Double.parseDouble(loads[0]) + Double.parseDouble(loads[1]) + Double.parseDouble(loads[2])) / 3;
+                                        } else {
+                                            break;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                } else {
+                                    break;
+                                }
+                            } else if (line == 4) {
+                                if (Util.isNumeric(metric)) {
+                                    numOfProc = Integer.parseInt(metric);
+                                    if (numOfProc > 0) {
+                                        cpuLoadPercent = (loadAvg / numOfProc) * 100;
+                                        serverOK = true;
+                                    } else {
+                                        break;
+                                    }
+                                } else {
+                                    break;
                                 }
                             }
                         }
-
                     }
-                    return null;
+                    if (serverOK) {
+                        //get metrics from elastic search for a one week period
+                        Agent agent = agentManager.getAgentByUUID(resultEntry.getKey());
+                        if (agent != null) {
+                            Calendar cal = Calendar.getInstance();
+                            cal.add(Calendar.DATE, -7);
+                            Date startDate = cal.getTime();
+                            Date endDate = Calendar.getInstance().getTime();
+                            Map<Metric, Double> averageMetrics = new EnumMap<Metric, Double>(Metric.class);
+                            for (Metric metricKey : Metric.values()) {
+                                Map<Date, Double> metricMap = monitor.getData(agent.getHostname(), metricKey, startDate, endDate);
+                                if (!metricMap.isEmpty()) {
+                                    double avg = 0;
+                                    for (Map.Entry<Date, Double> metricEntry : metricMap.entrySet()) {
+                                        avg += metricEntry.getValue();
+                                    }
+                                    avg /= metricMap.size();
+
+                                    averageMetrics.put(metricKey, avg);
+                                }
+                            }
+                            ServerMetric serverMetric = new ServerMetric(freeHddMb, freeRamMb, (int) cpuLoadPercent, numOfProc, averageMetrics);
+                            serverMetrics.put(agent, serverMetric);
+                        }
+                    }
                 }
-            });
+            }
 
             if (!serverMetrics.isEmpty()) {
                 //get number of lxcs currently present on servers
@@ -257,53 +248,41 @@ public class LxcManagerImpl implements LxcManager {
 
             Task getLxcListTask = Tasks.getLxcListTask(pAgents);
 
-            taskRunner.executeTaskNWait(getLxcListTask, new TaskCallback() {
-                private final Map<UUID, String> lxcMap = new HashMap<UUID, String>();
+            taskRunner.executeTaskNWait(getLxcListTask);
 
-                @Override
-                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                    if (Util.isFinalResponse(response)) {
-                        lxcMap.put(response.getUuid(), stdOut);
-                    }
-
-                    if (task.isCompleted()) {
-                        for (Map.Entry<UUID, String> parentEntry : lxcMap.entrySet()) {
-                            Agent agent = agentManager.getAgentByUUID(parentEntry.getKey());
-                            String parentHostname = agent == null
-                                    ? String.format("Offline[%s]", parentEntry.getKey()) : agent.getHostname();
-                            EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
-                            String[] lxcStrs = parentEntry.getValue().split("\\n");
-                            LxcState currState = null;
-                            for (String lxcStr : lxcStrs) {
-                                if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
-                                    if (lxcs.get(LxcState.RUNNING) == null) {
-                                        lxcs.put(LxcState.RUNNING, new ArrayList<String>());
-                                    }
-                                    currState = LxcState.RUNNING;
-                                } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
-                                    if (lxcs.get(LxcState.STOPPED) == null) {
-                                        lxcs.put(LxcState.STOPPED, new ArrayList<String>());
-                                    }
-                                    currState = LxcState.STOPPED;
-                                } else if (LxcState.FROZEN.name().equalsIgnoreCase(lxcStr)) {
-                                    if (lxcs.get(LxcState.FROZEN) == null) {
-                                        lxcs.put(LxcState.FROZEN, new ArrayList<String>());
-                                    }
-                                    currState = LxcState.FROZEN;
-                                } else if (currState != null
-                                        && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                                    lxcs.get(currState).add(lxcStr);
-                                }
+            if (getLxcListTask.isCompleted()) {
+                for (Map.Entry<UUID, Result> resultEntry : getLxcListTask.getResults().entrySet()) {
+                    Agent agent = agentManager.getAgentByUUID(resultEntry.getKey());
+                    String parentHostname = agent == null
+                            ? String.format("Offline[%s]", resultEntry.getKey()) : agent.getHostname();
+                    EnumMap<LxcState, List<String>> lxcs = new EnumMap<LxcState, List<String>>(LxcState.class);
+                    String[] lxcStrs = resultEntry.getValue().getStdOut().split("\\n");
+                    LxcState currState = null;
+                    for (String lxcStr : lxcStrs) {
+                        if (LxcState.RUNNING.name().equalsIgnoreCase(lxcStr)) {
+                            if (lxcs.get(LxcState.RUNNING) == null) {
+                                lxcs.put(LxcState.RUNNING, new ArrayList<String>());
                             }
-                            agentFamilies.put(parentHostname, lxcs);
+                            currState = LxcState.RUNNING;
+                        } else if (LxcState.STOPPED.name().equalsIgnoreCase(lxcStr)) {
+                            if (lxcs.get(LxcState.STOPPED) == null) {
+                                lxcs.put(LxcState.STOPPED, new ArrayList<String>());
+                            }
+                            currState = LxcState.STOPPED;
+                        } else if (LxcState.FROZEN.name().equalsIgnoreCase(lxcStr)) {
+                            if (lxcs.get(LxcState.FROZEN) == null) {
+                                lxcs.put(LxcState.FROZEN, new ArrayList<String>());
+                            }
+                            currState = LxcState.FROZEN;
+                        } else if (currState != null
+                                && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                            lxcs.get(currState).add(lxcStr.trim());
                         }
                     }
 
-                    return null;
+                    agentFamilies.put(parentHostname, lxcs);
                 }
-            });
-
+            }
         }
 
         return agentFamilies;

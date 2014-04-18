@@ -79,4 +79,9 @@ public class ServerMetric {
         this.numOfLxcs = numOfLxcs;
     }
 
+    @Override
+    public String toString() {
+        return "ServerMetric{" + "freeHddMb=" + freeHddMb + ", freeRamMb=" + freeRamMb + ", cpuLoadPercent=" + cpuLoadPercent + ", numOfProcessors=" + numOfProcessors + ", numOfLxcs=" + numOfLxcs + ", averageMetrics=" + averageMetrics + '}';
+    }
+
 }
