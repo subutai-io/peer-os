@@ -22,8 +22,8 @@ public abstract class LxcPlacementStrategy {
     private final Map<Agent, Map<String, Integer>> placementInfoMap = new HashMap<Agent, Map<String, Integer>>();
 
     /**
-     * Optional method to implement if placement uses simple logic to calculate
-     * lxc slots on a physical server
+     * Optional method to implement for calculating total number of lxc slots
+     * each physical server can accommodate
      *
      * @param serverMetrics
      * @return map where key is a physical agent and value is a number of lxcs

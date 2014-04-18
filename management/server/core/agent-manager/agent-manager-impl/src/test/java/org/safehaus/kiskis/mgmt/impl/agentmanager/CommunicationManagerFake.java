@@ -13,7 +13,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Request;
  *
  * @author dilshat
  */
-public class CommunicationManagerMock implements CommunicationManager {
+public class CommunicationManagerFake implements CommunicationManager {
 
     private Request request;
     private boolean isListenerAdded;

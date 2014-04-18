@@ -16,9 +16,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
@@ -32,7 +30,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 public class AgentManagerImplTest {
 
     private AgentManager agentManager;
-    CommunicationManagerMock communicationManagerMock;
+    private CommunicationManagerFake communicationManager;
 
     public AgentManagerImplTest() {
     }
@@ -48,9 +46,8 @@ public class AgentManagerImplTest {
     @Before
     public void setUp() {
         agentManager = new AgentManagerImpl();
-        communicationManagerMock = new CommunicationManagerMock();
-        ((AgentManagerImpl) agentManager).setCommunicationService(communicationManagerMock);
-        ((AgentManagerImpl) agentManager).setDbManagerService(new DbManagerMock());
+        communicationManager = new CommunicationManagerFake();
+        ((AgentManagerImpl) agentManager).setCommunicationService(communicationManager);
         ((AgentManagerImpl) agentManager).init();
     }
 
@@ -71,13 +68,13 @@ public class AgentManagerImplTest {
 
     @Test
     public void testRegistrationWithCommunication() {
-        assertTrue(communicationManagerMock.isIsListenerAdded());
+        assertTrue(communicationManager.isIsListenerAdded());
     }
 
     @Test
     public void testUnRegistrationFRomCommunication() {
         ((AgentManagerImpl) agentManager).destroy();
-        assertTrue(communicationManagerMock.isIsListenerRemoved());
+        assertTrue(communicationManager.isIsListenerRemoved());
     }
 
     @Test
@@ -184,7 +181,7 @@ public class AgentManagerImplTest {
         UUID uuid = UUID.randomUUID();
         Response response = getRegistrationRequestResponse(uuid, true, null);
         ((ResponseListener) agentManager).onResponse(response);
-        assertEquals(RequestType.REGISTRATION_REQUEST_DONE, communicationManagerMock.getRequest().getType());
+        assertEquals(RequestType.REGISTRATION_REQUEST_DONE, communicationManager.getRequest().getType());
     }
 
     @Test
@@ -192,7 +189,7 @@ public class AgentManagerImplTest {
         UUID uuid = UUID.randomUUID();
         Response response = getRegistrationRequestResponse(uuid, true, null);
         ((ResponseListener) agentManager).onResponse(response);
-        assertEquals(uuid, communicationManagerMock.getRequest().getUuid());
+        assertEquals(uuid, communicationManager.getRequest().getUuid());
     }
 
     @Test
