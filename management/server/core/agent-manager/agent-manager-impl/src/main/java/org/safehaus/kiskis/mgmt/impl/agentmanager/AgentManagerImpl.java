@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.agentmanager;
 
+import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
@@ -177,6 +178,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      */
     public void init() {
         try {
+
+            Preconditions.checkNotNull(communicationService);
 
             agents = CacheBuilder.newBuilder().
                     expireAfterWrite(Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES).
