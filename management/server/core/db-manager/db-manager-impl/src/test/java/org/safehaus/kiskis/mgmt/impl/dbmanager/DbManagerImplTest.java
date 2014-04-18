@@ -53,7 +53,7 @@ public class DbManagerImplTest {
 
     @Before
     public void setUp() {
-        ((DbManagerImpl) dbManager).setTestSession(cassandraCQLUnit.session);
+        ((DbManagerImpl) dbManager).setSession(cassandraCQLUnit.session);
     }
 
     @After

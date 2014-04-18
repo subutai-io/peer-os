@@ -180,7 +180,6 @@ public class CommunicationManagerImpl implements CommunicationManager {
      */
     public void init() {
 
-        Preconditions.checkNotNull(amqBindAddress);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(amqBindAddress), "Bind address is null or empty");
         Preconditions.checkArgument(amqBindAddress.matches(Common.HOSTNAME_REGEX), "Invalid bind address");
         Preconditions.checkArgument(amqPort >= 1024 && amqPort <= 65536, "Port must be n range 1024 and 65536");
