@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.impl.tracker;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -40,6 +41,7 @@ public class TrackerImpl implements Tracker {
     private DbManager dbManager;
 
     public void setDbManager(DbManager dbManager) {
+        Preconditions.checkNotNull(dbManager, "Db manager is null");
         this.dbManager = dbManager;
     }
 

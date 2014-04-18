@@ -68,6 +68,7 @@ public class DbManagerImpl implements DbManager {
     }
 
     public void setSession(Session session) {
+        Preconditions.checkNotNull(session, "Session is null");
         this.session = session;
     }
 
