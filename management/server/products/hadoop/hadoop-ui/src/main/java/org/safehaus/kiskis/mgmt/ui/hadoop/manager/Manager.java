@@ -47,7 +47,7 @@ public class Manager extends Panel {
         indicator.setContentMode(Label.CONTENT_XHTML);
         indicator.setHeight(11, Sizeable.UNITS_PIXELS);
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
-        indicator.setVisible(false);
+        indicator.setVisible(true);
 
         return indicator;
     }

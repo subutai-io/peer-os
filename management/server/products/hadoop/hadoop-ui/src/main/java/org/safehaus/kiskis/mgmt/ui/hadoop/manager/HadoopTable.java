@@ -33,7 +33,7 @@ public class HadoopTable extends TreeTable {
 
     private Label indicator;
 
-    public HadoopTable(String caption, Label indicator) {
+    public HadoopTable(String caption, final Label indicator) {
         this.indicator = indicator;
         setCaption(caption);
 
@@ -57,6 +57,7 @@ public class HadoopTable extends TreeTable {
                 if (action == UNINSTALL_ITEM_ACTION) {
                     Item row = getItem(target);
 
+                    indicator.setVisible(true);
                     UUID trackID = HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
                     HadoopUI.getExecutor().execute(new WaitTask(trackID, new CompleteEvent() {
 
