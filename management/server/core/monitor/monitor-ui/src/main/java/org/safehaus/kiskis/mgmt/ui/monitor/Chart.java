@@ -28,19 +28,21 @@ class Chart {
 
     private void loadScripts() {
         javaScript.loadFile("js/jquery.min.js");
-        javaScript.loadFile("js/highcharts.js");
+//        javaScript.loadFile("js/highcharts.js");
+        javaScript.loadFile("js/jquery.flot.js");
+        javaScript.loadFile("js/chart-test.js");
     }
 
     void load(String host, Metric metric, Map<Date, Double> values) {
 
-        String data = toPoints(values);
+ /*       String data = toPoints(values);
 
         String chart = CHART_TEMPLATE
                 .replace( "$mainTitle", String.format("%s for %s", metric, host) )
                 .replace( "$yTitle", metric.getUnit() )
                 .replace( "$data", data );
 
-        javaScript.execute(chart);
+        javaScript.execute(chart);*/
     }
 
     private String toPoints(Map<Date, Double> values) {
