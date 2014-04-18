@@ -20,7 +20,9 @@ import java.util.UUID;
  * Created by daralbaev on 12.04.14.
  */
 public class HadoopTable extends TreeTable {
-    private static final Action REMOVE_ITEM_ACTION = new Action("Remove cluster");
+    private static final Action UNINSTALL_ITEM_ACTION = new Action("Uninstall cluster");
+    private static final Action ADD_ITEM_ACTION = new Action("Add new node");
+    private static final Action REMOVE_ITEM_ACTION = new Action("Exclude node");
 
     public static final String CLUSTER_NAME_PROPERTY = "Cluster Name";
     public static final String DOMAIN_NAME_PROPERTY = "Domain Name";
@@ -52,7 +54,7 @@ public class HadoopTable extends TreeTable {
         addActionHandler(new Action.Handler() {
 
             public void handleAction(Action action, Object sender, Object target) {
-                if (action == REMOVE_ITEM_ACTION) {
+                if (action == UNINSTALL_ITEM_ACTION) {
                     Item row = getItem(target);
 
                     UUID trackID = HadoopUI.getHadoopManager().uninstallCluster((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
@@ -67,10 +69,19 @@ public class HadoopTable extends TreeTable {
 
             public Action[] getActions(Object target, Object sender) {
 
-                if (target != null && areChildrenAllowed(target)) {
+                if (target != null) {
                     Item row = getItem(target);
-                    if (!Strings.isNullOrEmpty((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue())) {
-                        return new Action[]{REMOVE_ITEM_ACTION};
+                    if (areChildrenAllowed(target)) {
+                        if (!Strings.isNullOrEmpty((String) row.getItemProperty(DOMAIN_NAME_PROPERTY).getValue())) {
+                            return new Action[]{UNINSTALL_ITEM_ACTION, ADD_ITEM_ACTION};
+                        }
+                    }
+
+                    if (!areChildrenAllowed(target)) {
+                        if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
+                                row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
+                            return new Action[]{REMOVE_ITEM_ACTION};
+                        }
                     }
                 }
 
@@ -100,12 +111,14 @@ public class HadoopTable extends TreeTable {
         for (Config cluster : list) {
             NameNode nameNode = new NameNode(cluster);
             JobTracker jobTracker = new JobTracker(cluster);
+            SecondaryNameNode secondaryNameNode = new SecondaryNameNode(cluster);
+            nameNode.addSlaveNode(secondaryNameNode);
 
             Object rowId = addItem(new Object[]{
                             cluster.getClusterName(),
                             cluster.getDomainName(),
                             nameNode,
-                            new SecondaryNameNode(cluster),
+                            secondaryNameNode,
                             jobTracker,
                             cluster.getReplicationFactor()},
                     null

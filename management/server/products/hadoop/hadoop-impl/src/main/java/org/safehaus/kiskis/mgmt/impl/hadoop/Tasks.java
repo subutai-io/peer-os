@@ -38,7 +38,7 @@ public class Tasks {
     public static Task getSecondaryNameNodeTask(Config cfg) {
         Task task = new Task("Set Secondary NameNode slaves");
         task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getAddSecondaryNamenodeCommand(cfg.getSecondaryNameNode()));
+        task.addRequest(Commands.getAddSecondaryNamenodeCommand(cfg.getSecondaryNameNode()), cfg.getNameNode());
         return task;
     }
 

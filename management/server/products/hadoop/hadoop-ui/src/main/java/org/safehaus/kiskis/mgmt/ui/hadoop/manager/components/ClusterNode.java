@@ -19,11 +19,11 @@ public class ClusterNode extends HorizontalLayout {
     protected Label progressIcon;
     protected Config cluster;
     protected Button startButton, stopButton, restartButton;
-    protected List<SlaveNode> slaveNodes;
+    protected List<ClusterNode> slaveNodes;
 
     public ClusterNode(Config cluster) {
         this.cluster = cluster;
-        slaveNodes = new ArrayList<SlaveNode>();
+        slaveNodes = new ArrayList<ClusterNode>();
 
         setMargin(true);
         setSpacing(true);
@@ -66,7 +66,7 @@ public class ClusterNode extends HorizontalLayout {
         return restartButton;
     }
 
-    public void addSlaveNode(SlaveNode slaveNode) {
+    public void addSlaveNode(ClusterNode slaveNode) {
         slaveNodes.add(slaveNode);
     }
 
