@@ -449,6 +449,23 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Command Runner -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>command-runner-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>command-runner-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>command-runner-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Task Runner -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
