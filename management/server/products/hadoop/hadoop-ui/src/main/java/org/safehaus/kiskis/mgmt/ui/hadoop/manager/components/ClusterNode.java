@@ -40,8 +40,8 @@ public class ClusterNode extends HorizontalLayout {
         progressIcon = new Label();
         progressIcon.setIcon(new ThemeResource("../base/common/img/loading-indicator.gif"));
         progressIcon.setContentMode(Label.CONTENT_XHTML);
-        progressIcon.setHeight(24, Sizeable.UNITS_PIXELS);
-        progressIcon.setWidth(24, Sizeable.UNITS_PIXELS);
+        progressIcon.setHeight(20, Sizeable.UNITS_PIXELS);
+        progressIcon.setWidth(20, Sizeable.UNITS_PIXELS);
         progressIcon.setVisible(false);
 
         return progressIcon;
@@ -49,24 +49,24 @@ public class ClusterNode extends HorizontalLayout {
 
     private Embedded getStartButton() {
         startButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
-        startButton.setWidth(24, Sizeable.UNITS_PIXELS);
-        startButton.setHeight(24, Sizeable.UNITS_PIXELS);
+        startButton.setWidth(20, Sizeable.UNITS_PIXELS);
+        startButton.setHeight(20, Sizeable.UNITS_PIXELS);
 
         return startButton;
     }
 
     private Embedded getStopButton() {
         stopButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
-        stopButton.setWidth(24, Sizeable.UNITS_PIXELS);
-        stopButton.setHeight(24, Sizeable.UNITS_PIXELS);
+        stopButton.setWidth(20, Sizeable.UNITS_PIXELS);
+        stopButton.setHeight(20, Sizeable.UNITS_PIXELS);
 
         return stopButton;
     }
 
     private Embedded getRestartButton() {
         restartButton = new Embedded("", new ThemeResource("icons/buttons/restart.png"));
-        restartButton.setWidth(24, Sizeable.UNITS_PIXELS);
-        restartButton.setHeight(24, Sizeable.UNITS_PIXELS);
+        restartButton.setWidth(20, Sizeable.UNITS_PIXELS);
+        restartButton.setHeight(20, Sizeable.UNITS_PIXELS);
 
         return restartButton;
     }
