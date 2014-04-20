@@ -739,7 +739,7 @@
                                 </artifactItem>
 
                                 <!-- Hadoop -->
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-api</artifactId>
                                     <version>${project.version}</version>
@@ -753,7 +753,7 @@
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <!-- Products Modules - END -->
 
                                 <!-- TODO for API - START -->
