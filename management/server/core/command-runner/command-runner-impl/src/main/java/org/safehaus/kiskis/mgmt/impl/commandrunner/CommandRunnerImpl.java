@@ -161,7 +161,7 @@ public final class CommandRunnerImpl implements CommandRunner, ResponseListener 
     }
 
     public Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new CommandImpl(requestBuilder, agents);
     }
 
 }
