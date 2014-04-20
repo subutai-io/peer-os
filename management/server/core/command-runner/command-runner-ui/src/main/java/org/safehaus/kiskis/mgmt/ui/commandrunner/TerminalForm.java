@@ -88,20 +88,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
         indicator.setWidth(50, UNITS_PIXELS);
         indicator.setVisible(false);
         grid.addComponent(indicator, 19, 9, 19, 9);
-        Button test = new Button("Test");
-        test.addListener(new Button.ClickListener() {
-
-            public void buttonClick(Button.ClickEvent event) {
-                addOutput(new Date().toString() + "\n");
-                RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue().toString());
-                Command command = commandRunner.createCommand(requestBuilder, agentTree.getSelectedAgents());
-                commandRunner.runCommand(command, new CommandCallback());
-                addOutput(command.getResults().entrySet().iterator().next().getValue().getStdOut() + "\n");
-                addOutput(new Date().toString());
-
-            }
-        });
-        grid.addComponent(test);
 
         horizontalSplit.setSecondComponent(grid);
         setCompositionRoot(horizontalSplit);
