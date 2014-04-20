@@ -212,8 +212,8 @@ public class CommandRunnerTest {
             }
         });
 
-        Awaitility.await().atMost(1, TimeUnit.SECONDS).with().pollInterval(100, TimeUnit.MILLISECONDS)
-                .until(new Callable<Boolean>() {
+        Awaitility.await().atMost(1, TimeUnit.SECONDS).with().pollInterval(50, TimeUnit.MILLISECONDS)
+                .and().pollDelay(100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
 
                     public Boolean call() throws Exception {
                         return atomicInteger.get() == 1;
