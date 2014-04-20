@@ -164,4 +164,9 @@ public final class CommandRunnerImpl implements CommandRunner, ResponseListener 
         return new CommandImpl(requestBuilder, agents);
     }
 
+    public void runCommand(Command command, CommandCallback commandCallback) {
+        runCommandAsync(command, commandCallback);
+        ((CommandImpl) command).waitCompletion();
+    }
+
 }

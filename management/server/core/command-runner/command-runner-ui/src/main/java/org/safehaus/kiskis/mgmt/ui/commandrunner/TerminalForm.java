@@ -16,6 +16,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.Runo;
+import java.util.Date;
 import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
@@ -87,6 +88,18 @@ public class TerminalForm extends CustomComponent implements Disposable {
         indicator.setWidth(50, UNITS_PIXELS);
         indicator.setVisible(false);
         grid.addComponent(indicator, 19, 9, 19, 9);
+        Button test = new Button("Test");
+        test.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                addOutput(new Date().toString());
+                RequestBuilder requestBuilder = new RequestBuilder(timeoutTxtFld.getValue().toString());
+                commandRunner.runCommand(commandRunner.createCommand(requestBuilder, agentTree.getSelectedAgents()), new CommandCallback());
+                addOutput(new Date().toString());
+
+            }
+        });
+        grid.addComponent(test);
 
         horizontalSplit.setSecondComponent(grid);
         setCompositionRoot(horizontalSplit);

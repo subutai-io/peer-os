@@ -16,6 +16,8 @@ public interface CommandRunner {
 
     public void runCommandAsync(Command command, CommandCallback commandCallback);
 
+    public void runCommand(Command command, CommandCallback commandCallback);
+
     public Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents);
 
 }
