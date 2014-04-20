@@ -92,9 +92,11 @@ public class TerminalForm extends CustomComponent implements Disposable {
         test.addListener(new Button.ClickListener() {
 
             public void buttonClick(Button.ClickEvent event) {
-                addOutput(new Date().toString());
-                RequestBuilder requestBuilder = new RequestBuilder(timeoutTxtFld.getValue().toString());
-                commandRunner.runCommand(commandRunner.createCommand(requestBuilder, agentTree.getSelectedAgents()), new CommandCallback());
+                addOutput(new Date().toString() + "\n");
+                RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue().toString());
+                Command command = commandRunner.createCommand(requestBuilder, agentTree.getSelectedAgents());
+                commandRunner.runCommand(command, new CommandCallback());
+                addOutput(command.getResults().entrySet().iterator().next().getValue().getStdOut() + "\n");
                 addOutput(new Date().toString());
 
             }
