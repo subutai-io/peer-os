@@ -117,10 +117,6 @@ class CommandImpl implements Command {
         updateLock.unlock();
     }
 
-    boolean tryGetUpdateLock() {
-        return updateLock.tryLock();
-    }
-
     int getTimeout() {
         return timeout;
     }
