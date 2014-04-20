@@ -112,12 +112,12 @@ public class TerminalForm extends CustomComponent implements Disposable {
                     if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
                         int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
                         if (timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC) {
-                            requestBuilder = requestBuilder.withTimeout(timeout);
+                            requestBuilder.withTimeout(timeout);
                         }
                     }
 
                     if (workDirTxtFld.getValue() != null && !Util.isStringEmpty(workDirTxtFld.getValue().toString())) {
-                        requestBuilder = requestBuilder.withCwd(workDirTxtFld.getValue().toString());
+                        requestBuilder.withCwd(workDirTxtFld.getValue().toString());
                     }
                     Command command = commandRunner.createCommand(requestBuilder, agents);
                     indicator.setVisible(true);
