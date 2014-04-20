@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
  *
  * @author dilshat
  */
-public final class RequestBuilder {
+public class RequestBuilder {
 
     //never change
     private final String source = "COMMAND-RUNNER";

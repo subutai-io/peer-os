@@ -28,7 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
  *
  * @author dilshat
  */
-class CommandImpl implements Command {
+public class CommandImpl implements Command {
 
     private final Map<UUID, AgentResult> results = new HashMap<UUID, AgentResult>();
     /**
@@ -55,7 +55,7 @@ class CommandImpl implements Command {
         this.timeout = requestBuilder.getTimeout();
 
         for (Agent agent : agents) {
-            requests.add(requestBuilder.build(agent.getUuid(), commandUUID));
+            requests.add(requestBuilder.build(agent.getUuid(), getCommandUUID()));
         }
     }
 
@@ -117,15 +117,15 @@ class CommandImpl implements Command {
         updateLock.unlock();
     }
 
-    int getTimeout() {
+    public int getTimeout() {
         return timeout;
     }
 
-    Set<Request> getRequests() {
+    public Set<Request> getRequests() {
         return Collections.unmodifiableSet(requests);
     }
 
-    void setCommandStatus(CommandStatus commandStatus) {
+    public void setCommandStatus(CommandStatus commandStatus) {
         this.commandStatus = commandStatus;
     }
 
@@ -141,7 +141,7 @@ class CommandImpl implements Command {
         return requestsSucceeded;
     }
 
-    UUID getCommandUUID() {
+    public UUID getCommandUUID() {
         return commandUUID;
     }
 }

@@ -28,7 +28,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-public final class CommandRunnerImpl implements CommandRunner, ResponseListener {
+public class CommandRunnerImpl implements CommandRunner, ResponseListener {
 
     private static final Logger LOG = Logger.getLogger(CommandRunnerImpl.class.getName());
 
@@ -98,14 +98,17 @@ public final class CommandRunnerImpl implements CommandRunner, ResponseListener 
             //set command status to RUNNING
             commandImpl.setCommandStatus(CommandStatus.RUNNING);
             //execute command
-            executor.execute(new Runnable() {
-
-                public void run() {
-                    for (Request request : commandImpl.getRequests()) {
-                        communicationManager.sendRequest(request);
-                    }
-                }
-            });
+            for (Request request : commandImpl.getRequests()) {
+                communicationManager.sendRequest(request);
+            }
+//            executor.execute(new Runnable() {
+//
+//                public void run() {
+//                    for (Request request : commandImpl.getRequests()) {
+//                        communicationManager.sendRequest(request);
+//                    }
+//                }
+//            });
 
         }
     }
@@ -140,7 +143,6 @@ public final class CommandRunnerImpl implements CommandRunner, ResponseListener 
                                 //do cleanup on command completion or interruption by user
                                 if (commandExecutor.getCommand().hasCompleted()
                                         || commandExecutor.getCallback().isStopped()) {
-
                                     //remove command executor so that 
                                     //if response comes from agent it is not processed by callback
                                     commandExecutors.remove(commandExecutor.getCommand().getCommandUUID());
@@ -166,6 +168,15 @@ public final class CommandRunnerImpl implements CommandRunner, ResponseListener 
 
     public void runCommand(Command command, CommandCallback commandCallback) {
         runCommandAsync(command, commandCallback);
+        ((CommandImpl) command).waitCompletion();
+    }
+
+    public void runCommandAsync(Command command) {
+        runCommandAsync(command, new CommandCallback());
+    }
+
+    public void runCommand(Command command) {
+        runCommandAsync(command, new CommandCallback());
         ((CommandImpl) command).waitCompletion();
     }
 
