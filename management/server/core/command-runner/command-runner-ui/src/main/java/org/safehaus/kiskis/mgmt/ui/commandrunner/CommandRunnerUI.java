@@ -11,7 +11,7 @@ public class CommandRunnerUI implements Module {
     private CommandRunner commandRunner;
     private AgentManager agentManager;
 
-    public void setTaskRunner(CommandRunner commandRunner) {
+    public void setCommandRunner(CommandRunner commandRunner) {
         this.commandRunner = commandRunner;
     }
 
