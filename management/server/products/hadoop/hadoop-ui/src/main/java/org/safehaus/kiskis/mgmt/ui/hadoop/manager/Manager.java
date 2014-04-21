@@ -21,8 +21,8 @@ public class Manager extends Panel {
         horizontalLayout.setMargin(true);
         horizontalLayout.setSpacing(true);
 
-        horizontalLayout.addComponent(getIndicator());
         horizontalLayout.addComponent(getButtonRefresh());
+        horizontalLayout.addComponent(getIndicator());
 
         buttonsLayout = new HorizontalLayout();
         buttonsLayout.setMargin(true);
@@ -41,8 +41,6 @@ public class Manager extends Panel {
         stoppedButton.setEnabled(false);
         buttonsLayout.addComponent(stoppedButton);
         buttonsLayout.addComponent(new Label("Stopped node"));
-
-//        buttonsLayout.addComponent(getIndicator());
 
         addComponent(horizontalLayout);
         addComponent(getHadoopTable());
