@@ -67,6 +67,8 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         final CommandImpl commandImpl = (CommandImpl) command;
         Preconditions.checkArgument(commandExecutors.get(commandImpl.getCommandUUID()) == null, ""
                 + "This command has been already queued for execution");
+        Preconditions.checkArgument(commandImpl.getRequests() != null && !commandImpl.getRequests().isEmpty(),
+                "Requests are null or empty");
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CommandExecutor commandExecutor = new CommandExecutor(commandImpl, executor, commandCallback);

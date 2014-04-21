@@ -24,7 +24,7 @@ public class AgentResultTest {
 
     @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullAgentUUID() {
-        AgentResult agentResult = new AgentResultImpl(null);
+        new AgentResultImpl(null);
     }
 
     @Test

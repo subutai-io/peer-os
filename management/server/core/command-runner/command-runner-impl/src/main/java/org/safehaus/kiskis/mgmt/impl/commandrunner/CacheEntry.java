@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
+import com.google.common.base.Preconditions;
+
 /**
  * This class represents entry for {@code ExpiringCache}. Holds generic value
  * for the specified ttl.
@@ -33,6 +35,9 @@ public class CacheEntry<ValueType> {
      * @param ttlMs - entry time to live in milliseconds
      */
     public CacheEntry(ValueType value, long ttlMs) {
+        Preconditions.checkNotNull(value, "Value is null");
+        Preconditions.checkArgument(ttlMs > 0, "Time-to-live must be greater than 0");
+
         this.value = value;
         this.ttlMs = ttlMs;
         this.createTimestamp = System.currentTimeMillis();
