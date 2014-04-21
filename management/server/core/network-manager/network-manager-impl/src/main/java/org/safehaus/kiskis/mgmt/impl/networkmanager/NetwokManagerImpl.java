@@ -35,6 +35,4 @@ public class NetwokManagerImpl implements NetworkManager {
     public boolean configHostsOnAgents(List<Agent> agentList, Agent agent, String domainName) {
         return new HostManager(taskRunner, agentList, domainName).execute(agent);
     }
-
-
 }
