@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
-import com.vaadin.ui.Button;
+import com.vaadin.event.MouseEvents;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
@@ -16,25 +16,25 @@ public class JobTracker extends ClusterNode {
     public JobTracker(final Config cluster) {
         super(cluster);
 
-        startButton.addListener(new Button.ClickListener() {
+        startButton.addListener(new MouseEvents.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
                 getStatus(HadoopUI.getHadoopManager().startJobTracker(cluster));
             }
         });
 
-        stopButton.addListener(new Button.ClickListener() {
+        stopButton.addListener(new MouseEvents.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
                 getStatus(HadoopUI.getHadoopManager().stopJobTracker(cluster));
             }
         });
 
-        restartButton.addListener(new Button.ClickListener() {
+        restartButton.addListener(new MouseEvents.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
                 getStatus(HadoopUI.getHadoopManager().restartJobTracker(cluster));
             }

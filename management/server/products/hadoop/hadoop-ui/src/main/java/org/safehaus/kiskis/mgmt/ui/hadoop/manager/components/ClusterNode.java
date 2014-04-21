@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
 public class ClusterNode extends HorizontalLayout {
 
     protected Config cluster;
-    protected Button progressButton, startButton, stopButton, restartButton;
+    protected Embedded progressButton, startButton, stopButton, restartButton;
     protected List<ClusterNode> slaveNodes;
 
     public ClusterNode(Config cluster) {
@@ -31,31 +31,35 @@ public class ClusterNode extends HorizontalLayout {
         addComponent(getRestartButton());
     }
 
-    private Button getProgressButton() {
-        progressButton = new Button();
-        progressButton.setIcon(new ThemeResource("../base/common/img/loading-indicator.gif"));
+    private Embedded getProgressButton() {
+        progressButton = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+        progressButton.setWidth(24, UNITS_PIXELS);
+        progressButton.setHeight(24, UNITS_PIXELS);
         progressButton.setVisible(false);
 
         return progressButton;
     }
 
-    private Button getStartButton() {
-        startButton = new Button();
-        startButton.setIcon(new ThemeResource("icons/buttons/start.png"));
+    private Embedded getStartButton() {
+        startButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
+        startButton.setWidth(24, UNITS_PIXELS);
+        startButton.setHeight(24, UNITS_PIXELS);
 
         return startButton;
     }
 
-    private Button getStopButton() {
-        stopButton = new Button();
-        startButton.setIcon(new ThemeResource("icons/buttons/stop.png"));
+    private Embedded getStopButton() {
+        stopButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
+        stopButton.setWidth(24, UNITS_PIXELS);
+        stopButton.setHeight(24, UNITS_PIXELS);
 
         return stopButton;
     }
 
-    private Button getRestartButton() {
-        restartButton = new Button();
-        startButton.setIcon(new ThemeResource("icons/buttons/restart.png"));
+    private Embedded getRestartButton() {
+        restartButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
+        restartButton.setWidth(24, UNITS_PIXELS);
+        restartButton.setHeight(24, UNITS_PIXELS);
 
         return restartButton;
     }
