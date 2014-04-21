@@ -6,7 +6,7 @@ import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-public abstract class BaseHandler implements Runnable {
+public abstract class AbstractHandler implements Runnable {
 
     final HiveImpl manager;
     final String clusterName;
@@ -14,7 +14,7 @@ public abstract class BaseHandler implements Runnable {
 
     String hostname;
 
-    public BaseHandler(HiveImpl manager, String clusterName, ProductOperation po) {
+    public AbstractHandler(HiveImpl manager, String clusterName, ProductOperation po) {
         this.manager = manager;
         this.clusterName = clusterName;
         this.po = po;

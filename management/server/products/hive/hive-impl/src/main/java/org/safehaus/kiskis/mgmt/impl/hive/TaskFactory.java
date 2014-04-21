@@ -87,16 +87,8 @@ public class TaskFactory {
     }
 
     public static Task stop(Agent agent, Product product) {
-        List ls = new ArrayList(1);
-        ls.add(agent);
-        return stop(ls, product);
-    }
-
-    public static Task stop(Collection<Agent> agents, Product product) {
         Task t = new Task("Stop " + product);
-        for(Agent agent : agents) {
-            t.addRequest(Requests.make(Requests.Type.STOP, product), agent);
-        }
+        t.addRequest(Requests.make(Requests.Type.STOP, product), agent);
         return t;
     }
 
@@ -109,12 +101,6 @@ public class TaskFactory {
     public static Task status(Agent agent, Product product) {
         Task t = new Task("Status of " + product);
         t.addRequest(Requests.make(Requests.Type.STATUS, product), agent);
-        return t;
-    }
-
-    public static Task wrapRequest(Request request, Agent agent, String desc) {
-        Task t = new Task(desc);
-        t.addRequest(request, agent);
         return t;
     }
 

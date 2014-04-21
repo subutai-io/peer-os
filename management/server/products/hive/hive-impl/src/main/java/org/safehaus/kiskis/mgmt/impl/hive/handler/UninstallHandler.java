@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-public class UninstallHandler extends BaseHandler {
+public class UninstallHandler extends AbstractHandler {
 
     public UninstallHandler(HiveImpl manager, String clusterName, ProductOperation po) {
         super(manager, clusterName, po);
@@ -35,32 +35,6 @@ public class UninstallHandler extends BaseHandler {
             po.addLogFailed("Connected client(s) not found");
             return;
         }
-
-        // STOP services
-//        po.addLog("Stop Hive clients");
-//        Task stopTask = TaskFactory.stop(config.getClients(), Product.HIVE);
-//        manager.getTaskRunner().executeTaskNWait(stopTask);
-//        if(stopTask.isCompleted()) {
-//            for(Agent a : config.getClients()) {
-//                Result res = stopTask.getResults().get(a.getUuid());
-//                if(res.getExitCode() != null && res.getExitCode() == 0)
-//                    po.addLog("Service stopped on " + a.getHostname() + ": " + res.getStdOut());
-//                else
-//                    po.addLog("Failed to stop on " + a.getHostname() + ": " + res.getStdErr());
-//            }
-//        } else {
-//            po.addLog("Failed to stop services on client nodes: " + stopTask.getFirstError());
-//        }
-//
-//        po.addLog("Stopping Hive server service...");
-//        stopTask = TaskFactory.stop(config.getServer(), Product.HIVE);
-//        manager.getTaskRunner().executeTaskNWait(stopTask);
-//        po.addLog(stopTask.getTaskStatus().toString() + "\n");
-//
-//        po.addLog("Stopping Derby server service...");
-//        stopTask = TaskFactory.stop(config.getServer(), Product.DERBY);
-//        manager.getTaskRunner().executeTaskNWait(stopTask);
-//        po.addLog(stopTask.getTaskStatus().toString() + "\n");
 
         po.addLog("Removing Hive client(s)...");
         Task task = TaskFactory.uninstallClient(config.getClients());

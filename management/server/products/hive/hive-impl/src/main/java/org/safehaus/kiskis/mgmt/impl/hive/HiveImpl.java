@@ -27,7 +27,7 @@ public class HiveImpl extends HiveBase {
     public UUID statusCheck(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Status check for " + hostname);
-        BaseHandler h = new StatusHandler(this, clusterName, po);
+        AbstractHandler h = new StatusHandler(this, clusterName, po);
         h.setHostname(hostname);
         executor.execute(h);
         return po.getId();
@@ -36,7 +36,7 @@ public class HiveImpl extends HiveBase {
     public UUID startNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Start node " + hostname);
-        BaseHandler h = new StartHandler(this, clusterName, po);
+        AbstractHandler h = new StartHandler(this, clusterName, po);
         h.setHostname(hostname);
         executor.execute(h);
         return po.getId();
@@ -45,7 +45,7 @@ public class HiveImpl extends HiveBase {
     public UUID stopNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Stop node " + hostname);
-        BaseHandler h = new StopHandler(this, clusterName, po);
+        AbstractHandler h = new StopHandler(this, clusterName, po);
         h.setHostname(hostname);
         executor.execute(h);
         return po.getId();
@@ -54,7 +54,7 @@ public class HiveImpl extends HiveBase {
     public UUID restartNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Restart node " + hostname);
-        BaseHandler h = new RestartHandler(this, clusterName, po);
+        AbstractHandler h = new RestartHandler(this, clusterName, po);
         h.setHostname(hostname);
         executor.execute(h);
         return po.getId();
@@ -63,7 +63,7 @@ public class HiveImpl extends HiveBase {
     public UUID addNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Add node to cluster: " + hostname);
-        BaseHandler h = new AddNodeHandler(this, clusterName, po);
+        AbstractHandler h = new AddNodeHandler(this, clusterName, po);
         h.setHostname(hostname);
         executor.execute(h);
         return po.getId();
@@ -72,7 +72,7 @@ public class HiveImpl extends HiveBase {
     public UUID destroyNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Remove node from cluster: " + hostname);
-        BaseHandler h = new DestroyNodeHandler(this, clusterName, po);
+        AbstractHandler h = new DestroyNodeHandler(this, clusterName, po);
         h.setHostname(hostname);
         executor.execute(h);
         return po.getId();

@@ -389,7 +389,8 @@ public class Manager {
 
             public void itemClick(ItemClickEvent event) {
                 if(event.isDoubleClick()) {
-                    String hostname = (String)table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                    String hostname = (String)table.getItem(event.getItemId())
+                            .getItemProperty("Host").getValue();
                     Agent agent = HiveUI.getAgentManager().getAgentByHostname(hostname);
                     if(agent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(agent));
@@ -413,6 +414,7 @@ public class Manager {
                     public void windowClose(Window.CloseEvent e) {
                         refreshClustersInfo();
                     }
-                });
+                }
+        );
     }
 }

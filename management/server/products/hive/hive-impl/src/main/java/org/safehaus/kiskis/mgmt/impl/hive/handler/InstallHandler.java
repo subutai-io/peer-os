@@ -13,7 +13,7 @@ import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-public class InstallHandler extends BaseHandler {
+public class InstallHandler extends AbstractHandler {
 
     private Config config;
 

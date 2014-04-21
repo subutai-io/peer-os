@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.ui.hive.wizard;
 import com.vaadin.data.Item;
 import com.vaadin.ui.TreeTable;
 
-public class ConfigView {
+class ConfigView {
 
     private final TreeTable configTbl;
 
@@ -17,7 +17,7 @@ public class ConfigView {
 
     public void addStringCfg(String cfgCategory, String cfgValue) {
         Item ctg = configTbl.getItem(cfgCategory);
-        if (ctg == null) {
+        if(ctg == null) {
             configTbl.addItem(new Object[]{cfgCategory}, cfgCategory);
         }
         configTbl.addItem(new Object[]{cfgValue}, cfgCategory + "_" + cfgValue);

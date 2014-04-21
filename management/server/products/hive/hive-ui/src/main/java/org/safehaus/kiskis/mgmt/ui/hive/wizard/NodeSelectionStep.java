@@ -138,8 +138,9 @@ public class NodeSelectionStep extends Panel {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if(event.getProperty().getValue() != null) {
-                    Set<Agent> agentList = new HashSet((Collection)event.getProperty().getValue());
-                    wizard.getConfig().setClients(agentList);
+                    Set<Agent> clients = new HashSet();
+                    clients.addAll((Collection)event.getProperty().getValue());
+                    wizard.getConfig().setClients(clients);
                 }
             }
         });

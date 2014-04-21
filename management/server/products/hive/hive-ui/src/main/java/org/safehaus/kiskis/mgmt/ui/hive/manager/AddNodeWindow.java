@@ -62,7 +62,8 @@ class AddNodeWindow extends Window {
                 addNodeBtn.setEnabled(false);
                 showProgress();
                 Agent agent = (Agent)hadoopNodes.getValue();
-                final UUID trackID = HiveUI.getManager().addNode(config.getClusterName(), agent.getHostname());
+                final UUID trackID = HiveUI.getManager().addNode(
+                        config.getClusterName(), agent.getHostname());
                 HiveUI.getExecutor().execute(new Runnable() {
 
                     public void run() {

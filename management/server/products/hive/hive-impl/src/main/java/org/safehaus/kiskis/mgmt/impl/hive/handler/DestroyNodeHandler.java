@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-public class DestroyNodeHandler extends BaseHandler {
+public class DestroyNodeHandler extends AbstractHandler {
 
     public DestroyNodeHandler(HiveImpl manager, String clusterName, ProductOperation po) {
         super(manager, clusterName, po);

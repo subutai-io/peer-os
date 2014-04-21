@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-public class StatusHandler extends BaseHandler {
+public class StatusHandler extends AbstractHandler {
 
     public StatusHandler(HiveImpl manager, String clusterName, ProductOperation po) {
         super(manager, clusterName, po);

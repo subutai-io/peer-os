@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-public class AddNodeHandler extends BaseHandler {
+public class AddNodeHandler extends AbstractHandler {
 
     public AddNodeHandler(HiveImpl manager, String clusterName, ProductOperation po) {
         super(manager, clusterName, po);

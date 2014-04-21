@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class HiveUI implements Module {
 
-    public static final String MODULE_NAME = "Hive v2";
+    public static final String MODULE_NAME = "Hive";
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Hive manager;
