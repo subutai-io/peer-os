@@ -22,4 +22,12 @@ public interface Command {
 
     public UUID getCommandUUID();
 
+    public void setData(Object data);
+
+    public Object getData();
+
+    public String getAllErrors();
+
+    public String getDescription();
+
 }

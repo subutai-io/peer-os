@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
@@ -157,7 +158,19 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     }
 
     public Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
-        return new CommandImpl(requestBuilder, agents);
+        return new CommandImpl(null, requestBuilder, agents);
+    }
+
+    public Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
+        return new CommandImpl(description, requestBuilder, agents);
+    }
+
+    public Command createCommand(Set<AgentRequestBuilder> agentRequestBuilders) {
+        return new CommandImpl(null, agentRequestBuilders);
+    }
+
+    public Command createCommand(String description, Set<AgentRequestBuilder> agentRequestBuilders) {
+        return new CommandImpl(description, agentRequestBuilders);
     }
 
     public void runCommand(Command command, CommandCallback commandCallback) {

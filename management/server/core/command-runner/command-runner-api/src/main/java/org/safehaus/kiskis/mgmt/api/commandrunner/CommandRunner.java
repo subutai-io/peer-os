@@ -24,4 +24,10 @@ public interface CommandRunner {
 
     public Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents);
 
+    public Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents);
+
+    public Command createCommand(Set<AgentRequestBuilder> agentRequestBuilders);
+
+    public Command createCommand(String description, Set<AgentRequestBuilder> agentRequestBuilders);
+
 }

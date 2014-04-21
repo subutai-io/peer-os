@@ -9,7 +9,7 @@ package org.safehaus.kiskis.mgmt.impl.mongodb.common;
  *
  * @author dilshat
  */
-public enum TaskType {
+public enum CommandType {
 
-    START_CONFIG_SERVERS, START_ROUTERS, START_REPLICA_SET, FIND_PRIMARY_NODE, RESTART_ROUTERS
+    START_CONFIG_SERVERS, START_ROUTERS, START_DATA_NODES, FIND_PRIMARY_NODE
 }

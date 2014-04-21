@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
@@ -44,12 +45,15 @@ public class CommandImpl implements Command {
     private volatile CommandStatus commandStatus = CommandStatus.NEW;
     private volatile int requestsCompleted = 0;
     private volatile int requestsSucceeded = 0;
+    private Object data;
+    private final String description;
 
-    public CommandImpl(RequestBuilder requestBuilder, Set<Agent> agents) {
+    public CommandImpl(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
 
         Preconditions.checkNotNull(requestBuilder, "Request Builder is null");
         Preconditions.checkArgument(agents != null && !agents.isEmpty(), "Agents are null or empty");
 
+        this.description = description;
         this.commandUUID = Util.generateTimeBasedUUID();
         this.requestsToRun = agents.size();
         this.timeout = requestBuilder.getTimeout();
@@ -57,6 +61,24 @@ public class CommandImpl implements Command {
         for (Agent agent : agents) {
             requests.add(requestBuilder.build(agent.getUuid(), commandUUID));
         }
+    }
+
+    public CommandImpl(String description, Set<AgentRequestBuilder> requestBuilders) {
+        Preconditions.checkArgument(requestBuilders != null && !requestBuilders.isEmpty(), "Request Builders are null or empty");
+
+        this.description = description;
+        this.commandUUID = Util.generateTimeBasedUUID();
+        this.requestsToRun = requestBuilders.size();
+
+        int maxTimeout = 0;
+        for (AgentRequestBuilder requestBuilder : requestBuilders) {
+            requests.add(requestBuilder.build(requestBuilder.getAgent().getUuid(), commandUUID));
+            if (requestBuilder.getTimeout() > maxTimeout) {
+                maxTimeout = requestBuilder.getTimeout();
+            }
+        }
+
+        this.timeout = maxTimeout;
     }
 
     public boolean hasCompleted() {
@@ -151,6 +173,32 @@ public class CommandImpl implements Command {
 
     public UUID getCommandUUID() {
         return commandUUID;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getAllErrors() {
+        StringBuilder errors = new StringBuilder();
+        for (Map.Entry<UUID, AgentResult> result : results.entrySet()) {
+            AgentResult agentResult = result.getValue();
+            errors.append(agentResult.getAgentUUID()).
+                    append(": ").
+                    append(agentResult.getStdErr()).
+                    append("; Exit code: ").
+                    append(agentResult.getExitCode()).
+                    append("\n");
+        }
+        return errors.toString();
     }
 
     @Override

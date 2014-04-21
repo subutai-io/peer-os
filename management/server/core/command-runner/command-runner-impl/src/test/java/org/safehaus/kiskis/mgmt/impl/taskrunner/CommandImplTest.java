@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import static org.junit.Assert.*;
@@ -12,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandImpl;
@@ -33,7 +35,7 @@ public class CommandImplTest {
     public void beforeMethod() {
         Set<Agent> agents = MockUtils.getAgents(agentUUID);
         RequestBuilder requestBuilder = MockUtils.getRequestBuilder("pwd", 1, agents);
-        command = new CommandImpl(requestBuilder, agents);
+        command = new CommandImpl(null, requestBuilder, agents);
     }
 
     @Test(expected = NullPointerException.class)
@@ -42,8 +44,19 @@ public class CommandImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void constructorShouldFailNullAgentBuilder() {
+        new CommandImpl(null, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorShouldFailEmptyAgentBuilder() {
+        Set<AgentRequestBuilder> ag = new HashSet<AgentRequestBuilder>();
+        new CommandImpl(null, ag);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailNullAgents() {
-        new CommandImpl(mock(RequestBuilder.class), null);
+        new CommandImpl(null, mock(RequestBuilder.class), null);
     }
 
     @Test
@@ -81,7 +94,7 @@ public class CommandImplTest {
 
         Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
         when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
-        
+
         command.appendResult(response);
 
         assertEquals(SOME_DUMMY_OUTPUT, command.getResults().get(agentUUID).getStdOut());
@@ -92,7 +105,7 @@ public class CommandImplTest {
 
         Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
         when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
-        
+
         command.appendResult(response);
         command.appendResult(response);
 
