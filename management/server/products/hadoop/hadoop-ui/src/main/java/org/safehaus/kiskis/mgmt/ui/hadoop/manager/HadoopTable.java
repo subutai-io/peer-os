@@ -150,6 +150,6 @@ public class HadoopTable extends TreeTable {
             setParent(rowId, parentId);
             setCollapsed(rowId, false);
         }
-        indicator.setVisible(false);
+//        indicator.setVisible(false);
     }
 }
