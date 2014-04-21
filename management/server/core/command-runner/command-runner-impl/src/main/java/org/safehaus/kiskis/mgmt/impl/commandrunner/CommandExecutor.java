@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
+import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import java.util.concurrent.ExecutorService;
 
@@ -19,6 +20,10 @@ public class CommandExecutor {
     final private CommandCallback callback;
 
     public CommandExecutor(CommandImpl command, ExecutorService executor, CommandCallback callback) {
+
+        Preconditions.checkNotNull(command, "Command is null");
+        Preconditions.checkNotNull(executor, "Executor is null");
+        Preconditions.checkNotNull(callback, "Callback is null");
 
         this.command = command;
         this.executor = executor;

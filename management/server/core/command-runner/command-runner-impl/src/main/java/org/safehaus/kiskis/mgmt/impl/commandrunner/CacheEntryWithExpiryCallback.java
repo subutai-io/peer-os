@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
+import com.google.common.base.Preconditions;
+
 /**
  * This class represents entry for {@code ExpiringCache}. Holds generic value
  * for the specified ttl. When entry is expired the supplied ExpiryCallback is
@@ -28,6 +30,7 @@ public class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueTyp
      */
     public CacheEntryWithExpiryCallback(ValueType value, long ttlMs, EntryExpiryCallback<ValueType> expiryCallback) {
         super(value, ttlMs);
+        Preconditions.checkNotNull(expiryCallback, "Callback is null");
         this.expiryCallback = expiryCallback;
     }
 

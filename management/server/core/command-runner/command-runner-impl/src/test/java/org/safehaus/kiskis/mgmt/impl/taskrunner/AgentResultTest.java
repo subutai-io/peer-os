@@ -9,7 +9,6 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static org.mockito.Mockito.when;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.impl.commandrunner.AgentResultImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
@@ -21,6 +20,8 @@ public class AgentResultTest {
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";
     private final Integer OK_EXIT_CODE = 0;
+    private final UUID agentUUID = UUID.randomUUID();
+    private final AgentResultImpl agentResult = new AgentResultImpl(agentUUID);
 
     @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullAgentUUID() {
@@ -29,7 +30,6 @@ public class AgentResultTest {
 
     @Test
     public void shouldNotAppendNullResponse() {
-        AgentResultImpl agentResult = new AgentResultImpl(UUID.randomUUID());
 
         agentResult.appendResults(null);
 
@@ -38,7 +38,6 @@ public class AgentResultTest {
 
     @Test
     public void shouldNotAppendAlienResponse() {
-        AgentResultImpl agentResult = new AgentResultImpl(UUID.randomUUID());
         Response response = MockUtils.getIntermediateResponse(UUID.randomUUID(), UUID.randomUUID());
         when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
 
@@ -49,8 +48,6 @@ public class AgentResultTest {
 
     @Test
     public void shouldAppendOwnResponse() {
-        UUID agentUUID = UUID.randomUUID();
-        AgentResultImpl agentResult = new AgentResultImpl(agentUUID);
         Response response = MockUtils.getIntermediateResponse(agentUUID, UUID.randomUUID());
         when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
 
@@ -61,8 +58,6 @@ public class AgentResultTest {
 
     @Test
     public void shouldAppendExitCode() {
-        UUID agentUUID = UUID.randomUUID();
-        AgentResultImpl agentResult = new AgentResultImpl(agentUUID);
         Response response = MockUtils.getSucceededResponse(agentUUID, UUID.randomUUID());
 
         agentResult.appendResults(response);
@@ -72,8 +67,6 @@ public class AgentResultTest {
 
     @Test
     public void shouldNotAppendIfExitCodeAlreadySet() {
-        UUID agentUUID = UUID.randomUUID();
-        AgentResultImpl agentResult = new AgentResultImpl(agentUUID);
         Response response = MockUtils.getSucceededResponse(agentUUID, UUID.randomUUID());
 
         agentResult.appendResults(response);

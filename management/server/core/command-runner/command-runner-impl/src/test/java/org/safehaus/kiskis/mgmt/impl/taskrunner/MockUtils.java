@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandRunnerImpl;
@@ -67,7 +70,6 @@ public class MockUtils {
     public static Agent getAgent(UUID agentUUID) {
         Agent agent = mock(Agent.class);
         when(agent.getUuid()).thenReturn(agentUUID);
-        when(agent.getUuid()).thenReturn(agentUUID);
 
         return agent;
     }
@@ -81,34 +83,52 @@ public class MockUtils {
         return agents;
     }
 
-    public static Request getRequest(UUID agentUUID, UUID commandUUID, int timeout) {
+    public static Request getRequest(String program, UUID agentUUID, UUID commandUUID, int timeout) {
         Request request = mock(Request.class);
         when(request.getUuid()).thenReturn(agentUUID);
         when(request.getType()).thenReturn(RequestType.EXECUTE_REQUEST);
+        when(request.getProgram()).thenReturn(program);
         when(request.getTaskUuid()).thenReturn(commandUUID);
         when(request.getTimeout()).thenReturn(timeout);
 
         return request;
     }
 
-    public static Set<Request> getRequests(UUID agentUUID, UUID commandUUID, int timeout) {
+    public static Set<Request> getRequests(String program, UUID agentUUID, UUID commandUUID, int timeout) {
         Set<Request> requests = new HashSet<Request>();
-        requests.add(getRequest(agentUUID, commandUUID, timeout));
+        requests.add(getRequest(program, agentUUID, commandUUID, timeout));
 
         return requests;
     }
 
-    public static RequestBuilder getRequestBuilder(int timeout) {
+    public static RequestBuilder getRequestBuilder(String command, int timeout) {
         RequestBuilder requestBuilder = mock(RequestBuilder.class);
         when(requestBuilder.getTimeout()).thenReturn(timeout);
 
         return requestBuilder;
     }
 
-    public static Command getCommand(CommandRunnerImpl commandRunner, UUID agentUUID, int timeout) {
+    public static RequestBuilder getRequestBuilder(final String program, final int timeout, Set<Agent> agents) {
+        RequestBuilder requestBuilder = getRequestBuilder(program, timeout);
+        when(requestBuilder.build(any(UUID.class), any(UUID.class))).
+                thenAnswer(new Answer<Request>() {
+
+                    public Request answer(InvocationOnMock invocation) throws Throwable {
+                        Object[] args = invocation.getArguments();
+                        UUID agentUUID = (UUID) args[0];
+                        UUID commandUUID = (UUID) args[1];
+
+                        return getRequest(program, agentUUID, commandUUID, timeout);
+                    }
+                });
+
+        return requestBuilder;
+    }
+
+    public static Command getCommand(String program, CommandRunnerImpl commandRunner, UUID agentUUID, int timeout) {
 
         Command command = commandRunner.createCommand(
-                getRequestBuilder(timeout),
+                getRequestBuilder(program, timeout),
                 getAgents(agentUUID));
 
         return command;

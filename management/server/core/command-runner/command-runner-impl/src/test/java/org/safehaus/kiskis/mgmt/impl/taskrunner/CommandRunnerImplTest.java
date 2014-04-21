@@ -37,7 +37,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-public class CommandRunnerTest {
+public class CommandRunnerImplTest {
 
     private static ExecutorService exec;
     private final boolean allTests = true;
@@ -98,7 +98,7 @@ public class CommandRunnerTest {
     public void shouldSendRequestToCommManager() {
         Assume.assumeTrue(allTests);
 
-        Command command = MockUtils.getCommand(commandRunner, UUID.randomUUID(), 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, UUID.randomUUID(), 1);
 
         commandRunner.runCommand(command);
 
@@ -109,7 +109,7 @@ public class CommandRunnerTest {
     public void commandShouldTimeout() {
         Assume.assumeTrue(allTests);
 
-        Command command = MockUtils.getCommand(commandRunner, UUID.randomUUID(), 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, UUID.randomUUID(), 1);
 
         commandRunner.runCommand(command);
 
@@ -120,7 +120,7 @@ public class CommandRunnerTest {
     public void commandShouldTimeoutAsync() {
         Assume.assumeTrue(allTests);
 
-        Command command = MockUtils.getCommand(commandRunner, UUID.randomUUID(), 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, UUID.randomUUID(), 1);
 
         commandRunner.runCommandAsync(command);
 
@@ -134,7 +134,7 @@ public class CommandRunnerTest {
         Assume.assumeTrue(allTests);
 
         UUID agentUUID = UUID.randomUUID();
-        Command command = MockUtils.getCommand(commandRunner, agentUUID, 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, agentUUID, 1);
         final Response response = MockUtils.getSucceededResponse(agentUUID, command.getCommandUUID());
 
         commandRunner.runCommandAsync(command);
@@ -155,7 +155,7 @@ public class CommandRunnerTest {
         Assume.assumeTrue(allTests);
 
         UUID agentUUID = UUID.randomUUID();
-        Command command = MockUtils.getCommand(commandRunner, agentUUID, 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, agentUUID, 1);
         final Response response = MockUtils.getSucceededResponse(agentUUID, command.getCommandUUID());
 
         exec.execute(new Runnable() {
@@ -165,14 +165,12 @@ public class CommandRunnerTest {
                     Thread.sleep(100);
                     commandRunner.onResponse(response);
                 } catch (InterruptedException ex) {
-                    return;
                 }
             }
         });
         commandRunner.runCommand(command);
 
-        Awaitility.await().atMost(1, TimeUnit.SECONDS).with().pollInterval(100, TimeUnit.MILLISECONDS)
-                .untilCall(to(command).getCommandStatus(), is(CommandStatus.SUCCEEDED));
+        assertEquals(CommandStatus.SUCCEEDED, command.getCommandStatus());
 
     }
 
@@ -181,7 +179,7 @@ public class CommandRunnerTest {
         Assume.assumeTrue(allTests);
 
         UUID agentUUID = UUID.randomUUID();
-        Command command = MockUtils.getCommand(commandRunner, agentUUID, 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, agentUUID, 1);
         final Response response = MockUtils.getFailedResponse(agentUUID, command.getCommandUUID());
 
         commandRunner.runCommandAsync(command);
@@ -202,7 +200,7 @@ public class CommandRunnerTest {
         Assume.assumeTrue(allTests);
 
         UUID agentUUID = UUID.randomUUID();
-        Command command = MockUtils.getCommand(commandRunner, agentUUID, 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, agentUUID, 1);
         final Response response = MockUtils.getFailedResponse(agentUUID, command.getCommandUUID());
 
         exec.execute(new Runnable() {
@@ -212,15 +210,13 @@ public class CommandRunnerTest {
                     Thread.sleep(100);
                     commandRunner.onResponse(response);
                 } catch (InterruptedException ex) {
-                    return;
                 }
             }
         });
 
         commandRunner.runCommand(command);
 
-        Awaitility.await().atMost(1, TimeUnit.SECONDS).with().pollInterval(100, TimeUnit.MILLISECONDS)
-                .untilCall(to(command).getCommandStatus(), is(CommandStatus.FAILED));
+        assertEquals(CommandStatus.FAILED, command.getCommandStatus());
 
     }
 
@@ -229,7 +225,7 @@ public class CommandRunnerTest {
         Assume.assumeTrue(allTests);
 
         UUID agentUUID = UUID.randomUUID();
-        Command command = MockUtils.getCommand(commandRunner, agentUUID, 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, agentUUID, 1);
         final Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
 
         final AtomicInteger atomicInteger = new AtomicInteger();
@@ -266,7 +262,7 @@ public class CommandRunnerTest {
         Assume.assumeTrue(allTests);
 
         UUID agentUUID = UUID.randomUUID();
-        Command command = MockUtils.getCommand(commandRunner, agentUUID, 1);
+        Command command = MockUtils.getCommand("ls", commandRunner, agentUUID, 1);
         final Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
 
         final AtomicInteger atomicInteger = new AtomicInteger();
@@ -278,7 +274,6 @@ public class CommandRunnerTest {
                     commandRunner.onResponse(response);
                     commandRunner.onResponse(response);
                 } catch (InterruptedException ex) {
-                    return;
                 }
             }
         });
@@ -292,13 +287,7 @@ public class CommandRunnerTest {
 
         });
 
-        Awaitility.await().atMost(1, TimeUnit.SECONDS).with().pollInterval(50, TimeUnit.MILLISECONDS)
-                .and().pollDelay(200, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
-
-                    public Boolean call() throws Exception {
-                        return atomicInteger.get() == 1;
-                    }
-                });
+        assertEquals(1, atomicInteger.get());
 
     }
 
