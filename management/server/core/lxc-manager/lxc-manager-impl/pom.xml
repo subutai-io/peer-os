@@ -27,10 +27,10 @@
                 <version>${org.apache.felix.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                        <Bundle-SymbolicName>${project.groupId}.impl.lxcmanager</Bundle-SymbolicName>
-                        <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true
-                        </Export-Package>
+                    <Bundle-SymbolicName>${project.groupId}.impl.lxcmanager</Bundle-SymbolicName>
+                    <Export-Package>
+                        {local-packages};version=${project.version};-noimport:=true
+                    </Export-Package>
                 </configuration>
             </plugin>
         </plugins>
@@ -97,6 +97,11 @@
             <artifactId>monitor-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${com.google.guava.version}</version>
+        </dependency>        
     </dependencies>
 
 </project>

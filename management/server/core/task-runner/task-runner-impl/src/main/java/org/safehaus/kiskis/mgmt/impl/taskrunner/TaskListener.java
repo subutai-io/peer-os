@@ -13,7 +13,6 @@ import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * This class is used by {@code TaskMediator}. Holds task along with its
@@ -33,19 +32,19 @@ class TaskListener {
     private final TaskCallback taskCallback;
     /**
      * map which holds all cumulated stdouts for this task where key is UUID of
-     * agent/node. Each std out contains last 10000 cumulated symbols
+     * agent/node.
      */
     private final Map<UUID, StringBuilder> stdOut;
     /**
      * map which holds all cumulated stderrs for this task where key is UUID of
-     * agent/node. Each std err contains last 10000 cumulated symbols
+     * agent/node.
      */
     private final Map<UUID, StringBuilder> stdErr;
 
     /**
      * Initializes the {@code TaskListener}
      *
-     * @param task         - task
+     * @param task - task
      * @param taskCallback - task callback
      */
     public TaskListener(Task task, TaskCallback taskCallback) {
@@ -96,9 +95,7 @@ class TaskListener {
                 stdOut.put(response.getUuid(), sb);
             }
             sb.append(response.getStdOut());
-            if (sb.length() > Common.MAX_COLLECTED_RESPONSE_LENGTH) {
-                sb.delete(0, sb.length() - Common.MAX_COLLECTED_RESPONSE_LENGTH);
-            }
+
         }
     }
 
@@ -115,9 +112,7 @@ class TaskListener {
                 stdErr.put(response.getUuid(), sb);
             }
             sb.append(response.getStdErr());
-            if (sb.length() > Common.MAX_COLLECTED_RESPONSE_LENGTH) {
-                sb.delete(0, sb.length() - Common.MAX_COLLECTED_RESPONSE_LENGTH);
-            }
+
         }
     }
 
@@ -126,7 +121,7 @@ class TaskListener {
      * to whom relates the supplied response
      *
      * @param response response for which to return cumulated std out
-     * @return cumulated last 10000 symbols of std out stream
+     * @return cumulated std out stream
      */
     public String getStdOut(Response response) {
         if (stdOut.get(response.getUuid()) != null) {
@@ -140,7 +135,7 @@ class TaskListener {
      * to whom relates the supplied response
      *
      * @param response response for which to return cumulated std err
-     * @return cumulated last 10000 symbols of std err stream
+     * @return std err stream
      */
     public String getStdErr(Response response) {
         if (stdErr.get(response.getUuid()) != null) {

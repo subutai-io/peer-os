@@ -11,6 +11,8 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -21,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  *
@@ -64,21 +67,28 @@ public class DbManagerImpl implements DbManager {
         this.cassandraPort = cassandraPort;
     }
 
+    public void setSession(Session session) {
+        Preconditions.checkNotNull(session, "Session is null");
+        this.session = session;
+    }
+
     /**
      * Initializes db manager
      */
     public void init() {
+
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(cassandraKeyspace), "Keyspace is null or empty");
+        Preconditions.checkArgument(cassandraPort >= 1024 && cassandraPort <= 65536, "Port must be n range 1024 and 65536");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(cassandraHost), "Cassandra host is null or empty");
+        Preconditions.checkArgument(cassandraHost.matches(Common.HOSTNAME_REGEX), "Invalid cassandra host");
+
         try {
             cluster = Cluster.builder().withPort(cassandraPort).addContactPoint(cassandraHost).build();
-            session = cluster.connect(cassandraKeyspace);
+            setSession(cluster.connect(cassandraKeyspace));
             LOG.log(Level.INFO, "DbManager started");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error in init", ex);
         }
-    }
-
-    public void setTestSession(Session session) {
-        this.session = session;
     }
 
     /**

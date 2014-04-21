@@ -47,6 +47,11 @@
             <artifactId>communication-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${com.google.guava.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

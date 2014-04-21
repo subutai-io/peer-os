@@ -17,6 +17,7 @@ public class Tasks {
 
     public static Task getCloneSingleLxcTask(Agent physicalAgent, String lxcHostName) {
         Task task = new Task();
+        task.setData(TaskType.CLONE_LXC);
         task.addRequest(Commands.getCloneCommand(lxcHostName), physicalAgent);
         return task;
     }
