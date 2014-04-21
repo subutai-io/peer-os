@@ -24,7 +24,7 @@ public class Manager extends Panel {
 
         horizontalLayout.addComponent(getIndicator());
         horizontalLayout.addComponent(getButtonRefresh());
-        horizontalLayout.addComponent(getDestroyButton());
+//        horizontalLayout.addComponent(getDestroyButton());
 
         buttonsLayout = new HorizontalLayout();
         buttonsLayout.setMargin(true);

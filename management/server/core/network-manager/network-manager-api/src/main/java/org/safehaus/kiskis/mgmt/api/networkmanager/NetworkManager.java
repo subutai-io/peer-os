@@ -10,5 +10,7 @@ import java.util.List;
 public interface NetworkManager {
     public boolean configSshOnAgents(List<Agent> agentList);
 
+    public boolean configSshOnAgents(List<Agent> agentList, Agent agent);
+
     public boolean configHostsOnAgents(List<Agent> agentList, String domainName);
 }
