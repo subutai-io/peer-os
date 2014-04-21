@@ -30,17 +30,19 @@ public class Manager extends Panel {
         buttonsLayout.setMargin(true);
         buttonsLayout.setSpacing(true);
 
-        Embedded startedButton = new Embedded("Started node", new ThemeResource("icons/buttons/start.png"));
+        Embedded startedButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
         startedButton.setWidth(ClusterNode.ICON_SIZE, UNITS_PIXELS);
         startedButton.setHeight(ClusterNode.ICON_SIZE, UNITS_PIXELS);
         startedButton.setEnabled(false);
         buttonsLayout.addComponent(startedButton);
+        buttonsLayout.addComponent(new Label("Started node"));
 
-        Embedded stoppedButton = new Embedded("Started node", new ThemeResource("icons/buttons/stop.png"));
+        Embedded stoppedButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
         stoppedButton.setWidth(ClusterNode.ICON_SIZE, UNITS_PIXELS);
         stoppedButton.setHeight(ClusterNode.ICON_SIZE, UNITS_PIXELS);
         stoppedButton.setEnabled(false);
         buttonsLayout.addComponent(stoppedButton);
+        buttonsLayout.addComponent(new Label("Stopped node"));
 
         addComponent(horizontalLayout);
         addComponent(getHadoopTable());
