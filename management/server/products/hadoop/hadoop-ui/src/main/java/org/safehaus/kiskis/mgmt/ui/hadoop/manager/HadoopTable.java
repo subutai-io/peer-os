@@ -11,8 +11,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.JobTracker;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.NameNode;
 import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.WaitTask;
 
 import java.util.List;
@@ -112,8 +110,8 @@ public class HadoopTable extends TreeTable {
 
         List<Config> list = HadoopUI.getHadoopManager().getClusters();
         for (Config cluster : list) {
-            NameNode nameNode = new NameNode(cluster);
-            JobTracker jobTracker = new JobTracker(cluster);
+//            NameNode nameNode = new NameNode(cluster);
+//            JobTracker jobTracker = new JobTracker(cluster);
 //            SecondaryNameNode secondaryNameNode = new SecondaryNameNode(cluster);
 //            nameNode.addSlaveNode(secondaryNameNode);
 
