@@ -22,9 +22,8 @@ public class Manager extends Panel {
         horizontalLayout.setSpacing(true);
 
         horizontalLayout.addComponent(getIndicator());
-        horizontalLayout.setComponentAlignment(indicator, Alignment.MIDDLE_LEFT);
         horizontalLayout.addComponent(getButtonRefresh());
-        horizontalLayout.setComponentAlignment(refreshButton, Alignment.MIDDLE_LEFT);
+        horizontalLayout.addComponent(getDestroyButton());
 
         buttonsLayout = new HorizontalLayout();
         buttonsLayout.setMargin(true);
