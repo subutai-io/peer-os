@@ -212,22 +212,23 @@ public class MongoImpl implements Mongo {
 
                     @Override
                     public void onResponse(Response response, AgentResult agentResult, Command command) {
+
+                        int count = 0;
+                        for (AgentResult result : command.getResults().values()) {
+                            if (result.getStdOut().contains("child process started successfully, parent exiting")) {
+                                count++;
+                            }
+                        }
                         if (command.getData() == CommandType.START_CONFIG_SERVERS) {
-                            if (Util.countNumberOfOccurences(agentResult.getStdOut().toString(),
-                                    "child process started successfully, parent exiting")
-                                    == config.getConfigServers().size()) {
+                            if (count == config.getConfigServers().size()) {
                                 commandOK.set(true);
                             }
                         } else if (command.getData() == CommandType.START_ROUTERS) {
-                            if (Util.countNumberOfOccurences(agentResult.getStdOut().toString(),
-                                    "child process started successfully, parent exiting")
-                                    == config.getRouterServers().size()) {
+                            if (count == config.getRouterServers().size()) {
                                 commandOK.set(true);
                             }
                         } else if (command.getData() == CommandType.START_DATA_NODES) {
-                            if (Util.countNumberOfOccurences(agentResult.getStdOut().toString(),
-                                    "child process started successfully, parent exiting")
-                                    == config.getDataNodes().size()) {
+                            if (count == config.getDataNodes().size()) {
                                 commandOK.set(true);
                             }
                         }
@@ -402,7 +403,7 @@ public class MongoImpl implements Mongo {
                     commandRunner.runCommand(stopRoutersCommand);
                     //don't check status of this command since it always ends with execute_timeouted
                     if (stopRoutersCommand.hasCompleted()) {
-                        final AtomicInteger okCount = new AtomicInteger(0);
+                        final AtomicInteger okCount = new AtomicInteger();
                         commandRunner.runCommand(
                                 Commands.getStartRouterCommand(
                                         config.getRouterPort(),
@@ -413,8 +414,11 @@ public class MongoImpl implements Mongo {
 
                                             @Override
                                             public void onResponse(Response response, AgentResult agentResult, Command command) {
-                                                if (agentResult.getStdOut().contains("child process started successfully, parent exiting")) {
-                                                    okCount.incrementAndGet();
+                                                okCount.set(0);
+                                                for (AgentResult result : command.getResults().values()) {
+                                                    if (result.getStdOut().contains("child process started successfully, parent exiting")) {
+                                                        okCount.incrementAndGet();
+                                                    }
                                                 }
                                                 if (okCount.get() == config.getRouterServers().size()) {
                                                     stop();
@@ -708,9 +712,8 @@ public class MongoImpl implements Mongo {
 
                     @Override
                     public void onResponse(Response response, AgentResult agentResult, Command command) {
-                        if (Util.countNumberOfOccurences(agentResult.getStdOut().toString(),
-                                "child process started successfully, parent exiting")
-                                == config.getRouterServers().size()) {
+                        if (agentResult.getStdOut().contains(
+                                "child process started successfully, parent exiting")) {
                             commandOK.set(true);
                             stop();
                         }
@@ -788,9 +791,8 @@ public class MongoImpl implements Mongo {
 
                     @Override
                     public void onResponse(Response response, AgentResult agentResult, Command command) {
-                        if (Util.countNumberOfOccurences(agentResult.getStdOut().toString(),
-                                "child process started successfully, parent exiting")
-                                == config.getRouterServers().size()) {
+                        if (agentResult.getStdOut().toString().contains(
+                                "child process started successfully, parent exiting")) {
                             commandOK.set(true);
                             stop();
                         }

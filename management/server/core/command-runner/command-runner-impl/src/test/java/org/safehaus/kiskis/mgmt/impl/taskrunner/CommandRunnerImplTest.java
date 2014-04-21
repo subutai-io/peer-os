@@ -291,4 +291,37 @@ public class CommandRunnerImplTest {
 
     }
 
+    @Test
+    public void commandShouldStopEarlier() throws InterruptedException {
+        Assume.assumeTrue(allTests);
+
+        UUID agentUUID = UUID.randomUUID();
+        Command command = MockUtils.getCommand("ls", commandRunner, agentUUID, 1);
+        final Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
+
+        long ts = System.currentTimeMillis();
+        exec.execute(new Runnable() {
+
+            public void run() {
+                try {
+                    Thread.sleep(100);
+                    commandRunner.onResponse(response);
+                } catch (InterruptedException ex) {
+                }
+            }
+        });
+        commandRunner.runCommand(command, new CommandCallback() {
+
+            @Override
+            public void onResponse(Response response, AgentResult agentResult, Command command) {
+                stop();
+            }
+
+        });
+
+        assertFalse(command.hasCompleted());
+        assertTrue(System.currentTimeMillis() - ts < 200);
+
+    }
+
 }
