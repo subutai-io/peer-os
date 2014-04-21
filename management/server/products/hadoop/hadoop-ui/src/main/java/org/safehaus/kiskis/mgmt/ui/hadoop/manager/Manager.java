@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
-import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
@@ -12,7 +11,7 @@ import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
 public class Manager extends Panel {
     private HorizontalLayout horizontalLayout, buttonsLayout;
     private Label indicator;
-    private Button refreshButton, destroyButton, addButton, includeButton, excludeButton;
+    private Button refreshButton;
     private HadoopTable table;
 
     public Manager() {
@@ -24,7 +23,6 @@ public class Manager extends Panel {
 
         horizontalLayout.addComponent(getIndicator());
         horizontalLayout.addComponent(getButtonRefresh());
-//        horizontalLayout.addComponent(getDestroyButton());
 
         buttonsLayout = new HorizontalLayout();
         buttonsLayout.setMargin(true);
@@ -59,19 +57,6 @@ public class Manager extends Panel {
         });
 
         return refreshButton;
-    }
-
-    private Button getDestroyButton() {
-        destroyButton = new Button("Destroy");
-        destroyButton.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                Item row = table.getItem(table.getValue());
-                System.out.println((String) row.getItemProperty(HadoopTable.CLUSTER_NAME_PROPERTY).getValue());
-            }
-        });
-
-        return destroyButton;
     }
 
     private Label getIndicator() {
