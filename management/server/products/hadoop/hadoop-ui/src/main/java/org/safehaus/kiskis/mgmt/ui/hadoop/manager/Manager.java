@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
  */
 public class Manager extends Panel {
     private HorizontalLayout horizontalLayout, buttonsLayout;
-    private Label indicator;
+    private Embedded indicator;
     private Button refreshButton;
     private HadoopTable table;
 
@@ -21,7 +21,7 @@ public class Manager extends Panel {
         horizontalLayout.setMargin(true);
         horizontalLayout.setSpacing(true);
 
-//        horizontalLayout.addComponent(getIndicator());
+        horizontalLayout.addComponent(getIndicator());
         horizontalLayout.addComponent(getButtonRefresh());
 
         buttonsLayout = new HorizontalLayout();
@@ -42,7 +42,7 @@ public class Manager extends Panel {
         buttonsLayout.addComponent(stoppedButton);
         buttonsLayout.addComponent(new Label("Stopped node"));
 
-        buttonsLayout.addComponent(getIndicator());
+//        buttonsLayout.addComponent(getIndicator());
 
         addComponent(horizontalLayout);
         addComponent(getHadoopTable());
@@ -61,10 +61,8 @@ public class Manager extends Panel {
         return refreshButton;
     }
 
-    private Label getIndicator() {
-        indicator = new Label("Label");
-        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
-        indicator.setContentMode(Label.CONTENT_XHTML);
+    private Embedded getIndicator() {
+        indicator = new Embedded("", new ThemeResource("icons/indicator.gif"));
         indicator.setHeight(11, Sizeable.UNITS_PIXELS);
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(true);
