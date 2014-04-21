@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
@@ -15,9 +14,8 @@ import java.util.UUID;
  */
 public class ClusterNode extends HorizontalLayout {
 
-    protected Button progressButton;
     protected Config cluster;
-    protected Button startButton, stopButton, restartButton;
+    protected Button progressButton, startButton, stopButton, restartButton;
     protected List<ClusterNode> slaveNodes;
 
     public ClusterNode(Config cluster) {
@@ -28,7 +26,6 @@ public class ClusterNode extends HorizontalLayout {
         setSpacing(true);
 
         addComponent(getProgressButton());
-        setComponentAlignment(startButton, Alignment.MIDDLE_CENTER);
         addComponent(getStartButton());
         addComponent(getStopButton());
         addComponent(getRestartButton());
