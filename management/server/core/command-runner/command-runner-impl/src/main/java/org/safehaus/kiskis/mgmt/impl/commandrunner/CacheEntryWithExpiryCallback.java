@@ -12,7 +12,7 @@ package org.safehaus.kiskis.mgmt.impl.commandrunner;
  *
  * @author dilshat
  */
-class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueType> {
+public class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueType> {
 
     /**
      * callback to trigger when entry expires
@@ -22,8 +22,8 @@ class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueType> {
     /**
      * Initialized the {@code CacheEntryWithExpiryCallback}
      *
-     * @param value          - entry value
-     * @param ttlMs          - entry ttl in milliseconds
+     * @param value - entry value
+     * @param ttlMs - entry ttl in milliseconds
      * @param expiryCallback -- callback to trigger when entry expires
      */
     public CacheEntryWithExpiryCallback(ValueType value, long ttlMs, EntryExpiryCallback<ValueType> expiryCallback) {

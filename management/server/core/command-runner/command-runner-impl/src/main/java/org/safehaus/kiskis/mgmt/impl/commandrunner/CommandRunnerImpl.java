@@ -101,14 +101,6 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
             for (Request request : commandImpl.getRequests()) {
                 communicationManager.sendRequest(request);
             }
-//            executor.execute(new Runnable() {
-//
-//                public void run() {
-//                    for (Request request : commandImpl.getRequests()) {
-//                        communicationManager.sendRequest(request);
-//                    }
-//                }
-//            });
 
         }
     }

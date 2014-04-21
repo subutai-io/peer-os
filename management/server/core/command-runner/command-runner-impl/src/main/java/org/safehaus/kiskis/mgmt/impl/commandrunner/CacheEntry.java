@@ -11,7 +11,7 @@ package org.safehaus.kiskis.mgmt.impl.commandrunner;
  *
  * @author dilshat
  */
-class CacheEntry<ValueType> {
+public class CacheEntry<ValueType> {
 
     /**
      * entry value

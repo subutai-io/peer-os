@@ -11,7 +11,7 @@ package org.safehaus.kiskis.mgmt.impl.commandrunner;
  *
  * @author dilshat
  */
-interface EntryExpiryCallback<ValueType> {
+public interface EntryExpiryCallback<ValueType> {
 
     /**
      * This method of callback is called when entry expires

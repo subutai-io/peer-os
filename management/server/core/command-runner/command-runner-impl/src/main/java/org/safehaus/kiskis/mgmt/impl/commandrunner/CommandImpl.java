@@ -55,7 +55,7 @@ public class CommandImpl implements Command {
         this.timeout = requestBuilder.getTimeout();
 
         for (Agent agent : agents) {
-            requests.add(requestBuilder.build(agent.getUuid(), getCommandUUID()));
+            requests.add(requestBuilder.build(agent.getUuid(), commandUUID));
         }
     }
 
@@ -71,7 +71,7 @@ public class CommandImpl implements Command {
         return Collections.unmodifiableMap(results);
     }
 
-    void appendResult(Response response) {
+    public void appendResult(Response response) {
         if (response != null && response.getUuid() != null) {
 
             AgentResultImpl agentResult = (AgentResultImpl) results.get(response.getUuid());
@@ -98,11 +98,11 @@ public class CommandImpl implements Command {
         }
     }
 
-    void incrementCompletedRequestsCount() {
+    public void incrementCompletedRequestsCount() {
         requestsCompleted++;
     }
 
-    void incrementSucceededRequestsCount() {
+    public void incrementSucceededRequestsCount() {
         requestsSucceeded++;
     }
 
@@ -137,15 +137,15 @@ public class CommandImpl implements Command {
         this.commandStatus = commandStatus;
     }
 
-    int getRequestsRun() {
+    public int getRequestsRun() {
         return requestsToRun;
     }
 
-    int getRequestsCompleted() {
+    public int getRequestsCompleted() {
         return requestsCompleted;
     }
 
-    int getRequestsSucceeded() {
+    public int getRequestsSucceeded() {
         return requestsSucceeded;
     }
 

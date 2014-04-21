@@ -14,7 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-class AgentResultImpl implements AgentResult {
+public class AgentResultImpl implements AgentResult {
 
     private final UUID agentUUID;
     private final StringBuilder stdOut = new StringBuilder();
@@ -25,7 +25,7 @@ class AgentResultImpl implements AgentResult {
         this.agentUUID = agentUUID;
     }
 
-    void appendResults(Response response) {
+    public void appendResults(Response response) {
         if (response != null && exitCode == null) {
             if (!Strings.isNullOrEmpty(response.getStdOut())) {
                 stdOut.append(response.getStdOut());

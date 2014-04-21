@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
  *
  * @author dilshat
  */
-class ExpiringCache<KeyType, ValueType> {
+public class ExpiringCache<KeyType, ValueType> {
 
     private final long evictionRunIntervalMs = 10;
     private final Map<KeyType, CacheEntry<ValueType>> entries = new ConcurrentHashMap<KeyType, CacheEntry<ValueType>>();

@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
  *
  * @author dilshat
  */
-class CommandExecutor {
+public class CommandExecutor {
 
     final private CommandImpl command;
     final private ExecutorService executor;
