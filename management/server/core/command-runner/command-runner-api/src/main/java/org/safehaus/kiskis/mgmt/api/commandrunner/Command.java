@@ -20,4 +20,6 @@ public interface Command {
 
     public Map<UUID, AgentResult> getResults();
 
+    public UUID getCommandUUID();
+
 }
