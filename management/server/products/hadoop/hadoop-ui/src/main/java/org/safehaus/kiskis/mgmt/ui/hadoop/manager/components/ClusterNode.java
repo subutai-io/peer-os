@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class ClusterNode extends HorizontalLayout {
 
-    public static final int ICON_SIZE = 20;
+    public static final int ICON_SIZE = 18;
 
     protected Config cluster;
     protected Embedded progressButton, startButton, stopButton, restartButton;
@@ -40,8 +40,8 @@ public class ClusterNode extends HorizontalLayout {
 
     private Embedded getProgressButton() {
         progressButton = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-        progressButton.setWidth(ICON_SIZE, UNITS_PIXELS);
-        progressButton.setHeight(ICON_SIZE, UNITS_PIXELS);
+        progressButton.setWidth(ICON_SIZE, UNITS_PIXELS + 5);
+        progressButton.setHeight(ICON_SIZE, UNITS_PIXELS + 5);
         progressButton.setVisible(false);
 
         return progressButton;
