@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.event.Action;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -31,9 +31,9 @@ public class HadoopTable extends TreeTable {
     public static final String JOBTRACKER_PROPERTY = "JobTracker/TaskTrackers";
     public static final String REPLICATION_PROPERTY = "Replication Factor";
 
-    private Label indicator;
+    private Embedded indicator;
 
-    public HadoopTable(String caption, final Label indicator) {
+    public HadoopTable(String caption, final Embedded indicator) {
         this.indicator = indicator;
         setCaption(caption);
 
