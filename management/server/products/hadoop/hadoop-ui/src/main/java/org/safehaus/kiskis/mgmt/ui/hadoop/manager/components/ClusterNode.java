@@ -40,8 +40,8 @@ public class ClusterNode extends HorizontalLayout {
 
     private Embedded getProgressButton() {
         progressButton = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-        progressButton.setWidth(ICON_SIZE, UNITS_PIXELS + 5);
-        progressButton.setHeight(ICON_SIZE, UNITS_PIXELS + 5);
+        progressButton.setWidth(ICON_SIZE, UNITS_PIXELS + 2);
+        progressButton.setHeight(ICON_SIZE, UNITS_PIXELS + 2);
         progressButton.setVisible(false);
 
         return progressButton;
