@@ -112,15 +112,15 @@ public class HadoopTable extends TreeTable {
         for (Config cluster : list) {
             NameNode nameNode = new NameNode(cluster);
             JobTracker jobTracker = new JobTracker(cluster);
-            SecondaryNameNode secondaryNameNode = new SecondaryNameNode(cluster);
-            nameNode.addSlaveNode(secondaryNameNode);
+//            SecondaryNameNode secondaryNameNode = new SecondaryNameNode(cluster);
+//            nameNode.addSlaveNode(secondaryNameNode);
 
             Object rowId = addItem(new Object[]{
                             cluster.getClusterName(),
                             cluster.getDomainName(),
                             nameNode,
-                            secondaryNameNode,
-                            jobTracker,
+                            null,//secondaryNameNode,
+                            null, //jobTracker,
                             cluster.getReplicationFactor()},
                     null
             );
@@ -135,9 +135,9 @@ public class HadoopTable extends TreeTable {
                 Object childID = addItem(new Object[]{
                                 null,
                                 null,
-                                dataNode,
+                                null,//dataNode,
                                 null,
-                                taskTracker,
+                                null,//taskTracker,
                                 null},
                         null
                 );
