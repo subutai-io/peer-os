@@ -29,13 +29,13 @@ public class ClusterNode extends HorizontalLayout {
         setSpacing(true);
 
         addComponent(getProgressButton());
-        setComponentAlignment(progressButton, Alignment.MIDDLE_CENTER);
+        setComponentAlignment(progressButton, Alignment.TOP_CENTER);
         addComponent(getStartButton());
-        setComponentAlignment(startButton, Alignment.MIDDLE_CENTER);
+        setComponentAlignment(startButton, Alignment.TOP_CENTER);
         addComponent(getStopButton());
-        setComponentAlignment(stopButton, Alignment.MIDDLE_CENTER);
+        setComponentAlignment(stopButton, Alignment.TOP_CENTER);
         addComponent(getRestartButton());
-        setComponentAlignment(restartButton, Alignment.MIDDLE_CENTER);
+        setComponentAlignment(restartButton, Alignment.TOP_CENTER);
     }
 
     private Embedded getProgressButton() {
@@ -64,7 +64,7 @@ public class ClusterNode extends HorizontalLayout {
     }
 
     private Embedded getRestartButton() {
-        restartButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
+        restartButton = new Embedded("", new ThemeResource("icons/buttons/restart.png"));
         restartButton.setWidth(ICON_SIZE, UNITS_PIXELS);
         restartButton.setHeight(ICON_SIZE, UNITS_PIXELS);
 
