@@ -3,14 +3,15 @@ package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
 
 /**
  * Created by daralbaev on 12.04.14.
  */
 public class Manager extends Panel {
-    private HorizontalLayout horizontalLayout;
+    private HorizontalLayout horizontalLayout, buttonsLayout;
     private Label indicator;
-    private Button refreshButton;
+    private Button refreshButton, destroyButton, addButton, includeButton, excludeButton;
     private HadoopTable table;
 
     public Manager() {
@@ -25,8 +26,25 @@ public class Manager extends Panel {
         horizontalLayout.addComponent(getButtonRefresh());
         horizontalLayout.setComponentAlignment(refreshButton, Alignment.MIDDLE_LEFT);
 
+        buttonsLayout = new HorizontalLayout();
+        buttonsLayout.setMargin(true);
+        buttonsLayout.setSpacing(true);
+
+        Embedded startedButton = new Embedded("Started node", new ThemeResource("icons/buttons/start.png"));
+        startedButton.setWidth(ClusterNode.ICON_SIZE, UNITS_PIXELS);
+        startedButton.setHeight(ClusterNode.ICON_SIZE, UNITS_PIXELS);
+        startedButton.setEnabled(false);
+        buttonsLayout.addComponent(startedButton);
+
+        Embedded stoppedButton = new Embedded("Started node", new ThemeResource("icons/buttons/stop.png"));
+        stoppedButton.setWidth(ClusterNode.ICON_SIZE, UNITS_PIXELS);
+        stoppedButton.setHeight(ClusterNode.ICON_SIZE, UNITS_PIXELS);
+        stoppedButton.setEnabled(false);
+        buttonsLayout.addComponent(stoppedButton);
+
         addComponent(horizontalLayout);
         addComponent(getHadoopTable());
+        addComponent(buttonsLayout);
     }
 
     private Button getButtonRefresh() {

@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class ClusterNode extends HorizontalLayout {
 
-    public static final int ICON_SIZE = 25;
+    public static final int ICON_SIZE = 20;
 
     protected Config cluster;
     protected Embedded progressButton, startButton, stopButton, restartButton;
