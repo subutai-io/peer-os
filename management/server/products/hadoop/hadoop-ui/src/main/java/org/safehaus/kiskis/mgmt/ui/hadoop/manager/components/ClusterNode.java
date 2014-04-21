@@ -49,6 +49,7 @@ public class ClusterNode extends HorizontalLayout {
 
     private Embedded getStartButton() {
         startButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
+        startButton.setDescription("Start");
         startButton.setWidth(ICON_SIZE, UNITS_PIXELS);
         startButton.setHeight(ICON_SIZE, UNITS_PIXELS);
 
@@ -57,6 +58,7 @@ public class ClusterNode extends HorizontalLayout {
 
     private Embedded getStopButton() {
         stopButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
+        startButton.setDescription("Stop");
         stopButton.setWidth(ICON_SIZE, UNITS_PIXELS);
         stopButton.setHeight(ICON_SIZE, UNITS_PIXELS);
 
@@ -65,6 +67,7 @@ public class ClusterNode extends HorizontalLayout {
 
     private Embedded getRestartButton() {
         restartButton = new Embedded("", new ThemeResource("icons/buttons/restart.png"));
+        startButton.setDescription("Restart");
         restartButton.setWidth(ICON_SIZE, UNITS_PIXELS);
         restartButton.setHeight(ICON_SIZE, UNITS_PIXELS);
 
