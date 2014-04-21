@@ -7,11 +7,13 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
-import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.*;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.ClusterNode;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.JobTracker;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.NameNode;
+import org.safehaus.kiskis.mgmt.ui.hadoop.manager.components.WaitTask;
 
 import java.util.List;
 import java.util.UUID;
@@ -118,14 +120,14 @@ public class HadoopTable extends TreeTable {
             Object rowId = addItem(new Object[]{
                             cluster.getClusterName(),
                             cluster.getDomainName(),
-                            nameNode,
+                            null,//nameNode,
                             null,//secondaryNameNode,
                             null, //jobTracker,
                             cluster.getReplicationFactor()},
                     null
             );
 
-            for (Agent agent : cluster.getDataNodes()) {
+            /*for (Agent agent : cluster.getDataNodes()) {
                 SlaveNode dataNode = new SlaveNode(cluster, agent, true);
                 SlaveNode taskTracker = new SlaveNode(cluster, agent, false);
 
@@ -135,9 +137,9 @@ public class HadoopTable extends TreeTable {
                 Object childID = addItem(new Object[]{
                                 null,
                                 null,
-                                null,//dataNode,
+                                dataNode,
                                 null,
-                                null,//taskTracker,
+                                taskTracker,
                                 null},
                         null
                 );
@@ -145,7 +147,7 @@ public class HadoopTable extends TreeTable {
                 setParent(childID, rowId);
                 setCollapsed(childID, true);
                 setChildrenAllowed(childID, false);
-            }
+            }*/
 
             setParent(rowId, parentId);
             setCollapsed(rowId, false);
