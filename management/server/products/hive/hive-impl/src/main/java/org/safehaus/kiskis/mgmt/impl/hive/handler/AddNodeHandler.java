@@ -66,7 +66,7 @@ public class AddNodeHandler extends BaseHandler {
             }
 
             if(skipInstall || installed) {
-                task = TaskFactory.configureClient(set);
+                task = TaskFactory.configureClient(set, config.getServer());
                 manager.getTaskRunner().executeTaskNWait(task);
                 res = task.getResults().get(agent.getUuid());
                 installed = task.isCompleted() && isZero(res.getExitCode());

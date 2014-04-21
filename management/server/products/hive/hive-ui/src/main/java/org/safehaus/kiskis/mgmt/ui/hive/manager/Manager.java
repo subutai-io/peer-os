@@ -104,7 +104,6 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                // TODO:
                 if(config == null) {
                     show("Select cluster");
                     return;

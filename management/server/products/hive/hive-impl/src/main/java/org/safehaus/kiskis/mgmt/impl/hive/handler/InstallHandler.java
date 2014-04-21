@@ -113,7 +113,8 @@ public class InstallHandler extends BaseHandler {
                     }
                 }
                 if(readyClients.size() > 0) {
-                    Task configTask = TaskFactory.configureClient(readyClients);
+                    Task configTask = TaskFactory.configureClient(readyClients,
+                            config.getServer());
                     manager.getTaskRunner().executeTaskNWait(configTask);
                     for(Agent a : readyClients) {
                         res = configTask.getResults().get(a.getUuid());
@@ -124,6 +125,7 @@ public class InstallHandler extends BaseHandler {
                             po.addLog(String.format("Failed to configure client node '%s': %s",
                                     a.getHostname(), res.getStdErr()));
                     }
+                    po.addLogDone("Done");
                 }
             } else {
                 po.addLogFailed("Failed to install client(s): "

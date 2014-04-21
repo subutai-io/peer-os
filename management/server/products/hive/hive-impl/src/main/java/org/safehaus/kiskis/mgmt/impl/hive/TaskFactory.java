@@ -48,10 +48,10 @@ public class TaskFactory {
         return t;
     }
 
-    public static Task configureClient(Collection<Agent> agents) {
+    public static Task configureClient(Collection<Agent> agents, Agent server) {
         Task t = new Task("Configure Hive client(s)");
         for(Agent agent : agents) {
-            String host = "thrift://" + agent.getListIP().get(0) + ":10000";
+            String host = "thrift://" + server.getListIP().get(0) + ":10000";
             Request r = Requests.addHivePoperty("add", "hive-site.xml", "hive.metastore.uris", host);
             t.addRequest(r, agent);
         }
