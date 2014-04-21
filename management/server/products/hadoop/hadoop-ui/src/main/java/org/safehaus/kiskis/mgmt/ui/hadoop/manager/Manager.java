@@ -61,6 +61,18 @@ public class Manager extends Panel {
         return refreshButton;
     }
 
+    private Button getDestroyButton() {
+        destroyButton = new Button("Destroy");
+        destroyButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                System.out.println(table.getValue());
+            }
+        });
+
+        return destroyButton;
+    }
+
     private Label getIndicator() {
         indicator = new Label("Label");
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
@@ -75,6 +87,7 @@ public class Manager extends Panel {
     private HadoopTable getHadoopTable() {
         if (table == null) {
             table = new HadoopTable("Hadoop Clusters", indicator);
+            table.setMultiSelect(false);
         }
 
         return table;
