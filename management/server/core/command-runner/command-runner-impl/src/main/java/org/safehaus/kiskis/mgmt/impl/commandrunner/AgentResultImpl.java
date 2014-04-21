@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
@@ -22,11 +23,13 @@ public class AgentResultImpl implements AgentResult {
     private Integer exitCode;
 
     public AgentResultImpl(UUID agentUUID) {
+        Preconditions.checkNotNull(agentUUID, "Agent UUID is null");
+
         this.agentUUID = agentUUID;
     }
 
     public void appendResults(Response response) {
-        if (response != null && exitCode == null) {
+        if (response != null && exitCode == null && agentUUID.equals(response.getUuid())) {
             if (!Strings.isNullOrEmpty(response.getStdOut())) {
                 stdOut.append(response.getStdOut());
             }
