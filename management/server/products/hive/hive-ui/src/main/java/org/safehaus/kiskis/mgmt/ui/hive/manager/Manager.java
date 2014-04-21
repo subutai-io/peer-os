@@ -1,8 +1,10 @@
 package org.safehaus.kiskis.mgmt.ui.hive.manager;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
@@ -62,8 +64,6 @@ public class Manager {
             }
         });
 
-        controlsContent.addComponent(clusterCombo);
-
         Button refreshClustersBtn = new Button("Refresh clusters");
         refreshClustersBtn.addListener(new Button.ClickListener() {
 
@@ -72,8 +72,6 @@ public class Manager {
                 refreshClustersInfo();
             }
         });
-
-        controlsContent.addComponent(refreshClustersBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -97,7 +95,20 @@ public class Manager {
 
         });
 
-        controlsContent.addComponent(destroyClusterBtn);
+        Button checkAllBtn = new Button("Check all");
+        checkAllBtn.addListener(new Button.ClickListener() {
+
+            public void buttonClick(Button.ClickEvent event) {
+                Table[] tables = new Table[]{serverTable, clientsTable};
+                for(Table t : tables) {
+                    for(Object itemId : t.getItemIds()) {
+                        Item item = t.getItem(itemId);
+                        Object e = item.getItemProperty("Check").getValue();
+                        if(e instanceof Button) ((Button)e).click();
+                    }
+                }
+            }
+        });
 
         Button addNodeBtn = new Button("Add Node");
         addNodeBtn.addListener(new Button.ClickListener() {
@@ -136,6 +147,10 @@ public class Manager {
             }
         });
 
+        controlsContent.addComponent(clusterCombo);
+        controlsContent.addComponent(refreshClustersBtn);
+        controlsContent.addComponent(destroyClusterBtn);
+        controlsContent.addComponent(checkAllBtn);
         controlsContent.addComponent(addNodeBtn);
 
         content.addComponent(controlsContent);
@@ -162,9 +177,13 @@ public class Manager {
             final Button stopBtn = new Button("Stop");
             final Button restartBtn = new Button("Restart");
             final Button destroyBtn = !server ? new Button("Destroy") : null;
+            final Embedded icon = new Embedded("", new ThemeResource(
+                    "../base/common/img/loading-indicator.gif"));
+
             startBtn.setEnabled(false);
             stopBtn.setEnabled(false);
             restartBtn.setEnabled(false);
+            icon.setVisible(false);
 
             final List items = new ArrayList();
             items.add(agent.getHostname());
@@ -204,31 +223,35 @@ public class Manager {
                     }
                 });
             }
+            items.add(icon);
 
             table.addItem(items.toArray(), null);
 
             checkBtn.addListener(new Button.ClickListener() {
                 public void buttonClick(Button.ClickEvent event) {
+                    icon.setVisible(true);
                     for(Object e : items) {
                         if(e instanceof Button) ((Button)e).setEnabled(false);
                     }
                     final UUID trackId = HiveUI.getManager().statusCheck(
                             config.getClusterName(), agent.getHostname());
-                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackId,
-                            new Window.CloseListener() {
+                    HiveUI.getExecutor().execute(new Runnable() {
 
-                                public void windowClose(Window.CloseEvent e) {
-                                    ProductOperationView po
-                                    = HiveUI.getTracker().getProductOperation(
-                                            Config.PRODUCT_KEY, trackId);
-                                    boolean running = po.getState() == ProductOperationState.SUCCEEDED;
-                                    checkBtn.setEnabled(true);
-                                    startBtn.setEnabled(!running);
-                                    stopBtn.setEnabled(running);
-                                    restartBtn.setEnabled(running);
-                                    if(destroyBtn != null) destroyBtn.setEnabled(true);
-                                }
-                            });
+                        public void run() {
+                            ProductOperationView po = null;
+                            while(po == null || po.getState() == ProductOperationState.RUNNING) {
+                                po = HiveUI.getTracker().getProductOperation(
+                                        Config.PRODUCT_KEY, trackId);
+                            }
+                            boolean running = po.getState() == ProductOperationState.SUCCEEDED;
+                            checkBtn.setEnabled(true);
+                            startBtn.setEnabled(!running);
+                            stopBtn.setEnabled(running);
+                            restartBtn.setEnabled(running);
+                            if(destroyBtn != null) destroyBtn.setEnabled(true);
+                            icon.setVisible(false);
+                        }
+                    });
                 }
             });
 
@@ -347,29 +370,20 @@ public class Manager {
 
     private Table createTableTemplate(String caption, int size, boolean server) {
         final Table table = new Table(caption);
-        table
-                .addContainerProperty("Host", String.class, null);
-        table.addContainerProperty(
-                "Status", Button.class, null);
-        table.addContainerProperty(
-                "Start", Button.class, null);
-        table.addContainerProperty(
-                "Stop", Button.class, null);
-        table.addContainerProperty(
-                "Restart", Button.class, null);
+        table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Start", Button.class, null);
+        table.addContainerProperty("Stop", Button.class, null);
+        table.addContainerProperty("Restart", Button.class, null);
         if(!server)
-            table.addContainerProperty(
-                    "Destroy", Button.class, null);
-        table.setWidth(
-                100, Sizeable.UNITS_PERCENTAGE);
+            table.addContainerProperty("Destroy", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
+        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
 
-        table.setPageLength(
-                10);
-        table.setSelectable(
-                false);
-        table.setImmediate(
-                true);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
 
         table.addListener(new ItemClickEvent.ItemClickListener() {
 
@@ -385,8 +399,7 @@ public class Manager {
                     }
                 }
             }
-        }
-        );
+        });
         return table;
     }
 
