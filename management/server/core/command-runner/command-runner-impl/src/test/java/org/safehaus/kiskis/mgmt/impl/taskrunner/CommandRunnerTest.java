@@ -15,10 +15,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import static org.hamcrest.Matchers.equalTo;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.hamcrest.core.Is.is;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandRunnerImpl;
@@ -42,6 +44,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 public class CommandRunnerTest {
 
     private static ExecutorService exec;
+    private final boolean allTests = true;
 
     @BeforeClass
     public static void setupClass() {
@@ -55,6 +58,7 @@ public class CommandRunnerTest {
 
     @Test
     public void shouldRunCommand() {
+        Assume.assumeTrue(allTests);
         CommandRunner commandRunner = mock(CommandRunnerImpl.class);
         Command command = mock(Command.class);
         CommandCallback callback = mock(CommandCallback.class);
@@ -66,6 +70,7 @@ public class CommandRunnerTest {
 
     @Test
     public void shouldAddListenerToCommManager() {
+        Assume.assumeTrue(allTests);
         CommunicationManager communicationManager = mock(CommunicationManager.class);
         CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
 
@@ -76,6 +81,7 @@ public class CommandRunnerTest {
 
     @Test
     public void shouldRemoveListenerFromCommManager() {
+        Assume.assumeTrue(allTests);
         CommunicationManager communicationManager = mock(CommunicationManager.class);
         CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
         commandRunnerImpl.init();
@@ -87,34 +93,24 @@ public class CommandRunnerTest {
 
     @Test
     public void shouldSendRequestToCommManager() {
+        Assume.assumeTrue(allTests);
         CommunicationManager communicationManager = mock(CommunicationManager.class);
         CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
         commandRunnerImpl.init();
-        UUID uuid = UUID.randomUUID();
-        CommandImpl commandImpl = mock(CommandImpl.class);
-        when(commandImpl.getCommandUUID()).thenReturn(uuid);
-        when(commandImpl.getTimeout()).thenReturn(1);
-        Request request = mock(Request.class);
-        Set<Request> requests = new HashSet<Request>();
-        requests.add(request);
-        when(commandImpl.getRequests()).thenReturn(requests);
+        Command command = MockUtils.getCommand(commandRunnerImpl, UUID.randomUUID(), 1);
 
-        commandRunnerImpl.runCommand(commandImpl);
+        commandRunnerImpl.runCommand(command);
 
         verify(communicationManager).sendRequest(any(Request.class));
     }
 
     @Test
     public void commandShouldTimeout() {
+        Assume.assumeTrue(allTests);
         CommunicationManager communicationManager = mock(CommunicationManager.class);
         CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
-        Agent agent = mock(Agent.class);
-        Set<Agent> agents = new HashSet<Agent>();
-        agents.add(agent);
-        RequestBuilder builder = mock(RequestBuilder.class);
-        when(builder.getTimeout()).thenReturn(1);
-        Command command = commandRunnerImpl.createCommand(builder, agents);
         commandRunnerImpl.init();
+        Command command = MockUtils.getCommand(commandRunnerImpl, UUID.randomUUID(), 1);
 
         commandRunnerImpl.runCommand(command);
 
@@ -123,15 +119,11 @@ public class CommandRunnerTest {
 
     @Test
     public void commandShouldTimeoutAsync() {
+        Assume.assumeTrue(allTests);
         CommunicationManager communicationManager = mock(CommunicationManager.class);
         CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
-        Agent agent = mock(Agent.class);
-        Set<Agent> agents = new HashSet<Agent>();
-        agents.add(agent);
-        RequestBuilder builder = mock(RequestBuilder.class);
-        when(builder.getTimeout()).thenReturn(1);
         commandRunnerImpl.init();
-        final Command command = commandRunnerImpl.createCommand(builder, agents);
+        Command command = MockUtils.getCommand(commandRunnerImpl, UUID.randomUUID(), 1);
 
         commandRunnerImpl.runCommandAsync(command);
 
@@ -142,23 +134,14 @@ public class CommandRunnerTest {
 
     @Test
     public void commandShouldSucceed() throws InterruptedException {
+        Assume.assumeTrue(allTests);
         CommunicationManager communicationManager = mock(CommunicationManager.class);
         final CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
         commandRunnerImpl.init();
-        Agent agent = mock(Agent.class);
-        Set<Agent> agents = new HashSet<Agent>();
-        agents.add(agent);
         UUID agentUUID = UUID.randomUUID();
-        when(agent.getUuid()).thenReturn(agentUUID);
-        RequestBuilder builder = mock(RequestBuilder.class);
-        when(builder.getTimeout()).thenReturn(1);
-        final Command command = commandRunnerImpl.createCommand(builder, agents);
-        UUID commandUUID = ((CommandImpl) command).getCommandUUID();
-        final Response response = mock(Response.class);
-        when(response.getUuid()).thenReturn(agentUUID);
-        when(response.getTaskUuid()).thenReturn(commandUUID);
-        when(response.isFinal()).thenReturn(true);
-        when(response.hasSucceeded()).thenReturn(true);
+        CommandImpl command = (CommandImpl) MockUtils.getCommand(commandRunnerImpl, agentUUID, 1);
+        UUID commandUUID = command.getCommandUUID();
+        final Response response = MockUtils.getSucceededResponse(agentUUID, commandUUID);
 
         commandRunnerImpl.runCommandAsync(command);
         exec.execute(new Runnable() {
@@ -174,24 +157,39 @@ public class CommandRunnerTest {
     }
 
     @Test
-    public void commandShouldStop() throws InterruptedException {
+    public void commandShouldFail() throws InterruptedException {
+        Assume.assumeTrue(allTests);
         CommunicationManager communicationManager = mock(CommunicationManager.class);
         final CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
         commandRunnerImpl.init();
-        Agent agent = mock(Agent.class);
-        Set<Agent> agents = new HashSet<Agent>();
-        agents.add(agent);
         UUID agentUUID = UUID.randomUUID();
-        when(agent.getUuid()).thenReturn(agentUUID);
-        RequestBuilder builder = mock(RequestBuilder.class);
-        when(builder.getTimeout()).thenReturn(1);
-        final Command command = commandRunnerImpl.createCommand(builder, agents);
-        UUID commandUUID = ((CommandImpl) command).getCommandUUID();
-        final Response response = mock(Response.class);
-        when(response.getUuid()).thenReturn(agentUUID);
-        when(response.getTaskUuid()).thenReturn(commandUUID);
-        when(response.isFinal()).thenReturn(false);
-        when(response.hasSucceeded()).thenReturn(false);
+        CommandImpl command = (CommandImpl) MockUtils.getCommand(commandRunnerImpl, agentUUID, 1);
+        UUID commandUUID = command.getCommandUUID();
+        final Response response = MockUtils.getFailedResponse(agentUUID, commandUUID);
+
+        commandRunnerImpl.runCommandAsync(command);
+        exec.execute(new Runnable() {
+
+            public void run() {
+                commandRunnerImpl.onResponse(response);
+            }
+        });
+
+        Awaitility.await().atMost(1, TimeUnit.SECONDS).with().pollInterval(100, TimeUnit.MILLISECONDS)
+                .untilCall(to(command).getCommandStatus(), is(CommandStatus.FAILED));
+
+    }
+
+    @Test
+    public void commandShouldStop() throws InterruptedException {
+        Assume.assumeTrue(allTests);
+        CommunicationManager communicationManager = mock(CommunicationManager.class);
+        final CommandRunnerImpl commandRunnerImpl = new CommandRunnerImpl(communicationManager);
+        commandRunnerImpl.init();
+        UUID agentUUID = UUID.randomUUID();
+        CommandImpl command = (CommandImpl) MockUtils.getCommand(commandRunnerImpl, agentUUID, 1);
+        UUID commandUUID = command.getCommandUUID();
+        final Response response = MockUtils.getIntermediateResponse(agentUUID, commandUUID);
 
         final AtomicInteger atomicInteger = new AtomicInteger();
         commandRunnerImpl.runCommandAsync(command, new CommandCallback() {

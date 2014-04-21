@@ -42,8 +42,8 @@ public class CommandImpl implements Command {
     private final Lock updateLock = new ReentrantLock(true);
 
     private volatile CommandStatus commandStatus = CommandStatus.NEW;
-    private int requestsCompleted = 0;
-    private int requestsSucceeded = 0;
+    private volatile int requestsCompleted = 0;
+    private volatile int requestsSucceeded = 0;
 
     public CommandImpl(RequestBuilder requestBuilder, Set<Agent> agents) {
 
@@ -83,37 +83,45 @@ public class CommandImpl implements Command {
             agentResult.appendResults(response);
 
             if (response.isFinal()) {
-                requestsCompleted++;
+                incrementCompletedRequestsCount();
                 if (response.hasSucceeded()) {
-                    requestsSucceeded++;
+                    incrementSucceededRequestsCount();
                 }
-                if (requestsCompleted == requestsToRun) {
-                    if (requestsCompleted == requestsSucceeded) {
-                        commandStatus = CommandStatus.SUCCEEDED;
+                if (getRequestsCompleted() == getRequestsRun()) {
+                    if (getRequestsCompleted() == getRequestsSucceeded()) {
+                        setCommandStatus(CommandStatus.SUCCEEDED);
                     } else {
-                        commandStatus = CommandStatus.FAILED;
+                        setCommandStatus(CommandStatus.FAILED);
                     }
                 }
             }
         }
     }
 
-    void waitCompletion() {
+    void incrementCompletedRequestsCount() {
+        requestsCompleted++;
+    }
+
+    void incrementSucceededRequestsCount() {
+        requestsSucceeded++;
+    }
+
+    public void waitCompletion() {
         try {
             completionSemaphore.acquire();
         } catch (InterruptedException ex) {
         }
     }
 
-    void notifyWaitingThreads() {
+    public void notifyWaitingThreads() {
         completionSemaphore.release();
     }
 
-    void getUpdateLock() {
+    public void getUpdateLock() {
         updateLock.lock();
     }
 
-    void releaseUpdateLock() {
+    public void releaseUpdateLock() {
         updateLock.unlock();
     }
 
@@ -144,4 +152,10 @@ public class CommandImpl implements Command {
     public UUID getCommandUUID() {
         return commandUUID;
     }
+
+    @Override
+    public String toString() {
+        return "CommandImpl{" + "results=" + results + ", requestsToRun=" + requestsToRun + ", commandUUID=" + commandUUID + ", requests=" + requests + ", timeout=" + timeout + ", commandStatus=" + commandStatus + ", requestsCompleted=" + requestsCompleted + ", requestsSucceeded=" + requestsSucceeded + '}';
+    }
+
 }
