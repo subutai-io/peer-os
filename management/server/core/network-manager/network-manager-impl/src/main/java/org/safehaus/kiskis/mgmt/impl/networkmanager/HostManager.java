@@ -31,6 +31,15 @@ public class HostManager {
         return false;
     }
 
+    public boolean execute(Agent agent) {
+        if (agentList != null && !agentList.isEmpty() && agent != null) {
+            agentList.add(agent);
+            return write();
+        }
+
+        return false;
+    }
+
     private boolean write() {
         String hosts = prepareHost();
         Task task = Tasks.getWriteHostTask(agentList, hosts);

@@ -31,5 +31,10 @@ public class NetwokManagerImpl implements NetworkManager {
         return new HostManager(taskRunner, agentList, domainName).execute();
     }
 
+    @Override
+    public boolean configHostsOnAgents(List<Agent> agentList, Agent agent, String domainName) {
+        return new HostManager(taskRunner, agentList, domainName).execute(agent);
+    }
+
 
 }

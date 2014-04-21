@@ -13,4 +13,6 @@ public interface NetworkManager {
     public boolean configSshOnAgents(List<Agent> agentList, Agent agent);
 
     public boolean configHostsOnAgents(List<Agent> agentList, String domainName);
+
+    public boolean configHostsOnAgents(List<Agent> agentList, Agent agent, String domainName);
 }
