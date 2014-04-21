@@ -12,16 +12,12 @@ public abstract class BaseHandler implements Runnable {
     final String clusterName;
     final ProductOperation po;
 
-    final Config config;
     String hostname;
 
     public BaseHandler(HiveImpl manager, String clusterName, ProductOperation po) {
         this.manager = manager;
         this.clusterName = clusterName;
         this.po = po;
-
-        this.config = manager.getDbManager().getInfo(Config.PRODUCT_KEY,
-                clusterName, Config.class);
     }
 
     public String getHostname() {
@@ -30,6 +26,15 @@ public abstract class BaseHandler implements Runnable {
 
     public void setHostname(String hostname) {
         this.hostname = hostname;
+    }
+
+    Config getClusterConfig() {
+        return manager.getDbManager().getInfo(Config.PRODUCT_KEY, clusterName,
+                Config.class);
+    }
+
+    boolean isServerNode(Config config, String hostname) {
+        return config.getServer().getHostname().equalsIgnoreCase(hostname);
     }
 
     boolean isNodeConnected(String hostname) {
@@ -43,19 +48,26 @@ public abstract class BaseHandler implements Runnable {
      * @param removeDisconnected
      * @return number of connected nodes
      */
-    int checkClientNodes(boolean removeDisconnected) {
+    int checkClientNodes(Config config, boolean removeDisconnected) {
+        int connected = 0;
         Iterator<Agent> it = config.getClients().iterator();
         while(it.hasNext()) {
             Agent a = it.next();
-            if(manager.getAgentManager().getAgentByHostname(a.getHostname()) == null) {
-                String m = String.format("Node '%s' is not connected.", a.getHostname());
-                if(removeDisconnected) {
-                    it.remove();
-                    m += " Omitting from installation";
-                }
-                po.addLog(m);
+            if(manager.getAgentManager().getAgentByHostname(a.getHostname()) != null) {
+                connected++;
+                continue;
             }
+            String m = String.format("Node '%s' is not connected.", a.getHostname());
+            if(removeDisconnected) {
+                it.remove();
+                m += " Omitting from clients list";
+            }
+            po.addLog(m);
         }
-        return config.getClients().size();
+        return connected;
+    }
+
+    boolean isZero(Integer i) {
+        return i != null && i == 0;
     }
 }

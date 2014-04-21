@@ -1,6 +1,8 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
@@ -13,14 +15,20 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class InstallHandler extends BaseHandler {
 
+    private Config config;
+
     public InstallHandler(HiveImpl manager, String clusterName, ProductOperation po) {
         super(manager, clusterName, po);
     }
 
+    public void setConfig(Config config) {
+        this.config = config;
+    }
+
     public void run() {
-        if(config != null) {
-            po.addLogFailed(String.format("Cluster '%s' already exists.\nInstallation aborted",
-                    config.getClusterName()));
+        if(getClusterConfig() != null) {
+            po.addLogFailed(String.format("Cluster '%s' already exists",
+                    clusterName));
             return;
         }
 
@@ -31,7 +39,7 @@ public class InstallHandler extends BaseHandler {
             return;
         }
         // check client nodes
-        if(checkClientNodes(true) == 0) {
+        if(checkClientNodes(config, true) == 0) {
             po.addLogFailed("No nodes eligible for installation. Operation aborted");
             return;
         }
@@ -70,34 +78,56 @@ public class InstallHandler extends BaseHandler {
             return;
         }
 
-        // install
-        Task serverTask = TaskFactory.installServer(config.getServer(), skipHive, skipDerby);
-        Task clientTask = TaskFactory.installClient(config.getClients());
-
+        // save cluster info and install
         po.addLog("Save cluster info");
         if(manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
             po.addLog("Cluster info saved");
 
             po.addLog("Installing server...");
-            serverTask = manager.getTaskRunner().executeTaskNWait(serverTask);
-
-            if(serverTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                po.addLog("Server successfully installed");
-                po.addLog("Installing clients...");
-                clientTask = manager.getTaskRunner().executeTaskNWait(clientTask);
-
-                if(clientTask.isCompleted()) {
-                    for(Agent a : config.getClients()) {
-                        res = clientTask.getResults().get(a.getUuid());
-                        if(res.getExitCode() != null && res.getExitCode() == 0)
-                            po.addLog("Hive successfully installed on " + a.getHostname());
-                        else
-                            po.addLog("Failed to install Hive on " + a.getHostname());
-                    }
-                } else {
-                    po.addLogFailed("Failed to install client(s): "
-                            + clientTask.getFirstError());
+            List<Task> serverTasks = TaskFactory.installServer(config.getServer(),
+                    skipHive, skipDerby);
+            for(Task t : serverTasks) {
+                manager.getTaskRunner().executeTaskNWait(t);
+                po.addLog(t.getDescription() + " " + t.getTaskStatus());
+                if(t.getTaskStatus() != TaskStatus.SUCCESS) {
+                    Result r = t.getResults().get(config.getServer().getUuid());
+                    po.addLogFailed(r.getStdErr());
+                    return;
                 }
+            }
+            po.addLog("Server successfully installed");
+
+            po.addLog("Installing clients...");
+            Task clientTask = TaskFactory.installClient(config.getClients());
+            manager.getTaskRunner().executeTaskNWait(clientTask);
+
+            if(clientTask.isCompleted()) {
+                List<Agent> readyClients = new ArrayList<Agent>();
+                for(Agent a : config.getClients()) {
+                    res = clientTask.getResults().get(a.getUuid());
+                    if(isZero(res.getExitCode())) {
+                        readyClients.add(a);
+                        po.addLog("Hive successfully installed on " + a.getHostname());
+                    } else {
+                        po.addLog("Failed to install Hive on " + a.getHostname());
+                    }
+                }
+                if(readyClients.size() > 0) {
+                    Task configTask = TaskFactory.configureClient(readyClients);
+                    manager.getTaskRunner().executeTaskNWait(configTask);
+                    for(Agent a : readyClients) {
+                        res = configTask.getResults().get(a.getUuid());
+                        if(isZero(res.getExitCode()))
+                            po.addLog(String.format("Client node '%s' successfully configured",
+                                    a.getHostname()));
+                        else
+                            po.addLog(String.format("Failed to configure client node '%s': %s",
+                                    a.getHostname(), res.getStdErr()));
+                    }
+                }
+            } else {
+                po.addLogFailed("Failed to install client(s): "
+                        + clientTask.getFirstError());
             }
         } else {
             po.addLogFailed("Failed to save cluster info.\nInstallation aborted");

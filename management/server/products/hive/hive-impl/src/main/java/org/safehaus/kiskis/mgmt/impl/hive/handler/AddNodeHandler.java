@@ -5,7 +5,6 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.Product;
@@ -19,9 +18,9 @@ public class AddNodeHandler extends BaseHandler {
     }
 
     public void run() {
+        Config config = getClusterConfig();
         if(config == null) {
-            po.addLogFailed(String.format("Cluster '%s' does not exist",
-                    config.getClusterName()));
+            po.addLogFailed(String.format("Cluster '%s' does not exist", clusterName));
             return;
         }
 
@@ -38,8 +37,8 @@ public class AddNodeHandler extends BaseHandler {
             return;
         }
         Result res = task.getResults().get(agent.getUuid());
-        boolean skipHive;
-        if(skipHive = res.getStdOut().contains(Product.HIVE.getPackageName())) {
+        boolean skipInstall;
+        if(skipInstall = res.getStdOut().contains(Product.HIVE.getPackageName())) {
             po.addLog("Hive already installed on " + hostname);
         }
 
@@ -51,14 +50,37 @@ public class AddNodeHandler extends BaseHandler {
 
             Set<Agent> set = new HashSet<Agent>(2);
             set.add(agent);
-            task = TaskFactory.installClient(set, skipHive);
-            manager.getTaskRunner().executeTaskNWait(task);
-            if(task.getTaskStatus() == TaskStatus.SUCCESS) {
-                po.addLogDone(String.format("Node '%s' successfully added",
-                        hostname));
-            } else {
-                po.addLogFailed("Failed to add node: " + res.getStdErr());
+            boolean installed = false;
+
+            if(!skipInstall) {
+                task = TaskFactory.installClient(set);
+                manager.getTaskRunner().executeTaskNWait(task);
+                res = task.getResults().get(agent.getUuid());
+                installed = task.isCompleted() && isZero(res.getExitCode());
+                if(installed) {
+                    po.addLog(String.format("Node '%s' successfully added",
+                            hostname));
+                } else {
+                    po.addLog("Failed to add node: " + res.getStdErr());
+                }
             }
+
+            if(skipInstall || installed) {
+                task = TaskFactory.configureClient(set);
+                manager.getTaskRunner().executeTaskNWait(task);
+                res = task.getResults().get(agent.getUuid());
+                installed = task.isCompleted() && isZero(res.getExitCode());
+                if(installed)
+                    po.addLog(task.getDescription() + " " + task.getTaskStatus());
+                else {
+                    po.addLog(res.getStdOut());
+                    po.addLog(res.getStdErr());
+                }
+            }
+
+            if(installed) po.addLogDone("Done");
+            else po.addLogFailed(null);
+
         } else {
             po.addLogFailed("Failed to update cluster info");
         }

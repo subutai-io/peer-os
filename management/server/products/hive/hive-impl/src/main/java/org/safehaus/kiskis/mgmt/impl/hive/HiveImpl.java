@@ -11,7 +11,9 @@ public class HiveImpl extends HiveBase {
     public UUID installCluster(Config config) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Installing cluster " + config.getClusterName());
-        executor.execute(new InstallHandler(this, config.getClusterName(), po));
+        InstallHandler h = new InstallHandler(this, config.getClusterName(), po);
+        h.setConfig(config);
+        executor.execute(h);
         return po.getId();
     }
 

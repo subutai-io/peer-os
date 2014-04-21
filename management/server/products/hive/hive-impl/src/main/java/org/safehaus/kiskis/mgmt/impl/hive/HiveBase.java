@@ -57,12 +57,4 @@ public abstract class HiveBase implements Hive {
         this.dbManager = dbManager;
     }
 
-    public ExecutorService getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(ExecutorService executor) {
-        this.executor = executor;
-    }
-
 }

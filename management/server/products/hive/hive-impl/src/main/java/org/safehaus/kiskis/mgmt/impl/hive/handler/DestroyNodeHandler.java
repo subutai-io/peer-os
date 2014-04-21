@@ -5,7 +5,6 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
@@ -18,9 +17,9 @@ public class DestroyNodeHandler extends BaseHandler {
     }
 
     public void run() {
+        Config config = getClusterConfig();
         if(config == null) {
-            po.addLogFailed(String.format("Cluster '%s' does not exist",
-                    config.getClusterName()));
+            po.addLogFailed(String.format("Cluster '%s' does not exist", clusterName));
             return;
         }
 
@@ -39,24 +38,22 @@ public class DestroyNodeHandler extends BaseHandler {
         set.add(agent);
         Task task = TaskFactory.uninstallClient(set);
         manager.getTaskRunner().executeTaskNWait(task);
-        if(task.getTaskStatus() == TaskStatus.SUCCESS) {
-            Result res = task.getResults().get(agent.getUuid());
-            if(res.getExitCode() != null && res.getExitCode() == 0) {
-                po.addLog("Hive client removed");
 
-                config.getClients().remove(agent);
+        Result res = task.getResults().get(agent.getUuid());
+        po.addLog(res.getStdOut());
+        po.addLog(res.getStdErr());
 
-                po.addLog("Update cluster info...");
-                if(manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config))
-                    po.addLogDone("Cluster info successfully updated");
-                else
-                    po.addLogFailed("Failed to update cluster info");
+        boolean ok = task.isCompleted() && isZero(res.getExitCode());
+        if(ok) {
+            config.getClients().remove(agent);
+            po.addLog("Done");
 
-            } else {
-                po.addLogFailed("Failed to remove Hive client: " + res.getStdErr());
-            }
-        } else {
-            po.addLogFailed("Failed to remove node: " + task.getFirstError());
+            po.addLog("Update cluster info...");
+            if(manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config))
+                po.addLogDone("Cluster info successfully updated");
+            else
+                po.addLogFailed("Failed to update cluster info");
+
         }
     }
 

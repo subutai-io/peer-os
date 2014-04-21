@@ -1,10 +1,10 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.hive.Config;
+import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
@@ -15,9 +15,10 @@ public class RestartHandler extends BaseHandler {
     }
 
     public void run() {
+        Config config = getClusterConfig();
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
-                    config.getClusterName()));
+                    clusterName));
             return;
         }
 
@@ -27,19 +28,31 @@ public class RestartHandler extends BaseHandler {
             return;
         }
 
-        Task task = TaskFactory.restart(agent);
-        manager.getTaskRunner().executeTaskNWait(task);
-        if(task.getTaskStatus() == TaskStatus.SUCCESS) {
-            Result res = task.getResults().get(agent.getUuid());
-            if(res.getExitCode() != null && res.getExitCode() == 0)
-                po.addLogDone(String.format("Node '%s' restarted", hostname));
-            else
-                po.addLogFailed(String.format("Failed to restart node '%s': %s",
-                        hostname, res.getStdErr()));
-        } else {
-            po.addLogFailed(String.format("Failed to restart node '%s': %s",
-                    hostname, task.getFirstError()));
+        Task restartHiveTask = TaskFactory.restart(agent, Product.HIVE);
+        manager.getTaskRunner().executeTaskNWait(restartHiveTask);
+
+        Result res = restartHiveTask.getResults().get(agent.getUuid());
+        po.addLog(res.getStdOut());
+        po.addLog(res.getStdErr());
+
+        boolean ok = restartHiveTask.isCompleted() && isZero(res.getExitCode());
+
+        // if server node, restart Derby as well
+        if(ok && agent.equals(config.getServer())) {
+
+            Task restartDerbyTask = TaskFactory.restart(agent, Product.DERBY);
+            manager.getTaskRunner().executeTaskNWait(restartDerbyTask);
+
+            res = restartDerbyTask.getResults().get(agent.getUuid());
+            po.addLog(res.getStdOut());
+            po.addLog(res.getStdErr());
+
+            ok = restartDerbyTask.isCompleted() && isZero(res.getExitCode());
         }
+
+        if(ok) po.addLogDone("Done");
+        else po.addLogFailed(null);
+
     }
 
 }

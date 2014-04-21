@@ -17,5 +17,6 @@
     <modules>
         <module>hive-api</module>
         <module>hive-impl</module>
+        <module>hive-ui</module>
     </modules>
 </project>

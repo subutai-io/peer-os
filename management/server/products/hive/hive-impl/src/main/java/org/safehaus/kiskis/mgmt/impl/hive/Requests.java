@@ -8,6 +8,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 class Requests {
 
+    private static final String EXEC_PROFILE = ". /etc/profile";
+
     enum Type {
 
         INSTALL,
@@ -37,9 +39,11 @@ class Requests {
             case START:
             case STOP:
             case RESTART:
-                sb = new StringBuilder("service ");
-                sb.append(product.getServiceName()).append(" ");
-                sb.append(type.toString().toLowerCase());
+                sb = new StringBuilder();
+                if(product.isProfileScriptRun())
+                    sb.append(EXEC_PROFILE).append(" && ");
+                sb.append("service ").append(product.getServiceName());
+                sb.append(" ").append(type.toString().toLowerCase());
                 req.setProgram(sb.toString());
                 break;
             default:
@@ -49,16 +53,16 @@ class Requests {
         return req;
     }
 
-    static Request configureServer(String host) {
+    static Request configureHiveServer(String host) {
         Request req = getRequestTemplate();
-        req.setProgram("hive-configure.sh " + host); // provide IP address of server
+        req.setProgram(". /etc/profile && hive-configure.sh " + host); // provide IP address of server
         return req;
     }
 
-    static Request addPoperty(String cmd, String propFile, String property, String value) {
+    static Request addHivePoperty(String cmd, String propFile, String property, String value) {
         StringBuilder sb = new StringBuilder();
-        sb.append("hive-property.sh ").append(cmd).append(" ").append(propFile);
-        sb.append(" ").append(propFile);
+        sb.append(". /etc/profile && hive-property.sh ").append(cmd).append(" ");
+        sb.append(propFile).append(" ").append(property);
         if(value != null) sb.append(" ").append(value);
 
         Request req = getRequestTemplate();
