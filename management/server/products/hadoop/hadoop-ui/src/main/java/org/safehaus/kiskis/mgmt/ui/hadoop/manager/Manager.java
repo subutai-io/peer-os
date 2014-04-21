@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager;
 
+import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
@@ -65,7 +66,8 @@ public class Manager extends Panel {
         destroyButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                System.out.println(table.getValue());
+                Item row = table.getItem(table.getValue());
+                System.out.println((String) row.getItemProperty(HadoopTable.CLUSTER_NAME_PROPERTY).getValue());
             }
         });
 
