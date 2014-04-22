@@ -9,27 +9,26 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.api.shark.Shark;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 /**
  * @author dilshat
  */
 public class SharkImpl implements Shark {
 
-    private TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
@@ -40,6 +39,7 @@ public class SharkImpl implements Shark {
     }
 
     public void destroy() {
+        commandRunner = null;
         executor.shutdown();
     }
 
@@ -51,8 +51,12 @@ public class SharkImpl implements Shark {
         this.tracker = tracker;
     }
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+    public void setCommandRunner(CommandRunner commandRunner) {
+        SharkImpl.commandRunner = commandRunner;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void setAgentManager(AgentManager agentManager) {
@@ -62,7 +66,7 @@ public class SharkImpl implements Shark {
     public UUID installCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", clusterName));
+                        String.format("Installing cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -79,7 +83,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -99,15 +103,16 @@ public class SharkImpl implements Shark {
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(config.getNodes()));
+                Command checkInstalledCommand = Commands.getCheckInstalledCommand(config.getNodes());
+                commandRunner.runCommand(checkInstalledCommand);
 
-                if (!checkInstalled.isCompleted()) {
+                if (!checkInstalledCommand.hasCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
                 }
 
                 for (Agent node : config.getNodes()) {
-                    Result result = checkInstalled.getResults().get(node.getUuid());
+                    AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
 
                     if (result.getStdOut().contains("ksks-shark")) {
                         po.addLogFailed(String.format("Node %s already has Shark installed\nInstallation aborted", node.getHostname()));
@@ -123,20 +128,22 @@ public class SharkImpl implements Shark {
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info saved to DB\nInstalling Shark...");
 
-                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
+                    Command installCommand = Commands.getInstallCommand(config.getNodes());
+                    commandRunner.runCommand(installCommand);
 
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Installation succeeded\nSetting Master IP...");
 
-                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
+                        Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getNodes(), sparkConfig.getMasterNode());
+                        commandRunner.runCommand(setMasterIPCommand);
 
-                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                             po.addLogDone("Master IP successfully set\nDone");
                         } else {
-                            po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPTask.getFirstError()));
+                            po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPCommand.getAllErrors()));
                         }
                     } else {
-                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                     }
                 } else {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
@@ -150,7 +157,7 @@ public class SharkImpl implements Shark {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+                        String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -170,23 +177,23 @@ public class SharkImpl implements Shark {
 
                 po.addLog("Uninstalling Shark...");
 
-                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(config.getNodes()));
+                Command uninstallCommand = Commands.getUninstallCommand(config.getNodes());
+                commandRunner.runCommand(uninstallCommand);
 
-                if (uninstallTask.isCompleted()) {
-                    for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        Result result = res.getValue();
-                        Agent agent = agentManager.getAgentByUUID(res.getKey());
+                if (uninstallCommand.hasCompleted()) {
+                    for (AgentResult result : uninstallCommand.getResults().values()) {
+                        Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
                             if (result.getStdOut().contains("Package ksks-shark is not installed, so not removed")) {
                                 po.addLog(String.format("Shark is not installed, so not removed on node %s", result.getStdErr(),
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
                             } else {
                                 po.addLog(String.format("Shark is removed from node %s",
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
                             }
                         } else {
                             po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                                    agent == null ? res.getKey() : agent.getHostname()));
+                                    agent == null ? result.getAgentUUID() : agent.getHostname()));
                         }
                     }
                     po.addLog("Updating db...");
@@ -196,7 +203,7 @@ public class SharkImpl implements Shark {
                         po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
                     }
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                    po.addLogFailed("Uninstallation failed, command timed out");
                 }
 
             }
@@ -208,7 +215,7 @@ public class SharkImpl implements Shark {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying %s in %s", lxcHostname, clusterName));
+                        String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -235,10 +242,11 @@ public class SharkImpl implements Shark {
                     return;
                 }
                 po.addLog("Uninstalling Shark...");
-                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                Command uninstallCommand = Commands.getUninstallCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(uninstallCommand);
 
-                if (uninstallTask.isCompleted()) {
-                    Result result = uninstallTask.getResults().get(agent.getUuid());
+                if (uninstallCommand.hasCompleted()) {
+                    AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
                     if (result.getExitCode() != null && result.getExitCode() == 0) {
                         if (result.getStdOut().contains("Package ksks-shark is not installed, so not removed")) {
                             po.addLog(String.format("Shark is not installed, so not removed on node %s", result.getStdErr(),
@@ -261,7 +269,7 @@ public class SharkImpl implements Shark {
                         po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                     }
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                    po.addLogFailed("Uninstallation failed, command timed out");
                 }
             }
         });
@@ -272,7 +280,7 @@ public class SharkImpl implements Shark {
     public UUID addNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Adding node to %s", clusterName));
+                        String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -297,7 +305,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -311,14 +319,15 @@ public class SharkImpl implements Shark {
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
+                Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(checkInstalledCommand);
 
-                if (!checkInstalled.isCompleted()) {
+                if (!checkInstalledCommand.hasCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
                 }
 
-                Result result = checkInstalled.getResults().get(agent.getUuid());
+                AgentResult result = checkInstalledCommand.getResults().get(agent.getUuid());
 
                 if (result.getStdOut().contains("ksks-shark")) {
                     po.addLogFailed(String.format("Node %s already has Shark installed\nInstallation aborted", lxcHostname));
@@ -334,21 +343,23 @@ public class SharkImpl implements Shark {
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info updated in DB\nInstalling Shark...");
 
-                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                    Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
+                    commandRunner.runCommand(installCommand);
 
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Installation succeeded\nSetting Master IP...");
 
-                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), sparkConfig.getMasterNode()));
+                        Command setMasterIPCommand = Commands.getSetMasterIPCommand(Util.wrapAgentToSet(agent), sparkConfig.getMasterNode());
+                        commandRunner.runCommand(setMasterIPCommand);
 
-                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Master IP successfully set\nDone");
+                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                            po.addLogDone("Master IP set successfully\nDone");
                         } else {
-                            po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPTask.getFirstError()));
+                            po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPCommand.getAllErrors()));
                         }
                     } else {
 
-                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                     }
                 } else {
                     po.addLogFailed("Could not update cluster info in DB! Please see logs\nInstallation aborted");
@@ -367,7 +378,7 @@ public class SharkImpl implements Shark {
     public UUID actualizeMasterIP(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Actualizing master IP of %s", clusterName));
+                        String.format("Actualizing master IP of %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -380,7 +391,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -393,12 +404,13 @@ public class SharkImpl implements Shark {
                     }
                 }
 
-                Task setMaterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getNodes(), sparkConfig.getMasterNode()));
+                Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getNodes(), sparkConfig.getMasterNode());
+                commandRunner.runCommand(setMasterIPCommand);
 
-                if (setMaterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                     po.addLogDone("Master IP actualized successfully\nDone");
                 } else {
-                    po.addLogFailed(String.format("Failed to actualize Master IP, %s", setMaterIPTask.getFirstError()));
+                    po.addLogFailed(String.format("Failed to actualize Master IP, %s", setMasterIPCommand.getAllErrors()));
                 }
 
             }
