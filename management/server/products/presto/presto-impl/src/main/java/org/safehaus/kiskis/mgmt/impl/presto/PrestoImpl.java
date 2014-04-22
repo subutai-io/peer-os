@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.api.presto.Presto;
-import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -20,13 +19,18 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 /**
  * @author dilshat
  */
 public class PrestoImpl implements Presto {
 
-    private TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
@@ -37,6 +41,7 @@ public class PrestoImpl implements Presto {
     }
 
     public void destroy() {
+        commandRunner = null;
         executor.shutdown();
     }
 
@@ -48,8 +53,12 @@ public class PrestoImpl implements Presto {
         this.tracker = tracker;
     }
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+    public void setCommandRunner(CommandRunner commandRunner) {
+        PrestoImpl.commandRunner = commandRunner;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void setAgentManager(AgentManager agentManager) {
@@ -63,7 +72,7 @@ public class PrestoImpl implements Presto {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", config.getClusterName()));
+                        String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -84,7 +93,7 @@ public class PrestoImpl implements Presto {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getWorkers().iterator(); it.hasNext(); ) {
+                for (Iterator<Agent> it = config.getWorkers().iterator(); it.hasNext();) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -101,15 +110,16 @@ public class PrestoImpl implements Presto {
 
                 //check installed ksks packages
                 Set<Agent> allNodes = config.getAllNodes();
-                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(allNodes));
+                Command checkInstalledCommand = Commands.getCheckInstalledCommand(allNodes);
+                commandRunner.runCommand(checkInstalledCommand);
 
-                if (!checkInstalled.isCompleted()) {
+                if (!checkInstalledCommand.hasCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
                 }
-                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext(); ) {
+                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext();) {
                     Agent node = it.next();
-                    Result result = checkInstalled.getResults().get(node.getUuid());
+                    AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
                     if (result.getStdOut().contains("ksks-presto")) {
                         po.addLog(String.format("Node %s already has Presto installed. Omitting this node from installation", node.getHostname()));
                         config.getWorkers().remove(node);
@@ -136,54 +146,57 @@ public class PrestoImpl implements Presto {
                     po.addLog("Cluster info saved to DB\nInstalling Presto...");
                     //install presto            
 
-                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getAllNodes()));
+                    Command installCommand = Commands.getInstallCommand(config.getAllNodes());
+                    commandRunner.runCommand(installCommand);
 
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Installation succeeded\nConfiguring coordinator...");
 
-                        Task configureCoordinatorTask = taskRunner.executeTaskNWait(Tasks.getSetCoordinatorTask(config.getCoordinatorNode()));
+                        Command configureCoordinatorCommand = Commands.getSetCoordinatorCommand(config.getCoordinatorNode());
+                        commandRunner.runCommand(configureCoordinatorCommand);
 
-                        if (configureCoordinatorTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (configureCoordinatorCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                             po.addLog("Coordinator configured successfully\nConfiguring workers...");
 
-                            Task configureWorkersTask = taskRunner.executeTaskNWait(Tasks.getSetWorkerTask(config.getCoordinatorNode(), config.getWorkers()));
+                            Command configureWorkersCommand = Commands.getSetWorkerCommand(config.getCoordinatorNode(), config.getWorkers());
+                            commandRunner.runCommand(configureWorkersCommand);
 
-                            if (configureWorkersTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            if (configureWorkersCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                                 po.addLog("Workers configured successfully\nStarting Presto...");
 
-                                Task startPrestoTask = Tasks.getStartTask(config.getAllNodes());
+                                Command startNodesCommand = Commands.getStartCommand(config.getAllNodes());
                                 final AtomicInteger okCount = new AtomicInteger(0);
-                                taskRunner.executeTaskNWait(startPrestoTask, new InterruptableTaskCallback() {
+                                commandRunner.runCommand(startNodesCommand, new CommandCallback() {
 
-                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                                        if (stdOut.contains("Started")) {
+                                    @Override
+                                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                        if (agentResult.getStdOut().contains("Started")) {
                                             okCount.incrementAndGet();
                                         }
 
                                         if (okCount.get() == config.getAllNodes().size()) {
-                                            interrupt();
+                                            stop();
                                         }
 
-                                        return null;
                                     }
+
                                 });
 
                                 if (okCount.get() == config.getAllNodes().size()) {
                                     po.addLogDone("Presto started successfully\nDone");
                                 } else {
-                                    po.addLogFailed(String.format("Failed to start Presto, %s", startPrestoTask.getFirstError()));
+                                    po.addLogFailed(String.format("Failed to start Presto, %s", startNodesCommand.getAllErrors()));
                                 }
 
                             } else {
-                                po.addLogFailed(String.format("Failed to configure workers, %s", configureWorkersTask.getFirstError()));
+                                po.addLogFailed(String.format("Failed to configure workers, %s", configureWorkersCommand.getAllErrors()));
                             }
                         } else {
-                            po.addLogFailed(String.format("Failed to configure coordinator, %s", configureCoordinatorTask.getFirstError()));
+                            po.addLogFailed(String.format("Failed to configure coordinator, %s", configureCoordinatorCommand.getAllErrors()));
                         }
 
                     } else {
-                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                     }
                 } else {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
@@ -198,7 +211,7 @@ public class PrestoImpl implements Presto {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+                        String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -218,23 +231,23 @@ public class PrestoImpl implements Presto {
 
                 po.addLog("Uninstalling Presto...");
 
-                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(config.getAllNodes()));
+                Command uninstallCommand = Commands.getUninstallCommand(config.getAllNodes());
+                commandRunner.runCommand(uninstallCommand);
 
-                if (uninstallTask.isCompleted()) {
-                    for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        Result result = res.getValue();
-                        Agent agent = agentManager.getAgentByUUID(res.getKey());
+                if (uninstallCommand.hasCompleted()) {
+                    for (AgentResult result : uninstallCommand.getResults().values()) {
+                        Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
                             if (result.getStdOut().contains("Package ksks-presto is not installed, so not removed")) {
                                 po.addLog(String.format("Presto is not installed, so not removed on node %s", result.getStdErr(),
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
                             } else {
                                 po.addLog(String.format("Presto is removed from node %s",
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
                             }
                         } else {
                             po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                                    agent == null ? res.getKey() : agent.getHostname()));
+                                    agent == null ? result.getAgentUUID() : agent.getHostname()));
                         }
                     }
                     po.addLog("Updating db...");
@@ -244,7 +257,7 @@ public class PrestoImpl implements Presto {
                         po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
                     }
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
                 }
             }
         });
@@ -256,7 +269,7 @@ public class PrestoImpl implements Presto {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Adding node %s to %s", lxcHostname, clusterName));
+                        String.format("Adding node %s to %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -287,14 +300,15 @@ public class PrestoImpl implements Presto {
                 po.addLog("Checking prerequisites...");
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
+                Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(checkInstalledCommand);
 
-                if (!checkInstalled.isCompleted()) {
+                if (!checkInstalledCommand.hasCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nOperation aborted");
                     return;
                 }
 
-                Result result = checkInstalled.getResults().get(agent.getUuid());
+                AgentResult result = checkInstalledCommand.getResults().get(agent.getUuid());
 
                 if (result.getStdOut().contains("ksks-presto")) {
                     po.addLogFailed(String.format("Node %s already has Presto installed\nOperation aborted", lxcHostname));
@@ -312,45 +326,48 @@ public class PrestoImpl implements Presto {
                     //install presto            
 
                     po.addLog("Installing Presto...");
-                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                    Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
+                    commandRunner.runCommand(installCommand);
 
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Installation succeeded");
                     } else {
-                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                         return;
                     }
 
                     po.addLog("Configuring worker...");
-                    Task configureWorkerTask = taskRunner.executeTaskNWait(Tasks.getSetWorkerTask(config.getCoordinatorNode(), Util.wrapAgentToSet(agent)));
+                    Command configureWorkerCommand = Commands.getSetWorkerCommand(config.getCoordinatorNode(), Util.wrapAgentToSet(agent));
+                    commandRunner.runCommand(configureWorkerCommand);
 
-                    if (configureWorkerTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (configureWorkerCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Worker configured successfully\nStarting Presto on new node...");
 
-                        Task startPrestoTask = Tasks.getStartTask(Util.wrapAgentToSet(agent));
+                        Command startCommand = Commands.getStatusCommand(Util.wrapAgentToSet(agent));
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTaskNWait(startPrestoTask, new InterruptableTaskCallback() {
+                        commandRunner.runCommand(startCommand, new CommandCallback() {
 
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                if (stdOut.contains("Started")) {
+                            @Override
+                            public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                if (agentResult.getStdOut().contains("Started")) {
                                     okCount.incrementAndGet();
                                 }
 
                                 if (okCount.get() > 0) {
-                                    interrupt();
+                                    stop();
                                 }
 
-                                return null;
                             }
+
                         });
 
                         if (okCount.get() > 0) {
                             po.addLogDone("Presto started successfully\nDone");
                         } else {
-                            po.addLogFailed(String.format("Failed to start Presto, %s", startPrestoTask.getFirstError()));
+                            po.addLogFailed(String.format("Failed to start Presto, %s", startCommand.getAllErrors()));
                         }
                     } else {
-                        po.addLogFailed(String.format("Failed to configure worker, %s", configureWorkerTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to configure worker, %s", configureWorkerCommand.getAllErrors()));
                     }
 
                 } else {
@@ -366,7 +383,7 @@ public class PrestoImpl implements Presto {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying %s in %s", lxcHostname, clusterName));
+                        String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -396,11 +413,11 @@ public class PrestoImpl implements Presto {
 
                 po.addLog("Uninstalling Presto...");
 
-                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                Command uninstallCommand = Commands.getUninstallCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(uninstallCommand);
 
-                if (uninstallTask.isCompleted()) {
-                    Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
-                    Result result = res.getValue();
+                if (uninstallCommand.hasCompleted()) {
+                    AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
                     if (result.getExitCode() != null && result.getExitCode() == 0) {
                         if (result.getStdOut().contains("Package ksks-presto is not installed, so not removed")) {
                             po.addLog(String.format("Presto is not installed, so not removed on node %s", result.getStdErr(),
@@ -415,7 +432,7 @@ public class PrestoImpl implements Presto {
                     }
 
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
                     return;
                 }
 
@@ -437,7 +454,7 @@ public class PrestoImpl implements Presto {
     public UUID changeCoordinatorNode(final String clusterName, final String newCoordinatorHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Changing coordinator to %s in %s", newCoordinatorHostname, clusterName));
+                        String.format("Changing coordinator to %s in %s", newCoordinatorHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -472,14 +489,19 @@ public class PrestoImpl implements Presto {
 
                 po.addLog("Stopping all nodes...");
                 //stop all nodes
-                Task stopAllNodesTask = taskRunner.executeTaskNWait(Tasks.getStopTask(config.getAllNodes()));
-                if (stopAllNodesTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                Command stopNodesCommand = Commands.getStopCommand(config.getAllNodes());
+                commandRunner.runCommand(stopNodesCommand);
+
+                if (stopNodesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                     po.addLog("All nodes stopped\nConfiguring coordinator...");
-                    Task configureCoordinatorTask = taskRunner.executeTaskNWait(Tasks.getSetCoordinatorTask(newCoordinator));
-                    if (configureCoordinatorTask.getTaskStatus() == TaskStatus.SUCCESS) {
+
+                    Command configureCoordinatorCommand = Commands.getSetCoordinatorCommand(newCoordinator);
+                    commandRunner.runCommand(configureCoordinatorCommand);
+
+                    if (configureCoordinatorCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Coordinator configured successfully");
                     } else {
-                        po.addLogFailed(String.format("Failed to configure coordinator, %s\nOperation aborted", configureCoordinatorTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to configure coordinator, %s\nOperation aborted", configureCoordinatorCommand.getAllErrors()));
                         return;
                     }
 
@@ -488,31 +510,34 @@ public class PrestoImpl implements Presto {
                     config.setCoordinatorNode(newCoordinator);
 
                     po.addLog("Configuring workers...");
-                    Task configureWorkersTask = taskRunner.executeTaskNWait(Tasks.getSetWorkerTask(newCoordinator, config.getWorkers()));
-                    if (configureWorkersTask.getTaskStatus() == TaskStatus.SUCCESS) {
+
+                    Command configureWorkersCommand = Commands.getSetWorkerCommand(newCoordinator, config.getWorkers());
+                    commandRunner.runCommand(configureWorkersCommand);
+
+                    if (configureWorkersCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Workers configured successfully\nStarting cluster...");
 
-                        Task startPrestoTask = Tasks.getStartTask(config.getAllNodes());
+                        Command startNodesCommand = Commands.getStartCommand(config.getAllNodes());
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTaskNWait(startPrestoTask, new InterruptableTaskCallback() {
+                        commandRunner.runCommand(startNodesCommand, new CommandCallback() {
 
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                if (stdOut.contains("Started")) {
+                            @Override
+                            public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                if (agentResult.getStdOut().contains("Started")) {
                                     okCount.incrementAndGet();
                                 }
 
                                 if (okCount.get() == config.getAllNodes().size()) {
-                                    interrupt();
+                                    stop();
                                 }
-
-                                return null;
                             }
+
                         });
 
                         if (okCount.get() == config.getAllNodes().size()) {
                             po.addLog("Cluster started successfully");
                         } else {
-                            po.addLog(String.format("Start of cluster failed, %s, skipping...", startPrestoTask.getFirstError()));
+                            po.addLog(String.format("Start of cluster failed, %s, skipping...", startNodesCommand.getAllErrors()));
                         }
 
                         po.addLog("Updating db...");
@@ -523,11 +548,11 @@ public class PrestoImpl implements Presto {
                             po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                         }
                     } else {
-                        po.addLogFailed(String.format("Failed to configure workers, %s\nOperation aborted", configureWorkersTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to configure workers, %s\nOperation aborted", configureWorkersCommand.getAllErrors()));
                     }
 
                 } else {
-                    po.addLogFailed(String.format("Failed to stop all nodes, %s", stopAllNodesTask.getFirstError()));
+                    po.addLogFailed(String.format("Failed to stop all nodes, %s", stopNodesCommand.getAllErrors()));
                 }
             }
         });
@@ -538,7 +563,7 @@ public class PrestoImpl implements Presto {
     public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting node %s in %s", lxcHostname, clusterName));
+                        String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -562,28 +587,27 @@ public class PrestoImpl implements Presto {
 
                 po.addLog(String.format("Starting node %s...", node.getHostname()));
 
-                Task startTask = Tasks.getStartTask(Util.wrapAgentToSet(node));
-
+                Command startNodeCommand = Commands.getStartCommand(Util.wrapAgentToSet(node));
                 final AtomicInteger okCount = new AtomicInteger(0);
-                taskRunner.executeTaskNWait(startTask, new InterruptableTaskCallback() {
+                commandRunner.runCommand(startNodeCommand, new CommandCallback() {
 
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        if (stdOut.contains("Started")) {
+                    @Override
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                        if (agentResult.getStdOut().contains("Started")) {
                             okCount.incrementAndGet();
                         }
 
                         if (okCount.get() > 0) {
-                            interrupt();
+                            stop();
                         }
-
-                        return null;
                     }
+
                 });
 
                 if (okCount.get() > 0) {
                     po.addLogDone(String.format("Node %s started", node.getHostname()));
                 } else {
-                    po.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(), startTask.getFirstError()));
+                    po.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(), startNodeCommand.getAllErrors()));
                 }
 
             }
@@ -596,7 +620,7 @@ public class PrestoImpl implements Presto {
     public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -620,12 +644,13 @@ public class PrestoImpl implements Presto {
 
                 po.addLog(String.format("Stopping node %s...", node.getHostname()));
 
-                Task stopTask = taskRunner.executeTaskNWait(Tasks.getStopTask(Util.wrapAgentToSet(node)));
+                Command stopNodeCommand = Commands.getStopCommand(Util.wrapAgentToSet(node));
+                commandRunner.runCommand(stopNodeCommand);
 
-                if (stopTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (stopNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                     po.addLogDone(String.format("Node %s stopped", node.getHostname()));
                 } else {
-                    po.addLogFailed(String.format("Stopping %s failed, %s", node.getHostname(), stopTask.getFirstError()));
+                    po.addLogFailed(String.format("Stopping %s failed, %s", node.getHostname(), stopNodeCommand.getAllErrors()));
                 }
 
             }
@@ -637,7 +662,7 @@ public class PrestoImpl implements Presto {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -661,14 +686,13 @@ public class PrestoImpl implements Presto {
 
                 po.addLog("Checking node...");
 
-                Task checkNodeTask = taskRunner.executeTaskNWait(
-                        Tasks.getStatusTask(Util.wrapAgentToSet(node)));
+                Command checkNodeCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(node));
+                commandRunner.runCommand(checkNodeCommand);
 
-                Result res = checkNodeTask.getResults().get(node.getUuid());
-                if (checkNodeTask.isCompleted()) {
-                    po.addLogDone(String.format("%s", res.getStdOut()));
+                if (checkNodeCommand.hasCompleted()) {
+                    po.addLogDone(String.format("%s", checkNodeCommand.getResults().get(node.getUuid()).getStdOut()));
                 } else {
-                    po.addLogFailed(String.format("Faied to check status, %s", res.getStdErr()));
+                    po.addLogFailed(String.format("Faied to check status, %s", checkNodeCommand.getAllErrors()));
                 }
             }
         });
