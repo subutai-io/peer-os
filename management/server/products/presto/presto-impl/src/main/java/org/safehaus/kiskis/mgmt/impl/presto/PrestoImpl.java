@@ -343,7 +343,7 @@ public class PrestoImpl implements Presto {
                     if (configureWorkerCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Worker configured successfully\nStarting Presto on new node...");
 
-                        Command startCommand = Commands.getStatusCommand(Util.wrapAgentToSet(agent));
+                        Command startCommand = Commands.getStartCommand(Util.wrapAgentToSet(agent));
                         final AtomicInteger okCount = new AtomicInteger(0);
                         commandRunner.runCommand(startCommand, new CommandCallback() {
 
