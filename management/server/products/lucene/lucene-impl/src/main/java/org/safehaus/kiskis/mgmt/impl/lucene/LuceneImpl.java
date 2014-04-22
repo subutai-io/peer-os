@@ -22,7 +22,6 @@ import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 /**
  * @author dilshat
@@ -135,7 +134,7 @@ public class LuceneImpl implements Lucene {
                     Command installCommand = Commands.getInstallCommand(config.getNodes());
                     commandRunner.runCommand(installCommand);
 
-                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (installCommand.hasSucceeded()) {
                         po.addLogDone("Installation succeeded\nDone");
                     } else {
                         po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
@@ -329,7 +328,7 @@ public class LuceneImpl implements Lucene {
                     Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
                     commandRunner.runCommand(installCommand);
 
-                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (installCommand.hasSucceeded()) {
                         po.addLogDone("Installation succeeded\nDone");
                     } else {
                         po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));

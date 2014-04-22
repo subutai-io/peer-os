@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 /**
  * @author dilshat
@@ -131,13 +130,13 @@ public class SharkImpl implements Shark {
                     Command installCommand = Commands.getInstallCommand(config.getNodes());
                     commandRunner.runCommand(installCommand);
 
-                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (installCommand.hasSucceeded()) {
                         po.addLog("Installation succeeded\nSetting Master IP...");
 
                         Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getNodes(), sparkConfig.getMasterNode());
                         commandRunner.runCommand(setMasterIPCommand);
 
-                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        if (setMasterIPCommand.hasSucceeded()) {
                             po.addLogDone("Master IP successfully set\nDone");
                         } else {
                             po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPCommand.getAllErrors()));
@@ -346,13 +345,13 @@ public class SharkImpl implements Shark {
                     Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
                     commandRunner.runCommand(installCommand);
 
-                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (installCommand.hasSucceeded()) {
                         po.addLog("Installation succeeded\nSetting Master IP...");
 
                         Command setMasterIPCommand = Commands.getSetMasterIPCommand(Util.wrapAgentToSet(agent), sparkConfig.getMasterNode());
                         commandRunner.runCommand(setMasterIPCommand);
 
-                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        if (setMasterIPCommand.hasSucceeded()) {
                             po.addLogDone("Master IP set successfully\nDone");
                         } else {
                             po.addLogFailed(String.format("Failed to set Master IP, %s", setMasterIPCommand.getAllErrors()));
@@ -407,7 +406,7 @@ public class SharkImpl implements Shark {
                 Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getNodes(), sparkConfig.getMasterNode());
                 commandRunner.runCommand(setMasterIPCommand);
 
-                if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                if (setMasterIPCommand.hasSucceeded()) {
                     po.addLogDone("Master IP actualized successfully\nDone");
                 } else {
                     po.addLogFailed(String.format("Failed to actualize Master IP, %s", setMasterIPCommand.getAllErrors()));

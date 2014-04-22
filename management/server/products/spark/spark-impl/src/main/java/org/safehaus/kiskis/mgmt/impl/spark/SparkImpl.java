@@ -23,11 +23,9 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 /**
  * @author dilshat
- * @todo check destroy slave on master & stop slave in manager
  */
 public class SparkImpl implements Spark {
 
@@ -150,19 +148,19 @@ public class SparkImpl implements Spark {
                     Command installCommand = Commands.getInstallCommand(config.getAllNodes());
                     commandRunner.runCommand(installCommand);
 
-                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (installCommand.hasSucceeded()) {
                         po.addLog("Installation succeeded\nSetting master IP...");
 
                         Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getMasterNode(), config.getAllNodes());
                         commandRunner.runCommand(setMasterIPCommand);
 
-                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        if (setMasterIPCommand.hasSucceeded()) {
                             po.addLog("Setting master IP succeeded\nRegistering slaves...");
 
                             Command addSlavesCommand = Commands.getAddSlavesCommand(config.getSlaveNodes(), config.getMasterNode());
                             commandRunner.runCommand(addSlavesCommand);
 
-                            if (addSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                            if (addSlavesCommand.hasSucceeded()) {
                                 po.addLog("Slaves successfully registered\nStarting cluster...");
 
                                 Command startNodesCommand = Commands.getStartAllCommand(config.getMasterNode());
@@ -330,7 +328,7 @@ public class SparkImpl implements Spark {
                         Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
                         commandRunner.runCommand(installCommand);
 
-                        if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        if (installCommand.hasSucceeded()) {
                             po.addLog("Installation succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
@@ -342,13 +340,13 @@ public class SparkImpl implements Spark {
                     Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getMasterNode(), Util.wrapAgentToSet(agent));
                     commandRunner.runCommand(setMasterIPCommand);
 
-                    if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (setMasterIPCommand.hasSucceeded()) {
                         po.addLog("Master IP successfully set\nRegistering slave with master...");
 
                         Command addSlaveCommand = Commands.getAddSlaveCommand(agent, config.getMasterNode());
                         commandRunner.runCommand(addSlaveCommand);
 
-                        if (addSlaveCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        if (addSlaveCommand.hasSucceeded()) {
                             po.addLog("Registration succeeded\nRestarting master...");
 
                             Command restartMasterCommand = Commands.getRestartMasterCommand(config.getMasterNode());
@@ -453,7 +451,7 @@ public class SparkImpl implements Spark {
                     Command clearSlavesCommand = Commands.getClearSlaveCommand(agent, config.getMasterNode());
                     commandRunner.runCommand(clearSlavesCommand);
 
-                    if (clearSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (clearSlavesCommand.hasSucceeded()) {
                         po.addLog("Successfully unregistered slave from master\nRestarting master...");
 
                         Command restartMasterCommand = Commands.getRestartMasterCommand(config.getMasterNode());
@@ -519,7 +517,7 @@ public class SparkImpl implements Spark {
                     Command stopSlaveCommand = Commands.getStopSlaveCommand(agent);
                     commandRunner.runCommand(stopSlaveCommand);
 
-                    if (stopSlaveCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (stopSlaveCommand.hasSucceeded()) {
                         po.addLog("Slave stopped successfully");
                     } else {
                         po.addLog(String.format("Failed to stop slave, %s, skipping...", stopSlaveCommand.getAllErrors()));
@@ -581,12 +579,12 @@ public class SparkImpl implements Spark {
                 //stop all nodes
                 Command stopNodesCommand = Commands.getStopAllCommand(config.getMasterNode());
                 commandRunner.runCommand(stopNodesCommand);
-                if (stopNodesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                if (stopNodesCommand.hasSucceeded()) {
                     po.addLog("All nodes stopped\nClearing slaves on old master...");
                     //clear slaves from old master
                     Command clearSlavesCommand = Commands.getClearSlavesCommand(config.getMasterNode());
                     commandRunner.runCommand(clearSlavesCommand);
-                    if (clearSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (clearSlavesCommand.hasSucceeded()) {
                         po.addLog("Slaves cleared successfully");
                     } else {
                         po.addLog(String.format("Clearing slaves failed, %s, skipping...", clearSlavesCommand.getAllErrors()));
@@ -602,12 +600,12 @@ public class SparkImpl implements Spark {
                     po.addLog("Adding nodes to new master...");
                     Command addSlavesCommand = Commands.getAddSlavesCommand(config.getSlaveNodes(), config.getMasterNode());
                     commandRunner.runCommand(addSlavesCommand);
-                    if (addSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (addSlavesCommand.hasSucceeded()) {
                         po.addLog("Nodes added successfully\nSetting new master IP...");
                         //modify master ip on all nodes
                         Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getMasterNode(), config.getAllNodes());
                         commandRunner.runCommand(setMasterIPCommand);
-                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        if (setMasterIPCommand.hasSucceeded()) {
                             po.addLog("Master IP set successfully\nStarting cluster...");
                             //start master & slaves
 
@@ -770,7 +768,7 @@ public class SparkImpl implements Spark {
                 }
                 commandRunner.runCommand(stopCommand);
 
-                if (stopCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                if (stopCommand.hasSucceeded()) {
                     po.addLogDone(String.format("Node %s stopped", node.getHostname()));
                 } else {
                     po.addLogFailed(String.format("Stopping %s failed, %s", node.getHostname(), stopCommand.getAllErrors()));
@@ -813,7 +811,7 @@ public class SparkImpl implements Spark {
                 commandRunner.runCommand(checkNodeCommand);
 
                 AgentResult res = checkNodeCommand.getResults().get(node.getUuid());
-                if (checkNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                if (checkNodeCommand.hasSucceeded()) {
                     po.addLogDone(String.format("%s", res.getStdOut()));
                 } else {
                     po.addLogFailed(String.format("Faied to check status, %s", checkNodeCommand.getAllErrors()));
