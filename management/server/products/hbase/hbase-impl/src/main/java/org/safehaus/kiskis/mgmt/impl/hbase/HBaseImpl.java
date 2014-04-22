@@ -78,15 +78,6 @@ public class HBaseImpl implements HBase {
 
                     po.addLog("Cluster info saved to DB\nInstalling HBase...");
 
-                    // Updating repository
-                    Task repositoryUpdateTask = taskRunner.executeTaskNWait(Tasks.getAptUpdate(allNodes));
-
-                    if (repositoryUpdateTask.getTaskStatus() != TaskStatus.SUCCESS) {
-                        po.addLogFailed(String.format("Installation failed, %s", repositoryUpdateTask.getFirstError()));
-                        return;
-                    }
-                    po.addLog("Installation succeeded\nSetting master...");
-
                     // Installing HBase
                     Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(allNodes));
 
@@ -164,10 +155,10 @@ public class HBaseImpl implements HBase {
                     return;
                 }
 
-                Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(allNodes));
+                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(allNodes));
 
-                if (installTask.getTaskStatus() != TaskStatus.SUCCESS) {
-                    po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                if (uninstallTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
                     return;
                 }
 
@@ -258,6 +249,55 @@ public class HBaseImpl implements HBase {
         return po.getId();
     }
 
+    public UUID startNodes(final String clusterName) {
+
+
+        final ProductOperation po
+                = tracker.createProductOperation(HBaseConfig.PRODUCT_KEY,
+                String.format("Starting nodes in %s", clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                HBaseConfig config = dbManager.getInfo(HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    return;
+                }
+
+                Set<Agent> nodes = new HashSet<Agent>();
+                nodes.addAll(config.getQuorum());
+                nodes.addAll(config.getRegion());
+                nodes.add(config.getBackupMasters());
+                nodes.add(config.getMaster());
+
+                final Task startNodeTask = new Task("Start HBase nodes");
+
+                for (Iterator<Agent> iterator = nodes.iterator(); iterator.hasNext(); ) {
+                    Agent agent = iterator.next();
+                    if (agentManager.getAgentByHostname(agent.getHostname()) == null) {
+                        po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", agent.getHostname()));
+                        return;
+                    }
+
+                    startNodeTask.addRequest(Commands.getStartCommand(), agent);
+                }
+
+                taskRunner.executeTaskNWait(startNodeTask);
+
+                if (startNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLogDone("Starting all nodes done");
+                } else {
+                    po.addLogFailed(String.format("Starting all nodes failed %s", startNodeTask.getFirstError()));
+
+                }
+
+            }
+        });
+
+        return po.getId();
+    }
+
     public UUID stopNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(HBaseConfig.PRODUCT_KEY,
@@ -323,6 +363,53 @@ public class HBaseImpl implements HBase {
                             lxcHostName,
                             stopNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
                     ));
+                }
+
+            }
+        });
+
+        return po.getId();
+    }
+
+    public UUID stopNodes(final String clusterName) {
+        final ProductOperation po
+                = tracker.createProductOperation(HBaseConfig.PRODUCT_KEY,
+                String.format("Stopping nodes in %s", clusterName));
+
+        executor.execute(new Runnable() {
+
+            public void run() {
+                HBaseConfig config = dbManager.getInfo(HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    return;
+                }
+
+                Set<Agent> nodes = new HashSet<Agent>();
+                nodes.addAll(config.getQuorum());
+                nodes.addAll(config.getRegion());
+                nodes.add(config.getBackupMasters());
+                nodes.add(config.getMaster());
+
+                final Task stopNodeTask = new Task("Stop HBase nodes");
+
+                for (Iterator<Agent> iterator = nodes.iterator(); iterator.hasNext(); ) {
+                    Agent agent = iterator.next();
+                    if (agentManager.getAgentByHostname(agent.getHostname()) == null) {
+                        po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", agent.getHostname()));
+                        return;
+                    }
+
+                    stopNodeTask.addRequest(Commands.getStopCommand(), agent);
+                }
+
+                taskRunner.executeTaskNWait(stopNodeTask);
+
+                if (stopNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLogDone("Stopping all nodes done");
+                } else {
+                    po.addLogFailed(String.format("Stopping all nodes failed %s", stopNodeTask.getFirstError()));
+
                 }
 
             }

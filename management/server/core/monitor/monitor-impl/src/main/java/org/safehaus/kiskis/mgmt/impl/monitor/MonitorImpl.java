@@ -46,7 +46,7 @@ public class MonitorImpl implements Monitor {
                 .replace( "$startDate", dateToStr(startDate) )
                 .replace( "$endDate", dateToStr(endDate) );
 
-        LOG.info("query: {}", query);
+        LOG.debug("query: {}", query);
 
         String response = HttpPost.execute(query);
         List<JsonNode> nodes = toNodes(response);
@@ -70,7 +70,7 @@ public class MonitorImpl implements Monitor {
             JsonNode node = hits.get(i).get("_source");
             nodes.add(node);
 
-            LOG.info("node: {}", node);
+            LOG.debug("node: {}", node);
         }
 
         return nodes;

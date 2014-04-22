@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
  */
 public class HBaseUI implements Module {
 
-    public static final String MODULE_NAME = "HBase new";
+    public static final String MODULE_NAME = "HBase";
     private static HBase hbaseManager;
     private static AgentManager agentManager;
     private static Tracker tracker;

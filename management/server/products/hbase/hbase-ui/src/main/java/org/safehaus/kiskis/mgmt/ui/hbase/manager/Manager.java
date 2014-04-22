@@ -52,7 +52,7 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        masterTable = createTableTemplate("Master", 100);
+        masterTable = createMasterTableTemplate("Master", 100);
         regionTable = createTableTemplate("Region", 100);
         quorumTable = createTableTemplate("Quorum", 100);
         bmasterTable = createTableTemplate("Backup master", 100);
@@ -90,20 +90,6 @@ public class Manager {
         });
 
         controlsContent.addComponent(refreshClustersBtn);
-        /*
-        Button checkAllBtn = new Button("Check all");
-        checkAllBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                checkNodesStatus(masterTable);
-                checkNodesStatus(quorumTable);
-                checkNodesStatus(regionTable);
-            }
-
-        });
-        controlsContent.addComponent(checkAllBtn);
-        */
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -138,42 +124,6 @@ public class Manager {
         });
 
         controlsContent.addComponent(destroyClusterBtn);
-
-        /*
-        Button addNodeBtn = new Button("Add Node");
-
-        addNodeBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Confirm adding node",
-                            String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = HBaseUI.getHbaseManager().addNode(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                    );
-                } else {
-                    show("Please, select cluster");
-                }
-            }
-        });
-
-        controlsContent.addComponent(addNodeBtn);
-        */
         content.addComponent(controlsContent);
 
         content.addComponent(masterTable);
@@ -191,7 +141,7 @@ public class Manager {
         contentRoot.getWindow().showNotification(notification);
     }
 
-    private void populateTable(final Table table, Set<Agent> agents, final HBaseType type) {
+    private void populateMasterTable(final Table table, Set<Agent> agents, final HBaseType type) {
 
         table.removeAllItems();
 
@@ -199,21 +149,19 @@ public class Manager {
             final Agent agent = (Agent) it.next();
 
             final Button checkBtn = new Button("Check");
-            final Button startBtn = new Button("Start");
-            final Button stopBtn = new Button("Stop");
-            final Button destroyBtn = new Button("Destroy");
+//            final Button startBtn = new Button("Start");
+//            final Button stopBtn = new Button("Stop");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-            stopBtn.setEnabled(false);
-            startBtn.setEnabled(false);
+//            stopBtn.setEnabled(false);
+//            startBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
                             agent.getHostname(),
                             type,
                             checkBtn,
-                            startBtn,
-                            stopBtn,
-                            destroyBtn,
+//                            startBtn,
+//                            stopBtn,
                             progressIcon},
                     null
             );
@@ -224,20 +172,19 @@ public class Manager {
                 public void buttonClick(Button.ClickEvent event) {
 
                     progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
+//                    startBtn.setEnabled(false);
+//                    stopBtn.setEnabled(false);
 
                     HBaseUI.getExecutor().execute(new CheckTask(type, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
-                                if (state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else if (state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
+//                                if (state == NodeState.RUNNING) {
+//                                    stopBtn.setEnabled(true);
+//                                } else if (state == NodeState.STOPPED) {
+//                                    startBtn.setEnabled(true);
+//                                }
+                                show(state.toString());
                                 progressIcon.setVisible(false);
                             }
                         }
@@ -245,54 +192,90 @@ public class Manager {
                 }
             });
 
-            startBtn.addListener(new Button.ClickListener() {
+//            startBtn.addListener(new Button.ClickListener() {
+//
+//                @Override
+//                public void buttonClick(Button.ClickEvent event) {
+//
+//                    progressIcon.setVisible(true);
+////                    startBtn.setEnabled(false);
+////                    stopBtn.setEnabled(false);
+//
+//                    HBaseUI.getExecutor().execute(new StartTask(type, config.getClusterName(), new CompleteEvent() {
+//
+//                        public void onComplete(NodeState state) {
+//                            synchronized (progressIcon) {
+////                                if (state == NodeState.RUNNING) {
+////                                    stopBtn.setEnabled(true);
+////                                } else {
+////                                    startBtn.setEnabled(true);
+////                                }
+//                                progressIcon.setVisible(false);
+//                            }
+//                        }
+//                    }));
+//
+//                }
+//            });
+//
+//            stopBtn.addListener(new Button.ClickListener() {
+//
+//                @Override
+//                public void buttonClick(Button.ClickEvent event) {
+//
+//                    progressIcon.setVisible(true);
+////                    startBtn.setEnabled(false);
+////                    stopBtn.setEnabled(false);
+//
+//                    HBaseUI.getExecutor().execute(new StopTask(type, config.getClusterName(), new CompleteEvent() {
+//
+//                        public void onComplete(NodeState state) {
+//                            synchronized (progressIcon) {
+//                                if (state == NodeState.STOPPED) {
+//                                    startBtn.setEnabled(true);
+//                                } else {
+//                                    stopBtn.setEnabled(true);
+//                                }
+//                                progressIcon.setVisible(false);
+//                            }
+//                        }
+//                    }));
+//                }
+//            });
+
+        }
+    }
+    private void populateTable(final Table table, Set<Agent> agents, final HBaseType type) {
+
+        table.removeAllItems();
+
+        for (Iterator it = agents.iterator(); it.hasNext(); ) {
+            final Agent agent = (Agent) it.next();
+
+            final Button checkBtn = new Button("Check");
+            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            progressIcon.setVisible(false);
+
+            final Object rowId = table.addItem(new Object[]{
+                            agent.getHostname(),
+                            type,
+                            checkBtn,
+                            progressIcon},
+                    null
+            );
+
+            checkBtn.addListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
 
                     progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
 
-                    HBaseUI.getExecutor().execute(new StartTask(type, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    HBaseUI.getExecutor().execute(new CheckTask(type, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
-                                if (state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-
-                }
-            });
-
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    HBaseUI.getExecutor().execute(new StopTask(type, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                if (state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                } else {
-                                    stopBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(true);
+                                show(state.toString());
                                 progressIcon.setVisible(false);
                             }
                         }
@@ -300,33 +283,6 @@ public class Manager {
                 }
             });
 
-            destroyBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    MgmtApplication.showConfirmationDialog(
-                            "Node destruction confirmation",
-                            String.format("Do you want to destroy the %s node?", agent.getHostname()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = HBaseUI.getHbaseManager().destroyNode(config.getClusterName(), agent.getHostname());
-                                        MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                    );
-
-                }
-            });
         }
     }
 
@@ -337,7 +293,7 @@ public class Manager {
 
             Set<Agent> masterSet = new HashSet<Agent>();
             masterSet.add(config.getMaster());
-            populateTable(masterTable, masterSet, HBaseType.HMaster);
+            populateMasterTable(masterTable, masterSet, HBaseType.HMaster);
 
             Set<Agent> bmasterSet = new HashSet<Agent>();
             bmasterSet.add(config.getBackupMasters());
@@ -380,14 +336,13 @@ public class Manager {
         }
     }
 
-    private Table createTableTemplate(String caption, int size) {
+    private Table createMasterTableTemplate(String caption, int size) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Type", HBaseType.class, null);
         table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
+//        table.addContainerProperty("Start", Button.class, null);
+//        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setSizeFull();
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
@@ -413,5 +368,36 @@ public class Manager {
         });
         return table;
     }
+    private Table createTableTemplate(String caption, int size) {
+        final Table table = new Table(caption);
+        table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("Type", HBaseType.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
+        table.setSizeFull();
+        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        table.setHeight(size, Sizeable.UNITS_PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
+
+        table.addListener(new ItemClickEvent.ItemClickListener() {
+
+            public void itemClick(ItemClickEvent event) {
+                if (event.isDoubleClick()) {
+                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                    Agent lxcAgent = HBaseUI.getAgentManager().getAgentByHostname(lxcHostname);
+                    if (lxcAgent != null) {
+                        Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
+                        MgmtApplication.addCustomWindow(terminal);
+                    } else {
+                        show("Agent is not connected");
+                    }
+                }
+            }
+        });
+        return table;
+    }
+
 
 }
