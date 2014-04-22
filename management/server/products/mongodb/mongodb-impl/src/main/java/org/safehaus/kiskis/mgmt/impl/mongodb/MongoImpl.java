@@ -243,14 +243,12 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.getCommandStatus() != CommandStatus.RUNNING || commandOK.get()) {
-                if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
-                    po.addLog(String.format("Command %s succeeded", command.getDescription()));
-                } else {
-                    po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
-                    installationOK = false;
-                    break;
-                }
+            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+                po.addLog(String.format("Command %s succeeded", command.getDescription()));
+            } else {
+                po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
+                installationOK = false;
+                break;
             }
         }
 
@@ -459,7 +457,7 @@ public class MongoImpl implements Mongo {
                                                 primaryNodeAgent, config.getDataNodePort(), agent, config.getDomainName());
 
                                 commandRunner.runCommand(unregisterSecondaryNodeFromPrimaryCommand);
-                                if (unregisterSecondaryNodeFromPrimaryCommand.getCommandStatus() != CommandStatus.SUCCEEDED) {
+                                if (!unregisterSecondaryNodeFromPrimaryCommand.hasCompleted()) {
                                     po.addLog("Could not unregister this node from replica set, skipping...");
                                 }
                             }
@@ -650,14 +648,12 @@ public class MongoImpl implements Mongo {
                     if (agentResult != null) {
                         if (agentResult.getStdOut().indexOf("couldn't connect to server") > -1) {
                             po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.STOPPED));
-                            return;
                         } else if (agentResult.getStdOut().indexOf("connecting to") > -1) {
                             po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.RUNNING));
-                            return;
                         } else {
                             po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
-                            return;
                         }
+                        return;
                     }
                 }
                 po.addLogFailed(String.format("Error checking status of node %s : %s", node.getHostname(), checkNodeCommand.getAllErrors()));
@@ -722,14 +718,12 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.getCommandStatus() != CommandStatus.RUNNING || commandOK.get()) {
-                if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
-                    po.addLog(String.format("Command %s succeeded", command.getDescription()));
-                } else {
-                    po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
-                    additionOK = false;
-                    break;
-                }
+            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+                po.addLog(String.format("Command %s succeeded", command.getDescription()));
+            } else {
+                po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
+                additionOK = false;
+                break;
             }
 
         }
@@ -756,21 +750,21 @@ public class MongoImpl implements Mongo {
 
                     commandRunner.runCommand(registerSecondaryNodeWithPrimaryCommand);
                     if (registerSecondaryNodeWithPrimaryCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
-                        po.addLogDone(String.format("Command %s succeeded\nAddition succeeded",
+                        po.addLogDone(String.format("Command %s succeeded\nNode addition succeeded",
                                 registerSecondaryNodeWithPrimaryCommand.getDescription()));
                     } else {
-                        po.addLogFailed(String.format("Command %s failed: %s",
+                        po.addLogFailed(String.format("Command %s failed: %s\nNode addition failed",
                                 registerSecondaryNodeWithPrimaryCommand.getDescription(),
                                 registerSecondaryNodeWithPrimaryCommand.getAllErrors()));
                     }
                 } else {
-                    po.addLogFailed("Could not find primary node");
+                    po.addLogFailed("Could not find primary node\nNode addition failed");
                 }
             } else {
-                po.addLogFailed("Could not find primary node");
+                po.addLogFailed("Could not find primary node\nNode addition failed");
             }
         } else {
-            po.addLogFailed("Addition failed");
+            po.addLogFailed("Node addition failed");
         }
 
     }
@@ -801,22 +795,20 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.getCommandStatus() != CommandStatus.RUNNING || commandOK.get()) {
-                if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
-                    po.addLog(String.format("Command %s succeeded", command.getDescription()));
-                } else {
-                    po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
-                    additionOK = false;
-                    break;
-                }
+            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+                po.addLog(String.format("Command %s succeeded", command.getDescription()));
+            } else {
+                po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
+                additionOK = false;
+                break;
             }
 
         }
 
         if (additionOK) {
-            po.addLogDone("Addition succeeded");
+            po.addLogDone("Node addition succeeded");
         } else {
-            po.addLogFailed("Addition failed");
+            po.addLogFailed("Node addition failed");
         }
     }
 
