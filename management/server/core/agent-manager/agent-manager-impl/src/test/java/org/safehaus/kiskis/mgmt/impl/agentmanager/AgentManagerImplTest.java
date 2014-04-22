@@ -71,21 +71,21 @@ public class AgentManagerImplTest {
     @Test
     public void testGetAgentsNotEmpty() {
 
-        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(UUID.randomUUID(), false, null));
+        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(UUID.randomUUID(), false, "hostname"));
         assertFalse(agentManager.getAgents().isEmpty());
     }
 
     @Test
     public void testGetPhysicalAgentsEmpty2() {
         UUID uuid = UUID.randomUUID();
-        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, true, null));
+        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, true, "hostname"));
         assertTrue(agentManager.getPhysicalAgents().isEmpty());
     }
 
     @Test
     public void testGetPhysicalAgentsNotEmpty() {
         UUID uuid = UUID.randomUUID();
-        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, false, null));
+        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, false, "hostname"));
         assertFalse(agentManager.getPhysicalAgents().isEmpty());
     }
 
@@ -99,7 +99,7 @@ public class AgentManagerImplTest {
     @Test
     public void testGetLxcAgentsNotEmpty() {
         UUID uuid = UUID.randomUUID();
-        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, true, null));
+        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, true, "hostname"));
         assertFalse(agentManager.getLxcAgents().isEmpty());
     }
 
@@ -127,20 +127,20 @@ public class AgentManagerImplTest {
     @Test
     public void testGetAgentsByPresentUUID() {
         UUID uuid = UUID.randomUUID();
-        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, false, null));
+        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, false, "hostname"));
         assertTrue(agentManager.getAgents().iterator().next().getUuid().equals(uuid));
     }
 
     @Test
     public void testGetAgentsByMissingUUID() {
-        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(null, false, null));
+        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(null, false, "hostname"));
         assertTrue(agentManager.getAgents().isEmpty());
     }
 
     @Test
     public void testGetAgentsByUUID() {
         UUID uuid = UUID.randomUUID();
-        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, false, null));
+        ((ResponseListener) agentManager).onResponse(TestUtils.getRegistrationRequestResponse(uuid, false, "hostname"));
         assertNotNull(agentManager.getAgentByUUID(uuid));
     }
 
@@ -155,7 +155,7 @@ public class AgentManagerImplTest {
     @Test
     public void testSendAckToAgent() {
         UUID uuid = UUID.randomUUID();
-        Response response = TestUtils.getRegistrationRequestResponse(uuid, true, null);
+        Response response = TestUtils.getRegistrationRequestResponse(uuid, true, "hostname");
         ((ResponseListener) agentManager).onResponse(response);
         assertEquals(RequestType.REGISTRATION_REQUEST_DONE, communicationManager.getRequest().getType());
     }
@@ -163,7 +163,7 @@ public class AgentManagerImplTest {
     @Test
     public void testSendAckToAgentUUID() {
         UUID uuid = UUID.randomUUID();
-        Response response = TestUtils.getRegistrationRequestResponse(uuid, true, null);
+        Response response = TestUtils.getRegistrationRequestResponse(uuid, true, "hostname");
         ((ResponseListener) agentManager).onResponse(response);
         assertEquals(uuid, communicationManager.getRequest().getUuid());
     }
@@ -171,7 +171,7 @@ public class AgentManagerImplTest {
     @Test
     public void testDeleteAgent() {
         UUID uuid = UUID.randomUUID();
-        Response response = TestUtils.getRegistrationRequestResponse(uuid, true, null);
+        Response response = TestUtils.getRegistrationRequestResponse(uuid, true, "hostname");
         response.setTransportId("blablabla");
         ((ResponseListener) agentManager).onResponse(response);
         assertFalse(agentManager.getAgents().isEmpty());

@@ -22,9 +22,17 @@ public class NetwokManagerImpl implements NetworkManager {
     }
 
     @Override
+    public boolean configSshOnAgents(List<Agent> agentList, Agent agent) {
+        return new SshManager(taskRunner, agentList).execute(agent);
+    }
+
+    @Override
     public boolean configHostsOnAgents(List<Agent> agentList, String domainName) {
         return new HostManager(taskRunner, agentList, domainName).execute();
     }
 
-
+    @Override
+    public boolean configHostsOnAgents(List<Agent> agentList, Agent agent, String domainName) {
+        return new HostManager(taskRunner, agentList, domainName).execute(agent);
+    }
 }

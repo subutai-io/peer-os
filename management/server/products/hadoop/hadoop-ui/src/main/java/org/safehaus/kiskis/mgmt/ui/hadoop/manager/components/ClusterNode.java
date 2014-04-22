@@ -1,10 +1,9 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
 import java.util.ArrayList;
@@ -16,9 +15,10 @@ import java.util.UUID;
  */
 public class ClusterNode extends HorizontalLayout {
 
-    protected Label progressIcon;
+    public static final int ICON_SIZE = 18;
+
     protected Config cluster;
-    protected Button startButton, stopButton, restartButton;
+    protected Embedded progressButton, startButton, stopButton, restartButton;
     protected List<ClusterNode> slaveNodes;
 
     public ClusterNode(Config cluster) {
@@ -28,40 +28,48 @@ public class ClusterNode extends HorizontalLayout {
         setMargin(true);
         setSpacing(true);
 
-        addComponent(getProgressIcon());
+        addComponent(getProgressButton());
+        setComponentAlignment(progressButton, Alignment.TOP_CENTER);
         addComponent(getStartButton());
+        setComponentAlignment(startButton, Alignment.TOP_CENTER);
         addComponent(getStopButton());
+        setComponentAlignment(stopButton, Alignment.TOP_CENTER);
         addComponent(getRestartButton());
+        setComponentAlignment(restartButton, Alignment.TOP_CENTER);
     }
 
-    private Label getProgressIcon() {
-        progressIcon = new Label();
-        progressIcon.setIcon(new ThemeResource("../base/common/img/loading-indicator.gif"));
-        progressIcon.setContentMode(Label.CONTENT_XHTML);
-        progressIcon.setHeight(11, Sizeable.UNITS_PIXELS);
-        progressIcon.setWidth(50, Sizeable.UNITS_PIXELS);
-        progressIcon.setVisible(false);
+    private Embedded getProgressButton() {
+        progressButton = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+        progressButton.setWidth(ICON_SIZE + 2, UNITS_PIXELS);
+        progressButton.setHeight(ICON_SIZE + 2, UNITS_PIXELS);
+        progressButton.setVisible(false);
 
-        return progressIcon;
+        return progressButton;
     }
 
-    private Button getStartButton() {
-        startButton = new Button();
-        startButton.setIcon(new ThemeResource("icons/buttons/start.png"));
+    private Embedded getStartButton() {
+        startButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
+        startButton.setDescription("Start");
+        startButton.setWidth(ICON_SIZE, UNITS_PIXELS);
+        startButton.setHeight(ICON_SIZE, UNITS_PIXELS);
 
         return startButton;
     }
 
-    private Button getStopButton() {
-        stopButton = new Button();
-        stopButton.setIcon(new ThemeResource("icons/buttons/stop.png"));
+    private Embedded getStopButton() {
+        stopButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
+        stopButton.setDescription("Stop");
+        stopButton.setWidth(ICON_SIZE, UNITS_PIXELS);
+        stopButton.setHeight(ICON_SIZE, UNITS_PIXELS);
 
         return stopButton;
     }
 
-    private Button getRestartButton() {
-        restartButton = new Button();
-        restartButton.setIcon(new ThemeResource("icons/buttons/restart.png"));
+    private Embedded getRestartButton() {
+        restartButton = new Embedded("", new ThemeResource("icons/buttons/restart.png"));
+        restartButton.setDescription("Restart");
+        restartButton.setWidth(ICON_SIZE, UNITS_PIXELS);
+        restartButton.setHeight(ICON_SIZE, UNITS_PIXELS);
 
         return restartButton;
     }

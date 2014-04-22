@@ -449,12 +449,24 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!-- Task Runner -->
+                                <!-- Command Runner -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>task-runner-ui</artifactId>
+                                    <artifactId>command-runner-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>command-runner-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>command-runner-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!-- Task Runner -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>task-runner-api</artifactId>
@@ -686,7 +698,7 @@
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                
+
                                 <!-- Zookeeper -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -738,6 +750,23 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Hive -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hive-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hive-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hive-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                
                                 <!-- Hadoop -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -763,7 +792,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -775,11 +804,6 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>oozie-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hive-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!-- TODO for API - END -->

@@ -151,6 +151,15 @@ public class Response implements Serializable {
         return taskUuid;
     }
 
+    public boolean isFinal() {
+        return ResponseType.EXECUTE_RESPONSE_DONE.equals(type)
+                || ResponseType.EXECUTE_TIMEOUTED.equals(type);
+    }
+
+    public boolean hasSucceeded() {
+        return ResponseType.EXECUTE_RESPONSE_DONE.equals(type) && exitCode != null && exitCode == 0;
+    }
+
     @Override
     public String toString() {
         return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", ips=" + ips + ", isLxc=" + isLxc + ", transportId=" + transportId + '}';
