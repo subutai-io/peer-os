@@ -16,6 +16,8 @@ public interface Command {
 
     public boolean hasCompleted();
 
+    public boolean hasSucceeded();
+
     public CommandStatus getCommandStatus();
 
     public Map<UUID, AgentResult> getResults();
