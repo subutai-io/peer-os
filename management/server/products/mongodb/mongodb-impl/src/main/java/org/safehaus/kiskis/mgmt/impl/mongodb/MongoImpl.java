@@ -243,7 +243,7 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.hasCompleted() || commandOK.get()) {
+            if (command.getCommandStatus() != CommandStatus.RUNNING || commandOK.get()) {
                 if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
                     po.addLog(String.format("Command %s succeeded", command.getDescription()));
                 } else {
@@ -603,15 +603,13 @@ public class MongoImpl implements Mongo {
                 Command stopNodeCommand = Commands.getStopNodeCommand(Util.wrapAgentToSet(node));
                 commandRunner.runCommand(stopNodeCommand);
 
-                if (stopNodeCommand.hasCompleted()) {
-                    if (stopNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
-                        po.addLogDone(String.format("Node on %s stopped", lxcHostname));
-                    } else {
-                        po.addLogFailed(String.format("Failed to stop node %s. %s",
-                                lxcHostname,
-                                stopNodeCommand.getAllErrors()
-                        ));
-                    }
+                if (stopNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    po.addLogDone(String.format("Node on %s stopped", lxcHostname));
+                } else {
+                    po.addLogFailed(String.format("Failed to stop node %s. %s",
+                            lxcHostname,
+                            stopNodeCommand.getAllErrors()
+                    ));
                 }
 
             }
@@ -724,7 +722,7 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.hasCompleted() || commandOK.get()) {
+            if (command.getCommandStatus() != CommandStatus.RUNNING || commandOK.get()) {
                 if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
                     po.addLog(String.format("Command %s succeeded", command.getDescription()));
                 } else {
@@ -803,7 +801,7 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.hasCompleted() || commandOK.get()) {
+            if (command.getCommandStatus() != CommandStatus.RUNNING || commandOK.get()) {
                 if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
                     po.addLog(String.format("Command %s succeeded", command.getDescription()));
                 } else {
