@@ -686,7 +686,7 @@ public class PrestoImpl implements Presto {
 
                 po.addLog("Checking node...");
 
-                Command checkNodeCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(node));
+                Command checkNodeCommand = Commands.getStatusCommand(Util.wrapAgentToSet(node));
                 commandRunner.runCommand(checkNodeCommand);
 
                 if (checkNodeCommand.hasCompleted()) {
