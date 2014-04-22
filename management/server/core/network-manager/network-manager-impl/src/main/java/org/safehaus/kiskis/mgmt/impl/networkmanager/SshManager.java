@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,6 +28,22 @@ public class SshManager {
     public boolean execute() {
         if (agentList != null && !agentList.isEmpty()) {
             if (create()) {
+                if (read()) {
+                    if (write()) {
+                        return config();
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean execute(Agent agent) {
+        if (agentList != null && !agentList.isEmpty() && agent != null) {
+            if (create(agent)) {
+                agentList.add(agent);
+
                 if (read()) {
                     if (write()) {
                         return config();
@@ -77,6 +94,33 @@ public class SshManager {
 
     private boolean write() {
         Task task = Tasks.getWriteSshTask(agentList, keys);
+
+        taskRunner.executeTask(task, new TaskCallback() {
+
+            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+                if (task.isCompleted()) {
+                    synchronized (task) {
+                        task.notifyAll();
+                    }
+                }
+
+                return null;
+            }
+        });
+
+        synchronized (task) {
+            try {
+                task.wait(task.getAvgTimeout() * 1000 + 1000);
+            } catch (InterruptedException ex) {
+                return false;
+            }
+        }
+
+        return task.getTaskStatus() == TaskStatus.SUCCESS;
+    }
+
+    private boolean create(Agent agent) {
+        Task task = Tasks.getCreateSshTask(Arrays.asList(agent));
 
         taskRunner.executeTask(task, new TaskCallback() {
 

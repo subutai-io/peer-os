@@ -686,7 +686,7 @@
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                
+
                                 <!-- Zookeeper -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -763,7 +763,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>

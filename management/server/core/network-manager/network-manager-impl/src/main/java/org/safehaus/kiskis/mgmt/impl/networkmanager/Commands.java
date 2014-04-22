@@ -51,7 +51,7 @@ public class Commands {
         req.setProgram(String.format(
                 "mkdir -p /root/.ssh && " +
                         "chmod 700 /root/.ssh && " +
-                        "echo '%s' >> /root/.ssh/authorized_keys && " +
+                        "echo '%s' > /root/.ssh/authorized_keys && " +
                         "chmod 644 /root/.ssh/authorized_keys", key
         ));
         return req;
