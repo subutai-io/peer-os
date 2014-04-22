@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class CommandRunnerUI implements Module {
 
-    public static final String MODULE_NAME = "Terminal2";
+    public static final String MODULE_NAME = "Terminal";
     private CommandRunner commandRunner;
     private AgentManager agentManager;
 

@@ -469,11 +469,6 @@
                                 <!-- Task Runner -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>task-runner-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>task-runner-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -780,7 +775,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
