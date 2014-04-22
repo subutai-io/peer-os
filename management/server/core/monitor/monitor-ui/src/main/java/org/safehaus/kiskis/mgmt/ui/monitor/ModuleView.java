@@ -103,7 +103,7 @@ public class ModuleView extends CustomComponent {
         AbsoluteLayout chartLayout = new AbsoluteLayout();
         chartLayout.setWidth(800, Sizeable.UNITS_PIXELS);
         chartLayout.setHeight(400, Sizeable.UNITS_PIXELS);
-        chartLayout.setDebugId("placeholder");
+        chartLayout.setDebugId("chart");
 
         layout.addComponent(chartLayout, "left: 250px; top: 50px;");
     }
