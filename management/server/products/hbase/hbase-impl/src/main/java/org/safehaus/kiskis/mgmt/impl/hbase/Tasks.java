@@ -34,15 +34,6 @@ public class Tasks {
         return task;
     }
 
-    public static Task getAptUpdate(Set<Agent> agents) {
-        Task task = new Task("Repository update");
-        task.setData(TaskType.REPOSITORY_UPDATE);
-        for (Agent agent : agents) {
-            task.addRequest(Commands.getRepositoryUpdateCommand(), agent);
-        }
-        return task;
-    }
-
     public static Task getConfigMasterTask(Set<Agent> agents, Agent hadoopNameNode, Agent master) {
         Task task = new Task("Setting master");
         task.setData(TaskType.SET_MASTER);

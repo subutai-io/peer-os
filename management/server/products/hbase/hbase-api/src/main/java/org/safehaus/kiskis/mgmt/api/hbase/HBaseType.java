@@ -8,7 +8,7 @@ public enum HBaseType {
     HMaster("HMaster is running", "HMaster is NOT running"),
     HQuorumPeer("HQuorumPeer is running", "HQuorumPeer is NOT running"),
     HRegionServer("HRegionServer is running", "HRegionServer is NOT running"),
-    BackupMaster("is running", "is NOT running");
+    BackupMaster("HMaster is running", "HMaster is NOT running");
     String runningMsg;
     String notRunningMsg;
 
