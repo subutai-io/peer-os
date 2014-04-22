@@ -311,7 +311,6 @@ public class Commands {
         findPrimaryNodeCommand.setData(CommandType.FIND_PRIMARY_NODE);
         commands.add(findPrimaryNodeCommand);
 
-//        commands.add(getRegisterSecondaryNodeWithPrimaryCommand(newDataNodeAgent, config.getDataNodePort(), config.getDomainName(), newDataNodeAgent));
         return commands;
     }
 
