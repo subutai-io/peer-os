@@ -9,6 +9,7 @@ import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 
 /**
  * @author dilshat
@@ -19,7 +20,7 @@ public class Commands {
         return MahoutImpl.getCommandRunner().createCommand(
                 "Install Mahout",
                 new RequestBuilder("apt-get --force-yes --assume-yes install ksks-mahout")
-                .withTimeout(90),
+                .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
                 agents);
     }
 

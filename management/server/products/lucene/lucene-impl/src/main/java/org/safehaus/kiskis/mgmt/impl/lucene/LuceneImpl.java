@@ -264,7 +264,6 @@ public class LuceneImpl implements Lucene {
                         po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                     }
                 } else {
-
                     po.addLogFailed("Uninstallation failed, command timed out");
                 }
             }
