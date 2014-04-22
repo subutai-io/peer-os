@@ -85,6 +85,10 @@ public class CommandImpl implements Command {
         return commandStatus == CommandStatus.FAILED || commandStatus == CommandStatus.SUCCEEDED;
     }
 
+    public boolean hasSucceeded() {
+        return commandStatus == CommandStatus.SUCCEEDED;
+    }
+
     public CommandStatus getCommandStatus() {
         return commandStatus;
     }

@@ -23,7 +23,6 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 /**
  * @author dilshat
@@ -149,19 +148,19 @@ public class PrestoImpl implements Presto {
                     Command installCommand = Commands.getInstallCommand(config.getAllNodes());
                     commandRunner.runCommand(installCommand);
 
-                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (installCommand.hasSucceeded()) {
                         po.addLog("Installation succeeded\nConfiguring coordinator...");
 
                         Command configureCoordinatorCommand = Commands.getSetCoordinatorCommand(config.getCoordinatorNode());
                         commandRunner.runCommand(configureCoordinatorCommand);
 
-                        if (configureCoordinatorCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        if (configureCoordinatorCommand.hasSucceeded()) {
                             po.addLog("Coordinator configured successfully\nConfiguring workers...");
 
                             Command configureWorkersCommand = Commands.getSetWorkerCommand(config.getCoordinatorNode(), config.getWorkers());
                             commandRunner.runCommand(configureWorkersCommand);
 
-                            if (configureWorkersCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                            if (configureWorkersCommand.hasSucceeded()) {
                                 po.addLog("Workers configured successfully\nStarting Presto...");
 
                                 Command startNodesCommand = Commands.getStartCommand(config.getAllNodes());
@@ -329,7 +328,7 @@ public class PrestoImpl implements Presto {
                     Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
                     commandRunner.runCommand(installCommand);
 
-                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (installCommand.hasSucceeded()) {
                         po.addLog("Installation succeeded");
                     } else {
                         po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
@@ -340,7 +339,7 @@ public class PrestoImpl implements Presto {
                     Command configureWorkerCommand = Commands.getSetWorkerCommand(config.getCoordinatorNode(), Util.wrapAgentToSet(agent));
                     commandRunner.runCommand(configureWorkerCommand);
 
-                    if (configureWorkerCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (configureWorkerCommand.hasSucceeded()) {
                         po.addLog("Worker configured successfully\nStarting Presto on new node...");
 
                         Command startCommand = Commands.getStartCommand(Util.wrapAgentToSet(agent));
@@ -492,13 +491,13 @@ public class PrestoImpl implements Presto {
                 Command stopNodesCommand = Commands.getStopCommand(config.getAllNodes());
                 commandRunner.runCommand(stopNodesCommand);
 
-                if (stopNodesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                if (stopNodesCommand.hasSucceeded()) {
                     po.addLog("All nodes stopped\nConfiguring coordinator...");
 
                     Command configureCoordinatorCommand = Commands.getSetCoordinatorCommand(newCoordinator);
                     commandRunner.runCommand(configureCoordinatorCommand);
 
-                    if (configureCoordinatorCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (configureCoordinatorCommand.hasSucceeded()) {
                         po.addLog("Coordinator configured successfully");
                     } else {
                         po.addLogFailed(String.format("Failed to configure coordinator, %s\nOperation aborted", configureCoordinatorCommand.getAllErrors()));
@@ -514,7 +513,7 @@ public class PrestoImpl implements Presto {
                     Command configureWorkersCommand = Commands.getSetWorkerCommand(newCoordinator, config.getWorkers());
                     commandRunner.runCommand(configureWorkersCommand);
 
-                    if (configureWorkersCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (configureWorkersCommand.hasSucceeded()) {
                         po.addLog("Workers configured successfully\nStarting cluster...");
 
                         Command startNodesCommand = Commands.getStartCommand(config.getAllNodes());
@@ -647,7 +646,7 @@ public class PrestoImpl implements Presto {
                 Command stopNodeCommand = Commands.getStopCommand(Util.wrapAgentToSet(node));
                 commandRunner.runCommand(stopNodeCommand);
 
-                if (stopNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                if (stopNodeCommand.hasSucceeded()) {
                     po.addLogDone(String.format("Node %s stopped", node.getHostname()));
                 } else {
                     po.addLogFailed(String.format("Stopping %s failed, %s", node.getHostname(), stopNodeCommand.getAllErrors()));

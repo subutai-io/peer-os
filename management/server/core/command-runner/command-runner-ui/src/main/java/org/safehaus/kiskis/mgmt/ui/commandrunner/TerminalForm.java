@@ -17,6 +17,8 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.Runo;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -41,9 +43,12 @@ public class TerminalForm extends CustomComponent implements Disposable {
     private final MgmtAgentManager agentTree;
     private final TextArea commandOutputTxtArea;
     private volatile int taskCount = 0;
+    private ExecutorService executor;
 
     public TerminalForm(final CommandRunner commandRunner, final AgentManager agentManager) {
         setHeight(100, UNITS_PERCENTAGE);
+
+        executor = Executors.newCachedThreadPool();
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
@@ -119,38 +124,43 @@ public class TerminalForm extends CustomComponent implements Disposable {
                     if (workDirTxtFld.getValue() != null && !Util.isStringEmpty(workDirTxtFld.getValue().toString())) {
                         requestBuilder.withCwd(workDirTxtFld.getValue().toString());
                     }
-                    Command command = commandRunner.createCommand(requestBuilder, agents);
+                    final Command command = commandRunner.createCommand(requestBuilder, agents);
                     indicator.setVisible(true);
                     taskCount++;
-                    commandRunner.runCommandAsync(command, new CommandCallback() {
+                    executor.execute(new Runnable() {
 
-                        @Override
-                        public void onResponse(Response response, AgentResult agentResult, Command command) {
-                            Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                            String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
-                            StringBuilder out = new StringBuilder(host).append(":\n");
-                            if (!Util.isStringEmpty(response.getStdOut())) {
-                                out.append(response.getStdOut()).append("\n");
-                            }
-                            if (!Util.isStringEmpty(response.getStdErr())) {
-                                out.append(response.getStdErr()).append("\n");
-                            }
-                            if (Util.isFinalResponse(response)) {
-                                if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                    out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
-                                } else {
-                                    out.append("Command timed out").append("\n\n");
+                        public void run() {
+                            commandRunner.runCommand(command, new CommandCallback() {
+
+                                @Override
+                                public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                    Agent agent = agentManager.getAgentByUUID(response.getUuid());
+                                    String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
+                                    StringBuilder out = new StringBuilder(host).append(":\n");
+                                    if (!Util.isStringEmpty(response.getStdOut())) {
+                                        out.append(response.getStdOut()).append("\n");
+                                    }
+                                    if (!Util.isStringEmpty(response.getStdErr())) {
+                                        out.append(response.getStdErr()).append("\n");
+                                    }
+                                    if (Util.isFinalResponse(response)) {
+                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                            out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
+                                        } else {
+                                            out.append("Command timed out").append("\n\n");
+                                        }
+                                    }
+                                    addOutput(out.toString());
+
                                 }
-                            }
-                            addOutput(out.toString());
-                            if (command.hasCompleted()) {
-                                taskCount--;
-                                if (taskCount == 0) {
-                                    indicator.setVisible(false);
-                                }
+
+                            });
+
+                            taskCount--;
+                            if (taskCount == 0) {
+                                indicator.setVisible(false);
                             }
                         }
-
                     });
                 }
             }
@@ -176,6 +186,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
     public void dispose() {
         agentTree.dispose();
+        executor.shutdown();
     }
 
 }

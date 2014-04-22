@@ -30,7 +30,6 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.CommandType;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
 
@@ -243,7 +242,7 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+            if (command.hasSucceeded() || commandOK.get()) {
                 po.addLog(String.format("Command %s succeeded", command.getDescription()));
             } else {
                 po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
@@ -601,7 +600,7 @@ public class MongoImpl implements Mongo {
                 Command stopNodeCommand = Commands.getStopNodeCommand(Util.wrapAgentToSet(node));
                 commandRunner.runCommand(stopNodeCommand);
 
-                if (stopNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                if (stopNodeCommand.hasSucceeded()) {
                     po.addLogDone(String.format("Node on %s stopped", lxcHostname));
                 } else {
                     po.addLogFailed(String.format("Failed to stop node %s. %s",
@@ -718,7 +717,7 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+            if (command.hasSucceeded() || commandOK.get()) {
                 po.addLog(String.format("Command %s succeeded", command.getDescription()));
             } else {
                 po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
@@ -749,7 +748,7 @@ public class MongoImpl implements Mongo {
                                     agent, config.getDataNodePort(), config.getDomainName(), primaryNodeAgent);
 
                     commandRunner.runCommand(registerSecondaryNodeWithPrimaryCommand);
-                    if (registerSecondaryNodeWithPrimaryCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    if (registerSecondaryNodeWithPrimaryCommand.hasSucceeded()) {
                         po.addLogDone(String.format("Command %s succeeded\nNode addition succeeded",
                                 registerSecondaryNodeWithPrimaryCommand.getDescription()));
                     } else {
@@ -795,7 +794,7 @@ public class MongoImpl implements Mongo {
                 commandRunner.runCommand(command);
             }
 
-            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+            if (command.hasSucceeded() || commandOK.get()) {
                 po.addLog(String.format("Command %s succeeded", command.getDescription()));
             } else {
                 po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
