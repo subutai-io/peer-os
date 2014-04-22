@@ -13,33 +13,33 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
-import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.TaskType;
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.Tasks;
-import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddDataNodeOperation;
-import org.safehaus.kiskis.mgmt.impl.mongodb.operation.AddRouterOperation;
-import org.safehaus.kiskis.mgmt.impl.mongodb.operation.InstallClusterOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
-
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
+import org.safehaus.kiskis.mgmt.impl.mongodb.common.CommandType;
+import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
 
 /**
  * @author dilshat
  */
 public class MongoImpl implements Mongo {
 
-    private static TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
     private static AgentManager agentManager;
     private static DbManager dbManager;
     private static LxcManager lxcManager;
@@ -66,12 +66,12 @@ public class MongoImpl implements Mongo {
         MongoImpl.dbManager = dbManager;
     }
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        MongoImpl.taskRunner = taskRunner;
+    public void setCommandRunner(CommandRunner commandRunner) {
+        MongoImpl.commandRunner = commandRunner;
     }
 
-    public static TaskRunner getTaskRunner() {
-        return taskRunner;
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public static AgentManager getAgentManager() {
@@ -95,7 +95,7 @@ public class MongoImpl implements Mongo {
     }
 
     public void destroy() {
-        MongoImpl.taskRunner = null;
+        MongoImpl.commandRunner = null;
         MongoImpl.agentManager = null;
         MongoImpl.dbManager = null;
         MongoImpl.lxcManager = null;
@@ -106,7 +106,7 @@ public class MongoImpl implements Mongo {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", config.getClusterName()));
+                        String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -196,79 +196,74 @@ public class MongoImpl implements Mongo {
     }
 
     private void installMongoCluster(final Config config, final ProductOperation po) {
-        final Operation installOperation = new InstallClusterOperation(config);
-        po.addLog(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
 
-        taskRunner.executeTask(installOperation.getNextTask(), new TaskCallback() {
-            private final StringBuilder startConfigServersOutput = new StringBuilder();
-            private final StringBuilder startRoutersOutput = new StringBuilder();
-            private final StringBuilder startDataNodesOutput = new StringBuilder();
+        List<Command> installationCommands = Commands.getInstallationCommands(config);
 
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
+        boolean installationOK = true;
 
-                boolean taskCompleted = task.isCompleted();
-                boolean taskSucceeded = task.getTaskStatus() == TaskStatus.SUCCESS;
+        for (Command command : installationCommands) {
+            po.addLog(String.format("Running command: %s", command.getDescription()));
+            final AtomicBoolean commandOK = new AtomicBoolean();
 
-                if (task.getData() != null) {
-                    boolean taskOk = false;
-                    if (task.getData() == TaskType.START_CONFIG_SERVERS) {
-                        startConfigServersOutput.append(response.getStdOut());
-                        if (Util.countNumberOfOccurences(startConfigServersOutput.toString(),
-                                "child process started successfully, parent exiting")
-                                == config.getConfigServers().size()) {
-                            taskOk = true;
+            if (command.getData() == CommandType.START_CONFIG_SERVERS
+                    || command.getData() == CommandType.START_ROUTERS
+                    || command.getData() == CommandType.START_DATA_NODES) {
+                commandRunner.runCommand(command, new CommandCallback() {
+
+                    @Override
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+
+                        int count = 0;
+                        for (AgentResult result : command.getResults().values()) {
+                            if (result.getStdOut().contains("child process started successfully, parent exiting")) {
+                                count++;
+                            }
                         }
-                    } else if (task.getData() == TaskType.START_ROUTERS) {
-                        startRoutersOutput.append(response.getStdOut());
-                        if (Util.countNumberOfOccurences(startRoutersOutput.toString(),
-                                "child process started successfully, parent exiting")
-                                == config.getRouterServers().size()) {
-                            taskOk = true;
+                        if (command.getData() == CommandType.START_CONFIG_SERVERS) {
+                            if (count == config.getConfigServers().size()) {
+                                commandOK.set(true);
+                            }
+                        } else if (command.getData() == CommandType.START_ROUTERS) {
+                            if (count == config.getRouterServers().size()) {
+                                commandOK.set(true);
+                            }
+                        } else if (command.getData() == CommandType.START_DATA_NODES) {
+                            if (count == config.getDataNodes().size()) {
+                                commandOK.set(true);
+                            }
                         }
-                    } else if (task.getData() == TaskType.START_REPLICA_SET) {
-                        startDataNodesOutput.append(response.getStdOut());
-                        if (Util.countNumberOfOccurences(startDataNodesOutput.toString(),
-                                "child process started successfully, parent exiting")
-                                == config.getDataNodes().size()) {
-                            taskOk = true;
+                        if (commandOK.get()) {
+                            stop();
                         }
-                    }
-                    if (taskOk) {
-                        taskCompleted = true;
-                        taskSucceeded = true;
-                        taskRunner.removeTaskCallback(task.getUuid());
-                    }
-                }
-
-                if (taskCompleted) {
-                    if (taskSucceeded) {
-                        po.addLog(String.format("Task %s succeeded", task.getDescription()));
-                        if (installOperation.hasNextTask()) {
-                            po.addLog(String.format("Running task %s", installOperation.peekNextTask().getDescription()));
-                            return installOperation.getNextTask();
-                        } else {
-                            po.addLogDone(String.format("Operation %s completed", installOperation.getDescription()));
-
-                        }
-                    } else {
-
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s",
-                                task.getDescription(), installOperation.getDescription(), task.getFirstError()));
 
                     }
-                }
 
-                return null;
+                });
+            } else {
+                commandRunner.runCommand(command);
             }
-        });
+
+            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+                po.addLog(String.format("Command %s succeeded", command.getDescription()));
+            } else {
+                po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
+                installationOK = false;
+                break;
+            }
+        }
+
+        if (installationOK) {
+            po.addLogDone("Installation succeeded");
+        } else {
+            po.addLogFailed("Installation failed");
+        }
 
     }
 
     public UUID addNode(final String clusterName, final NodeType nodeType) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Adding %s to %s", nodeType, clusterName));
+                        String.format("Adding %s to %s", nodeType, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -301,7 +296,11 @@ public class MongoImpl implements Mongo {
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                         po.addLog("Cluster info updated in DB\nInstalling Mongo");
                         //start addition of node
-                        addNodeInternal(po, config, nodeType, agent);
+                        if (nodeType == NodeType.DATA_NODE) {
+                            addDataNode(po, config, agent);
+                        } else if (nodeType == NodeType.ROUTER_NODE) {
+                            addRouter(po, config, agent);
+                        }
                     } else {
                         po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
                     }
@@ -315,94 +314,10 @@ public class MongoImpl implements Mongo {
         return po.getId();
     }
 
-    private void addNodeInternal(final ProductOperation po, final Config config, final NodeType nodeType, final Agent agent) {
-
-        final Operation operation
-                = (nodeType == NodeType.DATA_NODE)
-                ? new AddDataNodeOperation(config, agent)
-                : new AddRouterOperation(config, agent);
-
-        po.addLog(String.format("Running task %s", operation.peekNextTask().getDescription()));
-
-        taskRunner.executeTask(operation.getNextTask(), new TaskCallback() {
-
-            private final StringBuilder routersOutput = new StringBuilder();
-
-            @Override
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                boolean taskCompleted = task.isCompleted();
-                boolean taskSucceeded = task.getTaskStatus() == TaskStatus.SUCCESS;
-
-                if (task.getData() == TaskType.FIND_PRIMARY_NODE) {
-
-                    if (task.isCompleted()) {
-                        Agent primaryNodeAgent = null;
-                        Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                        Matcher m = p.matcher(stdOut);
-                        if (m.find()) {
-                            String primaryNodeHost = m.group(1);
-                            if (!Util.isStringEmpty(primaryNodeHost)) {
-                                String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
-                                primaryNodeAgent = agentManager.getAgentByHostname(hostname);
-                            }
-                        }
-
-                        if (primaryNodeAgent != null) {
-                            Request registerSecondaryWithPrimaryCmd = operation.peekNextTask().getRequests().iterator().next();
-                            registerSecondaryWithPrimaryCmd.setUuid(primaryNodeAgent.getUuid());
-                        } else {
-                            taskSucceeded = false;
-                        }
-                    }
-                } else if (task.getData() == TaskType.START_REPLICA_SET
-                        || task.getData() == TaskType.START_ROUTERS
-                        || task.getData() == TaskType.START_CONFIG_SERVERS
-                        || task.getData() == TaskType.RESTART_ROUTERS) {
-                    if (task.getData() == TaskType.RESTART_ROUTERS && !Util.isStringEmpty(response.getStdOut())) {
-                        routersOutput.append(response.getStdOut());
-                    }
-
-                    if ((task.getData() == TaskType.RESTART_ROUTERS
-                            && Util.countNumberOfOccurences(routersOutput.toString(),
-                            "child process started successfully, parent exiting")
-                            == config.getRouterServers().size())
-                            || (task.getData() != TaskType.RESTART_ROUTERS
-                            && stdOut.indexOf(
-                            "child process started successfully, parent exiting") > -1)) {
-                        taskCompleted = true;
-                        taskSucceeded = true;
-                        taskRunner.removeTaskCallback(task.getUuid());
-                    }
-                }
-
-                if (taskCompleted) {
-                    if (taskSucceeded) {
-                        po.addLog(String.format("Task %s succeeded", task.getDescription()));
-
-                        if (operation.hasNextTask()) {
-                            po.addLog(String.format("Running task %s", operation.peekNextTask().getDescription()));
-
-                            return operation.getNextTask();
-                        } else {
-                            po.addLogDone(String.format("Operation %s completed\nDone", operation.getDescription()));
-                        }
-                    } else {
-                        po.addLogFailed(String.format("Task %s failed. Operation %s failed\n%s\nUse LXC module to cleanup",
-                                task.getDescription(), operation.getDescription(), task.getFirstError()));
-                    }
-                }
-
-                return null;
-            }
-        });
-
-    }
-
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+                        String.format("Destroying cluster %s", clusterName));
         executor.execute(new Runnable() {
 
             public void run() {
@@ -444,7 +359,7 @@ public class MongoImpl implements Mongo {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying %s in %s", lxcHostname, clusterName));
+                        String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         //go on operation
         executor.execute(new Runnable() {
@@ -482,26 +397,33 @@ public class MongoImpl implements Mongo {
                     config.getConfigServers().remove(agent);
                     //restart routers
                     po.addLog("Restarting routers...");
-                    Task stopMongoTask = taskRunner.executeTaskNWait(Tasks.getStopMongoTask(config.getRouterServers()));
-                    //don't check status of this task since this task always ends with execute_timeouted
-                    if (stopMongoTask.isCompleted()) {
-                        Task startRoutersTask = taskRunner.executeTaskNWait(Tasks.getStartRoutersTask(config.getRouterServers(),
-                                config.getConfigServers(), config));
+                    Command stopRoutersCommand = Commands.getStopNodeCommand(config.getRouterServers());
+                    commandRunner.runCommand(stopRoutersCommand);
+                    //don't check status of this command since it always ends with execute_timeouted
+                    if (stopRoutersCommand.hasCompleted()) {
+                        final AtomicInteger okCount = new AtomicInteger();
+                        commandRunner.runCommand(
+                                Commands.getStartRouterCommand(
+                                        config.getRouterPort(),
+                                        config.getCfgSrvPort(),
+                                        config.getDomainName(),
+                                        config.getConfigServers(),
+                                        config.getRouterServers()), new CommandCallback() {
 
-                        final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTaskNWait(startRoutersTask, new InterruptableTaskCallback() {
+                                            @Override
+                                            public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                                okCount.set(0);
+                                                for (AgentResult result : command.getResults().values()) {
+                                                    if (result.getStdOut().contains("child process started successfully, parent exiting")) {
+                                                        okCount.incrementAndGet();
+                                                    }
+                                                }
+                                                if (okCount.get() == config.getRouterServers().size()) {
+                                                    stop();
+                                                }
+                                            }
 
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
-
-                                    okCount.incrementAndGet();
-                                }
-                                if (okCount.get() == config.getRouterServers().size()) {
-                                    interrupt();
-                                }
-                                return null;
-                            }
-                        });
+                                        });
 
                         if (okCount.get() != config.getRouterServers().size()) {
                             po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
@@ -514,11 +436,12 @@ public class MongoImpl implements Mongo {
                     config.getDataNodes().remove(agent);
                     //unregister from primary
                     po.addLog("Unregistering this node from replica set...");
-                    Task findPrimaryNodeTask = taskRunner.executeTaskNWait(Tasks.getFindPrimaryNodeTask(agent, config));
+                    Command findPrimaryNodeCommand = Commands.getFindPrimaryNodeCommand(agent, config.getDataNodePort());
+                    commandRunner.runCommand(findPrimaryNodeCommand);
 
-                    if (findPrimaryNodeTask.isCompleted()) {
+                    if (findPrimaryNodeCommand.hasCompleted() && !findPrimaryNodeCommand.getResults().isEmpty()) {
                         Pattern p = Pattern.compile("primary\" : \"(.*)\"");
-                        Matcher m = p.matcher(findPrimaryNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut());
+                        Matcher m = p.matcher(findPrimaryNodeCommand.getResults().get(agent.getUuid()).getStdOut());
                         Agent primaryNodeAgent = null;
                         if (m.find()) {
                             String primaryNodeHost = m.group(1);
@@ -529,12 +452,12 @@ public class MongoImpl implements Mongo {
                         }
                         if (primaryNodeAgent != null) {
                             if (primaryNodeAgent != agent) {
-                                Task unregisterSecondaryNodeFromPrimaryTask
-                                        = taskRunner.executeTaskNWait(
-                                        Tasks.getUnregisterSecondaryFromPrimaryTask(
-                                                primaryNodeAgent, agent, config)
-                                );
-                                if (unregisterSecondaryNodeFromPrimaryTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                                Command unregisterSecondaryNodeFromPrimaryCommand
+                                        = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
+                                                primaryNodeAgent, config.getDataNodePort(), agent, config.getDomainName());
+
+                                commandRunner.runCommand(unregisterSecondaryNodeFromPrimaryCommand);
+                                if (!unregisterSecondaryNodeFromPrimaryCommand.hasCompleted()) {
                                     po.addLog("Could not unregister this node from replica set, skipping...");
                                 }
                             }
@@ -585,7 +508,7 @@ public class MongoImpl implements Mongo {
     public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting node %s in %s", lxcHostname, clusterName));
+                        String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -606,41 +529,40 @@ public class MongoImpl implements Mongo {
                     return;
                 }
 
-                Task startNodeTask;
+                Command startNodeCommand;
                 NodeType nodeType = getNodeType(config, node);
 
                 if (nodeType == NodeType.CONFIG_NODE) {
-                    startNodeTask = Tasks.getStartConfigServersTask(
-                            Util.wrapAgentToSet(node), config);
-
+                    startNodeCommand = Commands.getStartConfigServerCommand(config.getCfgSrvPort(), Util.wrapAgentToSet(node));
                 } else if (nodeType == NodeType.DATA_NODE) {
-                    startNodeTask = Tasks.getStartReplicaSetTask(
-                            Util.wrapAgentToSet(node), config);
+                    startNodeCommand = Commands.getStartDataNodeCommand(config.getDataNodePort(), Util.wrapAgentToSet(node));
                 } else {
-                    startNodeTask = Tasks.getStartRoutersTask(
-                            Util.wrapAgentToSet(node),
-                            config.getConfigServers(),
-                            config);
+                    startNodeCommand = Commands.getStartRouterCommand(
+                            config.getRouterPort(), config.getCfgSrvPort(),
+                            config.getDomainName(), config.getConfigServers(),
+                            Util.wrapAgentToSet(node));
                 }
                 po.addLog("Starting node...");
-                taskRunner.executeTaskNWait(startNodeTask, new InterruptableTaskCallback() {
+                commandRunner.runCommand(startNodeCommand, new CommandCallback() {
 
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        if (stdOut.indexOf("child process started successfully, parent exiting") > -1) {
+                    @Override
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                        if (agentResult.getStdOut().contains("child process started successfully, parent exiting")) {
 
-                            task.setData(NodeState.RUNNING);
-                            interrupt();
+                            command.setData(NodeState.RUNNING);
+
+                            stop();
                         }
-                        return null;
                     }
+
                 });
 
-                if (NodeState.RUNNING.equals(startNodeTask.getData())) {
+                if (NodeState.RUNNING.equals(startNodeCommand.getData())) {
                     po.addLogDone(String.format("Node on %s started", lxcHostname));
                 } else {
                     po.addLogFailed(String.format("Failed to start node %s. %s",
                             lxcHostname,
-                            startNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
+                            startNodeCommand.getAllErrors()
                     ));
                 }
 
@@ -654,7 +576,7 @@ public class MongoImpl implements Mongo {
     public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -676,18 +598,16 @@ public class MongoImpl implements Mongo {
                 }
 
                 po.addLog("Stopping node...");
-                Task stopNodeTask = taskRunner.executeTaskNWait(
-                        Tasks.getStopMongoTask(Util.wrapAgentToSet(node)));
+                Command stopNodeCommand = Commands.getStopNodeCommand(Util.wrapAgentToSet(node));
+                commandRunner.runCommand(stopNodeCommand);
 
-                if (stopNodeTask.isCompleted()) {
-                    if (stopNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLogDone(String.format("Node on %s stopped", lxcHostname));
-                    } else {
-                        po.addLogFailed(String.format("Failed to stop node %s. %s",
-                                lxcHostname,
-                                stopNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
-                        ));
-                    }
+                if (stopNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                    po.addLogDone(String.format("Node on %s stopped", lxcHostname));
+                } else {
+                    po.addLogFailed(String.format("Failed to stop node %s. %s",
+                            lxcHostname,
+                            stopNodeCommand.getAllErrors()
+                    ));
                 }
 
             }
@@ -699,7 +619,7 @@ public class MongoImpl implements Mongo {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -720,19 +640,23 @@ public class MongoImpl implements Mongo {
                     return;
                 }
                 po.addLog("Checking node...");
-                Task checkNodeTask = taskRunner.executeTaskNWait(
-                        Tasks.getCheckStatusTask(Util.wrapAgentToSet(node), getNodeType(config, node), config));
+                Command checkNodeCommand = Commands.getCheckInstanceRunningCommand(node, config.getDomainName(), getNodePort(config, node));
+                commandRunner.runCommand(checkNodeCommand);
 
-                if (checkNodeTask.isCompleted()) {
-                    String stdOut = checkNodeTask.getResults().entrySet().iterator().next().getValue().getStdOut();
-                    if (stdOut.indexOf("couldn't connect to server") > -1) {
-                        po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.STOPPED));
-                    } else if (stdOut.indexOf("connecting to") > -1) {
-                        po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.RUNNING));
-                    } else {
-                        po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
+                if (checkNodeCommand.hasCompleted()) {
+                    AgentResult agentResult = checkNodeCommand.getResults().get(node.getUuid());
+                    if (agentResult != null) {
+                        if (agentResult.getStdOut().indexOf("couldn't connect to server") > -1) {
+                            po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.STOPPED));
+                        } else if (agentResult.getStdOut().indexOf("connecting to") > -1) {
+                            po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.RUNNING));
+                        } else {
+                            po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
+                        }
+                        return;
                     }
                 }
+                po.addLogFailed(String.format("Error checking status of node %s : %s", node.getHostname(), checkNodeCommand.getAllErrors()));
 
             }
         });
@@ -750,6 +674,142 @@ public class MongoImpl implements Mongo {
         }
 
         return nodeType;
+    }
+
+    private int getNodePort(Config config, Agent node) {
+
+        if (config.getRouterServers().contains(node)) {
+            return config.getRouterPort();
+        } else if (config.getConfigServers().contains(node)) {
+            return config.getCfgSrvPort();
+        }
+
+        return config.getDataNodePort();
+    }
+
+    private void addDataNode(ProductOperation po, final Config config, Agent agent) {
+        List<Command> commands = Commands.getAddDataNodeCommands(config, agent);
+
+        boolean additionOK = true;
+        Command findPrimaryNodeCommand = null;
+
+        for (Command command : commands) {
+            po.addLog(String.format("Running command: %s", command.getDescription()));
+            final AtomicBoolean commandOK = new AtomicBoolean();
+
+            if (command.getData() == CommandType.FIND_PRIMARY_NODE) {
+                findPrimaryNodeCommand = command;
+            }
+
+            if (command.getData() == CommandType.START_DATA_NODES) {
+                commandRunner.runCommand(command, new CommandCallback() {
+
+                    @Override
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                        if (agentResult.getStdOut().contains(
+                                "child process started successfully, parent exiting")) {
+                            commandOK.set(true);
+                            stop();
+                        }
+                    }
+
+                });
+            } else {
+                commandRunner.runCommand(command);
+            }
+
+            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+                po.addLog(String.format("Command %s succeeded", command.getDescription()));
+            } else {
+                po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
+                additionOK = false;
+                break;
+            }
+
+        }
+
+        //parse result of findPrimaryNodeCommand
+        if (additionOK) {
+            if (findPrimaryNodeCommand != null && !findPrimaryNodeCommand.getResults().isEmpty()) {
+                Agent primaryNodeAgent = null;
+                Pattern p = Pattern.compile("primary\" : \"(.*)\"");
+                AgentResult result = findPrimaryNodeCommand.getResults().entrySet().iterator().next().getValue();
+                Matcher m = p.matcher(result.getStdOut());
+                if (m.find()) {
+                    String primaryNodeHost = m.group(1);
+                    if (!Util.isStringEmpty(primaryNodeHost)) {
+                        String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
+                        primaryNodeAgent = agentManager.getAgentByHostname(hostname);
+                    }
+                }
+
+                if (primaryNodeAgent != null) {
+                    Command registerSecondaryNodeWithPrimaryCommand
+                            = Commands.getRegisterSecondaryNodeWithPrimaryCommand(
+                                    agent, config.getDataNodePort(), config.getDomainName(), primaryNodeAgent);
+
+                    commandRunner.runCommand(registerSecondaryNodeWithPrimaryCommand);
+                    if (registerSecondaryNodeWithPrimaryCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                        po.addLogDone(String.format("Command %s succeeded\nNode addition succeeded",
+                                registerSecondaryNodeWithPrimaryCommand.getDescription()));
+                    } else {
+                        po.addLogFailed(String.format("Command %s failed: %s\nNode addition failed",
+                                registerSecondaryNodeWithPrimaryCommand.getDescription(),
+                                registerSecondaryNodeWithPrimaryCommand.getAllErrors()));
+                    }
+                } else {
+                    po.addLogFailed("Could not find primary node\nNode addition failed");
+                }
+            } else {
+                po.addLogFailed("Could not find primary node\nNode addition failed");
+            }
+        } else {
+            po.addLogFailed("Node addition failed");
+        }
+
+    }
+
+    private void addRouter(ProductOperation po, final Config config, Agent agent) {
+        List<Command> commands = Commands.getAddRouterCommands(config, agent);
+
+        boolean additionOK = true;
+
+        for (Command command : commands) {
+            po.addLog(String.format("Running command: %s", command.getDescription()));
+            final AtomicBoolean commandOK = new AtomicBoolean();
+
+            if (command.getData() == CommandType.START_ROUTERS) {
+                commandRunner.runCommand(command, new CommandCallback() {
+
+                    @Override
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                        if (agentResult.getStdOut().toString().contains(
+                                "child process started successfully, parent exiting")) {
+                            commandOK.set(true);
+                            stop();
+                        }
+                    }
+
+                });
+            } else {
+                commandRunner.runCommand(command);
+            }
+
+            if (command.getCommandStatus() == CommandStatus.SUCCEEDED || commandOK.get()) {
+                po.addLog(String.format("Command %s succeeded", command.getDescription()));
+            } else {
+                po.addLog(String.format("Command %s failed: %s", command.getDescription(), command.getAllErrors()));
+                additionOK = false;
+                break;
+            }
+
+        }
+
+        if (additionOK) {
+            po.addLogDone("Node addition succeeded");
+        } else {
+            po.addLogFailed("Node addition failed");
+        }
     }
 
 }

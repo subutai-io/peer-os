@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.agentmanager;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
@@ -266,7 +267,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     agents.put(response.getUuid(), checkAgent);
                     return;
                 }
-                Agent agent = new Agent(response.getUuid(), response.getHostname());
+                Agent agent = new Agent(response.getUuid(), Strings.isNullOrEmpty(response.getHostname()) ? response.getUuid().toString() : response.getHostname());
                 agent.setMacAddress(response.getMacAddress());
                 agent.setTransportId(response.getTransportId());
                 if (response.isIsLxc() == null) {
@@ -275,9 +276,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     agent.setIsLXC(response.isIsLxc());
                 }
                 agent.setListIP(response.getIps());
-                if (agent.getHostname() == null || agent.getHostname().trim().isEmpty()) {
-                    agent.setHostname(agent.getUuid().toString());
-                }
                 if (agent.isIsLXC()) {
                     if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
                         agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));

@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.mongodb.common;
+package org.safehaus.kiskis.mgmt.api.commandrunner;
 
 /**
  *
  * @author dilshat
  */
-public enum TaskType {
+public enum CommandStatus {
 
-    START_CONFIG_SERVERS, START_ROUTERS, START_REPLICA_SET, FIND_PRIMARY_NODE, RESTART_ROUTERS
+    NEW, RUNNING, TIMEDOUT, SUCCEEDED, FAILED
 }

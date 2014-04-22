@@ -23,5 +23,6 @@
         <module>network-manager</module>
         <module>tracker</module>
         <module>monitor</module>
+	<module>command-runner</module>
     </modules>
 </project>
