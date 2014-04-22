@@ -28,5 +28,6 @@
         <module>hadoop</module>
         <module>zookeeper</module>
         <module>hive</module>
+        <module>sqoop</module>
     </modules>
 </project>
