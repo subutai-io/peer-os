@@ -26,6 +26,7 @@
         <module>presto</module>
         <module>hbase</module>
         <module>hadoop</module>
-	<module>zookeeper</module>
+        <module>zookeeper</module>
+        <module>hive</module>
     </modules>
 </project>

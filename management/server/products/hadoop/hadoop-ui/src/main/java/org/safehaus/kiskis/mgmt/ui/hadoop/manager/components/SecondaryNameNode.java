@@ -30,7 +30,7 @@ public class SecondaryNameNode extends ClusterNode {
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
             public void onComplete(NodeState state) {
-                synchronized (progressIcon) {
+                synchronized (progressButton) {
                     boolean isRunning = false;
                     if (state == NodeState.RUNNING) {
                         isRunning = true;
@@ -50,6 +50,6 @@ public class SecondaryNameNode extends ClusterNode {
     protected void setLoading(boolean isLoading) {
         startButton.setVisible(!isLoading);
         stopButton.setVisible(!isLoading);
-        progressIcon.setVisible(isLoading);
+        progressButton.setVisible(isLoading);
     }
 }

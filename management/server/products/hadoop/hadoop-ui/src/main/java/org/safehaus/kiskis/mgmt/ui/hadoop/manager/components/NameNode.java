@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
-import com.vaadin.ui.Button;
+import com.vaadin.event.MouseEvents;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
@@ -16,25 +16,25 @@ public class NameNode extends ClusterNode {
     public NameNode(final Config cluster) {
         super(cluster);
 
-        startButton.addListener(new Button.ClickListener() {
+        startButton.addListener(new MouseEvents.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
                 getStatus(HadoopUI.getHadoopManager().startNameNode(cluster));
             }
         });
 
-        stopButton.addListener(new Button.ClickListener() {
+        stopButton.addListener(new MouseEvents.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
                 getStatus(HadoopUI.getHadoopManager().stopNameNode(cluster));
             }
         });
 
-        restartButton.addListener(new Button.ClickListener() {
+        restartButton.addListener(new MouseEvents.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
                 getStatus(HadoopUI.getHadoopManager().restartNameNode(cluster));
             }
@@ -53,7 +53,7 @@ public class NameNode extends ClusterNode {
         HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
             public void onComplete(NodeState state) {
-                synchronized (progressIcon) {
+                synchronized (progressButton) {
                     boolean isRunning = false;
                     if (state == NodeState.RUNNING) {
                         isRunning = true;
@@ -81,6 +81,6 @@ public class NameNode extends ClusterNode {
         startButton.setVisible(!isLoading);
         stopButton.setVisible(!isLoading);
         restartButton.setVisible(!isLoading);
-        progressIcon.setVisible(isLoading);
+        progressButton.setVisible(isLoading);
     }
 }
