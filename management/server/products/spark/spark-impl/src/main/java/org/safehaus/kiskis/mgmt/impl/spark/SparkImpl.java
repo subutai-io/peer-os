@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.api.spark.Spark;
-import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -20,6 +19,11 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 /**
  * @author dilshat
@@ -27,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SparkImpl implements Spark {
 
-    private TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
@@ -38,6 +42,7 @@ public class SparkImpl implements Spark {
     }
 
     public void destroy() {
+        commandRunner = null;
         executor.shutdown();
     }
 
@@ -49,8 +54,12 @@ public class SparkImpl implements Spark {
         this.tracker = tracker;
     }
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+    public void setCommandRunner(CommandRunner commandRunner) {
+        SparkImpl.commandRunner = commandRunner;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void setAgentManager(AgentManager agentManager) {
@@ -64,7 +73,7 @@ public class SparkImpl implements Spark {
     public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", config.getClusterName()));
+                        String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
@@ -85,7 +94,7 @@ public class SparkImpl implements Spark {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getSlaveNodes().iterator(); it.hasNext(); ) {
+                for (Iterator<Agent> it = config.getSlaveNodes().iterator(); it.hasNext();) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -102,15 +111,17 @@ public class SparkImpl implements Spark {
 
                 //check installed ksks packages
                 Set<Agent> allNodes = config.getAllNodes();
-                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(allNodes));
+                Command checkInstalledCommand = Commands.getCheckInstalledCommand(allNodes);
+                commandRunner.runCommand(checkInstalledCommand);
 
-                if (!checkInstalled.isCompleted()) {
+                if (!checkInstalledCommand.hasCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
                     return;
                 }
-                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext(); ) {
+                for (Iterator<Agent> it = allNodes.iterator(); it.hasNext();) {
                     Agent node = it.next();
-                    Result result = checkInstalled.getResults().get(node.getUuid());
+
+                    AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
                     if (result.getStdOut().contains("ksks-spark")) {
                         po.addLog(String.format("Node %s already has Spark installed. Omitting this node from installation", node.getHostname()));
                         config.getSlaveNodes().remove(node);
@@ -136,52 +147,54 @@ public class SparkImpl implements Spark {
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLog("Cluster info saved to DB\nInstalling Spark...");
                     //install spark            
+                    Command installCommand = Commands.getInstallCommand(config.getAllNodes());
+                    commandRunner.runCommand(installCommand);
 
-                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getAllNodes()));
-
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Installation succeeded\nSetting master IP...");
 
-                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getAllNodes(), config.getMasterNode()));
+                        Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getMasterNode(), config.getAllNodes());
+                        commandRunner.runCommand(setMasterIPCommand);
 
-                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                             po.addLog("Setting master IP succeeded\nRegistering slaves...");
 
-                            Task registerSlavesTask = taskRunner.executeTaskNWait(Tasks.getAddSlavesTask(config.getMasterNode(), config.getSlaveNodes()));
+                            Command addSlavesCommand = Commands.getAddSlavesCommand(config.getSlaveNodes(), config.getMasterNode());
+                            commandRunner.runCommand(addSlavesCommand);
 
-                            if (registerSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                                po.addLog("Slaves successfully registered\nStarting Spark...");
+                            if (addSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
+                                po.addLog("Slaves successfully registered\nStarting cluster...");
 
-                                Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
+                                Command startNodesCommand = Commands.getStartAllCommand(config.getMasterNode());
                                 final AtomicInteger okCount = new AtomicInteger(0);
-                                taskRunner.executeTaskNWait(startSparkTask, new InterruptableTaskCallback() {
+                                commandRunner.runCommand(startNodesCommand, new CommandCallback() {
 
-                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+                                    @Override
+                                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                        okCount.set(Util.countNumberOfOccurences(agentResult.getStdOut(), "starting"));
 
                                         if (okCount.get() >= config.getAllNodes().size()) {
-                                            interrupt();
+                                            stop();
                                         }
-
-                                        return null;
                                     }
+
                                 });
 
                                 if (okCount.get() >= config.getAllNodes().size()) {
-                                    po.addLogDone("Spark started successfully\nDone");
+                                    po.addLogDone("cluster started successfully\nDone");
                                 } else {
-                                    po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
+                                    po.addLogFailed(String.format("Failed to start cluster, %s", startNodesCommand.getAllErrors()));
                                 }
 
                             } else {
-                                po.addLogFailed(String.format("Failed to register slaves with master, %s", registerSlavesTask.getFirstError()));
+                                po.addLogFailed(String.format("Failed to register slaves with master, %s", addSlavesCommand.getAllErrors()));
                             }
                         } else {
-                            po.addLogFailed(String.format("Setting master IP failed, %s", setMasterIPTask.getFirstError()));
+                            po.addLogFailed(String.format("Setting master IP failed, %s", setMasterIPCommand.getAllErrors()));
                         }
 
                     } else {
-                        po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                     }
                 } else {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
@@ -196,7 +209,7 @@ public class SparkImpl implements Spark {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+                        String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -216,23 +229,23 @@ public class SparkImpl implements Spark {
 
                 po.addLog("Uninstalling Spark...");
 
-                Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(config.getAllNodes()));
+                Command uninstallCommand = Commands.getUninstallCommand(config.getAllNodes());
+                commandRunner.runCommand(uninstallCommand);
 
-                if (uninstallTask.isCompleted()) {
-                    for (Map.Entry<UUID, Result> res : uninstallTask.getResults().entrySet()) {
-                        Result result = res.getValue();
-                        Agent agent = agentManager.getAgentByUUID(res.getKey());
+                if (uninstallCommand.hasCompleted()) {
+                    for (AgentResult result : uninstallCommand.getResults().values()) {
+                        Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
                             if (result.getStdOut().contains("Package ksks-spark is not installed, so not removed")) {
                                 po.addLog(String.format("Spark is not installed, so not removed on node %s", result.getStdErr(),
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
                             } else {
                                 po.addLog(String.format("Spark is removed from node %s",
-                                        agent == null ? res.getKey() : agent.getHostname()));
+                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
                             }
                         } else {
                             po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                                    agent == null ? res.getKey() : agent.getHostname()));
+                                    agent == null ? result.getAgentUUID() : agent.getHostname()));
                         }
                     }
                     po.addLog("Updating db...");
@@ -242,7 +255,7 @@ public class SparkImpl implements Spark {
                         po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
                     }
                 } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
                 }
             }
         });
@@ -254,7 +267,7 @@ public class SparkImpl implements Spark {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Adding node %s to %s", lxcHostname, clusterName));
+                        String.format("Adding node %s to %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -287,14 +300,15 @@ public class SparkImpl implements Spark {
                 boolean install = !agent.equals(config.getMasterNode());
 
                 //check installed ksks packages
-                Task checkInstalled = taskRunner.executeTaskNWait(Tasks.getCheckInstalledTask(Util.wrapAgentToSet(agent)));
+                Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(checkInstalledCommand);
 
-                if (!checkInstalled.isCompleted()) {
+                if (!checkInstalledCommand.hasCompleted()) {
                     po.addLogFailed("Failed to check presence of installed ksks packages\nOperation aborted");
                     return;
                 }
 
-                Result result = checkInstalled.getResults().get(agent.getUuid());
+                AgentResult result = checkInstalledCommand.getResults().get(agent.getUuid());
 
                 if (result.getStdOut().contains("ksks-spark") && install) {
                     po.addLogFailed(String.format("Node %s already has Spark installed\nOperation aborted", lxcHostname));
@@ -313,79 +327,82 @@ public class SparkImpl implements Spark {
 
                     if (install) {
                         po.addLog("Installing Spark...");
-                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(agent)));
+                        Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
+                        commandRunner.runCommand(installCommand);
 
-                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (installCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                             po.addLog("Installation succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                             return;
                         }
                     }
 
                     po.addLog("Setting master IP on slave...");
-                    Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(Util.wrapAgentToSet(agent), config.getMasterNode()));
+                    Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getMasterNode(), Util.wrapAgentToSet(agent));
+                    commandRunner.runCommand(setMasterIPCommand);
 
-                    if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Master IP successfully set\nRegistering slave with master...");
 
-                        Task registerSlaveTask = taskRunner.executeTaskNWait(Tasks.getAddSlaveTask(config.getMasterNode(), agent));
+                        Command addSlaveCommand = Commands.getAddSlaveCommand(agent, config.getMasterNode());
+                        commandRunner.runCommand(addSlaveCommand);
 
-                        if (registerSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (addSlaveCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                             po.addLog("Registration succeeded\nRestarting master...");
 
-                            Task restartMasterTask = Tasks.getRestartMasterTask(config.getMasterNode());
+                            Command restartMasterCommand = Commands.getRestartMasterCommand(config.getMasterNode());
                             final AtomicInteger okCount = new AtomicInteger(0);
-                            taskRunner.executeTaskNWait(restartMasterTask, new InterruptableTaskCallback() {
+                            commandRunner.runCommand(restartMasterCommand, new CommandCallback() {
 
-                                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                    if (stdOut.contains("starting")) {
+                                @Override
+                                public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                    if (agentResult.getStdOut().contains("starting")) {
                                         okCount.incrementAndGet();
                                     }
 
                                     if (okCount.get() > 0) {
-                                        interrupt();
+                                        stop();
                                     }
-
-                                    return null;
                                 }
+
                             });
 
                             if (okCount.get() > 0) {
                                 po.addLog("Master restarted successfully\nStarting Spark on new node...");
 
-                                Task startSparkTask = Tasks.getStartSlaveTask(Util.wrapAgentToSet(agent));
+                                Command startSlaveCommand = Commands.getStartSlaveCommand(agent);
                                 okCount.set(0);
-                                taskRunner.executeTaskNWait(startSparkTask, new InterruptableTaskCallback() {
+                                commandRunner.runCommand(startSlaveCommand, new CommandCallback() {
 
-                                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                        if (stdOut.contains("starting")) {
+                                    @Override
+                                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                        if (agentResult.getStdOut().contains("starting")) {
                                             okCount.incrementAndGet();
                                         }
 
                                         if (okCount.get() > 0) {
-                                            interrupt();
+                                            stop();
                                         }
-
-                                        return null;
                                     }
+
                                 });
 
                                 if (okCount.get() > 0) {
                                     po.addLogDone("Spark started successfully\nDone");
                                 } else {
-                                    po.addLogFailed(String.format("Failed to start Spark, %s", startSparkTask.getFirstError()));
+                                    po.addLogFailed(String.format("Failed to start Spark, %s", startSlaveCommand.getAllErrors()));
                                 }
 
                             } else {
-                                po.addLogFailed(String.format("Master restart failed, %s", restartMasterTask.getFirstError()));
+                                po.addLogFailed(String.format("Master restart failed, %s", restartMasterCommand.getAllErrors()));
                             }
 
                         } else {
-                            po.addLogFailed(String.format("Registration failed, %s", registerSlaveTask.getFirstError()));
+                            po.addLogFailed(String.format("Registration failed, %s", addSlaveCommand.getAllErrors()));
                         }
                     } else {
-                        po.addLogFailed(String.format("Failed to set master IP, %s", setMasterIPTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to set master IP, %s", setMasterIPCommand.getAllErrors()));
                     }
 
                 } else {
@@ -401,7 +418,7 @@ public class SparkImpl implements Spark {
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying %s in %s", lxcHostname, clusterName));
+                        String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -433,36 +450,37 @@ public class SparkImpl implements Spark {
 
                 if (agentManager.getAgentByHostname(config.getMasterNode().getHostname()) != null) {
 
-                    Task unregisterSlaveTask = taskRunner.executeTaskNWait(Tasks.getRemoveSlaveTask(config.getMasterNode(), agent));
+                    Command clearSlavesCommand = Commands.getClearSlaveCommand(agent, config.getMasterNode());
+                    commandRunner.runCommand(clearSlavesCommand);
 
-                    if (unregisterSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (clearSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Successfully unregistered slave from master\nRestarting master...");
 
-                        Task restartMasterTask = Tasks.getRestartMasterTask(config.getMasterNode());
+                        Command restartMasterCommand = Commands.getRestartMasterCommand(config.getMasterNode());
                         final AtomicInteger okCount = new AtomicInteger(0);
-                        taskRunner.executeTaskNWait(restartMasterTask, new InterruptableTaskCallback() {
+                        commandRunner.runCommand(restartMasterCommand, new CommandCallback() {
 
-                            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                if (stdOut.contains("starting")) {
+                            @Override
+                            public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                if (agentResult.getStdOut().contains("starting")) {
                                     okCount.incrementAndGet();
                                 }
 
                                 if (okCount.get() > 0) {
-                                    interrupt();
+                                    stop();
                                 }
-
-                                return null;
                             }
+
                         });
 
                         if (okCount.get() > 0) {
                             po.addLog("Master restarted successfully");
                         } else {
-                            po.addLog(String.format("Master restart failed, %s, skipping...", restartMasterTask.getFirstError()));
+                            po.addLog(String.format("Master restart failed, %s, skipping...", restartMasterCommand.getAllErrors()));
                         }
                     } else {
                         po.addLog(String.format("Failed to unregister slave from master: %s, skipping...",
-                                unregisterSlaveTask.getFirstError()));
+                                clearSlavesCommand.getAllErrors()));
                     }
                 } else {
                     po.addLog("Failed to unregister slave from master: Master is not connected, skipping...");
@@ -473,11 +491,11 @@ public class SparkImpl implements Spark {
                 if (uninstall) {
                     po.addLog("Uninstalling Spark...");
 
-                    Task uninstallTask = taskRunner.executeTaskNWait(Tasks.getUninstallTask(Util.wrapAgentToSet(agent)));
+                    Command uninstallCommand = Commands.getUninstallCommand(Util.wrapAgentToSet(agent));
+                    commandRunner.runCommand(uninstallCommand);
 
-                    if (uninstallTask.isCompleted()) {
-                        Map.Entry<UUID, Result> res = uninstallTask.getResults().entrySet().iterator().next();
-                        Result result = res.getValue();
+                    if (uninstallCommand.hasCompleted()) {
+                        AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
                             if (result.getStdOut().contains("Package ksks-spark is not installed, so not removed")) {
                                 po.addLog(String.format("Spark is not installed, so not removed on node %s", result.getStdErr(),
@@ -492,18 +510,19 @@ public class SparkImpl implements Spark {
                         }
 
                     } else {
-                        po.addLogFailed(String.format("Uninstallation failed, %s", uninstallTask.getFirstError()));
+                        po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
                         return;
                     }
                 } else {
                     po.addLog("Stopping slave...");
 
-                    Task stopSlaveTask = taskRunner.executeTaskNWait(Tasks.getStopSlaveTask(Util.wrapAgentToSet(agent)));
+                    Command stopSlaveCommand = Commands.getStopSlaveCommand(agent);
+                    commandRunner.runCommand(stopSlaveCommand);
 
-                    if (stopSlaveTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (stopSlaveCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Slave stopped successfully");
                     } else {
-                        po.addLog(String.format("Failed to stop slave, %s, skipping...", stopSlaveTask.getFirstError()));
+                        po.addLog(String.format("Failed to stop slave, %s, skipping...", stopSlaveCommand.getAllErrors()));
                     }
                 }
 
@@ -525,7 +544,7 @@ public class SparkImpl implements Spark {
     public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Changing master to %s in %s", newMasterHostname, clusterName));
+                        String.format("Changing master to %s in %s", newMasterHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -560,15 +579,17 @@ public class SparkImpl implements Spark {
 
                 po.addLog("Stopping all nodes...");
                 //stop all nodes
-                Task stopAllNodesTask = taskRunner.executeTaskNWait(Tasks.getStopAllTask(Util.wrapAgentToSet(config.getMasterNode())));
-                if (stopAllNodesTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                Command stopNodesCommand = Commands.getStopAllCommand(config.getMasterNode());
+                commandRunner.runCommand(stopNodesCommand);
+                if (stopNodesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                     po.addLog("All nodes stopped\nClearing slaves on old master...");
                     //clear slaves from old master
-                    Task clearSlavesTask = taskRunner.executeTaskNWait(Tasks.getClearSlavesTask(config.getMasterNode()));
-                    if (clearSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    Command clearSlavesCommand = Commands.getClearSlavesCommand(config.getMasterNode());
+                    commandRunner.runCommand(clearSlavesCommand);
+                    if (clearSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Slaves cleared successfully");
                     } else {
-                        po.addLog(String.format("Clearing slaves failed, %s, skipping...", clearSlavesTask.getFirstError()));
+                        po.addLog(String.format("Clearing slaves failed, %s, skipping...", clearSlavesCommand.getAllErrors()));
                     }
                     //add slaves to new master, if keepSlave=true then master node is also added as slave
                     config.getSlaveNodes().add(config.getMasterNode());
@@ -579,34 +600,37 @@ public class SparkImpl implements Spark {
                         config.getSlaveNodes().remove(newMaster);
                     }
                     po.addLog("Adding nodes to new master...");
-                    Task addSlavesTask = taskRunner.executeTaskNWait(Tasks.getAddSlavesTask(newMaster, config.getSlaveNodes()));
-                    if (addSlavesTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    Command addSlavesCommand = Commands.getAddSlavesCommand(config.getSlaveNodes(), config.getMasterNode());
+                    commandRunner.runCommand(addSlavesCommand);
+                    if (addSlavesCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                         po.addLog("Nodes added successfully\nSetting new master IP...");
                         //modify master ip on all nodes
-                        Task setMasterIPTask = taskRunner.executeTaskNWait(Tasks.getSetMasterIPTask(config.getAllNodes(), newMaster));
-                        if (setMasterIPTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getMasterNode(), config.getAllNodes());
+                        commandRunner.runCommand(setMasterIPCommand);
+                        if (setMasterIPCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                             po.addLog("Master IP set successfully\nStarting cluster...");
                             //start master & slaves
 
-                            Task startSparkTask = Tasks.getStartAllTask(Util.wrapAgentToSet(config.getMasterNode()));
+                            Command startNodesCommand = Commands.getStartAllCommand(config.getMasterNode());
                             final AtomicInteger okCount = new AtomicInteger(0);
-                            taskRunner.executeTaskNWait(startSparkTask, new InterruptableTaskCallback() {
+                            commandRunner.runCommand(startNodesCommand, new CommandCallback() {
 
-                                public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                                    okCount.set(Util.countNumberOfOccurences(stdOut, "starting"));
+                                @Override
+                                public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                    okCount.set(Util.countNumberOfOccurences(agentResult.getStdOut(), "starting"));
 
                                     if (okCount.get() >= config.getAllNodes().size()) {
-                                        interrupt();
+                                        stop();
                                     }
 
-                                    return null;
                                 }
+
                             });
 
                             if (okCount.get() >= config.getAllNodes().size()) {
                                 po.addLog("Cluster started successfully");
                             } else {
-                                po.addLog(String.format("Start of cluster failed, %s, skipping...", startSparkTask.getFirstError()));
+                                po.addLog(String.format("Start of cluster failed, %s, skipping...", startNodesCommand.getAllErrors()));
                             }
 
                             po.addLog("Updating db...");
@@ -617,14 +641,14 @@ public class SparkImpl implements Spark {
                                 po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
                             }
                         } else {
-                            po.addLogFailed(String.format("Failed to set master IP on all nodes, %s\nOperation aborted", setMasterIPTask.getFirstError()));
+                            po.addLogFailed(String.format("Failed to set master IP on all nodes, %s\nOperation aborted", setMasterIPCommand.getAllErrors()));
                         }
                     } else {
-                        po.addLogFailed(String.format("Failed to add slaves to new master, %s\nOperation aborted", addSlavesTask.getFirstError()));
+                        po.addLogFailed(String.format("Failed to add slaves to new master, %s\nOperation aborted", addSlavesCommand.getAllErrors()));
                     }
 
                 } else {
-                    po.addLogFailed(String.format("Failed to stop all nodes, %s", stopAllNodesTask.getFirstError()));
+                    po.addLogFailed(String.format("Failed to stop all nodes, %s", stopNodesCommand.getAllErrors()));
                 }
             }
         });
@@ -635,7 +659,7 @@ public class SparkImpl implements Spark {
     public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting node %s in %s", lxcHostname, clusterName));
+                        String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -667,33 +691,33 @@ public class SparkImpl implements Spark {
 
                 po.addLog(String.format("Starting %s on %s...", master ? "master" : "slave", node.getHostname()));
 
-                Task startTask;
+                Command startCommand;
                 if (master) {
-                    startTask = Tasks.getStartMasterTask(Util.wrapAgentToSet(node));
+                    startCommand = Commands.getStartMasterCommand(node);
                 } else {
-                    startTask = Tasks.getStartSlaveTask(Util.wrapAgentToSet(node));
+                    startCommand = Commands.getStartSlaveCommand(node);
                 }
 
                 final AtomicInteger okCount = new AtomicInteger(0);
-                taskRunner.executeTaskNWait(startTask, new InterruptableTaskCallback() {
+                commandRunner.runCommand(startCommand, new CommandCallback() {
 
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                        if (stdOut.contains("starting")) {
+                    @Override
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                        if (agentResult.getStdOut().contains("starting")) {
                             okCount.incrementAndGet();
                         }
 
                         if (okCount.get() > 0) {
-                            interrupt();
+                            stop();
                         }
-
-                        return null;
                     }
+
                 });
 
                 if (okCount.get() > 0) {
                     po.addLogDone(String.format("Node %s started", node.getHostname()));
                 } else {
-                    po.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(), startTask.getFirstError()));
+                    po.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(), startCommand.getAllErrors()));
                 }
 
             }
@@ -706,7 +730,7 @@ public class SparkImpl implements Spark {
     public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -738,17 +762,18 @@ public class SparkImpl implements Spark {
 
                 po.addLog(String.format("Stopping %s on %s...", master ? "master" : "slave", node.getHostname()));
 
-                Task stopTask;
+                Command stopCommand;
                 if (master) {
-                    stopTask = taskRunner.executeTaskNWait(Tasks.getStopMasterTask(Util.wrapAgentToSet(node)));
+                    stopCommand = Commands.getStopMasterCommand(node);
                 } else {
-                    stopTask = taskRunner.executeTaskNWait(Tasks.getStopSlaveTask(Util.wrapAgentToSet(node)));
+                    stopCommand = Commands.getStopSlaveCommand(node);
                 }
+                commandRunner.runCommand(stopCommand);
 
-                if (stopTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (stopCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                     po.addLogDone(String.format("Node %s stopped", node.getHostname()));
                 } else {
-                    po.addLogFailed(String.format("Stopping %s failed, %s", node.getHostname(), stopTask.getFirstError()));
+                    po.addLogFailed(String.format("Stopping %s failed, %s", node.getHostname(), stopCommand.getAllErrors()));
                 }
 
             }
@@ -760,7 +785,7 @@ public class SparkImpl implements Spark {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -784,14 +809,14 @@ public class SparkImpl implements Spark {
 
                 po.addLog("Checking node...");
 
-                Task checkNodeTask = taskRunner.executeTaskNWait(
-                        Tasks.getStatusAllTask(Util.wrapAgentToSet(node)));
+                Command checkNodeCommand = Commands.getStatusAllCommand(node);
+                commandRunner.runCommand(checkNodeCommand);
 
-                Result res = checkNodeTask.getResults().get(node.getUuid());
-                if (checkNodeTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                AgentResult res = checkNodeCommand.getResults().get(node.getUuid());
+                if (checkNodeCommand.getCommandStatus() == CommandStatus.SUCCEEDED) {
                     po.addLogDone(String.format("%s", res.getStdOut()));
                 } else {
-                    po.addLogFailed(String.format("Faied to check status, %s", res.getStdErr()));
+                    po.addLogFailed(String.format("Faied to check status, %s", checkNodeCommand.getAllErrors()));
                 }
             }
         });
