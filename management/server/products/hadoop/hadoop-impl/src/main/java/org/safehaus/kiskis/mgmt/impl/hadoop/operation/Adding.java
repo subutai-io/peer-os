@@ -49,7 +49,9 @@ public class Adding {
                     Agent agent = null;
 
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
-                        agent = (Agent) entry.getValue();
+                        for (Agent a : entry.getValue()) {
+                            agent = a;
+                        }
                     }
                     po.addLog("Lxc containers created successfully\nConfiguring network...");
 
