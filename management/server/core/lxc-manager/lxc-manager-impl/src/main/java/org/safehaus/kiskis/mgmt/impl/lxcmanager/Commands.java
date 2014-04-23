@@ -5,10 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  *
@@ -16,95 +17,62 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class Commands {
 
-    public static Request getTemplate() {
-        return CommandFactory.newRequest(
-                RequestType.EXECUTE_REQUEST, // type
-                null, //                        !! agent uuid
-                null, //                        source
-                null, //                        !! task uuid 
-                1, //                           !! request sequence number
-                "/", //                         cwd
-                null, //                        program
-                OutputRedirection.RETURN, //    std output redirection 
-                OutputRedirection.RETURN, //    std error redirection
-                null, //                        stdout capture file path
-                null, //                        stderr capture file path
-                "root", //                      runas
-                null, //                        arg
-                null, //                        env vars
-                30); //                         timeout (sec)
+    public static Command getCloneCommand(Agent physicalAgent, String lxcHostName) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format("/usr/bin/lxc-clone -o base-container -n %s", lxcHostName))
+                .withTimeout(360),
+                Util.wrapAgentToSet(physicalAgent));
     }
 
-    public static Request getCloneCommand(String lxcHostname) {
-        Request req = getTemplate();
-        req.setProgram(String.format("/usr/bin/lxc-clone -o base-container -n %s", lxcHostname));
-        req.setTimeout(360);
-        return req;
+    public static Command getCloneNStartCommand(Agent physicalAgent, String lxcHostName) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format(
+                                "/usr/bin/lxc-clone -o base-container -n %1$s;sleep 10;/usr/bin/lxc-start -n %1$s -d;sleep 10;/usr/bin/lxc-info -n %1$s",
+                                lxcHostName))
+                .withTimeout(360),
+                Util.wrapAgentToSet(physicalAgent));
     }
 
-    public static Request getCloneNStartCommand(String lxcHostname) {
-        Request req = getTemplate();
-        req.setProgram(String.format(
-                "/usr/bin/lxc-clone -o base-container -n %1$s;sleep 10;/usr/bin/lxc-start -n %1$s -d;sleep 10;/usr/bin/lxc-info -n %1$s",
-                lxcHostname));
-        req.setTimeout(360);
-        return req;
+    public static Command getLxcListCommand(Set<Agent> agents) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder("/usr/bin/lxc-list")
+                .withTimeout(60),
+                agents);
     }
 
-    public static Request getLxcListCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("/usr/bin/lxc-list");
-        req.setTimeout(60);
-        return req;
+    public static Command getLxcInfoCommand(Agent physicalAgent, String lxcHostName) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format("sleep 10 ; /usr/bin/lxc-info -n %s", lxcHostName))
+                .withTimeout(60),
+                Util.wrapAgentToSet(physicalAgent));
     }
 
-    public static Request getLxcInfoCommand(String lxcHostname) {
-
-        Request req = getTemplate();
-        req.setProgram(String.format("/usr/bin/lxc-info -n %s", lxcHostname));
-        req.setTimeout(60);
-        return req;
+    public static Command getLxcStartCommand(Agent physicalAgent, String lxcHostName) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format("/usr/bin/lxc-start -n %s -d", lxcHostName))
+                .withTimeout(120),
+                Util.wrapAgentToSet(physicalAgent));
     }
 
-    public static Request getLxcInfoWithWaitCommand(String lxcHostname) {
-
-        Request req = getTemplate();
-        req.setProgram(String.format("sleep 10;/usr/bin/lxc-info -n %s", lxcHostname));
-        req.setTimeout(60);
-        return req;
+    public static Command getLxcStopCommand(Agent physicalAgent, String lxcHostName) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format("/usr/bin/lxc-stop -n %s", lxcHostName))
+                .withTimeout(60),
+                Util.wrapAgentToSet(physicalAgent));
     }
 
-    public static Request getLxcStartCommand(String lxcHostname) {
-
-        Request req = getTemplate();
-        req.setProgram(String.format("/usr/bin/lxc-start -n %s -d", lxcHostname));
-        req.setTimeout(120);
-        return req;
+    public static Command getLxcDestroyCommand(Agent physicalAgent, String lxcHostName) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format("/usr/bin/lxc-stop -n %1$s && /usr/bin/lxc-destroy -n %1$s", lxcHostName))
+                .withTimeout(180),
+                Util.wrapAgentToSet(physicalAgent));
     }
 
-    public static Request getLxcStopCommand(String lxcHostname) {
-
-        Request req = getTemplate();
-        req.setProgram(String.format("/usr/bin/lxc-stop -n %s", lxcHostname));
-        req.setTimeout(120);
-        return req;
-    }
-
-    public static Request getLxcDestroyCommand(String lxcHostname) {
-
-        Request req = getTemplate();
-        req.setProgram(String.format("/usr/bin/lxc-stop -n %1$s && /usr/bin/lxc-destroy -n %1$s", lxcHostname));
-        req.setTimeout(180);
-        return req;
-    }
-
-    public static Request getMetricsCommand() {
-
-        Request req = getTemplate();
-        req.setProgram("free -m | grep buffers/cache ; df /dev/sda1 | grep /dev/sda1 ; uptime ; nproc");
-        req.setTimeout(30);
-        return req;
+    public static Command getMetricsCommand(Set<Agent> agents) {
+        return LxcManagerImpl.getCommandRunner().createCommand(
+                new RequestBuilder("free -m | grep buffers/cache ; df /dev/sda1 | grep /dev/sda1 ; uptime ; nproc")
+                .withTimeout(30),
+                agents);
     }
 
 }
