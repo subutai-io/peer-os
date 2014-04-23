@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.impl.commandrunner.EntryExpiryCallback;
  *
  * @author dilshat
  */
-public class CacheEntryTest {
+public class CacheEntryUT {
 
     private final Object SOME_VALUE = new Object();
 

@@ -19,7 +19,7 @@ import org.safehaus.kiskis.mgmt.impl.commandrunner.ExpiringCache;
  *
  * @author dilshat
  */
-public class ExpiringCacheTest {
+public class ExpiringCacheUT {
 
     private final Object KEY = new Object();
     private final Object VALUE = new Object();

@@ -24,7 +24,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-public class CommandImplTest {
+public class CommandImplUT {
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";
 

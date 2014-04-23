@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.tracker;
 
+import com.google.common.base.Preconditions;
 import java.util.Date;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -40,6 +41,8 @@ public class ProductOperationViewImpl implements ProductOperationView {
     private final Date createDate;
 
     public ProductOperationViewImpl(ProductOperation po) {
+        Preconditions.checkNotNull(po, "Product operation is null");
+
         id = po.getId();
         description = po.getDescription();
         log = po.getLog();

@@ -24,7 +24,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
  *
  * @author dilshat
  */
-public class AgentManagerImplTest {
+public class AgentManagerImplUT {
 
     private final String LXC_HOSTNAME = "parent-lxc-hostname";
     private final String PARENT_HOSTNAME = "parent-lxc-hostname";
