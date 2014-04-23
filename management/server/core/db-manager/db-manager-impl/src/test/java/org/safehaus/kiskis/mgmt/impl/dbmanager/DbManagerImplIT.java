@@ -25,7 +25,7 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
  * @todo use classpath sql file with one single table
  */
 //@Ignore
-public class DbManagerImplTest {
+public class DbManagerImplIT {
 
     @Rule
     public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("pi.sql", true, true, "test"));

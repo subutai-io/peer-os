@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 /**
  * @author dilshat
  */
-public class CommunicationManagerImplTest {
+public class CommunicationManagerImplIT {
 
     private static CommunicationManagerImpl communicationManagerImpl = null;
 
@@ -136,7 +136,7 @@ public class CommunicationManagerImplTest {
                 try {
                     producer.send(session.createTextMessage(CommandJson.getResponse(response)));
                 } catch (JMSException ex) {
-                    Logger.getLogger(CommunicationManagerImplTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(CommunicationManagerImplIT.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

@@ -27,28 +27,46 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
+ * This is implementation of Command interface
  *
  * @author dilshat
  */
 public class CommandImpl implements Command {
 
+    //holds map of results of command execution where key is agent's UUID and value is AgentResult
     private final Map<UUID, AgentResult> results = new HashMap<UUID, AgentResult>();
-    /**
-     * Status of command
-     */
-    private final int requestsToRun;
+    //number of requests sent to agents
+    private final int requestsCount;
+    //uuid of command
     private final UUID commandUUID;
+    //set of requests to send to agents produced from supplied request builders
     private final Set<Request> requests = new HashSet<Request>();
+    //command timeout
     private final int timeout;
+    //semaphore used to wait until command completes or times out
     private final Semaphore completionSemaphore = new Semaphore(0);
+    //lock used to synchronize update of command state between command executor thread and cache evictor thread
     private final Lock updateLock = new ReentrantLock(true);
-
+    //status of command
     private volatile CommandStatus commandStatus = CommandStatus.NEW;
+    //number of requests completed so far
     private volatile int requestsCompleted = 0;
+    //number of requests succeeded so far
     private volatile int requestsSucceeded = 0;
+    //custom object assigned to this command
     private Object data;
+    //command description
     private final String description;
 
+    /**
+     * Constructor which initializes request based on supplied request builder
+     * and set of agents. The same request produced by request builder will be
+     * sent to supplied set of agents
+     *
+     * @param description - command description
+     * @param requestBuilder - request builder used to produce request
+     * @param agents - target agents
+     */
     public CommandImpl(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
 
         Preconditions.checkNotNull(requestBuilder, "Request Builder is null");
@@ -56,7 +74,7 @@ public class CommandImpl implements Command {
 
         this.description = description;
         this.commandUUID = Util.generateTimeBasedUUID();
-        this.requestsToRun = agents.size();
+        this.requestsCount = agents.size();
         this.timeout = requestBuilder.getTimeout();
 
         for (Agent agent : agents) {
@@ -64,12 +82,20 @@ public class CommandImpl implements Command {
         }
     }
 
+    /**
+     * Constructor which initializes request based on supplied request builders.
+     * Each agent will receive own custom request produced by corresponding
+     * AgentRequestBuilder
+     *
+     * @param description - command description
+     * @param requestBuilder - request builder used to produce request
+     */
     public CommandImpl(String description, Set<AgentRequestBuilder> requestBuilders) {
         Preconditions.checkArgument(requestBuilders != null && !requestBuilders.isEmpty(), "Request Builders are null or empty");
 
         this.description = description;
         this.commandUUID = Util.generateTimeBasedUUID();
-        this.requestsToRun = requestBuilders.size();
+        this.requestsCount = requestBuilders.size();
 
         int maxTimeout = 0;
         for (AgentRequestBuilder requestBuilder : requestBuilders) {
@@ -82,18 +108,42 @@ public class CommandImpl implements Command {
         this.timeout = maxTimeout;
     }
 
+    /**
+     * Shows if command has completed. The same as checking
+     * command.getCommandStatus == CommandStatus.SUCCEEDED ||
+     * command.getCommandStatus == CommandStatus.FAILED
+     *
+     * @return
+     */
     public boolean hasCompleted() {
         return commandStatus == CommandStatus.FAILED || commandStatus == CommandStatus.SUCCEEDED;
     }
 
+    /**
+     * Shows if command has succeeded. The same as checking
+     * command.getCommandStatus == CommandStatus.SUCCEEDED
+     *
+     * @return
+     */
     public boolean hasSucceeded() {
         return commandStatus == CommandStatus.SUCCEEDED;
     }
 
+    /**
+     * Returns command status
+     *
+     * @return
+     */
     public CommandStatus getCommandStatus() {
         return commandStatus;
     }
 
+    /**
+     * Returns map of results from agents where key is agent's UUID and value is
+     * instance of AgentResult
+     *
+     * @return
+     */
     public Map<UUID, AgentResult> getResults() {
         return Collections.unmodifiableMap(results);
     }
@@ -114,7 +164,7 @@ public class CommandImpl implements Command {
                 if (response.hasSucceeded()) {
                     incrementSucceededRequestsCount();
                 }
-                if (getRequestsCompleted() == getRequestsRun()) {
+                if (getRequestsCompleted() == getRequestsCount()) {
                     if (getRequestsCompleted() == getRequestsSucceeded()) {
                         setCommandStatus(CommandStatus.SUCCEEDED);
                     } else {
@@ -125,14 +175,23 @@ public class CommandImpl implements Command {
         }
     }
 
+    /**
+     * Increments count of completed requests
+     */
     public void incrementCompletedRequestsCount() {
         requestsCompleted++;
     }
 
+    /**
+     * Increments count of succeeded requests
+     */
     public void incrementSucceededRequestsCount() {
         requestsSucceeded++;
     }
 
+    /**
+     * Blocks caller until command has completed or timed out
+     */
     public void waitCompletion() {
         try {
             completionSemaphore.acquire();
@@ -140,58 +199,124 @@ public class CommandImpl implements Command {
         }
     }
 
+    /**
+     * Notifies waiting threads which called waitCompletion() that command has
+     * completed or timed out
+     */
     public void notifyWaitingThreads() {
         completionSemaphore.release();
     }
 
+    /**
+     * Acquires update lock of this command
+     */
     public void getUpdateLock() {
         updateLock.lock();
     }
 
+    /**
+     * Releases update lock of this command
+     */
     public void releaseUpdateLock() {
         updateLock.unlock();
     }
 
+    /**
+     * Return timeout of command, which is the maximum timeout among all
+     * requests of this command
+     *
+     * @return
+     */
     public int getTimeout() {
         return timeout;
     }
 
+    /**
+     * Returns all request of this command
+     *
+     * @return
+     */
     public Set<Request> getRequests() {
         return Collections.unmodifiableSet(requests);
     }
 
+    /**
+     * Sets command status
+     *
+     * @param commandStatus
+     */
     public void setCommandStatus(CommandStatus commandStatus) {
         this.commandStatus = commandStatus;
     }
 
-    public int getRequestsRun() {
-        return requestsToRun;
+    /**
+     * Returns count of requests in this command
+     *
+     * @return
+     */
+    public int getRequestsCount() {
+        return requestsCount;
     }
 
+    /**
+     * Returns number of requests completed so far
+     *
+     * @return
+     */
     public int getRequestsCompleted() {
         return requestsCompleted;
     }
 
+    /**
+     * Returns number of requests succeeded so far
+     *
+     * @return
+     */
     public int getRequestsSucceeded() {
         return requestsSucceeded;
     }
 
+    /**
+     * Returns command UUID
+     *
+     * @return
+     */
     public UUID getCommandUUID() {
         return commandUUID;
     }
 
+    /**
+     * Assigns custom object to this command
+     *
+     * @param data
+     */
     public void setData(Object data) {
         this.data = data;
     }
 
+    /**
+     * Returns custom object assigned to this command or null
+     *
+     * @return
+     */
     public Object getData() {
         return data;
     }
 
+    /**
+     * Returns command description or null
+     *
+     * @return
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns all std err outputs from agents joined in one string
+     *
+     * @return - all std err outputs from agents joined in one string
+     */
     public String getAllErrors() {
         StringBuilder errors = new StringBuilder();
         for (Map.Entry<UUID, AgentResult> result : results.entrySet()) {
@@ -210,7 +335,7 @@ public class CommandImpl implements Command {
 
     @Override
     public String toString() {
-        return "CommandImpl{" + "results=" + results + ", requestsToRun=" + requestsToRun + ", commandUUID=" + commandUUID + ", requests=" + requests + ", timeout=" + timeout + ", commandStatus=" + commandStatus + ", requestsCompleted=" + requestsCompleted + ", requestsSucceeded=" + requestsSucceeded + '}';
+        return "CommandImpl{" + "results=" + results + ", requestsCount=" + requestsCount + ", commandUUID=" + commandUUID + ", requests=" + requests + ", timeout=" + timeout + ", completionSemaphore=" + completionSemaphore + ", updateLock=" + updateLock + ", commandStatus=" + commandStatus + ", requestsCompleted=" + requestsCompleted + ", requestsSucceeded=" + requestsSucceeded + ", data=" + data + ", description=" + description + '}';
     }
 
 }

@@ -22,7 +22,7 @@ import org.safehaus.kiskis.mgmt.impl.dbmanager.DbManagerImpl;
  *
  * @author dilshat
  */
-public class TrackerImplTest {
+public class TrackerImplIT {
 
     @Rule
     public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("po.sql", true, true, "test"));
@@ -45,6 +45,7 @@ public class TrackerImplTest {
 
     @Test
     public void testCreateNGetProductOperation() {
+
         ProductOperation po = tracker.createProductOperation(source, description);
 
         assertNotNull(tracker.getProductOperation(source, po.getId()));
@@ -52,6 +53,7 @@ public class TrackerImplTest {
 
     @Test
     public void testGetProductOperations() {
+
         ProductOperation po = tracker.createProductOperation(source, description);
         po = tracker.createProductOperation(source, description);
 
@@ -64,10 +66,11 @@ public class TrackerImplTest {
     public void testGetProductOperationSources() {
 
         ProductOperation po = tracker.createProductOperation("source1", description);
+
         po = tracker.createProductOperation("source2", description);
         po = tracker.createProductOperation("source3", description);
 
-        assertEquals(tracker.getProductOperationSources().size(), 3);
+        assertEquals(3, tracker.getProductOperationSources().size());
 
     }
 

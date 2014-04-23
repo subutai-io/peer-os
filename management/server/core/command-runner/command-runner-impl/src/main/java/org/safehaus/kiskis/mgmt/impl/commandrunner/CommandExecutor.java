@@ -10,6 +10,7 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import java.util.concurrent.ExecutorService;
 
 /**
+ * This class holds command together with associated executor and callback
  *
  * @author dilshat
  */

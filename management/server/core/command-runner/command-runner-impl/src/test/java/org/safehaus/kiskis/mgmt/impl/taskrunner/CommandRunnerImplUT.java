@@ -37,7 +37,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-public class CommandRunnerImplTest {
+public class CommandRunnerImplUT {
 
     private static ExecutorService exec;
     private final boolean allTests = true;
