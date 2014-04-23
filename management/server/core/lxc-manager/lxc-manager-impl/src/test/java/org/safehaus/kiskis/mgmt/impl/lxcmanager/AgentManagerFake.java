@@ -24,8 +24,8 @@ public class AgentManagerFake implements AgentManager {
     private final Set<Agent> agents = new HashSet<Agent>();
 
     public AgentManagerFake() {
-        agents.add(TestUtils.getPhysicalAgent());
-        agents.add(TestUtils.getLxcAgent());
+        agents.add(MockUtils.getPhysicalAgent());
+        agents.add(MockUtils.getLxcAgent());
     }
 
     public Set<Agent> getAgents() {
@@ -33,11 +33,11 @@ public class AgentManagerFake implements AgentManager {
     }
 
     public Set<Agent> getPhysicalAgents() {
-        return Util.wrapAgentToSet(TestUtils.getPhysicalAgent());
+        return Util.wrapAgentToSet(MockUtils.getPhysicalAgent());
     }
 
     public Set<Agent> getLxcAgents() {
-        return Util.wrapAgentToSet(TestUtils.getLxcAgent());
+        return Util.wrapAgentToSet(MockUtils.getLxcAgent());
     }
 
     public Agent getAgentByHostname(String hostname) {
@@ -50,9 +50,9 @@ public class AgentManagerFake implements AgentManager {
 
         if (hostname != null) {
             if (hostname.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
-                return new Agent(TestUtils.getLxcAgent().getUuid(), hostname);
+                return new Agent(MockUtils.getLxcAgent().getUuid(), hostname);
             } else {
-                return new Agent(TestUtils.getPhysicalAgent().getUuid(), hostname);
+                return new Agent(MockUtils.getPhysicalAgent().getUuid(), hostname);
             }
         }
         
