@@ -11,5 +11,5 @@ package org.safehaus.kiskis.mgmt.api.lxcmanager;
  */
 public enum LxcState {
 
-    RUNNING, STOPPED, FROZEN
+    UNKNOWN, RUNNING, STOPPED, FROZEN
 }

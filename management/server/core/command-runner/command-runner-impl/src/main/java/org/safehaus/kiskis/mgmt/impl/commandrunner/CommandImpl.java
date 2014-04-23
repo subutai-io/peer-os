@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -195,12 +196,14 @@ public class CommandImpl implements Command {
         StringBuilder errors = new StringBuilder();
         for (Map.Entry<UUID, AgentResult> result : results.entrySet()) {
             AgentResult agentResult = result.getValue();
-            errors.append(agentResult.getAgentUUID()).
-                    append(": ").
-                    append(agentResult.getStdErr()).
-                    append("; Exit code: ").
-                    append(agentResult.getExitCode()).
-                    append("\n");
+            if (!Strings.isNullOrEmpty(agentResult.getStdErr()) || agentResult.getExitCode() != null) {
+                errors.append(agentResult.getAgentUUID()).
+                        append(": ").
+                        append(agentResult.getStdErr()).
+                        append("; Exit code: ").
+                        append(agentResult.getExitCode()).
+                        append("\n");
+            }
         }
         return errors.toString();
     }
