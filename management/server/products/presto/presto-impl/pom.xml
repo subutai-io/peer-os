@@ -78,11 +78,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>task-runner-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>agent-manager-api</artifactId>
             <version>${project.version}</version>
@@ -105,6 +100,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lxc-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>command-runner-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

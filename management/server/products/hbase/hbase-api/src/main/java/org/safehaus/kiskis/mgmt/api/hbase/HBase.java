@@ -21,7 +21,9 @@ public interface HBase {
 
     public UUID startNode(String clusterName, String lxcHostname);
 
-    public UUID stopNode(String clusterName, String lxcHostname);
+    public UUID startNodes(String clusterName);
+
+    public UUID stopNodes(String clusterName);
 
     public UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
 

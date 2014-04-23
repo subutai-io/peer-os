@@ -20,20 +20,19 @@ import java.util.UUID;
  */
 public class StopTask implements Runnable {
 
-    private final String clusterName, lxcHostname;
+    private final String clusterName;
     private final CompleteEvent completeEvent;
     private final HBaseType type;
 
-    public StopTask(HBaseType type, String clusterName, String lxcHostname, CompleteEvent completeEvent) {
+    public StopTask(HBaseType type, String clusterName, CompleteEvent completeEvent) {
         this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
         this.type = type;
     }
 
     public void run() {
 
-        UUID trackID = HBaseUI.getHbaseManager().stopNode(clusterName, lxcHostname);
+        UUID trackID = HBaseUI.getHbaseManager().stopNodes(clusterName);
 
         long start = System.currentTimeMillis();
         NodeState state = NodeState.UNKNOWN;

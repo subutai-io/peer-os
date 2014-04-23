@@ -34,14 +34,6 @@ public class Commands {
                 30); //
     }
 
-    public static Request getRepositoryUpdateCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("apt-get update");
-        req.setStdOut(OutputRedirection.NO);
-        req.setTimeout(90);
-        return req;
-    }
-
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
         req.setProgram("apt-get --force-yes --assume-yes install ksks-hbase");

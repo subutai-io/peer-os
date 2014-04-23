@@ -28,15 +28,17 @@ class Chart {
 
     private void loadScripts() {
         javaScript.loadFile("js/jquery.min.js");
-        javaScript.loadFile("js/highcharts.js");
+        javaScript.loadFile("js/jquery.flot.min.js");
+        javaScript.loadFile("js/jquery.flot.time.min.js");
     }
 
     void load(String host, Metric metric, Map<Date, Double> values) {
 
         String data = toPoints(values);
+        String label = String.format("%s for %s", metric.toString(), host);
 
         String chart = CHART_TEMPLATE
-                .replace( "$mainTitle", String.format("%s for %s", metric, host) )
+                .replace( "$label", label )
                 .replace( "$yTitle", metric.getUnit() )
                 .replace( "$data", data );
 
@@ -53,10 +55,9 @@ class Chart {
                 str += ", ";
             }
 
-            // Passing date as string so we don't deal with timezone issues between javascript and the server
-            str += String.format("{ x: Date.parse('%s'), y: %s }", DATE_FORMAT.format(date), values.get(date));
-
+            str += String.format("[Date.parse('%s'), %s ]", DATE_FORMAT.format(date), values.get(date));
             i++;
+
             if (i > maxSize) {
                 break;
             }
