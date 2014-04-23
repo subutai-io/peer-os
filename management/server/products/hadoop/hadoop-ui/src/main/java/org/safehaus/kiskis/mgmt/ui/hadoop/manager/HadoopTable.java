@@ -7,6 +7,7 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
@@ -65,6 +66,13 @@ public class HadoopTable extends TreeTable {
                             refreshDataSource();
                         }
                     }));
+                } else if (action == ADD_ITEM_ACTION) {
+                    Item row = getItem(target);
+
+                    indicator.setVisible(true);
+                    UUID trackID = HadoopUI.getHadoopManager().addNode((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                    refreshDataSource();
                 }
             }
 

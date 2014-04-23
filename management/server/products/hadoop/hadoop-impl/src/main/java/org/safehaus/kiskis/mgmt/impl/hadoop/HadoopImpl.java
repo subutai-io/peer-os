@@ -8,6 +8,7 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Adding;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Installation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration.*;
@@ -154,6 +155,11 @@ public class HadoopImpl implements Hadoop {
     @Override
     public UUID statusTaskTracker(Agent agent) {
         return new TaskTracker(this, null).status(agent);
+    }
+
+    @Override
+    public UUID addNode(String clusterName) {
+        return new Adding(this, clusterName).execute();
     }
 
 

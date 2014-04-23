@@ -19,7 +19,6 @@ public class InstallHadoopOperation {
 
     public InstallHadoopOperation(Config config) {
 
-        System.out.println("InstallHadoopOperation started");
         this.config = config;
         taskList = new ArrayList<Task>();
 
@@ -37,7 +36,6 @@ public class InstallHadoopOperation {
             taskList.add(task);
         }
         taskList.add(Tasks.getFormatNameNodeTask(config));
-        System.out.println("InstallHadoopOperation finished");
     }
 
     public List<Task> getTaskList() {

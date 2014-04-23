@@ -95,12 +95,97 @@ public class Commands {
         return req;
     }
 
+    public static Request getRemoveSlaveCommand(Agent agent) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format(
+                ". /etc/profile && " +
+                        "hadoop-master-slave.sh slaves clear %s", agent.getHostname()
+        ));
+        return req;
+    }
+
+    public static Request getExcludeDataNodeCommand(Agent agent) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format(
+                        ". /etc/profile && " +
+                                "hadoop-master-slave.sh dfs.exclude clear %s", agent.getHostname()
+                )
+        );
+        return req;
+    }
+
+    public static Request getExcludeTaskTrackerCommand(Agent agent) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format(
+                        ". /etc/profile && " +
+                                "hadoop-master-slave.sh mapred.exclude clear %s", agent.getHostname()
+                )
+        );
+        return req;
+    }
+
+    public static Request getIncludeDataNodeCommand(Agent agent) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format(
+                        ". /etc/profile && " +
+                                "hadoop-master-slave.sh dfs.exclude %s", agent.getHostname()
+                )
+        );
+        return req;
+    }
+
+    public static Request getIncludeTaskTrackerCommand(Agent agent) {
+        Request req = getRequestTemplate();
+        req.setProgram(String.format(
+                        ". /etc/profile && " +
+                                "hadoop-master-slave.sh mapred.exclude %s", agent.getHostname()
+                )
+        );
+        return req;
+    }
+
     public static Request getFormatNameNodeCommand() {
         Request req = getRequestTemplate();
         req.setProgram(
                 ". /etc/profile && " +
                         "hadoop namenode -format"
         );
+        return req;
+    }
+
+    public static Request getRefreshNameNodeCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram(
+                ". /etc/profile && " +
+                        "hadoop dfsadmin -refreshNodes"
+        );
+        return req;
+    }
+
+    public static Request getRefreshJobTrackerCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram(
+                ". /etc/profile && " +
+                        "hadoop mradmin -refreshNodes"
+        );
+        return req;
+    }
+
+    public static Request getStartNameNodeCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram(". /etc/profile && " +
+                        "hadoop-daemons.sh start datanode"
+        );
+        req.setTimeout(20);
+        return req;
+    }
+
+    public static Request getStartTaskTrackerCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram(". /etc/profile && " +
+                        "hadoop-daemons.sh start tasktracker"
+        );
+        req.setTimeout(20);
         return req;
     }
 

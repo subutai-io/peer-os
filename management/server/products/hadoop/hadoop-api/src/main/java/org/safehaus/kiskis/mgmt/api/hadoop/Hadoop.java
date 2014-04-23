@@ -35,6 +35,8 @@ public interface Hadoop {
 
     public UUID statusTaskTracker(Agent agent);
 
+    public UUID addNode(String clusterName);
+
     /**
      * Returns list of configurations of installed clusters
      *
