@@ -12,22 +12,38 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
+ * Implementation of AgentResult interface
  *
  * @author dilshat
  */
 public class AgentResultImpl implements AgentResult {
 
+    //tagent UUID
     private final UUID agentUUID;
+    //std out of command execution
     private final StringBuilder stdOut = new StringBuilder();
+    //std err of command execution
     private final StringBuilder stdErr = new StringBuilder();
+    //exit code of command execution
     private Integer exitCode;
 
+    /**
+     * Constructor
+     *
+     * @param agentUUID - UUID of agent
+     */
     public AgentResultImpl(UUID agentUUID) {
         Preconditions.checkNotNull(agentUUID, "Agent UUID is null");
 
         this.agentUUID = agentUUID;
     }
 
+    /**
+     * When a response arrives this method is called by command runner to append
+     * results of command execution to this object
+     *
+     * @param response
+     */
     public void appendResults(Response response) {
         if (response != null && exitCode == null && agentUUID.equals(response.getUuid())) {
             if (!Strings.isNullOrEmpty(response.getStdOut())) {

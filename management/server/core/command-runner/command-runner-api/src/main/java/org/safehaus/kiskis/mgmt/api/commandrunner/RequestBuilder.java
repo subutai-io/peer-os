@@ -16,32 +16,49 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
+ * Represents command to agent. This class is used when the same command should
+ * be run on a set of agents simultaneously
  *
  * @author dilshat
  */
 public class RequestBuilder {
 
-    //never change
+    //source of command
     private final String source = "COMMAND-RUNNER";
+    //the same for all commands
     private final Integer requestSequenceNumber = 1;
-    //mandatory
+    //the command to execute, e.g. ls
     private final String command;
-    //optional
+    //current working directory
     private String cwd = "/";
+    //type of command
     private RequestType type = RequestType.EXECUTE_REQUEST;
+    //std out redirection
     private OutputRedirection outputRedirection = OutputRedirection.RETURN;
+    //std err redirection
     private OutputRedirection errRedirection = OutputRedirection.RETURN;
+    //command timeout interval
     private Integer timeout = 30;
+    //file path for std out redirection if any
     private String stdOutPath;
+    //file path for std err redirection if any
     private String stdErrPath;
+    //user under which to run the command
     private String runAs = "root";
+    //command arguments
     private List<String> cmdArgs;
+    //environment variables
     private Map<String, String> envVars;
 
     public Integer getTimeout() {
         return timeout;
     }
 
+    /**
+     * Constructor
+     *
+     * @param command - command to run
+     */
     public RequestBuilder(String command) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(command),
                 "Command is null or empty");

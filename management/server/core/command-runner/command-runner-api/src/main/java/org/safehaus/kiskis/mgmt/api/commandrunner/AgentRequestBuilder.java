@@ -9,13 +9,22 @@ import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
+ * Represents command to agent. This class is used when for each agent there is
+ * a specific custom command, not common to all agents
  *
  * @author dilshat
  */
 public class AgentRequestBuilder extends RequestBuilder {
 
+    //target agent
     private final Agent agent;
 
+    /**
+     * Constructor
+     *
+     * @param agent - target agent
+     * @param command - command to run
+     */
     public AgentRequestBuilder(Agent agent, String command) {
         super(command);
         Preconditions.checkNotNull(agent, "Agent is null");
