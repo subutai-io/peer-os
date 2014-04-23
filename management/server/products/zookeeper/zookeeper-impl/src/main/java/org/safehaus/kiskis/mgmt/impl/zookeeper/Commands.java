@@ -5,10 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import java.util.HashSet;
+import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 /**
  *
@@ -16,69 +20,52 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
  */
 public class Commands {
 
-    public static Request getRequestTemplate() {
-        return CommandFactory.newRequest(
-                RequestType.EXECUTE_REQUEST, // type
-                null, //                        !! agent uuid
-                null, //     source
-                null, //                        !! task uuid 
-                1, //                           !! request sequence number
-                "/", //                         cwd
-                "pwd", //                        program
-                OutputRedirection.RETURN, //    std output redirection 
-                OutputRedirection.RETURN, //    std error redirection
-                null, //                        stdout capture file path
-                null, //                        stderr capture file path
-                "root", //                      runas
-                null, //                        arg
-                null, //                        env vars
-                30); //  
+    public static Command getInstallCommand(Set<Agent> agents) {
+        return Impl.getCommandRunner().createCommand(
+                new RequestBuilder("sleep 10 ; apt-get --force-yes --assume-yes install ksks-zookeeper")
+                .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+                agents);
     }
 
-    public static Request getInstallCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("sleep 10 ; apt-get --force-yes --assume-yes install ksks-zookeeper");
-        req.setStdOut(OutputRedirection.NO);
-        req.setTimeout(90);
-        return req;
+    public static Command getStartCommand(Set<Agent> agents) {
+        return Impl.getCommandRunner().createCommand(
+                new RequestBuilder("service zookeeper start").withTimeout(15),
+                agents);
     }
 
-    public static Request getStartCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("service zookeeper start");
-        req.setTimeout(15);
-        return req;
+    public static Command getRestartCommand(Set<Agent> agents) {
+        return Impl.getCommandRunner().createCommand(
+                new RequestBuilder("service zookeeper restart").withTimeout(15),
+                agents);
     }
 
-    public static Request getRestartCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("service zookeeper restart");
-        req.setTimeout(15);
-        return req;
+    public static Command getStopCommand(Agent agent) {
+        return Impl.getCommandRunner().createCommand(
+                new RequestBuilder("service zookeeper stop"),
+                Util.wrapAgentToSet(agent));
     }
 
-    public static Request getStopCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("service zookeeper stop");
-        return req;
+    public static Command getStatusCommand(Agent agent) {
+        return Impl.getCommandRunner().createCommand(
+                new RequestBuilder("service zookeeper status"),
+                Util.wrapAgentToSet(agent));
     }
 
-    public static Request getStatusCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram("service zookeeper status");
-        return req;
-    }
+    public static Command getUpdateSettingsCommand(String zkName, Set<Agent> agents) {
+        StringBuilder zkNames = new StringBuilder();
+        for (int i = 1; i <= agents.size(); i++) {
+            zkNames.append(zkName).append(i).append(" ");
+        }
 
-    public static Request getReadSettingsCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram(". /etc/profile && cat $ZOOKEEPER_HOME/conf/zoo.cfg");
-        return req;
-    }
+        Set<AgentRequestBuilder> requestBuilders = new HashSet<AgentRequestBuilder>();
 
-    public static Request getUpdateSettingsCommand(String zkNames, int id) {
-        Request req = getRequestTemplate();
-        req.setProgram(String.format(". /etc/profile && zookeeper-conf.sh %s && zookeeper-setID.sh %s", zkNames, id));
-        return req;
+        int id = 0;
+        for (Agent agent : agents) {
+            requestBuilders.add(new AgentRequestBuilder(agent,
+                    String.format(". /etc/profile && zookeeper-conf.sh %s && zookeeper-setID.sh %s", zkNames, ++id)));
+        }
+
+        return Impl.getCommandRunner().createCommand(requestBuilders);
     }
 
 }
