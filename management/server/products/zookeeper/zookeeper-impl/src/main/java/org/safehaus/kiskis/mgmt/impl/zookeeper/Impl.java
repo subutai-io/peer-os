@@ -102,7 +102,8 @@ public class Impl implements Api {
 
                             //update settings
                             Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
-
+                            commandRunner.runCommand(updateSettingsCommand);
+                            
                             if (updateSettingsCommand.hasSucceeded()) {
 
                                 po.addLog(String.format("Settings updated\nStarting %s...", Config.PRODUCT_KEY));
