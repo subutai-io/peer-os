@@ -31,22 +31,22 @@ public class Wizard {
         return vlayout;
     }
 
-    protected void next() {
+    public void next() {
         step++;
         putForm();
     }
 
-    protected void back() {
+    public void back() {
         step--;
         putForm();
     }
 
-    protected void cancel() {
+    public void cancel() {
         step = 1;
         putForm();
     }
 
-    protected void init() {
+    public void init() {
         step = 1;
         config = new HBaseConfig();
         putForm();

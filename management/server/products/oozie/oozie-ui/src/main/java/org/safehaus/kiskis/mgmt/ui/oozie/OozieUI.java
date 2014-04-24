@@ -1,0 +1,85 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.safehaus.kiskis.mgmt.ui.oozie;
+
+import com.vaadin.ui.Component;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.oozie.Oozie;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * @author dilshat
+ */
+public class OozieUI implements Module {
+
+    public static final String MODULE_NAME = "Oozie";
+    private static Oozie oozieManager;
+    private static AgentManager agentManager;
+    private static Tracker tracker;
+    private static ExecutorService executor;
+    private static DbManager dbManager;
+
+    public static Tracker getTracker() {
+        return tracker;
+    }
+
+    public void setTracker(Tracker tracker) {
+        OozieUI.tracker = tracker;
+    }
+
+    public static Oozie getOozieManager() {
+        return oozieManager;
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
+    }
+
+    public void setOozieManager(Oozie oozieManager) {
+        OozieUI.oozieManager = oozieManager;
+    }
+
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager) {
+        OozieUI.agentManager = agentManager;
+    }
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+    public static DbManager getDbManager() {
+        return dbManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        OozieUI.dbManager = dbManager;
+    }
+
+    public void destroy() {
+        oozieManager = null;
+        agentManager = null;
+        tracker = null;
+        executor.shutdown();
+    }
+
+    public String getName() {
+        return MODULE_NAME;
+    }
+
+    public Component createComponent() {
+        return new OozieForm();
+    }
+
+}

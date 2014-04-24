@@ -5,6 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.impl.tracker;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import java.util.Date;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -51,6 +53,10 @@ public class ProductOperationImpl implements ProductOperation {
     private final String source;
 
     public ProductOperationImpl(String source, String description, TrackerImpl tracker) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(source), "Source is null or empty");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(description), "Description is null or empty");
+        Preconditions.checkNotNull(tracker, "Tracker is null");
+
         this.description = description;
         this.source = source;
         this.tracker = tracker;

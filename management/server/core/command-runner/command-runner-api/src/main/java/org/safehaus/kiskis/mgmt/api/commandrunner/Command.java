@@ -1,0 +1,85 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.safehaus.kiskis.mgmt.api.commandrunner;
+
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Command to execute on agent(s)
+ *
+ * @author dilshat
+ */
+public interface Command {
+
+    /**
+     * Shows if command has completed. The same as checking
+     * command.getCommandStatus == CommandStatus.SUCCEEDED ||
+     * command.getCommandStatus == CommandStatus.FAILED
+     *
+     * @return
+     */
+    public boolean hasCompleted();
+
+    /**
+     * Shows if command has succeeded. The same as checking
+     * command.getCommandStatus == CommandStatus.SUCCEEDED
+     *
+     * @return
+     */
+    public boolean hasSucceeded();
+
+    /**
+     * Returns command status
+     *
+     * @return
+     */
+    public CommandStatus getCommandStatus();
+
+    /**
+     * Returns map of results from agents where key is agent's UUID and value is
+     * instance of AgentResult
+     *
+     * @return
+     */
+    public Map<UUID, AgentResult> getResults();
+
+    /**
+     * Returns command UUID
+     *
+     * @return - command UUID
+     */
+    public UUID getCommandUUID();
+
+    /**
+     * Lets assign custom object to this command
+     *
+     * @param data - custom object
+     */
+    public void setData(Object data);
+
+    /**
+     * Returns custom object assigned to this command
+     *
+     * @return - custom object assigned to this command or null
+     */
+    public Object getData();
+
+    /**
+     * Returns all std err outputs from agents joined in one string
+     *
+     * @return - all std err outputs from agents joined in one string
+     */
+    public String getAllErrors();
+
+    /**
+     * Returns description of command or null
+     *
+     * @return - description of command or null
+     */
+    public String getDescription();
+
+}

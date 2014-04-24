@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
@@ -22,6 +24,8 @@ public class Agent implements Serializable, Comparable<Agent> {
     private String transportId;
 
     public Agent(UUID uuid, String hostname) {
+        Preconditions.checkNotNull(uuid, "UUID is null");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(hostname), "Hostname is null");
         this.uuid = uuid;
         this.hostname = hostname;
     }

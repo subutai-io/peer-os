@@ -15,9 +15,7 @@
 
     <modules>
         <module>hadoop</module>
-        <module>cassandra</module>
         <module>sqoop</module>
-        <module>oozie</module>
         <module>hive</module>
     </modules>
 

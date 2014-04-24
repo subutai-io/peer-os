@@ -42,6 +42,7 @@ public class TrackerImpl implements Tracker {
 
     public void setDbManager(DbManager dbManager) {
         Preconditions.checkNotNull(dbManager, "Db manager is null");
+        
         this.dbManager = dbManager;
     }
 

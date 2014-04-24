@@ -46,7 +46,7 @@ class CommandProducer implements Runnable {
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
             producer.setTimeToLive(communicationManagerImpl.getAmqMaxMessageToAgentTtlSec() * 1000);
             String json = CommandJson.getJson(command);
-            if (command.getType() != RequestType.HEARTBEAT_REQUEST) {
+            if (!RequestType.HEARTBEAT_REQUEST.equals(command.getType())) {
                 LOG.log(Level.INFO, "\nSending: {0}", json);
             }
             TextMessage message = session.createTextMessage(json);
