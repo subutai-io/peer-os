@@ -12,21 +12,21 @@ public interface CommunicationManager {
     /**
      * Sends request to agent
      *
-     * @param request
+     * @param request - request to send
      */
     public void sendRequest(Request request);
 
     /**
      * adds response listener
      *
-     * @param listener
+     * @param listener - listener to add
      */
     public void addListener(ResponseListener listener);
 
     /**
      * removes response listener
      *
-     * @param listener
+     * @param listener - - listener to remove
      */
     public void removeListener(ResponseListener listener);
 }

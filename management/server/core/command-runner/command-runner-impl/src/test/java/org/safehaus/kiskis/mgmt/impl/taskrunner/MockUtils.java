@@ -5,11 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import static org.mockito.Mockito.*;
-import static org.mockito.Matchers.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -21,8 +16,13 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
+
 /**
- *
  * @author dilshat
  */
 public class MockUtils {

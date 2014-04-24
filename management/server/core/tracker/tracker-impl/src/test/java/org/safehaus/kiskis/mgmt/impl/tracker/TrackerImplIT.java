@@ -54,8 +54,8 @@ public class TrackerImplIT {
     @Test
     public void testGetProductOperations() {
 
-        ProductOperation po = tracker.createProductOperation(source, description);
-        po = tracker.createProductOperation(source, description);
+        tracker.createProductOperation(source, description);
+        tracker.createProductOperation(source, description);
 
         Date endDate = new Date();
         Date startDate = new Date(endDate.getTime() - 5 * 1000);
@@ -65,10 +65,10 @@ public class TrackerImplIT {
     @Test
     public void testGetProductOperationSources() {
 
-        ProductOperation po = tracker.createProductOperation("source1", description);
+        tracker.createProductOperation("source1", description);
 
-        po = tracker.createProductOperation("source2", description);
-        po = tracker.createProductOperation("source3", description);
+        tracker.createProductOperation("source2", description);
+        tracker.createProductOperation("source3", description);
 
         assertEquals(3, tracker.getProductOperationSources().size());
 

@@ -108,10 +108,7 @@ public class Agent implements Serializable, Comparable<Agent> {
             return false;
         }
         final Agent other = (Agent) obj;
-        if (this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid))) {
-            return false;
-        }
-        return true;
+        return !(this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid)));
     }
 
     @Override

@@ -33,7 +33,6 @@ import org.safehaus.kiskis.mgmt.ui.pig.PigUI;
  */
 public class ConfigurationStep extends Panel {
 
-    private final ComboBox hadoopClusters;
     private final TwinColSelect select;
 
     public ConfigurationStep(final Wizard wizard) {
@@ -45,7 +44,7 @@ public class ConfigurationStep extends Panel {
         content.setSpacing(true);
         content.setMargin(true);
 
-        hadoopClusters = new ComboBox("Hadoop cluster");
+        ComboBox hadoopClusters = new ComboBox("Hadoop cluster");
         select = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
         hadoopClusters.setMultiSelect(false);

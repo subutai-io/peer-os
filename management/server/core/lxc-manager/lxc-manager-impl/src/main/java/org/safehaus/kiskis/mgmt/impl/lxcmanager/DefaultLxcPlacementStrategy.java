@@ -24,7 +24,7 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
 
     private final double MIN_HDD_LXC_MB = 15 * 1024;         // 15G
     private final double MIN_HDD_IN_RESERVE_MB = 50 * 1024;  // 50G
-    private final double MIN_RAM_LXC_MB = 1 * 1024;          // 1G
+    private final double MIN_RAM_LXC_MB = 1024;          // 1G
     private final double MIN_RAM_IN_RESERVE_MB = 2 * 1024;   // 2G
     private final double MIN_CPU_LXC_PERCENT = 10;           // 10%
     private final double MIN_CPU_IN_RESERVE_PERCENT = 20;    // 20%
@@ -40,7 +40,7 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
      * Optional method to implement if placement uses simple logic to calculate
      * lxc slots on a physical server
      *
-     * @param serverMetrics
+     * @param serverMetrics - metrics of all connected physical servers
      * @return map where key is a physical agent and value is a number of lxcs
      * this physical server can accommodate
      */

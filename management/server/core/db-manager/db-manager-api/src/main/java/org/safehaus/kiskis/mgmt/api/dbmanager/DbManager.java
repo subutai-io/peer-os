@@ -6,10 +6,10 @@
 package org.safehaus.kiskis.mgmt.api.dbmanager;
 
 import com.datastax.driver.core.ResultSet;
+
 import java.util.List;
 
 /**
- *
  * @author dilshat
  */
 public interface DbManager {
@@ -17,7 +17,7 @@ public interface DbManager {
     /**
      * Executes a select query against db
      *
-     * @param cql - sql query with placeholders for bind parameters in form of ?
+     * @param cql    - sql query with placeholders for bind parameters in form of ?
      * @param values - bind parameters
      * @return - resultset
      */
@@ -26,7 +26,7 @@ public interface DbManager {
     /**
      * Executes CUD (insert update delete) query against DB
      *
-     * @param cql - sql query with placeholders for bind parameters in form of ?
+     * @param cql    - sql query with placeholders for bind parameters in form of ?
      * @param values - bind parameters
      * @return true if all went well and false if exception was raised
      */
@@ -36,8 +36,8 @@ public interface DbManager {
      * Saves POJO to DB
      *
      * @param source - source key
-     * @param values - POJO key
-     * @param info - custom object
+     * @param key    - POJO key
+     * @param info   - custom object
      * @return true if all went well and false if exception was raised
      */
     public boolean saveInfo(String source, String key, Object info);
@@ -46,8 +46,8 @@ public interface DbManager {
      * Returns POJO from DB
      *
      * @param source - source key
-     * @param key - pojo key
-     * @param clazz - class of POJO
+     * @param key    - pojo key
+     * @param clazz  - class of POJO
      * @return - POJO
      */
     public <T> T getInfo(String source, String key, Class<T> clazz);
@@ -56,7 +56,7 @@ public interface DbManager {
      * Returns all POJOs from DB identified by source key
      *
      * @param source - source key
-     * @param clazz - class of POJO
+     * @param clazz  - class of POJO
      * @return - list of POJOs
      */
     public <T> List<T> getInfo(String source, Class<T> clazz);
@@ -65,7 +65,7 @@ public interface DbManager {
      * deletes POJO from DB
      *
      * @param source - source key
-     * @param values - POJO key
+     * @param key    - POJO key
      * @return true if all went well and false if exception was raised
      */
     public boolean deleteInfo(String source, String key);

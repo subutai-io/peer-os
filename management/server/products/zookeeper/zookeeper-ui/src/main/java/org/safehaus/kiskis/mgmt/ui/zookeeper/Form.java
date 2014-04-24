@@ -13,13 +13,9 @@ import org.safehaus.kiskis.mgmt.ui.zookeeper.manager.Manager;
 import org.safehaus.kiskis.mgmt.ui.zookeeper.wizard.Wizard;
 
 /**
- *
  * @author dilshat
  */
 public class Form extends CustomComponent {
-
-    private final Wizard wizard;
-    private final Manager manager;
 
     public Form() {
         setSizeFull();
@@ -29,8 +25,8 @@ public class Form extends CustomComponent {
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
         mongoSheet.setSizeFull();
-        manager = new Manager();
-        wizard = new Wizard();
+        Manager manager = new Manager();
+        Wizard wizard = new Wizard();
         mongoSheet.addTab(wizard.getContent(), "Install");
         mongoSheet.addTab(manager.getContent(), "Manage");
         verticalLayout.addComponent(mongoSheet);

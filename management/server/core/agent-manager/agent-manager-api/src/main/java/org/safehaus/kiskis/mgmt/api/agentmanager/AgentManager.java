@@ -48,7 +48,7 @@ public interface AgentManager {
     /**
      * Returns agent by its UUID or null if agent is not connected
      *
-     * @param hostname - UUID of agent
+     * @param uuid - UUID of agent
      * @return agent
      */
     public Agent getAgentByUUID(UUID uuid);
@@ -57,7 +57,7 @@ public interface AgentManager {
      * Returns agent by its physical parent node's hostname or null if agent is
      * not connected
      *
-     * @param hostname - hostname of agent's node physical parent node
+     * @param parentHostname - hostname of agent's node physical parent node
      * @return agent
      */
     public Set<Agent> getLxcAgentsByParentHostname(String parentHostname);
@@ -65,14 +65,14 @@ public interface AgentManager {
     /**
      * Adds listener which wants to be notified when agents connect/disconnect
      *
-     * @param listener
+     * @param listener - listener to add
      */
     public void addListener(AgentListener listener);
 
     /**
      * Removes listener
      *
-     * @param listener
+     * @param listener - - listener to remove
      */
     public void removeListener(AgentListener listener);
 

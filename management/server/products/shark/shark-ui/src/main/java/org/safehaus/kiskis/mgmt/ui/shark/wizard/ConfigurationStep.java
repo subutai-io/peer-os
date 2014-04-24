@@ -25,8 +25,6 @@ import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
  */
 public class ConfigurationStep extends Panel {
 
-    private final ComboBox sparkClusters;
-
     public ConfigurationStep(final Wizard wizard) {
 
         setSizeFull();
@@ -36,7 +34,7 @@ public class ConfigurationStep extends Panel {
         content.setSpacing(true);
         content.setMargin(true);
 
-        sparkClusters = new ComboBox("Spark cluster");
+        ComboBox sparkClusters = new ComboBox("Spark cluster");
 
         sparkClusters.setMultiSelect(false);
         sparkClusters.setImmediate(true);

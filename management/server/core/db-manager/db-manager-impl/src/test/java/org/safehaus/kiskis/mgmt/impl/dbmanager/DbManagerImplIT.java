@@ -9,33 +9,31 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.util.List;
 import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.Rule;
+import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
+import java.util.List;
+
+import static org.junit.Assert.*;
+
 /**
- *
  * @author dilshat
- * @todo use classpath sql file with one single table
  */
 //@Ignore
 public class DbManagerImplIT {
 
-    @Rule
-    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("pi.sql", true, true, "test"));
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
     private final DbManager dbManager = new DbManagerImpl();
-
     private final String source = "source";
     private final String key = "key";
     private final String content = "content";
+    @Rule
+    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("pi.sql", true, true, "test"));
 
     @Before
     public void setUp() {
