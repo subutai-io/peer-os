@@ -78,7 +78,7 @@ public class Adding {
                             po.addLog("Cluster info saved to DB");
                         } else {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +
-                                    "Installation aborted");
+                                    "Adding new node aborted");
                         }
                     } else {
                         po.addLogFailed("Could not configure network! Please see logs\nLXC creation aborted");

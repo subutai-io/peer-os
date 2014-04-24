@@ -1,13 +1,18 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by daralbaev on 02.04.14.
@@ -40,6 +45,15 @@ public class Commands {
         );
         req.setTimeout(180);
         return req;
+    }
+
+    public static Command getInstallCommand(List<Agent> agentList) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder("sleep 10;" +
+                        "apt-get --force-yes --assume-yes install ksks-hadoop")
+                        .withTimeout(180),
+                new HashSet<Agent>(agentList)
+        );
     }
 
     public static Request getClearMastersCommand() {
@@ -196,6 +210,14 @@ public class Commands {
         );
         req.setTimeout(20);
         return req;
+    }
+
+    public static Command getNameNodeCommand(Agent agent, String command) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format("service hadoop-dfs %s", command))
+                        .withTimeout(20),
+                Util.wrapAgentToSet(agent)
+        );
     }
 
     public static Request getJobTrackerCommand(String command) {

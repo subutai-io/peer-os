@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop;
 
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
@@ -25,6 +26,7 @@ import java.util.concurrent.Executors;
 public class HadoopImpl implements Hadoop {
     public static final String MODULE_NAME = "Hadoop";
     private TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
@@ -38,6 +40,15 @@ public class HadoopImpl implements Hadoop {
 
     public void destroy() {
         executor.shutdown();
+        commandRunner = null;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+    public void setCommandRunner(CommandRunner commandRunner) {
+        HadoopImpl.commandRunner = commandRunner;
     }
 
     public void setAgentManager(AgentManager agentManager) {
