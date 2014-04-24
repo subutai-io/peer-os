@@ -32,15 +32,14 @@ import java.util.logging.Logger;
 public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     private static final Logger LOG = Logger.getLogger(AgentManagerImpl.class.getName());
-
-    /**
-     * reference to communication manager
-     */
-    private CommunicationManager communicationService;
     /**
      * list of agent listeners
      */
     private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
+    /**
+     * reference to communication manager
+     */
+    private CommunicationManager communicationService;
     /**
      * executor for notifying agent listeners
      */
@@ -120,7 +119,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Returns agent by its UUID or null if agent is not connected
      *
-     * @param hostname - UUID of agent
+     * @param uuid - UUID of agent
      * @return agent
      */
     public Agent getAgentByUUID(UUID uuid) {
@@ -131,7 +130,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * Returns agent by its physical parent node's hostname or null if agent is
      * not connected
      *
-     * @param hostname - hostname of agent's node physical parent node
+     * @param parentHostname - hostname of agent's node physical parent node
      * @return agent
      */
     public Set<Agent> getLxcAgentsByParentHostname(String parentHostname) {
@@ -149,7 +148,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Adds listener which wants to be notified when agents connect/disconnect
      *
-     * @param listener
+     * @param listener - listener to add
      */
     @Override
     public void addListener(AgentListener listener) {
@@ -163,7 +162,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Removes listener
      *
-     * @param listener
+     * @param listener - - listener to remove
      */
     @Override
     public void removeListener(AgentListener listener) {
@@ -197,7 +196,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                             if (notifyAgentListeners) {
                                 notifyAgentListeners = false;
                                 Set<Agent> freshAgents = new HashSet(agents.asMap().values());
-                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
+                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); ) {
                                     AgentListener listener = it.next();
                                     try {
                                         listener.onAgent(freshAgents);

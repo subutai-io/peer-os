@@ -76,7 +76,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
 
                     Set<Agent> selectedList = new HashSet<Agent>();
 
-                    for (Object o : (Iterable<? extends Object>) t.getValue()) {
+                    for (Object o : (Iterable<?>) t.getValue()) {
                         if (tree.getItem(o).getItemProperty("value").getValue() != null) {
                             Agent agent = (Agent) tree.getItem(o).getItemProperty("value").getValue();
                             selectedList.add(agent);

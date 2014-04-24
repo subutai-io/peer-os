@@ -5,11 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import com.google.common.base.Preconditions;
+import org.safehaus.kiskis.mgmt.api.commandrunner.*;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -17,15 +20,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
+ * This class is implementation of CommandRunner interface. Runs commands on
+ * agents and routes received responses to corresponding callbacks.
  *
  * @author dilshat
  */
@@ -34,6 +32,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     private static final Logger LOG = Logger.getLogger(CommandRunnerImpl.class.getName());
 
     private final CommunicationManager communicationManager;
+    //cache of command executors where key is command UUID and value is CommandExecutor
     private ExpiringCache<UUID, CommandExecutor> commandExecutors;
 
     public CommandRunnerImpl(CommunicationManager communicationManager) {
@@ -42,11 +41,17 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         this.communicationManager = communicationManager;
     }
 
+    /**
+     * Initialized command runner
+     */
     public void init() {
         communicationManager.addListener(this);
         commandExecutors = new ExpiringCache<UUID, CommandExecutor>();
     }
 
+    /**
+     * Disposes command runner
+     */
     public void destroy() {
         communicationManager.removeListener(this);
         Map<UUID, CacheEntry<CommandExecutor>> entries = commandExecutors.getEntries();
@@ -74,6 +79,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CommandExecutor commandExecutor = new CommandExecutor(commandImpl, executor, commandCallback);
 
+        //put command to cache
         boolean queued = commandExecutors.put(commandImpl.getCommandUUID(), commandExecutor, commandImpl.getTimeout() * 1000, new EntryExpiryCallback<CommandExecutor>() {
 
             public void onEntryExpiry(CommandExecutor entry) {
@@ -108,6 +114,11 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         }
     }
 
+    /**
+     * Receives all responses from agents. Triggered by communication manager
+     *
+     * @param response - received response
+     */
     public void onResponse(final Response response) {
         if (response != null && response.getUuid() != null) {
             final CommandExecutor commandExecutor = commandExecutors.get(response.getTaskUuid());

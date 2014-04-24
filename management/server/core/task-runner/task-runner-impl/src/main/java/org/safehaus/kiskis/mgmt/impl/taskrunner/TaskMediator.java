@@ -5,18 +5,18 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
+import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 
 /**
  * This class is used internally by {@code TaskRunner}. {@code TaskMediator}
@@ -98,7 +98,7 @@ class TaskMediator {
                 }
             }
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, String.format("Error processing response: %s"), e);
+            LOG.log(Level.SEVERE, "Error processing response", e);
         }
         return null;
     }

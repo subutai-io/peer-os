@@ -1,15 +1,19 @@
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
+import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
-import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -18,21 +22,32 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Impl implements Api {
 
-    private TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
 
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+    public void setCommandRunner(CommandRunner commandRunner) {
+        Impl.commandRunner = commandRunner;
+    }
+
     public void init() {
         executor = Executors.newCachedThreadPool();
     }
 
     public void destroy() {
+        commandRunner = null;
         executor.shutdown();
     }
 
@@ -48,22 +63,20 @@ public class Impl implements Api {
         this.tracker = tracker;
     }
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
-    }
-
     public void setAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
     }
 
     public UUID installCluster(final Config config) {
+        Preconditions.checkNotNull(config, "Configuration is null");
+
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
             public void run() {
 
-                if (config == null || Util.isStringEmpty(config.getZkName()) || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                if (Util.isStringEmpty(config.getZkName()) || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -87,40 +100,55 @@ public class Impl implements Api {
                         po.addLog(String.format("Cluster info saved to DB\nInstalling %s...", Config.PRODUCT_KEY));
 
                         //install
-                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(config.getNodes()));
+                        Command installCommand = Commands.getInstallCommand(config.getNodes());
+                        commandRunner.runCommand(installCommand);
 
-                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (installCommand.hasSucceeded()) {
                             po.addLog("Installation succeeded\nUpdating settings...");
 
                             //update settings
-                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes(), config.getZkName()));
+                            Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+                            commandRunner.runCommand(updateSettingsCommand);
 
-                            if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            if (updateSettingsCommand.hasSucceeded()) {
 
                                 po.addLog(String.format("Settings updated\nStarting %s...", Config.PRODUCT_KEY));
                                 //start all nodes
-                                Task startTask = taskRunner.executeTaskNWait(Tasks.getStartTask(config.getNodes()));
+                                Command startCommand = Commands.getStartCommand(config.getNodes());
+                                final AtomicInteger count = new AtomicInteger();
+                                commandRunner.runCommand(startCommand, new CommandCallback() {
+                                    @Override
+                                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                        if (agentResult.getStdOut().contains("STARTED")) {
+                                            if (count.incrementAndGet() == config.getNodes().size()) {
+                                                stop();
+                                            }
+                                        }
+                                    }
+                                });
 
-                                if (startTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                if (count.get() == config.getNodes().size()) {
                                     po.addLogDone(String.format("Starting %s succeeded\nDone", Config.PRODUCT_KEY));
                                 } else {
-                                    po.addLogFailed(String.format("Starting %s failed, %s", Config.PRODUCT_KEY, startTask.getFirstError()));
+                                    po.addLogFailed(String.format("Starting %s failed, %s", Config.PRODUCT_KEY, startCommand.getAllErrors()));
                                 }
                             } else {
-                                po.addLogFailed(String.format("Failed to update settings, %s\nPlease update settings manually and restart the cluster", updateSettingsTask.getFirstError()));
+                                po.addLogFailed(String.format(
+                                        "Failed to update settings, %s\nPlease update settings manually and restart the cluster",
+                                        updateSettingsCommand.getAllErrors()));
                             }
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                         }
 
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostnames = new HashSet<String>();
+                        Set<String> lxcHostNames = new HashSet<String>();
                         for (Agent lxcAgent : config.getNodes()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
+                            lxcHostNames.add(lxcAgent.getHostname());
                         }
                         try {
-                            lxcManager.destroyLxcs(lxcHostnames);
+                            lxcManager.destroyLxcs(lxcHostNames);
                         } catch (LxcDestroyException ex) {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
@@ -139,7 +167,7 @@ public class Impl implements Api {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -152,12 +180,12 @@ public class Impl implements Api {
 
                 po.addLog("Destroying lxc containers...");
 
-                Set<String> lxcHostnames = new HashSet<String>();
+                Set<String> lxcHostNames = new HashSet<String>();
                 for (Agent lxcAgent : config.getNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
+                    lxcHostNames.add(lxcAgent.getHostname());
                 }
                 try {
-                    lxcManager.destroyLxcs(lxcHostnames);
+                    lxcManager.destroyLxcs(lxcHostNames);
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
@@ -178,7 +206,7 @@ public class Impl implements Api {
     public UUID startNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostName, clusterName));
+                String.format("Starting node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -201,40 +229,24 @@ public class Impl implements Api {
                 }
 
                 po.addLog("Starting node...");
-                Task startNodeTask = Tasks.getStartTask(Util.wrapAgentToSet(node));
-                final Task checkNodeTask = Tasks.getStatusTask(node);
 
-                taskRunner.executeTaskNWait(startNodeTask, new TaskCallback() {
-
+                Command startCommand = Commands.getStartCommand(Util.wrapAgentToSet(node));
+                final AtomicBoolean ok = new AtomicBoolean();
+                commandRunner.runCommand(startCommand, new CommandCallback() {
                     @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                        if (task.getData() == TaskType.START && task.isCompleted()) {
-                            //run status check task
-                            return checkNodeTask;
-
-                        } else if (task.getData() == TaskType.STATUS) {
-                            if (Util.isFinalResponse(response)) {
-                                if (stdOut.contains("is Running")) {
-                                    task.setData(NodeState.RUNNING);
-                                } else if (stdOut.contains("is NOT Running")) {
-                                    task.setData(NodeState.STOPPED);
-                                }
-
-                            }
-
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                        if (agentResult.getStdOut().contains("STARTED")) {
+                            ok.set(true);
+                            stop();
                         }
-
-                        return null;
                     }
                 });
 
-                if (NodeState.RUNNING.equals(checkNodeTask.getData())) {
+                if (ok.get()) {
                     po.addLogDone(String.format("Node on %s started", lxcHostName));
                 } else {
                     po.addLogFailed(String.format("Failed to start node %s. %s",
-                            lxcHostName,
-                            startNodeTask.getFirstError()
+                            lxcHostName, startCommand.getAllErrors()
                     ));
                 }
 
@@ -247,7 +259,7 @@ public class Impl implements Api {
     public UUID stopNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostName, clusterName));
+                String.format("Stopping node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -268,40 +280,22 @@ public class Impl implements Api {
                     return;
                 }
                 po.addLog("Stopping node...");
-                Task stopNodeTask = Tasks.getStopTask(Util.wrapAgentToSet(node));
-                final Task checkNodeTask = Tasks.getStatusTask(node);
 
-                taskRunner.executeTaskNWait(stopNodeTask, new TaskCallback() {
-
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                        if (task.getData() == TaskType.STOP && task.isCompleted()) {
-                            //run status check task
-                            return checkNodeTask;
-
-                        } else if (task.getData() == TaskType.STATUS) {
-                            if (Util.isFinalResponse(response)) {
-                                if (stdOut.contains("is Running")) {
-                                    task.setData(NodeState.RUNNING);
-                                } else if (stdOut.contains("is NOT Running")) {
-                                    task.setData(NodeState.STOPPED);
-                                }
-
-                            }
-
-                        }
-
-                        return null;
+                Command stopCommand = Commands.getStopCommand(node);
+                commandRunner.runCommand(stopCommand);
+                NodeState state = NodeState.UNKNOWN;
+                if (stopCommand.hasCompleted()) {
+                    AgentResult result = stopCommand.getResults().get(node.getUuid());
+                    if (result.getStdOut().contains("STOPPED")) {
+                        state = NodeState.STOPPED;
                     }
-                });
+                }
 
-                if (NodeState.STOPPED.equals(checkNodeTask.getData())) {
+                if (NodeState.STOPPED.equals(state)) {
                     po.addLogDone(String.format("Node on %s stopped", lxcHostName));
                 } else {
                     po.addLogFailed(String.format("Failed to stop node %s. %s",
-                            lxcHostName,
-                            stopNodeTask.getFirstError()
+                            lxcHostName, stopCommand.getAllErrors()
                     ));
                 }
 
@@ -314,7 +308,7 @@ public class Impl implements Api {
     public UUID checkNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking node %s in %s", lxcHostName, clusterName));
+                String.format("Checking node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -335,27 +329,27 @@ public class Impl implements Api {
                     return;
                 }
                 po.addLog("Checking node...");
-                final Task checkNodeTask = taskRunner.executeTaskNWait(Tasks.getStatusTask(node));
-
-                NodeState nodeState = NodeState.UNKNOWN;
-                if (checkNodeTask.isCompleted()) {
-                    Result result = checkNodeTask.getResults().entrySet().iterator().next().getValue();
+                Command checkCommand = Commands.getStatusCommand(node);
+                commandRunner.runCommand(checkCommand);
+                NodeState state = NodeState.UNKNOWN;
+                if (checkCommand.hasCompleted()) {
+                    AgentResult result = checkCommand.getResults().get(node.getUuid());
                     if (result.getStdOut().contains("is Running")) {
-                        nodeState = NodeState.RUNNING;
+                        state = NodeState.RUNNING;
                     } else if (result.getStdOut().contains("is NOT Running")) {
-                        nodeState = NodeState.STOPPED;
+                        state = NodeState.STOPPED;
                     }
                 }
 
-                if (NodeState.UNKNOWN.equals(nodeState)) {
+                if (NodeState.UNKNOWN.equals(state)) {
                     po.addLogFailed(String.format("Failed to check status of %s, %s",
                             lxcHostName,
-                            checkNodeTask.getFirstError()
+                            checkCommand.getAllErrors()
                     ));
                 } else {
                     po.addLogDone(String.format("Node %s is %s",
                             lxcHostName,
-                            nodeState
+                            state
                     ));
                 }
 
@@ -368,7 +362,7 @@ public class Impl implements Api {
     public UUID destroyNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostName, clusterName));
+                String.format("Destroying %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -414,23 +408,36 @@ public class Impl implements Api {
 
                 //update settings
                 po.addLog("Updating settings...");
-                Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes(), config.getZkName()));
+                Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+                commandRunner.runCommand(updateSettingsCommand);
 
-                if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (updateSettingsCommand.hasSucceeded()) {
                     po.addLog("Settings updated\nRestarting cluster...");
                     //restart all other nodes with new configuration
-                    Task restartTask = taskRunner.executeTaskNWait(Tasks.getRestartTask(config.getNodes()));
+                    Command restartCommand = Commands.getRestartCommand(config.getNodes());
+                    final AtomicInteger count = new AtomicInteger();
+                    commandRunner.runCommand(restartCommand, new CommandCallback() {
+                        @Override
+                        public void onResponse(Response response, AgentResult agentResult, Command command) {
+                            if (agentResult.getStdOut().contains("STARTED")) {
+                                if (count.incrementAndGet() == config.getNodes().size()) {
+                                    stop();
+                                }
+                            }
+                        }
+                    });
 
-                    if (restartTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (count.get() == config.getNodes().size()) {
                         po.addLog("Cluster successfully restarted");
                     } else {
-                        po.addLog(String.format("Failed to restart cluster, %s, skipping...", restartTask.getFirstError()));
+                        po.addLog(String.format("Failed to restart cluster, %s, skipping...", restartCommand.getAllErrors()));
                     }
                 } else {
                     po.addLog(
                             String.format(
                                     "Settings update failed, %s\nPlease update settings manually and restart the cluster, skipping...",
-                                    updateSettingsTask.getFirstError()));
+                                    updateSettingsCommand.getAllErrors())
+                    );
                 }
 
                 //update db
@@ -450,12 +457,12 @@ public class Impl implements Api {
     public UUID addNode(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -475,38 +482,52 @@ public class Impl implements Api {
                     po.addLog(String.format("Lxc container created successfully\nInstalling %s...", Config.PRODUCT_KEY));
 
                     //install
-                    Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(Util.wrapAgentToSet(lxcAgent)));
+                    Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
+                    commandRunner.runCommand(installCommand);
 
-                    if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                    if (installCommand.hasCompleted()) {
                         po.addLog("Installation succeeded\nUpdating db...");
                         //update db
                         if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
                             po.addLog("Cluster info updated in DB\nUpdating settings...");
 
                             //update settings
-                            Task updateSettingsTask = taskRunner.executeTaskNWait(Tasks.getUpdateSettingsTask(config.getNodes(), config.getZkName()));
+                            Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+                            commandRunner.runCommand(updateSettingsCommand);
 
-                            if (updateSettingsTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            if (updateSettingsCommand.hasSucceeded()) {
                                 po.addLog("Settings updated\nRestarting cluster...");
                                 //restart all nodes
-                                Task restartTask = taskRunner.executeTaskNWait(Tasks.getRestartTask(config.getNodes()));
-                                if (restartTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                                Command restartCommand = Commands.getRestartCommand(config.getNodes());
+                                final AtomicInteger count = new AtomicInteger();
+                                commandRunner.runCommand(restartCommand, new CommandCallback() {
+                                    @Override
+                                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                        if (agentResult.getStdOut().contains("STARTED")) {
+                                            if (count.incrementAndGet() == config.getNodes().size()) {
+                                                stop();
+                                            }
+                                        }
+                                    }
+                                });
+                                if (count.get() == config.getNodes().size()) {
                                     po.addLogDone("Cluster restarted successfully\nDone");
                                 } else {
-                                    po.addLogFailed("Failed to restart cluster");
+                                    po.addLogFailed(String.format("Failed to restart cluster, %s", restartCommand.getAllErrors()));
                                 }
                             } else {
                                 po.addLogFailed(
                                         String.format(
                                                 "Settings update failed, %s.\nPlease update settings manually and restart the cluster",
-                                                installTask.getFirstError()));
+                                                updateSettingsCommand.getAllErrors())
+                                );
                             }
                         } else {
                             po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
                         }
                     } else {
                         po.addLogFailed(String.format("Installation failed, %s\nUse LXC Module to cleanup",
-                                installTask.getFirstError()));
+                                installCommand.getAllErrors()));
                     }
 
                 } catch (LxcCreateException ex) {

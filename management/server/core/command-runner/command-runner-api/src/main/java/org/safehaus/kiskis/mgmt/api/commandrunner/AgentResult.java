@@ -8,17 +8,38 @@ package org.safehaus.kiskis.mgmt.api.commandrunner;
 import java.util.UUID;
 
 /**
+ * Represents result of command execution on agent
  *
  * @author dilshat
  */
 public interface AgentResult {
 
+    /**
+     * Returns exit code or null if command has not completed
+     *
+     * @return - exit code or null if command has not completed
+     */
     public Integer getExitCode();
 
+    /**
+     * Returns std out of command or empty string
+     *
+     * @return - std out of command or empty string
+     */
     public String getStdOut();
 
+    /**
+     * Returns std err of command or empty string
+     *
+     * @return - std err of command or empty string
+     */
     public String getStdErr();
 
+    /**
+     * Returns agent UUID
+     *
+     * @return - agent UUID
+     */
     public UUID getAgentUUID();
 
 }

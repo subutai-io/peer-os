@@ -10,22 +10,7 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -34,6 +19,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.solr.SolrUI;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -106,8 +95,29 @@ public class Manager {
             }
 
         });
-
         controlsContent.addComponent(checkAllBtn);
+
+        Button startAllBtn = new Button("Start all");
+        startAllBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                startAllNodes(nodesTable);
+            }
+
+        });
+        controlsContent.addComponent(startAllBtn);
+
+        Button stopAllBtn = new Button("Stop all");
+        stopAllBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                stopAllNodes(nodesTable);
+            }
+
+        });
+        controlsContent.addComponent(stopAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -183,6 +193,33 @@ public class Manager {
 
     }
 
+    public static void checkNodesStatus(Table table) {
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
+            Item row = table.getItem(rowId);
+            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
+            checkBtn.click();
+        }
+    }
+
+    public static void startAllNodes(Table table) {
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
+            Item row = table.getItem(rowId);
+            Button checkBtn = (Button) (row.getItemProperty("Start").getValue());
+            checkBtn.click();
+        }
+    }
+
+    public static void stopAllNodes(Table table) {
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
+            Item row = table.getItem(rowId);
+            Button checkBtn = (Button) (row.getItemProperty("Stop").getValue());
+            checkBtn.click();
+        }
+    }
+
     public Component getContent() {
         return contentRoot;
     }
@@ -195,9 +232,7 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext(); ) {
-            final Agent agent = (Agent) it.next();
-
+        for (final Agent agent : agents) {
             final Button checkBtn = new Button("Check");
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
@@ -207,7 +242,7 @@ public class Manager {
             startBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
-            final Object rowId = table.addItem(new Object[]{
+            table.addItem(new Object[]{
                             agent.getHostname(),
                             checkBtn,
                             startBtn,
@@ -357,15 +392,6 @@ public class Manager {
             } else {
                 clusterCombo.setValue(mongoClusterInfos.iterator().next());
             }
-        }
-    }
-
-    public static void checkNodesStatus(Table table) {
-        for (Iterator it = table.getItemIds().iterator(); it.hasNext(); ) {
-            int rowId = (Integer) it.next();
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-            checkBtn.click();
         }
     }
 

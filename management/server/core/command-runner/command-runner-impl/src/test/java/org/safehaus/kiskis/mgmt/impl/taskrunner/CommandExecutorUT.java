@@ -17,7 +17,7 @@ import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandImpl;
  *
  * @author dilshat
  */
-public class CommandExecutorTest {
+public class CommandExecutorUT {
 
     @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullCommand() {

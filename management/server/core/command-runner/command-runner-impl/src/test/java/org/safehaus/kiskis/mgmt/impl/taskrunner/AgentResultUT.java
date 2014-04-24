@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Response;
  *
  * @author dilshat
  */
-public class AgentResultTest {
+public class AgentResultUT {
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";
     private final Integer OK_EXIT_CODE = 0;

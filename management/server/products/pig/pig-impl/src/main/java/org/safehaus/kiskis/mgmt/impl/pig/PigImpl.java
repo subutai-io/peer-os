@@ -5,7 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.impl.pig;
 
+import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.pig.Config;
 import org.safehaus.kiskis.mgmt.api.pig.Pig;
@@ -19,9 +23,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 
 /**
  * @author dilshat
@@ -33,6 +34,14 @@ public class PigImpl implements Pig {
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+    public void setCommandRunner(CommandRunner commandRunner) {
+        PigImpl.commandRunner = commandRunner;
+    }
 
     public void init() {
         executor = Executors.newCachedThreadPool();
@@ -51,27 +60,21 @@ public class PigImpl implements Pig {
         this.tracker = tracker;
     }
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        PigImpl.commandRunner = commandRunner;
-    }
-
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
     public void setAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
     }
 
     public UUID installCluster(final Config config) {
+        Preconditions.checkNotNull(config, "Configuration is null");
+
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                if (config == null || Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
+                if (Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -82,7 +85,7 @@ public class PigImpl implements Pig {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -106,7 +109,7 @@ public class PigImpl implements Pig {
                     return;
                 }
 
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
 
                     AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
@@ -150,7 +153,7 @@ public class PigImpl implements Pig {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -178,7 +181,7 @@ public class PigImpl implements Pig {
                         Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
                             if (result.getStdOut().contains("Package ksks-pig is not installed, so not removed")) {
-                                po.addLog(String.format("Pig is not installed, so not removed on node %s", result.getStdErr(),
+                                po.addLog(String.format("Pig is not installed, so not removed on node %s",
                                         agent == null ? result.getAgentUUID() : agent.getHostname()));
                             } else {
                                 po.addLog(String.format("Pig is removed from node %s",
@@ -208,7 +211,7 @@ public class PigImpl implements Pig {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -242,7 +245,7 @@ public class PigImpl implements Pig {
                     AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
                     if (result.getExitCode() != null && result.getExitCode() == 0) {
                         if (result.getStdOut().contains("Package ksks-pig is not installed, so not removed")) {
-                            po.addLog(String.format("Pig is not installed, so not removed on node %s", result.getStdErr(),
+                            po.addLog(String.format("Pig is not installed, so not removed on node %s",
                                     agent.getHostname()));
                         } else {
                             po.addLog(String.format("Pig is removed from node %s",
@@ -273,7 +276,7 @@ public class PigImpl implements Pig {
     public UUID addNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 

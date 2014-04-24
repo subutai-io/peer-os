@@ -33,7 +33,7 @@ class CommunicationMessageListener implements MessageListener {
     /**
      * New message handler called by amq broker
      *
-     * @param message
+     * @param message - received message
      */
     @Override
     public void onMessage(Message message) {
@@ -69,7 +69,7 @@ class CommunicationMessageListener implements MessageListener {
     /**
      * Notifies listeners on new response
      *
-     * @param response
+     * @param response - response to notify listeners
      */
     private void notifyListeners(Response response) {
         try {
@@ -90,7 +90,7 @@ class CommunicationMessageListener implements MessageListener {
     /**
      * Adds response listener
      *
-     * @param listener
+     * @param listener - listener to add
      */
     public void addListener(ResponseListener listener) {
         try {
@@ -103,7 +103,7 @@ class CommunicationMessageListener implements MessageListener {
     /**
      * Removes response listener
      *
-     * @param listener
+     * @param listener - - listener to remove
      */
     public void removeListener(ResponseListener listener) {
         try {
@@ -116,7 +116,7 @@ class CommunicationMessageListener implements MessageListener {
     /**
      * Returns collection of listeners
      *
-     * @return
+     * @return - listeners added
      */
     Collection<ResponseListener> getListeners() {
         return Collections.unmodifiableCollection(listeners);
@@ -126,8 +126,6 @@ class CommunicationMessageListener implements MessageListener {
      * Disposes message listener
      */
     public void destroy() {
-        if (listeners != null) {
-            listeners.clear();
-        }
+        listeners.clear();
     }
 }

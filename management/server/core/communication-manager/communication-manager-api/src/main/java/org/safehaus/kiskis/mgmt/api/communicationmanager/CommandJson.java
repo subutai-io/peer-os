@@ -24,31 +24,6 @@ public class CommandJson {
     private static final Logger LOG = Logger.getLogger(CommandJson.class.getName());
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private static class CommandImpl implements Command {
-
-        Request command;
-        Response response;
-
-        public CommandImpl(Object message) {
-            if (message instanceof Request) {
-                this.command = (Request) message;
-            } else if (message instanceof Response) {
-                this.response = (Response) message;
-            }
-        }
-
-        @Override
-        public Response getResponse() {
-            return response;
-        }
-
-        @Override
-        public Request getRequest() {
-            return command;
-        }
-
-    }
-
     /**
      * Returns deserialized request from json string
      *
@@ -106,7 +81,7 @@ public class CommandJson {
     /**
      * Returns serialized request from Request POJO
      *
-     * @param json - request in pojo format
+     * @param cmd - request in pojo format
      * @return request in json format
      */
     public static String getJson(Request cmd) {
@@ -121,7 +96,7 @@ public class CommandJson {
     /**
      * Returns serialized response from Response POJO
      *
-     * @param json - response in pojo format
+     * @param cmd - response in pojo format
      * @return response in json format
      */
     public static String getResponse(Response cmd) {
@@ -136,7 +111,7 @@ public class CommandJson {
     /**
      * Returns serialized command from Command POJO
      *
-     * @param json - command in pojo format
+     * @param cmd - command in pojo format
      * @return request in command format
      */
     public static String getJson(Command cmd) {
@@ -151,7 +126,7 @@ public class CommandJson {
     /**
      * Returns serialized agent from Agent POJO
      *
-     * @param json - agent in pojo format
+     * @param agent - agent in pojo format
      * @return agent in json format
      */
     public static String getAgentJson(Object agent) {
@@ -185,7 +160,7 @@ public class CommandJson {
     /**
      * Escapes symbols in json string
      *
-     * @param string
+     * @param s - string to escape
      * @return escaped json string
      */
     private static String escape(String s) {
@@ -231,5 +206,30 @@ public class CommandJson {
             }
         }
         return sb.toString();
+    }
+
+    private static class CommandImpl implements Command {
+
+        Request command;
+        Response response;
+
+        public CommandImpl(Object message) {
+            if (message instanceof Request) {
+                this.command = (Request) message;
+            } else if (message instanceof Response) {
+                this.response = (Response) message;
+            }
+        }
+
+        @Override
+        public Response getResponse() {
+            return response;
+        }
+
+        @Override
+        public Request getRequest() {
+            return command;
+        }
+
     }
 }

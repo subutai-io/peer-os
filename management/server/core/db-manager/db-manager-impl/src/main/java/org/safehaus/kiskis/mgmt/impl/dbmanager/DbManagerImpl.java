@@ -5,28 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.impl.dbmanager;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
- *
  * @author dilshat
  */
 public class DbManagerImpl implements DbManager {
@@ -109,7 +104,7 @@ public class DbManagerImpl implements DbManager {
     /**
      * Executes a select query against db
      *
-     * @param cql - sql query with placeholders for bind parameters in form of ?
+     * @param cql    - sql query with placeholders for bind parameters in form of ?
      * @param values - bind parameters
      * @return - resultset
      */
@@ -134,7 +129,7 @@ public class DbManagerImpl implements DbManager {
     /**
      * Executes CUD (insert update delete) query against DB
      *
-     * @param cql - sql query with placeholders for bind parameters in form of ?
+     * @param cql    - sql query with placeholders for bind parameters in form of ?
      * @param values - bind parameters
      * @return true if all went well and false if exception was raised
      */
@@ -161,8 +156,8 @@ public class DbManagerImpl implements DbManager {
      * Saves POJO to DB
      *
      * @param source - source key
-     * @param values - POJO key
-     * @param info - custom object
+     * @param key    - POJO key
+     * @param info   - custom object
      * @return true if all went well and false if exception was raised
      */
     public boolean saveInfo(String source, String key, Object info) {
@@ -176,8 +171,8 @@ public class DbManagerImpl implements DbManager {
      * Returns POJO from DB
      *
      * @param source - source key
-     * @param key - pojo key
-     * @param clazz - class of POJO
+     * @param key    - pojo key
+     * @param clazz  - class of POJO
      * @return - POJO
      */
     public <T> T getInfo(String source, String key, Class<T> clazz) {
@@ -202,7 +197,7 @@ public class DbManagerImpl implements DbManager {
      * Returns all POJOs from DB identified by source key
      *
      * @param source - source key
-     * @param clazz - class of POJO
+     * @param clazz  - class of POJO
      * @return - list of POJOs
      */
     public <T> List<T> getInfo(String source, Class<T> clazz) {
@@ -225,7 +220,7 @@ public class DbManagerImpl implements DbManager {
      * deletes POJO from DB
      *
      * @param source - source key
-     * @param values - POJO key
+     * @param key    - POJO key
      * @return true if all went well and false if exception was raised
      */
     public boolean deleteInfo(String source, String key) {

@@ -17,9 +17,6 @@ import org.safehaus.kiskis.mgmt.ui.shark.wizard.Wizard;
  */
 public class SharkForm extends CustomComponent {
 
-    private final Wizard wizard;
-    private final Manager manager;
-
     public SharkForm() {
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -28,8 +25,8 @@ public class SharkForm extends CustomComponent {
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
         mongoSheet.setSizeFull();
-        manager = new Manager();
-        wizard = new Wizard();
+        Manager manager = new Manager();
+        Wizard wizard = new Wizard();
         mongoSheet.addTab(wizard.getContent(), "Install");
         mongoSheet.addTab(manager.getContent(), "Manage");
         verticalLayout.addComponent(mongoSheet);

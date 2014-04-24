@@ -122,7 +122,7 @@ public class ExpiringCache<KeyType, ValueType> {
     /**
      * Removes and return value from the cache by key or null if missing.
      *
-     * @param key
+     * @param key - entry key
      * @return entry value
      */
     public ValueType remove(KeyType key) {
