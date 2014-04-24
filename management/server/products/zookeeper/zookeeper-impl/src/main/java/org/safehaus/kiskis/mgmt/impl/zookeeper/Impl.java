@@ -1,25 +1,28 @@
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
+import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
-import org.safehaus.kiskis.mgmt.api.taskrunner.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Impl implements Api {
 
@@ -64,6 +67,8 @@ public class Impl implements Api {
     }
 
     public UUID installCluster(final Config config) {
+        Preconditions.checkNotNull(config, "Configuration is null");
+
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
@@ -109,9 +114,21 @@ public class Impl implements Api {
                                 po.addLog(String.format("Settings updated\nStarting %s...", Config.PRODUCT_KEY));
                                 //start all nodes
                                 Command startCommand = Commands.getStartCommand(config.getNodes());
-                                commandRunner.runCommand(startCommand);
+                                final AtomicInteger count = new AtomicInteger();
+                                commandRunner.runCommand(startCommand, new CommandCallback(){
+                                    @Override
+                                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                        if(agentResult.getStdOut().contains("STARTED")){
+                                            count.incrementAndGet();
 
-                                if (startCommand.hasSucceeded()) {
+                                            if(count.get() == config.getNodes().size()){
+                                                stop();
+                                            }
+                                        }
+                                    }
+                                });
+
+                                if (count.get() == config.getNodes().size()) {
                                     po.addLogDone(String.format("Starting %s succeeded\nDone", Config.PRODUCT_KEY));
                                 } else {
                                     po.addLogFailed(String.format("Starting %s failed, %s", Config.PRODUCT_KEY, startCommand.getAllErrors()));
