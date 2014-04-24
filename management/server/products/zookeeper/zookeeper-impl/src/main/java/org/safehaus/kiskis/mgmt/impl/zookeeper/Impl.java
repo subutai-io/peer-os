@@ -22,6 +22,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Impl implements Api {
@@ -230,16 +231,18 @@ public class Impl implements Api {
                 po.addLog("Starting node...");
 
                 Command startCommand = Commands.getStartCommand(Util.wrapAgentToSet(node));
-                commandRunner.runCommand(startCommand);
-                NodeState state = NodeState.UNKNOWN;
-                if (startCommand.hasCompleted()) {
-                    AgentResult result = startCommand.getResults().get(node.getUuid());
-                    if (result.getStdOut().contains("STARTED")) {
-                        state = NodeState.RUNNING;
+                final AtomicBoolean ok = new AtomicBoolean();
+                commandRunner.runCommand(startCommand, new CommandCallback() {
+                    @Override
+                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                        if (agentResult.getStdOut().contains("STARTED")) {
+                            ok.set(true);
+                            stop();
+                        }
                     }
-                }
+                });
 
-                if (NodeState.RUNNING.equals(state)) {
+                if (ok.get()) {
                     po.addLogDone(String.format("Node on %s started", lxcHostName));
                 } else {
                     po.addLogFailed(String.format("Failed to start node %s. %s",
