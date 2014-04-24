@@ -135,7 +135,7 @@ public class Config {
         this.countOfSlaveNodes = countOfSlaveNodes;
     }
 
-    public HashSet<Agent> getBlockedAgents() {
+    public Set<Agent> getBlockedAgents() {
         return blockedAgents;
     }
 
