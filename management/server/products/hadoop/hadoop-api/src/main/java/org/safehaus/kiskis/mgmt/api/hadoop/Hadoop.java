@@ -37,6 +37,8 @@ public interface Hadoop {
 
     public UUID addNode(String clusterName);
 
+    public UUID blockNode(Config config, Agent agent);
+
     /**
      * Returns list of configurations of installed clusters
      *

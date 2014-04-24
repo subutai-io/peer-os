@@ -173,6 +173,10 @@ public class HadoopImpl implements Hadoop {
         return new Adding(this, clusterName).execute();
     }
 
+    @Override
+    public UUID blockNode(Config config, Agent agent) {
+        return new DataNode(this, config).block(agent);
+    }
 
     @Override
     public List<Config> getClusters() {
