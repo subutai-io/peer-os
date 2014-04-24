@@ -18,9 +18,6 @@ import org.safehaus.kiskis.mgmt.ui.mongodb.wizard.Wizard;
  */
 public class MongoForm extends CustomComponent {
 
-    private final Wizard wizard;
-    private final Manager manager;
-
     public MongoForm() {
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -29,8 +26,8 @@ public class MongoForm extends CustomComponent {
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
         mongoSheet.setSizeFull();
-        manager = new Manager();
-        wizard = new Wizard();
+        Manager manager = new Manager();
+        Wizard wizard = new Wizard();
         mongoSheet.addTab(wizard.getContent(), "Install");
         mongoSheet.addTab(manager.getContent(), "Manage");
         verticalLayout.addComponent(mongoSheet);

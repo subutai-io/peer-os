@@ -76,7 +76,7 @@ public class Impl implements Api {
 
             public void run() {
 
-                if (config == null || Util.isStringEmpty(config.getZkName()) || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                if (Util.isStringEmpty(config.getZkName()) || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

@@ -5,11 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.api.commandrunner;
 
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
+import java.util.Set;
+
 /**
- *
  * @author dilshat
  */
 public interface CommandRunner {
@@ -20,7 +20,7 @@ public interface CommandRunner {
      * agent. Calling party may examine the command to see its status and
      * results of each agent.
      *
-     * @param command - command to run
+     * @param command         - command to run
      * @param commandCallback - callback to trigger on every response
      */
     public void runCommandAsync(Command command, CommandCallback commandCallback);
@@ -49,8 +49,8 @@ public interface CommandRunner {
      * agent. Calling party may examine the command to see its status and
      * results of each agent after this call returns.
      *
-     * @param command
-     * @param commandCallback
+     * @param command         - command to run
+     * @param commandCallback - - callback to trigger on every response
      */
     public void runCommand(Command command, CommandCallback commandCallback);
 
@@ -59,7 +59,7 @@ public interface CommandRunner {
      * which to run the command.
      *
      * @param requestBuilder - request builder
-     * @param agents - target agents
+     * @param agents         - target agents
      * @return - command
      */
     public Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents);
@@ -68,9 +68,9 @@ public interface CommandRunner {
      * Creates command based on supplied RequestBuilder and target agents on
      * which to run the command.
      *
-     * @param description - description of command
+     * @param description    - description of command
      * @param requestBuilder - request builder
-     * @param agents - target agents
+     * @param agents         - target agents
      * @return - command
      */
     public Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents);
@@ -78,7 +78,7 @@ public interface CommandRunner {
     /**
      * Creates command based on supplied set of AgentRequestBuilders.
      *
-     * @param agentRequestBuilders
+     * @param agentRequestBuilders - agent request builders
      * @return - command
      */
     public Command createCommand(Set<AgentRequestBuilder> agentRequestBuilders);
@@ -86,8 +86,8 @@ public interface CommandRunner {
     /**
      * Creates command based on supplied set of AgentRequestBuilders.
      *
-     * @param description - description of command
-     * @param agentRequestBuilders
+     * @param description          - description of command
+     * @param agentRequestBuilders - agent request builders
      * @return - command
      */
     public Command createCommand(String description, Set<AgentRequestBuilder> agentRequestBuilders);

@@ -16,7 +16,7 @@ public interface EntryExpiryCallback<ValueType> {
     /**
      * This method of callback is called when entry expires
      *
-     * @param entry
+     * @param entry - cache entry being expired
      */
     public void onEntryExpiry(ValueType entry);
 }

@@ -74,7 +74,7 @@ public class CommunicationManagerImplIT {
 
     @Test
     public void testSendRequest() throws JMSException {
-        Connection connection = null;
+        Connection connection;
         UUID uuid = UUID.randomUUID();
         //setup listener
         connection = communicationManagerImpl.createConnection();
@@ -114,7 +114,7 @@ public class CommunicationManagerImplIT {
 
     @Test
     public void testMessageReception() throws JMSException, InterruptedException {
-        Connection connection = null;
+        Connection connection;
 
         TestResponseListener responseListener = new TestResponseListener();
         communicationManagerImpl.addListener(responseListener);

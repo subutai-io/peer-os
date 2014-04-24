@@ -91,8 +91,7 @@ public class MongoImpl implements Mongo {
 
             public void run() {
 
-                if (config == null
-                        || Util.isStringEmpty(config.getClusterName())
+                if (Util.isStringEmpty(config.getClusterName())
                         || Util.isStringEmpty(config.getReplicaSetName())
                         || Util.isStringEmpty(config.getDomainName())
                         || config.getNumberOfConfigServers() <= 0

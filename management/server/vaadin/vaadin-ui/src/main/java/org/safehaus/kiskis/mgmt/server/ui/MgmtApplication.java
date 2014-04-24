@@ -38,7 +38,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private final AgentManager agentManager;
     private final TaskRunner taskRunner;
     private final Tracker tracker;
-    private Window window;
     private Set<Agent> selectedAgents = new HashSet<Agent>();
 //    private MgmtAgentManager agentList;
 
@@ -65,7 +64,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         try {
             setTheme(Runo.themeName());
 
-            window = new Window(title);
+            Window window = new Window(title);
             setMainWindow(window);
 
             VerticalLayout layout = new VerticalLayout();
@@ -111,7 +110,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 notifyTabListeners(tabs.getTab(tabs.getSelectedTab()));
             }
         } catch (Exception ex) {
-        } finally {
         }
     }
 

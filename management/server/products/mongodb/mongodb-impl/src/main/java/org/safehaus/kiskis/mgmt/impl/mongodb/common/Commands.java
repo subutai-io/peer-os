@@ -83,18 +83,12 @@ public class Commands {
 
     public static Command getRegisterSecondaryNodeWithPrimaryCommand(Agent secondaryNodeAgent, int dataNodePort, String domainName, Agent primaryNodeAgent) {
 
-        StringBuilder secondaryStr = new StringBuilder();
-        secondaryStr.append("rs.add('")
-                .append(secondaryNodeAgent.getHostname())
-                .append(".").append(domainName).
-                append(":").append(dataNodePort).append("');");
-
         return MongoImpl.getCommandRunner().createCommand("Register node with replica",
                 new RequestBuilder(
                         String.format(
                                 "mongo --port %s --eval \"%s\"",
                                 dataNodePort,
-                                secondaryStr.toString())
+                                "rs.add('" + secondaryNodeAgent.getHostname() + "." + domainName + ":" + dataNodePort + "');")
                 ).withTimeout(90),
                 Util.wrapAgentToSet(primaryNodeAgent));
     }

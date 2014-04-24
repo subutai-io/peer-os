@@ -5,22 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
+import java.util.*;
+
 /**
- *
  * @author dilshat
  */
 public class Util {
@@ -50,11 +40,7 @@ public class Util {
     }
 
     public static boolean isFinalResponse(Response response) {
-        if (response != null && response.getType() != null) {
-            return response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
-                    || response.getType() == ResponseType.EXECUTE_TIMEOUTED;
-        }
-        return false;
+        return response != null && response.getType() != null && (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE || response.getType() == ResponseType.EXECUTE_TIMEOUTED);
     }
 
     public static String getAgentIpByMask(Agent agent, String mask) {
@@ -72,7 +58,7 @@ public class Util {
     }
 
     public static Set<Agent> filterLxcAgents(Set<Agent> agents) {
-        Set<Agent> filteredAgents = new HashSet<Agent>();
+        Set<Agent> filteredAgents = new HashSet<>();
         if (agents != null) {
             for (Agent agent : agents) {
                 if (agent.isIsLXC()) {
@@ -84,7 +70,7 @@ public class Util {
     }
 
     public static Set<Agent> filterPhysicalAgents(Set<Agent> agents) {
-        Set<Agent> filteredAgents = new HashSet<Agent>();
+        Set<Agent> filteredAgents = new HashSet<>();
         if (agents != null) {
             for (Agent agent : agents) {
                 if (!agent.isIsLXC()) {
@@ -116,9 +102,9 @@ public class Util {
 
     public static Set<Agent> wrapAgentToSet(Agent agent) {
         if (agent != null) {
-            return new HashSet<Agent>(Arrays.asList(agent));
+            return new HashSet<>(Arrays.asList(agent));
         }
-        return new HashSet<Agent>();
+        return new HashSet<>();
     }
 
     public static boolean isNumeric(String str) {
@@ -132,16 +118,16 @@ public class Util {
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V>
-            sortMapByValueAsc(Map<K, V> map) {
+    sortMapByValueAsc(Map<K, V> map) {
         List<Map.Entry<K, V>> list
-                = new LinkedList<Map.Entry<K, V>>(map.entrySet());
+                = new LinkedList<>(map.entrySet());
         Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
             public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
                 return (o1.getValue()).compareTo(o2.getValue());
             }
         });
 
-        Map<K, V> result = new LinkedHashMap<K, V>();
+        Map<K, V> result = new LinkedHashMap<>();
         for (Map.Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
         }
@@ -149,16 +135,16 @@ public class Util {
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V>
-            sortMapByValueDesc(Map<K, V> map) {
+    sortMapByValueDesc(Map<K, V> map) {
         List<Map.Entry<K, V>> list
-                = new LinkedList<Map.Entry<K, V>>(map.entrySet());
+                = new LinkedList<>(map.entrySet());
         Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
             public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
                 return -(o1.getValue()).compareTo(o2.getValue());
             }
         });
 
-        Map<K, V> result = new LinkedHashMap<K, V>();
+        Map<K, V> result = new LinkedHashMap<>();
         for (Map.Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
         }

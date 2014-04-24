@@ -2,7 +2,6 @@ package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import java.util.Collection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.broker.BrokerService;
@@ -11,13 +10,14 @@ import org.apache.activemq.pool.PooledConnectionFactory;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import javax.jms.*;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 /**
  * This class is implementation of Communication Manager.
@@ -106,6 +106,10 @@ public class CommunicationManagerImpl implements CommunicationManager {
         return amqMaxMessageToAgentTtlSec;
     }
 
+    public void setAmqMaxMessageToAgentTtlSec(int amqMaxMessageToAgentTtlSec) {
+        this.amqMaxMessageToAgentTtlSec = amqMaxMessageToAgentTtlSec;
+    }
+
     public void setAmqPort(int amqPort) {
         this.amqPort = amqPort;
     }
@@ -134,10 +138,6 @@ public class CommunicationManagerImpl implements CommunicationManager {
         this.amqBrokerTrustStorePwd = amqBrokerTrustStorePwd;
     }
 
-    public void setAmqMaxMessageToAgentTtlSec(int amqMaxMessageToAgentTtlSec) {
-        this.amqMaxMessageToAgentTtlSec = amqMaxMessageToAgentTtlSec;
-    }
-
     public void setAmqMaxOfflineAgentTtlSec(int amqMaxOfflineAgentTtlSec) {
         this.amqMaxOfflineAgentTtlSec = amqMaxOfflineAgentTtlSec;
     }
@@ -161,7 +161,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * Sends request to agent
      *
-     * @param request
+     * @param request - request to send
      */
     public void sendRequest(Request request) {
         exec.submit(new CommandProducer(request, this));
@@ -314,7 +314,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * Adds listener
      *
-     * @param listener
+     * @param listener - listener to add
      */
     @Override
     public void addListener(ResponseListener listener) {
@@ -330,7 +330,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * Removes listener
      *
-     * @param listener
+     * @param listener - - listener to remove
      */
     @Override
     public void removeListener(ResponseListener listener) {

@@ -33,7 +33,6 @@ import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
  */
 public class ConfigurationStep extends Panel {
 
-    private final ComboBox hadoopClustersCombo;
     private final TwinColSelect slaveNodesSelect;
     private final ComboBox masterNodeCombo;
 
@@ -46,7 +45,7 @@ public class ConfigurationStep extends Panel {
         content.setSpacing(true);
         content.setMargin(true);
 
-        hadoopClustersCombo = new ComboBox("Hadoop cluster");
+        ComboBox hadoopClustersCombo = new ComboBox("Hadoop cluster");
         masterNodeCombo = new ComboBox("Master node");
         slaveNodesSelect = new TwinColSelect("Slave nodes", new ArrayList<Agent>());
 
