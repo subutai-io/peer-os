@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -15,7 +16,6 @@ import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -274,8 +274,7 @@ public class LxcManagerImpl implements LxcManager {
                                 lxcs.put(LxcState.FROZEN, new ArrayList<String>());
                             }
                             currState = LxcState.FROZEN;
-                        } else if (currState != null
-                                && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                        } else if (currState != null && !Strings.isNullOrEmpty(lxcStr)) {
                             lxcs.get(currState).add(lxcStr.trim());
                         }
                     }
