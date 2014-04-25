@@ -32,7 +32,6 @@ public class LxcManagerImpl implements LxcManager {
 
     private static CommandRunner commandRunner;
     private final Pattern p = Pattern.compile("load average: (.*)");
-    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 90;
     private AgentManager agentManager;
     private ExecutorService executor;
     private Monitor monitor;
@@ -689,7 +688,7 @@ public class LxcManagerImpl implements LxcManager {
             if (result) {
                 break;
             } else {
-                if (System.currentTimeMillis() - waitStart > LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
+                if (System.currentTimeMillis() - waitStart > Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
                     break;
                 } else {
                     try {
