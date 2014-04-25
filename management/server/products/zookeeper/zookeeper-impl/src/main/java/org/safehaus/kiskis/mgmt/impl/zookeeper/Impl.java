@@ -143,12 +143,8 @@ public class Impl implements Api {
 
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostNames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getNodes()) {
-                            lxcHostNames.add(lxcAgent.getHostname());
-                        }
                         try {
-                            lxcManager.destroyLxcs(lxcHostNames);
+                            lxcManager.destroyLxcs(lxcAgentsMap);
                         } catch (LxcDestroyException ex) {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
@@ -180,12 +176,8 @@ public class Impl implements Api {
 
                 po.addLog("Destroying lxc containers...");
 
-                Set<String> lxcHostNames = new HashSet<String>();
-                for (Agent lxcAgent : config.getNodes()) {
-                    lxcHostNames.add(lxcAgent.getHostname());
-                }
                 try {
-                    lxcManager.destroyLxcs(lxcHostNames);
+                    lxcManager.destroyLxcs(config.getNodes());
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));

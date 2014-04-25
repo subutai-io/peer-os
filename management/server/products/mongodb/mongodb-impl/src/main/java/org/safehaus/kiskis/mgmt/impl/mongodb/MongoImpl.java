@@ -145,18 +145,8 @@ public class MongoImpl implements Mongo {
                         installMongoCluster(config, po);
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostnames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getConfigServers()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        for (Agent lxcAgent : config.getRouterServers()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        for (Agent lxcAgent : config.getDataNodes()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
                         try {
-                            lxcManager.destroyLxcs(lxcHostnames);
+                            lxcManager.destroyLxcs(lxcAgentsMap);
                         } catch (LxcDestroyException ex) {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
@@ -306,18 +296,8 @@ public class MongoImpl implements Mongo {
                 }
 
                 po.addLog("Destroying lxc containers");
-                Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getConfigServers()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                for (Agent lxcAgent : config.getRouterServers()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                for (Agent lxcAgent : config.getDataNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
                 try {
-                    lxcManager.destroyLxcs(lxcHostnames);
+                    lxcManager.destroyLxcs(config.getAllNodes());
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));

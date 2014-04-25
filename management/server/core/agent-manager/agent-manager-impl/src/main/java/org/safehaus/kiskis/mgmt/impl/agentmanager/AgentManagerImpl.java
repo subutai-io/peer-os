@@ -45,7 +45,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      */
     private ExecutorService exec;
     /**
-     * cache of currently connected agents with expiry ttl
+     * cache of currently connected agents with expiry ttl. Agents will expire unless they send heartbeat message regularly
      */
     private Cache<UUID, Agent> agents;
 
@@ -262,28 +262,21 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             if (response != null && response.getUuid() != null) {
                 Agent checkAgent = agents.getIfPresent(response.getUuid());
                 if (checkAgent != null) {
-                    //update timestamp of agent here
+                    //update timestamp of agent here & return
                     agents.put(response.getUuid(), checkAgent);
                     return;
                 }
-                Agent agent = new Agent(response.getUuid(), Strings.isNullOrEmpty(response.getHostname()) ? response.getUuid().toString() : response.getHostname());
-                agent.setMacAddress(response.getMacAddress());
-                agent.setTransportId(response.getTransportId());
-                if (response.isIsLxc() == null) {
-                    agent.setIsLXC(false);
-                } else {
-                    agent.setIsLXC(response.isIsLxc());
-                }
-                agent.setListIP(response.getIps());
-                if (agent.isIsLXC()) {
-                    if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
-                        agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
-                    } else {
-                        agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
-                    }
-                }
+                //create agent from response
+                Agent agent = new Agent(response.getUuid(),
+                        Strings.isNullOrEmpty(response.getHostname()) ? response.getUuid().toString() : response.getHostname(),
+                        response.getParentHostName(), response.getMacAddress(), response.getIps(),
+                        !Strings.isNullOrEmpty(response.getParentHostName()), response.getTransportId());
+
+                //send registration acknowledgement to agent
                 sendAck(agent.getUuid());
+                //put agent to cache
                 agents.put(response.getUuid(), agent);
+                //notify listeners
                 notifyAgentListeners = true;
             }
         } catch (Exception e) {

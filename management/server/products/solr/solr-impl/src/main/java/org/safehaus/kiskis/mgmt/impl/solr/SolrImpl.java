@@ -1,6 +1,9 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
@@ -12,12 +15,10 @@ import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 
 public class SolrImpl implements Solr {
 
@@ -27,6 +28,14 @@ public class SolrImpl implements Solr {
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+    public void setCommandRunner(CommandRunner commandRunner) {
+        SolrImpl.commandRunner = commandRunner;
+    }
 
     public void init() {
         executor = Executors.newCachedThreadPool();
@@ -47,14 +56,6 @@ public class SolrImpl implements Solr {
 
     public void setTracker(Tracker tracker) {
         this.tracker = tracker;
-    }
-
-    public void setCommandRunner(CommandRunner commandRunner) {
-        SolrImpl.commandRunner = commandRunner;
-    }
-
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
     }
 
     public void setAgentManager(AgentManager agentManager) {
@@ -103,12 +104,8 @@ public class SolrImpl implements Solr {
 
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostnames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getNodes()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
                         try {
-                            lxcManager.destroyLxcs(lxcHostnames);
+                            lxcManager.destroyLxcs(lxcAgentsMap);
                         } catch (LxcDestroyException ex) {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
@@ -127,7 +124,7 @@ public class SolrImpl implements Solr {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -140,12 +137,8 @@ public class SolrImpl implements Solr {
 
                 po.addLog("Destroying lxc containers...");
 
-                Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
                 try {
-                    lxcManager.destroyLxcs(lxcHostnames);
+                    lxcManager.destroyLxcs(config.getNodes());
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
@@ -166,7 +159,7 @@ public class SolrImpl implements Solr {
     public UUID startNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostName, clusterName));
+                String.format("Starting node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -221,7 +214,7 @@ public class SolrImpl implements Solr {
     public UUID stopNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostName, clusterName));
+                String.format("Stopping node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -274,7 +267,7 @@ public class SolrImpl implements Solr {
     public UUID checkNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking node %s in %s", lxcHostName, clusterName));
+                String.format("Checking node %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -328,7 +321,7 @@ public class SolrImpl implements Solr {
     public UUID destroyNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostName, clusterName));
+                String.format("Destroying %s in %s", lxcHostName, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -387,7 +380,7 @@ public class SolrImpl implements Solr {
     public UUID addNode(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 

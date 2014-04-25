@@ -5,31 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.Before;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
+import org.junit.Test;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
+import java.util.*;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
- *
  * @author dilshat
  */
 //@Ignore
@@ -127,7 +119,7 @@ public class LxcManagerImplUT {
         try {
             Set<String> lxcHostnames = new HashSet<String>();
             lxcHostnames.add(MockUtils.getLxcAgent().getHostname());
-            lxcManager.destroyLxcs(lxcHostnames);
+            lxcManager.destroyLxcsByHostname(lxcHostnames);
         } catch (LxcDestroyException ex) {
             error = true;
         }
