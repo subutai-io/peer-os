@@ -3,14 +3,14 @@ package org.safehaus.kiskis.mgmt.impl.sqoop;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.sqoop.Sqoop;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
 public abstract class SqoopBase implements Sqoop {
 
-    protected TaskRunner taskRunner;
+    protected CommandRunner commandRunner;
     protected AgentManager agentManager;
     protected Tracker tracker;
     protected DbManager dbManager;
@@ -25,12 +25,12 @@ public abstract class SqoopBase implements Sqoop {
         executor.shutdown();
     }
 
-    public TaskRunner getTaskRunner() {
-        return taskRunner;
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+    public void setCommandRunner(CommandRunner commandRunner) {
+        this.commandRunner = commandRunner;
     }
 
     public AgentManager getAgentManager() {

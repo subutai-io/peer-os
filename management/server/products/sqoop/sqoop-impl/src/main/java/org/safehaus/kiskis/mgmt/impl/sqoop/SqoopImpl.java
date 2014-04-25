@@ -14,6 +14,7 @@ public class SqoopImpl extends SqoopBase {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Install Sqoop cluster " + config.getClusterName());
         InstallHandler h = new InstallHandler(this, config.getClusterName(), po);
+        h.setConfig(config);
         executor.execute(h);
         return po.getId();
     }
