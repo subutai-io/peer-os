@@ -13,6 +13,7 @@ import org.safehaus.kiskis.mgmt.api.solr.Solr;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.RefHolder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
@@ -22,19 +23,26 @@ import java.util.concurrent.Executors;
 
 public class SolrImpl implements Solr {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        SolrImpl.commandRunner = commandRunner;
+    public SolrImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, LxcManager lxcManager) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+        this.lxcManager = lxcManager;
+
+        RefHolder.addRef(commandRunner);
+        RefHolder.addRef(agentManager);
+        RefHolder.addRef(dbManager);
+        RefHolder.addRef(tracker);
+        RefHolder.addRef(lxcManager);
     }
 
     public void init() {
@@ -42,24 +50,7 @@ public class SolrImpl implements Solr {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
-    }
-
-    public void setLxcManager(LxcManager lxcManager) {
-        this.lxcManager = lxcManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
     }
 
     public UUID installCluster(final Config config) {
