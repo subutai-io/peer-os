@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.sqoop.handler;
 
-import java.util.Iterator;
+import java.util.*;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -39,6 +39,7 @@ public class InstallHandler extends AbstractHandler {
                 new RequestBuilder(s), config.getNodes());
         manager.getCommandRunner().runCommand(cmd);
 
+        Set<UUID> skipInstall = new HashSet<UUID>();
         if(cmd.hasCompleted()) {
             Iterator<Agent> it = config.getNodes().iterator();
             while(it.hasNext()) {
@@ -48,7 +49,7 @@ public class InstallHandler extends AbstractHandler {
                     if(res.getStdOut().contains(CommandFactory.PACKAGE_NAME)) {
                         po.addLog(String.format("%s already installed on %s",
                                 CommandFactory.PACKAGE_NAME, a.getHostname()));
-                        it.remove();
+                        skipInstall.add(a.getUuid());
                     }
                 } else {
                     po.addLog(String.format("Failed to check installed packages on %s: %s",
@@ -61,8 +62,9 @@ public class InstallHandler extends AbstractHandler {
             return;
         }
 
-        if(config.getNodes().isEmpty()) {
-            po.addLogFailed("No nodes for installation");
+        if(config.getNodes().size() == skipInstall.size()) {
+            saveClusterInfo(config);
+            po.addLogDone("No nodes for installation");
             return;
         }
 
@@ -76,12 +78,13 @@ public class InstallHandler extends AbstractHandler {
             Iterator<Agent> it = config.getNodes().iterator();
             while(it.hasNext()) {
                 Agent a = it.next();
+                if(skipInstall.contains(a.getUuid())) continue;
                 AgentResult res = cmd.getResults().get(a.getUuid());
                 if(isZero(res.getExitCode())) {
                     po.addLog("Successfully installed on " + a.getHostname());
                 } else {
                     it.remove();
-                    po.addLog("Failed to install in " + a.getHostname());
+                    po.addLog("Failed to install on " + a.getHostname());
                     po.addLog(res.getStdErr());
                 }
             }
@@ -89,14 +92,21 @@ public class InstallHandler extends AbstractHandler {
                 po.addLogFailed("Installation failed");
             } else {
                 // save cluster info
-                boolean b = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
-                        config.getClusterName(), config);
-                if(b) po.addLogDone("Cluster info successfully saved");
-                else po.addLogFailed("Failed to save cluster info");
+                boolean b = saveClusterInfo(config);
+                if(b) po.addLogDone("Installation completed");
+                else po.addLogFailed(null);
             }
         } else {
             po.addLogFailed(cmd.getAllErrors());
         }
+    }
+
+    private boolean saveClusterInfo(Config config) {
+        boolean saved = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
+                config.getClusterName(), config);
+        if(saved) po.addLog("Cluster info successfully saved");
+        else po.addLog("Failed to save cluster info");
+        return saved;
     }
 
 }
