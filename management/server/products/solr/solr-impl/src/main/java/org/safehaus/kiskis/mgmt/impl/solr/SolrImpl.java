@@ -38,9 +38,9 @@ public class SolrImpl implements Solr {
         this.tracker = tracker;
         this.lxcManager = lxcManager;
 
-        RefHolder.addRef(commandRunner);
         RefHolder.addRef(agentManager);
         RefHolder.addRef(dbManager);
+        RefHolder.addRef(commandRunner);
         RefHolder.addRef(tracker);
         RefHolder.addRef(lxcManager);
     }
