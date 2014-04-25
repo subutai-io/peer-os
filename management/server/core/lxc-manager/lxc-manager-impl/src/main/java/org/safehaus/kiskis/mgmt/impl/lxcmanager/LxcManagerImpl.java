@@ -16,6 +16,7 @@ import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -274,7 +275,7 @@ public class LxcManagerImpl implements LxcManager {
                                 lxcs.put(LxcState.FROZEN, new ArrayList<String>());
                             }
                             currState = LxcState.FROZEN;
-                        } else if (currState != null && !Strings.isNullOrEmpty(lxcStr)) {
+                        } else if (currState != null && !Common.BASE_CONTAINER_NAME.equalsIgnoreCase(lxcStr) && !Strings.isNullOrEmpty(lxcStr)) {
                             lxcs.get(currState).add(lxcStr.trim());
                         }
                     }
