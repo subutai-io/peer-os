@@ -1,13 +1,10 @@
 package org.safehaus.kiskis.mgmt.impl.sqoop.handler;
 
 import java.util.Iterator;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.sqoop.CommandFactory;
-import org.safehaus.kiskis.mgmt.impl.sqoop.CommandType;
-import org.safehaus.kiskis.mgmt.impl.sqoop.SqoopImpl;
+import org.safehaus.kiskis.mgmt.impl.sqoop.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
@@ -31,15 +28,15 @@ public class InstallHandler extends AbstractHandler {
             po.addLogFailed("Cluster already exists: " + config.getClusterName());
             return;
         }
-
         if(checkNodes(config, true) == 0) {
             po.addLogFailed("No nodes are connected");
             return;
         }
 
         // check if already installed
-        Command cmd = CommandFactory.make(manager.getCommandRunner(),
-                CommandType.INSTALL, config.getNodes());
+        String s = CommandFactory.build(CommandType.LIST, null);
+        Command cmd = manager.getCommandRunner().createCommand(
+                new RequestBuilder(s), config.getNodes());
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasCompleted()) {
@@ -70,8 +67,9 @@ public class InstallHandler extends AbstractHandler {
         }
 
         // installation
-        cmd = CommandFactory.make(manager.getCommandRunner(),
-                CommandType.INSTALL, config.getNodes());
+        s = CommandFactory.build(CommandType.INSTALL, null);
+        cmd = manager.getCommandRunner().createCommand(
+                new RequestBuilder(s).withTimeout(60), config.getNodes());
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasCompleted()) {

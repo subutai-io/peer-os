@@ -1,33 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.sqoop;
 
-import java.util.*;
-import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class CommandFactory {
 
     public static final String PACKAGE_NAME = "ksks-sqoop";
     private static final String EXEC_PROFILE = ". /etc/profile";
 
-    public static Command make(CommandRunner cmdRunner, CommandType type, Agent agent) {
-        return make(cmdRunner, type, Arrays.asList(agent));
-    }
-
-    public static Command make(CommandRunner cmdRunner, CommandType type,
-            Collection<Agent> agents) {
-        return make(cmdRunner, type, agents, null);
-    }
-
-    public static Command make(CommandRunner cmdRunner, CommandType type,
-            Collection<Agent> agents, CommonSetting settings) {
-
-        return cmdRunner.createCommand(
-                new RequestBuilder(buildCommand(type, settings)),
-                new HashSet<Agent>(agents));
-    }
-
-    private static String buildCommand(CommandType type, CommonSetting settings) {
+    public static String build(CommandType type, CommonSetting settings) {
         String s = null;
         switch(type) {
             case LIST:
