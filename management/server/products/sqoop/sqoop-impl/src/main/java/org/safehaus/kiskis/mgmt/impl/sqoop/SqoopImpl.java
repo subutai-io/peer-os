@@ -36,6 +36,24 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
+    public UUID addNode(String clusterName, String hostname) {
+        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
+                "Add new node " + hostname);
+        AddNodeHandler h = new AddNodeHandler(this, clusterName, po);
+        h.setHostname(hostname);
+        executor.execute(h);
+        return po.getId();
+    }
+
+    public UUID destroyNode(String clusterName, String hostname) {
+        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
+                "Destroy node " + hostname);
+        DestroyNodeHandler h = new DestroyNodeHandler(this, clusterName, po);
+        h.setHostname(hostname);
+        executor.execute(h);
+        return po.getId();
+    }
+
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }

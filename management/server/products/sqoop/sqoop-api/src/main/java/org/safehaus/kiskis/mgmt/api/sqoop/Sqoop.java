@@ -13,6 +13,10 @@ public interface Sqoop {
 
     public UUID isInstalled(String clusterName, String hostname);
 
+    public UUID addNode(String clusterName, String hostname);
+
+    public UUID destroyNode(String clusterName, String hostname);
+
     /**
      * Returns list of configurations of installed clusters
      *
