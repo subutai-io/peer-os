@@ -275,7 +275,7 @@ public class LxcManagerImpl implements LxcManager {
                                 lxcs.put(LxcState.FROZEN, new ArrayList<String>());
                             }
                             currState = LxcState.FROZEN;
-                        } else if (currState != null && !Common.BASE_CONTAINER_NAME.equalsIgnoreCase(lxcStr) && !Strings.isNullOrEmpty(lxcStr)) {
+                        } else if (currState != null && !Common.BASE_CONTAINER_NAME.equalsIgnoreCase(lxcStr.trim()) && !Strings.isNullOrEmpty(lxcStr)) {
                             lxcs.get(currState).add(lxcStr.trim());
                         }
                     }
