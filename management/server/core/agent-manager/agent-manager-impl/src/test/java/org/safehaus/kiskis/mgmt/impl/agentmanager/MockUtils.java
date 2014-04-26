@@ -23,8 +23,9 @@ public class MockUtils {
 
         when(response.getUuid()).thenReturn(UUID.randomUUID());
         when(response.isIsLxc()).thenReturn(true);
-        when(response.getHostname()).thenReturn("hostname");
         when(response.getIps()).thenReturn(mock(List.class));
+        when(response.getHostname()).thenReturn("lxchostname");
+        when(response.getParentHostName()).thenReturn("hostname");
         when(response.getType()).thenReturn(ResponseType.REGISTRATION_REQUEST);
 
         return response;

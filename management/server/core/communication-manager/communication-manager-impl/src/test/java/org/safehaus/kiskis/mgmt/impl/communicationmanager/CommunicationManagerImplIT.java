@@ -117,8 +117,7 @@ public class CommunicationManagerImplIT {
         Destination testQueue = session.createQueue("SERVICE_QUEUE");
         final MessageProducer producer = session.createProducer(testQueue);
 
-        final Response response = mock(Response.class);
-        when(response.getUuid()).thenReturn(uuid);
+        final Response response = new Response();
 
         Thread t = new Thread(new Runnable() {
 

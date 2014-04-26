@@ -27,16 +27,14 @@ import static org.mockito.Mockito.when;
 //@Ignore
 public class LxcManagerImplUT {
 
-    private final static LxcManager lxcManager = new LxcManagerImpl();
+    private LxcManager lxcManager;
 
     @Before
     public void setUpMethod() {
-        ((LxcManagerImpl) lxcManager).setAgentManager(new AgentManagerFake());
-        ((LxcManagerImpl) lxcManager).setCommandRunner(MockUtils.getAutoCommandRunner());
         Monitor monitor = mock(Monitor.class);
         when(monitor.getData(any(String.class), any(Metric.class), any(Date.class), any(Date.class)))
                 .thenReturn(Collections.EMPTY_MAP);
-        ((LxcManagerImpl) lxcManager).setMonitor(monitor);
+        lxcManager = new LxcManagerImpl(new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor);
         ((LxcManagerImpl) lxcManager).init();
     }
 
@@ -88,8 +86,7 @@ public class LxcManagerImplUT {
 
     @Test
     public void testStopLxcOnHost() {
-        ((LxcManagerImpl) lxcManager).setCommandRunner(
-                MockUtils.getHardCodedCommandRunner(true, true, 0, "STOPPED", null));
+        LxcManager lxcManager = new LxcManagerImpl(new AgentManagerFake(), MockUtils.getHardCodedCommandRunner(true, true, 0, "STOPPED", null), mock(Monitor.class));
 
         boolean result = lxcManager.stopLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
 

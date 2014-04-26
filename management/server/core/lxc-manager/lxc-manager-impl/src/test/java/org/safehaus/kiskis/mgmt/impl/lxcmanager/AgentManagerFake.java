@@ -47,7 +47,8 @@ public class AgentManagerFake implements AgentManager {
             }
         }
 
-        return null;
+        return MockUtils.getLxcAgent();
+
     }
 
     public Agent getAgentByUUID(UUID uuid) {
