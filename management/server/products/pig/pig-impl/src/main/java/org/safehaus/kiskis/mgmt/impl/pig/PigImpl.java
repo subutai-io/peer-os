@@ -30,18 +30,20 @@ import java.util.concurrent.Executors;
  */
 public class PigImpl implements Pig {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        PigImpl.commandRunner = commandRunner;
+    public PigImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -49,21 +51,9 @@ public class PigImpl implements Pig {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
     }
 
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
 
     public UUID installCluster(final Config config) {
         Preconditions.checkNotNull(config, "Configuration is null");

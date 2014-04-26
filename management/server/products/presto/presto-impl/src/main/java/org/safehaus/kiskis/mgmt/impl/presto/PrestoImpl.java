@@ -35,18 +35,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class PrestoImpl implements Presto {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+    public PrestoImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        PrestoImpl.commandRunner = commandRunner;
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -54,20 +55,7 @@ public class PrestoImpl implements Presto {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
     }
 
     public List<Config> getClusters() {

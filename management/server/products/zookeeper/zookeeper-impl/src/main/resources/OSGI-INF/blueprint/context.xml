@@ -14,11 +14,11 @@
     
     <bean id="impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.zookeeper.Impl"
           init-method="init" destroy-method="destroy">
-        <property name="commandRunner" ref="commandRunner"/>
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker" />
-        <property name="dbManager" ref="dbManager" />
-        <property name="lxcManager" ref="lxcManager"/>
+        <argument ref="commandRunner"/>
+        <argument ref="agentManager"/>
+        <argument ref="dbManager" />
+        <argument ref="tracker" />
+        <argument ref="lxcManager"/>
     </bean>    
        
     <service ref="impl" interface="org.safehaus.kiskis.mgmt.api.zookeeper.Api"/>

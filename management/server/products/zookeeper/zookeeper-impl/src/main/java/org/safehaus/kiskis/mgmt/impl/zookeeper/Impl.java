@@ -28,19 +28,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Impl implements Api {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+    public Impl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, LxcManager lxcManager) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+        this.lxcManager = lxcManager;
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        Impl.commandRunner = commandRunner;
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -48,25 +50,9 @@ public class Impl implements Api {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
     }
 
-    public void setLxcManager(LxcManager lxcManager) {
-        this.lxcManager = lxcManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
 
     public UUID installCluster(final Config config) {
         Preconditions.checkNotNull(config, "Configuration is null");

@@ -55,4 +55,13 @@ public class CommandsSingleton {
         return getCommandRunner().createCommand(agentRequestBuilders);
     }
 
+    protected static final Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
+
+        return getCommandRunner().createCommand(description, requestBuilder, agents);
+    }
+
+    protected static Command createCommand(String description, Set<AgentRequestBuilder> agentRequestBuilders) {
+        return getCommandRunner().createCommand(description, agentRequestBuilders);
+    }
+
 }

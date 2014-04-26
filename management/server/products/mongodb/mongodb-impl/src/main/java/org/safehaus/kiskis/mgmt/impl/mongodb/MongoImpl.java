@@ -41,35 +41,21 @@ import java.util.regex.Pattern;
  */
 public class MongoImpl implements Mongo {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private LxcManager lxcManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-    public void setCommandRunner(CommandRunner commandRunner) {
-        MongoImpl.commandRunner = commandRunner;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
+    public MongoImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, LxcManager lxcManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
         this.agentManager = agentManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
         this.dbManager = dbManager;
-    }
-
-    public void setLxcManager(LxcManager lxcManager) {
         this.lxcManager = lxcManager;
+        this.tracker = tracker;
+
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -77,7 +63,6 @@ public class MongoImpl implements Mongo {
     }
 
     public void destroy() {
-        MongoImpl.commandRunner = null;
         executor.shutdown();
     }
 
