@@ -184,6 +184,16 @@ public class HadoopImpl implements Hadoop {
     }
 
     @Override
+    public UUID unblockDataNode(Config config, Agent agent) {
+        return new DataNode(this, config).unblock(agent);
+    }
+
+    @Override
+    public UUID unblockTaskTracker(Config config, Agent agent) {
+        return new TaskTracker(this, config).unblock(agent);
+    }
+
+    @Override
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }

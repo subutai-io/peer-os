@@ -40,6 +40,11 @@ public interface Hadoop {
     public UUID blockDataNode(Config config, Agent agent);
 
     public UUID blockTaskTracker(Config config, Agent agent);
+
+    public UUID unblockDataNode(Config config, Agent agent);
+
+    public UUID unblockTaskTracker(Config config, Agent agent);
+
     /**
      * Returns list of configurations of installed clusters
      *

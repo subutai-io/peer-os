@@ -126,4 +126,51 @@ public class TaskTracker {
         return po.getId();
 
     }
+
+    public UUID unblock(final Agent agent) {
+
+        final ProductOperation po
+                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                String.format("Unblocking TaskTracker of %s cluster", agent.getHostname()));
+
+        parent.getExecutor().execute(new Runnable() {
+
+            public void run() {
+
+                final Agent node = parent.getAgentManager().getAgentByHostname(agent.getHostname());
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", agent.getHostname()));
+                    return;
+                }
+
+                Task task = Tasks.getSetTaskTrackerTask(config, agent);
+                parent.getTaskRunner().executeTaskNWait(task);
+
+                task = Tasks.getExcludeTaskTrackerCommand(config, agent);
+                parent.getTaskRunner().executeTaskNWait(task);
+
+                task = Tasks.getStartTaskTrackerTask(agent);
+                parent.getTaskRunner().executeTaskNWait(task);
+
+                config.getBlockedAgents().remove(agent);
+                if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                    po.addLog("Cluster info saved to DB");
+                } else {
+                    po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +
+                            "Blocking node aborted");
+                }
+
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
+                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
+                }
+            }
+        });
+
+        return po.getId();
+
+    }
 }
