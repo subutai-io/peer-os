@@ -5,20 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.ui.shark.wizard;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.api.spark.Config;
+import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
 import java.util.List;
-
-import org.safehaus.kiskis.mgmt.api.spark.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
 /**
  * @author dilshat
@@ -81,7 +74,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Spark cluster");
                 } else {
                     wizard.next();

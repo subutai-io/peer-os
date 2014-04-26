@@ -147,7 +147,7 @@ public class Cloner extends VerticalLayout {
         Set<Agent> physicalAgents = Util.filterPhysicalAgents(agentTree.getSelectedAgents());
         final String productName = textFieldLxcName.getValue().toString().trim();
 
-        if (!Util.isStringEmpty(productName) && !productName.matches(hostValidatorRegex)) {
+        if (!Strings.isNullOrEmpty(productName) && !productName.matches(hostValidatorRegex)) {
             show("Please, use only letters, digits, dots and hyphens in product name");
         } else if (physicalAgents.isEmpty()) {
             indicator.setVisible(true);

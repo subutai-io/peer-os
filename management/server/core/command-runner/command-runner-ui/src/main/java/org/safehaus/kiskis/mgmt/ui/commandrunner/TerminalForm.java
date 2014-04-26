@@ -5,26 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.ui.commandrunner;
 
+import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
+import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -34,8 +22,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
- *
  * @author dilshat
  */
 public class TerminalForm extends CustomComponent implements Disposable {
@@ -108,7 +99,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
                 Set<Agent> agents = agentTree.getSelectedAgents();
                 if (agents.isEmpty()) {
                     show("Please, select nodes");
-                } else if (programTxtFld.getValue() == null || Util.isStringEmpty(programTxtFld.getValue().toString())) {
+                } else if (programTxtFld.getValue() == null || Strings.isNullOrEmpty(programTxtFld.getValue().toString())) {
                     show("Please, enter command");
                 } else {
 
@@ -121,7 +112,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
                         }
                     }
 
-                    if (workDirTxtFld.getValue() != null && !Util.isStringEmpty(workDirTxtFld.getValue().toString())) {
+                    if (workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty(workDirTxtFld.getValue().toString())) {
                         requestBuilder.withCwd(workDirTxtFld.getValue().toString());
                     }
                     final Command command = commandRunner.createCommand(requestBuilder, agents);
@@ -137,13 +128,13 @@ public class TerminalForm extends CustomComponent implements Disposable {
                                     Agent agent = agentManager.getAgentByUUID(response.getUuid());
                                     String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
                                     StringBuilder out = new StringBuilder(host).append(":\n");
-                                    if (!Util.isStringEmpty(response.getStdOut())) {
+                                    if (!Strings.isNullOrEmpty(response.getStdOut())) {
                                         out.append(response.getStdOut()).append("\n");
                                     }
-                                    if (!Util.isStringEmpty(response.getStdErr())) {
+                                    if (!Strings.isNullOrEmpty(response.getStdErr())) {
                                         out.append(response.getStdErr()).append("\n");
                                     }
-                                    if (Util.isFinalResponse(response)) {
+                                    if (response.isFinal()) {
                                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                                             out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
                                         } else {
@@ -174,7 +165,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
     private void addOutput(String output) {
-        if (!Util.isStringEmpty(output)) {
+        if (!Strings.isNullOrEmpty(output)) {
             commandOutputTxtArea.setValue(String.format("%s%s", commandOutputTxtArea.getValue(), output));
             commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
         }

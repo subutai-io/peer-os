@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.spark;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -83,7 +84,7 @@ public class SparkImpl implements Spark {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
+                if (Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

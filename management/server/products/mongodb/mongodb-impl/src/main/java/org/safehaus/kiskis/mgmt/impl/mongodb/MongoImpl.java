@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -91,9 +92,9 @@ public class MongoImpl implements Mongo {
 
             public void run() {
 
-                if (Util.isStringEmpty(config.getClusterName())
-                        || Util.isStringEmpty(config.getReplicaSetName())
-                        || Util.isStringEmpty(config.getDomainName())
+                if (Strings.isNullOrEmpty(config.getClusterName())
+                        || Strings.isNullOrEmpty(config.getReplicaSetName())
+                        || Strings.isNullOrEmpty(config.getDomainName())
                         || config.getNumberOfConfigServers() <= 0
                         || config.getNumberOfRouters() <= 0
                         || config.getNumberOfDataNodes() <= 0
@@ -401,7 +402,7 @@ public class MongoImpl implements Mongo {
                         Agent primaryNodeAgent = null;
                         if (m.find()) {
                             String primaryNodeHost = m.group(1);
-                            if (!Util.isStringEmpty(primaryNodeHost)) {
+                            if (!Strings.isNullOrEmpty(primaryNodeHost)) {
                                 String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                                 primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                             }
@@ -693,7 +694,7 @@ public class MongoImpl implements Mongo {
                 Matcher m = p.matcher(result.getStdOut());
                 if (m.find()) {
                     String primaryNodeHost = m.group(1);
-                    if (!Util.isStringEmpty(primaryNodeHost)) {
+                    if (!Strings.isNullOrEmpty(primaryNodeHost)) {
                         String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                         primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                     }

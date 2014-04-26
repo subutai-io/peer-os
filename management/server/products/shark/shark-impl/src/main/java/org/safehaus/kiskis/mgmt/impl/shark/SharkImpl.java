@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.impl.shark;
 
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -70,7 +71,7 @@ public class SharkImpl implements Shark {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (Util.isStringEmpty(clusterName)) {
+                if (Strings.isNullOrEmpty(clusterName)) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

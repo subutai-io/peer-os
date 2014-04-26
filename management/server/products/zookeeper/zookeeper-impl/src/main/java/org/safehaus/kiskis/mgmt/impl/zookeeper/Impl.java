@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -76,7 +77,7 @@ public class Impl implements Api {
 
             public void run() {
 
-                if (Util.isStringEmpty(config.getZkName()) || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                if (Strings.isNullOrEmpty(config.getZkName()) || Strings.isNullOrEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

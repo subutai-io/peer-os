@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mongodb.wizard;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -96,7 +97,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
-                if (!Util.isStringEmpty(value)) {
+                if (!Strings.isNullOrEmpty(value)) {
                     wizard.getConfig().setReplicaSetName(value);
                 }
             }
@@ -148,7 +149,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
-                if (!Util.isStringEmpty(value)) {
+                if (!Strings.isNullOrEmpty(value)) {
                     wizard.getConfig().setDomainName(value);
                 }
             }
@@ -160,7 +161,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
 
                 } else {

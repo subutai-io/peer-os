@@ -5,20 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.ui.solr.wizard;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
+
 import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
- *
  * @author dilshat
  */
 public class ConfigurationStep extends Panel {
@@ -65,7 +58,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
 
                 } else {

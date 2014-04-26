@@ -295,7 +295,7 @@ public class LxcManagerImpl implements LxcManager {
      * @return true if all went ok, false otherwise
      */
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command cloneLxcCommand = Commands.getCloneCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(cloneLxcCommand);
             return cloneLxcCommand.hasSucceeded();
@@ -311,7 +311,7 @@ public class LxcManagerImpl implements LxcManager {
      * @return true if all went ok, false otherwise
      */
     public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command startLxcCommand = Commands.getLxcStartCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(startLxcCommand);
             Command lxcInfoCommand = Commands.getLxcInfoCommand(physicalAgent, lxcHostname);
@@ -339,7 +339,7 @@ public class LxcManagerImpl implements LxcManager {
      * @return true if all went ok, false otherwise
      */
     public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command stopLxcCommand = Commands.getLxcStopCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(stopLxcCommand);
             Command lxcInfoCommand = Commands.getLxcInfoCommand(physicalAgent, lxcHostname);
@@ -367,7 +367,7 @@ public class LxcManagerImpl implements LxcManager {
      * @return true if all went ok, false otherwise
      */
     public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command destroyLxcCommand = Commands.getLxcDestroyCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(destroyLxcCommand);
 
@@ -416,7 +416,7 @@ public class LxcManagerImpl implements LxcManager {
      * @return boolean if all went ok, false otherwise
      */
     public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command cloneNStartCommand = Commands.getCloneNStartCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(cloneNStartCommand);
 

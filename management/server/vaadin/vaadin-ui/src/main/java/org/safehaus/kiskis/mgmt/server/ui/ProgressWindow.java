@@ -5,22 +5,15 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui;
 
+import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.Window;
-
-import java.util.UUID;
-
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -30,10 +23,10 @@ public class ProgressWindow extends Window {
     private final TextArea outputTxtArea;
     private final Button ok;
     private final Label indicator;
-    private volatile boolean track = true;
     private final UUID trackID;
     private final Tracker tracker;
     private final String source;
+    private volatile boolean track = true;
 
     public ProgressWindow(Tracker tracker, UUID trackID, String source) {
         super("Operation progress");
@@ -134,7 +127,7 @@ public class ProgressWindow extends Window {
     }
 
     private void setOutput(String output) {
-        if (!Util.isStringEmpty(output)) {
+        if (!Strings.isNullOrEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }

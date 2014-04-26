@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -55,7 +56,7 @@ public class SolrImpl implements Solr {
 
             public void run() {
 
-                if (config == null || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                if (config == null || Strings.isNullOrEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

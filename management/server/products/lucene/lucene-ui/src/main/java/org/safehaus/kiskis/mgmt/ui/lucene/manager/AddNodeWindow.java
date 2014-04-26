@@ -5,28 +5,21 @@
  */
 package org.safehaus.kiskis.mgmt.ui.lucene.manager;
 
+import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.Window;
-import java.util.Set;
-import java.util.UUID;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.lucene.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.lucene.LuceneUI;
 
+import java.util.Set;
+import java.util.UUID;
+
 /**
- *
  * @author dilshat
  */
 public class AddNodeWindow extends Window {
@@ -159,7 +152,7 @@ public class AddNodeWindow extends Window {
     }
 
     private void setOutput(String output) {
-        if (!Util.isStringEmpty(output)) {
+        if (!Strings.isNullOrEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }
