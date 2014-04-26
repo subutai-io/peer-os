@@ -7,16 +7,23 @@ import java.util.Set;
 
 /**
  * This class is used to hold commands specific to client.
- * One needs to call init method prior to using it.
+ * One needs to call {@code init} method prior to using it.
  * Clients should extend this class and add custom commands creation methods
  * e.g.
+ * <p/>
  * <blockquote><pre>
- * public static Command getStartCommand(Set<Agent> agents) {
- *      return getCommandRunner().createCommand(
- *      new RequestBuilder("service solr start").withTimeout(60),
- *      agents);
+ * public class Commands extends CommandsSingleton{
+ *   public static Command getStartCommand(Set<Agent> agents) {
+ *     return createCommand(
+ *       new RequestBuilder("service solr start").withTimeout(60),
+ *       agents);
+ *   }
  * }
  * </pre></blockquote>
+ * <p/>
+ * Then somewhere in client code prior to using this class:
+ * <p/>
+ * {@code Commands.init(commandRunnner);}
  *
  * @author dilshat
  */
