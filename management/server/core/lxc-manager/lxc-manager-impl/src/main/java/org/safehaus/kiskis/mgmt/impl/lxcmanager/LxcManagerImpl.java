@@ -30,18 +30,18 @@ import java.util.regex.Pattern;
  */
 public class LxcManagerImpl implements LxcManager {
 
-    private static CommandRunner commandRunner;
     private final Pattern p = Pattern.compile("load average: (.*)");
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
     private Monitor monitor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+    public LxcManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor) {
+        this.agentManager = agentManager;
+        this.commandRunner = commandRunner;
+        this.monitor = monitor;
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        LxcManagerImpl.commandRunner = commandRunner;
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -53,17 +53,9 @@ public class LxcManagerImpl implements LxcManager {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
     }
 
-    public void setMonitor(Monitor monitor) {
-        this.monitor = monitor;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
 
     /**
      * Returns metrics of all physical servers connected to the management
