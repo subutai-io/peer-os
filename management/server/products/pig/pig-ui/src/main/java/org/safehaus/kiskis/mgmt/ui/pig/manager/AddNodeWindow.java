@@ -26,14 +26,12 @@ import java.util.UUID;
 public class AddNodeWindow extends Window {
 
     private final TextArea outputTxtArea;
-    private final Button ok;
     private final Label indicator;
     private volatile boolean track = true;
 
     public AddNodeWindow(final Config config, Set<Agent> nodes) {
         super("Add New Node");
         setModal(true);
-        setClosable(false);
 
         setWidth(600, AddNodeWindow.UNITS_PIXELS);
 
@@ -114,7 +112,7 @@ public class AddNodeWindow extends Window {
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
-        ok = new Button("Ok");
+        Button ok = new Button("Ok");
         ok.addListener(new Button.ClickListener() {
 
             @Override
@@ -144,12 +142,10 @@ public class AddNodeWindow extends Window {
 
     private void showProgress() {
         indicator.setVisible(true);
-        ok.setEnabled(false);
     }
 
     private void hideProgress() {
         indicator.setVisible(false);
-        ok.setEnabled(true);
     }
 
     private void setOutput(String output) {
