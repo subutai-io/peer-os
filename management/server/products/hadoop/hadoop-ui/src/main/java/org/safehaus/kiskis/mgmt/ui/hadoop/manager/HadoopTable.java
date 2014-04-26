@@ -83,7 +83,7 @@ public class HadoopTable extends TreeTable {
                     indicator.setVisible(true);
                     HadoopUI.getHadoopManager().blockDataNode(dataNode.getCluster(), dataNode.getAgent());
 
-                    UUID trackID = HadoopUI.getHadoopManager().blockTaskTracker(dataNode.getCluster(), dataNode.getAgent());
+                    UUID trackID = HadoopUI.getHadoopManager().blockTaskTracker(taskTracker.getCluster(), taskTracker.getAgent());
                     HadoopUI.getExecutor().execute(new WaitTask(trackID, new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
