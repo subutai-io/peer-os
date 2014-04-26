@@ -75,40 +75,6 @@ public class DataNode {
                             nodeState
                     ));
                 }
-
-                /*Task task = Tasks.getNameNodeCommandTask(agent, "status");
-                parent.getTaskRunner().executeTaskNWait(task);
-
-                NodeState nodeState = NodeState.UNKNOWN;
-                if (task.isCompleted()) {
-                    Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut() != null && result.getStdOut().contains("DataNode")) {
-                        String[] array = result.getStdOut().split("\n");
-
-                        for (String status : array) {
-                            if (status.contains("DataNode")) {
-                                String temp = status.
-                                        replaceAll("DataNode is ", "");
-                                if (temp.toLowerCase().contains("not")) {
-                                    nodeState = NodeState.STOPPED;
-                                } else {
-                                    nodeState = NodeState.RUNNING;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (NodeState.UNKNOWN.equals(nodeState)) {
-                    po.addLogFailed(String.format("Failed to check status of %s",
-                            agent.getHostname()
-                    ));
-                } else {
-                    po.addLogDone(String.format("DataNode of %s is %s",
-                            agent.getHostname(),
-                            nodeState
-                    ));
-                }*/
             }
         });
 

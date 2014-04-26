@@ -23,7 +23,8 @@ import java.util.UUID;
 public class HadoopTable extends TreeTable {
     private static final Action UNINSTALL_ITEM_ACTION = new Action("Uninstall cluster");
     private static final Action ADD_ITEM_ACTION = new Action("Add new node");
-    private static final Action REMOVE_ITEM_ACTION = new Action("Exclude node");
+    private static final Action EXCLUDE_ITEM_ACTION = new Action("Exclude node");
+    private static final Action INCLUDE_ITEM_ACTION = new Action("Include node");
 
     public static final String CLUSTER_NAME_PROPERTY = "Cluster Name";
     public static final String DOMAIN_NAME_PROPERTY = "Domain Name";
@@ -73,12 +74,16 @@ public class HadoopTable extends TreeTable {
                     UUID trackID = HadoopUI.getHadoopManager().addNode((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
                     MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                     refreshDataSource();
-                } else if (action == REMOVE_ITEM_ACTION) {
+                } else if (action == EXCLUDE_ITEM_ACTION) {
                     Item row = getItem(target);
 
-                    indicator.setVisible(true);
                     SlaveNode dataNode = (SlaveNode) row.getItemProperty(NAMENODE_PROPERTY).getValue();
-                    UUID trackID = HadoopUI.getHadoopManager().blockNode(dataNode.getCluster(), dataNode.getAgent());
+                    SlaveNode taskTracker = (SlaveNode) row.getItemProperty(JOBTRACKER_PROPERTY).getValue();
+
+                    indicator.setVisible(true);
+                    HadoopUI.getHadoopManager().blockDataNode(dataNode.getCluster(), dataNode.getAgent());
+
+                    UUID trackID = HadoopUI.getHadoopManager().blockTaskTracker(dataNode.getCluster(), dataNode.getAgent());
                     HadoopUI.getExecutor().execute(new WaitTask(trackID, new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
@@ -92,6 +97,7 @@ public class HadoopTable extends TreeTable {
 
                 if (target != null) {
                     Item row = getItem(target);
+
                     if (areChildrenAllowed(target)) {
                         if (!Strings.isNullOrEmpty((String) row.getItemProperty(DOMAIN_NAME_PROPERTY).getValue())) {
                             return new Action[]{UNINSTALL_ITEM_ACTION, ADD_ITEM_ACTION};
@@ -101,7 +107,14 @@ public class HadoopTable extends TreeTable {
                     if (!areChildrenAllowed(target)) {
                         if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
                                 row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
-                            return new Action[]{REMOVE_ITEM_ACTION};
+                            return new Action[]{EXCLUDE_ITEM_ACTION};
+                        }
+                    }
+
+                    if (!areChildrenAllowed(target)) {
+                        if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
+                                row.getItemProperty(NAMENODE_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
+                            return new Action[]{INCLUDE_ITEM_ACTION};
                         }
                     }
                 }
@@ -146,21 +159,35 @@ public class HadoopTable extends TreeTable {
             );
 
             for (Agent agent : cluster.getDataNodes()) {
-                SlaveNode dataNode = new SlaveNode(cluster, agent, true);
-                SlaveNode taskTracker = new SlaveNode(cluster, agent, false);
+                Object childID = null;
 
-                nameNode.addSlaveNode(dataNode);
-                jobTracker.addSlaveNode(taskTracker);
+                if (cluster.getBlockedAgents().contains(agent)) {
+                    childID = addItem(new Object[]{
+                                    "Blocked",
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null},
+                            null
+                    );
+                } else {
+                    SlaveNode dataNode = new SlaveNode(cluster, agent, true);
+                    SlaveNode taskTracker = new SlaveNode(cluster, agent, false);
 
-                Object childID = addItem(new Object[]{
-                                null,
-                                null,
-                                dataNode,
-                                null,
-                                taskTracker,
-                                null},
-                        null
-                );
+                    nameNode.addSlaveNode(dataNode);
+                    jobTracker.addSlaveNode(taskTracker);
+
+                    childID = addItem(new Object[]{
+                                    null,
+                                    null,
+                                    dataNode,
+                                    null,
+                                    taskTracker,
+                                    null},
+                            null
+                    );
+                }
 
                 setParent(childID, rowId);
                 setCollapsed(childID, true);

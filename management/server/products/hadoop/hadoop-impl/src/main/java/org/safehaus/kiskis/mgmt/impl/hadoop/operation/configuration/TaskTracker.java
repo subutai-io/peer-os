@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
+import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
 import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
@@ -71,6 +72,53 @@ public class TaskTracker {
                             agent.getHostname(),
                             nodeState
                     ));
+                }
+            }
+        });
+
+        return po.getId();
+
+    }
+
+    public UUID block(final Agent agent) {
+
+        final ProductOperation po
+                = parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                String.format("Blocking TaskTracker of %s cluster", agent.getHostname()));
+
+        parent.getExecutor().execute(new Runnable() {
+
+            public void run() {
+
+                final Agent node = parent.getAgentManager().getAgentByHostname(agent.getHostname());
+                if (node == null) {
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", agent.getHostname()));
+                    return;
+                }
+
+                Task task = Tasks.getClearTaskTrackerTask(config, agent);
+                parent.getTaskRunner().executeTaskNWait(task);
+
+                task = Tasks.getIncludeTaskTrackerCommand(config, agent);
+                parent.getTaskRunner().executeTaskNWait(task);
+
+                task = Tasks.getRefreshTaskTrackerTask(config);
+                parent.getTaskRunner().executeTaskNWait(task);
+
+                config.getBlockedAgents().add(agent);
+                if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                    po.addLog("Cluster info saved to DB");
+                } else {
+                    po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +
+                            "Blocking node aborted");
+                }
+
+                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
+                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
+                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
+                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
+                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
                 }
             }
         });
