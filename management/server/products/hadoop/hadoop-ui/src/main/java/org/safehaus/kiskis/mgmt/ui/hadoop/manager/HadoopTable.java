@@ -112,8 +112,8 @@ public class HadoopTable extends TreeTable {
                     }
 
                     if (!areChildrenAllowed(target)) {
-                        if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
-                                row.getItemProperty(NAMENODE_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
+                        if (row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue() != null &&
+                                row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
                             return new Action[]{INCLUDE_ITEM_ACTION};
                         }
                     }
