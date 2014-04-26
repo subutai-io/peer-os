@@ -39,12 +39,20 @@ public class CommandsSingleton {
         INSTANCE.commandRunner = commandRunner;
     }
 
-    protected static Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
-        return INSTANCE.commandRunner.createCommand(requestBuilder, agents);
+    private static final CommandRunner getCommandRunner() {
+        if (INSTANCE.commandRunner == null) {
+            throw new RuntimeException("Command Runner is null or not set. Call init method first");
+        }
+        return INSTANCE.commandRunner;
+    }
+
+    protected static final Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
+
+        return getCommandRunner().createCommand(requestBuilder, agents);
     }
 
     protected static Command createCommand(Set<AgentRequestBuilder> agentRequestBuilders) {
-        return INSTANCE.commandRunner.createCommand(agentRequestBuilders);
+        return getCommandRunner().createCommand(agentRequestBuilders);
     }
 
 }
