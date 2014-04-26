@@ -13,7 +13,6 @@ import org.safehaus.kiskis.mgmt.api.solr.Solr;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.RefHolder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
@@ -38,11 +37,7 @@ public class SolrImpl implements Solr {
         this.tracker = tracker;
         this.lxcManager = lxcManager;
 
-        RefHolder.addRef(agentManager);
-        RefHolder.addRef(dbManager);
-        RefHolder.addRef(commandRunner);
-        RefHolder.addRef(tracker);
-        RefHolder.addRef(lxcManager);
+        Commands.init(commandRunner);
     }
 
     public void init() {

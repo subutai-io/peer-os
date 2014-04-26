@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.RefHolder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 
@@ -20,8 +19,23 @@ import java.util.Set;
  */
 public class Commands {
 
+    private static Commands INSTANCE;
+    private CommandRunner commandRunner;
+
+    private Commands() {
+    }
+
+    public static void init(CommandRunner commandRunner) {
+        INSTANCE = new Commands();
+        INSTANCE.commandRunner = commandRunner;
+    }
+
+
     private static CommandRunner getCommandRunner() {
-        return RefHolder.getRef(CommandRunner.class);
+        if (INSTANCE == null) {
+            throw new RuntimeException("Commands not initialized");
+        }
+        return INSTANCE.commandRunner;
     }
 
     public static Command getInstallCommand(Set<Agent> agents) {
