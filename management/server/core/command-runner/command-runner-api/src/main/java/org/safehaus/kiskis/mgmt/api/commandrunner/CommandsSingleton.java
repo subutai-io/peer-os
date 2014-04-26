@@ -34,19 +34,19 @@ public class CommandsSingleton {
     protected CommandsSingleton() {
     }
 
-    public final static void init(CommandRunner commandRunner) {
+    public static void init(CommandRunner commandRunner) {
         Preconditions.checkNotNull(commandRunner, "Command Runner is null");
         INSTANCE.commandRunner = commandRunner;
     }
 
-    private static final CommandRunner getCommandRunner() {
+    private static CommandRunner getCommandRunner() {
         if (INSTANCE.commandRunner == null) {
             throw new RuntimeException("Command Runner is null or not set. Call init method first");
         }
         return INSTANCE.commandRunner;
     }
 
-    protected static final Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
+    protected static Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
 
         return getCommandRunner().createCommand(requestBuilder, agents);
     }
@@ -55,7 +55,7 @@ public class CommandsSingleton {
         return getCommandRunner().createCommand(agentRequestBuilders);
     }
 
-    protected static final Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
+    protected static Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
 
         return getCommandRunner().createCommand(description, requestBuilder, agents);
     }
