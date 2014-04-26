@@ -121,16 +121,16 @@ public class HadoopTable extends TreeTable {
                     }
 
                     if (!areChildrenAllowed(target)) {
-                        if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
-                                row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
-                            return new Action[]{EXCLUDE_ITEM_ACTION};
+                        if (row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue() != null &&
+                                row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
+                            return new Action[]{INCLUDE_ITEM_ACTION};
                         }
                     }
 
                     if (!areChildrenAllowed(target)) {
-                        if (row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue() != null &&
-                                row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
-                            return new Action[]{INCLUDE_ITEM_ACTION};
+                        if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
+                                row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
+                            return new Action[]{EXCLUDE_ITEM_ACTION};
                         }
                     }
                 }
