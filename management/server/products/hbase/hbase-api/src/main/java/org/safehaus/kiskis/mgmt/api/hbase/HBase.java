@@ -15,26 +15,19 @@ public interface HBase {
 
     public UUID installCluster(HBaseConfig config);
 
-//    public UUID uninstallCluster(String clusterName);
-
     public UUID uninstallCluster(HBaseConfig config);
 
-    public UUID startNode(String clusterName, String lxcHostname);
-
-    public UUID startNodes(String clusterName);
-
-    public UUID stopNodes(String clusterName);
-
-    public UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
-
-    public UUID addNode(String clusterName);
-
-    public UUID destroyNode(String clusterName, String lxcHostname);
-
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
     public List<HBaseConfig> getClusters();
+
+    UUID startCluster(String clusterName);
+
+    UUID stopCluster(String clusterName);
+
+    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
+
+    UUID startNodes(String clusterName);
+
+    UUID stopNodes(String clusterName);
+
+    UUID checkCluster(String clusterName);
 }
