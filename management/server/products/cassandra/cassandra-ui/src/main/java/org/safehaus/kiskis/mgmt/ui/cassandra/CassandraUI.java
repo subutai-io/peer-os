@@ -41,8 +41,8 @@ public class CassandraUI implements Module {
         return executor;
     }
 
-    public void setSolrManager(Cassandra solrManager) {
-        CassandraUI.cassandraManager = solrManager;
+    public void setCassandraManager(Cassandra cassandraManager) {
+        CassandraUI.cassandraManager = cassandraManager;
     }
 
     public static AgentManager getAgentManager() {

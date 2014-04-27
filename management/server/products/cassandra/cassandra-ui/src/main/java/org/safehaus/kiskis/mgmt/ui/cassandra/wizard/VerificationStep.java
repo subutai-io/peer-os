@@ -34,6 +34,9 @@ public class VerificationStep extends Panel {
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
         cfgView.addStringCfg("Domain Name", wizard.getConfig().getDomainName());
+        cfgView.addStringCfg("Data directory", wizard.getConfig().getDataDirectory());
+        cfgView.addStringCfg("Saved caches directory", wizard.getConfig().getSavedCachesDirectory());
+        cfgView.addStringCfg("Commit log directory", wizard.getConfig().getCommitLogDirectory());
         cfgView.addStringCfg("Number of seeds", wizard.getConfig().getNumberOfSeeds() + "");
 
         Button install = new Button("Install");
