@@ -2,7 +2,10 @@ package org.safehaus.kiskis.mgmt.api.hadoop;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by daralbaev on 02.04.14.
@@ -143,5 +146,22 @@ public class Config {
                 ", replicationFactor=" + replicationFactor +
                 ", countOfSlaveNodes=" + countOfSlaveNodes +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Config config = (Config) o;
+
+        if (clusterName != null ? !clusterName.equals(config.clusterName) : config.clusterName != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return clusterName != null ? clusterName.hashCode() : 0;
     }
 }
