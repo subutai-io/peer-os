@@ -366,7 +366,7 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(nodesTable, config.getNodes());
+//            populateTable(nodesTable, config.getNodes());
         } else {
             nodesTable.removeAllItems();
         }

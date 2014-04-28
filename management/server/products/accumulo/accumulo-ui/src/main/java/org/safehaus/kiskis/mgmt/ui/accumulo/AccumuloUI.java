@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.ui.accumulo;
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
@@ -23,8 +24,16 @@ public class AccumuloUI implements Module {
     private static Accumulo accumuloManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
+    private static DbManager dbManager;
     private static ExecutorService executor;
 
+    public static DbManager getDbManager() {
+        return dbManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        AccumuloUI.dbManager = dbManager;
+    }
 
     public static Tracker getTracker() {
         return tracker;

@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.impl.accumulo;
 
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
+import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -10,7 +11,6 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -55,52 +55,52 @@ public class AccumuloImpl implements Accumulo {
         executor.execute(new Runnable() {
 
             public void run() {
-
-                if (config == null || Strings.isNullOrEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
-                    po.addLogFailed("Malformed configuration\nInstallation aborted");
-                    return;
-                }
-
-                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
-                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
-                    return;
-                }
-
-                try {
-                    po.addLog(String.format("Creating %d lxc containers...", config.getNumberOfNodes()));
-                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(config.getNumberOfNodes());
-                    config.setNodes(new HashSet<Agent>());
-
-                    for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
-                        config.getNodes().addAll(entry.getValue());
-                    }
-                    po.addLog("Lxc containers created successfully\nUpdating db...");
-                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-
-                        po.addLog("Cluster info saved to DB\nInstalling Accumulo...");
-
-                        //install
-                        Command installCommand = Commands.getInstallCommand(config.getNodes());
-                        commandRunner.runCommand(installCommand);
-
-                        if (installCommand.hasSucceeded()) {
-                            po.addLogDone("Installation succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
-                        }
-
-                    } else {
-                        //destroy all lxcs also
-                        try {
-                            lxcManager.destroyLxcs(lxcAgentsMap);
-                        } catch (LxcDestroyException ex) {
-                            po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
-                        }
-                        po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
-                    }
-                } catch (LxcCreateException ex) {
-                    po.addLogFailed(ex.getMessage());
-                }
+//
+//                if (config == null || Strings.isNullOrEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+//                    po.addLogFailed("Malformed configuration\nInstallation aborted");
+//                    return;
+//                }
+//
+//                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
+//                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
+//                    return;
+//                }
+////
+//                try {
+////                    po.addLog(String.format("Creating %d lxc containers...", config.getNumberOfNodes()));
+////                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(config.getNumberOfNodes());
+////                    config.setNodes(new HashSet<Agent>());
+//
+//                    for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
+////                        config.getNodes().addAll(entry.getValue());
+//                    }
+//                    po.addLog("Lxc containers created successfully\nUpdating db...");
+//                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+//
+//                        po.addLog("Cluster info saved to DB\nInstalling Accumulo...");
+//
+//                        //install
+//                        Command installCommand = Commands.getInstallCommand(config.getNodes());
+//                        commandRunner.runCommand(installCommand);
+//
+//                        if (installCommand.hasSucceeded()) {
+//                            po.addLogDone("Installation succeeded");
+//                        } else {
+//                            po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
+//                        }
+//
+//                    } else {
+//                        //destroy all lxcs also
+//                        try {
+////                            lxcManager.destroyLxcs(lxcAgentsMap);
+//                        } catch (LxcDestroyException ex) {
+//                            po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
+//                        }
+//                        po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
+//                    }
+//                } catch (LxcCreateException ex) {
+//                    po.addLogFailed(ex.getMessage());
+//                }
 
             }
         });
@@ -125,7 +125,7 @@ public class AccumuloImpl implements Accumulo {
                 po.addLog("Destroying lxc containers...");
 
                 try {
-                    lxcManager.destroyLxcs(config.getNodes());
+                    lxcManager.destroyLxcs(config.getAllNodes());
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
@@ -163,14 +163,14 @@ public class AccumuloImpl implements Accumulo {
                     return;
                 }
 
-                if (!config.getNodes().contains(node)) {
+                if (!config.getAllNodes().contains(node)) {
                     po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
                     return;
                 }
 
                 po.addLog("Starting node...");
 
-                Command startCommand = Commands.getStartCommand(node);
+                Command startCommand = Commands.getStartCommand(Util.wrapAgentToSet(node));
                 commandRunner.runCommand(startCommand);
                 Command statusCommand = Commands.getStatusCommand(node);
                 commandRunner.runCommand(statusCommand);
@@ -217,7 +217,7 @@ public class AccumuloImpl implements Accumulo {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
-                if (!config.getNodes().contains(node)) {
+                if (!config.getAllNodes().contains(node)) {
                     po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
                     return;
                 }
@@ -270,7 +270,7 @@ public class AccumuloImpl implements Accumulo {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
-                if (!config.getNodes().contains(node)) {
+                if (!config.getAllNodes().contains(node)) {
                     po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
                     return;
                 }
@@ -324,12 +324,12 @@ public class AccumuloImpl implements Accumulo {
                     po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
                     return;
                 }
-                if (!config.getNodes().contains(agent)) {
+                if (!config.getAllNodes().contains(agent)) {
                     po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostName, clusterName));
                     return;
                 }
 
-                if (config.getNodes().size() == 1) {
+                if (config.getAllNodes().size() == 1) {
                     po.addLogFailed("This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted");
                     return;
                 }
@@ -351,7 +351,7 @@ public class AccumuloImpl implements Accumulo {
                 }
                 //update db
                 po.addLog("Updating db...");
-                config.getNodes().remove(agent);
+//                config.getNodes().remove(agent);
                 if (!dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                     po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
                             config.getClusterName()));
@@ -386,7 +386,7 @@ public class AccumuloImpl implements Accumulo {
 
                     Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
-                    config.getNodes().add(lxcAgent);
+//                    config.getNodes().add(lxcAgent);
                     po.addLog("Lxc container created successfully\nUpdating db...");
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
                         po.addLog("Cluster info updated in DB\nInstalling Accumulo...");

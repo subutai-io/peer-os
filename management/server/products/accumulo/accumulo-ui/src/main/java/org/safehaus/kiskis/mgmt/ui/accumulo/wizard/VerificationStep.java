@@ -5,18 +5,15 @@
  */
 package org.safehaus.kiskis.mgmt.ui.accumulo.wizard;
 
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import java.util.UUID;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 
+import java.util.UUID;
+
 /**
- *
  * @author dilshat
  */
 public class VerificationStep extends Panel {
@@ -36,7 +33,20 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        cfgView.addStringCfg("Number of nodes", wizard.getConfig().getNumberOfNodes() + "");
+        cfgView.addStringCfg("Master node", wizard.getConfig().getMasterNode().getHostname());
+        cfgView.addStringCfg("GC node", wizard.getConfig().getGcNode().getHostname());
+        for (Agent agent : wizard.getConfig().getTracers()) {
+            cfgView.addStringCfg("Tracers", agent.getHostname());
+        }
+        for (Agent agent : wizard.getConfig().getMonitors()) {
+            cfgView.addStringCfg("Monitors", agent.getHostname());
+        }
+        for (Agent agent : wizard.getConfig().getLoggers()) {
+            cfgView.addStringCfg("Loggers", agent.getHostname());
+        }
+        for (Agent agent : wizard.getConfig().getTabletServers()) {
+            cfgView.addStringCfg("Tablet servers", agent.getHostname());
+        }
 
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
