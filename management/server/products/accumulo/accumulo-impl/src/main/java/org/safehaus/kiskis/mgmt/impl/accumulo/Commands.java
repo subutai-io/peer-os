@@ -117,6 +117,17 @@ public class Commands extends CommandsSingleton {
                 nodes);
     }
 
+
+    public static Command getAddMonitorsCommand(Set<Agent> nodes, Set<Agent> monitors) {
+        StringBuilder monitorsSpaceSeparated = new StringBuilder();
+        for (Agent tracer : monitors) {
+            monitorsSpaceSeparated.append(tracer.getHostname()).append(" ");
+        }
+        return createCommand(
+                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh monitors add %s", monitorsSpaceSeparated)),
+                nodes);
+    }
+
     public static Command getAddSlavesCommand(Set<Agent> nodes, Set<Agent> slaveNodes) {
         StringBuilder slavesSpaceSeparated = new StringBuilder();
         for (Agent tracer : slaveNodes) {
