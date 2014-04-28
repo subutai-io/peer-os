@@ -70,7 +70,7 @@ public class OozieImpl implements Oozie {
                     po.addLog("Cluster info saved to DB");
 
                     // Installing Oozie server
-                    po.addLog("nInstalling Oozie server...");
+                    po.addLog("Installing Oozie server...");
                     Task installServerTask = taskRunner.executeTaskNWait(Tasks.getInstallServerTask(config.getServer()));
 
                     if (installServerTask.getTaskStatus() == TaskStatus.SUCCESS) {
@@ -107,12 +107,12 @@ public class OozieImpl implements Oozie {
                     Task configRegionTask = taskRunner.executeTaskNWait(Tasks.getConfigureRootGroupsTask(config.getHadoopNodes()));
 
                     if (configRegionTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                        po.addLogDone("Configuring root groups successful.");
+                        po.addLog("Configuring root groups successful.");
                     } else {
                         po.addLogFailed(String.format("Configuring failed, %s", configRegionTask.getFirstError()));
                         return;
                     }
-                    po.addLog("Oozie installation succeeded\n");
+                    po.addLogDone("Oozie installation succeeded");
 
 
                 } else {

@@ -265,40 +265,17 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext(); ) {
+        for (Iterator<Agent> it = agents.iterator(); it.hasNext(); ) {
             final Agent agent = (Agent) it.next();
-            final Button checkBtn = new Button("Check");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
                             agent.getHostname(),
-                            checkBtn,
-                            destroyBtn,
-                            progressIcon},
+                            destroyBtn},
                     null
             );
-
-            checkBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-
-                    OozieUI.getExecutor().execute(new CheckTask(agent, new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                show(state.toString());
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
 
             destroyBtn.addListener(new Button.ClickListener() {
 
