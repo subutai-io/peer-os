@@ -35,10 +35,22 @@ public interface Hadoop {
 
     public UUID statusTaskTracker(Agent agent);
 
+    public UUID addNode(String clusterName);
+
+    public UUID blockDataNode(Config config, Agent agent);
+
+    public UUID blockTaskTracker(Config config, Agent agent);
+
+    public UUID unblockDataNode(Config config, Agent agent);
+
+    public UUID unblockTaskTracker(Config config, Agent agent);
+
     /**
      * Returns list of configurations of installed clusters
      *
      * @return - list of configurations of installed clusters
      */
     public List<Config> getClusters();
+
+    public Config getCluster(String clusterName);
 }
