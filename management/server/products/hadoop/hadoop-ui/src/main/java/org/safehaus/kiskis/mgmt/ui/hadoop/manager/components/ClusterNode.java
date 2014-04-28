@@ -84,4 +84,8 @@ public class ClusterNode extends HorizontalLayout {
     protected void setLoading(boolean isLoading) {
 
     }
+
+    public Config getCluster() {
+        return cluster;
+    }
 }

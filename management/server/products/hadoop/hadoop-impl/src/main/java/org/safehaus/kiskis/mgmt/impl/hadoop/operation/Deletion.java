@@ -31,7 +31,7 @@ public class Deletion {
             public void run() {
                 Config config = parent.getDbManager().getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
