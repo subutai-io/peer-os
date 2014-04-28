@@ -16,6 +16,7 @@ public class SqoopUI implements Module {
     private static Tracker tracker;
     private static Sqoop manager;
     private static DbManager dbManager;
+
     private static ExecutorService executor;
 
     public void init() {
@@ -70,7 +71,7 @@ public class SqoopUI implements Module {
     }
 
     public Component createComponent() {
-        return null;// TODO:
+        return new SqoopForm();
     }
 
 }
