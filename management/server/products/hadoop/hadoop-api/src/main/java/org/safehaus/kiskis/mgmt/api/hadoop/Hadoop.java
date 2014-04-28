@@ -51,4 +51,6 @@ public interface Hadoop {
      * @return - list of configurations of installed clusters
      */
     public List<Config> getClusters();
+
+    public Config getCluster(String clusterName);
 }
