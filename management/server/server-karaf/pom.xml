@@ -788,11 +788,6 @@
                                 <!-- TODO for API - START -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>cassandra-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -801,11 +796,7 @@
                                     <artifactId>sqoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>oozie-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
+
                                 <!-- TODO for API - END -->
 
                             </artifactItems>
