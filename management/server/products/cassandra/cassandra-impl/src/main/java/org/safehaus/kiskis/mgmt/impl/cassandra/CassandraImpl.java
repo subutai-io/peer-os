@@ -334,7 +334,7 @@ public class CassandraImpl implements Cassandra {
                     return;
                 }
 
-                Command checkStatusCommand = Commands.getConfigureRpcAndListenAddressesCommand(config.getNodes(), "listen_address");
+                Command checkStatusCommand = Commands.getStatusCommand(config.getNodes());
                 commandRunner.runCommand(checkStatusCommand);
 
                 if (checkStatusCommand.hasSucceeded()) {
