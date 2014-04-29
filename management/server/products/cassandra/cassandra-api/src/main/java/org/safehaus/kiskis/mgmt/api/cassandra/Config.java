@@ -77,7 +77,6 @@ public class Config {
         this.seedNodes = seedNodes;
     }
 
-
     public Set<Agent> getNodes() {
         return nodes;
     }

@@ -5,33 +5,28 @@
  */
 package org.safehaus.kiskis.mgmt.api.oozie;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-
 import java.util.List;
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
 public interface Oozie {
 
-    public UUID installCluster(OozieConfig config);
+    public UUID installCluster(Config config);
 
-    public UUID uninstallCluster(String clusterName);
-
-    public UUID destroyNode(String clusterName, String lxcHostname);
+    public UUID uninstallCluster(Config config);
 
     /**
      * Returns list of configurations of installed clusters
      *
      * @return - list of configurations of installed clusters
-     *
      */
-    public List<OozieConfig> getClusters();
+    public List<Config> getClusters();
 
-    UUID startServer(Agent agent);
-    UUID stopServer(Agent agent);
+    UUID startServer(Config config);
 
-    UUID checkServerStatus(Agent agent);
+    UUID stopServer(Config config);
+
+    UUID checkServerStatus(Config config);
 }

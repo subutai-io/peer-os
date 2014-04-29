@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public class OozieConfig implements Serializable {
+public class Config {
 
     public static final String PRODUCT_KEY = "Oozie";
     private UUID uuid;
@@ -20,7 +20,7 @@ public class OozieConfig implements Serializable {
     private Set<Agent> hadoopNodes;
     private String clusterName = "";
 
-    public OozieConfig() {
+    public Config() {
         this.uuid = UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
