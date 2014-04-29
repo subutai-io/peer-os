@@ -86,7 +86,7 @@
         </dependency>
         <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>task-runner-api</artifactId>
+            <artifactId>command-runner-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -13,21 +13,21 @@ import java.util.UUID;
  */
 public interface HBase {
 
-    public UUID installCluster(HBaseConfig config);
+    public UUID installCluster(Config config);
 
-    public UUID uninstallCluster(HBaseConfig config);
+    public UUID uninstallCluster(Config config);
 
-    public List<HBaseConfig> getClusters();
+    public List<Config> getClusters();
 
     UUID startCluster(String clusterName);
 
     UUID stopCluster(String clusterName);
 
-    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
+//    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
 
-    UUID startNodes(String clusterName);
+//    UUID startNodes(String clusterName);
 
-    UUID stopNodes(String clusterName);
+//    UUID stopNodes(String clusterName);
 
     UUID checkCluster(String clusterName);
 }

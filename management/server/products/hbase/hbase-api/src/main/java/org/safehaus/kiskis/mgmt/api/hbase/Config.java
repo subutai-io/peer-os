@@ -15,7 +15,7 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public class HBaseConfig implements Serializable {
+public class Config {
 
     public static final String PRODUCT_KEY = "HBase";
     private int numberOfNodes = 4;
@@ -41,7 +41,7 @@ public class HBaseConfig implements Serializable {
         return PRODUCT_KEY;
     }
 
-    public HBaseConfig() {
+    public Config() {
         this.uuid = UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
@@ -61,7 +61,6 @@ public class HBaseConfig implements Serializable {
         this.domainInfo = "";
         this.clusterName = "";
     }
-
 
     public Agent getMaster() {
         return master;
