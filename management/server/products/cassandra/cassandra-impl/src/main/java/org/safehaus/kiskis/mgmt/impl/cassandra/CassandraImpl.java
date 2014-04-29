@@ -67,8 +67,6 @@ public class CassandraImpl implements Cassandra {
     }
 
 
-
-
     public UUID installCluster(final Config config) {
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Cassandra");
 
@@ -227,17 +225,18 @@ public class CassandraImpl implements Cassandra {
                         for (Agent seed : config.getSeedNodes()) {
                             sb.append(seed.getListIP().get(0)).append(",");
                         }
-                        sb.replace(sb.toString().length() -1, sb.toString().length(), "");
+                        sb.replace(sb.toString().length() - 1, sb.toString().length(), "");
                         sb.append('"');
                         po.addLog("Settings seeds " + sb.toString());
                         Task setSeeds = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "seeds " + sb.toString()));
 
                         if (setSeeds.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Configure seeds succeeded");
+                            po.addLog("Configure seeds succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setSeeds.getFirstError()));
                             return;
                         }
+                        po.addLog("Installation of Cassandra cluster succeeded");
 
 
                     } else {
