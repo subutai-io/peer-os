@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
 public interface Accumulo {
@@ -24,7 +23,7 @@ public interface Accumulo {
 
     public UUID checkNode(String clusterName, String lxcHostname);
 
-    public UUID addNode(String clusterName);
+    public UUID addNode(String clusterName, String lxcHostname, NodeType nodeType);
 
     public UUID destroyNode(String clusterName, String lxcHostname);
 
@@ -32,7 +31,6 @@ public interface Accumulo {
      * Returns list of configurations of installed clusters
      *
      * @return - list of configurations of installed clusters
-     *
      */
     public List<Config> getClusters();
 }

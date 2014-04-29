@@ -524,4 +524,9 @@ public class Impl implements Api {
 
     }
 
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+    }
+
 }

@@ -9,8 +9,9 @@ import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 import java.util.concurrent.ExecutorService;
@@ -22,18 +23,36 @@ import java.util.concurrent.Executors;
 public class AccumuloUI implements Module {
 
     private static Accumulo accumuloManager;
+    private static Hadoop hadoopManager;
+    private static Api zookeeperManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
-    private static DbManager dbManager;
+    //    private static DbManager dbManager;
     private static ExecutorService executor;
 
-    public static DbManager getDbManager() {
-        return dbManager;
+    public static Api getZookeeperManager() {
+        return zookeeperManager;
     }
 
-    public void setDbManager(DbManager dbManager) {
-        AccumuloUI.dbManager = dbManager;
+    public static void setZookeeperManager(Api zookeeperManager) {
+        AccumuloUI.zookeeperManager = zookeeperManager;
     }
+
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+    public static void setHadoopManager(Hadoop hadoopManager) {
+        AccumuloUI.hadoopManager = hadoopManager;
+    }
+
+//    public static DbManager getDbManager() {
+//        return dbManager;
+//    }
+//
+//    public void setDbManager(DbManager dbManager) {
+//        AccumuloUI.dbManager = dbManager;
+//    }
 
     public static Tracker getTracker() {
         return tracker;
@@ -71,7 +90,9 @@ public class AccumuloUI implements Module {
         accumuloManager = null;
         agentManager = null;
         tracker = null;
-        dbManager = null;
+//        dbManager = null;
+        hadoopManager = null;
+        zookeeperManager = null;
         executor.shutdown();
     }
 

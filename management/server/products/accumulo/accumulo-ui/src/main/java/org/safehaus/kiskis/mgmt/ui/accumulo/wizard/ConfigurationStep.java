@@ -9,10 +9,10 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
+import org.safehaus.kiskis.mgmt.ui.accumulo.common.UiUtil;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,13 +30,15 @@ public class ConfigurationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout content = new GridLayout(4, 4);
+        GridLayout content = new GridLayout(5, 4);
         content.setSizeFull();
         content.setSpacing(true);
         content.setMargin(true);
 
         //hadoop combo
         final ComboBox hadoopClustersCombo = UiUtil.getCombo("Hadoop cluster");
+        //zookeeper combo
+        final ComboBox zkClustersCombo = UiUtil.getCombo("Zookeeper cluster");
         //master nodes
         final ComboBox masterNodeCombo = UiUtil.getCombo("Master node");
         final ComboBox gcNodeCombo = UiUtil.getCombo("GC node");
@@ -46,23 +48,28 @@ public class ConfigurationStep extends Panel {
         final TwinColSelect slavesSelect = UiUtil.getTwinSelect("Slaves", "hostname", "Available Nodes", "Selected Nodes", 4);
 
         //get hadoop clusters from db
-        List<Config> clusters = AccumuloUI.getDbManager().
-                getInfo(Config.PRODUCT_KEY, Config.class);
+        List<org.safehaus.kiskis.mgmt.api.hadoop.Config> clusters = AccumuloUI.getHadoopManager().getClusters();
+        List<org.safehaus.kiskis.mgmt.api.zookeeper.Config> zkClusters = AccumuloUI.getZookeeperManager().getClusters();
 
         //fill hadoopClustersCombo with hadoop cluster infos
         if (clusters.size() > 0) {
-            for (Config hadoopClusterInfo : clusters) {
+            for (org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopClusterInfo : clusters) {
                 hadoopClustersCombo.addItem(hadoopClusterInfo);
                 hadoopClustersCombo.setItemCaption(hadoopClusterInfo,
                         hadoopClusterInfo.getClusterName());
             }
         }
 
+        //fill zkClustersCombo with hadoop cluster infos
+        if (zkClusters.size() > 0) {
+            for (org.safehaus.kiskis.mgmt.api.zookeeper.Config zkInfo : zkClusters) {
+                zkClustersCombo.addItem(zkInfo);
+                zkClustersCombo.setItemCaption(zkInfo, zkInfo.getClusterName());
+            }
+        }
+
         //try to find hadoop cluster info based on one saved in the configuration
-        Config info = AccumuloUI.getDbManager().
-                getInfo(Config.PRODUCT_KEY,
-                        wizard.getConfig().getClusterName(),
-                        Config.class);
+        org.safehaus.kiskis.mgmt.api.hadoop.Config info = AccumuloUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
         //select if saved found
         if (info != null) {
@@ -73,10 +80,22 @@ public class ConfigurationStep extends Panel {
             //select first one if saved not found
             hadoopClustersCombo.setValue(clusters.iterator().next());
         }
+        //try to find zk cluster info based on one saved in the configuration
+        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkInfo = AccumuloUI.getZookeeperManager().getCluster(wizard.getConfig().getZkClusterName());
+        //select if saved found
+        if (zkInfo != null) {
+            zkClustersCombo.setValue(zkInfo);
+            zkClustersCombo.setItemCaption(zkInfo,
+                    zkInfo.getClusterName());
+        } else if (zkClusters.size() > 0) {
+            //select first one if saved not found
+            zkClustersCombo.setValue(zkClusters.iterator().next());
+        }
+
 
         //fill selection controls with hadoop nodes
         if (hadoopClustersCombo.getValue() != null) {
-            Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
+            org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo = (org.safehaus.kiskis.mgmt.api.hadoop.Config) hadoopClustersCombo.getValue();
 
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
 
@@ -87,19 +106,36 @@ public class ConfigurationStep extends Panel {
             setTwinSelectDS(slavesSelect, hadoopInfo.getAllNodes());
         }
 
+        if (zkClustersCombo.getValue() != null) {
+            org.safehaus.kiskis.mgmt.api.zookeeper.Config zookeeperInfo = (org.safehaus.kiskis.mgmt.api.zookeeper.Config) zkClustersCombo.getValue();
+            wizard.getConfig().setZkClusterName(zookeeperInfo.getClusterName());
+        }
+
         //on hadoop cluster change reset all controls and config
         hadoopClustersCombo.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    Config hadoopInfo = (Config) event.getProperty().getValue();
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo = (org.safehaus.kiskis.mgmt.api.hadoop.Config) event.getProperty().getValue();
                     setComboDS(masterNodeCombo, hadoopInfo.getAllNodes());
                     setComboDS(gcNodeCombo, hadoopInfo.getAllNodes());
                     setComboDS(monitorNodeCombo, hadoopInfo.getAllNodes());
                     setTwinSelectDS(tracersSelect, hadoopInfo.getAllNodes());
                     setTwinSelectDS(slavesSelect, hadoopInfo.getAllNodes());
+                    String zkClusterName = wizard.getConfig().getZkClusterName();
                     wizard.getConfig().reset();
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
+                    wizard.getConfig().setZkClusterName(zkClusterName);
+                }
+            }
+        });
+
+        zkClustersCombo.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() != null) {
+                    org.safehaus.kiskis.mgmt.api.zookeeper.Config zookeeperInfo = (org.safehaus.kiskis.mgmt.api.zookeeper.Config) event.getProperty().getValue();
+                    wizard.getConfig().setZkClusterName(zookeeperInfo.getClusterName());
                 }
             }
         });
@@ -124,7 +160,7 @@ public class ConfigurationStep extends Panel {
                 if (event.getProperty().getValue() != null) {
                     Agent masterNode = (Agent) event.getProperty().getValue();
                     wizard.getConfig().setMasterNode(masterNode);
-                    Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo = (org.safehaus.kiskis.mgmt.api.hadoop.Config) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.remove(masterNode);
                     gcNodeCombo.removeListener(gcNodeComboChangeListener);
@@ -146,7 +182,7 @@ public class ConfigurationStep extends Panel {
                 if (event.getProperty().getValue() != null) {
                     Agent gcNode = (Agent) event.getProperty().getValue();
                     wizard.getConfig().setGcNode(gcNode);
-                    Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo = (org.safehaus.kiskis.mgmt.api.hadoop.Config) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.remove(gcNode);
                     masterNodeCombo.removeListener(masterNodeComboChangeListener);
@@ -211,6 +247,8 @@ public class ConfigurationStep extends Panel {
 
                 if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
+                } else if (Strings.isNullOrEmpty(wizard.getConfig().getZkClusterName())) {
+                    show("Please, select Zookeeper cluster");
                 } else if (wizard.getConfig().getMasterNode() == null) {
                     show("Please, select master node");
                 } else if (wizard.getConfig().getGcNode() == null) {
@@ -245,12 +283,13 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent(next);
 
         content.addComponent(hadoopClustersCombo, 0, 0);
-        content.addComponent(masterNodeCombo, 1, 0);
-        content.addComponent(gcNodeCombo, 2, 0);
-        content.addComponent(monitorNodeCombo, 3, 0);
-        content.addComponent(tracersSelect, 0, 1, 3, 1);
-        content.addComponent(slavesSelect, 0, 2, 3, 2);
-        content.addComponent(buttons, 0, 3, 3, 3);
+        content.addComponent(zkClustersCombo, 1, 0);
+        content.addComponent(masterNodeCombo, 2, 0);
+        content.addComponent(gcNodeCombo, 3, 0);
+        content.addComponent(monitorNodeCombo, 4, 0);
+        content.addComponent(tracersSelect, 0, 1, 4, 1);
+        content.addComponent(slavesSelect, 0, 2, 4, 2);
+        content.addComponent(buttons, 0, 3, 4, 3);
 
         addComponent(layout);
 

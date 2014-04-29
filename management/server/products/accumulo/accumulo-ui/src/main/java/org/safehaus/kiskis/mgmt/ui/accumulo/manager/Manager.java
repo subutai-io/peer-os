@@ -5,9 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.accumulo.manager;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
@@ -16,22 +14,27 @@ import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
+import org.safehaus.kiskis.mgmt.ui.accumulo.common.UiUtil;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 /**
+ * TODO add zk refresh option
+ *
  * @author dilshat
  */
 public class Manager {
 
     private final VerticalLayout contentRoot;
     private final ComboBox clusterCombo;
-    private final Table nodesTable;
+    private final Table mastersTable;
+    private final Table tracersTable;
+    private final Table slavesTable;
     private Config config;
 
     public Manager() {
@@ -50,7 +53,9 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        nodesTable = createTableTemplate("Nodes", 200);
+        mastersTable = UiUtil.createTableTemplate("Masters", 200, contentRoot.getWindow());
+        tracersTable = UiUtil.createTableTemplate("Tracers", 200, contentRoot.getWindow());
+        slavesTable = UiUtil.createTableTemplate("Slaves", 200, contentRoot.getWindow());
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -91,7 +96,9 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                checkNodesStatus(nodesTable);
+                checkNodesStatus(mastersTable);
+                checkNodesStatus(slavesTable);
+                checkNodesStatus(tracersTable);
             }
 
         });
@@ -102,7 +109,9 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                startAllNodes(nodesTable);
+                startAllNodes(mastersTable);
+                startAllNodes(slavesTable);
+                startAllNodes(tracersTable);
             }
 
         });
@@ -113,7 +122,9 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                stopAllNodes(nodesTable);
+                stopAllNodes(mastersTable);
+                stopAllNodes(slavesTable);
+                stopAllNodes(tracersTable);
             }
 
         });
@@ -145,7 +156,7 @@ public class Manager {
                             }
                     );
                 } else {
-                    show("Please, select cluster");
+                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
                 }
             }
 
@@ -153,82 +164,99 @@ public class Manager {
 
         controlsContent.addComponent(destroyClusterBtn);
 
-        Button addNodeBtn = new Button("Add Node");
-
-        addNodeBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Confirm adding node",
-                            String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = AccumuloUI.getAccumuloManager().addNode(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                    );
-                } else {
-                    show("Please, select cluster");
-                }
-            }
-        });
-
-        controlsContent.addComponent(addNodeBtn);
+        //use add node window
+//        Button addTracerBtn = new Button("Add Tracer");
+//
+//        addTracerBtn.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                if (config != null) {
+//                    MgmtApplication.showConfirmationDialog(
+//                            "Confirm adding tracer",
+//                            String.format("Do you want to add tracer to the %s cluster?", config.getClusterName()),
+//                            "Yes", "No", new ConfirmationDialogCallback() {
+//
+//                                @Override
+//                                public void response(boolean ok) {
+//                                    if (ok) {
+//                                        UUID trackID = AccumuloUI.getAccumuloManager().addNode(config.getClusterName(), NodeType.TRACER);
+//                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+//
+//                                            public void windowClose(Window.CloseEvent e) {
+//                                                refreshClustersInfo();
+//                                            }
+//                                        });
+//                                    }
+//                                }
+//                            }
+//                    );
+//                } else {
+//                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
+//                }
+//            }
+//        });
+//
+//        controlsContent.addComponent(addTracerBtn);
+//
+//        Button addSlaveBtn = new Button("Add Slave");
+//
+//        addSlaveBtn.addListener(new Button.ClickListener() {
+//
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                if (config != null) {
+//                    MgmtApplication.showConfirmationDialog(
+//                            "Confirm adding slave",
+//                            String.format("Do you want to add slave to the %s cluster?", config.getClusterName()),
+//                            "Yes", "No", new ConfirmationDialogCallback() {
+//
+//                                @Override
+//                                public void response(boolean ok) {
+//                                    if (ok) {
+//                                        UUID trackID = AccumuloUI.getAccumuloManager().addNode(config.getClusterName(), NodeType.SLAVE);
+//                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+//
+//                                            public void windowClose(Window.CloseEvent e) {
+//                                                refreshClustersInfo();
+//                                            }
+//                                        });
+//                                    }
+//                                }
+//                            }
+//                    );
+//                } else {
+//                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
+//                }
+//            }
+//        });
+//
+//        controlsContent.addComponent(addSlaveBtn);
 
         content.addComponent(controlsContent);
 
-        content.addComponent(nodesTable);
+        content.addComponent(mastersTable);
+        content.addComponent(tracersTable);
+        content.addComponent(slavesTable);
 
     }
 
     public static void checkNodesStatus(Table table) {
-        for (Object o : table.getItemIds()) {
-            int rowId = (Integer) o;
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-            checkBtn.click();
-        }
+        UiUtil.clickAllButtonsInTable(table, "Check");
     }
 
     public static void startAllNodes(Table table) {
-        for (Object o : table.getItemIds()) {
-            int rowId = (Integer) o;
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Start").getValue());
-            checkBtn.click();
-        }
+        UiUtil.clickAllButtonsInTable(table, "Start");
+
     }
 
     public static void stopAllNodes(Table table) {
-        for (Object o : table.getItemIds()) {
-            int rowId = (Integer) o;
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Stop").getValue());
-            checkBtn.click();
-        }
+        UiUtil.clickAllButtonsInTable(table, "Stop");
+
     }
 
-    public Component getContent() {
-        return contentRoot;
-    }
 
-    private void show(String notification) {
-        contentRoot.getWindow().showNotification(notification);
-    }
-
-    private void populateTable(final Table table, Set<Agent> agents) {
+    private void populateTable(final Table table, Set<Agent> agents, final boolean masters) {
 
         table.removeAllItems();
 
@@ -240,6 +268,7 @@ public class Manager {
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
+            destroyBtn.setEnabled(!masters);
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
@@ -271,7 +300,7 @@ public class Manager {
                                 } else if (state == NodeState.STOPPED) {
                                     startBtn.setEnabled(true);
                                 }
-                                destroyBtn.setEnabled(true);
+                                destroyBtn.setEnabled(!masters);
                                 progressIcon.setVisible(false);
                             }
                         }
@@ -298,7 +327,7 @@ public class Manager {
                                 } else {
                                     startBtn.setEnabled(true);
                                 }
-                                destroyBtn.setEnabled(true);
+                                destroyBtn.setEnabled(!masters);
                                 progressIcon.setVisible(false);
                             }
                         }
@@ -326,7 +355,7 @@ public class Manager {
                                 } else {
                                     stopBtn.setEnabled(true);
                                 }
-                                destroyBtn.setEnabled(true);
+                                destroyBtn.setEnabled(!masters);
                                 progressIcon.setVisible(false);
                             }
                         }
@@ -366,9 +395,17 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-//            populateTable(nodesTable, config.getNodes());
+            populateTable(slavesTable, config.getSlaves(), false);
+            populateTable(tracersTable, config.getTracers(), false);
+            Set<Agent> masters = new HashSet<Agent>();
+            masters.add(config.getMasterNode());
+            masters.add(config.getGcNode());
+            masters.add(config.getMonitor());
+            populateTable(mastersTable, masters, true);
         } else {
-            nodesTable.removeAllItems();
+            slavesTable.removeAllItems();
+            tracersTable.removeAllItems();
+            mastersTable.removeAllItems();
         }
     }
 
@@ -395,36 +432,9 @@ public class Manager {
         }
     }
 
-    private Table createTableTemplate(String caption, int size) {
-        final Table table = new Table(caption);
-        table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
-        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(size, Sizeable.UNITS_PIXELS);
-        table.setPageLength(10);
-        table.setSelectable(false);
-        table.setImmediate(true);
-
-        table.addListener(new ItemClickEvent.ItemClickListener() {
-
-            public void itemClick(ItemClickEvent event) {
-                if (event.isDoubleClick()) {
-                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                    Agent lxcAgent = AccumuloUI.getAgentManager().getAgentByHostname(lxcHostname);
-                    if (lxcAgent != null) {
-                        Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
-                        MgmtApplication.addCustomWindow(terminal);
-                    } else {
-                        show("Agent is not connected");
-                    }
-                }
-            }
-        });
-        return table;
+    public Component getContent() {
+        return contentRoot;
     }
+
 
 }

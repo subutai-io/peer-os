@@ -53,6 +53,12 @@ public class Commands extends CommandsSingleton {
                 Util.wrapAgentToSet(agent));
     }
 
+    public static Command getRestartCommand(Agent agent) {
+        return createCommand(
+                new RequestBuilder("/etc/init.d/accumulo restart"),
+                Util.wrapAgentToSet(agent));
+    }
+
     public static Command getStatusCommand(Agent agent) {
         return createCommand(
                 new RequestBuilder("/etc/init.d/accumulo status"),
@@ -150,5 +156,21 @@ public class Commands extends CommandsSingleton {
         return createCommand(
                 new RequestBuilder(String.format(". /etc/profile && accumulo-property.sh clear %s", propertyName)),
                 nodes);
+    }
+
+    public static Command getBindZKClusterCommand(Set<Agent> nodes, Set<Agent> zkNodes) {
+        StringBuilder zkNodesCommaSeparated = new StringBuilder();
+        for (Agent zkNode : zkNodes) {
+            zkNodesCommaSeparated.append(zkNode.getHostname()).append(":2181,");
+        }
+
+        zkNodesCommaSeparated.delete(zkNodesCommaSeparated.length() - 1, zkNodesCommaSeparated.length());
+        return createCommand(
+                new RequestBuilder(
+                        String.format(". /etc/profile && accumulo-conf.sh add accumulo-site.xml instance.zookeeper.host %s",
+                                zkNodesCommaSeparated)
+                ),
+                nodes
+        );
     }
 }

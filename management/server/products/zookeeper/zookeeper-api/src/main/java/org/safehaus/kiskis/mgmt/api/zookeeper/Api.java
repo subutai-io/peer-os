@@ -35,4 +35,7 @@ public interface Api {
      *
      */
     public List<Config> getClusters();
+
+    public Config getCluster(String clusterName);
 }
+

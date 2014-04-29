@@ -3,12 +3,12 @@ package org.safehaus.kiskis.mgmt.impl.accumulo;
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
+import org.safehaus.kiskis.mgmt.api.accumulo.NodeType;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -17,8 +17,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,7 +50,6 @@ public class AccumuloImpl implements Accumulo {
     }
 
     public UUID installCluster(final Config config) {
-//        Preconditions.checkNotNull(config, "Configuration is null");
 
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Accumulo");
 
@@ -65,6 +62,7 @@ public class AccumuloImpl implements Accumulo {
                         || config.getGcNode() == null
                         || config.getMonitor() == null
                         || Strings.isNullOrEmpty(config.getClusterName())
+                        || Strings.isNullOrEmpty(config.getZkClusterName())
                         || Util.isCollectionEmpty(config.getTracers())
                         || Util.isCollectionEmpty(config.getSlaves())
                         ) {
@@ -76,6 +74,13 @@ public class AccumuloImpl implements Accumulo {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
                 }
+                org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.zookeeper.Config.PRODUCT_KEY, config.getZkClusterName(), org.safehaus.kiskis.mgmt.api.zookeeper.Config.class);
+
+                if (zkConfig == null) {
+                    po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getZkClusterName()));
+                    return;
+                }
+
                 po.addLog("Updating db...");
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
 
@@ -114,15 +119,24 @@ public class AccumuloImpl implements Accumulo {
                                         commandRunner.runCommand(setSlavesCommand);
 
                                         if (setSlavesCommand.hasSucceeded()) {
-                                            po.addLog("Setting slaves succeeded\nStarting cluster...");
+                                            po.addLog("Setting slaves succeeded\nSetting ZK cluster...");
 
-                                            Command startClusterCommand = Commands.getStartCommand(config.getAllNodes());
-                                            commandRunner.runCommand(startClusterCommand);
+                                            Command setZkClusterCommand = Commands.getBindZKClusterCommand(config.getAllNodes(), zkConfig.getNodes());
+                                            commandRunner.runCommand(setZkClusterCommand);
 
-                                            if (startClusterCommand.hasSucceeded()) {
-                                                po.addLogDone("Cluster started successfully\nDone");
+                                            if (setZkClusterCommand.hasSucceeded()) {
+                                                po.addLog("Setting ZK cluster succeeded\nStarting cluster...");
+
+                                                Command startClusterCommand = Commands.getStartCommand(config.getAllNodes());
+                                                commandRunner.runCommand(startClusterCommand);
+
+                                                if (startClusterCommand.hasSucceeded()) {
+                                                    po.addLogDone("Cluster started successfully\nDone");
+                                                } else {
+                                                    po.addLogFailed(String.format("Starting cluster failed, %s", startClusterCommand.getAllErrors()));
+                                                }
                                             } else {
-                                                po.addLogFailed(String.format("Starting cluster failed, %s", startClusterCommand.getAllErrors()));
+                                                po.addLogFailed(String.format("Setting ZK cluster failed, %s", setZkClusterCommand.getAllErrors()));
                                             }
 
                                         } else {
@@ -198,6 +212,7 @@ public class AccumuloImpl implements Accumulo {
         return po.getId();
     }
 
+    //@todo check output
     public UUID startNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -253,6 +268,7 @@ public class AccumuloImpl implements Accumulo {
         return po.getId();
     }
 
+    //@todo check output
     public UUID stopNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -306,6 +322,7 @@ public class AccumuloImpl implements Accumulo {
         return po.getId();
     }
 
+    //@todo check output
     public UUID checkNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -360,6 +377,7 @@ public class AccumuloImpl implements Accumulo {
         return po.getId();
     }
 
+    //@todo check node type and update config accordingly
     public UUID destroyNode(final String clusterName, final String lxcHostName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -419,50 +437,87 @@ public class AccumuloImpl implements Accumulo {
         return po.getId();
     }
 
-    public UUID addNode(final String clusterName) {
+    //@todo add zk settings command
+    public UUID addNode(final String clusterName, final String lxcHostname, final NodeType nodeType) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Adding node to %s", clusterName));
+                String.format("Adding node %s of type %s to %s", lxcHostname, nodeType, clusterName));
 
         executor.execute(new Runnable() {
 
             public void run() {
+
+                if (Strings.isNullOrEmpty(clusterName) || Strings.isNullOrEmpty(lxcHostname) || nodeType == null) {
+                    po.addLogFailed("Malformed arguments passed");
+                    return;
+                }
                 Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
-                try {
+                Agent lxcAgent = agentManager.getAgentByHostname(lxcHostname);
+                if (lxcAgent == null) {
+                    po.addLogFailed(String.format("Agent %s is not connected\nOperation aborted", lxcHostname));
+                    return;
+                }
 
-                    po.addLog("Creating lxc container...");
+                if (config.getAllNodes().contains(lxcAgent)) {
+                    po.addLogFailed(String.format("Agent %s already belongs to this cluster\nOperation aborted", lxcHostname));
+                    return;
+                }
 
-                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(1);
+                if (nodeType == NodeType.SLAVE) {
+                    config.getSlaves().add(lxcAgent);
+                } else {
+                    config.getTracers().add(lxcAgent);
+                }
 
-                    Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
+                po.addLog(String.format("Installing %s on %s node...", Config.PRODUCT_KEY, nodeType));
 
-//                    config.getNodes().add(lxcAgent);
-                    po.addLog("Lxc container created successfully\nUpdating db...");
-                    if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
-                        po.addLog("Cluster info updated in DB\nInstalling Accumulo...");
+                Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
+                commandRunner.runCommand(installCommand);
 
-                        Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
-                        commandRunner.runCommand(installCommand);
+                if (installCommand.hasSucceeded()) {
+                    po.addLog("Installation succeeded\nRegistering node with cluster...");
 
-                        if (installCommand.hasSucceeded()) {
-                            po.addLogDone("Installation succeeded\nDone");
+                    Command addNodeCommand;
+                    if (nodeType == NodeType.SLAVE) {
+                        addNodeCommand = Commands.getAddSlavesCommand(config.getAllNodes(), Util.wrapAgentToSet(lxcAgent));
+                    } else {
+                        addNodeCommand = Commands.getAddTracersCommand(config.getAllNodes(), Util.wrapAgentToSet(lxcAgent));
+                    }
+                    commandRunner.runCommand(addNodeCommand);
 
+                    if (addNodeCommand.hasSucceeded()) {
+                        po.addLog("Node registration succeeded\nRestarting cluster...");
+
+                        Command restartClusterCommand = Commands.getRestartCommand(config.getMasterNode());
+                        commandRunner.runCommand(restartClusterCommand);
+
+                        if (restartClusterCommand.hasSucceeded()) {
+                            po.addLogDone("Cluster restarted successfully\nDone");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s",
-                                    installCommand.getAllErrors()));
+                            po.addLogFailed(String.format("Cluster restart failed, %s", restartClusterCommand.getAllErrors()));
                         }
                     } else {
-                        po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
+                        po.addLogFailed(String.format("Adding node failed, %s",
+                                addNodeCommand.getAllErrors()));
                     }
 
-                } catch (LxcCreateException ex) {
-                    po.addLogFailed(ex.getMessage());
+                } else {
+                    po.addLogFailed(String.format("Installation failed, %s",
+                            installCommand.getAllErrors()));
                 }
+
+//                if (dbManager.saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+//                    po.addLog("Cluster info updated in DB\nInstalling Accumulo...");
+//
+//
+//                } else {
+//                    po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
+//                }
             }
         });
 
