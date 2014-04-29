@@ -35,17 +35,12 @@ public class VerificationStep extends Panel {
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
         cfgView.addStringCfg("Master node", wizard.getConfig().getMasterNode().getHostname());
         cfgView.addStringCfg("GC node", wizard.getConfig().getGcNode().getHostname());
+        cfgView.addStringCfg("Monitor node", wizard.getConfig().getMonitor().getHostname());
         for (Agent agent : wizard.getConfig().getTracers()) {
             cfgView.addStringCfg("Tracers", agent.getHostname());
         }
-        for (Agent agent : wizard.getConfig().getMonitors()) {
-            cfgView.addStringCfg("Monitors", agent.getHostname());
-        }
-        for (Agent agent : wizard.getConfig().getLoggers()) {
-            cfgView.addStringCfg("Loggers", agent.getHostname());
-        }
-        for (Agent agent : wizard.getConfig().getTabletServers()) {
-            cfgView.addStringCfg("Tablet servers", agent.getHostname());
+        for (Agent agent : wizard.getConfig().getSlaves()) {
+            cfgView.addStringCfg("Slaves", agent.getHostname());
         }
 
         Button install = new Button("Install");

@@ -63,11 +63,10 @@ public class AccumuloImpl implements Accumulo {
                 if (config == null
                         || config.getMasterNode() == null
                         || config.getGcNode() == null
+                        || config.getMonitor() == null
                         || Strings.isNullOrEmpty(config.getClusterName())
                         || Util.isCollectionEmpty(config.getTracers())
-                        || Util.isCollectionEmpty(config.getMonitors())
-                        || Util.isCollectionEmpty(config.getLoggers())
-                        || Util.isCollectionEmpty(config.getTabletServers())
+                        || Util.isCollectionEmpty(config.getSlaves())
                         ) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
@@ -97,55 +96,45 @@ public class AccumuloImpl implements Accumulo {
                             Command setGCNodeCommand = Commands.getAddGCCommand(config.getAllNodes(), config.getGcNode());
                             commandRunner.runCommand(setGCNodeCommand);
                             if (setGCNodeCommand.hasSucceeded()) {
-                                po.addLog("Setting GC node succeeded\nSetting tracers...");
+                                po.addLog("Setting GC node succeeded\nSetting monitor node...");
 
-                                Command setTracersCommand = Commands.getAddTracersCommand(config.getAllNodes(), config.getTracers());
-                                commandRunner.runCommand(setTracersCommand);
+                                Command setMonitorCommand = Commands.getAddMonitorCommand(config.getAllNodes(), config.getMonitor());
+                                commandRunner.runCommand(setMonitorCommand);
 
-                                if (setTracersCommand.hasSucceeded()) {
-                                    po.addLog("Setting tracers succeeded\nSetting monitors...");
+                                if (setMonitorCommand.hasSucceeded()) {
+                                    po.addLog("Setting monitor node succeeded\nSetting tracers...");
 
-                                    Command setMonitorsCommand = Commands.getAddMonitorsCommand(config.getAllNodes(), config.getMonitors());
-                                    commandRunner.runCommand(setMonitorsCommand);
+                                    Command setTracersCommand = Commands.getAddTracersCommand(config.getAllNodes(), config.getTracers());
+                                    commandRunner.runCommand(setTracersCommand);
 
-                                    if (setMonitorsCommand.hasSucceeded()) {
-                                        po.addLog("Setting tracers succeeded\nSetting loggers...");
+                                    if (setTracersCommand.hasSucceeded()) {
+                                        po.addLog("Setting tracers succeeded\nSetting slaves...");
 
-                                        Command setLoggersCommand = Commands.getAddSlavesCommand(config.getAllNodes(), config.getLoggers());
-                                        commandRunner.runCommand(setLoggersCommand);
+                                        Command setSlavesCommand = Commands.getAddSlavesCommand(config.getAllNodes(), config.getSlaves());
+                                        commandRunner.runCommand(setSlavesCommand);
 
-                                        if (setLoggersCommand.hasSucceeded()) {
-                                            po.addLog("Setting tracers succeeded\nSetting tablet servers...");
+                                        if (setSlavesCommand.hasSucceeded()) {
+                                            po.addLog("Setting slaves succeeded\nStarting cluster...");
 
-                                            Command setTabletServersCommand = Commands.getAddSlavesCommand(config.getAllNodes(), config.getTabletServers());
-                                            commandRunner.runCommand(setTabletServersCommand);
+                                            Command startClusterCommand = Commands.getStartCommand(config.getAllNodes());
+                                            commandRunner.runCommand(startClusterCommand);
 
-                                            if (setTabletServersCommand.hasSucceeded()) {
-                                                po.addLog("Setting tablet servers succeeded\nStarting cluster...");
-
-                                                Command startClusterCommand = Commands.getStartCommand(config.getAllNodes());
-                                                commandRunner.runCommand(startClusterCommand);
-
-                                                if (startClusterCommand.hasSucceeded()) {
-                                                    po.addLogDone("Cluster started successfully\nDone");
-                                                } else {
-                                                    po.addLogFailed(String.format("Starting cluster failed, %s", startClusterCommand.getAllErrors()));
-                                                }
-
+                                            if (startClusterCommand.hasSucceeded()) {
+                                                po.addLogDone("Cluster started successfully\nDone");
                                             } else {
-                                                po.addLogFailed(String.format("Setting tablet servers failed, %s", setTabletServersCommand.getAllErrors()));
+                                                po.addLogFailed(String.format("Starting cluster failed, %s", startClusterCommand.getAllErrors()));
                                             }
 
                                         } else {
-                                            po.addLogFailed(String.format("Setting loggers failed, %s", setLoggersCommand.getAllErrors()));
+                                            po.addLogFailed(String.format("Setting slaves failed, %s", setSlavesCommand.getAllErrors()));
                                         }
 
                                     } else {
-                                        po.addLogFailed(String.format("Setting monitors failed, %s", setMonitorsCommand.getAllErrors()));
+                                        po.addLogFailed(String.format("Setting tracers failed, %s", setTracersCommand.getAllErrors()));
                                     }
 
                                 } else {
-                                    po.addLogFailed(String.format("Setting tracers failed, %s", setTracersCommand.getAllErrors()));
+                                    po.addLogFailed(String.format("Setting monitor failed, %s", setMonitorCommand.getAllErrors()));
                                 }
 
                             } else {

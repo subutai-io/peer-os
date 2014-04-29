@@ -65,13 +65,7 @@ public class Commands extends CommandsSingleton {
                 nodes);
     }
 
-    public static Command getClearMasterCommand(Set<Agent> nodes, Agent masterNode) {
-        return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh masters clear %s", masterNode.getHostname())),
-                nodes);
-    }
-
-    public static Command getClearAllMastersCommand(Set<Agent> nodes) {
+    public static Command getClearMasterCommand(Set<Agent> nodes) {
         return createCommand(
                 new RequestBuilder(". /etc/profile && accumuloMastersConf.sh masters clear"),
                 nodes);
@@ -93,7 +87,7 @@ public class Commands extends CommandsSingleton {
                 nodes);
     }
 
-    public static Command getClearAllTracersCommand(Set<Agent> nodes) {
+    public static Command getClearTracersCommand(Set<Agent> nodes) {
         return createCommand(
                 new RequestBuilder(". /etc/profile && accumuloMastersConf.sh tracers clear"),
                 nodes);
@@ -105,26 +99,22 @@ public class Commands extends CommandsSingleton {
                 nodes);
     }
 
-//    public static Command getClearGCCommand(Set<Agent> nodes, Agent gcNode) {
-//        return createCommand(
-//                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh gc clear %s", gcNode.getHostname())),
-//                nodes);
-//    }
-
-    public static Command getClearAllGCsCommand(Set<Agent> nodes) {
+    public static Command getClearGCCommand(Set<Agent> nodes) {
         return createCommand(
                 new RequestBuilder(". /etc/profile && accumuloMastersConf.sh gc clear"),
                 nodes);
     }
 
 
-    public static Command getAddMonitorsCommand(Set<Agent> nodes, Set<Agent> monitors) {
-        StringBuilder monitorsSpaceSeparated = new StringBuilder();
-        for (Agent tracer : monitors) {
-            monitorsSpaceSeparated.append(tracer.getHostname()).append(" ");
-        }
+    public static Command getAddMonitorCommand(Set<Agent> nodes, Agent monitor) {
         return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh monitors add %s", monitorsSpaceSeparated)),
+                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh monitor add %s", monitor.getHostname())),
+                nodes);
+    }
+
+    public static Command getClearMonitorCommand(Set<Agent> nodes) {
+        return createCommand(
+                new RequestBuilder(". /etc/profile && accumuloMastersConf.sh monitor clear"),
                 nodes);
     }
 
@@ -144,7 +134,7 @@ public class Commands extends CommandsSingleton {
                 nodes);
     }
 
-    public static Command getClearAllSlavesCommand(Set<Agent> nodes) {
+    public static Command getClearSlavesCommand(Set<Agent> nodes) {
         return createCommand(
                 new RequestBuilder(". /etc/profile && accumuloSlavesConf.sh slaves clear"),
                 nodes);

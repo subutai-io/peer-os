@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.accumulo;
 
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
+import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -20,7 +21,6 @@ import java.util.concurrent.Executors;
  */
 public class AccumuloUI implements Module {
 
-    public static final String MODULE_NAME = "Accumulo";
     private static Accumulo accumuloManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
@@ -71,11 +71,12 @@ public class AccumuloUI implements Module {
         accumuloManager = null;
         agentManager = null;
         tracker = null;
+        dbManager = null;
         executor.shutdown();
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {
