@@ -5,6 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.impl.cassandra;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandsSingleton;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
@@ -17,7 +20,7 @@ import java.util.Set;
 /**
  * @author dilshat
  */
-public class Commands {
+public class Commands extends CommandsSingleton {
 
     private static final String cassandraYamlConf = "$CASSANDRA_HOME/conf/cassandra.yaml";
 
@@ -43,7 +46,7 @@ public class Commands {
     public static Request getUpdateAptCommand() {
         Request req = getRequestTemplate();
         req.setProgram("sleep 10; apt-get update");
-        req.setStdOut(OutputRedirection.CAPTURE_AND_RETURN);
+        req.setStdOut(OutputRedirection.RETURN);
         req.setTimeout(90);
         return req;
     }
@@ -51,7 +54,7 @@ public class Commands {
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
         req.setProgram("sleep 10; apt-get --force-yes --assume-yes install ksks-cassandra");
-        req.setStdOut(OutputRedirection.CAPTURE_AND_RETURN);
+        req.setStdOut(OutputRedirection.RETURN);
         req.setTimeout(90);
         return req;
     }
@@ -77,8 +80,59 @@ public class Commands {
 
     public static Request getConfigureCommand(String param) {
         Request req = getRequestTemplate();
-        String rpcAddressSed = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh " + param ;
+        String rpcAddressSed = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh " + param;
         req.setProgram(rpcAddressSed);
         return req;
+    }
+
+    public static Command getInstallCommand(Set<Agent> agents) {
+//        AgentRequestBuilder ar = new AgentRequestBuilder(agent, "ls");
+//        Set<AgentRequestBuilder> setAr;
+//        createCommand(setAr);
+
+        return createCommand(
+                new RequestBuilder(
+                        "sleep 10; apt-get --force-yes --assume-yes install ksks-cassandra")
+                        .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+                agents
+        );
+
+    }
+
+    public static Command getStartCommand(Set<Agent> agents) {
+        return createCommand(
+                new RequestBuilder(
+                        "service cassandra start")
+                ,
+                agents
+        );
+    }
+
+    public static Command getStopCommand(Set<Agent> agents) {
+        return createCommand(
+                new RequestBuilder(
+                        "service cassandra stop")
+                ,
+                agents
+        );
+    }
+
+    public static Command getStatusCommand(Set<Agent> agents) {
+        return createCommand(
+                new RequestBuilder(
+                        "service cassandra status")
+                ,
+                agents
+        );
+    }
+
+    public static Command getConfigureCommand(Set<Agent> agents, String param) {
+
+        return createCommand(
+                new RequestBuilder(
+                        String.format("sh cassandra-conf.sh %s", param))
+                ,
+                agents
+        );
     }
 }

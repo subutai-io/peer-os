@@ -3,6 +3,8 @@ package org.safehaus.kiskis.mgmt.impl.cassandra;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
@@ -18,6 +20,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import sun.print.resources.serviceui;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -33,8 +36,10 @@ public class CassandraImpl implements Cassandra {
     private LxcManager lxcManager;
     private ExecutorService executor;
     private NetworkManager networkManager;
+    private CommandRunner commandRunner;
 
     public void init() {
+        Commands.init(commandRunner);
         executor = Executors.newCachedThreadPool();
     }
 
@@ -66,6 +71,9 @@ public class CassandraImpl implements Cassandra {
         this.networkManager = networkManager;
     }
 
+    public void setCommandRunner(CommandRunner commandRunner) {
+        this.commandRunner = commandRunner;
+    }
 
     public UUID installCluster(final Config config) {
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Cassandra");
@@ -130,92 +138,109 @@ public class CassandraImpl implements Cassandra {
                             return;
                         }
 
-                        po.addLog("Updating apt repository...");
+//                        po.addLog("Updating apt repository...");
                         //install
-                        Task updateAptTask = taskRunner.executeTaskNWait(Tasks.getUpdateAptTask(nodes));
+//                        Task updateAptTask = taskRunner.executeTaskNWait(Tasks.getUpdateAptTask(nodes));
 
-                        if (updateAptTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Update succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", updateAptTask.getFirstError()));
-                            return;
-                        }
+
+//                        if (updateAptTask.getTaskStatus() == TaskStatus.SUCCESS) {
+//                            po.addLog("Update succeeded");
+//                        } else {
+//                            po.addLogFailed(String.format("Installation failed, %s", updateAptTask.getFirstError()));
+//                            return;
+//                        }
 
                         //install
+
                         po.addLog("Installing...");
-                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(nodes));
+//                        Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(nodes));
+                        Command installCommand = Commands.getInstallCommand(nodes);
+                        commandRunner.runCommand(installCommand);
 
-                        if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (installCommand.hasSucceeded()) {
                             po.addLog("Installation succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
                             return;
                         }
 
                         // setting cluster name
                         po.addLog("\nSetting cluster name " + config.getClusterName());
 
-                        Task setClusterName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "cluster_name " + config.getClusterName()));
+//                        Task setClusterName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "cluster_name " + config.getClusterName()));
 
-                        if (setClusterName.getTaskStatus() == TaskStatus.SUCCESS) {
+                        Command setClusterNameCommand = Commands.getConfigureCommand(nodes, "cluster_name " + config.getClusterName());
+                        commandRunner.runCommand(setClusterNameCommand);
+
+                        if (setClusterNameCommand.hasSucceeded()) {
                             po.addLog("Configure cluster name succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setClusterName.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", setClusterNameCommand.getAllErrors()));
                             return;
                         }
 
                         // setting data directory name
-                        po.addLog("\nSetting data directory: " + config.getDataDirectory());
-                        Task setDataDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "data_dir " + config.getDataDirectory()));
+//                        Task setDataDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "data_dir " + config.getDataDirectory()));
 
-                        if (setDataDirName.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("\nSetting data directory: " + config.getDataDirectory());
+                        Command setDataDirCommand = Commands.getConfigureCommand(nodes, "data_dir " + config.getDataDirectory());
+                        commandRunner.runCommand(setDataDirCommand);
+
+                        if (setDataDirCommand.hasSucceeded()) {
                             po.addLog("Configure data directory succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setDataDirName.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", setDataDirCommand.getAllErrors()));
                             return;
                         }
 
                         // setting commit log directory
                         po.addLog("\nSetting commit directory: " + config.getCommitLogDirectory());
-                        Task setCommitDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "commitlog_dir " + config.getCommitLogDirectory()));
+                        Command setCommitDirCommand = Commands.getConfigureCommand(nodes, "commitlog_dir " + config.getCommitLogDirectory());
+                        commandRunner.runCommand(setCommitDirCommand);
 
-                        if (setCommitDirName.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Configure data directory succeeded");
+                        if (setCommitDirCommand.hasSucceeded()) {
+                            po.addLog("Configure commit directory succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setCommitDirName.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", setCommitDirCommand.getAllErrors()));
                             return;
                         }
 
                         // setting saved cache directory
                         po.addLog("\nSetting saved cache directory: " + config.getSavedCachesDirectory());
-                        Task setSavedCacheDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "saved_cache_dir " + config.getSavedCachesDirectory()));
+//                        Task setSavedCacheDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "saved_cache_dir " + config.getSavedCachesDirectory()));
+                        Command setSavedCacheDirCommand = Commands.getConfigureCommand(nodes,"saved_cache_dir " + config.getSavedCachesDirectory());
+                        commandRunner.runCommand(setSavedCacheDirCommand);
 
-                        if (setSavedCacheDirName.getTaskStatus() == TaskStatus.SUCCESS) {
+                        if (setSavedCacheDirCommand.hasSucceeded()) {
                             po.addLog("Configure saved cache directory succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setSavedCacheDirName.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", setSavedCacheDirCommand.getAllErrors()));
                             return;
                         }
 
                         // setting rpc address directory
                         po.addLog("\nSetting rpc address: " + config.getRpcAddressNode().getListIP().get(0));
-                        Task setRpcAddress = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "rpc_address " + config.getRpcAddressNode().getListIP().get(0)));
+//                        Task setRpcAddress = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "rpc_address " + config.getRpcAddressNode().getListIP().get(0)));
+                        Command setRpcAddressCommand =  Commands.getConfigureCommand(nodes, "rpc_address " + config.getRpcAddressNode().getListIP().get(0));
+                        commandRunner.runCommand(setRpcAddressCommand);
 
-                        if (setRpcAddress.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Configure saved cache directory succeeded");
+                        if (setRpcAddressCommand.hasSucceeded()) {
+                            po.addLog("Configure rpc address succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setRpcAddress.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", setRpcAddressCommand.getAllErrors()));
                             return;
                         }
 
                         // setting rpc address directory
                         po.addLog("\nSetting listen address: " + config.getListedAddressNode().getListIP().get(0));
-                        Task setListenAddress = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "listen_address " + config.getListedAddressNode().getListIP().get(0)));
+//                        Task setListenAddress = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "listen_address " + config.getListedAddressNode().getListIP().get(0)));
+                        Command setListenAddressCommand = Commands.getConfigureCommand(nodes, "listen_address " + config.getListedAddressNode().getListIP().get(0));
+                        commandRunner.runCommand(setListenAddressCommand);
 
-                        if (setListenAddress.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLog("Configure saved cache directory succeeded");
+                        if (setListenAddressCommand.hasSucceeded()) {
+                            po.addLog("Configure listen address succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setListenAddress.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", setListenAddressCommand.getAllErrors()));
                             return;
                         }
 
@@ -228,12 +253,16 @@ public class CassandraImpl implements Cassandra {
                         sb.replace(sb.toString().length() - 1, sb.toString().length(), "");
                         sb.append('"');
                         po.addLog("Settings seeds " + sb.toString());
-                        Task setSeeds = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "seeds " + sb.toString()));
 
-                        if (setSeeds.getTaskStatus() == TaskStatus.SUCCESS) {
+//                        Task setSeeds = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "seeds " + sb.toString()));
+
+                        Command setSeedsCommand = Commands.getConfigureCommand(nodes, "seeds " + sb.toString());
+                        commandRunner.runCommand(setSeedsCommand);
+
+                        if (setSeedsCommand.hasSucceeded()) {
                             po.addLog("Configure seeds succeeded");
                         } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setSeeds.getFirstError()));
+                            po.addLogFailed(String.format("Installation failed, %s", setSeedsCommand.getAllErrors()));
                             return;
                         }
                         po.addLog("Installation of Cassandra cluster succeeded");
