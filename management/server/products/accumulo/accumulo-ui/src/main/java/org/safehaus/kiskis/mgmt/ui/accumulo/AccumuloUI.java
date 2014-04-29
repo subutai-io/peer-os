@@ -27,14 +27,13 @@ public class AccumuloUI implements Module {
     private static Api zookeeperManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
-    //    private static DbManager dbManager;
     private static ExecutorService executor;
 
     public static Api getZookeeperManager() {
         return zookeeperManager;
     }
 
-    public static void setZookeeperManager(Api zookeeperManager) {
+    public void setZookeeperManager(Api zookeeperManager) {
         AccumuloUI.zookeeperManager = zookeeperManager;
     }
 
@@ -42,17 +41,9 @@ public class AccumuloUI implements Module {
         return hadoopManager;
     }
 
-    public static void setHadoopManager(Hadoop hadoopManager) {
+    public void setHadoopManager(Hadoop hadoopManager) {
         AccumuloUI.hadoopManager = hadoopManager;
     }
-
-//    public static DbManager getDbManager() {
-//        return dbManager;
-//    }
-//
-//    public void setDbManager(DbManager dbManager) {
-//        AccumuloUI.dbManager = dbManager;
-//    }
 
     public static Tracker getTracker() {
         return tracker;
@@ -90,7 +81,6 @@ public class AccumuloUI implements Module {
         accumuloManager = null;
         agentManager = null;
         tracker = null;
-//        dbManager = null;
         hadoopManager = null;
         zookeeperManager = null;
         executor.shutdown();
