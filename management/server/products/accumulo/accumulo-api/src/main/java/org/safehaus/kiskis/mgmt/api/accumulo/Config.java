@@ -16,8 +16,8 @@ import java.util.Set;
 public class Config {
 
     public static final String PRODUCT_KEY = "Accumulo";
-    private String clusterName;
-    private String zkClusterName;
+    private String clusterName = "";
+    private String zkClusterName = "";
     private Agent masterNode;
     private Agent gcNode;
     private Agent monitor;
@@ -93,8 +93,8 @@ public class Config {
     }
 
     public void reset() {
-        clusterName = null;
-        zkClusterName = null;
+        clusterName = "";
+        zkClusterName = "";
         masterNode = null;
         gcNode = null;
         monitor = null;
