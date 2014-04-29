@@ -20,7 +20,7 @@ public interface Command {
      * command.getCommandStatus == CommandStatus.SUCCEEDED ||
      * command.getCommandStatus == CommandStatus.FAILED
      *
-     * @return
+     * @return - true if completed, false otherwise
      */
     public boolean hasCompleted();
 
@@ -28,14 +28,14 @@ public interface Command {
      * Shows if command has succeeded. The same as checking
      * command.getCommandStatus == CommandStatus.SUCCEEDED
      *
-     * @return
+     * @return - true if succeeded, false otherwise
      */
     public boolean hasSucceeded();
 
     /**
      * Returns command status
      *
-     * @return
+     * @return - status of command
      */
     public CommandStatus getCommandStatus();
 
@@ -43,7 +43,7 @@ public interface Command {
      * Returns map of results from agents where key is agent's UUID and value is
      * instance of AgentResult
      *
-     * @return
+     * @return - map of agents' results
      */
     public Map<UUID, AgentResult> getResults();
 
@@ -55,18 +55,18 @@ public interface Command {
     public UUID getCommandUUID();
 
     /**
-     * Lets assign custom object to this command
-     *
-     * @param data - custom object
-     */
-    public void setData(Object data);
-
-    /**
      * Returns custom object assigned to this command
      *
      * @return - custom object assigned to this command or null
      */
     public Object getData();
+
+    /**
+     * Lets assign custom object to this command
+     *
+     * @param data - custom object
+     */
+    public void setData(Object data);
 
     /**
      * Returns all std err outputs from agents joined in one string

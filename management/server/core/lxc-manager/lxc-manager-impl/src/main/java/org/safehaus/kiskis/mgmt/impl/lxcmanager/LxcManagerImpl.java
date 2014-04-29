@@ -6,20 +6,22 @@
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
+import org.safehaus.kiskis.mgmt.api.monitor.Metric;
+import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.monitor.Metric;
-import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 
 /**
  * This is an implementation of LxcManager
@@ -29,12 +31,18 @@ import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 public class LxcManagerImpl implements LxcManager {
 
     private final Pattern p = Pattern.compile("load average: (.*)");
-    private final int LXC_AGENT_WAIT_TIMEOUT_SEC = 90;
-
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
     private Monitor monitor;
+
+    public LxcManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor) {
+        this.agentManager = agentManager;
+        this.commandRunner = commandRunner;
+        this.monitor = monitor;
+
+        Commands.init(commandRunner);
+    }
 
     public void init() {
         Preconditions.checkNotNull(agentManager, "Agent manager is null");
@@ -45,25 +53,9 @@ public class LxcManagerImpl implements LxcManager {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
     }
 
-    public void setMonitor(Monitor monitor) {
-        this.monitor = monitor;
-    }
-
-    public void setCommandRunner(CommandRunner commandRunner) {
-        LxcManagerImpl.commandRunner = commandRunner;
-    }
-
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
 
     /**
      * Returns metrics of all physical servers connected to the management
@@ -76,7 +68,7 @@ public class LxcManagerImpl implements LxcManager {
         final Map<Agent, ServerMetric> serverMetrics = new HashMap<Agent, ServerMetric>();
         Set<Agent> agents = agentManager.getPhysicalAgents();
         //omit management server
-        for (Iterator<Agent> it = agents.iterator(); it.hasNext();) {
+        for (Iterator<Agent> it = agents.iterator(); it.hasNext(); ) {
             Agent agent = it.next();
             if (!agent.getHostname().matches("^py.*")) {
                 it.remove();
@@ -186,7 +178,7 @@ public class LxcManagerImpl implements LxcManager {
             if (!serverMetrics.isEmpty()) {
                 //get number of lxcs currently present on servers
                 Map<String, EnumMap<LxcState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
-                for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext();) {
+                for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext(); ) {
                     Map.Entry<Agent, ServerMetric> entry = it.next();
                     EnumMap<LxcState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
                     if (info != null) {
@@ -238,7 +230,7 @@ public class LxcManagerImpl implements LxcManager {
     public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
         final Map<String, EnumMap<LxcState, List<String>>> agentFamilies = new HashMap<String, EnumMap<LxcState, List<String>>>();
         Set<Agent> pAgents = agentManager.getPhysicalAgents();
-        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext();) {
+        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext(); ) {
             Agent agent = it.next();
             if (!agent.getHostname().matches("^py.*")) {
                 it.remove();
@@ -274,8 +266,7 @@ public class LxcManagerImpl implements LxcManager {
                                 lxcs.put(LxcState.FROZEN, new ArrayList<String>());
                             }
                             currState = LxcState.FROZEN;
-                        } else if (currState != null
-                                && !Util.isStringEmpty(lxcStr) && lxcStr.contains(Common.PARENT_CHILD_LXC_SEPARATOR)) {
+                        } else if (currState != null && !Common.BASE_CONTAINER_NAME.equalsIgnoreCase(lxcStr.trim()) && !Strings.isNullOrEmpty(lxcStr)) {
                             lxcs.get(currState).add(lxcStr.trim());
                         }
                     }
@@ -292,11 +283,11 @@ public class LxcManagerImpl implements LxcManager {
      * Clones lxc on a given physical server and set its hostname
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname to set for a new lxc
+     * @param lxcHostname   - hostname to set for a new lxc
      * @return true if all went ok, false otherwise
      */
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command cloneLxcCommand = Commands.getCloneCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(cloneLxcCommand);
             return cloneLxcCommand.hasSucceeded();
@@ -308,11 +299,11 @@ public class LxcManagerImpl implements LxcManager {
      * Starts lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
     public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command startLxcCommand = Commands.getLxcStartCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(startLxcCommand);
             Command lxcInfoCommand = Commands.getLxcInfoCommand(physicalAgent, lxcHostname);
@@ -336,11 +327,11 @@ public class LxcManagerImpl implements LxcManager {
      * Stops lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
     public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command stopLxcCommand = Commands.getLxcStopCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(stopLxcCommand);
             Command lxcInfoCommand = Commands.getLxcInfoCommand(physicalAgent, lxcHostname);
@@ -364,11 +355,11 @@ public class LxcManagerImpl implements LxcManager {
      * Destroys lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
     public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command destroyLxcCommand = Commands.getLxcDestroyCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(destroyLxcCommand);
 
@@ -381,7 +372,7 @@ public class LxcManagerImpl implements LxcManager {
      * Creates specified number of lxs and starts them. Uses default placement
      * strategy for calculating location of lxcs on physical servers
      *
-     * @param count
+     * @param count - number of lxcs to create
      * @return map where key is physical agent and value is a set of lxc agents
      * on it
      */
@@ -413,11 +404,11 @@ public class LxcManagerImpl implements LxcManager {
      * Clones and starts lxc on a given physical server, sets hostname of lxc
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return boolean if all went ok, false otherwise
      */
     public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname) {
-        if (physicalAgent != null && !Util.isStringEmpty(lxcHostname)) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
             Command cloneNStartCommand = Commands.getCloneNStartCommand(physicalAgent, lxcHostname);
             commandRunner.runCommand(cloneNStartCommand);
 
@@ -438,36 +429,121 @@ public class LxcManagerImpl implements LxcManager {
     /**
      * Destroys specified lxcs
      *
-     * @param lxcHostnames - hostnames of lxc to destroy
+     * @param lxcAgentHostnames - set of lxc agents' hostnames
      */
-    public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException {
-        if (lxcHostnames != null && !lxcHostnames.isEmpty()) {
-            CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
-            List<LxcInfo> lxcInfos = new ArrayList<LxcInfo>();
-            for (String lxcHostname : lxcHostnames) {
-                if (!Util.isStringEmpty(lxcHostname) && lxcHostname.matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
-                    String parentHostname = lxcHostname.substring(0, lxcHostname.indexOf(Common.PARENT_CHILD_LXC_SEPARATOR));
+    public void destroyLxcsByHostname(Set<String> lxcAgentHostnames) throws LxcDestroyException {
+        if (lxcAgentHostnames == null || lxcAgentHostnames.isEmpty()) {
+            throw new LxcDestroyException("Lxc Hostnames is empty or null");
+        }
 
-                    Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
-                    if (physicalAgent != null) {
-                        LxcInfo lxcInfo = new LxcInfo(physicalAgent, lxcHostname, null);
-                        lxcInfos.add(lxcInfo);
-                    } else {
-                        throw new LxcDestroyException(String.format("Could node determine parent host of %s container", lxcHostname));
+        Set<Agent> lxcAgents = new HashSet<Agent>();
+        for (String lxcHostname : lxcAgentHostnames) {
+            if (lxcHostname != null) {
+                Agent lxcAgent = agentManager.getAgentByHostname(lxcHostname);
+                if (lxcAgent == null) {
+                    throw new LxcDestroyException(String.format("Lxc %s is not connected", lxcHostname));
+                }
+                lxcAgents.add(lxcAgent);
+            }
+        }
+
+        destroyLxcs(lxcAgents);
+    }
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param lxcAgents - set of lxc agents
+     */
+    public void destroyLxcs(Set<Agent> lxcAgents) throws LxcDestroyException {
+        if (lxcAgents == null || lxcAgents.isEmpty()) {
+            throw new LxcDestroyException("LxcAgents is null or empty");
+        }
+
+        Map<Agent, Set<Agent>> families = new HashMap<Agent, Set<Agent>>();
+        for (Agent lxcAgent : lxcAgents) {
+            if (lxcAgent != null) {
+                Agent parentAgent = agentManager.getAgentByHostname(lxcAgent.getParentHostName());
+                if (parentAgent == null) {
+                    throw new LxcDestroyException(String.format("Physical parent of %s is not connected", lxcAgent.getHostname()));
+                }
+                Set<Agent> lxcChildren = families.get(parentAgent);
+                if (lxcChildren == null) {
+                    lxcChildren = new HashSet<Agent>();
+                    families.put(parentAgent, lxcChildren);
+                }
+                lxcChildren.add(lxcAgent);
+            }
+        }
+
+        destroyLxcs(families);
+    }
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param agentFamilies - map where key is physical agent and values is a set of lxc children
+     */
+    public void destroyLxcs(Map<Agent, Set<Agent>> agentFamilies) throws LxcDestroyException {
+        Map<Agent, Set<String>> families = new HashMap<Agent, Set<String>>();
+
+        for (Map.Entry<Agent, Set<Agent>> entry : agentFamilies.entrySet()) {
+            Agent physicalAgent = entry.getKey();
+            if (physicalAgent != null) {
+                Set<Agent> lxcChildren = entry.getValue();
+                Set<String> lxcHostnames = families.get(physicalAgent);
+                if (lxcHostnames == null) {
+                    lxcHostnames = new HashSet<String>();
+                    families.put(physicalAgent, lxcHostnames);
+                }
+
+                for (Agent lxcAgent : lxcChildren) {
+                    if (lxcAgent != null) {
+                        lxcHostnames.add(lxcAgent.getHostname());
                     }
-                } else {
-                    throw new LxcDestroyException(String.format("Malformed lxc hostname [%s]", lxcHostname));
                 }
             }
+        }
 
-            //launch destroyals
+        destroyLxcsByHostname(families);
+    }
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param agentFamilies - map where key is physical agent and values is a set of lxc children's hostnames
+     */
+    public void destroyLxcsByHostname(Map<Agent, Set<String>> agentFamilies) throws LxcDestroyException {
+        if (agentFamilies == null || agentFamilies.isEmpty()) {
+            throw new LxcDestroyException("AgentFamilies is null or empty");
+        }
+
+        List<LxcInfo> lxcInfos = new ArrayList<LxcInfo>();
+        for (Map.Entry<Agent, Set<String>> family : agentFamilies.entrySet()) {
+            Agent physicalAgent = family.getKey();
+            if (physicalAgent != null) {
+                Set<String> children = family.getValue();
+
+                for (String lxcAgentHostname : children) {
+                    if (lxcAgentHostname != null) {
+                        LxcInfo lxcInfo = new LxcInfo(physicalAgent, lxcAgentHostname, null);
+                        lxcInfos.add(lxcInfo);
+                    }
+                }
+            }
+        }
+
+        if (!lxcInfos.isEmpty()) {
+
+            CompletionService<LxcInfo> completer = new ExecutorCompletionService<LxcInfo>(executor);
+            //launch destroy commands
             for (LxcInfo lxcInfo : lxcInfos) {
                 completer.submit(new LxcActor(lxcInfo, this, LxcAction.DESTROY));
             }
 
             //wait for completion
             try {
-                for (int i = 0; i < lxcInfos.size(); i++) {
+                for (LxcInfo lxcInfo : lxcInfos) {
                     Future<LxcInfo> future = completer.take();
                     future.get();
                 }
@@ -486,15 +562,15 @@ public class LxcManagerImpl implements LxcManager {
             }
 
         } else {
-            throw new LxcDestroyException("Invalid set of lxc hostnames");
+            throw new LxcDestroyException("Empty child lxcs provided");
         }
 
     }
 
     /**
-     * Creates lxcs baed on a supplied strategy.
+     * Creates lxcs based on a supplied strategy.
      *
-     * @param strategy
+     * @param strategy - strategy to use for lxc placement
      * @return map where key is type of node and values is a map where key is a
      * physical server and value is set of lxcs on it
      * @throws LxcCreateException
@@ -526,11 +602,8 @@ public class LxcManagerImpl implements LxcManager {
                 //create lxc containers
                 for (int i = 0; i < numOfLxcs; i++) {
                     count++;
-                    StringBuilder lxcHostname = new StringBuilder(physicalNode.getHostname());
-                    lxcHostname.append(Common.PARENT_CHILD_LXC_SEPARATOR);
-                    lxcHostname.append(Util.generateTimeBasedUUID().toString());
 
-                    LxcInfo lxcInfo = new LxcInfo(physicalNode, lxcHostname.toString(), nodeType);
+                    LxcInfo lxcInfo = new LxcInfo(physicalNode, Util.generateTimeBasedUUID().toString(), nodeType);
                     lxcInfos.add(lxcInfo);
                     completer.submit(new LxcActor(lxcInfo, this, LxcAction.CREATE));
 
@@ -557,14 +630,21 @@ public class LxcManagerImpl implements LxcManager {
 
         if (!result) {
             //cleanup lxcs
-            Set<String> lxcHostnames = new HashSet<String>();
+            Map<Agent, Set<String>> createdLxcFamilies = new HashMap<Agent, Set<String>>();
             for (LxcInfo lxcInfo : lxcInfos) {
+                Set<String> lxcHostnames = createdLxcFamilies.get(lxcInfo.getPhysicalAgent());
+                if (lxcHostnames == null) {
+                    lxcHostnames = new HashSet<String>();
+                    createdLxcFamilies.put(lxcInfo.getPhysicalAgent(), lxcHostnames);
+                }
                 lxcHostnames.add(lxcInfo.getLxcHostname());
             }
-            try {
-                destroyLxcs(lxcHostnames);
-            } catch (LxcDestroyException ex) {
-                throw new LxcCreateException("Not all lxcs created successfully. Use LXC module to cleanup");
+            if (!createdLxcFamilies.isEmpty()) {
+                try {
+                    destroyLxcsByHostname(createdLxcFamilies);
+                } catch (LxcDestroyException ex) {
+                    throw new LxcCreateException("Not all lxcs created successfully. Use LXC module to cleanup");
+                }
             }
             throw new LxcCreateException("Not all lxcs created successfully");
         }
@@ -600,7 +680,7 @@ public class LxcManagerImpl implements LxcManager {
             if (result) {
                 break;
             } else {
-                if (System.currentTimeMillis() - waitStart > LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
+                if (System.currentTimeMillis() - waitStart > Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000) {
                     break;
                 } else {
                     try {
@@ -614,14 +694,21 @@ public class LxcManagerImpl implements LxcManager {
 
         if (!result) {
             //cleanup lxcs
-            Set<String> lxcHostnames = new HashSet<String>();
+            Map<Agent, Set<String>> createdLxcFamilies = new HashMap<Agent, Set<String>>();
             for (LxcInfo lxcInfo : lxcInfos) {
+                Set<String> lxcHostnames = createdLxcFamilies.get(lxcInfo.getPhysicalAgent());
+                if (lxcHostnames == null) {
+                    lxcHostnames = new HashSet<String>();
+                    createdLxcFamilies.put(lxcInfo.getPhysicalAgent(), lxcHostnames);
+                }
                 lxcHostnames.add(lxcInfo.getLxcHostname());
             }
-            try {
-                destroyLxcs(lxcHostnames);
-            } catch (LxcDestroyException ex) {
-                throw new LxcCreateException("Waiting interval for lxc agents timed out. Use LXC module to cleanup");
+            if (!createdLxcFamilies.isEmpty()) {
+                try {
+                    destroyLxcsByHostname(createdLxcFamilies);
+                } catch (LxcDestroyException ex) {
+                    throw new LxcCreateException("Waiting interval for lxc agents timed out. Use LXC module to cleanup");
+                }
             }
             throw new LxcCreateException("Waiting interval for lxc agents timed out");
         }

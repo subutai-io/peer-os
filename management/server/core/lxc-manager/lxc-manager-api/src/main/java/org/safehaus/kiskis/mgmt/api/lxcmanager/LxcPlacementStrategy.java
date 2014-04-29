@@ -5,12 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
+import com.google.common.base.Strings;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 /**
  * This class should be extended by all lxc placement strategies
@@ -25,7 +25,7 @@ public abstract class LxcPlacementStrategy {
      * Optional method to implement for calculating total number of lxc slots
      * each physical server can accommodate
      *
-     * @param serverMetrics
+     * @param serverMetrics - metrics from all connected physical servers
      * @return map where key is a physical agent and value is a number of lxcs
      * this physical server can accommodate
      */
@@ -41,7 +41,7 @@ public abstract class LxcPlacementStrategy {
      * their type
      *
      * @param serverMetrics - map where key is a physical agent and value is a
-     * metric
+     *                      metric
      * @throws LxcCreateException
      */
     public abstract void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException;
@@ -50,7 +50,7 @@ public abstract class LxcPlacementStrategy {
         if (physicalNode == null) {
             throw new LxcCreateException("Physical node is null");
         }
-        if (Util.isStringEmpty(nodeType)) {
+        if (Strings.isNullOrEmpty(nodeType)) {
             throw new LxcCreateException("Node type is null or empty");
         }
         if (numberOfLxcsToCreate <= 0) {

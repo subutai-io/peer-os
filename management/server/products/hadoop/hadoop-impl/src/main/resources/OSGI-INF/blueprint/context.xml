@@ -3,6 +3,8 @@
 
     <reference id="taskRunner" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
     <reference id="agentManager" availability="mandatory"
@@ -17,6 +19,7 @@
     <bean id="hadoop-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl"
           init-method="init" destroy-method="destroy">
         <property name="taskRunner" ref="taskRunner"/>
+        <property name="commandRunner" ref="commandRunner"/>
         <property name="tracker" ref="tracker"/>
         <property name="agentManager" ref="agentManager"/>
         <property name="dbManager" ref="dbManager"/>

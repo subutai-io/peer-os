@@ -20,7 +20,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.oozie.OozieUI;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -99,7 +98,8 @@ public class Manager {
 
         });
 
-        Button restartHadoop = new Button("Restart Hadoop");
+        // TODO add restart hadoop button
+       /* Button restartHadoop = new Button("Restart Hadoop");
         restartHadoop.addListener(new Button.ClickListener() {
 
             @Override
@@ -109,7 +109,7 @@ public class Manager {
 
         });
 
-        controlsContent.addComponent(restartHadoop);
+        controlsContent.addComponent(restartHadoop);*/
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -265,40 +265,16 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext(); ) {
-            final Agent agent = (Agent) it.next();
-            final Button checkBtn = new Button("Check");
+        for (final Agent agent : agents) {
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
                             agent.getHostname(),
-                            checkBtn,
-                            destroyBtn,
-                            progressIcon},
+                            destroyBtn},
                     null
             );
-
-            checkBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-
-                    OozieUI.getExecutor().execute(new CheckTask(agent, new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                show(state.toString());
-                                destroyBtn.setEnabled(true);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
 
             destroyBtn.addListener(new Button.ClickListener() {
 
@@ -364,8 +340,8 @@ public class Manager {
     }
 
     public static void checkNodesStatus(Table table) {
-        for (Iterator it = table.getItemIds().iterator(); it.hasNext(); ) {
-            int rowId = (Integer) it.next();
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
             Item row = table.getItem(rowId);
             Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
             checkBtn.click();

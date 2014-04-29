@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.impl.cassandra;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -26,7 +27,7 @@ public class Tasks {
 
     public static Task getStartAllNodesTask(Set<Agent> agents) {
         Task task = new Task("Start all nodes");
-        task.setData(TaskType.INSTALL);
+        task.setData(TaskType.START_ALL);
         for (Agent agent : agents) {
             task.addRequest(Commands.getStartCommand(), agent);
         }
@@ -56,7 +57,7 @@ public class Tasks {
 
     public static Task getCheckAllNodesTask(Set<Agent> agents) {
         Task task = new Task("Check Cassandra");
-        task.setData(TaskType.INSTALL);
+        task.setData(TaskType.CHECK_ALL);
         for (Agent agent : agents) {
             task.addRequest(Commands.getStatusCommand(), agent);
         }
@@ -65,17 +66,28 @@ public class Tasks {
 
     public static Task getStopAllNodesTask(Set<Agent> agents) {
         Task task = new Task("Stop Cassandra");
-        task.setData(TaskType.INSTALL);
+        task.setData(TaskType.STOP_ALL);
         for (Agent agent : agents) {
             task.addRequest(Commands.getStartCommand(), agent);
         }
         return task;
     }
 
-    public static Task configureCassandra(Set<Agent> agent, String param) {
-        Task task = new Task("Stop Cassandra");
-        task.setData(TaskType.STOP);
-        task.addRequest(Commands.getConfigureCommand(agent, param));
+    public static Task configureCassandra(Set<Agent> agents, String param) {
+        Task task = new Task("Configure Cassandra");
+        task.setData(TaskType.CONFIGURE);
+        for (Agent agent : agents) {
+            task.addRequest(Commands.getConfigureCommand(param), agent);
+        }
+        return task;
+    }
+
+    public static Task getUpdateAptTask(Set<Agent> nodes) {
+        Task task = new Task("Update APT");
+        task.setData(TaskType.APTUPDATE);
+        for (Agent agent : nodes) {
+            task.addRequest(Commands.getUpdateAptCommand(), agent);
+        }
         return task;
     }
 }

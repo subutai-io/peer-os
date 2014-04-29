@@ -2,9 +2,9 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,84 +19,59 @@ public class Agent implements Serializable, Comparable<Agent> {
     private String hostname;
     private List<String> listIP;
     private boolean isLXC;
-    private Date lastHeartbeat;
     private String parentHostName;
     private String transportId;
 
-    public Agent(UUID uuid, String hostname) {
+    public Agent(UUID uuid, String hostname, String parentHostName, String macAddress, List<String> listIP, boolean isLXC, String transportId) {
         Preconditions.checkNotNull(uuid, "UUID is null");
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(hostname), "Hostname is null");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(hostname), "Hostname is null or empty");
+
         this.uuid = uuid;
+        this.macAddress = macAddress;
         this.hostname = hostname;
+        this.listIP = listIP;
+        this.isLXC = isLXC;
+        this.parentHostName = parentHostName;
+        this.transportId = transportId;
     }
 
     public String getTransportId() {
         return transportId;
     }
 
-    public void setTransportId(String transportId) {
-        this.transportId = transportId;
-    }
 
     public String getParentHostName() {
         return parentHostName;
     }
 
-    public void setParentHostName(String parentHostName) {
-        this.parentHostName = parentHostName;
-    }
 
     public boolean isIsLXC() {
         return isLXC;
     }
 
-    public void setIsLXC(boolean isLXC) {
-        this.isLXC = isLXC;
-    }
-
-    public Date getLastHeartbeat() {
-        return lastHeartbeat;
-    }
-
-    public void setLastHeartbeat(Date lastHeartbeat) {
-        this.lastHeartbeat = lastHeartbeat;
-    }
 
     public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 
     public String getMacAddress() {
         return macAddress;
-    }
-
-    public void setMacAddress(String mac) {
-        this.macAddress = mac;
     }
 
     public String getHostname() {
         return hostname;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
 
     public List<String> getListIP() {
         return Collections.unmodifiableList(listIP);
     }
 
-    public void setListIP(List<String> listIP) {
-        this.listIP = listIP;
-    }
 
     @Override
     public String toString() {
-        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP=" + listIP + ", isLXC=" + isLXC + ", lastHeartbeat=" + lastHeartbeat + ", parentHostName=" + parentHostName + ", transportId=" + transportId + '}';
+        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP=" + listIP + ", isLXC=" + isLXC + ", parentHostName=" + parentHostName + ", transportId=" + transportId + '}';
     }
 
     @Override
@@ -108,10 +83,7 @@ public class Agent implements Serializable, Comparable<Agent> {
             return false;
         }
         final Agent other = (Agent) obj;
-        if (this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid))) {
-            return false;
-        }
-        return true;
+        return !(this.uuid != other.uuid && (this.uuid == null || !this.uuid.equals(other.uuid)));
     }
 
     @Override

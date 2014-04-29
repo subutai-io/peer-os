@@ -5,32 +5,20 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui;
 
+import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import java.util.Set;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
+import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
+import java.util.Set;
+
 /**
- *
  * @author dilshat
  */
 public class TerminalWindow extends Window {
@@ -38,7 +26,7 @@ public class TerminalWindow extends Window {
     private final TextArea commandOutputTxtArea;
     private volatile int taskCount = 0;
 
-    public TerminalWindow(final Set<Agent> agents, final TaskRunner taskRunner, final AgentManager agentManager) {
+    public TerminalWindow(final Set<Agent> agents, final CommandRunner commandRunner, final AgentManager agentManager) {
         super(String.format("Shell"));
         setModal(true);
         setWidth(600, UNITS_PIXELS);
@@ -89,42 +77,41 @@ public class TerminalWindow extends Window {
         sendBtn.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (!Util.isStringEmpty(txtCommand.getValue().toString())) {
-                    Task task = new Task();
-                    for (Agent agent : agents) {
-                        Request request = getRequestTemplate();
-                        request.setProgram(txtCommand.getValue().toString());
-                        task.addRequest(request, agent);
-                    }
+                if (!Strings.isNullOrEmpty(txtCommand.getValue().toString())) {
                     indicator.setVisible(true);
                     taskCount++;
-                    taskRunner.executeTask(task, new TaskCallback() {
+                    final Command command = commandRunner.createCommand(new RequestBuilder(txtCommand.getValue().toString()), agents);
+                    MgmtAppFactory.getExecutor().execute(new Runnable() {
                         @Override
-                        public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                            Agent agent = agentManager.getAgentByUUID(response.getUuid());
-                            String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
-                            StringBuilder out = new StringBuilder(host).append(":\n");
-                            if (!Util.isStringEmpty(response.getStdOut())) {
-                                out.append(response.getStdOut()).append("\n");
-                            }
-                            if (!Util.isStringEmpty(response.getStdErr())) {
-                                out.append(response.getStdErr()).append("\n");
-                            }
-                            if (Util.isFinalResponse(response)) {
-                                if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-                                    out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
-                                } else {
-                                    out.append("Command timed out").append("\n\n");
+                        public void run() {
+                            commandRunner.runCommand(command, new CommandCallback() {
+
+                                @Override
+                                public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                    Agent agent = agentManager.getAgentByUUID(agentResult.getAgentUUID());
+                                    String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
+                                    StringBuilder out = new StringBuilder(host).append(":\n");
+                                    if (!Strings.isNullOrEmpty(response.getStdOut())) {
+                                        out.append(response.getStdOut()).append("\n");
+                                    }
+                                    if (!Strings.isNullOrEmpty(response.getStdErr())) {
+                                        out.append(response.getStdErr()).append("\n");
+                                    }
+                                    if (response.isFinal()) {
+                                        if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
+                                            out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
+                                        } else {
+                                            out.append("Command timed out").append("\n\n");
+                                        }
+                                    }
+                                    addOutput(out.toString());
+
                                 }
+                            });
+                            taskCount--;
+                            if (taskCount == 0) {
+                                indicator.setVisible(false);
                             }
-                            addOutput(out.toString());
-                            if (task.isCompleted()) {
-                                taskCount--;
-                                if (taskCount == 0) {
-                                    indicator.setVisible(false);
-                                }
-                            }
-                            return null;
                         }
                     });
                 } else {
@@ -143,14 +130,10 @@ public class TerminalWindow extends Window {
     }
 
     private void addOutput(String output) {
-        if (!Util.isStringEmpty(output)) {
+        if (!Strings.isNullOrEmpty(output)) {
             commandOutputTxtArea.setValue(String.format("%s%s", commandOutputTxtArea.getValue(), output));
             commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
         }
-    }
-
-    public static Request getRequestTemplate() {
-        return CommandFactory.newRequest(RequestType.EXECUTE_REQUEST, null, null, null, 1, "/", "pwd", OutputRedirection.RETURN, OutputRedirection.RETURN, null, null, "root", null, null, 60); //
     }
 
 }

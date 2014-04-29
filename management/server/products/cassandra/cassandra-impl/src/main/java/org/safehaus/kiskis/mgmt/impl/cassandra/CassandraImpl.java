@@ -66,6 +66,9 @@ public class CassandraImpl implements Cassandra {
         this.networkManager = networkManager;
     }
 
+
+
+
     public UUID installCluster(final Config config) {
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Cassandra");
 
@@ -113,39 +116,54 @@ public class CassandraImpl implements Cassandra {
 
                     po.addLog("Lxc containers created successfully\nUpdating db...");
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                        po.addLog("Cluster info saved to DB");
 
                         Set<Agent> nodes = new HashSet<Agent>();
                         nodes.addAll(config.getSeedNodes());
                         nodes.add(config.getRpcAddressNode());
                         nodes.add(config.getListedAddressNode());
 
-                        po.addLog("\nConfiguring networking between nodes...");
+                        po.addLog("Configuring networking between nodes...");
                         if (networkManager.configHostsOnAgents(new ArrayList<Agent>(nodes), config.getDomainName()) &&
                                 networkManager.configSshOnAgents(new ArrayList<Agent>(nodes))) {
-                            po.addLogDone("\nNetwork configuration done...");
+                            po.addLog("\nNetwork configuration done...");
                         } else {
-                            po.addLogFailed(String.format("\nNetwork configuration failed..."));
+                            po.addLogFailed(String.format("Network configuration failed..."));
+                            return;
                         }
 
-                        po.addLog("Cluster info saved to DB\nInstalling Cassandra...");
+                        po.addLog("Updating apt repository...");
+                        //install
+                        Task updateAptTask = taskRunner.executeTaskNWait(Tasks.getUpdateAptTask(nodes));
+
+                        if (updateAptTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                            po.addLog("Update succeeded");
+                        } else {
+                            po.addLogFailed(String.format("Installation failed, %s", updateAptTask.getFirstError()));
+                            return;
+                        }
 
                         //install
+                        po.addLog("Installing...");
                         Task installTask = taskRunner.executeTaskNWait(Tasks.getInstallTask(nodes));
 
                         if (installTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Installation succeeded");
+                            po.addLog("Installation succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", installTask.getFirstError()));
+                            return;
                         }
 
                         // setting cluster name
                         po.addLog("\nSetting cluster name " + config.getClusterName());
+
                         Task setClusterName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "cluster_name " + config.getClusterName()));
 
                         if (setClusterName.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Configure cluster name succeeded");
+                            po.addLog("Configure cluster name succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setClusterName.getFirstError()));
+                            return;
                         }
 
                         // setting data directory name
@@ -153,9 +171,10 @@ public class CassandraImpl implements Cassandra {
                         Task setDataDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "data_dir " + config.getDataDirectory()));
 
                         if (setDataDirName.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Configure data direcotrysucceeded");
+                            po.addLog("Configure data directory succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setDataDirName.getFirstError()));
+                            return;
                         }
 
                         // setting commit log directory
@@ -163,9 +182,10 @@ public class CassandraImpl implements Cassandra {
                         Task setCommitDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "commitlog_dir " + config.getCommitLogDirectory()));
 
                         if (setCommitDirName.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Configure data direcotry succeeded");
+                            po.addLog("Configure data directory succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setCommitDirName.getFirstError()));
+                            return;
                         }
 
                         // setting saved cache directory
@@ -173,9 +193,10 @@ public class CassandraImpl implements Cassandra {
                         Task setSavedCacheDirName = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "saved_cache_dir " + config.getSavedCachesDirectory()));
 
                         if (setSavedCacheDirName.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Configure saved cache direcotry succeeded");
+                            po.addLog("Configure saved cache directory succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setSavedCacheDirName.getFirstError()));
+                            return;
                         }
 
                         // setting rpc address directory
@@ -183,9 +204,10 @@ public class CassandraImpl implements Cassandra {
                         Task setRpcAddress = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "rpc_address " + config.getRpcAddressNode().getListIP().get(0)));
 
                         if (setRpcAddress.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Configure saved cache direcotry succeeded");
+                            po.addLog("Configure saved cache directory succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setRpcAddress.getFirstError()));
+                            return;
                         }
 
                         // setting rpc address directory
@@ -193,33 +215,36 @@ public class CassandraImpl implements Cassandra {
                         Task setListenAddress = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "listen_address " + config.getListedAddressNode().getListIP().get(0)));
 
                         if (setListenAddress.getTaskStatus() == TaskStatus.SUCCESS) {
-                            po.addLogDone("Configure saved cache direcotry succeeded");
+                            po.addLog("Configure saved cache directory succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setListenAddress.getFirstError()));
+                            return;
                         }
 
                         // setting seeds
                         StringBuilder sb = new StringBuilder();
+                        sb.append('"');
                         for (Agent seed : config.getSeedNodes()) {
-                            sb.append(seed.getListIP().get(0)).append(" ");
+                            sb.append(seed.getListIP().get(0)).append(",");
                         }
+                        sb.replace(sb.toString().length() -1, sb.toString().length(), "");
+                        sb.append('"');
+                        po.addLog("Settings seeds " + sb.toString());
                         Task setSeeds = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "seeds " + sb.toString()));
 
                         if (setSeeds.getTaskStatus() == TaskStatus.SUCCESS) {
                             po.addLogDone("Configure seeds succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setSeeds.getFirstError()));
+                            return;
                         }
 
 
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostnames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getSeedNodes()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        lxcHostnames.add(config.getListedAddressNode().getHostname());
-                        lxcHostnames.add(config.getRpcAddressNode().getHostname());
+                        Set<Agent> lxcHostnames = new HashSet<Agent>(config.getSeedNodes());
+                        lxcHostnames.add(config.getListedAddressNode());
+                        lxcHostnames.add(config.getRpcAddressNode());
                         try {
                             lxcManager.destroyLxcs(lxcHostnames);
                         } catch (LxcDestroyException ex) {
@@ -253,12 +278,9 @@ public class CassandraImpl implements Cassandra {
 
                 po.addLog("Destroying lxc containers...");
 
-                Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getSeedNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                lxcHostnames.add(config.getListedAddressNode().getHostname());
-                lxcHostnames.add(config.getRpcAddressNode().getHostname());
+                Set<Agent> lxcHostnames = new HashSet<Agent>(config.getSeedNodes());
+                lxcHostnames.add(config.getListedAddressNode());
+                lxcHostnames.add(config.getRpcAddressNode());
 
                 try {
                     lxcManager.destroyLxcs(lxcHostnames);

@@ -5,7 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.impl.shark;
 
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.api.shark.Shark;
@@ -18,59 +22,44 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 
 /**
  * @author dilshat
  */
 public class SharkImpl implements Shark {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
+
+    public SharkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+
+        Commands.init(commandRunner);
+    }
 
     public void init() {
         executor = Executors.newCachedThreadPool();
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setCommandRunner(CommandRunner commandRunner) {
-        SharkImpl.commandRunner = commandRunner;
-    }
-
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
     }
 
     public UUID installCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", clusterName));
+                String.format("Installing cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                if (Util.isStringEmpty(clusterName)) {
+                if (Strings.isNullOrEmpty(clusterName)) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -82,7 +71,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -156,7 +145,7 @@ public class SharkImpl implements Shark {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -184,7 +173,7 @@ public class SharkImpl implements Shark {
                         Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
                             if (result.getStdOut().contains("Package ksks-shark is not installed, so not removed")) {
-                                po.addLog(String.format("Shark is not installed, so not removed on node %s", result.getStdErr(),
+                                po.addLog(String.format("Shark is not installed, so not removed on node %s",
                                         agent == null ? result.getAgentUUID() : agent.getHostname()));
                             } else {
                                 po.addLog(String.format("Shark is removed from node %s",
@@ -214,7 +203,7 @@ public class SharkImpl implements Shark {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -248,7 +237,7 @@ public class SharkImpl implements Shark {
                     AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
                     if (result.getExitCode() != null && result.getExitCode() == 0) {
                         if (result.getStdOut().contains("Package ksks-shark is not installed, so not removed")) {
-                            po.addLog(String.format("Shark is not installed, so not removed on node %s", result.getStdErr(),
+                            po.addLog(String.format("Shark is not installed, so not removed on node %s",
                                     agent.getHostname()));
                         } else {
                             po.addLog(String.format("Shark is removed from node %s",
@@ -279,7 +268,7 @@ public class SharkImpl implements Shark {
     public UUID addNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -304,7 +293,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -377,7 +366,7 @@ public class SharkImpl implements Shark {
     public UUID actualizeMasterIP(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Actualizing master IP of %s", clusterName));
+                String.format("Actualizing master IP of %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -390,7 +379,7 @@ public class SharkImpl implements Shark {
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
                         = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                                org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;

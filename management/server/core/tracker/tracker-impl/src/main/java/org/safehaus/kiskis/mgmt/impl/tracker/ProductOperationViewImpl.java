@@ -68,8 +68,7 @@ public class ProductOperationViewImpl implements ProductOperationView {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        return hash;
+        return 3;
     }
 
     @Override
@@ -81,10 +80,7 @@ public class ProductOperationViewImpl implements ProductOperationView {
             return false;
         }
         final ProductOperationViewImpl other = (ProductOperationViewImpl) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !(this.id != other.id && (this.id == null || !this.id.equals(other.id)));
     }
 
     public Date getCreateDate() {

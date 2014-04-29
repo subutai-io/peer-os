@@ -47,10 +47,6 @@ public final class ConfirmationDialog extends Window implements Button.ClickList
      * Yes button.
      */
     private final Button okButton;
-    /**
-     * No button.
-     */
-    private final Button cancelButton;
 
     /**
      * Constructor for configuring confirmation dialog.
@@ -67,7 +63,10 @@ public final class ConfirmationDialog extends Window implements Button.ClickList
         setWidth(CONFIRMATION_DIALOG_WIDTH, ConfirmationDialog.UNITS_PIXELS);
         setHeight(CONFIRMATION_DIALOG_HEIGHT, ConfirmationDialog.UNITS_PIXELS);
         okButton = new Button(okLabel, this);
-        cancelButton = new Button(cancelLabel, this);
+        /*
+      No button.
+     */
+        Button cancelButton = new Button(cancelLabel, this);
         setModal(true);
 
         this.callback = callback;
@@ -81,7 +80,7 @@ public final class ConfirmationDialog extends Window implements Button.ClickList
         buttonLayout.addComponent(okButton);
         buttonLayout.addComponent(cancelButton);
         addComponent(buttonLayout);
-        ((VerticalLayout) getContent()).setHeight(ONE_HUNDRED_PERCENT,
+        getContent().setHeight(ONE_HUNDRED_PERCENT,
                 ConfirmationDialog.UNITS_PERCENTAGE);
         ((VerticalLayout) getContent()).setComponentAlignment(buttonLayout, Alignment.BOTTOM_CENTER);
     }
@@ -94,7 +93,7 @@ public final class ConfirmationDialog extends Window implements Button.ClickList
     @Override
     public void buttonClick(final ClickEvent event) {
         if (getParent() != null) {
-            ((Window) getParent()).removeWindow(this);
+            getParent().removeWindow(this);
         }
         callback.response(event.getSource() == okButton);
     }

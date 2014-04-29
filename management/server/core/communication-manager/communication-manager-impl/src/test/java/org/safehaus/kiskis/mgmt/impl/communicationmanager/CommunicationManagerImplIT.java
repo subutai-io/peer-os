@@ -5,7 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommandJson;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
@@ -17,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author dilshat
@@ -74,7 +78,7 @@ public class CommunicationManagerImplIT {
 
     @Test
     public void testSendRequest() throws JMSException {
-        Connection connection = null;
+        Connection connection;
         UUID uuid = UUID.randomUUID();
         //setup listener
         connection = communicationManagerImpl.createConnection();
@@ -97,24 +101,9 @@ public class CommunicationManagerImplIT {
 
     }
 
-    private static class TestResponseListener implements ResponseListener {
-
-        private final Object signal = new Object();
-        private Response response;
-
-        public void onResponse(Response response) {
-
-            this.response = response;
-
-            synchronized (signal) {
-                signal.notify();
-            }
-        }
-    }
-
     @Test
     public void testMessageReception() throws JMSException, InterruptedException {
-        Connection connection = null;
+        Connection connection;
 
         TestResponseListener responseListener = new TestResponseListener();
         communicationManagerImpl.addListener(responseListener);
@@ -129,7 +118,7 @@ public class CommunicationManagerImplIT {
         final MessageProducer producer = session.createProducer(testQueue);
 
         final Response response = new Response();
-        response.setUuid(uuid);
+
         Thread t = new Thread(new Runnable() {
 
             public void run() {
@@ -147,6 +136,21 @@ public class CommunicationManagerImplIT {
 
         assertEquals(response.getUuid(), responseListener.response.getUuid());
 
+    }
+
+    private static class TestResponseListener implements ResponseListener {
+
+        private final Object signal = new Object();
+        private Response response;
+
+        public void onResponse(Response response) {
+
+            this.response = response;
+
+            synchronized (signal) {
+                signal.notify();
+            }
+        }
     }
 
 }

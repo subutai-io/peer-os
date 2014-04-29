@@ -12,7 +12,7 @@ public interface ResponseListener {
     /**
      * Response arrival event
      *
-     * @param response
+     * @param response - received response
      */
     public void onResponse(Response response);
 

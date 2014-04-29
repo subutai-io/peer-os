@@ -5,7 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lucene;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lucene.Config;
 import org.safehaus.kiskis.mgmt.api.lucene.Lucene;
@@ -19,59 +24,46 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 
 /**
  * @author dilshat
  */
 public class LuceneImpl implements Lucene {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
+
+    public LuceneImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+
+        Commands.init(commandRunner);
+    }
 
     public void init() {
         executor = Executors.newCachedThreadPool();
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
     }
 
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setCommandRunner(CommandRunner commandRunner) {
-        LuceneImpl.commandRunner = commandRunner;
-    }
-
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
-
     public UUID installCluster(final Config config) {
+        Preconditions.checkNotNull(config, "Configuration is null");
+
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                if (config == null || Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
+                if (Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -82,7 +74,7 @@ public class LuceneImpl implements Lucene {
                 }
 
                 //check if node agent is connected
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
                     if (agentManager.getAgentByHostname(node.getHostname()) == null) {
                         po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
@@ -106,7 +98,7 @@ public class LuceneImpl implements Lucene {
                     return;
                 }
 
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
                     Agent node = it.next();
 
                     AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
@@ -151,7 +143,7 @@ public class LuceneImpl implements Lucene {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
@@ -179,7 +171,7 @@ public class LuceneImpl implements Lucene {
                         Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
                         if (result.getExitCode() != null && result.getExitCode() == 0) {
                             if (result.getStdOut().contains("Package ksks-lucene is not installed, so not removed")) {
-                                po.addLog(String.format("Lucene is not installed, so not removed on node %s", result.getStdErr(),
+                                po.addLog(String.format("Lucene is not installed, so not removed on node %s",
                                         agent == null ? result.getAgentUUID() : agent.getHostname()));
                             } else {
                                 po.addLog(String.format("Lucene is removed from node %s",
@@ -209,7 +201,7 @@ public class LuceneImpl implements Lucene {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -243,7 +235,7 @@ public class LuceneImpl implements Lucene {
                     AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
                     if (result.getExitCode() != null && result.getExitCode() == 0) {
                         if (result.getStdOut().contains("Package ksks-lucene is not installed, so not removed")) {
-                            po.addLog(String.format("Lucene is not installed, so not removed on node %s", result.getStdErr(),
+                            po.addLog(String.format("Lucene is not installed, so not removed on node %s",
                                     agent.getHostname()));
                         } else {
                             po.addLog(String.format("Lucene is removed from node %s",
@@ -274,7 +266,7 @@ public class LuceneImpl implements Lucene {
     public UUID addNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding node to %s", clusterName));
+                String.format("Adding node to %s", clusterName));
 
         executor.execute(new Runnable() {
 

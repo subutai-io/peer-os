@@ -5,11 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import com.google.common.base.Preconditions;
+import org.safehaus.kiskis.mgmt.api.commandrunner.*;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
+import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -17,13 +20,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
-import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**
  * This class is implementation of CommandRunner interface. Runs commands on
@@ -121,7 +117,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     /**
      * Receives all responses from agents. Triggered by communication manager
      *
-     * @param response
+     * @param response - received response
      */
     public void onResponse(final Response response) {
         if (response != null && response.getUuid() != null) {

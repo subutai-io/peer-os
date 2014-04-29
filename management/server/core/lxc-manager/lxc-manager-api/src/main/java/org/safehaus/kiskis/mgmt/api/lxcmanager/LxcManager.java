@@ -5,12 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  * @author dilshat
@@ -49,7 +49,7 @@ public interface LxcManager {
      * Clones lxc on a given physical server and set its hostname
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname to set for a new lxc
+     * @param lxcHostname   - hostname to set for a new lxc
      * @return true if all went ok, false otherwise
      */
     public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname);
@@ -58,7 +58,7 @@ public interface LxcManager {
      * Starts lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
     public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname);
@@ -67,7 +67,7 @@ public interface LxcManager {
      * Stops lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
     public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname);
@@ -76,7 +76,7 @@ public interface LxcManager {
      * Destroys lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
     public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname);
@@ -85,7 +85,7 @@ public interface LxcManager {
      * Clones and starts lxc on a given physical server, sets hostname of lxc
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
+     * @param lxcHostname   - hostname of lxc
      * @return boolean if all went ok, false otherwise
      */
     public boolean cloneNStartLxcOnHost(Agent physicalAgent, String lxcHostname);
@@ -94,7 +94,7 @@ public interface LxcManager {
      * Creates specified number of lxs and starts them. Uses default placement
      * strategy for calculating location of lxcs on physical servers
      *
-     * @param count
+     * @param count - number of lcxs to create
      * @return map where key is physical agent and value is a set of lxc agents
      * on it
      */
@@ -103,14 +103,35 @@ public interface LxcManager {
     /**
      * Destroys specified lxcs
      *
-     * @param lxcHostnames - hostnames of lxc to destroy
+     * @param agentFamilies - map where key is physical agent and values is a set of lxc children's hostnames
      */
-    public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException;
+    public void destroyLxcsByHostname(Map<Agent, Set<String>> agentFamilies) throws LxcDestroyException;
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param agentFamilies - map where key is physical agent and values is a set of lxc children
+     */
+    public void destroyLxcs(Map<Agent, Set<Agent>> agentFamilies) throws LxcDestroyException;
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param lxcAgents - set of lxc agents
+     */
+    public void destroyLxcs(Set<Agent> lxcAgents) throws LxcDestroyException;
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param lxcAgentHostnames - set of lxc agents' hostnames
+     */
+    public void destroyLxcsByHostname(Set<String> lxcAgentHostnames) throws LxcDestroyException;
 
     /**
      * Creates lxcs baed on a supplied strategy.
      *
-     * @param strategy
+     * @param strategy - strategy to use for lxc placement
      * @return map where key is type of node and values is a map where key is a
      * physical server and value is set of lxcs on it
      * @throws LxcCreateException

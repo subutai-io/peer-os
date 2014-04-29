@@ -5,37 +5,21 @@
  */
 package org.safehaus.kiskis.mgmt.ui.tracker;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.PopupDateField;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author dilshat
@@ -189,7 +173,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     }
 
     private void populateLogs() {
-        if (trackID != null && !Util.isStringEmpty(source)) {
+        if (trackID != null && !Strings.isNullOrEmpty(source)) {
             ProductOperationView po = TrackerUI.getTracker().getProductOperation(source, trackID);
             if (po != null) {
                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
@@ -203,7 +187,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     }
 
     private void populateOperations() {
-        if (!Util.isStringEmpty(source)) {
+        if (!Strings.isNullOrEmpty(source)) {
             List<ProductOperationView> operations = TrackerUI.getTracker().getProductOperations(
                     source, fromDateValue, toDateValue, limit);
             if (operations.isEmpty()) {
@@ -278,7 +262,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     }
 
     private void setOutput(String output) {
-        if (!Util.isStringEmpty(output)) {
+        if (!Strings.isNullOrEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }
@@ -291,7 +275,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         for (String src : sources) {
             sourcesCombo.addItem(src);
         }
-        if (!Util.isStringEmpty(oldSource)) {
+        if (!Strings.isNullOrEmpty(oldSource)) {
             sourcesCombo.setValue(oldSource);
         } else if (!sources.isEmpty()) {
             sourcesCombo.setValue(sources.iterator().next());

@@ -27,12 +27,8 @@ public class Installation {
 
     private void destroyLXC(ProductOperation po, String log) {
         //destroy all lxcs also
-        Set<String> lxcHostnames = new HashSet<String>();
-        for (Agent lxcAgent : config.getAllNodes()) {
-            lxcHostnames.add(lxcAgent.getHostname());
-        }
         try {
-            parent.getLxcManager().destroyLxcs(lxcHostnames);
+            parent.getLxcManager().destroyLxcs(new HashSet<Agent>(config.getAllNodes()));
             if (parent.getDbManager().deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
                 po.addLogDone("Cluster info deleted from DB\nDone");
             } else {

@@ -13,7 +13,10 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
@@ -32,21 +35,20 @@ import java.util.logging.Logger;
 public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     private static final Logger LOG = Logger.getLogger(AgentManagerImpl.class.getName());
-
-    /**
-     * reference to communication manager
-     */
-    private CommunicationManager communicationService;
     /**
      * list of agent listeners
      */
     private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<AgentListener>();
     /**
+     * reference to communication manager
+     */
+    private CommunicationManager communicationService;
+    /**
      * executor for notifying agent listeners
      */
     private ExecutorService exec;
     /**
-     * cache of currently connected agents with expiry ttl
+     * cache of currently connected agents with expiry ttl. Agents will expire unless they send heartbeat message regularly
      */
     private Cache<UUID, Agent> agents;
 
@@ -107,7 +109,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * @return agent
      */
     public Agent getAgentByHostname(String hostname) {
-        if (!Util.isStringEmpty(hostname)) {
+        if (!Strings.isNullOrEmpty(hostname)) {
             for (Agent agent : agents.asMap().values()) {
                 if (hostname.equalsIgnoreCase(agent.getHostname())) {
                     return agent;
@@ -120,7 +122,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Returns agent by its UUID or null if agent is not connected
      *
-     * @param hostname - UUID of agent
+     * @param uuid - UUID of agent
      * @return agent
      */
     public Agent getAgentByUUID(UUID uuid) {
@@ -131,12 +133,12 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * Returns agent by its physical parent node's hostname or null if agent is
      * not connected
      *
-     * @param hostname - hostname of agent's node physical parent node
+     * @param parentHostname - hostname of agent's node physical parent node
      * @return agent
      */
     public Set<Agent> getLxcAgentsByParentHostname(String parentHostname) {
         Set<Agent> lxcAgents = new HashSet<Agent>();
-        if (!Util.isStringEmpty(parentHostname)) {
+        if (!Strings.isNullOrEmpty(parentHostname)) {
             for (Agent agent : agents.asMap().values()) {
                 if (parentHostname.equalsIgnoreCase(agent.getParentHostName())) {
                     lxcAgents.add(agent);
@@ -149,7 +151,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Adds listener which wants to be notified when agents connect/disconnect
      *
-     * @param listener
+     * @param listener - listener to add
      */
     @Override
     public void addListener(AgentListener listener) {
@@ -163,7 +165,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Removes listener
      *
-     * @param listener
+     * @param listener - - listener to remove
      */
     @Override
     public void removeListener(AgentListener listener) {
@@ -197,7 +199,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                             if (notifyAgentListeners) {
                                 notifyAgentListeners = false;
                                 Set<Agent> freshAgents = new HashSet(agents.asMap().values());
-                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext();) {
+                                for (Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); ) {
                                     AgentListener listener = it.next();
                                     try {
                                         listener.onAgent(freshAgents);
@@ -263,28 +265,21 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             if (response != null && response.getUuid() != null) {
                 Agent checkAgent = agents.getIfPresent(response.getUuid());
                 if (checkAgent != null) {
-                    //update timestamp of agent here
+                    //update timestamp of agent here & return
                     agents.put(response.getUuid(), checkAgent);
                     return;
                 }
-                Agent agent = new Agent(response.getUuid(), Strings.isNullOrEmpty(response.getHostname()) ? response.getUuid().toString() : response.getHostname());
-                agent.setMacAddress(response.getMacAddress());
-                agent.setTransportId(response.getTransportId());
-                if (response.isIsLxc() == null) {
-                    agent.setIsLXC(false);
-                } else {
-                    agent.setIsLXC(response.isIsLxc());
-                }
-                agent.setListIP(response.getIps());
-                if (agent.isIsLXC()) {
-                    if (agent.getHostname() != null && agent.getHostname().matches(".+" + Common.PARENT_CHILD_LXC_SEPARATOR + ".+")) {
-                        agent.setParentHostName(agent.getHostname().substring(0, agent.getHostname().indexOf(Common.PARENT_CHILD_LXC_SEPARATOR)));
-                    } else {
-                        agent.setParentHostName(Common.UNKNOWN_LXC_PARENT_NAME);
-                    }
-                }
+                //create agent from response
+                Agent agent = new Agent(response.getUuid(),
+                        Strings.isNullOrEmpty(response.getHostname()) ? response.getUuid().toString() : response.getHostname(),
+                        response.getParentHostName(), response.getMacAddress(), response.getIps(),
+                        !Strings.isNullOrEmpty(response.getParentHostName()), response.getTransportId());
+
+                //send registration acknowledgement to agent
                 sendAck(agent.getUuid());
+                //put agent to cache
                 agents.put(response.getUuid(), agent);
+                //notify listeners
                 notifyAgentListeners = true;
             }
         } catch (Exception e) {

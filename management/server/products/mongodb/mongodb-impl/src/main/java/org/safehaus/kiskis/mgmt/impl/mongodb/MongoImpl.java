@@ -5,7 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
@@ -15,10 +21,13 @@ import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.impl.mongodb.common.CommandType;
+import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,67 +35,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.CommandType;
-import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
 
 /**
  * @author dilshat
  */
 public class MongoImpl implements Mongo {
 
-    private static CommandRunner commandRunner;
-    private static AgentManager agentManager;
-    private static DbManager dbManager;
-    private static LxcManager lxcManager;
-    private static Tracker tracker;
-    private static ExecutorService executor;
+    private CommandRunner commandRunner;
+    private AgentManager agentManager;
+    private DbManager dbManager;
+    private LxcManager lxcManager;
+    private Tracker tracker;
+    private ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+    public MongoImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, LxcManager lxcManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.lxcManager = lxcManager;
+        this.tracker = tracker;
 
-    public void setTracker(Tracker tracker) {
-        MongoImpl.tracker = tracker;
-    }
-
-    public void setLxcManager(LxcManager lxcManager) {
-        MongoImpl.lxcManager = lxcManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        MongoImpl.agentManager = agentManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        MongoImpl.dbManager = dbManager;
-    }
-
-    public void setCommandRunner(CommandRunner commandRunner) {
-        MongoImpl.commandRunner = commandRunner;
-    }
-
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
-
-    public static DbManager getDbManager() {
-        return dbManager;
-    }
-
-    public static LxcManager getLxcManager() {
-        return lxcManager;
-    }
-
-    public static ExecutorService getExecutor() {
-        return executor;
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -94,27 +63,23 @@ public class MongoImpl implements Mongo {
     }
 
     public void destroy() {
-        MongoImpl.commandRunner = null;
-        MongoImpl.agentManager = null;
-        MongoImpl.dbManager = null;
-        MongoImpl.lxcManager = null;
-        MongoImpl.tracker = null;
         executor.shutdown();
     }
 
     public UUID installCluster(final Config config) {
+        Preconditions.checkNotNull(config, "Configuration is null");
+
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing cluster %s", config.getClusterName()));
 
         executor.execute(new Runnable() {
 
             public void run() {
 
-                if (config == null
-                        || Util.isStringEmpty(config.getClusterName())
-                        || Util.isStringEmpty(config.getReplicaSetName())
-                        || Util.isStringEmpty(config.getDomainName())
+                if (Strings.isNullOrEmpty(config.getClusterName())
+                        || Strings.isNullOrEmpty(config.getReplicaSetName())
+                        || Strings.isNullOrEmpty(config.getDomainName())
                         || config.getNumberOfConfigServers() <= 0
                         || config.getNumberOfRouters() <= 0
                         || config.getNumberOfDataNodes() <= 0
@@ -166,18 +131,8 @@ public class MongoImpl implements Mongo {
                         installMongoCluster(config, po);
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostnames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getConfigServers()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        for (Agent lxcAgent : config.getRouterServers()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        for (Agent lxcAgent : config.getDataNodes()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
                         try {
-                            lxcManager.destroyLxcs(lxcHostnames);
+                            lxcManager.destroyLxcs(lxcAgentsMap);
                         } catch (LxcDestroyException ex) {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
@@ -262,7 +217,7 @@ public class MongoImpl implements Mongo {
     public UUID addNode(final String clusterName, final NodeType nodeType) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Adding %s to %s", nodeType, clusterName));
+                String.format("Adding %s to %s", nodeType, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -316,7 +271,7 @@ public class MongoImpl implements Mongo {
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying cluster %s", clusterName));
+                String.format("Destroying cluster %s", clusterName));
         executor.execute(new Runnable() {
 
             public void run() {
@@ -327,18 +282,8 @@ public class MongoImpl implements Mongo {
                 }
 
                 po.addLog("Destroying lxc containers");
-                Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getConfigServers()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                for (Agent lxcAgent : config.getRouterServers()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                for (Agent lxcAgent : config.getDataNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
                 try {
-                    lxcManager.destroyLxcs(lxcHostnames);
+                    lxcManager.destroyLxcs(config.getAllNodes());
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
@@ -358,7 +303,7 @@ public class MongoImpl implements Mongo {
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
         //go on operation
         executor.execute(new Runnable() {
@@ -409,20 +354,18 @@ public class MongoImpl implements Mongo {
                                         config.getConfigServers(),
                                         config.getRouterServers()), new CommandCallback() {
 
-                                            @Override
-                                            public void onResponse(Response response, AgentResult agentResult, Command command) {
-                                                okCount.set(0);
-                                                for (AgentResult result : command.getResults().values()) {
-                                                    if (result.getStdOut().contains("child process started successfully, parent exiting")) {
-                                                        okCount.incrementAndGet();
-                                                    }
-                                                }
-                                                if (okCount.get() == config.getRouterServers().size()) {
-                                                    stop();
-                                                }
+                                    @Override
+                                    public void onResponse(Response response, AgentResult agentResult, Command command) {
+                                        for (AgentResult result : command.getResults().values()) {
+                                            if (result.getStdOut().contains("child process started successfully, parent exiting")
+                                                    && okCount.incrementAndGet() == config.getRouterServers().size()) {
+                                                stop();
                                             }
+                                        }
+                                    }
 
-                                        });
+                                }
+                        );
 
                         if (okCount.get() != config.getRouterServers().size()) {
                             po.addLog("Not all routers restarted. Use Terminal module to restart them, skipping...");
@@ -444,7 +387,7 @@ public class MongoImpl implements Mongo {
                         Agent primaryNodeAgent = null;
                         if (m.find()) {
                             String primaryNodeHost = m.group(1);
-                            if (!Util.isStringEmpty(primaryNodeHost)) {
+                            if (!Strings.isNullOrEmpty(primaryNodeHost)) {
                                 String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                                 primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                             }
@@ -453,7 +396,7 @@ public class MongoImpl implements Mongo {
                             if (primaryNodeAgent != agent) {
                                 Command unregisterSecondaryNodeFromPrimaryCommand
                                         = Commands.getUnregisterSecondaryNodeFromPrimaryCommand(
-                                                primaryNodeAgent, config.getDataNodePort(), agent, config.getDomainName());
+                                        primaryNodeAgent, config.getDataNodePort(), agent, config.getDomainName());
 
                                 commandRunner.runCommand(unregisterSecondaryNodeFromPrimaryCommand);
                                 if (!unregisterSecondaryNodeFromPrimaryCommand.hasCompleted()) {
@@ -507,7 +450,7 @@ public class MongoImpl implements Mongo {
     public UUID startNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Starting node %s in %s", lxcHostname, clusterName));
+                String.format("Starting node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -575,7 +518,7 @@ public class MongoImpl implements Mongo {
     public UUID stopNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -618,7 +561,7 @@ public class MongoImpl implements Mongo {
     public UUID checkNode(final String clusterName, final String lxcHostname) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                        String.format("Checking state of %s in %s", lxcHostname, clusterName));
+                String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -645,9 +588,9 @@ public class MongoImpl implements Mongo {
                 if (checkNodeCommand.hasCompleted()) {
                     AgentResult agentResult = checkNodeCommand.getResults().get(node.getUuid());
                     if (agentResult != null) {
-                        if (agentResult.getStdOut().indexOf("couldn't connect to server") > -1) {
+                        if (agentResult.getStdOut().contains("couldn't connect to server")) {
                             po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.STOPPED));
-                        } else if (agentResult.getStdOut().indexOf("connecting to") > -1) {
+                        } else if (agentResult.getStdOut().contains("connecting to")) {
                             po.addLogDone(String.format("Node on %s is %s", lxcHostname, NodeState.RUNNING));
                         } else {
                             po.addLogFailed(String.format("Node on %s is not found", lxcHostname));
@@ -736,7 +679,7 @@ public class MongoImpl implements Mongo {
                 Matcher m = p.matcher(result.getStdOut());
                 if (m.find()) {
                     String primaryNodeHost = m.group(1);
-                    if (!Util.isStringEmpty(primaryNodeHost)) {
+                    if (!Strings.isNullOrEmpty(primaryNodeHost)) {
                         String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                         primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                     }
@@ -745,7 +688,7 @@ public class MongoImpl implements Mongo {
                 if (primaryNodeAgent != null) {
                     Command registerSecondaryNodeWithPrimaryCommand
                             = Commands.getRegisterSecondaryNodeWithPrimaryCommand(
-                                    agent, config.getDataNodePort(), config.getDomainName(), primaryNodeAgent);
+                            agent, config.getDataNodePort(), config.getDomainName(), primaryNodeAgent);
 
                     commandRunner.runCommand(registerSecondaryNodeWithPrimaryCommand);
                     if (registerSecondaryNodeWithPrimaryCommand.hasSucceeded()) {
@@ -782,7 +725,7 @@ public class MongoImpl implements Mongo {
 
                     @Override
                     public void onResponse(Response response, AgentResult agentResult, Command command) {
-                        if (agentResult.getStdOut().toString().contains(
+                        if (agentResult.getStdOut().contains(
                                 "child process started successfully, parent exiting")) {
                             commandOK.set(true);
                             stop();

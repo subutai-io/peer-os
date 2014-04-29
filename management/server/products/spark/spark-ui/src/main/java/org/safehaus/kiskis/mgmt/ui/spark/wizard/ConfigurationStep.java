@@ -5,35 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.ui.spark.wizard;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
+
+import java.util.*;
 
 /**
  * @author dilshat
  */
 public class ConfigurationStep extends Panel {
 
-    private final ComboBox hadoopClustersCombo;
     private final TwinColSelect slaveNodesSelect;
     private final ComboBox masterNodeCombo;
 
@@ -46,7 +34,7 @@ public class ConfigurationStep extends Panel {
         content.setSpacing(true);
         content.setMargin(true);
 
-        hadoopClustersCombo = new ComboBox("Hadoop cluster");
+        ComboBox hadoopClustersCombo = new ComboBox("Hadoop cluster");
         masterNodeCombo = new ComboBox("Master node");
         slaveNodesSelect = new TwinColSelect("Slave nodes", new ArrayList<Agent>());
 
@@ -162,7 +150,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
                 } else if (wizard.getConfig().getMasterNode() == null) {
                     show("Please, select master node");

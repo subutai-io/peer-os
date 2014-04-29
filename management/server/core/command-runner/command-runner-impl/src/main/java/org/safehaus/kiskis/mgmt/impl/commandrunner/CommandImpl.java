@@ -5,26 +5,18 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
+import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+
+import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This is implementation of Command interface
@@ -47,6 +39,8 @@ public class CommandImpl implements Command {
     private final Semaphore completionSemaphore = new Semaphore(0);
     //lock used to synchronize update of command state between command executor thread and cache evictor thread
     private final Lock updateLock = new ReentrantLock(true);
+    //command description
+    private final String description;
     //status of command
     private volatile CommandStatus commandStatus = CommandStatus.NEW;
     //number of requests completed so far
@@ -55,17 +49,15 @@ public class CommandImpl implements Command {
     private volatile int requestsSucceeded = 0;
     //custom object assigned to this command
     private Object data;
-    //command description
-    private final String description;
 
     /**
      * Constructor which initializes request based on supplied request builder
      * and set of agents. The same request produced by request builder will be
      * sent to supplied set of agents
      *
-     * @param description - command description
+     * @param description    - command description
      * @param requestBuilder - request builder used to produce request
-     * @param agents - target agents
+     * @param agents         - target agents
      */
     public CommandImpl(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
 
@@ -87,8 +79,8 @@ public class CommandImpl implements Command {
      * Each agent will receive own custom request produced by corresponding
      * AgentRequestBuilder
      *
-     * @param description - command description
-     * @param requestBuilder - request builder used to produce request
+     * @param description     - command description
+     * @param requestBuilders - request builder used to produce request
      */
     public CommandImpl(String description, Set<AgentRequestBuilder> requestBuilders) {
         Preconditions.checkArgument(requestBuilders != null && !requestBuilders.isEmpty(), "Request Builders are null or empty");
@@ -113,7 +105,7 @@ public class CommandImpl implements Command {
      * command.getCommandStatus == CommandStatus.SUCCEEDED ||
      * command.getCommandStatus == CommandStatus.FAILED
      *
-     * @return
+     * @return - true if completed, false otherwise
      */
     public boolean hasCompleted() {
         return commandStatus == CommandStatus.FAILED || commandStatus == CommandStatus.SUCCEEDED;
@@ -123,7 +115,7 @@ public class CommandImpl implements Command {
      * Shows if command has succeeded. The same as checking
      * command.getCommandStatus == CommandStatus.SUCCEEDED
      *
-     * @return
+     * @return - true if succeeded, false otherwise
      */
     public boolean hasSucceeded() {
         return commandStatus == CommandStatus.SUCCEEDED;
@@ -132,17 +124,26 @@ public class CommandImpl implements Command {
     /**
      * Returns command status
      *
-     * @return
+     * @return - status of command
      */
     public CommandStatus getCommandStatus() {
         return commandStatus;
     }
 
     /**
+     * Sets command status
+     *
+     * @param commandStatus - new status of command
+     */
+    public void setCommandStatus(CommandStatus commandStatus) {
+        this.commandStatus = commandStatus;
+    }
+
+    /**
      * Returns map of results from agents where key is agent's UUID and value is
      * instance of AgentResult
      *
-     * @return
+     * @return - map of agents' results
      */
     public Map<UUID, AgentResult> getResults() {
         return Collections.unmodifiableMap(results);
@@ -225,7 +226,7 @@ public class CommandImpl implements Command {
      * Return timeout of command, which is the maximum timeout among all
      * requests of this command
      *
-     * @return
+     * @return - command timeout
      */
     public int getTimeout() {
         return timeout;
@@ -234,25 +235,16 @@ public class CommandImpl implements Command {
     /**
      * Returns all request of this command
      *
-     * @return
+     * @return - requests of command
      */
     public Set<Request> getRequests() {
         return Collections.unmodifiableSet(requests);
     }
 
     /**
-     * Sets command status
-     *
-     * @param commandStatus
-     */
-    public void setCommandStatus(CommandStatus commandStatus) {
-        this.commandStatus = commandStatus;
-    }
-
-    /**
      * Returns count of requests in this command
      *
-     * @return
+     * @return number of requests in command
      */
     public int getRequestsCount() {
         return requestsCount;
@@ -261,7 +253,7 @@ public class CommandImpl implements Command {
     /**
      * Returns number of requests completed so far
      *
-     * @return
+     * @return - number of completed requests
      */
     public int getRequestsCompleted() {
         return requestsCompleted;
@@ -270,7 +262,7 @@ public class CommandImpl implements Command {
     /**
      * Returns number of requests succeeded so far
      *
-     * @return
+     * @return - number of succeeded requests
      */
     public int getRequestsSucceeded() {
         return requestsSucceeded;
@@ -279,34 +271,34 @@ public class CommandImpl implements Command {
     /**
      * Returns command UUID
      *
-     * @return
+     * @return - UUID of command
      */
     public UUID getCommandUUID() {
         return commandUUID;
     }
 
     /**
-     * Assigns custom object to this command
-     *
-     * @param data
-     */
-    public void setData(Object data) {
-        this.data = data;
-    }
-
-    /**
      * Returns custom object assigned to this command or null
      *
-     * @return
+     * @return - custom object or null
      */
     public Object getData() {
         return data;
     }
 
     /**
+     * Assigns custom object to this command
+     *
+     * @param data - custom object
+     */
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    /**
      * Returns command description or null
      *
-     * @return
+     * @return - description of command
      */
     public String getDescription() {
         return description;

@@ -7,11 +7,11 @@ package org.safehaus.kiskis.mgmt.impl.tracker;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import java.util.Date;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * This is an implementaion of ProductOperation
@@ -41,16 +41,14 @@ public class ProductOperationImpl implements ProductOperation {
      * Creation date of product operation
      */
     private final Date createDate;
-
-    /**
-     * State of product operation
-     */
-    private ProductOperationState state;
-
     /**
      * Source of product operation
      */
     private final String source;
+    /**
+     * State of product operation
+     */
+    private ProductOperationState state;
 
     public ProductOperationImpl(String source, String description, TrackerImpl tracker) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(source), "Source is null or empty");
@@ -83,7 +81,7 @@ public class ProductOperationImpl implements ProductOperation {
     }
 
     private void addLog(String logString, ProductOperationState state) {
-        if (!Util.isStringEmpty(logString)) {
+        if (!Strings.isNullOrEmpty(logString)) {
 
             if (log.length() > 0) {
                 log.append("\n");
@@ -108,8 +106,7 @@ public class ProductOperationImpl implements ProductOperation {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        return hash;
+        return 7;
     }
 
     @Override
@@ -121,10 +118,7 @@ public class ProductOperationImpl implements ProductOperation {
             return false;
         }
         final ProductOperationImpl other = (ProductOperationImpl) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !(this.id != other.id && (this.id == null || !this.id.equals(other.id)));
     }
 
     public Date createDate() {

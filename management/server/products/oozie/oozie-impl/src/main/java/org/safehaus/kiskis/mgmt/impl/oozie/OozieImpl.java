@@ -67,47 +67,52 @@ public class OozieImpl implements Oozie {
                 }
 
                 if (dbManager.saveInfo(config.PRODUCT_KEY, config.getClusterName(), config)) {
-
+                    po.addLog("Cluster info saved to DB");
 
                     // Installing Oozie server
-                    po.addLog("Cluster info saved to DB\nInstalling Oozie server...");
+                    po.addLog("Installing Oozie server...");
                     Task installServerTask = taskRunner.executeTaskNWait(Tasks.getInstallServerTask(config.getServer()));
 
-                    if (installServerTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                    if (installServerTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Install server successful.");
+                    } else {
                         po.addLogFailed(String.format("Installation failed, %s", installServerTask.getFirstError()));
                         return;
                     }
 
                     // Installing Oozie client
-                    po.addLog("Cluster info saved to DB\nInstalling Oozie clients...");
+                    po.addLog("Installing Oozie clients...");
                     Task installClientsTask = taskRunner.executeTaskNWait(Tasks.getInstallClientsTask(config.getClients()));
 
-                    if (installClientsTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                    if (installClientsTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Install clients successful.");
+                    } else {
                         po.addLogFailed(String.format("Installation failed, %s", installClientsTask.getFirstError()));
                         return;
                     }
 
-
                     // Configuring root hosts
-                    po.addLog("Installation succeeded\nConfiguring root hosts...");
+                    po.addLog("Configuring root hosts...");
                     Task configMasterTask = taskRunner.executeTaskNWait(Tasks.getConfigureRootHostsTask(config.getHadoopNodes(),  config.getServer().getListIP().get(0)));
 
-                    if (configMasterTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                    if (configMasterTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Configuring root hosts successful.");
+                    } else {
                         po.addLogFailed(String.format("Configuration failed, %s", configMasterTask.getFirstError()));
                         return;
                     }
-                    po.addLog("Configuring root hosts succeeded\nConfiguring root groups...");
 
+                    po.addLog("Configuring root groups...");
                     // Configuring root groups
                     Task configRegionTask = taskRunner.executeTaskNWait(Tasks.getConfigureRootGroupsTask(config.getHadoopNodes()));
 
-                    if (configRegionTask.getTaskStatus() != TaskStatus.SUCCESS) {
+                    if (configRegionTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                        po.addLog("Configuring root groups successful.");
+                    } else {
                         po.addLogFailed(String.format("Configuring failed, %s", configRegionTask.getFirstError()));
                         return;
                     }
-                    po.addLog("Configuring root groups succeeded\n");
-
-                    po.addLog("Oozie installation succeeded\n");
+                    po.addLogDone("Oozie installation succeeded");
 
 
                 } else {

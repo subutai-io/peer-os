@@ -6,10 +6,9 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.enums;
 
 /**
- *
  * @author dilshat
  */
 public enum NodeState {
 
-    STOPPED, RUNNING, UNKNOWN
+    STOPPED, RUNNING, NodeState, UNKNOWN
 }

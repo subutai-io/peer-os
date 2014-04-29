@@ -1,21 +1,18 @@
 package org.safehaus.kiskis.mgmt.ui.lxcmanager.clone;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("serial")
 public class Cloner extends VerticalLayout {
@@ -63,8 +60,7 @@ public class Cloner extends VerticalLayout {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 //clear completed
-                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
-                    Object rowId = it.next();
+                for (Object rowId : lxcTable.getItemIds()) {
                     Item row = lxcTable.getItem(rowId);
                     if (row != null) {
                         Embedded statusIcon = (Embedded) (row.getItemProperty(statusLabel).getValue());
@@ -76,8 +72,7 @@ public class Cloner extends VerticalLayout {
                     }
                 }
                 //clear empty parents
-                for (Iterator it = lxcTable.getItemIds().iterator(); it.hasNext();) {
-                    Object rowId = it.next();
+                for (Object rowId : lxcTable.getItemIds()) {
                     Item row = lxcTable.getItem(rowId);
                     if (row != null && row.getItemProperty(physicalHostLabel).getValue() != null
                             && (lxcTable.getChildren(rowId) == null || lxcTable.getChildren(rowId).isEmpty())) {
@@ -136,10 +131,11 @@ public class Cloner extends VerticalLayout {
                 Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
 
                 lxcTable.addItem(new Object[]{
-                    null,
-                    lxc,
-                    progressIcon},
-                        lxc);
+                                null,
+                                lxc,
+                                progressIcon},
+                        lxc
+                );
 
                 lxcTable.setParent(lxc, agent.getHostname());
                 lxcTable.setChildrenAllowed(lxc, false);
@@ -151,7 +147,7 @@ public class Cloner extends VerticalLayout {
         Set<Agent> physicalAgents = Util.filterPhysicalAgents(agentTree.getSelectedAgents());
         final String productName = textFieldLxcName.getValue().toString().trim();
 
-        if (!Util.isStringEmpty(productName) && !productName.matches(hostValidatorRegex)) {
+        if (!Strings.isNullOrEmpty(productName) && !productName.matches(hostValidatorRegex)) {
             show("Please, use only letters, digits, dots and hyphens in product name");
         } else if (physicalAgents.isEmpty()) {
             indicator.setVisible(true);
@@ -186,14 +182,14 @@ public class Cloner extends VerticalLayout {
                                     lxcHostNames = new ArrayList<String>();
                                     agentFamilies.put(entry.getKey(), lxcHostNames);
                                 }
-                                final StringBuilder lxcHost = new StringBuilder(entry.getKey().getHostname());
-                                lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR);
-                                if (Util.isStringEmpty(productName)) {
-                                    lxcHost.append(Util.generateTimeBasedUUID().toString());
-                                } else {
+                                final StringBuilder lxcHost = new StringBuilder();
+//                                lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR);
+                                if (!Strings.isNullOrEmpty(productName)) {
                                     lxcHost.append(productName);
                                     lxcHost.append(lxcHostNames.size() + 1);
+                                    lxcHost.append("-");
                                 }
+                                lxcHost.append(Util.generateTimeBasedUUID().toString());
                                 lxcHostNames.add(lxcHost.toString());
 
                                 //start clone task
@@ -229,13 +225,11 @@ public class Cloner extends VerticalLayout {
             for (Agent physAgent : physicalAgents) {
                 List<String> lxcHostNames = new ArrayList<String>();
                 for (int i = 1; i <= count; i++) {
-                    StringBuilder lxcHost = new StringBuilder(physAgent.getHostname());
-                    lxcHost.append(Common.PARENT_CHILD_LXC_SEPARATOR);
-                    if (!Util.isStringEmpty(productName)) {
-                        lxcHost.append(productName).append(i);
-                    } else {
-                        lxcHost.append(Util.generateTimeBasedUUID().toString());
+                    StringBuilder lxcHost = new StringBuilder();
+                    if (!Strings.isNullOrEmpty(productName)) {
+                        lxcHost.append(productName).append(i).append("-");
                     }
+                    lxcHost.append(Util.generateTimeBasedUUID().toString());
                     lxcHostNames.add(lxcHost.toString());
                 }
                 agentFamilies.put(physAgent, lxcHostNames);

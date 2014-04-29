@@ -10,5 +10,5 @@ package org.safehaus.kiskis.mgmt.impl.cassandra;
  */
 public enum TaskType {
 
-    CHECK, INSTALL, UNINSTALL, START, STOP, STATUS
+    CHECK, INSTALL, UNINSTALL, START, STOP, CONFIGURE, APTUPDATE, START_ALL, CHECK_ALL, STOP_ALL, STATUS
 }

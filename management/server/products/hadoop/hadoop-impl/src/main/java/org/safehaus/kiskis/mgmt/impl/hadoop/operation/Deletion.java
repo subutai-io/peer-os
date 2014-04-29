@@ -7,7 +7,6 @@ import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -31,7 +30,7 @@ public class Deletion {
             public void run() {
                 Config config = parent.getDbManager().getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
                 if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
@@ -44,12 +43,8 @@ public class Deletion {
 
                 po.addLog("Destroying lxc containers...");
 
-                Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getAllNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
                 try {
-                    parent.getLxcManager().destroyLxcs(lxcHostnames);
+                    parent.getLxcManager().destroyLxcs(new HashSet<Agent>(config.getAllNodes()));
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
