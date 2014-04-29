@@ -17,14 +17,6 @@ public interface Cassandra {
 
     public UUID uninstallCluster(String clusterName);
 
-    public UUID startNode(String clusterName, String lxcHostname);
-
-    public UUID stopNode(String clusterName, String lxcHostname);
-
-    public UUID checkNode(String clusterName, String lxcHostname);
-
-//    public UUID destroyNode(String clusterName, String lxcHostname);
-
     /**
      * Returns list of configurations of installed clusters
      *
@@ -33,7 +25,6 @@ public interface Cassandra {
     public List<Config> getClusters();
 
     UUID startAllNodes(String clusterName);
-
 
     UUID checkAllNodes(String clusterName);
 

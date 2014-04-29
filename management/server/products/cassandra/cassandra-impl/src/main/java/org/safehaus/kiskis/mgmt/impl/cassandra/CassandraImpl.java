@@ -208,7 +208,7 @@ public class CassandraImpl implements Cassandra {
                         for (Agent seed : config.getSeedNodes()) {
                             sb.append(Util.getAgentIpByMask(seed, Common.IP_MASK)).append(",");
                         }
-                        sb.replace(sb.toString().length()-1, sb.toString().length(), "");
+                        sb.replace(sb.toString().length() - 1, sb.toString().length(), "");
 //                        sb.append('"');
                         po.addLog("Settings seeds " + sb.toString());
 
@@ -278,157 +278,7 @@ public class CassandraImpl implements Cassandra {
         return po.getId();
     }
 
-    public UUID startNode(final String clusterName, final String lxcHostName) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting node %s in %s", lxcHostName, clusterName));
-
-        executor.execute(new Runnable() {
-
-            public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
-                    return;
-                }
-
-                final Agent node = agentManager.getAgentByHostname(lxcHostName);
-                if (node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
-                    return;
-                }
-                po.addLog("Starting node...");
-                Task startNodeTask = Tasks.getStartTask(node);
-                final Task checkNodeTask = Tasks.getStatusTask(node);
-
-                taskRunner.executeTask(startNodeTask, new TaskCallback() {
-
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                        if (task.getData() == TaskType.START && task.isCompleted()) {
-                            //run status check task
-                            return checkNodeTask;
-
-                        } else if (task.getData() == TaskType.STATUS) {
-                            if (Util.isFinalResponse(response)) {
-                                if (stdOut.contains("is running")) {
-                                    task.setData(NodeState.RUNNING);
-                                } else if (stdOut.contains("is not running")) {
-                                    task.setData(NodeState.STOPPED);
-                                }
-
-                                synchronized (task) {
-                                    task.notifyAll();
-                                }
-                            }
-
-                        }
-
-                        return null;
-                    }
-                });
-
-                synchronized (checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + startNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
-
-                if (NodeState.RUNNING.equals(checkNodeTask.getData())) {
-                    po.addLogDone(String.format("Node on %s started", lxcHostName));
-                } else {
-                    po.addLogFailed(String.format("Failed to start node %s. %s",
-                            lxcHostName,
-                            startNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
-                    ));
-                }
-
-            }
-        });
-
-        return po.getId();
-    }
-
-    public UUID stopNode(final String clusterName, final String lxcHostName) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping node %s in %s", lxcHostName, clusterName));
-
-        executor.execute(new Runnable() {
-
-            public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
-                    return;
-                }
-
-                final Agent node = agentManager.getAgentByHostname(lxcHostName);
-                if (node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostName));
-                    return;
-                }
-                po.addLog("Stopping node...");
-                Task stopNodeTask = Tasks.getStopTask(node);
-                final Task checkNodeTask = Tasks.getStatusTask(node);
-
-                taskRunner.executeTask(stopNodeTask, new TaskCallback() {
-
-                    @Override
-                    public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-
-                        if (task.getData() == TaskType.STOP && task.isCompleted()) {
-                            //run status check task
-                            return checkNodeTask;
-
-                        } else if (task.getData() == TaskType.STATUS) {
-                            if (Util.isFinalResponse(response)) {
-                                if (stdOut.contains("is running")) {
-                                    task.setData(NodeState.RUNNING);
-                                } else if (stdOut.contains("is not running")) {
-                                    task.setData(NodeState.STOPPED);
-                                }
-
-                                synchronized (task) {
-                                    task.notifyAll();
-                                }
-                            }
-
-                        }
-
-                        return null;
-                    }
-                });
-
-                synchronized (checkNodeTask) {
-                    try {
-                        checkNodeTask.wait((checkNodeTask.getAvgTimeout() + stopNodeTask.getAvgTimeout()) * 1000 + 1000);
-                    } catch (InterruptedException ex) {
-                    }
-                }
-
-                if (NodeState.STOPPED.equals(checkNodeTask.getData())) {
-                    po.addLogDone(String.format("Node on %s stopped", lxcHostName));
-                } else {
-                    po.addLogFailed(String.format("Failed to stop node %s. %s",
-                            lxcHostName,
-                            stopNodeTask.getResults().entrySet().iterator().next().getValue().getStdErr()
-                    ));
-                }
-
-            }
-        });
-
-        return po.getId();
-    }
-
     @Override
-    public UUID checkNode(String clusterName, String lxcHostname) {
-        return null;
-    }
-
     public UUID startAllNodes(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -442,13 +292,13 @@ public class CassandraImpl implements Cassandra {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
+                Command startServiceCommand = Commands.getStartCommand(config.getNodes());
+                commandRunner.runCommand(startServiceCommand);
 
-                Task startTask = taskRunner.executeTaskNWait(Tasks.getStartAllNodesTask(config.getNodes()));
-
-                if (startTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (startServiceCommand.hasSucceeded()) {
                     po.addLogDone("Start succeeded");
                 } else {
-                    po.addLogFailed(String.format("Start failed, %s", startTask.getFirstError()));
+                    po.addLogFailed(String.format("Start failed, %s", startServiceCommand.getAllErrors()));
                 }
 
             }
@@ -457,6 +307,7 @@ public class CassandraImpl implements Cassandra {
         return po.getId();
     }
 
+    @Override
     public UUID stopAllNodes(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -471,12 +322,13 @@ public class CassandraImpl implements Cassandra {
                     return;
                 }
 
-                Task stopTask = taskRunner.executeTaskNWait(Tasks.getStopAllNodesTask(config.getNodes()));
+                Command stopServiceCommand = Commands.getStopCommand(config.getNodes());
+                commandRunner.runCommand(stopServiceCommand);
 
-                if (stopTask.getTaskStatus() == TaskStatus.SUCCESS) {
+                if (stopServiceCommand.hasSucceeded()) {
                     po.addLogDone("Stop succeeded");
                 } else {
-                    po.addLogFailed(String.format("Start failed, %s", stopTask.getFirstError()));
+                    po.addLogFailed(String.format("Start failed, %s", stopServiceCommand.getAllErrors()));
                 }
 
             }
@@ -500,12 +352,13 @@ public class CassandraImpl implements Cassandra {
                     return;
                 }
 
-                Task checkStatusTask = taskRunner.executeTaskNWait(Tasks.getCheckAllNodesTask(config.getNodes()));
+                Command checkStatusCommand = Commands.getConfigureRpcAndListenAddressesCommand(config.getNodes(), "listen_address");
+                commandRunner.runCommand(checkStatusCommand);
 
-                if (checkStatusTask.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLogDone("Check succeeded");
+                if (checkStatusCommand.hasSucceeded()) {
+                    po.addLogDone("All nodes are running.");
                 } else {
-                    po.addLogFailed(String.format("Start failed, %s", checkStatusTask.getFirstError()));
+                    po.addLogFailed(String.format("Check status failed, %s", checkStatusCommand.getAllErrors()));
                 }
 
             }
