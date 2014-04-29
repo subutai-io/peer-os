@@ -5,8 +5,8 @@
 
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-	<artifactId>db-manager-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <artifactId>db-manager-parent</artifactId>
+        <version>2.0.0</version>
     </parent>
 
     <artifactId>db-manager-api</artifactId>
