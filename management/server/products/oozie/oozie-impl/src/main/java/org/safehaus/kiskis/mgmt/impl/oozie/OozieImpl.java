@@ -4,7 +4,6 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
 import org.safehaus.kiskis.mgmt.api.oozie.Config;
 import org.safehaus.kiskis.mgmt.api.oozie.Oozie;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -24,7 +23,6 @@ public class OozieImpl implements Oozie {
     private Tracker tracker;
     private ExecutorService executor;
     private CommandRunner commandRunner;
-    private NetworkManager networkManager;
 
 
     public void init() {
@@ -52,10 +50,6 @@ public class OozieImpl implements Oozie {
         this.commandRunner = commandRunner;
     }
 
-    public void setNetworkManager(NetworkManager networkManager) {
-        this.networkManager = networkManager;
-    }
-
     public UUID installCluster(final Config config) {
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Oozie");
 
@@ -73,15 +67,6 @@ public class OozieImpl implements Oozie {
                     Set<Agent> allNodes = new HashSet<Agent>();
                     allNodes.add(config.getServer());
                     allNodes.addAll(config.getClients());
-
-                    po.addLog("Configuring networking between nodes...");
-                    if (networkManager.configHostsOnAgents(new ArrayList<Agent>(allNodes), config.getDomainInfo()) &&
-                            networkManager.configSshOnAgents(new ArrayList<Agent>(allNodes))) {
-                        po.addLog("Network configuration done...");
-                    } else {
-                        po.addLogFailed(String.format("Network configuration failed..."));
-                        return;
-                    }
 
                     // Installing Oozie server
                     po.addLog("Installing Oozie server...");

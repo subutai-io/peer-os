@@ -9,8 +9,6 @@
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>    
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
-    <reference id="networkManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager"/>
 
     <bean id="oozie-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.oozie.OozieImpl"
           init-method="init" destroy-method="destroy">
@@ -18,7 +16,6 @@
         <property name="agentManager" ref="agentManager"/>
         <property name="tracker" ref="tracker" />
         <property name="dbManager" ref="dbManager" />
-        <property name="networkManager" ref="networkManager" />
     </bean>
        
     <service ref="oozie-impl" interface="org.safehaus.kiskis.mgmt.api.oozie.Oozie"/>
