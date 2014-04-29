@@ -18,6 +18,7 @@ public class SqoopUI implements Module {
     private static DbManager dbManager;
 
     private static ExecutorService executor;
+    private static SqoopForm form;
 
     public void init() {
         executor = Executors.newCachedThreadPool();
@@ -71,7 +72,12 @@ public class SqoopUI implements Module {
     }
 
     public Component createComponent() {
-        return new SqoopForm();
+        SqoopUI.form = new SqoopForm();
+        return SqoopUI.form;
+    }
+
+    public static SqoopForm getForm() {
+        return form;
     }
 
 }

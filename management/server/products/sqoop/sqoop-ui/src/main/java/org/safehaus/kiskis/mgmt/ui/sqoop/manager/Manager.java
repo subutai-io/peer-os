@@ -19,6 +19,8 @@ public class Manager {
     private final VerticalLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
+    private final ImportPanel importPanel;
+    private final ExportPanel exportPanel;
     private Config config;
 
     public Manager() {
@@ -135,6 +137,9 @@ public class Manager {
         content.addComponent(controlsContent);
         content.addComponent(nodesTable);
 
+        importPanel = new ImportPanel();
+        exportPanel = new ExportPanel();
+
     }
 
     public Component getContent() {
@@ -170,7 +175,9 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    // TODO:
+                    importPanel.setAgent(agent);
+                    importPanel.setType(null);
+                    SqoopUI.getForm().addTab(importPanel);
                 }
             });
 
@@ -178,7 +185,8 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    // TODO:
+                    exportPanel.setAgent(agent);
+                    SqoopUI.getForm().addTab(exportPanel);
                 }
             });
 
@@ -254,7 +262,7 @@ public class Manager {
         table.setHeight(size, Sizeable.UNITS_PIXELS);
 
         table.setPageLength(10);
-        table.setSelectable(true); // TODO:
+        table.setSelectable(true);
         table.setImmediate(true);
 
         table.addListener(new ItemClickEvent.ItemClickListener() {
