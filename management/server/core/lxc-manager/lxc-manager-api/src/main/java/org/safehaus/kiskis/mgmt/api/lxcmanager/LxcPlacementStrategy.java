@@ -5,8 +5,8 @@
  */
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public abstract class LxcPlacementStrategy {
         if (physicalNode == null) {
             throw new LxcCreateException("Physical node is null");
         }
-        if (Util.isStringEmpty(nodeType)) {
+        if (Strings.isNullOrEmpty(nodeType)) {
             throw new LxcCreateException("Node type is null or empty");
         }
         if (numberOfLxcsToCreate <= 0) {

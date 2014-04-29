@@ -5,45 +5,43 @@
  */
 package org.safehaus.kiskis.mgmt.impl.mongodb.common;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandsSingleton;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.impl.mongodb.MongoImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
+import java.util.*;
+
 /**
- *
  * @author dilshat
  */
-public class Commands {
+public class Commands extends CommandsSingleton {
 
     // INSTALLATION COMMANDS ===================================================
     public static Command getInstallCommand(Set<Agent> agents) {
-        return MongoImpl.getCommandRunner().createCommand("Install Mongo",
+        return createCommand("Install Mongo",
                 new RequestBuilder(
                         "sleep 10 ; /usr/bin/apt-get --force-yes --assume-yes install ksks-mongo")
-                .withTimeout(360),
-                agents);
+                        .withTimeout(360),
+                agents
+        );
     }
 
     public static Command getSetReplicaSetNameCommand(String replicaSetName, Set<Agent> agents) {
-        return MongoImpl.getCommandRunner().createCommand("Set replica set name",
+        return createCommand("Set replica set name",
                 new RequestBuilder(
                         String.format(
                                 "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'",
                                 replicaSetName,
                                 Constants.DATA_NODE_CONF_FILE)
                 ).withTimeout(30),
-                agents);
+                agents
+        );
     }
 
     public static Command getAddIpHostToEtcHostsCommand(String domainName, Set<Agent> agents) {
@@ -78,19 +76,20 @@ public class Commands {
 
         }
 
-        return MongoImpl.getCommandRunner().createCommand("Add ip-host pair to /etc/hosts", requestBuilders);
+        return createCommand("Add ip-host pair to /etc/hosts", requestBuilders);
     }
 
     public static Command getRegisterSecondaryNodeWithPrimaryCommand(Agent secondaryNodeAgent, int dataNodePort, String domainName, Agent primaryNodeAgent) {
 
-        return MongoImpl.getCommandRunner().createCommand("Register node with replica",
+        return createCommand("Register node with replica",
                 new RequestBuilder(
                         String.format(
                                 "mongo --port %s --eval \"%s\"",
                                 dataNodePort,
                                 "rs.add('" + secondaryNodeAgent.getHostname() + "." + domainName + ":" + dataNodePort + "');")
                 ).withTimeout(90),
-                Util.wrapAgentToSet(primaryNodeAgent));
+                Util.wrapAgentToSet(primaryNodeAgent)
+        );
     }
 
     public static Command getRegisterSecondaryNodesWithPrimaryCommand(Set<Agent> dataNodes, int dataNodePort, String domainName) {
@@ -105,7 +104,7 @@ public class Commands {
                     append(":").append(dataNodePort).append("');");
         }
 
-        return MongoImpl.getCommandRunner().createCommand("Initiate replica set",
+        return createCommand("Initiate replica set",
                 new RequestBuilder(
                         String.format(
                                 "mongo --port %s --eval \"rs.initiate();\" ; sleep 30 ; mongo --port %s --eval \"%s\"",
@@ -113,11 +112,12 @@ public class Commands {
                                 dataNodePort,
                                 secondaryStr.toString())
                 ).withTimeout(180),
-                Util.wrapAgentToSet(primaryNodeAgent));
+                Util.wrapAgentToSet(primaryNodeAgent)
+        );
     }
 
     public static Command getUnregisterSecondaryNodeFromPrimaryCommand(Agent primaryNodeAgent, int dataNodePort, Agent removeNode, String domainName) {
-        return MongoImpl.getCommandRunner().createCommand("Unregister node from replica",
+        return createCommand("Unregister node from replica",
                 new RequestBuilder(
                         String.format(
                                 "mongo --port %s --eval \"rs.remove('%s.%s:%s');\"",
@@ -127,7 +127,8 @@ public class Commands {
                                 dataNodePort
                         )
                 ).withTimeout(30),
-                Util.wrapAgentToSet(primaryNodeAgent));
+                Util.wrapAgentToSet(primaryNodeAgent)
+        );
     }
 
     public static Command getRegisterReplicaWithRouterCommand(Set<Agent> dataNodes, int routerPort, int dataNodePort, String domainName, String replicaSetName, Agent router) {
@@ -138,7 +139,7 @@ public class Commands {
                     append(":").append(dataNodePort).append("');");
         }
 
-        return MongoImpl.getCommandRunner().createCommand("Register replica with router",
+        return createCommand("Register replica with router",
                 new RequestBuilder(
                         String.format(
                                 "sleep 30 ; mongo --port %s --eval \"%s\"",
@@ -146,21 +147,24 @@ public class Commands {
                                 shard.toString()
                         )
                 ).withTimeout(120),
-                Util.wrapAgentToSet(router));
+                Util.wrapAgentToSet(router)
+        );
     }
 
     // LIFECYCLE COMMANDS =======================================================
     public static Command getStartConfigServerCommand(int cfgSrvPort, Set<Agent> configServers) {
-        return MongoImpl.getCommandRunner().createCommand("Start config server(s)",
+        return createCommand("Start config server(s)",
                 new RequestBuilder(
                         String.format("/bin/mkdir -p %s ; mongod --configsvr --dbpath %s --port %s --fork --logpath %s/mongodb.log",
                                 Constants.CONFIG_DIR,
                                 Constants.CONFIG_DIR,
                                 cfgSrvPort,
                                 Constants.LOG_DIR
-                        ))
-                .withTimeout(Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC),
-                configServers);
+                        )
+                )
+                        .withTimeout(Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC),
+                configServers
+        );
     }
 
     public static Command getStartRouterCommand(int routerPort, int cfgSrvPort, String domainName, Set<Agent> configServers, Set<Agent> routers) {
@@ -175,53 +179,61 @@ public class Commands {
             configServersArg.setLength(configServersArg.length() - 1);
         }
 
-        return MongoImpl.getCommandRunner().createCommand("Start router(s)",
+        return createCommand("Start router(s)",
                 new RequestBuilder(
                         String.format("mongos --configdb %s --port %s --fork --logpath %s/mongodb.log",
                                 configServersArg.toString(),
                                 routerPort,
                                 Constants.LOG_DIR
-                        ))
-                .withTimeout(Timeouts.START_ROUTER_TIMEOUT_SEC),
-                routers);
+                        )
+                )
+                        .withTimeout(Timeouts.START_ROUTER_TIMEOUT_SEC),
+                routers
+        );
     }
 
     public static Command getStartDataNodeCommand(int dataNodePort, Set<Agent> dataNodes) {
-        return MongoImpl.getCommandRunner().createCommand("Start data node(s)",
+        return createCommand("Start data node(s)",
                 new RequestBuilder(
                         String.format("mongod --config %s --port %s --fork --logpath %s/mongodb.log",
                                 Constants.DATA_NODE_CONF_FILE,
                                 dataNodePort,
                                 Constants.LOG_DIR
-                        ))
-                .withTimeout(Timeouts.START_DATE_NODE_TIMEOUT_SEC),
-                dataNodes);
+                        )
+                )
+                        .withTimeout(Timeouts.START_DATE_NODE_TIMEOUT_SEC),
+                dataNodes
+        );
     }
 
     public static Command getCheckInstanceRunningCommand(Agent node, String domainName, int port) {
-        return MongoImpl.getCommandRunner().createCommand("Check node(s)",
+        return createCommand("Check node(s)",
                 new RequestBuilder(
                         String.format("mongo --host %s.%s --port %s",
                                 node.getHostname(),
                                 domainName,
                                 port
-                        ))
-                .withTimeout(Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC),
-                Util.wrapAgentToSet(node));
+                        )
+                )
+                        .withTimeout(Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC),
+                Util.wrapAgentToSet(node)
+        );
     }
 
     public static Command getStopNodeCommand(Set<Agent> nodes) {
-        return MongoImpl.getCommandRunner().createCommand("Stop node(s)",
+        return createCommand("Stop node(s)",
                 new RequestBuilder("/usr/bin/pkill -2 mongo")
-                .withTimeout(Timeouts.STOP_NODE_TIMEOUT_SEC),
-                nodes);
+                        .withTimeout(Timeouts.STOP_NODE_TIMEOUT_SEC),
+                nodes
+        );
     }
 
     public static Command getFindPrimaryNodeCommand(Agent secondaryNode, int dataNodePort) {
-        return MongoImpl.getCommandRunner().createCommand("Find primary node",
+        return createCommand("Find primary node",
                 new RequestBuilder(String.format("/bin/echo 'db.isMaster()' | mongo --port %s", dataNodePort))
-                .withTimeout(30),
-                Util.wrapAgentToSet(secondaryNode));
+                        .withTimeout(30),
+                Util.wrapAgentToSet(secondaryNode)
+        );
     }
 
     public static List<Command> getInstallationCommands(Config config) {

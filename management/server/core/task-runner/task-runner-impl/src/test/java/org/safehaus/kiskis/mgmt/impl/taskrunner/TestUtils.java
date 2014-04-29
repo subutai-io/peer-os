@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.taskrunner;
 
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -16,18 +15,22 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
+import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
- *
  * @author dilshat
  */
 public class TestUtils {
 
     public static Response getResponse(ResponseType responseType, Integer exitCode, Task task) {
-        Response response = new Response();
-        response.setUuid(task.getRequests().get(0).getUuid());
-        response.setTaskUuid(task.getUuid());
-        response.setType(responseType);
-        response.setExitCode(exitCode);
+        Response response = mock(Response.class);
+        when(response.getUuid()).thenReturn(task.getRequests().get(0).getUuid());
+        when(response.getTaskUuid()).thenReturn(task.getUuid());
+        when(response.getType()).thenReturn(responseType);
+        when(response.getExitCode()).thenReturn(exitCode);
 
         return response;
     }
@@ -35,7 +38,7 @@ public class TestUtils {
     public static Task getTask(int timeout) {
         Task task = new Task();
         UUID agentID = UUID.randomUUID();
-        Agent agent = new Agent(agentID, "testhost");
+        Agent agent = new Agent(agentID, "testhost", "parent", null, null, true, null);
         Request req = getRequestTemplate();
         req.setTimeout(timeout);
         task.addRequest(req, agent);
@@ -62,13 +65,12 @@ public class TestUtils {
     }
 
     public static TaskCallback getCallback() {
-        TaskCallback callback = new TaskCallback() {
+        return new TaskCallback() {
 
             public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
                 return null;
             }
         };
-        return callback;
     }
 
 }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * @author dilshat
@@ -319,8 +320,8 @@ public class TaskRunnerImplTaskStatusesTest {
         Thread.sleep(10);
 
         Response response = TestUtils.getResponse(ResponseType.EXECUTE_RESPONSE, null, task);
-        response.setStdOut("stdout");
-        response.setStdErr("stderr");
+        when(response.getStdOut()).thenReturn("stdout");
+        when(response.getStdErr()).thenReturn("stderr");
 
         //supply outs
         ((ResponseListener) taskrunner).onResponse(response);
@@ -349,8 +350,8 @@ public class TaskRunnerImplTaskStatusesTest {
         Thread.sleep(10);
 
         Response response = TestUtils.getResponse(ResponseType.EXECUTE_RESPONSE, null, task);
-        response.setStdOut("stdout1");
-        response.setStdErr("stderr1");
+        when(response.getStdOut()).thenReturn("stdout1");
+        when(response.getStdErr()).thenReturn("stderr1");
 
         //supply outs
         ((ResponseListener) taskrunner).onResponse(response);
@@ -359,8 +360,8 @@ public class TaskRunnerImplTaskStatusesTest {
         Thread.sleep(10);
 
         response = TestUtils.getResponse(ResponseType.EXECUTE_RESPONSE, null, task);
-        response.setStdOut("stdout2");
-        response.setStdErr("stderr2");
+        when(response.getStdOut()).thenReturn("stdout2");
+        when(response.getStdErr()).thenReturn("stderr2");
 
         //supply outs
         ((ResponseListener) taskrunner).onResponse(response);
@@ -401,8 +402,8 @@ public class TaskRunnerImplTaskStatusesTest {
         Thread.sleep(10);
 
         Response response = TestUtils.getResponse(ResponseType.EXECUTE_RESPONSE, null, task);
-        response.setStdOut("stdout1");
-        response.setStdErr("stderr1");
+        when(response.getStdOut()).thenReturn("stdout1");
+        when(response.getStdErr()).thenReturn("stderr1");
 
         //supply outs
         ((ResponseListener) taskrunner).onResponse(response);

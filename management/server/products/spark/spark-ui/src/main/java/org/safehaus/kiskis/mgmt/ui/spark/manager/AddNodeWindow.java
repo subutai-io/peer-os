@@ -5,27 +5,19 @@
  */
 package org.safehaus.kiskis.mgmt.ui.spark.manager;
 
+import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.Window;
-
-import java.util.Set;
-import java.util.UUID;
-
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
+
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -33,14 +25,12 @@ import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
 public class AddNodeWindow extends Window {
 
     private final TextArea outputTxtArea;
-    private final Button ok;
     private final Label indicator;
     private volatile boolean track = true;
 
     public AddNodeWindow(final Config config, Set<Agent> nodes) {
         super("Add New Node");
         setModal(true);
-        setClosable(false);
 
         setWidth(600, AddNodeWindow.UNITS_PIXELS);
 
@@ -121,7 +111,7 @@ public class AddNodeWindow extends Window {
         indicator.setWidth(50, Sizeable.UNITS_PIXELS);
         indicator.setVisible(false);
 
-        ok = new Button("Ok");
+        Button ok = new Button("Ok");
         ok.addListener(new Button.ClickListener() {
 
             @Override
@@ -151,16 +141,14 @@ public class AddNodeWindow extends Window {
 
     private void showProgress() {
         indicator.setVisible(true);
-        ok.setEnabled(false);
     }
 
     private void hideProgress() {
         indicator.setVisible(false);
-        ok.setEnabled(true);
     }
 
     private void setOutput(String output) {
-        if (!Util.isStringEmpty(output)) {
+        if (!Strings.isNullOrEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }

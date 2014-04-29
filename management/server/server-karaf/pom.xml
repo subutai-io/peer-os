@@ -563,6 +563,22 @@
 
                                 <!-- Products Modules - START -->
 
+                                <!-- Accumulo -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>accumulo-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>accumulo-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>accumulo-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!-- Presto -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>

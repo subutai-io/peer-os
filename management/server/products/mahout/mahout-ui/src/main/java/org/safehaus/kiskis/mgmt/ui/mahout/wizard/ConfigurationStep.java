@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mahout.wizard;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
@@ -127,7 +128,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
                     show("Please, select target nodes");

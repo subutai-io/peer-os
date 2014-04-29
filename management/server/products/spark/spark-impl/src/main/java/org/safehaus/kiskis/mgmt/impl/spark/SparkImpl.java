@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.spark;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -34,18 +35,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SparkImpl implements Spark {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+    public SparkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        SparkImpl.commandRunner = commandRunner;
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -53,20 +55,7 @@ public class SparkImpl implements Spark {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
     }
 
     public List<Config> getClusters() {
@@ -83,7 +72,7 @@ public class SparkImpl implements Spark {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
+                if (Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getSlaveNodes()) || config.getMasterNode() == null) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

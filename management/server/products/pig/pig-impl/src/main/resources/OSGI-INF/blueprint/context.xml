@@ -12,11 +12,11 @@
     
     <bean id="pig-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.pig.PigImpl"
           init-method="init" destroy-method="destroy">
-        <property name="commandRunner" ref="commandRunner"/>
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker" />
-        <property name="dbManager" ref="dbManager" />
-    </bean>    
+        <argument ref="commandRunner"/>
+        <argument ref="agentManager"/>
+        <argument ref="dbManager" />
+        <argument ref="tracker" />
+    </bean>
        
     <service ref="pig-impl" interface="org.safehaus.kiskis.mgmt.api.pig.Pig"/>
     
