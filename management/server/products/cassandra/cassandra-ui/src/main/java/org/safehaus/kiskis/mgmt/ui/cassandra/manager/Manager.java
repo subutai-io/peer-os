@@ -32,9 +32,7 @@ public class Manager {
 
     private final VerticalLayout contentRoot;
     private final ComboBox clusterCombo;
-    private final Table listenNodesTable;
-    private final Table rpcNodesTable;
-    private final Table seedNodesTable;
+    private final Table nodesTable;
     private Config config;
 
     public Manager() {
@@ -53,9 +51,7 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        listenNodesTable = createTableTemplate("Listen nodes", 100);
-        rpcNodesTable = createTableTemplate("RPC nodes", 100);
-        seedNodesTable = createTableTemplate("Seed nodes", 100);
+        nodesTable = createTableTemplate("Cluster nodes", 300);
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -184,9 +180,7 @@ public class Manager {
 
         content.addComponent(controlsContent);
 
-        content.addComponent(listenNodesTable);
-        content.addComponent(rpcNodesTable);
-        content.addComponent(seedNodesTable);
+        content.addComponent(nodesTable);
 
     }
 
@@ -248,57 +242,6 @@ public class Manager {
                 }
             });
 
-//            startBtn.addListener(new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//
-//                    progressIcon.setVisible(true);
-////                    startBtn.setEnabled(false);
-////                    stopBtn.setEnabled(false);
-//
-//                    CassandraUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-//
-//                        public void onComplete(NodeState state) {
-//                            synchronized (progressIcon) {
-//                                if (state == NodeState.RUNNING) {
-//                                    stopBtn.setEnabled(true);
-//                                } else {
-//                                    startBtn.setEnabled(true);
-//                                }
-//                                progressIcon.setVisible(false);
-//                            }
-//                        }
-//                    }));
-//
-//                }
-//            });
-//
-//            stopBtn.addListener(new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//
-//                    progressIcon.setVisible(true);
-//                    startBtn.setEnabled(false);
-//                    stopBtn.setEnabled(false);
-//
-//                    CassandraUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-//
-//                        public void onComplete(NodeState state) {
-//                            synchronized (progressIcon) {
-//                                if (state == NodeState.STOPPED) {
-//                                    startBtn.setEnabled(true);
-//                                } else {
-//                                    stopBtn.setEnabled(true);
-//                                }
-//                                progressIcon.setVisible(false);
-//                            }
-//                        }
-//                    }));
-//                }
-//            });
-
         }
     }
 
@@ -344,11 +287,9 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(listenNodesTable, config.getNodes());
-            populateTable(rpcNodesTable, config.getNodes());
-            populateTable(seedNodesTable, config.getSeedNodes());
+            populateTable(nodesTable, config.getNodes());
         } else {
-            listenNodesTable.removeAllItems();
+            nodesTable.removeAllItems();
         }
     }
 

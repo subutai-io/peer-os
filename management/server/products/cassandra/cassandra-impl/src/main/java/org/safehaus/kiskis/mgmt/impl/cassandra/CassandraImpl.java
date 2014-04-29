@@ -20,6 +20,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 import sun.print.resources.serviceui;
 
 import java.util.*;
@@ -96,21 +97,21 @@ public class CassandraImpl implements Cassandra {
                     }
 
                     Set<Agent> seedNodes = new HashSet<Agent>();
-                    for (Iterator<Agent> iterator = seedNodes.iterator(); iterator.hasNext(); ) {
-                        Agent agent = iterator.next();
+                    for (Agent agent : config.getNodes()) {
                         seedNodes.add(agent);
                         if (seedNodes.size() == config.getNumberOfSeeds()) break;
                     }
                     config.setSeedNodes(seedNodes);
 
-                    po.addLog("Lxc containers created successfully\nUpdating db...");
+                    po.addLog("Lxc containers created successfully.");
+                    po.addLog("Updating db...");
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                         po.addLog("Cluster info saved to DB");
 
                         po.addLog("Configuring networking between nodes...");
-                        if (networkManager.configHostsOnAgents(new ArrayList<Agent>(config.getNumberOfNodes()), config.getDomainName()) &&
-                                networkManager.configSshOnAgents(new ArrayList<Agent>(config.getNumberOfNodes()))) {
-                            po.addLog("\nNetwork configuration done...");
+                        if (networkManager.configHostsOnAgents(new ArrayList<Agent>(config.getNodes()), config.getDomainName()) &&
+                                networkManager.configSshOnAgents(new ArrayList<Agent>(config.getNodes()))) {
+                            po.addLog("Network configuration done...");
                         } else {
                             po.addLogFailed(String.format("Network configuration failed..."));
                             return;
@@ -203,15 +204,13 @@ public class CassandraImpl implements Cassandra {
 
                         // setting seeds
                         StringBuilder sb = new StringBuilder();
-                        sb.append('"');
+//                        sb.append('"');
                         for (Agent seed : config.getSeedNodes()) {
-                            sb.append(seed.getListIP().get(0)).append(",");
+                            sb.append(Util.getAgentIpByMask(seed, Common.IP_MASK)).append(",");
                         }
-                        sb.replace(sb.toString().length() - 1, sb.toString().length(), "");
-                        sb.append('"');
+                        sb.replace(sb.toString().length()-1, sb.toString().length(), "");
+//                        sb.append('"');
                         po.addLog("Settings seeds " + sb.toString());
-
-//                        Task setSeeds = taskRunner.executeTaskNWait(Tasks.configureCassandra(nodes, "seeds " + sb.toString()));
 
                         Command setSeedsCommand = Commands.getConfigureCommand(config.getNodes(), "seeds " + sb.toString());
                         commandRunner.runCommand(setSeedsCommand);
