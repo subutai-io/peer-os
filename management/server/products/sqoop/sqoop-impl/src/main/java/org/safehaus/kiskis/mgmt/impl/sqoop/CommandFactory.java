@@ -47,7 +47,7 @@ public class CommandFactory {
     }
 
     private static String importData(ImportSetting settings) {
-        boolean all = settings.getBooleanParameter("import-all-tables");
+        boolean all = settings.getBooleanParameter(ImportParameter.IMPORT_ALL_TABLES);
         StringBuilder sb = new StringBuilder();
         sb.append(EXEC_PROFILE).append(" && ");
         switch(settings.getType()) {
@@ -66,8 +66,10 @@ public class CommandFactory {
                 appendOption(sb, "password", settings.getPassword());
                 appendOption(sb, "table", settings.getTableName());
                 appendOption(sb, "hbase-create-table", null);
-                appendOption(sb, "hbase-table", settings.getStringParameter("hbase-table"));
-                appendOption(sb, "column-family", settings.getStringParameter("column-family"));
+                appendOption(sb, "hbase-table", settings.getStringParameter(
+                        ImportParameter.DATASOURCE_TABLE_NAME));
+                appendOption(sb, "column-family", settings.getStringParameter(
+                        ImportParameter.DATASOURCE_COLUMN_FAMILY));
                 break;
             case HIVE:
                 if(all) sb.append("sqoop-import-all-tables");
@@ -78,8 +80,8 @@ public class CommandFactory {
                 appendOption(sb, "hive-import", null);
                 if(!all) {
                     appendOption(sb, "table", settings.getTableName());
-                    String db = settings.getStringParameter("hive-database");
-                    String tb = settings.getStringParameter("hive-table");
+                    String db = settings.getStringParameter(ImportParameter.DATASOURCE_DATABASE);
+                    String tb = settings.getStringParameter(ImportParameter.DATASOURCE_TABLE_NAME);
                     appendOption(sb, "hive-table", db + "." + tb);
                 }
                 break;

@@ -1,13 +1,13 @@
 package org.safehaus.kiskis.mgmt.api.sqoop.setting;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import org.safehaus.kiskis.mgmt.api.sqoop.DataSourceType;
 
 public class ImportSetting extends CommonSetting {
 
     DataSourceType type;
-    Map<String, Object> parameters;
+    Map<ImportParameter, Object> parameters;
 
     public DataSourceType getType() {
         return type;
@@ -17,23 +17,26 @@ public class ImportSetting extends CommonSetting {
         this.type = type;
     }
 
-    public void addParameter(String param, Object value) {
-        if(parameters == null) parameters = new HashMap<String, Object>();
+    public void addParameter(ImportParameter param, Object value) {
+        if(parameters == null)
+            parameters = new EnumMap<ImportParameter, Object>(ImportParameter.class);
         parameters.put(param, value);
     }
 
-    public Object getParameter(String param) {
+    public Object getParameter(ImportParameter param) {
         return parameters != null ? parameters.get(param) : null;
     }
 
-    public String getStringParameter(String param) {
+    public String getStringParameter(ImportParameter param) {
         Object p = getParameter(param);
         return p != null ? p.toString() : null;
     }
 
-    public boolean getBooleanParameter(String param) {
+    public boolean getBooleanParameter(ImportParameter param) {
         Object p = getParameter(param);
-        return p != null ? Boolean.parseBoolean(p.toString()) : false;
+        if(p == null) return false;
+        if(p instanceof Boolean) return ((Boolean)p).booleanValue();
+        return Boolean.parseBoolean(p.toString());
     }
 
     @Override
