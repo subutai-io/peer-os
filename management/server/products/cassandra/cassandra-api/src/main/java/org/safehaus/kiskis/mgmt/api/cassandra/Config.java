@@ -114,4 +114,7 @@ public class Config {
                 ", savedCachesDirectory='" + savedCachesDirectory + '\'' +
                 '}';
     }
+
+    public void reset() {
+    }
 }

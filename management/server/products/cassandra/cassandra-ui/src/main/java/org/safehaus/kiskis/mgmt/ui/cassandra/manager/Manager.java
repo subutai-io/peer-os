@@ -344,8 +344,8 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(listenNodesTable, config.getListedAddressNode());
-            populateTable(rpcNodesTable, config.getRpcAddressNode());
+            populateTable(listenNodesTable, config.getNodes());
+            populateTable(rpcNodesTable, config.getNodes());
             populateTable(seedNodesTable, config.getSeedNodes());
         } else {
             listenNodesTable.removeAllItems();
