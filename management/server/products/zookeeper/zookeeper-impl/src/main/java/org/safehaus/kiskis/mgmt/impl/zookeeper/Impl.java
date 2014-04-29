@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -27,19 +28,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Impl implements Api {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+    public Impl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, LxcManager lxcManager) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+        this.lxcManager = lxcManager;
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        Impl.commandRunner = commandRunner;
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -47,25 +50,9 @@ public class Impl implements Api {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
     }
 
-    public void setLxcManager(LxcManager lxcManager) {
-        this.lxcManager = lxcManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
 
     public UUID installCluster(final Config config) {
         Preconditions.checkNotNull(config, "Configuration is null");
@@ -76,7 +63,7 @@ public class Impl implements Api {
 
             public void run() {
 
-                if (Util.isStringEmpty(config.getZkName()) || Util.isStringEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                if (Strings.isNullOrEmpty(config.getZkName()) || Strings.isNullOrEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -143,12 +130,8 @@ public class Impl implements Api {
 
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostNames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getNodes()) {
-                            lxcHostNames.add(lxcAgent.getHostname());
-                        }
                         try {
-                            lxcManager.destroyLxcs(lxcHostNames);
+                            lxcManager.destroyLxcs(lxcAgentsMap);
                         } catch (LxcDestroyException ex) {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
@@ -180,12 +163,8 @@ public class Impl implements Api {
 
                 po.addLog("Destroying lxc containers...");
 
-                Set<String> lxcHostNames = new HashSet<String>();
-                for (Agent lxcAgent : config.getNodes()) {
-                    lxcHostNames.add(lxcAgent.getHostname());
-                }
                 try {
-                    lxcManager.destroyLxcs(lxcHostNames);
+                    lxcManager.destroyLxcs(config.getNodes());
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));

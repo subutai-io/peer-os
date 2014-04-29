@@ -242,12 +242,9 @@ public class CassandraImpl implements Cassandra {
 
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostnames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getSeedNodes()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        lxcHostnames.add(config.getListedAddressNode().getHostname());
-                        lxcHostnames.add(config.getRpcAddressNode().getHostname());
+                        Set<Agent> lxcHostnames = new HashSet<Agent>(config.getSeedNodes());
+                        lxcHostnames.add(config.getListedAddressNode());
+                        lxcHostnames.add(config.getRpcAddressNode());
                         try {
                             lxcManager.destroyLxcs(lxcHostnames);
                         } catch (LxcDestroyException ex) {
@@ -281,12 +278,9 @@ public class CassandraImpl implements Cassandra {
 
                 po.addLog("Destroying lxc containers...");
 
-                Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getSeedNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                lxcHostnames.add(config.getListedAddressNode().getHostname());
-                lxcHostnames.add(config.getRpcAddressNode().getHostname());
+                Set<Agent> lxcHostnames = new HashSet<Agent>(config.getSeedNodes());
+                lxcHostnames.add(config.getListedAddressNode());
+                lxcHostnames.add(config.getRpcAddressNode());
 
                 try {
                     lxcManager.destroyLxcs(lxcHostnames);

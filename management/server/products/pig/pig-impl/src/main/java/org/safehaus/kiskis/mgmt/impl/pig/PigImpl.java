@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.pig;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -29,18 +30,20 @@ import java.util.concurrent.Executors;
  */
 public class PigImpl implements Pig {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        PigImpl.commandRunner = commandRunner;
+    public PigImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -48,21 +51,9 @@ public class PigImpl implements Pig {
     }
 
     public void destroy() {
-        commandRunner = null;
         executor.shutdown();
     }
 
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
 
     public UUID installCluster(final Config config) {
         Preconditions.checkNotNull(config, "Configuration is null");
@@ -74,7 +65,7 @@ public class PigImpl implements Pig {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (Util.isStringEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
+                if (Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }

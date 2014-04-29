@@ -12,10 +12,10 @@
 
     <bean id="presto-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.presto.PrestoImpl"
           init-method="init" destroy-method="destroy">
-        <property name="commandRunner" ref="commandRunner"/>
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="dbManager" ref="dbManager"/>
+        <argument ref="commandRunner"/>
+        <argument ref="agentManager"/>
+        <argument ref="dbManager"/>
+        <argument ref="tracker"/>
     </bean>
 
     <service ref="presto-impl" interface="org.safehaus.kiskis.mgmt.api.presto.Presto"/>

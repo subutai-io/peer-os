@@ -7,14 +7,12 @@ package org.safehaus.kiskis.mgmt.ui.cassandra.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 
 /**
  * @author dilshat
  */
 public class StepSetDirectories extends Panel {
 
-    private Task task;
 
     public StepSetDirectories(final Wizard wizard) {
 
@@ -97,10 +95,6 @@ public class StepSetDirectories extends Panel {
         savedCachesTxtFld.setValue(wizard.getConfig().getSavedCachesDirectory());
         commitLogTxtFld.setValue(wizard.getConfig().getCommitLogDirectory());
 
-    }
-
-    private void show(String notification) {
-        getWindow().showNotification(notification);
     }
 
 }

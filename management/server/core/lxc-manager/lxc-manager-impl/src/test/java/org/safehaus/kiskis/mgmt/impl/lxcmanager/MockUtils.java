@@ -5,13 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
@@ -21,8 +14,16 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
- *
  * @author dilshat
  */
 public class MockUtils {
@@ -37,6 +38,7 @@ public class MockUtils {
         when(agent.getHostname()).thenReturn(PHYSICAL_HOSTNAME);
         when(agent.getUuid()).thenReturn(physicalUUID);
         when(agent.isIsLXC()).thenReturn(false);
+        when(agent.getParentHostName()).thenReturn(null);
         when(agent.compareTo(agent)).thenCallRealMethod();
         return agent;
     }

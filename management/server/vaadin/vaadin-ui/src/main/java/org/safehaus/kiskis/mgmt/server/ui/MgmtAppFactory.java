@@ -2,25 +2,30 @@ package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
 import com.vaadin.Application.SystemMessages;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory;
+import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 
 public class MgmtAppFactory implements ApplicationFactory {
 
+    private static ExecutorService executor;
     private final String title;
     private AgentManager agentManager;
-    private TaskRunner taskRunner;
+    private CommandRunner commandRunner;
     private Tracker tracker;
     private ModuleNotifier moduleNotifier;
-    private static ExecutorService executor;
 
-    public MgmtAppFactory(String title) {
+    public MgmtAppFactory(String title, AgentManager agentManager, CommandRunner taskRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
         this.title = title;
+        this.agentManager = agentManager;
+        this.commandRunner = taskRunner;
+        this.tracker = tracker;
+        this.moduleNotifier = moduleNotifier;
     }
 
     public static ExecutorService getExecutor() {
@@ -39,23 +44,7 @@ public class MgmtAppFactory implements ApplicationFactory {
 
     @Override
     public Application newInstance() {
-        return new MgmtApplication(title, agentManager, taskRunner, tracker, moduleNotifier);
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
-
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setModuleNotifier(ModuleNotifier moduleNotifier) {
-        this.moduleNotifier = moduleNotifier;
+        return new MgmtApplication(title, agentManager, commandRunner, tracker, moduleNotifier);
     }
 
     public void init() {

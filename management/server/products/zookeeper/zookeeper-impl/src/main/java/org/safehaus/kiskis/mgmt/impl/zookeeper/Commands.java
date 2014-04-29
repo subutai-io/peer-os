@@ -5,48 +5,50 @@
  */
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandsSingleton;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- *
  * @author dilshat
  */
-public class Commands {
+public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand(Set<Agent> agents) {
-        return Impl.getCommandRunner().createCommand(
+        return createCommand(
                 new RequestBuilder("sleep 10 ; apt-get --force-yes --assume-yes install ksks-zookeeper")
-                .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
-                agents);
+                        .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+                agents
+        );
     }
 
     public static Command getStartCommand(Set<Agent> agents) {
-        return Impl.getCommandRunner().createCommand(
+        return createCommand(
                 new RequestBuilder("service zookeeper start").withTimeout(15),
                 agents);
     }
 
     public static Command getRestartCommand(Set<Agent> agents) {
-        return Impl.getCommandRunner().createCommand(
+        return createCommand(
                 new RequestBuilder("service zookeeper restart").withTimeout(15),
                 agents);
     }
 
     public static Command getStopCommand(Agent agent) {
-        return Impl.getCommandRunner().createCommand(
+        return createCommand(
                 new RequestBuilder("service zookeeper stop"),
                 Util.wrapAgentToSet(agent));
     }
 
     public static Command getStatusCommand(Agent agent) {
-        return Impl.getCommandRunner().createCommand(
+        return createCommand(
                 new RequestBuilder("service zookeeper status"),
                 Util.wrapAgentToSet(agent));
     }
@@ -65,7 +67,7 @@ public class Commands {
                     String.format(". /etc/profile && zookeeper-conf.sh %s && zookeeper-setID.sh %s", zkNames, ++id)));
         }
 
-        return Impl.getCommandRunner().createCommand(requestBuilders);
+        return createCommand(requestBuilders);
     }
 
 }

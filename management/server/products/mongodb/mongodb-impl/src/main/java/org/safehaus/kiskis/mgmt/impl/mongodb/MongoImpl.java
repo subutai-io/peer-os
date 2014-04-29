@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -40,35 +41,21 @@ import java.util.regex.Pattern;
  */
 public class MongoImpl implements Mongo {
 
-    private static CommandRunner commandRunner;
+    private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private LxcManager lxcManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-    public void setCommandRunner(CommandRunner commandRunner) {
-        MongoImpl.commandRunner = commandRunner;
-    }
-
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
+    public MongoImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, LxcManager lxcManager, Tracker tracker) {
+        this.commandRunner = commandRunner;
         this.agentManager = agentManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
         this.dbManager = dbManager;
-    }
-
-    public void setLxcManager(LxcManager lxcManager) {
         this.lxcManager = lxcManager;
+        this.tracker = tracker;
+
+        Commands.init(commandRunner);
     }
 
     public void init() {
@@ -76,7 +63,6 @@ public class MongoImpl implements Mongo {
     }
 
     public void destroy() {
-        MongoImpl.commandRunner = null;
         executor.shutdown();
     }
 
@@ -91,9 +77,9 @@ public class MongoImpl implements Mongo {
 
             public void run() {
 
-                if (Util.isStringEmpty(config.getClusterName())
-                        || Util.isStringEmpty(config.getReplicaSetName())
-                        || Util.isStringEmpty(config.getDomainName())
+                if (Strings.isNullOrEmpty(config.getClusterName())
+                        || Strings.isNullOrEmpty(config.getReplicaSetName())
+                        || Strings.isNullOrEmpty(config.getDomainName())
                         || config.getNumberOfConfigServers() <= 0
                         || config.getNumberOfRouters() <= 0
                         || config.getNumberOfDataNodes() <= 0
@@ -145,18 +131,8 @@ public class MongoImpl implements Mongo {
                         installMongoCluster(config, po);
                     } else {
                         //destroy all lxcs also
-                        Set<String> lxcHostnames = new HashSet<String>();
-                        for (Agent lxcAgent : config.getConfigServers()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        for (Agent lxcAgent : config.getRouterServers()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
-                        for (Agent lxcAgent : config.getDataNodes()) {
-                            lxcHostnames.add(lxcAgent.getHostname());
-                        }
                         try {
-                            lxcManager.destroyLxcs(lxcHostnames);
+                            lxcManager.destroyLxcs(lxcAgentsMap);
                         } catch (LxcDestroyException ex) {
                             po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                         }
@@ -306,18 +282,8 @@ public class MongoImpl implements Mongo {
                 }
 
                 po.addLog("Destroying lxc containers");
-                Set<String> lxcHostnames = new HashSet<String>();
-                for (Agent lxcAgent : config.getConfigServers()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                for (Agent lxcAgent : config.getRouterServers()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
-                for (Agent lxcAgent : config.getDataNodes()) {
-                    lxcHostnames.add(lxcAgent.getHostname());
-                }
                 try {
-                    lxcManager.destroyLxcs(lxcHostnames);
+                    lxcManager.destroyLxcs(config.getAllNodes());
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));
@@ -421,7 +387,7 @@ public class MongoImpl implements Mongo {
                         Agent primaryNodeAgent = null;
                         if (m.find()) {
                             String primaryNodeHost = m.group(1);
-                            if (!Util.isStringEmpty(primaryNodeHost)) {
+                            if (!Strings.isNullOrEmpty(primaryNodeHost)) {
                                 String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                                 primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                             }
@@ -713,7 +679,7 @@ public class MongoImpl implements Mongo {
                 Matcher m = p.matcher(result.getStdOut());
                 if (m.find()) {
                     String primaryNodeHost = m.group(1);
-                    if (!Util.isStringEmpty(primaryNodeHost)) {
+                    if (!Strings.isNullOrEmpty(primaryNodeHost)) {
                         String hostname = primaryNodeHost.split(":")[0].replace("." + config.getDomainName(), "");
                         primaryNodeAgent = agentManager.getAgentByHostname(hostname);
                     }

@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>accumulo</module>
         <module>mongodb</module>
         <module>solr</module>
         <module>mahout</module>

@@ -14,8 +14,8 @@
 
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
-    <reference id="taskRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
     <reference id="moduleNotifier" availability="mandatory"
@@ -23,11 +23,11 @@
 
     <bean id="appFactory" scope="singleton" init-method="init" destroy-method="destroy"
           class="org.safehaus.kiskis.mgmt.server.ui.MgmtAppFactory">
-        <property name="taskRunner" ref="taskRunner"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="agentManager" ref="agentManager"/>
-        <property name="moduleNotifier" ref="moduleNotifier"/>
         <argument value="${title}"/>
+        <argument ref="agentManager"/>
+        <argument ref="commandRunner"/>
+        <argument ref="tracker"/>
+        <argument ref="moduleNotifier"/>
     </bean>
 
     <service ref="appFactory" interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory">

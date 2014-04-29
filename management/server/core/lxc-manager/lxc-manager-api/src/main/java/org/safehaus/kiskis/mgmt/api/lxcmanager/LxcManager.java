@@ -103,9 +103,30 @@ public interface LxcManager {
     /**
      * Destroys specified lxcs
      *
-     * @param lxcHostnames - hostnames of lxc to destroy
+     * @param agentFamilies - map where key is physical agent and values is a set of lxc children's hostnames
      */
-    public void destroyLxcs(Set<String> lxcHostnames) throws LxcDestroyException;
+    public void destroyLxcsByHostname(Map<Agent, Set<String>> agentFamilies) throws LxcDestroyException;
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param agentFamilies - map where key is physical agent and values is a set of lxc children
+     */
+    public void destroyLxcs(Map<Agent, Set<Agent>> agentFamilies) throws LxcDestroyException;
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param lxcAgents - set of lxc agents
+     */
+    public void destroyLxcs(Set<Agent> lxcAgents) throws LxcDestroyException;
+
+    /**
+     * Destroys specified lxcs
+     *
+     * @param lxcAgentHostnames - set of lxc agents' hostnames
+     */
+    public void destroyLxcsByHostname(Set<String> lxcAgentHostnames) throws LxcDestroyException;
 
     /**
      * Creates lxcs baed on a supplied strategy.

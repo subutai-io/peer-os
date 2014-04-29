@@ -5,46 +5,36 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.Before;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
+import org.junit.Test;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
+import java.util.*;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
- *
  * @author dilshat
  */
 //@Ignore
 public class LxcManagerImplUT {
 
-    private final static LxcManager lxcManager = new LxcManagerImpl();
+    private LxcManager lxcManager;
 
     @Before
     public void setUpMethod() {
-        ((LxcManagerImpl) lxcManager).setAgentManager(new AgentManagerFake());
-        ((LxcManagerImpl) lxcManager).setCommandRunner(MockUtils.getAutoCommandRunner());
         Monitor monitor = mock(Monitor.class);
         when(monitor.getData(any(String.class), any(Metric.class), any(Date.class), any(Date.class)))
                 .thenReturn(Collections.EMPTY_MAP);
-        ((LxcManagerImpl) lxcManager).setMonitor(monitor);
+        lxcManager = new LxcManagerImpl(new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor);
         ((LxcManagerImpl) lxcManager).init();
     }
 
@@ -96,8 +86,7 @@ public class LxcManagerImplUT {
 
     @Test
     public void testStopLxcOnHost() {
-        ((LxcManagerImpl) lxcManager).setCommandRunner(
-                MockUtils.getHardCodedCommandRunner(true, true, 0, "STOPPED", null));
+        LxcManager lxcManager = new LxcManagerImpl(new AgentManagerFake(), MockUtils.getHardCodedCommandRunner(true, true, 0, "STOPPED", null), mock(Monitor.class));
 
         boolean result = lxcManager.stopLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
 
@@ -127,7 +116,7 @@ public class LxcManagerImplUT {
         try {
             Set<String> lxcHostnames = new HashSet<String>();
             lxcHostnames.add(MockUtils.getLxcAgent().getHostname());
-            lxcManager.destroyLxcs(lxcHostnames);
+            lxcManager.destroyLxcsByHostname(lxcHostnames);
         } catch (LxcDestroyException ex) {
             error = true;
         }
