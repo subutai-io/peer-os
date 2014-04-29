@@ -68,7 +68,7 @@ public class Tasks {
         Task task = new Task("Stop Cassandra");
         task.setData(TaskType.STOP_ALL);
         for (Agent agent : agents) {
-            task.addRequest(Commands.getStartCommand(), agent);
+            task.addRequest(Commands.getStopCommand(), agent);
         }
         return task;
     }
