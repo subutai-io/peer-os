@@ -733,6 +733,40 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Cassandra -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>cassandra-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>cassandra-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>cassandra-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!-- Oozie -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>oozie-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>oozie-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>oozie-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Flume -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
