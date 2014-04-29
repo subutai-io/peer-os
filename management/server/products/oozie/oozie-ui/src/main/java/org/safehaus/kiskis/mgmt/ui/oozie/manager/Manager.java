@@ -20,7 +20,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.oozie.OozieUI;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -99,7 +98,8 @@ public class Manager {
 
         });
 
-        Button restartHadoop = new Button("Restart Hadoop");
+        // TODO add restart hadoop button
+       /* Button restartHadoop = new Button("Restart Hadoop");
         restartHadoop.addListener(new Button.ClickListener() {
 
             @Override
@@ -109,7 +109,7 @@ public class Manager {
 
         });
 
-        controlsContent.addComponent(restartHadoop);
+        controlsContent.addComponent(restartHadoop);*/
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -265,8 +265,7 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator<Agent> it = agents.iterator(); it.hasNext(); ) {
-            final Agent agent = (Agent) it.next();
+        for (final Agent agent : agents) {
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             progressIcon.setVisible(false);
@@ -341,8 +340,8 @@ public class Manager {
     }
 
     public static void checkNodesStatus(Table table) {
-        for (Iterator it = table.getItemIds().iterator(); it.hasNext(); ) {
-            int rowId = (Integer) it.next();
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
             Item row = table.getItem(rowId);
             Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
             checkBtn.click();
