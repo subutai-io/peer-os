@@ -20,11 +20,13 @@ public class Config {
     private Agent nameNode, jobTracker, secondaryNameNode;
     private List<Agent> dataNodes, taskTrackers;
     private Integer replicationFactor, countOfSlaveNodes;
+    private Set<Agent> blockedAgents;
 
     public Config() {
         domainName = "intra.lan";
         dataNodes = new ArrayList<Agent>();
         taskTrackers = new ArrayList<Agent>();
+        blockedAgents = new HashSet<Agent>();
     }
 
     public List<Agent> getAllNodes() {
@@ -131,6 +133,14 @@ public class Config {
 
     public void setCountOfSlaveNodes(Integer countOfSlaveNodes) {
         this.countOfSlaveNodes = countOfSlaveNodes;
+    }
+
+    public Set<Agent> getBlockedAgents() {
+        return blockedAgents;
+    }
+
+    public void setBlockedAgents(HashSet<Agent> blockedAgents) {
+        this.blockedAgents = blockedAgents;
     }
 
     @Override

@@ -40,10 +40,18 @@ public class Commands {
                 30); //  
     }
 
+    public static Request getUpdateAptCommand() {
+        Request req = getRequestTemplate();
+        req.setProgram("sleep 10; apt-get update");
+        req.setStdOut(OutputRedirection.CAPTURE_AND_RETURN);
+        req.setTimeout(90);
+        return req;
+    }
+
     public static Request getInstallCommand() {
         Request req = getRequestTemplate();
-        req.setProgram("apt-get --force-yes --assume-yes install ksks-cassandra");
-        req.setStdOut(OutputRedirection.NO);
+        req.setProgram("sleep 10; apt-get --force-yes --assume-yes install ksks-cassandra");
+        req.setStdOut(OutputRedirection.CAPTURE_AND_RETURN);
         req.setTimeout(90);
         return req;
     }
@@ -67,14 +75,9 @@ public class Commands {
         return req;
     }
 
-    public static Request getConfigureCommand(Set<Agent> seeds, String param) {
+    public static Request getConfigureCommand(String param) {
         Request req = getRequestTemplate();
-        StringBuilder ips = new StringBuilder();
-        for (Iterator<Agent> iterator = seeds.iterator(); iterator.hasNext(); ) {
-            Agent next =  iterator.next();
-            ips.append(next.getListIP().get(0)).append(" ");
-        }
-        String rpcAddressSed = "sh cassandra-conf.sh " + param ;
+        String rpcAddressSed = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh " + param ;
         req.setProgram(rpcAddressSed);
         return req;
     }

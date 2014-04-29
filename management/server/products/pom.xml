@@ -32,4 +32,5 @@
         <module>oozie</module>
         <module>cassandra</module>
     </modules>
+
 </project>

@@ -50,6 +50,42 @@ public class ConfigurationStep extends Panel {
             }
         });
 
+        final TextField dataDirectoryTxtFld = new TextField("Data directory");
+        dataDirectoryTxtFld.setInputPrompt("/var/lib/cassandra/data");
+        dataDirectoryTxtFld.setRequired(true);
+        dataDirectoryTxtFld.setMaxLength(20);
+        dataDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
+        dataDirectoryTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setDataDirectory(event.getProperty().getValue().toString().trim());
+            }
+        });
+
+        final TextField commitLogDirectoryTxtFld = new TextField("Commit log directory");
+        commitLogDirectoryTxtFld.setInputPrompt("/var/lib/cassandra/commitlog");
+        commitLogDirectoryTxtFld.setRequired(true);
+        commitLogDirectoryTxtFld.setMaxLength(20);
+        commitLogDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
+        commitLogDirectoryTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setCommitLogDirectory(event.getProperty().getValue().toString().trim());
+            }
+        });
+
+        final TextField savedCachesDirectoryTxtFld = new TextField("Saved caches directory");
+        savedCachesDirectoryTxtFld.setInputPrompt("/var/lib/cassandra/saved_caches");
+        savedCachesDirectoryTxtFld.setRequired(true);
+        savedCachesDirectoryTxtFld.setMaxLength(20);
+        savedCachesDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
+        savedCachesDirectoryTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setSavedCachesDirectory(event.getProperty().getValue().toString().trim());
+            }
+        });
+
         //configuration servers number
         ComboBox nodesCountCombo = new ComboBox("Choose number of seeds", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         nodesCountCombo.setMultiSelect(false);
@@ -99,6 +135,9 @@ public class ConfigurationStep extends Panel {
 
         content.addComponent(clusterNameTxtFld);
         content.addComponent(domainNameTxtFld);
+        content.addComponent(dataDirectoryTxtFld);
+        content.addComponent(commitLogDirectoryTxtFld);
+        content.addComponent(savedCachesDirectoryTxtFld);
         content.addComponent(nodesCountCombo);
         content.addComponent(buttons);
 

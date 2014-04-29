@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop;
 
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
@@ -8,6 +9,7 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
 import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Adding;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Installation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration.*;
@@ -24,6 +26,7 @@ import java.util.concurrent.Executors;
 public class HadoopImpl implements Hadoop {
     public static final String MODULE_NAME = "Hadoop";
     private TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
@@ -37,6 +40,15 @@ public class HadoopImpl implements Hadoop {
 
     public void destroy() {
         executor.shutdown();
+        commandRunner = null;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+    public void setCommandRunner(CommandRunner commandRunner) {
+        HadoopImpl.commandRunner = commandRunner;
     }
 
     public void setAgentManager(AgentManager agentManager) {
@@ -156,9 +168,38 @@ public class HadoopImpl implements Hadoop {
         return new TaskTracker(this, null).status(agent);
     }
 
+    @Override
+    public UUID addNode(String clusterName) {
+        return new Adding(this, clusterName).execute();
+    }
+
+    @Override
+    public UUID blockDataNode(Config config, Agent agent) {
+        return new DataNode(this, config).block(agent);
+    }
+
+    @Override
+    public UUID blockTaskTracker(Config config, Agent agent) {
+        return new TaskTracker(this, config).block(agent);
+    }
+
+    @Override
+    public UUID unblockDataNode(Config config, Agent agent) {
+        return new DataNode(this, config).unblock(agent);
+    }
+
+    @Override
+    public UUID unblockTaskTracker(Config config, Agent agent) {
+        return new TaskTracker(this, config).unblock(agent);
+    }
 
     @Override
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 }

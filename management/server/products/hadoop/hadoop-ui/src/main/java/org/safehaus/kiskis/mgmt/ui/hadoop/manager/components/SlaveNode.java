@@ -58,4 +58,8 @@ public class SlaveNode extends ClusterNode {
         stopButton.setVisible(!isLoading);
         progressButton.setVisible(isLoading);
     }
+
+    public Agent getAgent() {
+        return agent;
+    }
 }

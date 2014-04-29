@@ -91,6 +91,72 @@ public class Manager {
 
         controlsContent.addComponent(refreshClustersBtn);
 
+        Button startClustersBtn = new Button("Start cluster");
+        startClustersBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+                    UUID trackID = HBaseUI.getHbaseManager().startCluster(config.getClusterName());
+                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                        public void windowClose(Window.CloseEvent e) {
+                            refreshClustersInfo();
+                        }
+                    });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+
+        });
+
+        controlsContent.addComponent(startClustersBtn);
+
+        Button stopClustersBtn = new Button("Stop cluster");
+        stopClustersBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+                    UUID trackID = HBaseUI.getHbaseManager().stopCluster(config.getClusterName());
+                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                        public void windowClose(Window.CloseEvent e) {
+                            refreshClustersInfo();
+                        }
+                    });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+
+        });
+
+        controlsContent.addComponent(stopClustersBtn);
+
+        Button checkClustersBtn = new Button("Check cluster");
+        checkClustersBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+                    UUID trackID = HBaseUI.getHbaseManager().checkCluster(config.getClusterName());
+                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
+
+                        public void windowClose(Window.CloseEvent e) {
+                            refreshClustersInfo();
+                        }
+                    });
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+
+        });
+
+        controlsContent.addComponent(checkClustersBtn);
+
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
 
@@ -145,23 +211,15 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext(); ) {
-            final Agent agent = (Agent) it.next();
-
+        for (final Agent agent : agents) {
             final Button checkBtn = new Button("Check");
-//            final Button startBtn = new Button("Start");
-//            final Button stopBtn = new Button("Stop");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-//            stopBtn.setEnabled(false);
-//            startBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
                             agent.getHostname(),
                             type,
                             checkBtn,
-//                            startBtn,
-//                            stopBtn,
                             progressIcon},
                     null
             );
@@ -172,8 +230,6 @@ public class Manager {
                 public void buttonClick(Button.ClickEvent event) {
 
                     progressIcon.setVisible(true);
-//                    startBtn.setEnabled(false);
-//                    stopBtn.setEnabled(false);
 
                     HBaseUI.getExecutor().execute(new CheckTask(type, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
@@ -192,66 +248,13 @@ public class Manager {
                 }
             });
 
-//            startBtn.addListener(new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//
-//                    progressIcon.setVisible(true);
-////                    startBtn.setEnabled(false);
-////                    stopBtn.setEnabled(false);
-//
-//                    HBaseUI.getExecutor().execute(new StartTask(type, config.getClusterName(), new CompleteEvent() {
-//
-//                        public void onComplete(NodeState state) {
-//                            synchronized (progressIcon) {
-////                                if (state == NodeState.RUNNING) {
-////                                    stopBtn.setEnabled(true);
-////                                } else {
-////                                    startBtn.setEnabled(true);
-////                                }
-//                                progressIcon.setVisible(false);
-//                            }
-//                        }
-//                    }));
-//
-//                }
-//            });
-//
-//            stopBtn.addListener(new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//
-//                    progressIcon.setVisible(true);
-////                    startBtn.setEnabled(false);
-////                    stopBtn.setEnabled(false);
-//
-//                    HBaseUI.getExecutor().execute(new StopTask(type, config.getClusterName(), new CompleteEvent() {
-//
-//                        public void onComplete(NodeState state) {
-//                            synchronized (progressIcon) {
-//                                if (state == NodeState.STOPPED) {
-//                                    startBtn.setEnabled(true);
-//                                } else {
-//                                    stopBtn.setEnabled(true);
-//                                }
-//                                progressIcon.setVisible(false);
-//                            }
-//                        }
-//                    }));
-//                }
-//            });
-
         }
     }
     private void populateTable(final Table table, Set<Agent> agents, final HBaseType type) {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext(); ) {
-            final Agent agent = (Agent) it.next();
-
+        for (final Agent agent : agents) {
             final Button checkBtn = new Button("Check");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             progressIcon.setVisible(false);
@@ -328,8 +331,8 @@ public class Manager {
     }
 
     public static void checkNodesStatus(Table table) {
-        for (Iterator it = table.getItemIds().iterator(); it.hasNext(); ) {
-            int rowId = (Integer) it.next();
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
             Item row = table.getItem(rowId);
             Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
             checkBtn.click();
@@ -341,8 +344,6 @@ public class Manager {
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Type", HBaseType.class, null);
         table.addContainerProperty("Check", Button.class, null);
-//        table.addContainerProperty("Start", Button.class, null);
-//        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setSizeFull();
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);

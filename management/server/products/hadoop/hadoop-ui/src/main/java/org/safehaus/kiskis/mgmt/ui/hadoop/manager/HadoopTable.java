@@ -7,6 +7,7 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
@@ -22,7 +23,8 @@ import java.util.UUID;
 public class HadoopTable extends TreeTable {
     private static final Action UNINSTALL_ITEM_ACTION = new Action("Uninstall cluster");
     private static final Action ADD_ITEM_ACTION = new Action("Add new node");
-    private static final Action REMOVE_ITEM_ACTION = new Action("Exclude node");
+    private static final Action EXCLUDE_ITEM_ACTION = new Action("Exclude node");
+    private static final Action INCLUDE_ITEM_ACTION = new Action("Include node");
 
     public static final String CLUSTER_NAME_PROPERTY = "Cluster Name";
     public static final String DOMAIN_NAME_PROPERTY = "Domain Name";
@@ -65,6 +67,45 @@ public class HadoopTable extends TreeTable {
                             refreshDataSource();
                         }
                     }));
+                } else if (action == ADD_ITEM_ACTION) {
+                    Item row = getItem(target);
+
+                    indicator.setVisible(true);
+                    UUID trackID = HadoopUI.getHadoopManager().addNode((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
+                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                    refreshDataSource();
+                } else if (action == EXCLUDE_ITEM_ACTION) {
+                    Item row = getItem(target);
+
+                    SlaveNode dataNode = (SlaveNode) row.getItemProperty(NAMENODE_PROPERTY).getValue();
+                    SlaveNode taskTracker = (SlaveNode) row.getItemProperty(JOBTRACKER_PROPERTY).getValue();
+
+                    indicator.setVisible(true);
+                    HadoopUI.getHadoopManager().blockDataNode(dataNode.getCluster(), dataNode.getAgent());
+
+                    UUID trackID = HadoopUI.getHadoopManager().blockTaskTracker(taskTracker.getCluster(), taskTracker.getAgent());
+                    HadoopUI.getExecutor().execute(new WaitTask(trackID, new CompleteEvent() {
+
+                        public void onComplete(NodeState state) {
+                            refreshDataSource();
+                        }
+                    }));
+                } else if (action == INCLUDE_ITEM_ACTION) {
+                    Item row = getItem(target);
+
+                    SlaveNode dataNode = (SlaveNode) row.getItemProperty(NAMENODE_PROPERTY).getValue();
+                    SlaveNode taskTracker = (SlaveNode) row.getItemProperty(JOBTRACKER_PROPERTY).getValue();
+
+                    indicator.setVisible(true);
+                    HadoopUI.getHadoopManager().unblockDataNode(dataNode.getCluster(), dataNode.getAgent());
+
+                    UUID trackID = HadoopUI.getHadoopManager().unblockTaskTracker(taskTracker.getCluster(), taskTracker.getAgent());
+                    HadoopUI.getExecutor().execute(new WaitTask(trackID, new CompleteEvent() {
+
+                        public void onComplete(NodeState state) {
+                            refreshDataSource();
+                        }
+                    }));
                 }
             }
 
@@ -72,6 +113,7 @@ public class HadoopTable extends TreeTable {
 
                 if (target != null) {
                     Item row = getItem(target);
+
                     if (areChildrenAllowed(target)) {
                         if (!Strings.isNullOrEmpty((String) row.getItemProperty(DOMAIN_NAME_PROPERTY).getValue())) {
                             return new Action[]{UNINSTALL_ITEM_ACTION, ADD_ITEM_ACTION};
@@ -79,9 +121,16 @@ public class HadoopTable extends TreeTable {
                     }
 
                     if (!areChildrenAllowed(target)) {
+                        if (row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue() != null &&
+                                row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
+                            return new Action[]{INCLUDE_ITEM_ACTION};
+                        }
+                    }
+
+                    if (!areChildrenAllowed(target)) {
                         if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
                                 row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
-                            return new Action[]{REMOVE_ITEM_ACTION};
+                            return new Action[]{EXCLUDE_ITEM_ACTION};
                         }
                     }
                 }
@@ -126,21 +175,35 @@ public class HadoopTable extends TreeTable {
             );
 
             for (Agent agent : cluster.getDataNodes()) {
+                Object childID = null;
+
                 SlaveNode dataNode = new SlaveNode(cluster, agent, true);
                 SlaveNode taskTracker = new SlaveNode(cluster, agent, false);
 
                 nameNode.addSlaveNode(dataNode);
                 jobTracker.addSlaveNode(taskTracker);
 
-                Object childID = addItem(new Object[]{
-                                null,
-                                null,
-                                dataNode,
-                                null,
-                                taskTracker,
-                                null},
-                        null
-                );
+                if (cluster.getBlockedAgents().contains(agent)) {
+                    childID = addItem(new Object[]{
+                                    "Blocked",
+                                    null,
+                                    dataNode,
+                                    null,
+                                    taskTracker,
+                                    null},
+                            null
+                    );
+                } else {
+                    childID = addItem(new Object[]{
+                                    null,
+                                    null,
+                                    dataNode,
+                                    null,
+                                    taskTracker,
+                                    null},
+                            null
+                    );
+                }
 
                 setParent(childID, rowId);
                 setCollapsed(childID, true);
