@@ -5,15 +5,19 @@
  */
 package org.safehaus.kiskis.mgmt.impl.cassandra;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandsSingleton;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -86,9 +90,6 @@ public class Commands extends CommandsSingleton {
     }
 
     public static Command getInstallCommand(Set<Agent> agents) {
-//        AgentRequestBuilder ar = new AgentRequestBuilder(agent, "ls");
-//        Set<AgentRequestBuilder> setAr;
-//        createCommand(setAr);
 
         return createCommand(
                 new RequestBuilder(
@@ -130,9 +131,22 @@ public class Commands extends CommandsSingleton {
 
         return createCommand(
                 new RequestBuilder(
-                        String.format("sh cassandra-conf.sh %s", param))
+                        String.format(". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s", param))
                 ,
                 agents
         );
     }
+
+    public static Command getConfigureRpcAndListenAddressesCommand(Set<Agent> agents, String param) {
+        Set<AgentRequestBuilder> sarb = new HashSet<AgentRequestBuilder>();
+        for (Agent agent : agents) {
+            AgentRequestBuilder arb = new AgentRequestBuilder(agent,
+                    String.format(". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s ",
+                            param,
+                            Util.getAgentIpByMask(agent, Common.IP_MASK)));
+            sarb.add(arb);
+        }
+        return createCommand(sarb);
+    }
+
 }
