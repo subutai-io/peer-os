@@ -87,7 +87,7 @@ public class ConfigurationStep extends Panel {
         });
 
         //configuration servers number
-        ComboBox nodesCountCombo = new ComboBox("Choose number of seeds", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        ComboBox nodesCountCombo = new ComboBox("Choose number of nodes in cluster", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate(true);
         nodesCountCombo.setTextInputAllowed(false);
@@ -95,6 +95,21 @@ public class ConfigurationStep extends Panel {
         nodesCountCombo.setValue(wizard.getConfig());
 
         nodesCountCombo.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setNumberOfNodes((Integer) event.getProperty().getValue());
+            }
+        });
+
+        //configuration servers number
+        ComboBox seedsCountCombo = new ComboBox("Choose number of seeds", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        seedsCountCombo.setMultiSelect(false);
+        seedsCountCombo.setImmediate(true);
+        seedsCountCombo.setTextInputAllowed(false);
+        seedsCountCombo.setNullSelectionAllowed(false);
+        seedsCountCombo.setValue(wizard.getConfig());
+
+        seedsCountCombo.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setNumberOfSeeds((Integer) event.getProperty().getValue());
@@ -139,6 +154,7 @@ public class ConfigurationStep extends Panel {
         content.addComponent(commitLogDirectoryTxtFld);
         content.addComponent(savedCachesDirectoryTxtFld);
         content.addComponent(nodesCountCombo);
+        content.addComponent(seedsCountCombo);
         content.addComponent(buttons);
 
         addComponent(layout);

@@ -11,7 +11,7 @@ package org.safehaus.kiskis.mgmt.ui.oozie.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.api.oozie.OozieConfig;
+import org.safehaus.kiskis.mgmt.api.oozie.Config;
 
 /**
  * @author dilshat
@@ -20,8 +20,7 @@ public class Wizard {
 
     private final VerticalLayout vlayout;
     private int step = 1;
-    private OozieConfig config = new OozieConfig();
-    private StepFinish stepFinish;
+    private Config config = new Config();
 
     public Wizard() {
         vlayout = new VerticalLayout();
@@ -51,11 +50,11 @@ public class Wizard {
 
     public void init() {
         step = 1;
-        config = new OozieConfig();
+        config = new Config();
         putForm();
     }
 
-    public OozieConfig getConfig() {
+    public Config getConfig() {
         return config;
     }
 

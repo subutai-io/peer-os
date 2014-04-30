@@ -17,10 +17,10 @@ public class Config {
     public static final String PRODUCT_KEY = "Cassandra";
     private String clusterName = "";
     private String domainName = "";
-    private Agent listedAddressNode;
-    private Agent rpcAddressNode;
     private int numberOfSeeds;
+    private int numberOfNodes;
     private Set<Agent> seedNodes;
+    private Set<Agent> nodes;
     private String dataDirectory = "/var/lib/cassandra/data";
     private String commitLogDirectory = "/var/lib/cassandra/commitlog";
     private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
@@ -35,22 +35,6 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
-    }
-
-    public Agent getListedAddressNode() {
-        return listedAddressNode;
-    }
-
-    public void setListedAddressNode(Agent listedAddressNode) {
-        this.listedAddressNode = listedAddressNode;
-    }
-
-    public Agent getRpcAddressNode() {
-        return rpcAddressNode;
-    }
-
-    public void setRpcAddressNode(Agent rpcAddressNode) {
-        this.rpcAddressNode = rpcAddressNode;
     }
 
     public String getDataDirectory() {
@@ -93,6 +77,14 @@ public class Config {
         this.seedNodes = seedNodes;
     }
 
+    public Set<Agent> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(Set<Agent> nodes) {
+        this.nodes = nodes;
+    }
+
     public String getDomainName() {
         return domainName;
     }
@@ -101,15 +93,21 @@ public class Config {
         this.domainName = domainName;
     }
 
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    public void setNumberOfNodes(int numberOfNodes) {
+        this.numberOfNodes = numberOfNodes;
+    }
+
     @Override
     public String toString() {
         return "Config{" +
                 "clusterName='" + clusterName + '\'' +
                 ", domainName='" + domainName + '\'' +
-                ", listedAddressNodes=" + listedAddressNode +
-                ", rpcAddressNodes=" + rpcAddressNode +
                 ", numberOfSeeds=" + numberOfSeeds +
-                ", seedNodes=" + seedNodes +
+                ", numberOfNodes=" + numberOfNodes +
                 ", dataDirectory='" + dataDirectory + '\'' +
                 ", commitLogDirectory='" + commitLogDirectory + '\'' +
                 ", savedCachesDirectory='" + savedCachesDirectory + '\'' +
@@ -117,13 +115,6 @@ public class Config {
     }
 
     public void reset() {
-//        this.clusterName = "";
-//        this.listedAddressNodes = null;
-//        rpcAddressNodes = null;
-//        numberOfSeeds = 0;
-//        seedNodes = null;
-//        dataDirectory = "/var/lib/cassandra/data";
-//        commitLogDirectory = "/var/lib/cassandra/commitlog";
-//        savedCachesDirectory = "/var/lib/cassandra/saved_caches";
+
     }
 }

@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.oozie.wizard;
 
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.oozie.OozieConfig;
+import org.safehaus.kiskis.mgmt.api.oozie.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.oozie.OozieUI;
@@ -45,7 +45,7 @@ public class VerificationStep extends Panel {
             public void buttonClick(Button.ClickEvent event) {
 
                 UUID trackID = OozieUI.getOozieManager().installCluster(wizard.getConfig());
-                MgmtApplication.showProgressWindow(OozieConfig.PRODUCT_KEY, trackID, null);
+                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }
         });
