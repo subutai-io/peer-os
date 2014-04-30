@@ -17,15 +17,15 @@ public interface Accumulo {
 
     public UUID uninstallCluster(String clusterName);
 
-    public UUID startNode(String clusterName, String lxcHostname);
+    public UUID startCluster(String clusterName);
 
-    public UUID stopNode(String clusterName, String lxcHostname);
+    public UUID stopCluster(String clusterName);
 
     public UUID checkNode(String clusterName, String lxcHostname);
 
     public UUID addNode(String clusterName, String lxcHostname, NodeType nodeType);
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
+    public UUID destroyNode(String clusterName, String lxcHostname, NodeType nodeType);
 
     /**
      * Returns list of configurations of installed clusters
@@ -33,4 +33,12 @@ public interface Accumulo {
      * @return - list of configurations of installed clusters
      */
     public List<Config> getClusters();
+
+    /**
+     * Returns configuration of installed cluster by its name
+     *
+     * @param clusterName - name of cluster
+     * @return - configuration of installed cluster
+     */
+    public Config getCluster(String clusterName);
 }

@@ -9,8 +9,8 @@
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
-    <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
 
     <bean id="accumulo-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.accumulo.AccumuloImpl"
           init-method="init" destroy-method="destroy">
@@ -18,7 +18,7 @@
         <argument ref="agentManager"/>
         <argument ref="dbManager"/>
         <argument ref="tracker"/>
-        <argument ref="lxcManager"/>
+        <argument ref="hadoopManager"/>
     </bean>
 
     <service ref="accumulo-impl" interface="org.safehaus.kiskis.mgmt.api.accumulo.Accumulo"/>

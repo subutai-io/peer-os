@@ -42,9 +42,8 @@ public class UiUtil {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
+        table.addContainerProperty("Nodes state", String.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);

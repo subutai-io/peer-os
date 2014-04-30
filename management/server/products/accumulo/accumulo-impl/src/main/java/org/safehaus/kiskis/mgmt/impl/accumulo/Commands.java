@@ -41,10 +41,10 @@ public class Commands extends CommandsSingleton {
                 agents);
     }
 
-    public static Command getStartCommand(Set<Agent> agents) {
+    public static Command getStartCommand(Agent agent) {
         return createCommand(
                 new RequestBuilder("/etc/init.d/accumulo start").withTimeout(60),
-                agents);
+                Util.wrapAgentToSet(agent));
     }
 
     public static Command getStopCommand(Agent agent) {

@@ -10,11 +10,10 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
+import org.safehaus.kiskis.mgmt.api.accumulo.NodeType;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 import org.safehaus.kiskis.mgmt.ui.accumulo.common.UiUtil;
 
@@ -104,31 +103,25 @@ public class Manager {
         });
         controlsContent.addComponent(checkAllBtn);
 
-        Button startAllBtn = new Button("Start all");
-        startAllBtn.addListener(new Button.ClickListener() {
+        Button startClusterBtn = new Button("Start cluster");
+        startClusterBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                startAllNodes(mastersTable);
-                startAllNodes(slavesTable);
-                startAllNodes(tracersTable);
             }
 
         });
-        controlsContent.addComponent(startAllBtn);
+        controlsContent.addComponent(startClusterBtn);
 
-        Button stopAllBtn = new Button("Stop all");
-        stopAllBtn.addListener(new Button.ClickListener() {
+        Button stopClusterBtn = new Button("Stop cluster");
+        stopClusterBtn.addListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                stopAllNodes(mastersTable);
-                stopAllNodes(slavesTable);
-                stopAllNodes(tracersTable);
             }
 
         });
-        controlsContent.addComponent(stopAllBtn);
+        controlsContent.addComponent(stopClusterBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -245,38 +238,22 @@ public class Manager {
         UiUtil.clickAllButtonsInTable(table, "Check");
     }
 
-    public static void startAllNodes(Table table) {
-        UiUtil.clickAllButtonsInTable(table, "Start");
-
-    }
-
-    public static void stopAllNodes(Table table) {
-        UiUtil.clickAllButtonsInTable(table, "Stop");
-
-    }
-
-
     private void populateTable(final Table table, Set<Agent> agents, final boolean masters) {
 
         table.removeAllItems();
 
         for (final Agent agent : agents) {
             final Button checkBtn = new Button("Check");
-            final Button startBtn = new Button("Start");
-            final Button stopBtn = new Button("Stop");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-            stopBtn.setEnabled(false);
-            startBtn.setEnabled(false);
             destroyBtn.setEnabled(!masters);
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
                             agent.getHostname(),
                             checkBtn,
-                            startBtn,
-                            stopBtn,
                             destroyBtn,
+                            "",//here will go result of check status command
                             progressIcon},
                     null
             );
@@ -286,82 +263,9 @@ public class Manager {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
 
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    AccumuloUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                if (state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else if (state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(!masters);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
                 }
             });
 
-            startBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    AccumuloUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                if (state == NodeState.RUNNING) {
-                                    stopBtn.setEnabled(true);
-                                } else {
-                                    startBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(!masters);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-
-                }
-            });
-
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-                    startBtn.setEnabled(false);
-                    stopBtn.setEnabled(false);
-                    destroyBtn.setEnabled(false);
-
-                    AccumuloUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-                                if (state == NodeState.STOPPED) {
-                                    startBtn.setEnabled(true);
-                                } else {
-                                    stopBtn.setEnabled(true);
-                                }
-                                destroyBtn.setEnabled(!masters);
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
 
             destroyBtn.addListener(new Button.ClickListener() {
 
@@ -376,7 +280,8 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = AccumuloUI.getAccumuloManager().destroyNode(config.getClusterName(), agent.getHostname());
+                                        UUID trackID = AccumuloUI.getAccumuloManager().destroyNode(config.getClusterName(), agent.getHostname(),
+                                                table == tracersTable ? NodeType.TRACER : NodeType.LOGGER);
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
