@@ -66,8 +66,7 @@ public class ExportPanel extends ImportExportBase {
         }));
 
         List<Component> ls = new ArrayList<Component>();
-        String title = "Sqoop Export / Hostname: " + agent.getHostname();
-        ls.add(UIUtil.getLabel("<h1>" + title + "</h1>", 100, UNITS_PERCENTAGE));
+        ls.add(UIUtil.getLabel("<h1>Sqoop Export</h1>", 100, UNITS_PERCENTAGE));
         ls.add(connStringField);
         ls.add(tableField);
         ls.add(usernameField);

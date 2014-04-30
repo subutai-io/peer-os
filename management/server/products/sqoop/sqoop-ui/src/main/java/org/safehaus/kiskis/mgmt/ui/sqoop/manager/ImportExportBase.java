@@ -58,6 +58,8 @@ public abstract class ImportExportBase extends Panel {
         for(int i = 0; i < components.size(); i++) {
             grid.addComponent(components.get(i), 0, i);
         }
+        String title = "<h1>Hostname: " + agent.getHostname() + "</h1>";
+        grid.addComponent(UIUtil.getLabel(title, 100, UNITS_PERCENTAGE), 1, 0);
         grid.addComponent(logTextArea, 1, 1, 1, components.size() - 1 - 1);
 
         addComponent(grid);
