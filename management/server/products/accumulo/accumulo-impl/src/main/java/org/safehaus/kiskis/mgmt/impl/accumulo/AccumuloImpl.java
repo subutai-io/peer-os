@@ -489,8 +489,11 @@ public class AccumuloImpl implements Accumulo {
                     return;
                 }
 
-                if (config.getAllNodes().contains(lxcAgent)) {
-                    po.addLogFailed(String.format("Agent %s already belongs to this cluster\nOperation aborted", lxcHostname));
+                if (nodeType == NodeType.TRACER && config.getTracers().contains(lxcAgent)) {
+                    po.addLogFailed(String.format("Agent %s already belongs to tracers\nOperation aborted", lxcHostname));
+                    return;
+                } else if (nodeType.isSlave() && config.getSlaves().contains(lxcAgent)) {
+                    po.addLogFailed(String.format("Agent %s already belongs to slaves\nOperation aborted", lxcHostname));
                     return;
                 }
 
@@ -505,13 +508,11 @@ public class AccumuloImpl implements Accumulo {
 
                 AgentResult result = checkInstalledCommand.getResults().get(lxcAgent.getUuid());
 
-                if (result.getStdOut().contains("ksks-accumulo")) {
-                    po.addLogFailed(String.format("Node %s already has Accumulo installed. Installation aborted", lxcAgent.getHostname()));
-                    return;
-                } else if (!result.getStdOut().contains("ksks-hadoop")) {
+                if (!result.getStdOut().contains("ksks-hadoop")) {
                     po.addLogFailed(String.format("Node %s has no Hadoop installation. Installation aborted", lxcAgent.getHostname()));
                     return;
                 }
+                boolean install = !result.getStdOut().contains("ksks-accumulo");
 
                 org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig = hadoopManager.getCluster(config.getClusterName());
 
@@ -541,53 +542,60 @@ public class AccumuloImpl implements Accumulo {
 
                 po.addLog("Updating DB...");
                 if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog(String.format("Cluster info updated in DB\nInstalling %s on %s node...", Config.PRODUCT_KEY, lxcAgent.getHostname()));
 
-                    Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
-                    commandRunner.runCommand(installCommand);
+                    po.addLog("Cluster info updated in DB");
 
-                    if (installCommand.hasSucceeded()) {
-                        po.addLog("Installation succeeded\nRegistering node with cluster...");
+                    if (install) {
+                        po.addLog(String.format("Installing %s on %s node...", Config.PRODUCT_KEY, lxcAgent.getHostname()));
 
-                        Command addNodeCommand;
-                        if (nodeType.isSlave()) {
-                            addNodeCommand = Commands.getAddSlavesCommand(config.getAllNodes(), Util.wrapAgentToSet(lxcAgent));
+                        Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
+                        commandRunner.runCommand(installCommand);
+
+                        if (installCommand.hasSucceeded()) {
+                            po.addLog("Installation succeeded");
                         } else {
-                            addNodeCommand = Commands.getAddTracersCommand(config.getAllNodes(), Util.wrapAgentToSet(lxcAgent));
+                            po.addLogFailed(String.format("Installation failed, %s\nOperation aborted",
+                                    installCommand.getAllErrors()));
+                            return;
                         }
-                        commandRunner.runCommand(addNodeCommand);
+                    }
+                    po.addLog("Registering node with cluster...");
 
-                        if (addNodeCommand.hasSucceeded()) {
+                    Command addNodeCommand;
+                    if (nodeType.isSlave()) {
+                        addNodeCommand = Commands.getAddSlavesCommand(config.getAllNodes(), Util.wrapAgentToSet(lxcAgent));
+                    } else {
+                        addNodeCommand = Commands.getAddTracersCommand(config.getAllNodes(), Util.wrapAgentToSet(lxcAgent));
+                    }
+                    commandRunner.runCommand(addNodeCommand);
 
-                            po.addLog("Node registration succeeded\nSetting Zk cluster...");
+                    if (addNodeCommand.hasSucceeded()) {
 
-                            Command setZkClusterCommand = Commands.getBindZKClusterCommand(Util.wrapAgentToSet(lxcAgent), zkConfig.getNodes());
-                            commandRunner.runCommand(setZkClusterCommand);
+                        po.addLog("Node registration succeeded\nSetting Zk cluster...");
 
-                            if (setZkClusterCommand.hasSucceeded()) {
-                                po.addLog("Setting ZK cluster succeeded\nRestarting cluster...");
+                        Command setZkClusterCommand = Commands.getBindZKClusterCommand(Util.wrapAgentToSet(lxcAgent), zkConfig.getNodes());
+                        commandRunner.runCommand(setZkClusterCommand);
 
-                                Command restartClusterCommand = Commands.getRestartCommand(config.getMasterNode());
-                                commandRunner.runCommand(restartClusterCommand);
+                        if (setZkClusterCommand.hasSucceeded()) {
+                            po.addLog("Setting ZK cluster succeeded\nRestarting cluster...");
 
-                                if (restartClusterCommand.hasSucceeded()) {
-                                    po.addLogDone("Cluster restarted successfully\nDone");
-                                } else {
-                                    po.addLogFailed(String.format("Cluster restart failed, %s", restartClusterCommand.getAllErrors()));
-                                }
+                            Command restartClusterCommand = Commands.getRestartCommand(config.getMasterNode());
+                            commandRunner.runCommand(restartClusterCommand);
+
+                            if (restartClusterCommand.hasSucceeded()) {
+                                po.addLogDone("Cluster restarted successfully\nDone");
                             } else {
-                                po.addLogFailed(String.format("Setting ZK cluster failed, %s",
-                                        setZkClusterCommand.getAllErrors()));
+                                po.addLogFailed(String.format("Cluster restart failed, %s", restartClusterCommand.getAllErrors()));
                             }
                         } else {
-                            po.addLogFailed(String.format("Adding node failed, %s",
-                                    addNodeCommand.getAllErrors()));
+                            po.addLogFailed(String.format("Setting ZK cluster failed, %s",
+                                    setZkClusterCommand.getAllErrors()));
                         }
-
                     } else {
-                        po.addLogFailed(String.format("Installation failed, %s",
-                                installCommand.getAllErrors()));
+                        po.addLogFailed(String.format("Adding node failed, %s",
+                                addNodeCommand.getAllErrors()));
                     }
+
 
                 } else {
                     po.addLogFailed("Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed");
