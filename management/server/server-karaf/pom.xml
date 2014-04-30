@@ -833,7 +833,7 @@
                                     <artifactId>sqoop-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                                                
+
                                 <!-- Hadoop -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -851,14 +851,6 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!-- Products Modules - END -->
-
-                                <!-- TODO for API - START -->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>hadoop-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <!-- TODO for API - END -->
 
                             </artifactItems>
                         </configuration>
