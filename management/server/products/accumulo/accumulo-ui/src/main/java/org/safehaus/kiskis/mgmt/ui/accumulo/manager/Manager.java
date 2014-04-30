@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * TODO add zk refresh option
@@ -34,6 +36,12 @@ public class Manager {
     private final Table mastersTable;
     private final Table tracersTable;
     private final Table slavesTable;
+    private final Pattern masterPattern = Pattern.compile(".*(Master.+?g).*");
+    private final Pattern gcPattern = Pattern.compile(".*(GC.+?g).*");
+    private final Pattern monitorPattern = Pattern.compile(".*(Monitor.+?g).*");
+    private final Pattern tracerPattern = Pattern.compile(".*(Tracer.+?g).*");
+    private final Pattern loggerPattern = Pattern.compile(".*(Logger.+?g).*");
+    private final Pattern tabletServerPattern = Pattern.compile(".*(Tablet Server.+?g).*");
     private Config config;
 
     public Manager() {
@@ -238,6 +246,48 @@ public class Manager {
         UiUtil.clickAllButtonsInTable(table, "Check");
     }
 
+    private String parseMastersState(String result) {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher masterMatcher = masterPattern.matcher(result);
+        if (masterMatcher.find()) {
+            parsedResult.append(masterMatcher.group(1));
+        }
+        Matcher gcMatcher = gcPattern.matcher(result);
+        if (gcMatcher.find()) {
+            parsedResult.append(gcMatcher.group(1));
+        }
+        Matcher monitorMatcher = monitorPattern.matcher(result);
+        if (monitorMatcher.find()) {
+            parsedResult.append(monitorMatcher.group(1));
+        }
+
+        return parsedResult.toString();
+    }
+
+    private String parseTracersState(String result) {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher tracersMatcher = tracerPattern.matcher(result);
+        if (tracersMatcher.find()) {
+            parsedResult.append(tracersMatcher.group(1));
+        }
+
+        return parsedResult.toString();
+    }
+
+    private String parseSlavesState(String result) {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher loggersMatcher = loggerPattern.matcher(result);
+        if (loggersMatcher.find()) {
+            parsedResult.append(loggersMatcher.group(1));
+        }
+        Matcher tablerServersMatcher = tabletServerPattern.matcher(result);
+        if (tablerServersMatcher.find()) {
+            parsedResult.append(tablerServersMatcher.group(1));
+        }
+
+        return parsedResult.toString();
+    }
+
     private void populateTable(final Table table, Set<Agent> agents, final boolean masters) {
 
         table.removeAllItems();
@@ -246,6 +296,7 @@ public class Manager {
             final Button checkBtn = new Button("Check");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            final StringBuilder resultHolder = new StringBuilder();
             destroyBtn.setEnabled(!masters);
             progressIcon.setVisible(false);
 
@@ -253,7 +304,7 @@ public class Manager {
                             agent.getHostname(),
                             checkBtn,
                             destroyBtn,
-                            "",//here will go result of check status command
+                            resultHolder,//here will go result of check status command
                             progressIcon},
                     null
             );
@@ -262,7 +313,25 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    progressIcon.setVisible(true);
 
+                    AccumuloUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+
+                        public void onComplete(String result) {
+                            resultHolder.setLength(0);
+                            synchronized (progressIcon) {
+                                if (masters) {
+                                    resultHolder.append(parseMastersState(result));
+                                } else if (table == tracersTable) {
+                                    resultHolder.append(parseTracersState(result));
+                                } else if (table == slavesTable) {
+                                    resultHolder.append(parseSlavesState(result));
+                                }
+                                destroyBtn.setEnabled(!masters);
+                                progressIcon.setVisible(false);
+                            }
+                        }
+                    }));
                 }
             });
 
