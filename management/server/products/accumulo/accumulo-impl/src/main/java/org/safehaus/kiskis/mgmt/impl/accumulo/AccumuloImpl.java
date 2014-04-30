@@ -401,8 +401,16 @@ public class AccumuloImpl implements Accumulo {
                 }
 
                 if (nodeType == NodeType.TRACER) {
+                    if (config.getTracers().size() == 1) {
+                        po.addLogFailed("This is the last tracer in the cluster, destroy cluster instead\nOperation aborted");
+                        return;
+                    }
                     config.getTracers().remove(agent);
                 } else {
+                    if (config.getSlaves().size() == 1) {
+                        po.addLogFailed("This is the last slave in the cluster, destroy cluster instead\nOperation aborted");
+                        return;
+                    }
                     config.getSlaves().remove(agent);
                 }
 
