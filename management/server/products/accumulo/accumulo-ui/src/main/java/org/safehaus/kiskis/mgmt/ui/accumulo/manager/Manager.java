@@ -17,10 +17,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 import org.safehaus.kiskis.mgmt.ui.accumulo.common.UiUtil;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +57,7 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        mastersTable = UiUtil.createTableTemplate("Masters", 120, contentRoot.getWindow());
+        mastersTable = UiUtil.createTableTemplate("Masters", 150, contentRoot.getWindow());
         tracersTable = UiUtil.createTableTemplate("Tracers", 150, contentRoot.getWindow());
         slavesTable = UiUtil.createTableTemplate("Slaves", 150, contentRoot.getWindow());
         //tables go here
@@ -286,11 +283,13 @@ public class Manager {
         return parsedResult.toString();
     }
 
-    private void populateTable(final Table table, Set<Agent> agents, final boolean masters) {
+    private void populateTable(final Table table, List<Agent> agents, final boolean masters) {
 
         table.removeAllItems();
 
+        int i = 0;
         for (final Agent agent : agents) {
+            i++;
             final Button checkBtn = new Button("Check");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
@@ -299,7 +298,7 @@ public class Manager {
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
-                            agent.getHostname(),
+                            (masters ? (i == 1 ? "Master: " : i == 2 ? "GC: " : "Monitor: ") : "") + agent.getHostname(),
                             checkBtn,
                             destroyBtn,
                             resultHolder,
@@ -325,6 +324,7 @@ public class Manager {
                                 } else if (table == slavesTable) {
                                     resultHolder.append(parseSlavesState(result));
                                 }
+                                System.out.println(resultHolder);
                                 destroyBtn.setEnabled(!masters);
                                 progressIcon.setVisible(false);
                             }
@@ -367,9 +367,9 @@ public class Manager {
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(slavesTable, config.getSlaves(), false);
-            populateTable(tracersTable, config.getTracers(), false);
-            Set<Agent> masters = new HashSet<Agent>();
+            populateTable(slavesTable, new ArrayList<Agent>(config.getSlaves()), false);
+            populateTable(tracersTable, new ArrayList<Agent>(config.getTracers()), false);
+            List<Agent> masters = new ArrayList<Agent>();
             masters.add(config.getMasterNode());
             masters.add(config.getGcNode());
             masters.add(config.getMonitor());
