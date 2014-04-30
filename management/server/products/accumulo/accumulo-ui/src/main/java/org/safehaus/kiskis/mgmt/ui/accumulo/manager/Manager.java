@@ -245,15 +245,15 @@ public class Manager {
         StringBuilder parsedResult = new StringBuilder();
         Matcher masterMatcher = masterPattern.matcher(result);
         if (masterMatcher.find()) {
-            parsedResult.append(masterMatcher.group(1));
+            parsedResult.append(masterMatcher.group(1)).append(" ");
         }
         Matcher gcMatcher = gcPattern.matcher(result);
         if (gcMatcher.find()) {
-            parsedResult.append(gcMatcher.group(1));
+            parsedResult.append(gcMatcher.group(1)).append(" ");
         }
         Matcher monitorMatcher = monitorPattern.matcher(result);
         if (monitorMatcher.find()) {
-            parsedResult.append(monitorMatcher.group(1));
+            parsedResult.append(monitorMatcher.group(1)).append(" ");
         }
 
         return parsedResult.toString();
@@ -263,7 +263,7 @@ public class Manager {
         StringBuilder parsedResult = new StringBuilder();
         Matcher tracersMatcher = tracerPattern.matcher(result);
         if (tracersMatcher.find()) {
-            parsedResult.append(tracersMatcher.group(1));
+            parsedResult.append(tracersMatcher.group(1)).append(" ");
         }
 
         return parsedResult.toString();
@@ -273,11 +273,11 @@ public class Manager {
         StringBuilder parsedResult = new StringBuilder();
         Matcher loggersMatcher = loggerPattern.matcher(result);
         if (loggersMatcher.find()) {
-            parsedResult.append(loggersMatcher.group(1));
+            parsedResult.append(loggersMatcher.group(1)).append(" ");
         }
         Matcher tablerServersMatcher = tabletServerPattern.matcher(result);
         if (tablerServersMatcher.find()) {
-            parsedResult.append(tablerServersMatcher.group(1));
+            parsedResult.append(tablerServersMatcher.group(1)).append(" ");
         }
 
         return parsedResult.toString();
@@ -293,7 +293,7 @@ public class Manager {
             final Button checkBtn = new Button("Check");
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-            final StringBuilder resultHolder = new StringBuilder();
+            final Label resultHolder = new Label();
             destroyBtn.setEnabled(!masters);
             progressIcon.setVisible(false);
 
@@ -315,14 +315,13 @@ public class Manager {
                     AccumuloUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(String result) {
-                            resultHolder.setLength(0);
                             synchronized (progressIcon) {
                                 if (masters) {
-                                    resultHolder.append(parseMastersState(result));
+                                    resultHolder.setValue(parseMastersState(result));
                                 } else if (table == tracersTable) {
-                                    resultHolder.append(parseTracersState(result));
+                                    resultHolder.setValue(parseTracersState(result));
                                 } else if (table == slavesTable) {
-                                    resultHolder.append(parseSlavesState(result));
+                                    resultHolder.setValue(parseSlavesState(result));
                                 }
                                 System.out.println(resultHolder);
                                 destroyBtn.setEnabled(!masters);
