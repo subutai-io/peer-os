@@ -323,7 +323,6 @@ public class Manager {
                                 } else if (table == slavesTable) {
                                     resultHolder.setValue(parseSlavesState(result));
                                 }
-                                System.out.println(resultHolder);
                                 destroyBtn.setEnabled(!masters);
                                 progressIcon.setVisible(false);
                             }
