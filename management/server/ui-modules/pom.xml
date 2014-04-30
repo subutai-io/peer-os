@@ -15,7 +15,6 @@
 
     <modules>
         <module>hadoop</module>
-        <module>sqoop</module>
         <module>hive</module>
     </modules>
 

@@ -817,6 +817,23 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Sqoop -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>sqoop-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>sqoop-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>sqoop-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                                                
                                 <!-- Hadoop -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -841,12 +858,6 @@
                                     <artifactId>hadoop-module</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>sqoop-module</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-
                                 <!-- TODO for API - END -->
 
                             </artifactItems>
