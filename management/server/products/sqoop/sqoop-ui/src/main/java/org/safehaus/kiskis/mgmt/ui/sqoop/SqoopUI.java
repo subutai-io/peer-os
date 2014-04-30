@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class SqoopUI implements Module {
 
-    public static final String MODULE_NAME = "Sqoop v2";
+    public static final String MODULE_NAME = "Sqoop";
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Sqoop manager;
