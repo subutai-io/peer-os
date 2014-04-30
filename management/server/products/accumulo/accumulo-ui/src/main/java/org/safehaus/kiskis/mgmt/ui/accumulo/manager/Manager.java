@@ -51,7 +51,7 @@ public class Manager {
         contentRoot.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 
-        VerticalLayout content = new VerticalLayout();
+        final VerticalLayout content = new VerticalLayout();
         content.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
 
@@ -84,7 +84,6 @@ public class Manager {
                 refreshUI();
             }
         });
-
         controlsContent.addComponent(clusterCombo);
 
         Button refreshClustersBtn = new Button("Refresh clusters");
@@ -95,7 +94,6 @@ public class Manager {
                 refreshClustersInfo();
             }
         });
-
         controlsContent.addComponent(refreshClustersBtn);
 
         Button checkAllBtn = new Button("Check all");
@@ -162,77 +160,77 @@ public class Manager {
             }
 
         });
-
         controlsContent.addComponent(destroyClusterBtn);
 
-        //use add node window
-//        Button addTracerBtn = new Button("Add Tracer");
-//
-//        addTracerBtn.addListener(new Button.ClickListener() {
-//
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-//                if (config != null) {
-//                    MgmtApplication.showConfirmationDialog(
-//                            "Confirm adding tracer",
-//                            String.format("Do you want to add tracer to the %s cluster?", config.getClusterName()),
-//                            "Yes", "No", new ConfirmationDialogCallback() {
-//
-//                                @Override
-//                                public void response(boolean ok) {
-//                                    if (ok) {
-//                                        UUID trackID = AccumuloUI.getAccumuloManager().addNode(config.getClusterName(), NodeType.TRACER);
-//                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-//
-//                                            public void windowClose(Window.CloseEvent e) {
-//                                                refreshClustersInfo();
-//                                            }
-//                                        });
-//                                    }
-//                                }
-//                            }
-//                    );
-//                } else {
-//                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
-//                }
-//            }
-//        });
-//
-//        controlsContent.addComponent(addTracerBtn);
-//
-//        Button addSlaveBtn = new Button("Add Slave");
-//
-//        addSlaveBtn.addListener(new Button.ClickListener() {
-//
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-//                if (config != null) {
-//                    MgmtApplication.showConfirmationDialog(
-//                            "Confirm adding slave",
-//                            String.format("Do you want to add slave to the %s cluster?", config.getClusterName()),
-//                            "Yes", "No", new ConfirmationDialogCallback() {
-//
-//                                @Override
-//                                public void response(boolean ok) {
-//                                    if (ok) {
-//                                        UUID trackID = AccumuloUI.getAccumuloManager().addNode(config.getClusterName(), NodeType.SLAVE);
-//                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-//
-//                                            public void windowClose(Window.CloseEvent e) {
-//                                                refreshClustersInfo();
-//                                            }
-//                                        });
-//                                    }
-//                                }
-//                            }
-//                    );
-//                } else {
-//                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
-//                }
-//            }
-//        });
-//
-//        controlsContent.addComponent(addSlaveBtn);
+        Button addTracerBtn = new Button("Add Tracer");
+        addTracerBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig = AccumuloUI.getHadoopManager().getCluster(config.getClusterName());
+                    if (hadoopConfig != null) {
+
+                        Set<Agent> availableNodes = new HashSet<Agent>(hadoopConfig.getAllNodes());
+                        availableNodes.removeAll(config.getTracers());
+                        if (availableNodes.isEmpty()) {
+                            UiUtil.showMsg("All Hadoop nodes already have tracers installed", contentRoot.getWindow());
+                            return;
+                        }
+
+                        AddNodeWindow addNodeWindow = new AddNodeWindow(config, availableNodes, NodeType.TRACER);
+                        MgmtApplication.addCustomWindow(addNodeWindow);
+                        addNodeWindow.addListener(new Window.CloseListener() {
+
+                            public void windowClose(Window.CloseEvent e) {
+                                refreshClustersInfo();
+                            }
+                        });
+                    } else {
+                        UiUtil.showMsg(String.format("Hadoop cluster %s not found", config.getClusterName()), contentRoot.getWindow());
+                    }
+                } else {
+                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
+                }
+            }
+        });
+        controlsContent.addComponent(addTracerBtn);
+
+        Button addSlaveBtn = new Button("Add Slave");
+        addSlaveBtn.addListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (config != null) {
+
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig = AccumuloUI.getHadoopManager().getCluster(config.getClusterName());
+                    if (hadoopConfig != null) {
+
+                        Set<Agent> availableNodes = new HashSet<Agent>(hadoopConfig.getAllNodes());
+                        availableNodes.removeAll(config.getSlaves());
+                        if (availableNodes.isEmpty()) {
+                            UiUtil.showMsg("All Hadoop nodes already have slaves installed", contentRoot.getWindow());
+                            return;
+                        }
+
+                        AddNodeWindow addNodeWindow = new AddNodeWindow(config, availableNodes, NodeType.LOGGER);
+                        MgmtApplication.addCustomWindow(addNodeWindow);
+                        addNodeWindow.addListener(new Window.CloseListener() {
+
+                            public void windowClose(Window.CloseEvent e) {
+                                refreshClustersInfo();
+                            }
+                        });
+                    } else {
+                        UiUtil.showMsg(String.format("Hadoop cluster %s not found", config.getClusterName()), contentRoot.getWindow());
+                    }
+                } else {
+                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
+                }
+            }
+        });
+        controlsContent.addComponent(addSlaveBtn);
 
         content.addComponent(controlsContent);
 
@@ -304,7 +302,7 @@ public class Manager {
                             agent.getHostname(),
                             checkBtn,
                             destroyBtn,
-                            resultHolder,//here will go result of check status command
+                            resultHolder,
                             progressIcon},
                     null
             );
