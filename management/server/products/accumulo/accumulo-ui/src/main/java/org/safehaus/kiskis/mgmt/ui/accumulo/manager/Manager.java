@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * TODO add zk refresh option
+ * TODO implement start/stop cluster methods
  *
  * @author dilshat
  */
