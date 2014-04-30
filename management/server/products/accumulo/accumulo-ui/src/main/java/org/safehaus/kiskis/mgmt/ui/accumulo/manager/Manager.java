@@ -60,9 +60,9 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        mastersTable = UiUtil.createTableTemplate("Masters", 200, contentRoot.getWindow());
-        tracersTable = UiUtil.createTableTemplate("Tracers", 200, contentRoot.getWindow());
-        slavesTable = UiUtil.createTableTemplate("Slaves", 200, contentRoot.getWindow());
+        mastersTable = UiUtil.createTableTemplate("Masters", 120, contentRoot.getWindow());
+        tracersTable = UiUtil.createTableTemplate("Tracers", 150, contentRoot.getWindow());
+        slavesTable = UiUtil.createTableTemplate("Slaves", 150, contentRoot.getWindow());
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
