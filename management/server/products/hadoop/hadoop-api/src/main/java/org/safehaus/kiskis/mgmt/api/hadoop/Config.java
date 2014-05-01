@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.api.hadoop;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,7 +11,7 @@ import java.util.Set;
 /**
  * Created by daralbaev on 02.04.14.
  */
-public class Config {
+public class Config implements ConfigBase {
     public static final String PRODUCT_KEY = "Hadoop";
     public static final int
             NAME_NODE_PORT = 8020,
@@ -69,6 +70,11 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
     }
 
     public String getDomainName() {
