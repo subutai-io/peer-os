@@ -5,30 +5,20 @@
  */
 package org.safehaus.kiskis.mgmt.api.presto;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public interface Presto {
-
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(String clusterName);
+public interface Presto extends ApiBase<Config> {
 
     public UUID addWorkerNode(String clusterName, String lxcHostname);
 
     public UUID destroyWorkerNode(String clusterName, String lxcHostname);
 
     public UUID changeCoordinatorNode(String clusterName, String newMasterHostname);
-
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
-    public List<Config> getClusters();
 
     /**
      * Starts the specified node

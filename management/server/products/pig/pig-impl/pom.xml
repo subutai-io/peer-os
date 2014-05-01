@@ -28,40 +28,18 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.impl.pig</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.impl.pig</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    <!--
-        <repositories>
-            <repository>
-                <id>vaadin-addons</id>
-                <url>http://maven.vaadin.com/vaadin-addons</url>
-            </repository>
-        </repositories>-->
 
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>${org.osgi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>ui-vaadin-services</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>ui-vaadin</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -83,6 +61,21 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <artifactId>ui-vaadin-services</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ui-vaadin</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
