@@ -111,6 +111,8 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                UUID trackID = AccumuloUI.getAccumuloManager().startCluster(config.getClusterName());
+                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
             }
 
         });
@@ -121,6 +123,8 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                UUID trackID = AccumuloUI.getAccumuloManager().stopCluster(config.getClusterName());
+                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
             }
 
         });
@@ -294,7 +298,8 @@ public class Manager {
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             final Label resultHolder = new Label();
-            destroyBtn.setEnabled(!masters);
+            destroyBtn.setVisible(!masters);
+            destroyBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
@@ -323,7 +328,7 @@ public class Manager {
                                 } else if (table == slavesTable) {
                                     resultHolder.setValue(parseSlavesState(result));
                                 }
-                                destroyBtn.setEnabled(!masters);
+                                destroyBtn.setEnabled(true);
                                 progressIcon.setVisible(false);
                             }
                         }
