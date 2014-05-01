@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hadoop-module</artifactId>
+            <artifactId>hadoop-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
