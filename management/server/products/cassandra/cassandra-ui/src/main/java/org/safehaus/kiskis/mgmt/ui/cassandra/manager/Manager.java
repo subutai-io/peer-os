@@ -32,9 +32,7 @@ public class Manager {
 
     private final VerticalLayout contentRoot;
     private final ComboBox clusterCombo;
-    private final Table listenNodesTable;
-    private final Table rpcNodesTable;
-    private final Table seedNodesTable;
+    private final Table nodesTable;
     private Config config;
 
     public Manager() {
@@ -53,9 +51,7 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        listenNodesTable = createTableTemplate("Listen nodes", 100);
-        rpcNodesTable = createTableTemplate("RPC nodes", 100);
-        seedNodesTable = createTableTemplate("Seed nodes", 100);
+        nodesTable = createTableTemplate("Cluster nodes", 300);
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -121,7 +117,6 @@ public class Manager {
                         refreshClustersInfo();
                     }
                 });
-//                checkNodesStatus(listenNodesTable);
             }
 
         });
@@ -140,12 +135,9 @@ public class Manager {
                         refreshClustersInfo();
                     }
                 });
-//                checkNodesStatus(listenNodesTable);
             }
 
         });
-
-        controlsContent.addComponent(stopAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addListener(new Button.ClickListener() {
@@ -179,14 +171,10 @@ public class Manager {
 
         });
 
+        controlsContent.addComponent(stopAllBtn);
         controlsContent.addComponent(destroyClusterBtn);
-
-
         content.addComponent(controlsContent);
-
-        content.addComponent(listenNodesTable);
-        content.addComponent(rpcNodesTable);
-        content.addComponent(seedNodesTable);
+        content.addComponent(nodesTable);
 
     }
 
@@ -199,156 +187,24 @@ public class Manager {
     }
 
     private void populateTable(final Table table, Set<Agent> agents) {
-
         table.removeAllItems();
-
         for (Iterator it = agents.iterator(); it.hasNext(); ) {
             final Agent agent = (Agent) it.next();
-
-            final Button checkBtn = new Button("Check");
-//            final Button startBtn = new Button("Start");
-//            final Button stopBtn = new Button("Stop");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-//            stopBtn.setEnabled(false);
-//            startBtn.setEnabled(false);
             progressIcon.setVisible(false);
-
             final Object rowId = table.addItem(new Object[]{
                             agent.getHostname(),
-                            checkBtn,
-//                            startBtn,
-//                            stopBtn,
                             progressIcon},
                     null
             );
-
-            checkBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-
-                    progressIcon.setVisible(true);
-//                    startBtn.setEnabled(false);
-//                    stopBtn.setEnabled(false);
-
-                    CassandraUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                        public void onComplete(NodeState state) {
-                            synchronized (progressIcon) {
-//                                if (state == NodeState.RUNNING) {
-//                                    stopBtn.setEnabled(true);
-//                                } else if (state == NodeState.STOPPED) {
-//                                    startBtn.setEnabled(true);
-//                                }
-                                show(state.toString());
-                                progressIcon.setVisible(false);
-                            }
-                        }
-                    }));
-                }
-            });
-
-//            startBtn.addListener(new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//
-//                    progressIcon.setVisible(true);
-////                    startBtn.setEnabled(false);
-////                    stopBtn.setEnabled(false);
-//
-//                    CassandraUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-//
-//                        public void onComplete(NodeState state) {
-//                            synchronized (progressIcon) {
-//                                if (state == NodeState.RUNNING) {
-//                                    stopBtn.setEnabled(true);
-//                                } else {
-//                                    startBtn.setEnabled(true);
-//                                }
-//                                progressIcon.setVisible(false);
-//                            }
-//                        }
-//                    }));
-//
-//                }
-//            });
-//
-//            stopBtn.addListener(new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//
-//                    progressIcon.setVisible(true);
-//                    startBtn.setEnabled(false);
-//                    stopBtn.setEnabled(false);
-//
-//                    CassandraUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-//
-//                        public void onComplete(NodeState state) {
-//                            synchronized (progressIcon) {
-//                                if (state == NodeState.STOPPED) {
-//                                    startBtn.setEnabled(true);
-//                                } else {
-//                                    stopBtn.setEnabled(true);
-//                                }
-//                                progressIcon.setVisible(false);
-//                            }
-//                        }
-//                    }));
-//                }
-//            });
-
         }
-    }
-
-    private void populateTable(final Table table, final Agent agent) {
-
-        table.removeAllItems();
-        final Button checkBtn = new Button("Check");
-        final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-        progressIcon.setVisible(false);
-
-        final Object rowId = table.addItem(new Object[]{
-                        agent.getHostname(),
-                        checkBtn,
-                        progressIcon},
-                null
-        );
-
-        checkBtn.addListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-
-                progressIcon.setVisible(true);
-                CassandraUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-
-                    public void onComplete(NodeState state) {
-                        synchronized (progressIcon) {
-//                                if (state == NodeState.RUNNING) {
-//                                    stopBtn.setEnabled(true);
-//                                } else if (state == NodeState.STOPPED) {
-//                                    startBtn.setEnabled(true);
-//                                }
-                            show(state.toString());
-                            progressIcon.setVisible(false);
-                        }
-                    }
-                }));
-            }
-        });
-
-
     }
 
     private void refreshUI() {
         if (config != null) {
-            populateTable(listenNodesTable, config.getListedAddressNode());
-            populateTable(rpcNodesTable, config.getRpcAddressNode());
-            populateTable(seedNodesTable, config.getSeedNodes());
+            populateTable(nodesTable, config.getNodes());
         } else {
-            listenNodesTable.removeAllItems();
+            nodesTable.removeAllItems();
         }
     }
 
@@ -375,28 +231,15 @@ public class Manager {
         }
     }
 
-    public static void checkNodesStatus(Table table) {
-        for (Iterator it = table.getItemIds().iterator(); it.hasNext(); ) {
-            int rowId = (Integer) it.next();
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-            checkBtn.click();
-        }
-    }
-
     private Table createTableTemplate(String caption, int size) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-//        table.addContainerProperty("Start", Button.class, null);
-//        table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         table.setHeight(size, Sizeable.UNITS_PIXELS);
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
-
         table.addListener(new ItemClickEvent.ItemClickListener() {
 
             public void itemClick(ItemClickEvent event) {

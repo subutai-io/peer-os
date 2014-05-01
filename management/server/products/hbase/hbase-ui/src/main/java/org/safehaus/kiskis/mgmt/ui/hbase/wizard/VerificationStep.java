@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
 
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
+import org.safehaus.kiskis.mgmt.api.hbase.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI;
@@ -50,7 +50,7 @@ public class VerificationStep extends Panel {
             public void buttonClick(Button.ClickEvent event) {
 
                 UUID trackID = HBaseUI.getHbaseManager().installCluster(wizard.getConfig());
-                MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, null);
+                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }
         });
