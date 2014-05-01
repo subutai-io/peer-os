@@ -4,11 +4,15 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import java.util.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.sqoop.SqoopUI;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class NodeSelectionStep extends Panel {
 
@@ -34,13 +38,13 @@ public class NodeSelectionStep extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent e) {
                 select.setValue(null);
-                if(e.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo)e.getProperty().getValue();
+                if (e.getProperty().getValue() != null) {
+                    Config hadoopInfo = (Config) e.getProperty().getValue();
                     select.setContainerDataSource(new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents())
+                                    Agent.class, hadoopInfo.getAllNodes())
                     );
                     // do select if values exist
-                    if(!Util.isCollectionEmpty(wizard.getConfig().getNodes()))
+                    if (!Util.isCollectionEmpty(wizard.getConfig().getNodes()))
                         select.setValue(wizard.getConfig().getNodes());
 
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
@@ -48,20 +52,17 @@ public class NodeSelectionStep extends Panel {
             }
         });
 
-        List<HadoopClusterInfo> clusters = SqoopUI.getDbManager().getInfo(
-                HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
-        if(clusters.size() > 0) {
-            for(HadoopClusterInfo hci : clusters) {
+        List<Config> clusters = SqoopUI.getHadoopManager().getClusters();
+        if (clusters.size() > 0) {
+            for (Config hci : clusters) {
                 hadoopClusters.addItem(hci);
                 hadoopClusters.setItemCaption(hci, hci.getClusterName());
             }
         }
         // select cluster if config has cluster name set
-        if(wizard.getConfig().getClusterName() != null) {
-            HadoopClusterInfo info = SqoopUI.getDbManager().getInfo(
-                    HadoopClusterInfo.SOURCE, wizard.getConfig().getClusterName(),
-                    HadoopClusterInfo.class);
-            if(info != null) hadoopClusters.setValue(info);
+        if (wizard.getConfig().getClusterName() != null) {
+            Config info = SqoopUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
+            if (info != null) hadoopClusters.setValue(info);
         }
 
         select = makeClientNodeSelector(wizard);
@@ -72,9 +73,9 @@ public class NodeSelectionStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if(Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Select Hadoop cluster");
-                } else if(Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
                     show("Select client nodes");
                 } else {
                     wizard.next();
@@ -121,15 +122,15 @@ public class NodeSelectionStep extends Panel {
         tcs.setRightColumnCaption("Selected Nodes");
         tcs.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         tcs.setRequired(true);
-        if(!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
+        if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
             tcs.setValue(wizard.getConfig().getNodes());
         }
         tcs.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
-                if(event.getProperty().getValue() != null) {
+                if (event.getProperty().getValue() != null) {
                     Set<Agent> clients = new HashSet();
-                    clients.addAll((Collection)event.getProperty().getValue());
+                    clients.addAll((Collection) event.getProperty().getValue());
                     wizard.getConfig().setNodes(clients);
                 }
             }

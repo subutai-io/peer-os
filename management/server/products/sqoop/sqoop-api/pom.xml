@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.sqoop</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.sqoop</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

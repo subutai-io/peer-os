@@ -1,35 +1,25 @@
 package org.safehaus.kiskis.mgmt.ui.sqoop;
 
 import com.vaadin.ui.Component;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
+import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.api.sqoop.Sqoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class SqoopUI implements Module {
 
-    public static final String MODULE_NAME = "Sqoop";
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Sqoop manager;
-    private static DbManager dbManager;
+    private static Hadoop hadoopManager;
 
     private static ExecutorService executor;
     private static SqoopForm form;
-
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
-
-    public void destroy() {
-        agentManager = null;
-        tracker = null;
-        manager = null;
-        executor.shutdown();
-    }
 
     public static AgentManager getAgentManager() {
         return agentManager;
@@ -55,29 +45,41 @@ public class SqoopUI implements Module {
         SqoopUI.manager = manager;
     }
 
-    public static DbManager getDbManager() {
-        return dbManager;
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
     }
 
-    public void setDbManager(DbManager dbManager) {
-        SqoopUI.dbManager = dbManager;
+    public void setHadoopManager(Hadoop hadoopManager) {
+        SqoopUI.hadoopManager = hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
         return executor;
     }
 
+    public static SqoopForm getForm() {
+        return form;
+    }
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+    public void destroy() {
+        agentManager = null;
+        tracker = null;
+        manager = null;
+        hadoopManager = null;
+        executor.shutdown();
+    }
+
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {
         SqoopUI.form = new SqoopForm();
         return SqoopUI.form;
-    }
-
-    public static SqoopForm getForm() {
-        return form;
     }
 
 }
