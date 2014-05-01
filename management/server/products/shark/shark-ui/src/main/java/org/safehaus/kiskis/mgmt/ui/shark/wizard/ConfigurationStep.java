@@ -35,8 +35,7 @@ public class ConfigurationStep extends Panel {
         sparkClusters.setRequired(true);
         sparkClusters.setNullSelectionAllowed(false);
 
-        List<Config> clusters = SharkUI.getDbManager().
-                getInfo(Config.PRODUCT_KEY, Config.class);
+        List<Config> clusters = SharkUI.getSparkManager().getClusters();
         if (clusters.size() > 0) {
             for (Config info : clusters) {
                 sparkClusters.addItem(info);
@@ -57,10 +56,8 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        Config info = SharkUI.getDbManager().
-                getInfo(Config.PRODUCT_KEY,
-                        wizard.getConfig().getClusterName(),
-                        Config.class);
+        Config info = SharkUI.getSparkManager().getCluster(wizard.getConfig().getClusterName());
+
         if (info != null) {
             sparkClusters.setValue(info);
         } else if (clusters.size() > 0) {

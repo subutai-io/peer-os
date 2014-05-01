@@ -5,15 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.ui.spark.manager;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
-
-import java.util.UUID;
-
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
+
+import java.util.UUID;
 
 /**
  * @author dilshat

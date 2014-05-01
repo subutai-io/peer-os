@@ -5,18 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.ui.shark.wizard;
 
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-
-import java.util.UUID;
-
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
+
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -48,7 +43,7 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                UUID trackID = SharkUI.getSharkManager().installCluster(wizard.getConfig().getClusterName());
+                UUID trackID = SharkUI.getSharkManager().installCluster(wizard.getConfig());
                 MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }

@@ -6,30 +6,33 @@
 package org.safehaus.kiskis.mgmt.ui.shark;
 
 import com.vaadin.ui.Component;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.shark.Config;
+import org.safehaus.kiskis.mgmt.api.shark.Shark;
+import org.safehaus.kiskis.mgmt.api.spark.Spark;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.shark.Shark;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 /**
  * @author dilshat
  */
 public class SharkUI implements Module {
 
-    public static final String MODULE_NAME = "Shark";
     private static Shark sharkManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
-    private static DbManager dbManager;
+    private static Spark sparkManager;
     private static ExecutorService executor;
 
     public static Tracker getTracker() {
         return tracker;
+    }
+
+    public void setTracker(Tracker tracker) {
+        SharkUI.tracker = tracker;
     }
 
     public static Shark getSharkManager() {
@@ -40,16 +43,12 @@ public class SharkUI implements Module {
         SharkUI.sharkManager = sharkManager;
     }
 
-    public void setTracker(Tracker tracker) {
-        SharkUI.tracker = tracker;
+    public static Spark getSparkManager() {
+        return sparkManager;
     }
 
-    public static DbManager getDbManager() {
-        return dbManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        SharkUI.dbManager = dbManager;
+    public void setSparkManager(Spark sparkManager) {
+        SharkUI.sparkManager = sparkManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -71,13 +70,13 @@ public class SharkUI implements Module {
     public void destroy() {
         sharkManager = null;
         agentManager = null;
-        dbManager = null;
+        sparkManager = null;
         tracker = null;
         executor.shutdown();
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

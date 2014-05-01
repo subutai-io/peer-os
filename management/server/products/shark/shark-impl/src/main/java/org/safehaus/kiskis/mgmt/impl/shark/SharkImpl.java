@@ -51,34 +51,34 @@ public class SharkImpl implements Shark {
         executor.shutdown();
     }
 
-    public UUID installCluster(final String clusterName) {
+    public UUID installCluster(final Config config) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", clusterName));
+                String.format("Installing %s", Config.PRODUCT_KEY));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                if (Strings.isNullOrEmpty(clusterName)) {
+                if (config == null || Strings.isNullOrEmpty(config.getClusterName())) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
 
-                if (dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class) != null) {
-                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", clusterName));
+                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
+                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
                 }
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
-                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
+                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, config.getClusterName(),
                         org.safehaus.kiskis.mgmt.api.spark.Config.class);
                 if (sparkConfig == null) {
-                    po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
+                    po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", config.getClusterName()));
                     return;
                 }
 
                 Config config = new Config();
-                config.setClusterName(clusterName);
+                config.setClusterName(config.getClusterName());
                 config.setNodes(sparkConfig.getAllNodes());
 
                 for (Agent node : config.getNodes()) {
@@ -361,6 +361,11 @@ public class SharkImpl implements Shark {
 
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
     public UUID actualizeMasterIP(final String clusterName) {

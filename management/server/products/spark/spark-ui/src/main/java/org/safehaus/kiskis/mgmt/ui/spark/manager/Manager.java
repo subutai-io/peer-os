@@ -14,7 +14,6 @@ import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -156,12 +155,9 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    HadoopClusterInfo info = SparkUI.getDbManager().
-                            getInfo(HadoopClusterInfo.SOURCE,
-                                    config.getClusterName(),
-                                    HadoopClusterInfo.class);
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config info = SparkUI.getHadoopManager().getCluster(config.getClusterName());
                     if (info != null) {
-                        Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
+                        Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
                         nodes.removeAll(config.getSlaveNodes());
                         if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);

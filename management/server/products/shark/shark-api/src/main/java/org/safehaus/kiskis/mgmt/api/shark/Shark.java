@@ -5,17 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.shark;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public interface Shark {
-
-    public UUID installCluster(String clusterName);
-
-    public UUID uninstallCluster(String clusterName);
+public interface Shark extends ApiBase<Config> {
 
     public UUID addNode(String clusterName, String lxcHostname);
 
@@ -23,10 +20,4 @@ public interface Shark {
 
     public UUID actualizeMasterIP(String clusterName);
 
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
-    public List<Config> getClusters();
 }
