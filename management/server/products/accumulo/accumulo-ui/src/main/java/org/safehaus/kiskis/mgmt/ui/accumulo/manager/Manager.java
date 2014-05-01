@@ -57,9 +57,9 @@ public class Manager {
         contentRoot.setMargin(true);
 
         //tables go here
-        mastersTable = UiUtil.createTableTemplate("Masters", 150, contentRoot.getWindow());
-        tracersTable = UiUtil.createTableTemplate("Tracers", 150, contentRoot.getWindow());
-        slavesTable = UiUtil.createTableTemplate("Slaves", 150, contentRoot.getWindow());
+        mastersTable = UiUtil.createTableTemplate("Masters", 150, contentRoot.getWindow(), false);
+        tracersTable = UiUtil.createTableTemplate("Tracers", 150, contentRoot.getWindow(), true);
+        slavesTable = UiUtil.createTableTemplate("Slaves", 150, contentRoot.getWindow(), true);
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -298,11 +298,14 @@ public class Manager {
             final Button destroyBtn = new Button("Destroy");
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             final Label resultHolder = new Label();
-            destroyBtn.setVisible(!masters);
             destroyBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
-            table.addItem(new Object[]{
+            table.addItem(masters ? new Object[]{
+                            (masters ? (i == 1 ? "Master: " : i == 2 ? "GC: " : "Monitor: ") : "") + agent.getHostname(),
+                            checkBtn,
+                            resultHolder,
+                            progressIcon} : new Object[]{
                             (masters ? (i == 1 ? "Master: " : i == 2 ? "GC: " : "Monitor: ") : "") + agent.getHostname(),
                             checkBtn,
                             destroyBtn,

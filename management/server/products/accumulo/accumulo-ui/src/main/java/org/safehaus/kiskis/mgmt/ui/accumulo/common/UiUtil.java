@@ -36,13 +36,16 @@ public class UiUtil {
         twinColSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         twinColSelect.setRequired(true);
         return twinColSelect;
+
     }
 
-    public static Table createTableTemplate(String caption, int size, final Window window) {
+    public static Table createTableTemplate(String caption, int size, final Window window, boolean destroyButtonNeeded) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
+        if (destroyButtonNeeded) {
+            table.addContainerProperty("Destroy", Button.class, null);
+        }
         table.addContainerProperty("Nodes state", Label.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
