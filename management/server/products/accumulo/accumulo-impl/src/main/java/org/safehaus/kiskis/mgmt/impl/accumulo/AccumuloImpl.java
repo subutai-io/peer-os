@@ -50,7 +50,7 @@ public class AccumuloImpl implements Accumulo {
 
     public UUID installCluster(final Config config) {
 
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Accumulo");
+        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", Config.PRODUCT_KEY));
 
         executor.execute(new Runnable() {
 
