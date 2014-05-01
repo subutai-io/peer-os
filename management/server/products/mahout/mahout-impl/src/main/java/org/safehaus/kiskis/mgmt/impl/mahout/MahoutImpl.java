@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.mahout;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
@@ -55,16 +54,15 @@ public class MahoutImpl implements Mahout {
     }
 
     public UUID installCluster(final Config config) {
-        Preconditions.checkNotNull(config, "Configuration is null");
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing %s", Config.PRODUCT_KEY));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                if (Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
+                if (config == null || Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -338,6 +336,11 @@ public class MahoutImpl implements Mahout {
 
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
 }

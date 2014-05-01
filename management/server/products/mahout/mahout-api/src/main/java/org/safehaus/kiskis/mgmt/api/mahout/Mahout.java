@@ -5,28 +5,17 @@
  */
 package org.safehaus.kiskis.mgmt.api.mahout;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
-public interface Mahout {
-
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(String clusterName);
+public interface Mahout extends ApiBase<Config> {
 
     public UUID addNode(String clusterName, String lxcHostname);
 
     public UUID destroyNode(String clusterName, String lxcHostname);
 
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     *
-     */
-    public List<Config> getClusters();
 }

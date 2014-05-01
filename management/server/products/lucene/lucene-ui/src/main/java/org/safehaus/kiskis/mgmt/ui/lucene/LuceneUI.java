@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.ui.lucene;
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
+import org.safehaus.kiskis.mgmt.api.lucene.Config;
 import org.safehaus.kiskis.mgmt.api.lucene.Lucene;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -20,7 +21,6 @@ import java.util.concurrent.Executors;
  */
 public class LuceneUI implements Module {
 
-    public static final String MODULE_NAME = "Lucene";
     private static Lucene luceneManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
@@ -76,7 +76,7 @@ public class LuceneUI implements Module {
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

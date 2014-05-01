@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.mahout</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.mahout</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
