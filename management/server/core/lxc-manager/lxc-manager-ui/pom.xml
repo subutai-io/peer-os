@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.ui.lxcmanager</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.ui.lxcmanager</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
@@ -42,18 +42,33 @@
             <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin-services</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>task-runner-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>agent-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lxc-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -75,21 +90,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${com.google.guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>task-runner-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>agent-manager-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lxc-manager-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

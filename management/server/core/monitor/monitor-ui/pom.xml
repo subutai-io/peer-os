@@ -48,12 +48,12 @@
             <version>${com.vaadin.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin-services</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin</artifactId>
             <version>${project.version}</version>
         </dependency>
