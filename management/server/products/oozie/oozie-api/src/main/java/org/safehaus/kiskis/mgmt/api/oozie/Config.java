@@ -2,19 +2,19 @@ package org.safehaus.kiskis.mgmt.api.oozie;
 
 import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
-import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public class Config {
+public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Oozie";
-    private UUID uuid;
     String domainInfo;
+    private UUID uuid;
     private Agent server;
     private Set<Agent> clients;
     private Set<Agent> hadoopNodes;
@@ -68,6 +68,11 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
     }
 
     public Set<Agent> getHadoopNodes() {

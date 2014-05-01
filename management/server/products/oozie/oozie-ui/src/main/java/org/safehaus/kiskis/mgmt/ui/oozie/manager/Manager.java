@@ -15,9 +15,7 @@ import org.safehaus.kiskis.mgmt.api.oozie.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.oozie.OozieUI;
 
 import java.util.List;
@@ -114,7 +112,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = OozieUI.getOozieManager().uninstallCluster(config);
+                                        UUID trackID = OozieUI.getOozieManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -137,6 +135,15 @@ public class Manager {
         content.addComponent(serverTable);
         content.addComponent(clientsTable);
 
+    }
+
+    public static void checkNodesStatus(Table table) {
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
+            Item row = table.getItem(rowId);
+            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
+            checkBtn.click();
+        }
     }
 
     public Component getContent() {
@@ -314,15 +321,6 @@ public class Manager {
             } else {
                 clusterCombo.setValue(info.iterator().next());
             }
-        }
-    }
-
-    public static void checkNodesStatus(Table table) {
-        for (Object o : table.getItemIds()) {
-            int rowId = (Integer) o;
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-            checkBtn.click();
         }
     }
 

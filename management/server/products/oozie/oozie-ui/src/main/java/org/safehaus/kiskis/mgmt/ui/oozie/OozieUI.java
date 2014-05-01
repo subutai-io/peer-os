@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.ui.oozie;
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.oozie.Config;
 import org.safehaus.kiskis.mgmt.api.oozie.Oozie;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -20,7 +21,6 @@ import java.util.concurrent.Executors;
  */
 public class OozieUI implements Module {
 
-    public static final String MODULE_NAME = "Oozie";
     private static Oozie oozieManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
@@ -39,12 +39,12 @@ public class OozieUI implements Module {
         return oozieManager;
     }
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
-
     public void setOozieManager(Oozie oozieManager) {
         OozieUI.oozieManager = oozieManager;
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
     }
 
     public static AgentManager getAgentManager() {
@@ -55,10 +55,6 @@ public class OozieUI implements Module {
         OozieUI.agentManager = agentManager;
     }
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
-
     public static DbManager getDbManager() {
         return dbManager;
     }
@@ -67,15 +63,20 @@ public class OozieUI implements Module {
         OozieUI.dbManager = dbManager;
     }
 
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
     public void destroy() {
         oozieManager = null;
         agentManager = null;
         tracker = null;
+        dbManager = null;
         executor.shutdown();
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {
