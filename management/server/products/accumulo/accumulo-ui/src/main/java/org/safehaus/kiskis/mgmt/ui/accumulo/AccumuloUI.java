@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 import java.util.concurrent.ExecutorService;
@@ -24,16 +24,16 @@ public class AccumuloUI implements Module {
 
     private static Accumulo accumuloManager;
     private static Hadoop hadoopManager;
-    private static Api zookeeperManager;
+    private static Zookeeper zookeeperManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static ExecutorService executor;
 
-    public static Api getZookeeperManager() {
+    public static Zookeeper getZookeeperManager() {
         return zookeeperManager;
     }
 
-    public void setZookeeperManager(Api zookeeperManager) {
+    public void setZookeeperManager(Zookeeper zookeeperManager) {
         AccumuloUI.zookeeperManager = zookeeperManager;
     }
 

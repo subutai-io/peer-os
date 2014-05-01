@@ -12,7 +12,7 @@
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
     <reference id="zookeeperManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Api"/>
+               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI"
           init-method="init" destroy-method="destroy">

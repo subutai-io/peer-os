@@ -5,18 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.zookeeper;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
-public interface Api {
-
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(String clusterName);
+public interface Zookeeper extends ApiBase<Config> {
 
     public UUID startNode(String clusterName, String lxcHostname);
 
@@ -28,14 +24,5 @@ public interface Api {
 
     public UUID destroyNode(String clusterName, String lxcHostname);
 
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     *
-     */
-    public List<Config> getClusters();
-
-    public Config getCluster(String clusterName);
 }
 

@@ -13,7 +13,7 @@ import com.vaadin.ui.Panel;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.ui.zookeeper.UI;
+import org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI;
 
 /**
  *
@@ -45,7 +45,7 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                UUID trackID = UI.getManager().installCluster(wizard.getConfig());
+                UUID trackID = ZookeeperUI.getManager().installCluster(wizard.getConfig());
                 MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }

@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
-import org.safehaus.kiskis.mgmt.ui.zookeeper.UI;
+import org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI;
 
 /**
  *
@@ -30,12 +30,12 @@ public class CheckTask implements Runnable {
 
     public void run() {
 
-        UUID trackID = UI.getManager().checkNode(clusterName, lxcHostname);
+        UUID trackID = ZookeeperUI.getManager().checkNode(clusterName, lxcHostname);
 
         NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
         while (!Thread.interrupted()) {
-            ProductOperationView po = UI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+            ProductOperationView po = ZookeeperUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
                     if (po.getLog().contains(NodeState.STOPPED.toString())) {
