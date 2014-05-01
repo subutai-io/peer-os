@@ -1,13 +1,11 @@
 package org.safehaus.kiskis.mgmt.api.flume;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
-public interface Flume {
+public interface Flume extends ApiBase<Config> {
 
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(String clusterName);
 
     public UUID startNode(String clusterName, String lxcHostname);
 
@@ -19,10 +17,4 @@ public interface Flume {
 
     public UUID destroyNode(String clusterName, String lxcHostname);
 
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
-    public List<Config> getClusters();
 }

@@ -1,10 +1,11 @@
 package org.safehaus.kiskis.mgmt.api.flume;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
+
 import java.util.Set;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-
-public class Config {
+public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Flume";
     private String clusterName = "";
@@ -16,6 +17,11 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
     }
 
     public Set<Agent> getNodes() {

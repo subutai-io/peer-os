@@ -1,13 +1,11 @@
 package org.safehaus.kiskis.mgmt.api.hive;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
-public interface Hive {
+public interface Hive extends ApiBase<Config> {
 
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(String clusterName);
 
     public UUID statusCheck(String clusterName, String hostname);
 
@@ -21,11 +19,4 @@ public interface Hive {
 
     public UUID destroyNode(String clusterName, String hostname);
 
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     *
-     */
-    public List<Config> getClusters();
 }

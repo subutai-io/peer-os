@@ -4,11 +4,15 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import java.util.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.hive.HiveUI;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class NodeSelectionStep extends Panel {
 
@@ -39,19 +43,19 @@ public class NodeSelectionStep extends Panel {
             public void valueChange(Property.ValueChangeEvent e) {
                 serverNode.removeAllItems();
                 select.setValue(null);
-                if(e.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo)e.getProperty().getValue();
-                    for(Agent a : hadoopInfo.getAllAgents()) {
+                if (e.getProperty().getValue() != null) {
+                    Config hadoopInfo = (Config) e.getProperty().getValue();
+                    for (Agent a : hadoopInfo.getAllNodes()) {
                         serverNode.addItem(a);
                         serverNode.setItemCaption(a, a.getHostname());
                     }
                     select.setContainerDataSource(new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents())
+                                    Agent.class, hadoopInfo.getAllNodes())
                     );
                     // do select if values exist
-                    if(wizard.getConfig().getServer() != null)
+                    if (wizard.getConfig().getServer() != null)
                         serverNode.setValue(wizard.getConfig().getServer());
-                    if(!Util.isCollectionEmpty(wizard.getConfig().getClients()))
+                    if (!Util.isCollectionEmpty(wizard.getConfig().getClients()))
                         select.setValue(wizard.getConfig().getClients());
 
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
@@ -59,19 +63,16 @@ public class NodeSelectionStep extends Panel {
             }
         });
 
-        List<HadoopClusterInfo> clusters = HiveUI.getDbManager().getInfo(
-                HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
-        if(clusters.size() > 0) {
-            for(HadoopClusterInfo hci : clusters) {
+        List<Config> clusters = HiveUI.getHadoopManager().getClusters();
+        if (clusters.size() > 0) {
+            for (Config hci : clusters) {
                 hadoopClusters.addItem(hci);
                 hadoopClusters.setItemCaption(hci, hci.getClusterName());
             }
         }
 
-        HadoopClusterInfo info = HiveUI.getDbManager().getInfo(
-                HadoopClusterInfo.SOURCE, wizard.getConfig().getClusterName(),
-                HadoopClusterInfo.class);
-        if(info != null) hadoopClusters.setValue(info);
+        Config info = HiveUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
+        if (info != null) hadoopClusters.setValue(info);
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -79,11 +80,11 @@ public class NodeSelectionStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                if(Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Select Hadoop cluster");
-                } else if(wizard.getConfig().getServer() == null) {
+                } else if (wizard.getConfig().getServer() == null) {
                     show("Select server node");
-                } else if(Util.isCollectionEmpty(wizard.getConfig().getClients())) {
+                } else if (Util.isCollectionEmpty(wizard.getConfig().getClients())) {
                     show("Select client nodes");
                 } else {
                     wizard.next();
@@ -131,15 +132,15 @@ public class NodeSelectionStep extends Panel {
         tcs.setRightColumnCaption("Selected Nodes");
         tcs.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         tcs.setRequired(true);
-        if(!Util.isCollectionEmpty(wizard.getConfig().getClients())) {
+        if (!Util.isCollectionEmpty(wizard.getConfig().getClients())) {
             tcs.setValue(wizard.getConfig().getClients());
         }
         tcs.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
-                if(event.getProperty().getValue() != null) {
+                if (event.getProperty().getValue() != null) {
                     Set<Agent> clients = new HashSet();
-                    clients.addAll((Collection)event.getProperty().getValue());
+                    clients.addAll((Collection) event.getProperty().getValue());
                     wizard.getConfig().setClients(clients);
                 }
             }
@@ -157,19 +158,19 @@ public class NodeSelectionStep extends Panel {
         cb.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
-                Agent serverNode = (Agent)event.getProperty().getValue();
+                Agent serverNode = (Agent) event.getProperty().getValue();
                 wizard.getConfig().setServer(serverNode);
 
-                HadoopClusterInfo hci = (HadoopClusterInfo)hadoopClusters.getValue();
+                Config hci = (Config) hadoopClusters.getValue();
                 select.removeAllItems();
-                for(Agent a : hci.getAllAgents()) {
-                    if(a.equals(serverNode)) continue;
+                for (Agent a : hci.getAllNodes()) {
+                    if (a.equals(serverNode)) continue;
                     select.addItem(a);
                     select.setItemCaption(a, a.getHostname());
                 }
             }
         });
-        if(wizard.getConfig().getServer() != null)
+        if (wizard.getConfig().getServer() != null)
             cb.setValue(wizard.getConfig().getServer());
         return cb;
     }
