@@ -6,20 +6,20 @@
 package org.safehaus.kiskis.mgmt.ui.mongodb;
 
 import com.vaadin.ui.Component;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
- *
  * @author dilshat
  */
 public class MongoUI implements Module {
 
-    public static final String MODULE_NAME = "Mongo";
     private static Mongo mongoManager;
     private static AgentManager agentManager;
     private static ExecutorService executor;
@@ -37,12 +37,12 @@ public class MongoUI implements Module {
         return mongoManager;
     }
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
-
     public void setMongoManager(Mongo mongoManager) {
         MongoUI.mongoManager = mongoManager;
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
     }
 
     public static AgentManager getAgentManager() {
@@ -64,21 +64,8 @@ public class MongoUI implements Module {
         executor.shutdown();
     }
 
-//    public static void showProgressWindow(UUID trackID, final Window.CloseListener closeCallback) {
-//        Window progressWindow = MgmtApplication.createProgressWindow(Config.PRODUCT_KEY, trackID);
-//        MgmtApplication.addCustomWindow(progressWindow);
-//        if (closeCallback != null) {
-//            progressWindow.addListener(new Window.CloseListener() {
-//
-//                @Override
-//                public void windowClose(Window.CloseEvent e) {
-//                    closeCallback.windowClose(e);
-//                }
-//            });
-//        }
-//    }
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

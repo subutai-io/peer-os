@@ -5,7 +5,17 @@ package org.safehaus.kiskis.mgmt.shared.protocol;
  */
 public interface ConfigBase {
 
+    /**
+     * Returns name of cluster
+     *
+     * @return - name of cluster
+     */
     public String getClusterName();
 
+    /**
+     * Returns product name
+     *
+     * @return - product name
+     */
     public String getProductName();
 }

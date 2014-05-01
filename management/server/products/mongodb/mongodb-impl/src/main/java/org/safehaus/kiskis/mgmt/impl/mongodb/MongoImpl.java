@@ -5,7 +5,6 @@
  */
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
@@ -67,17 +66,17 @@ public class MongoImpl implements Mongo {
     }
 
     public UUID installCluster(final Config config) {
-        Preconditions.checkNotNull(config, "Configuration is null");
 
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing %s", Config.PRODUCT_KEY));
 
         executor.execute(new Runnable() {
 
             public void run() {
 
-                if (Strings.isNullOrEmpty(config.getClusterName())
+                if (config == null
+                        || Strings.isNullOrEmpty(config.getClusterName())
                         || Strings.isNullOrEmpty(config.getReplicaSetName())
                         || Strings.isNullOrEmpty(config.getDomainName())
                         || config.getNumberOfConfigServers() <= 0
@@ -445,6 +444,11 @@ public class MongoImpl implements Mongo {
     public List<Config> getClusters() {
 
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
     public UUID startNode(final String clusterName, final String lxcHostname) {
