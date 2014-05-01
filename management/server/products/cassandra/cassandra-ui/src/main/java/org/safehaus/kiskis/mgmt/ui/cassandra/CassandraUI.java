@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.ui.cassandra;
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
+import org.safehaus.kiskis.mgmt.api.cassandra.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
@@ -19,7 +20,6 @@ import java.util.concurrent.Executors;
  */
 public class CassandraUI implements Module {
 
-    public static final String MODULE_NAME = "Cassandra";
     private static Cassandra cassandraManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
@@ -37,12 +37,12 @@ public class CassandraUI implements Module {
         return cassandraManager;
     }
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
-
     public void setCassandraManager(Cassandra cassandraManager) {
         CassandraUI.cassandraManager = cassandraManager;
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
     }
 
     public static AgentManager getAgentManager() {
@@ -65,7 +65,7 @@ public class CassandraUI implements Module {
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

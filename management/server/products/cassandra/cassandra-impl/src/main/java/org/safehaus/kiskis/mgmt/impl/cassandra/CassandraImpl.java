@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.impl.cassandra;
 
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -353,6 +352,11 @@ public class CassandraImpl implements Cassandra {
 
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
 
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
 

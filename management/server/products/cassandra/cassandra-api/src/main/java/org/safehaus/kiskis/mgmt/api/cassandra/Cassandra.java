@@ -5,24 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.cassandra;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public interface Cassandra {
-
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(String clusterName);
-
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
-    public List<Config> getClusters();
+public interface Cassandra extends ApiBase<Config> {
 
     UUID startAllNodes(String clusterName);
 

@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.cassandra</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.cassandra</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
