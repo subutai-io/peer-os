@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.hbase</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.hbase</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

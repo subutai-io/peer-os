@@ -16,12 +16,13 @@ import org.safehaus.kiskis.mgmt.api.hbase.HBaseType;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -171,7 +172,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = HBaseUI.getHbaseManager().uninstallCluster(config);
+                                        UUID trackID = HBaseUI.getHbaseManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -198,6 +199,15 @@ public class Manager {
 
     }
 
+    public static void checkNodesStatus(Table table) {
+        for (Object o : table.getItemIds()) {
+            int rowId = (Integer) o;
+            Item row = table.getItem(rowId);
+            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
+            checkBtn.click();
+        }
+    }
+
     public Component getContent() {
         return contentRoot;
     }
@@ -222,6 +232,7 @@ public class Manager {
             );
         }
     }
+
     private void populateTable(final Table table, Set<Agent> agents, final HBaseType type) {
 
         table.removeAllItems();
@@ -280,15 +291,6 @@ public class Manager {
             } else {
                 clusterCombo.setValue(clusters.iterator().next());
             }
-        }
-    }
-
-    public static void checkNodesStatus(Table table) {
-        for (Object o : table.getItemIds()) {
-            int rowId = (Integer) o;
-            Item row = table.getItem(rowId);
-            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-            checkBtn.click();
         }
     }
 

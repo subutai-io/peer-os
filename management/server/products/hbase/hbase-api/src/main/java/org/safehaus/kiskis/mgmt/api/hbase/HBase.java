@@ -5,19 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.hbase;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public interface HBase {
-
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(Config config);
-
-    public List<Config> getClusters();
+public interface HBase extends ApiBase<Config> {
 
     UUID startCluster(String clusterName);
 
