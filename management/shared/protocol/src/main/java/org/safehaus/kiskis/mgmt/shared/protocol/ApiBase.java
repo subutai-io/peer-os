@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * Created by dilshat on 5/1/14.
  */
-public interface ApiBase<T> {
+public interface ApiBase<T extends ConfigBase> {
 
     /**
      * Installs cluster according to the specified configuration object
